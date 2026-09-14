@@ -97,16 +97,18 @@ val generateExecutorCatalogue = tasks.register("generateExecutorCatalogue") {
                     inputs.add(if (body.contains("instruction.valueSlot")) "KotlinValueInput.Slot(instruction.valueSlot, KotlinValueType.$type)" else "KotlinValueInput.Field(\"value\", KotlinValueType.$type)")
                 }
                 val expression = "$packageName.${valueCall.groupValues[1]}(%binding%.memory, @0@, %binding%.memArg.offset${if (load) "" else ", @1@"})"
-                scalarEntries[match.groupValues[1]] = "KotlinValueInstruction(${if (load) "instruction.destinationSlot" else "null"}, listOf(${inputs.joinToString()}), \"$expression\", KotlinValueType.${if (load) "I64" else "UNIT"})"
+                val destinationType = valueCall.groupValues[1].removePrefix("value").take(3)
+                val canonicalResult = !load || destinationType == "I32" || destinationType == "I64"
+                scalarEntries[match.groupValues[1]] = "KotlinValueInstruction(${if (load) "instruction.destinationSlot" else "null"}, listOf(${inputs.joinToString()}), \"$expression\", KotlinValueType.${if (load) "I64" else "UNIT"}, KotlinValueType.${if (load) destinationType else "UNIT"}, canonicalResult = $canonicalResult)"
             }
         }
         val parametricSource = executorSources.asFile.resolve("parametric/StrictParametricExecutors.kt").readText()
         val parametricAdapter = Regex("internal inline fun SelectExecutor\\(.*?instruction: (ParametricInstruction\\.\\w+),\\s*\\) = executeSelect\\((.*?)\\n\\)", RegexOption.DOT_MATCHES_ALL)
         parametricAdapter.findAll(parametricSource).forEach { match ->
             val inputs = listOf("condition", "val1", "val2").map { field ->
-                if (match.groupValues[2].contains("instruction.${field}Slot")) "KotlinValueInput.Slot(instruction.${field}Slot, KotlinValueType.I64)" else "KotlinValueInput.Field(\"$field\", KotlinValueType.I64)"
+                if (match.groupValues[2].contains("instruction.${field}Slot")) "KotlinValueInput.Slot(instruction.${field}Slot, KotlinValueType.I64, rawWord = true)" else "KotlinValueInput.Field(\"$field\", KotlinValueType.I64)"
             }
-            scalarEntries[match.groupValues[1]] = "KotlinValueInstruction(instruction.destinationSlot, listOf(${inputs.joinToString()}), \"io.github.charlietap.chasm.executor.invoker.instruction.parametric.valueSelect(@0@, @1@, @2@)\", KotlinValueType.I64)"
+            scalarEntries[match.groupValues[1]] = "KotlinValueInstruction(instruction.destinationSlot, listOf(${inputs.joinToString()}), \"io.github.charlietap.chasm.executor.invoker.instruction.parametric.valueSelect(@0@, @1@, @2@)\", KotlinValueType.I64, null)"
         }
         output.resolveSibling("ValueCatalogue.kt").writeText(buildString {
             appendLine("// Generated from scalar adapter declarations. Do not edit.")

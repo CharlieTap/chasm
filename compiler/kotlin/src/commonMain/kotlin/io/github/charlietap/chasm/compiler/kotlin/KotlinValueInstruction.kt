@@ -36,7 +36,7 @@ internal enum class KotlinValueType {
 internal sealed interface KotlinValueInput {
     val type: KotlinValueType
 
-    data class Slot(val slot: Int, override val type: KotlinValueType) : KotlinValueInput
+    data class Slot(val slot: Int, override val type: KotlinValueType, val rawWord: Boolean = false) : KotlinValueInput
 
     data class Field(val field: String, override val type: KotlinValueType) : KotlinValueInput
 
@@ -48,18 +48,24 @@ internal data class KotlinValueInstruction(
     val inputs: List<KotlinValueInput>,
     val expression: String,
     val resultType: KotlinValueType,
+    // Null denotes an untyped word transfer; resultType still describes the
+    // Kotlin operation's representation, which can differ for memory loads.
+    val destinationType: KotlinValueType? = resultType,
+    val canonicalResult: Boolean = true,
 ) {
-    fun expression(index: Int, read: (Int) -> String): String {
+    fun expression(index: Int, read: (Int) -> String): String = resultType.encode(operationExpression(index) { input -> input.type.decode(read(input.slot)) })
+
+    fun operationExpression(index: Int, read: (KotlinValueInput.Slot) -> String): String {
         var result = expression.replace("%binding%", "i$index")
         inputs.forEachIndexed { inputIndex, input ->
             val value = when (input) {
-                is KotlinValueInput.Slot -> input.type.decode(read(input.slot))
+                is KotlinValueInput.Slot -> read(input)
                 is KotlinValueInput.Field -> "i$index.${input.field}"
                 is KotlinValueInput.Literal -> input.source
             }
             result = result.replace("@$inputIndex@", value)
         }
-        return resultType.encode(result)
+        return result
     }
 }
 
@@ -68,12 +74,12 @@ internal fun valueInstruction(instruction: LinkedInstruction): KotlinValueInstru
     return when (instruction) {
         is NumericInstruction.I32ConstS -> KotlinValueInstruction(instruction.destinationSlot, field("value", KotlinValueType.I32), "@0@", KotlinValueType.I32)
         is NumericInstruction.I64ConstS -> KotlinValueInstruction(instruction.destinationSlot, field("value", KotlinValueType.I64), "@0@", KotlinValueType.I64)
-        is NumericInstruction.F32ConstS -> KotlinValueInstruction(instruction.destinationSlot, field("bits", KotlinValueType.I32), "@0@", KotlinValueType.I32)
-        is NumericInstruction.F64ConstS -> KotlinValueInstruction(instruction.destinationSlot, field("bits", KotlinValueType.I64), "@0@", KotlinValueType.I64)
-        is AdminInstruction.CopySlot -> KotlinValueInstruction(instruction.destinationSlot, listOf(KotlinValueInput.Slot(instruction.sourceSlot, KotlinValueType.I64)), "@0@", KotlinValueType.I64)
-        is VariableInstruction.GlobalGetS -> KotlinValueInstruction(instruction.destinationSlot, field("global.value", KotlinValueType.I64), "@0@", KotlinValueType.I64)
+        is NumericInstruction.F32ConstS -> KotlinValueInstruction(instruction.destinationSlot, field("bits", KotlinValueType.I32), "@0@", KotlinValueType.I32, KotlinValueType.F32, canonicalResult = false)
+        is NumericInstruction.F64ConstS -> KotlinValueInstruction(instruction.destinationSlot, field("bits", KotlinValueType.I64), "@0@", KotlinValueType.I64, KotlinValueType.F64, canonicalResult = false)
+        is AdminInstruction.CopySlot -> KotlinValueInstruction(instruction.destinationSlot, listOf(KotlinValueInput.Slot(instruction.sourceSlot, KotlinValueType.I64, rawWord = true)), "@0@", KotlinValueType.I64, null)
+        is VariableInstruction.GlobalGetS -> KotlinValueInstruction(instruction.destinationSlot, field("global.value", KotlinValueType.I64), "@0@", KotlinValueType.I64, null)
         is VariableInstruction.GlobalSetI -> KotlinValueInstruction(null, field("value", KotlinValueType.I64), "%binding%.global.value = @0@", KotlinValueType.UNIT)
-        is VariableInstruction.GlobalSetS -> KotlinValueInstruction(null, listOf(KotlinValueInput.Slot(instruction.sourceSlot, KotlinValueType.I64)), "%binding%.global.value = @0@", KotlinValueType.UNIT)
+        is VariableInstruction.GlobalSetS -> KotlinValueInstruction(null, listOf(KotlinValueInput.Slot(instruction.sourceSlot, KotlinValueType.I64, rawWord = true)), "%binding%.global.value = @0@", KotlinValueType.UNIT)
         is NumericInstruction.I32BitFieldExtractS -> KotlinValueInstruction(
             instruction.destinationSlot,
             listOf(KotlinValueInput.Slot(instruction.operandSlot, KotlinValueType.I32)),

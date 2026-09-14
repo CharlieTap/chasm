@@ -10,13 +10,14 @@ enum class KotlinGenerationTier {
     REGIONS,
     RESUMABLE,
     STRUCTURED,
+    TYPED,
 }
 
 /** Source generation has no JVM dependencies; only compilation/loading is platform specific. */
 class KotlinSourceGenerator(
     private val maxBlockInstructions: Int = 16,
     private val maxClassInstructions: Int = 192,
-    private val tier: KotlinGenerationTier = KotlinGenerationTier.STRUCTURED,
+    private val tier: KotlinGenerationTier = KotlinGenerationTier.TYPED,
     private val maxRegionInstructions: Int = 96,
 ) {
     init {
@@ -36,7 +37,7 @@ class KotlinSourceGenerator(
                     "No Kotlin executor for ${instruction::class.simpleName}"
                 }
             }
-            return generateRegions(firstIp, instructions, functionEntryIps, maxRegionInstructions, tier >= KotlinGenerationTier.RESUMABLE, additionalEntryIps, tier >= KotlinGenerationTier.STRUCTURED)
+            return generateRegions(firstIp, instructions, functionEntryIps, maxRegionInstructions, tier >= KotlinGenerationTier.RESUMABLE, additionalEntryIps, tier >= KotlinGenerationTier.STRUCTURED, tier >= KotlinGenerationTier.TYPED)
         }
         val entries = functionEntryIps.mapTo(mutableSetOf()) { it - firstIp }
         additionalEntryIps.forEach { entries.add(it - firstIp) }
@@ -193,6 +194,11 @@ data class KotlinProgramSource(
     val structuredLoopCount: Int = 0,
     val structuredBlockCount: Int = 0,
     val linearBodyCount: Int = 0,
+    val nativeI32SlotCount: Int = 0,
+    val nativeF32SlotCount: Int = 0,
+    val nativeF64SlotCount: Int = 0,
+    val rawSlotCount: Int = 0,
+    val mixedSlotCount: Int = 0,
 ) {
     val blockCount: Int get() = groups.sumOf { it.blocks.size }
 }

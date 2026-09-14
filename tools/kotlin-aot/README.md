@@ -32,8 +32,14 @@ Single-entry linear loops use Kotlin `while`, `continue` and `break` directly.
 Bodies with one entry and a linear sequence of blocks and loops also omit the
 outer program-counter switch. Other graphs retain the state machine, including
 loops with incoming branches or exception handlers in their interior.
+Consistently typed numeric slots use Int, Float or Double locals. Each retains
+its original raw word until a numeric write, preserving all bits through
+unexecuted paths, raw copies and frame-helper reloads. Mixed numeric slots keep
+Long storage. Reports include the counts for each representation.
 See [the stage record](../../KOTLIN_AOT_STAGES.md) for eligibility, coverage and
 measurements. Earlier tiers remain selectable through `KotlinGenerationTier`.
+The typed-local stage passed correctness but regressed CoreMark relative to
+STRUCTURED; see the recorded comparisons before choosing a tier for performance.
 
 Reference, table and aggregate operations use the existing frame helpers.
 Generated locals are saved before these helpers and reloaded afterward, so
@@ -161,7 +167,8 @@ registration pipeline; JVM class loading is platform specific.
 
 The backend retains ValueStack traffic at region and helper boundaries, linked
 operand objects, runtime call/exception dispatch and ordinary lowering at
-instantiation. Generated scalar locals currently retain raw Long slot bits.
+instantiation. Mixed numeric slots retain raw Long storage; native locals also
+keep a raw word and a flag where required to preserve untyped slot contents.
 The prototype driver also retains the Kotlin compiler dependency in cached
 processes. Splitting preparation into a separate distributable tool, compact
 operand binding, and tuning compilation/code size remain future work.

@@ -11,6 +11,7 @@ internal fun generateRegions(
     resumeFunctions: Boolean = false,
     additionalEntryIps: IntArray = intArrayOf(),
     structureControl: Boolean = false,
+    typedValues: Boolean = false,
 ): KotlinProgramSource {
     val calls = instructions.map(::executorCall)
     val values = instructions.map(::valueInstruction)
@@ -68,17 +69,28 @@ internal fun generateRegions(
     var structuredLoops = 0
     var structuredBlocks = 0
     var linearBodies = 0
+    var nativeI32Slots = 0
+    var nativeF32Slots = 0
+    var nativeF64Slots = 0
+    var rawSlots = 0
+    var mixedSlots = 0
     val groups = mutableListOf<KotlinSourceGroup>()
     var resumableFunctions = 0
     var fallbackFunctions = 0
     val orderedFunctions = functionEntries.sorted()
 
     fun emit(name: String, blocks: List<KotlinBlock>) {
+        val layout = regionValueLayout(blocks.flatMap { (it.startOffset until it.endOffset).toList() }, values, branches, copies, typedValues)
+        nativeI32Slots += layout.nativeTypes.count { it.value == KotlinValueType.I32 }
+        nativeF32Slots += layout.nativeTypes.count { it.value == KotlinValueType.F32 }
+        nativeF64Slots += layout.nativeTypes.count { it.value == KotlinValueType.F64 }
+        rawSlots += layout.slots.size - layout.nativeTypes.size
+        mixedSlots += layout.mixedSlotCount
         val plan = if (structureControl) structuredControl(blocks, branches, firstIp, predecessors, forcedEntries) else null
         structuredLoops += plan?.loops?.size ?: 0
         structuredBlocks += plan?.loops?.sumOf { it.blocks.size } ?: 0
         if (plan?.linearExit != null) linearBodies++
-        groups.add(KotlinSourceGroup(name, regionSource(name, firstIp, blocks, instructions, calls, values, branches, copies, plan), blocks, plan?.entryOffsets ?: blocks.map { it.startOffset }))
+        groups.add(KotlinSourceGroup(name, regionSource(name, firstIp, blocks, instructions, calls, values, branches, copies, plan, layout), blocks, plan?.entryOffsets ?: blocks.map { it.startOffset }))
     }
     orderedFunctions.forEachIndexed { functionIndex, start ->
         val end = orderedFunctions.getOrElse(functionIndex + 1) { instructions.size }
@@ -107,6 +119,11 @@ internal fun generateRegions(
         structuredLoops,
         structuredBlocks,
         linearBodies,
+        nativeI32Slots,
+        nativeF32Slots,
+        nativeF64Slots,
+        rawSlots,
+        mixedSlots,
     )
 }
 
@@ -120,59 +137,30 @@ private fun regionSource(
     branches: List<KotlinBranch?>,
     copies: List<KotlinCopies?>,
     plan: KotlinStructuredPlan?,
+    layout: KotlinRegionValueLayout,
 ): String = buildString {
     // Calls and returns are holes in a resumable body. Their original
     // dispatchers stay installed; reaching one exits to the runtime and the
     // saved successor IP re-enters this body after the callee returns.
     val range = blocks.flatMap { (it.startOffset until it.endOffset).toList() }
-    val slots = mutableSetOf<Int>()
-    val modified = mutableSetOf<Int>()
+    val locals = KotlinRegionValues(this, layout)
 
-    fun inputs(inputs: List<KotlinValueInput>) {
-        inputs.filterIsInstance<KotlinValueInput.Slot>().forEach { slots.add(it.slot) }
-    }
+    fun save(indent: String) = locals.save(indent)
 
-    fun writes(writes: List<Int>) {
-        slots.addAll(writes)
-        modified.addAll(writes)
-    }
-    for (index in range) {
-        values[index]?.let { value ->
-            inputs(value.inputs)
-            value.destinationSlot?.let { writes(listOf(it)) }
-        }
-        copies[index]?.let { copy ->
-            inputs(copy.sources)
-            writes(copy.destinations)
-        }
-        branches[index]?.let { branch ->
-            branch.condition?.let { inputs(it.inputs) }
-            branch.copies?.let { copy ->
-                inputs(copy.sources)
-                writes(copy.destinations)
-            }
-        }
-    }
-    require(slots.all { it >= 0 }) { "Generated regions require nonnegative frame slots" }
-    val orderedSlots = slots.sorted()
-    val orderedModified = modified.sorted()
-
-    fun save(indent: String) = orderedModified.forEach { appendLine("${indent}vstack.setFrameSlot($it, r$it)") }
-
-    fun reload(indent: String) = orderedSlots.forEach { appendLine("${indent}r$it = vstack.getFrameSlot($it)") }
+    fun reload(indent: String) = locals.reload(indent)
 
     fun input(input: KotlinValueInput, index: Int): String = when (input) {
-        is KotlinValueInput.Slot -> "r${input.slot}"
+        is KotlinValueInput.Slot -> locals.word(input.slot)
         is KotlinValueInput.Literal -> input.type.encode(input.source)
         is KotlinValueInput.Field -> input.type.encode("i$index.${input.field}")
     }
 
     fun emitCopies(copy: KotlinCopies, index: Int, indent: String) {
         if (copy.sequential) {
-            copy.sources.zip(copy.destinations).forEach { (source, destination) -> appendLine("${indent}r$destination = ${input(source, index)}") }
+            copy.sources.zip(copy.destinations).forEach { (source, destination) -> locals.writeWord(destination, input(source, index), indent) }
         } else {
             copy.sources.forEachIndexed { operandIndex, source -> appendLine("${indent}val copy${index}_$operandIndex = ${input(source, index)}") }
-            copy.destinations.forEachIndexed { operandIndex, destination -> appendLine("${indent}r$destination = copy${index}_$operandIndex") }
+            copy.destinations.forEachIndexed { operandIndex, destination -> locals.writeWord(destination, "copy${index}_$operandIndex", indent) }
         }
     }
     appendLine("@file:Suppress(\"UNUSED_PARAMETER\", \"VARIABLE_WITH_REDUNDANT_INITIALIZER\")")
@@ -192,7 +180,7 @@ private fun regionSource(
     // Kotlin inlines two separate bodies. The measured invoke body contains no
     // counter calls, conditionals, or per-block instruction dispatch.
     appendLine("    private inline fun region(vstack: ValueStack, context: ExecutionContext, entry: Int, onBlock: (Int) -> Unit): Int {")
-    orderedSlots.forEach { appendLine("        var r$it = vstack.getFrameSlot($it)") }
+    locals.declarations("        ")
 
     fun emitBlock(block: KotlinBlock, indent: String, transition: (Int, String) -> Unit) {
         appendLine("${indent}onBlock(${block.size})")
@@ -202,12 +190,11 @@ private fun regionSource(
             val branch = branches[index]
             when {
                 value != null -> {
-                    val expression = value.expression(index) { "r$it" }
-                    appendLine("$indent${value.destinationSlot?.let { "r$it = " } ?: ""}$expression")
+                    locals.emit(index, value, indent)
                 }
                 copy != null -> emitCopies(copy, index, indent)
                 branch != null -> {
-                    val condition = branch.condition?.expression(index) { "r$it" }
+                    val condition = branch.condition?.let { it.resultType.encode(it.operationExpression(index, locals::read)) }
                     if (branch.table) {
                         appendLine("${indent}val selector = ($condition).toInt()")
                         appendLine("${indent}pc = if (selector >= 0 && selector < ${branch.targets.lastIndex}) i$index.targetIps[selector] - baseIp else ${branch.targets.last() - firstIp}")

@@ -19,7 +19,7 @@ Commit each completed stage before beginning the next.
 | 4 | Resume generated function bodies around existing guest and host calls | Complete |
 | 5 | Reference/GC and exception synchronization; supported Wasm 3.0 corpus | Complete |
 | 6 | Structured Kotlin loops and function bodies with explicit eligibility | Complete |
-| 7 | Typed generated values, including safe handling of reused physical slots | Pending |
+| 7 | Typed generated values, including safe handling of reused physical slots | Complete |
 | 8 | Optional direct compiled calls with explicit eligibility and runtime fallback | Pending |
 
 The source compiler must preserve the existing Wasm call stack, traps, host
@@ -47,6 +47,7 @@ differences between stages should not be treated as isolated optimization gains.
 | 4: resumable functions | 1583.16 | 4215.85 | 2.663x | Same 209 fixtures in three modes; deterministic CoreMark match |
 | 5: GC and exceptions | 1582.90 | 4255.92 | 2.689x | 386 supported fixtures in three modes; deterministic CoreMark match |
 | 6: structured control | 1580.65 | 4926.11 | 3.117x | Same 386 fixtures in three modes; deterministic CoreMark match |
+| 7: typed locals | 1592.86 | 3347.47 | 2.102x | Same 386 fixtures in three modes; deterministic CoreMark match |
 
 Stage 1 extracts 86 scalar operations from 271 frame wrappers. Existing
 value-based helpers remain in use. It changes semantic factoring, with no new
@@ -158,3 +159,36 @@ at bytecode offset 5044, with no counters or instruction-dispatch calls.
 Eleven focused backend tests and ABI checks pass. Five generated scores range
 from 4874.09 to 4950.50, compared with 4220.30 to 4322.14 in stage 5. The paired
 interpreter median remains similar; the recorded within-stage ratio is 3.117x.
+
+Stage 7 uses Int, Float and Double locals when a region's numeric uses agree on
+the slot type. Slots with mixed numeric uses retain Long storage. Memory-load
+metadata distinguishes the logical value type from the helper's raw-word
+result, and untyped copies, selections and globals do not impose a numeric type.
+
+Each native local keeps the incoming raw word until a canonical numeric write
+occurs. Raw copies and helper reloads restore that state. This preserves all
+64 bits on paths that skip a numeric write, including references returned by a
+frame helper into a slot otherwise used for integers. Canonical numeric reads
+use the native local directly. Boundary saves retain the complete word.
+
+Focused tests exercise skipped writes carrying double/NaN words, native float
+signed zero and NaN copies, mixed numeric reuse, and an integer slot replaced by
+an I31 reference through a frame helper. The existing Wasm and forced-GC tests
+remain enabled. Reports separate native Int/Float/Double locals, raw locals and
+slots with mixed numeric uses; counts are summed over generated bodies.
+
+All 386 fixtures pass in preparation, cached and interpreter modes, and every
+fixture's preparation block and instruction counts match stage 6 exactly.
+CoreMark has 501 Int, one Float and four Double locals, plus 54 raw locals
+including five mixed slots. It retains 27 structured loops and 43 bodies without
+the outer program-counter switch. Source totals 508,713 bytes and classes total
+2,746,534 bytes; the largest measured method ends at bytecode offset 5357, with
+no counter or per-instruction dispatcher calls. Fourteen focused backend tests
+and ABI checks pass.
+
+Generated scores range from 3296.79 to 3397.70. The 3347.47 median is a clear
+regression from stage 6's 4926.11, while the paired interpreter medians remain
+similar. Native locals with conservative raw-word preservation do not produce
+a speed gain here. The earlier STRUCTURED tier remains selectable, and this
+stage is retained as a correctness-validated checkpoint rather than presented
+as a performance improvement.

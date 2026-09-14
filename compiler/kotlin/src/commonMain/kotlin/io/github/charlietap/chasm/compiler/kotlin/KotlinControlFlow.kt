@@ -17,18 +17,18 @@ internal data class KotlinBranch(
 )
 
 internal fun copies(instruction: LinkedInstruction): KotlinCopies? = when (instruction) {
-    is AdminInstruction.CopySlots -> KotlinCopies(instruction.sourceSlots.map { KotlinValueInput.Slot(it, KotlinValueType.I64) }, instruction.destinationSlots.toList(), instruction.sequential)
+    is AdminInstruction.CopySlots -> KotlinCopies(instruction.sourceSlots.map { KotlinValueInput.Slot(it, KotlinValueType.I64, rawWord = true) }, instruction.destinationSlots.toList(), instruction.sequential)
     else -> null
 }
 
 internal fun branch(instruction: LinkedInstruction): KotlinBranch? {
     fun predicate(input: KotlinValueInput) = KotlinValueInstruction(null, listOf(input), "@0@", KotlinValueType.I64)
 
-    fun slot(value: Int) = predicate(KotlinValueInput.Slot(value, KotlinValueType.I64))
+    fun slot(value: Int) = predicate(KotlinValueInput.Slot(value, KotlinValueType.I64, rawWord = true))
 
     fun immediate(value: Long) = predicate(KotlinValueInput.Literal(longLiteral(value), KotlinValueType.I64))
 
-    fun copy(source: Int, destination: Int) = KotlinCopies(listOf(KotlinValueInput.Slot(source, KotlinValueType.I64)), listOf(destination))
+    fun copy(source: Int, destination: Int) = KotlinCopies(listOf(KotlinValueInput.Slot(source, KotlinValueType.I64, rawWord = true)), listOf(destination))
     return when (instruction) {
         is AdminInstruction.Jump -> KotlinBranch(listOf(instruction.targetIp))
         is AdminInstruction.JumpCopies -> KotlinBranch(
@@ -36,7 +36,7 @@ internal fun branch(instruction: LinkedInstruction): KotlinBranch? {
             copies = KotlinCopies(
                 instruction.operands.sources.map { source ->
                     when (source) {
-                        is TransferSource.Slot -> KotlinValueInput.Slot(source.slot, KotlinValueType.I64)
+                        is TransferSource.Slot -> KotlinValueInput.Slot(source.slot, KotlinValueType.I64, rawWord = true)
                         is TransferSource.Immediate -> KotlinValueInput.Literal(longLiteral(source.value), KotlinValueType.I64)
                     }
                 },

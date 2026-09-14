@@ -41,6 +41,11 @@ data class KotlinCompilationReport(
     val structuredLoopCount: Int = 0,
     val structuredBlockCount: Int = 0,
     val linearBodyCount: Int = 0,
+    val nativeI32SlotCount: Int = 0,
+    val nativeF32SlotCount: Int = 0,
+    val nativeF64SlotCount: Int = 0,
+    val rawSlotCount: Int = 0,
+    val mixedSlotCount: Int = 0,
 )
 
 /**
@@ -128,6 +133,11 @@ class JvmKotlinProgramCompiler(
                     structuredLoopCount = source.structuredLoopCount,
                     structuredBlockCount = source.structuredBlockCount,
                     linearBodyCount = source.linearBodyCount,
+                    nativeI32SlotCount = source.nativeI32SlotCount,
+                    nativeF32SlotCount = source.nativeF32SlotCount,
+                    nativeF64SlotCount = source.nativeF64SlotCount,
+                    rawSlotCount = source.rawSlotCount,
+                    mixedSlotCount = source.mixedSlotCount,
                 ),
             )
             null
