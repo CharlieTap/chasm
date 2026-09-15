@@ -6,12 +6,14 @@ import kotlin.test.assertEquals
 internal fun assertGenerates(
     category: String,
     wasmInterface: WasmInterface,
-    interfaceVisibility: TypeVisibility = TypeVisibility.PUBLIC,
-    implementationVisibility: TypeVisibility = TypeVisibility.INTERNAL,
+    interfaceVisibility: InterfaceVisibility = InterfaceVisibility.PUBLIC,
+    factoryVisibility: FactoryVisibility = FactoryVisibility.PUBLIC,
+    implementationVisibility: ImplementationVisibility = ImplementationVisibility.PRIVATE,
     config: CodegenConfig = CodegenConfig(),
 ) {
     val generated = WasmInterfaceGenerator()(
         interfaceVisibility = interfaceVisibility,
+        factoryVisibility = factoryVisibility,
         implementationVisibility = implementationVisibility,
         wasmInterface = wasmInterface,
         config = config,

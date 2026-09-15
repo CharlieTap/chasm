@@ -20,16 +20,18 @@ abstract class WasmModule
         abstract val allocator: Property<ExportedAllocator>
         abstract val initializers: SetProperty<String>
         abstract val functions: ListProperty<WasmFunction>
-        abstract val interfaceVisibility: Property<TypeVisibility>
-        abstract val implementationVisibility: Property<TypeVisibility>
+        abstract val interfaceVisibility: Property<InterfaceVisibility>
+        abstract val implementationVisibility: Property<ImplementationVisibility>
+        abstract val factoryVisibility: Property<FactoryVisibility>
         abstract val ignoredExports: SetProperty<String>
 
         init {
             binary.convention(projectLayout.projectDirectory.file(DEFAULT_MODULE_FILE_PATH))
             codegenConfig.convention(CodegenConfig())
             functions.convention([])
-            interfaceVisibility.convention(TypeVisibility.PUBLIC)
-            implementationVisibility.convention(TypeVisibility.INTERNAL)
+            interfaceVisibility.convention(InterfaceVisibility.PUBLIC)
+            implementationVisibility.convention(ImplementationVisibility.PRIVATE)
+            factoryVisibility.convention(FactoryVisibility.PUBLIC)
         }
 
         fun function(name: String, configuration: WasmFunctionBuilder.() -> Unit) {

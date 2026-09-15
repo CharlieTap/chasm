@@ -35,6 +35,8 @@ internal val IMPORT_CLASS_NAME = Import::class.asClassName()
 internal val IMPORT_LIST_CLASS_NAME = List::class.asClassName().parameterizedBy(IMPORT_CLASS_NAME)
 internal val MODULE_FACTORY_CLASS_NAME = ClassName("io.github.charlietap.chasm.vm", "ModuleFactory")
 internal val INSTANCE_FACTORY_CLASS_NAME = ClassName("io.github.charlietap.chasm.vm", "InstanceFactory")
+internal val SUSPEND_MODULE_FACTORY_CLASS_NAME = ClassName("io.github.charlietap.chasm.vm", "SuspendModuleFactory")
+internal val SUSPEND_INSTANCE_FACTORY_CLASS_NAME = ClassName("io.github.charlietap.chasm.vm", "SuspendInstanceFactory")
 internal val VM_FACTORY_CLASS_NAME = MemberName("io.github.charlietap.chasm.vm", "virtualMachineFactory")
 internal val SUSPENDING_VM_FACTORY_CLASS_NAME =
     MemberName("io.github.charlietap.chasm.vm", "suspendingVirtualMachineFactory")

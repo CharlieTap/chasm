@@ -40,6 +40,7 @@ public abstract class io/github/charlietap/chasm/gradle/CodegenTask : org/gradle
 	public abstract fun getAllocator ()Lorg/gradle/api/provider/Property;
 	public abstract fun getBinary ()Lorg/gradle/api/file/RegularFileProperty;
 	public abstract fun getConfig ()Lorg/gradle/api/provider/Property;
+	public abstract fun getFactoryVisibility ()Lorg/gradle/api/provider/Property;
 	public abstract fun getFunctions ()Lorg/gradle/api/provider/ListProperty;
 	public abstract fun getIgnoredExports ()Lorg/gradle/api/provider/SetProperty;
 	public abstract fun getImplementationVisibility ()Lorg/gradle/api/provider/Property;
@@ -64,6 +65,14 @@ public final class io/github/charlietap/chasm/gradle/ExportedAllocator : java/io
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class io/github/charlietap/chasm/gradle/FactoryVisibility : java/lang/Enum {
+	public static final field INTERNAL Lio/github/charlietap/chasm/gradle/FactoryVisibility;
+	public static final field PUBLIC Lio/github/charlietap/chasm/gradle/FactoryVisibility;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/charlietap/chasm/gradle/FactoryVisibility;
+	public static fun values ()[Lio/github/charlietap/chasm/gradle/FactoryVisibility;
+}
+
 public final class io/github/charlietap/chasm/gradle/FunctionParameterDefinition : java/io/Serializable {
 	public fun <init> (Ljava/lang/String;Lio/github/charlietap/chasm/gradle/Type;Lio/github/charlietap/chasm/gradle/StringEncodingStrategy;Lio/github/charlietap/chasm/gradle/StringAllocationStrategy;)V
 	public synthetic fun <init> (Ljava/lang/String;Lio/github/charlietap/chasm/gradle/Type;Lio/github/charlietap/chasm/gradle/StringEncodingStrategy;Lio/github/charlietap/chasm/gradle/StringAllocationStrategy;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
@@ -80,6 +89,23 @@ public final class io/github/charlietap/chasm/gradle/FunctionParameterDefinition
 	public final fun getType ()Lio/github/charlietap/chasm/gradle/Type;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/gradle/ImplementationVisibility : java/lang/Enum {
+	public static final field INTERNAL Lio/github/charlietap/chasm/gradle/ImplementationVisibility;
+	public static final field PRIVATE Lio/github/charlietap/chasm/gradle/ImplementationVisibility;
+	public static final field PUBLIC Lio/github/charlietap/chasm/gradle/ImplementationVisibility;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/charlietap/chasm/gradle/ImplementationVisibility;
+	public static fun values ()[Lio/github/charlietap/chasm/gradle/ImplementationVisibility;
+}
+
+public final class io/github/charlietap/chasm/gradle/InterfaceVisibility : java/lang/Enum {
+	public static final field INTERNAL Lio/github/charlietap/chasm/gradle/InterfaceVisibility;
+	public static final field PUBLIC Lio/github/charlietap/chasm/gradle/InterfaceVisibility;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/charlietap/chasm/gradle/InterfaceVisibility;
+	public static fun values ()[Lio/github/charlietap/chasm/gradle/InterfaceVisibility;
 }
 
 public final class io/github/charlietap/chasm/gradle/ReturnTypeDefinition : java/io/Serializable {
@@ -140,14 +166,6 @@ public final class io/github/charlietap/chasm/gradle/StringEncodingStrategy : ja
 public abstract interface class io/github/charlietap/chasm/gradle/Type : java/io/Serializable {
 }
 
-public final class io/github/charlietap/chasm/gradle/TypeVisibility : java/lang/Enum {
-	public static final field INTERNAL Lio/github/charlietap/chasm/gradle/TypeVisibility;
-	public static final field PUBLIC Lio/github/charlietap/chasm/gradle/TypeVisibility;
-	public static fun getEntries ()Lkotlin/enums/EnumEntries;
-	public static fun valueOf (Ljava/lang/String;)Lio/github/charlietap/chasm/gradle/TypeVisibility;
-	public static fun values ()[Lio/github/charlietap/chasm/gradle/TypeVisibility;
-}
-
 public final class io/github/charlietap/chasm/gradle/WasmFunction : java/io/Serializable {
 	public fun <init> (Ljava/lang/String;Ljava/util/List;Lio/github/charlietap/chasm/gradle/ReturnTypeDefinition;)V
 	public final fun component1 ()Ljava/lang/String;
@@ -189,6 +207,7 @@ public abstract class io/github/charlietap/chasm/gradle/WasmModule {
 	public abstract fun getAllocator ()Lorg/gradle/api/provider/Property;
 	public abstract fun getBinary ()Lorg/gradle/api/file/RegularFileProperty;
 	public abstract fun getCodegenConfig ()Lorg/gradle/api/provider/Property;
+	public abstract fun getFactoryVisibility ()Lorg/gradle/api/provider/Property;
 	public abstract fun getFunctions ()Lorg/gradle/api/provider/ListProperty;
 	public abstract fun getIgnoredExports ()Lorg/gradle/api/provider/SetProperty;
 	public abstract fun getImplementationVisibility ()Lorg/gradle/api/provider/Property;

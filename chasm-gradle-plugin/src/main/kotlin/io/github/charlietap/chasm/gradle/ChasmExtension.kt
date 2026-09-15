@@ -14,9 +14,20 @@ enum class RuntimeDependencyConfiguration {
     IMPLEMENTATION,
 }
 
-enum class TypeVisibility {
+enum class InterfaceVisibility {
     INTERNAL,
     PUBLIC,
+}
+
+enum class FactoryVisibility {
+    INTERNAL,
+    PUBLIC,
+}
+
+enum class ImplementationVisibility {
+    INTERNAL,
+    PUBLIC,
+    PRIVATE,
 }
 
 @ChasmDsl

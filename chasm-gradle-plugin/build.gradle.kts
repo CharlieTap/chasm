@@ -193,6 +193,7 @@ functionalTest.configure {
     systemProperty("chasm.functionalTest.pluginId", chasmPluginId)
     systemProperty("chasm.functionalTest.pluginVersion", pluginVersion)
     systemProperty("chasm.functionalTest.kotlinPluginVersion", libs.versions.kotlin.get())
+    systemProperty("chasm.functionalTest.coroutinesVersion", libs.versions.kotlinx.coroutines.get())
     systemProperty("chasm.functionalTest.androidPluginVersion", libs.versions.android.build.tools.plugin.get())
     systemProperty("chasm.functionalTest.minimumAgpPluginVersion", minimumAgpVersion)
     systemProperty("chasm.functionalTest.minimumGradleVersion", minimumGradleVersion)

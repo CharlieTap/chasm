@@ -15,23 +15,35 @@ import io.github.charlietap.chasm.vm.virtualMachineFactory
 import kotlin.ByteArray
 import kotlin.collections.List
 
-internal class UnitReturnImpl(
-  private val binary: ByteArray,
-  private val imports: List<CodegenImport> = emptyList(),
-  private val virtualMachine: WasmVirtualMachine = virtualMachineFactory(),
-  private val moduleFactory: ModuleFactory? = null,
-  private val instanceFactory: InstanceFactory? = null,
+public fun unitReturn(
+  binary: ByteArray,
+  imports: List<CodegenImport> = emptyList(),
+  virtualMachine: WasmVirtualMachine = virtualMachineFactory(),
+  moduleFactory: ModuleFactory? = null,
+  instanceFactory: InstanceFactory? = null,
+): UnitReturn {
+  val store: Store = virtualMachine.storeInit()
+
+  val module: Module = moduleFactory?.invoke(binary) ?: virtualMachine.moduleDecode(binary).`expect`("Failed to decode binary")
+
+  val allocatedImports: List<Import> = virtualMachine.importFactory(store, imports)
+
+  val instance: Instance = instanceFactory?.invoke(store, module, allocatedImports) ?: virtualMachine.moduleInstantiate(store, module, allocatedImports).`expect`("Failed to instantiate module")
+
+  return UnitReturnImpl(
+    imports = allocatedImports,
+    instance = instance,
+    store = store,
+    virtualMachine = virtualMachine,
+  )
+}
+
+private class UnitReturnImpl(
+  private val imports: List<Import>,
+  private val instance: Instance,
+  private val store: Store,
+  private val virtualMachine: WasmVirtualMachine,
 ) : UnitReturn {
-  private val store: Store = virtualMachine.storeInit()
-
-  private val module: Module =
-      moduleFactory?.invoke(binary) ?: virtualMachine.moduleDecode(binary).`expect`("Failed to decode binary")
-
-  private val allocatedImports: List<Import> = virtualMachine.importFactory(store, imports)
-
-  private val instance: Instance =
-      instanceFactory?.invoke(store, module, allocatedImports) ?: virtualMachine.moduleInstantiate(store, module, allocatedImports).`expect`("Failed to instantiate module")
-
   private val invokePreparedFunction: PreparedFunction =
       virtualMachine.prepareFunction(store, instance, "invoke", emptyList()).`expect`("Failed to prepare function invoke")
 

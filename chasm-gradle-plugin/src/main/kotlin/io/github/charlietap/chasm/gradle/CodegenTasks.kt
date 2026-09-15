@@ -24,6 +24,7 @@ internal fun registerCodegenTask(
         task.packageName.set(module.packageName)
         task.interfaceVisibility.set(module.interfaceVisibility)
         task.implementationVisibility.set(module.implementationVisibility)
+        task.factoryVisibility.set(module.factoryVisibility)
         task.initializers.set(module.initializers)
         task.functions.set(module.functions)
         task.ignoredExports.set(module.ignoredExports)

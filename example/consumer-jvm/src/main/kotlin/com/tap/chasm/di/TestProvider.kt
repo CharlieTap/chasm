@@ -1,7 +1,7 @@
 package com.tap.chasm.di
 
 import com.test.chasm.TestService
-import com.test.chasm.TestServiceImpl
+import com.test.chasm.testService
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesTo
 import dev.zacsweers.metro.Provides
@@ -14,6 +14,6 @@ interface TestProvider {
         val bytes = TestProvider::class.java.classLoader.getResourceAsStream("test.wasm")?.use {
             it.readBytes()
         } ?: throw FileNotFoundException("Could not find resource 'fibonacci.wasm' on the classpath")
-        return TestServiceImpl(bytes)
+        return testService(bytes)
     }
 }

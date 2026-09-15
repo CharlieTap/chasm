@@ -35,14 +35,23 @@ internal class DataClassGenerator {
 internal class WasmInterfaceGenerator(
     private val dataClassGenerator: DataClassGenerator = DataClassGenerator(),
     private val classInterfaceGenerator: ClassInterfaceGenerator = ClassInterfaceGenerator(),
+    private val factoryFunctionGenerator: FactoryFunctionGenerator = FactoryFunctionGenerator(),
     private val classImplementationGenerator: ClassImplementationGenerator = ClassImplementationGenerator(),
+    private val visibilityValidator: VisibilityValidator = VisibilityValidator(),
 ) {
     operator fun invoke(
-        interfaceVisibility: TypeVisibility,
-        implementationVisibility: TypeVisibility,
+        interfaceVisibility: InterfaceVisibility,
+        factoryVisibility: FactoryVisibility,
         wasmInterface: WasmInterface,
+        implementationVisibility: ImplementationVisibility = ImplementationVisibility.PRIVATE,
         config: CodegenConfig = CodegenConfig(),
     ): List<FileSpec> {
+        visibilityValidator(
+            interfaceName = wasmInterface.interfaceName,
+            interfaceVisibility = interfaceVisibility,
+            factoryVisibility = factoryVisibility,
+            implementationVisibility = implementationVisibility,
+        )
 
         val interfaceFile = FileSpec.builder(wasmInterface.packageName, wasmInterface.interfaceName).apply {
             wasmInterface.types.forEach { type ->
@@ -52,17 +61,49 @@ internal class WasmInterfaceGenerator(
         }.build()
 
         val implementationFile = FileSpec.builder(wasmInterface.packageName, wasmInterface.interfaceName + "Impl").apply {
+            addFunction(
+                factoryFunctionGenerator(
+                    packageName = wasmInterface.packageName,
+                    interfaceName = wasmInterface.interfaceName,
+                    visibility = factoryVisibility,
+                    generateSuspendingFactory = config.generateSuspendingFactories,
+                ),
+            )
             addType(
                 classImplementationGenerator(
                     packageName = wasmInterface.packageName,
                     interfaceName = wasmInterface.interfaceName,
                     visibility = implementationVisibility,
                     wasmInterface = wasmInterface,
-                    generateSuspendingFactory = config.generateSuspendingFactories,
                 ),
             )
         }.build()
 
         return listOf(interfaceFile, implementationFile)
+    }
+}
+
+internal class VisibilityValidator {
+    operator fun invoke(
+        interfaceName: String,
+        interfaceVisibility: InterfaceVisibility,
+        factoryVisibility: FactoryVisibility,
+        implementationVisibility: ImplementationVisibility,
+    ) {
+        if (interfaceVisibility == InterfaceVisibility.INTERNAL && factoryVisibility == FactoryVisibility.PUBLIC) {
+            throw IllegalStateException(
+                "Cannot generate public factory for internal interface $interfaceName. " +
+                    "Set factoryVisibility to INTERNAL or make the interface PUBLIC.",
+            )
+        }
+        if (
+            interfaceVisibility == InterfaceVisibility.INTERNAL &&
+            implementationVisibility == ImplementationVisibility.PUBLIC
+        ) {
+            throw IllegalStateException(
+                "Cannot generate public implementation for internal interface $interfaceName. " +
+                    "Set implementationVisibility to INTERNAL or PRIVATE, or make the interface PUBLIC.",
+            )
+        }
     }
 }

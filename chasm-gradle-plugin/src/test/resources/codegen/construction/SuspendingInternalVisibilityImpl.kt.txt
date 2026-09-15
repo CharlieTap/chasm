@@ -15,13 +15,13 @@ import io.github.charlietap.chasm.vm.suspendingVirtualMachineFactory
 import kotlin.ByteArray
 import kotlin.collections.List
 
-public suspend fun suspendingConstruction(
+internal suspend fun suspendingInternalVisibility(
   binary: ByteArray,
   imports: List<CodegenImport> = emptyList(),
   virtualMachine: SuspendingWasmVirtualMachine = suspendingVirtualMachineFactory(),
   moduleFactory: SuspendModuleFactory? = null,
   instanceFactory: SuspendInstanceFactory? = null,
-): SuspendingConstruction {
+): SuspendingInternalVisibility {
   val store: Store = virtualMachine.storeInit()
 
   val module: Module = moduleFactory?.invoke(binary) ?: virtualMachine.moduleDecodeSuspending(binary).`expect`("Failed to decode binary")
@@ -30,7 +30,7 @@ public suspend fun suspendingConstruction(
 
   val instance: Instance = instanceFactory?.invoke(store, module, allocatedImports) ?: virtualMachine.moduleInstantiateSuspending(store, module, allocatedImports).`expect`("Failed to instantiate module")
 
-  return SuspendingConstructionImpl(
+  return SuspendingInternalVisibilityImpl(
     imports = allocatedImports,
     instance = instance,
     store = store,
@@ -38,9 +38,9 @@ public suspend fun suspendingConstruction(
   )
 }
 
-private class SuspendingConstructionImpl(
+internal class SuspendingInternalVisibilityImpl(
   private val imports: List<Import>,
   private val instance: Instance,
   private val store: Store,
   private val virtualMachine: WasmVirtualMachine,
-) : SuspendingConstruction
+) : SuspendingInternalVisibility

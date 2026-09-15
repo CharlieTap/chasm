@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.gradle
 
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
+import org.gradle.testkit.runner.TaskOutcome
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.Comparator
@@ -77,6 +78,8 @@ class ChasmPluginFunctionalTest {
 
         val multiplatformProject = project(
             build = """
+                import io.github.charlietap.chasm.gradle.CodegenConfig
+
                 plugins {
                     id("$pluginId")
                     id("org.jetbrains.kotlin.multiplatform")
@@ -89,12 +92,12 @@ class ChasmPluginFunctionalTest {
                 chasm {
                     modules.create("CommonService") {
                         packageName.set("test.chasm")
+                        codegenConfig.set(CodegenConfig(generateSuspendingFactories = true))
                     }
                 }
             """,
-            warningMode = WarningMode.KNOWN_KMP_DEPRECATION,
         )
-        val multiplatformResult = multiplatformProject.build("tasks", "--group=chasm")
+        val multiplatformResult = multiplatformProject.build("codegenModuleCommonMainCommonService")
         assertContains(multiplatformResult.output, "codegenModuleCommonMainCommonService")
     }
 
@@ -123,6 +126,540 @@ class ChasmPluginFunctionalTest {
     }
 
     @Test
+    fun `top-level factories construct and execute synchronous and suspending services`() {
+        val project = project(
+            build = """
+                import io.github.charlietap.chasm.gradle.CodegenConfig
+                import io.github.charlietap.chasm.gradle.FactoryVisibility
+                import io.github.charlietap.chasm.gradle.InterfaceVisibility
+
+                plugins {
+                    id("$pluginId")
+                    id("org.jetbrains.kotlin.jvm")
+                    application
+                }
+
+                dependencies {
+                    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
+                }
+
+                application {
+                    mainClass.set("test.consumer.Main")
+                }
+
+                chasm {
+                    modules.create("SyncService") {
+                        packageName.set("test.generated")
+                    }
+                    modules.create("RichService") {
+                        binary.set(layout.projectDirectory.file("src/main/wasm/rich.wasm"))
+                        packageName.set("test.generated")
+                        interfaceVisibility.set(InterfaceVisibility.INTERNAL)
+                        factoryVisibility.set(FactoryVisibility.INTERNAL)
+                        initializers.set(linkedSetOf("initialize", "start", "finish"))
+                        codegenConfig.set(
+                            CodegenConfig(
+                                generateTypesafeGlobalProperties = true,
+                                generateTypesafeMemoryProperties = true,
+                                generateSuspendingFactories = true,
+                            ),
+                        )
+                    }
+                }
+            """,
+            binary = ANSWER_WASM_MODULE,
+        )
+        project.writeBytes("src/main/wasm/rich.wasm", RICH_WASM_MODULE)
+        project.writeBytes("src/main/resources/module.wasm", ANSWER_WASM_MODULE)
+        project.writeBytes("src/main/resources/rich.wasm", RICH_WASM_MODULE)
+        project.write(
+            "src/main/kotlin/test/consumer/Main.kt",
+            """
+                package test.consumer
+
+                import io.github.charlietap.chasm.vm.ExternalAddress
+                import io.github.charlietap.chasm.vm.FunctionType
+                import io.github.charlietap.chasm.vm.Global
+                import io.github.charlietap.chasm.vm.HostFunction
+                import io.github.charlietap.chasm.vm.Import
+                import io.github.charlietap.chasm.vm.Instance
+                import io.github.charlietap.chasm.vm.Memory
+                import io.github.charlietap.chasm.vm.Module
+                import io.github.charlietap.chasm.vm.NumberType
+                import io.github.charlietap.chasm.vm.PreparedFunction
+                import io.github.charlietap.chasm.vm.Store
+                import io.github.charlietap.chasm.vm.SuspendingWasmVirtualMachine
+                import io.github.charlietap.chasm.vm.ValueType
+                import io.github.charlietap.chasm.vm.WasmVirtualMachine
+                import io.github.charlietap.chasm.vm.`expect`
+                import io.github.charlietap.chasm.vm.codegen.FunctionImport
+                import io.github.charlietap.chasm.vm.suspendingVirtualMachineFactory
+                import kotlinx.coroutines.delay
+                import kotlinx.coroutines.runBlocking
+                import test.generated.RichService
+                import test.generated.SyncService
+                import test.generated.richService
+                import test.generated.syncService
+
+                private class TrackingVirtualMachine(
+                    private val delegate: SuspendingWasmVirtualMachine,
+                ) : SuspendingWasmVirtualMachine, WasmVirtualMachine by delegate {
+                    var storeInitCalls = 0
+                    var moduleDecodeCalls = 0
+                    var moduleInstantiateCalls = 0
+                    var allocateFunctionCalls = 0
+                    var prepareFunctionCalls = 0
+                    var failDecode = false
+                    var failInstantiate = false
+                    var failInitializer: String? = null
+                    val initializerInvocations = mutableListOf<String>()
+
+                    lateinit var store: Store
+                    lateinit var allocatedFunction: ExternalAddress.Function
+                    lateinit var expectedInstance: Instance
+
+                    override fun storeInit(): Store = delegate.storeInit().also {
+                        storeInitCalls += 1
+                        store = it
+                    }
+
+                    override suspend fun moduleDecodeSuspending(
+                        binary: ByteArray,
+                    ): WasmVirtualMachine.Result<Module> {
+                        moduleDecodeCalls += 1
+                        if (failDecode) {
+                            return WasmVirtualMachine.Result.Error("deliberate decode failure")
+                        }
+                        return delegate.moduleDecodeSuspending(binary)
+                    }
+
+                    override suspend fun moduleInstantiateSuspending(
+                        store: Store,
+                        module: Module,
+                        imports: List<Import>,
+                    ): WasmVirtualMachine.Result<Instance> {
+                        moduleInstantiateCalls += 1
+                        check(store === this.store)
+                        check(imports.single().address === allocatedFunction)
+                        if (failInstantiate) {
+                            return WasmVirtualMachine.Result.Error("deliberate instantiate failure")
+                        }
+                        return delegate.moduleInstantiateSuspending(store, module, imports).also { result ->
+                            if (result is WasmVirtualMachine.Result.Ok) {
+                                expectedInstance = result.value
+                            }
+                        }
+                    }
+
+                    override fun allocateFunction(
+                        store: Store,
+                        type: FunctionType,
+                        function: HostFunction,
+                    ): WasmVirtualMachine.Result<ExternalAddress.Function> {
+                        allocateFunctionCalls += 1
+                        check(store === this.store)
+                        return delegate.allocateFunction(store, type, function).also { result ->
+                            if (result is WasmVirtualMachine.Result.Ok) {
+                                allocatedFunction = result.value
+                            }
+                        }
+                    }
+
+                    override fun prepareFunction(
+                        store: Store,
+                        instance: Instance,
+                        functionName: String,
+                        resultTypes: List<ValueType>,
+                    ): WasmVirtualMachine.Result<PreparedFunction> {
+                        prepareFunctionCalls += 1
+                        checkRuntimeObjects(store, instance)
+                        return delegate.prepareFunction(store, instance, functionName, resultTypes)
+                    }
+
+                    override fun functionInvokeTyped(
+                        store: Store,
+                        instance: Instance,
+                        functionName: String,
+                        args: List<WasmVirtualMachine.Value>,
+                        resultTypes: List<ValueType>,
+                    ): WasmVirtualMachine.Result<List<WasmVirtualMachine.Value>> {
+                        checkRuntimeObjects(store, instance)
+                        initializerInvocations += functionName
+                        if (functionName == failInitializer) {
+                            return WasmVirtualMachine.Result.Error("deliberate initializer failure")
+                        }
+                        return delegate.functionInvokeTyped(store, instance, functionName, args, resultTypes)
+                    }
+
+                    override fun exportGlobal(
+                        instance: Instance,
+                        name: String,
+                    ): WasmVirtualMachine.Result<Global> {
+                        check(instance === expectedInstance)
+                        return delegate.exportGlobal(instance, name)
+                    }
+
+                    override fun globalRead(
+                        store: Store,
+                        global: Global,
+                    ): WasmVirtualMachine.Result<WasmVirtualMachine.Value> {
+                        check(store === this.store)
+                        return delegate.globalRead(store, global)
+                    }
+
+                    override fun globalWrite(
+                        store: Store,
+                        global: Global,
+                        value: WasmVirtualMachine.Value,
+                    ): WasmVirtualMachine.Result<Unit> {
+                        check(store === this.store)
+                        return delegate.globalWrite(store, global, value)
+                    }
+
+                    override fun exportMemory(
+                        instance: Instance,
+                        name: String,
+                    ): WasmVirtualMachine.Result<Memory> {
+                        check(instance === expectedInstance)
+                        return delegate.exportMemory(instance, name)
+                    }
+
+                    override fun memoryReadBytes(
+                        store: Store,
+                        memory: Memory,
+                        pointer: Int,
+                        bytesToRead: Int,
+                        buffer: ByteArray,
+                        bufferPointer: Int,
+                    ): WasmVirtualMachine.Result<ByteArray> {
+                        check(store === this.store)
+                        return delegate.memoryReadBytes(store, memory, pointer, bytesToRead, buffer, bufferPointer)
+                    }
+
+                    override fun memoryWriteBytes(
+                        store: Store,
+                        memory: Memory,
+                        pointer: Int,
+                        bytes: ByteArray,
+                    ): WasmVirtualMachine.Result<Unit> {
+                        check(store === this.store)
+                        return delegate.memoryWriteBytes(store, memory, pointer, bytes)
+                    }
+
+                    fun recordInstance(instance: Instance): Instance = instance.also {
+                        expectedInstance = it
+                    }
+
+                    private fun checkRuntimeObjects(store: Store, instance: Instance) {
+                        check(store === this.store)
+                        check(instance === expectedInstance)
+                    }
+                }
+
+                private fun recordingImport(events: MutableList<Int>) = FunctionImport(
+                    moduleName = "env",
+                    entityName = "record",
+                    type = FunctionType(
+                        params = listOf(ValueType.Number(NumberType.I32)),
+                        results = emptyList(),
+                    ),
+                    function = { values ->
+                        events += (values.single() as WasmVirtualMachine.Value.I32).value
+                        emptyList()
+                    },
+                )
+
+                object Main {
+                    @JvmStatic
+                    fun main(args: Array<String>) = runBlocking {
+                        val binary = requireNotNull(Main::class.java.getResourceAsStream("/module.wasm")).readBytes()
+
+                        val syncService: SyncService = syncService(binary)
+                        check(syncService.answer() == 42)
+
+                        val richBinary = requireNotNull(Main::class.java.getResourceAsStream("/rich.wasm")).readBytes()
+                        val realVirtualMachine = suspendingVirtualMachineFactory()
+                        val virtualMachine = TrackingVirtualMachine(realVirtualMachine)
+                        val initializerEvents = mutableListOf<Int>()
+                        var moduleHookCalls = 0
+                        var instanceHookCalls = 0
+                        var decodedModule: Module? = null
+                        val richService: RichService = richService(
+                            binary = richBinary,
+                            imports = listOf(recordingImport(initializerEvents)),
+                            virtualMachine = virtualMachine,
+                            moduleFactory = { bytes ->
+                                delay(1)
+                                moduleHookCalls += 1
+                                check(bytes === richBinary)
+                                realVirtualMachine.moduleDecodeSuspending(bytes).`expect`("module hook").also {
+                                    decodedModule = it
+                                }
+                            },
+                            instanceFactory = { store, module, imports ->
+                                delay(1)
+                                instanceHookCalls += 1
+                                check(store === virtualMachine.store)
+                                check(module === decodedModule)
+                                check(imports.single().address === virtualMachine.allocatedFunction)
+                                realVirtualMachine.moduleInstantiateSuspending(store, module, imports)
+                                    .`expect`("instance hook")
+                                    .let(virtualMachine::recordInstance)
+                            },
+                        )
+                        check(virtualMachine.storeInitCalls == 1)
+                        check(moduleHookCalls == 1)
+                        check(instanceHookCalls == 1)
+                        check(virtualMachine.moduleDecodeCalls == 0)
+                        check(virtualMachine.moduleInstantiateCalls == 0)
+                        check(virtualMachine.allocateFunctionCalls == 1)
+                        check(virtualMachine.prepareFunctionCalls == 1)
+                        check(virtualMachine.initializerInvocations == listOf("initialize", "start", "finish"))
+                        check(initializerEvents == listOf(1, 2, 3))
+                        check(richService.counter == 16)
+                        check(richService.answer() == 16)
+                        check(richService.answer() == 16)
+                        check(virtualMachine.prepareFunctionCalls == 1)
+
+                        richService.counter = 21
+                        check(richService.answer() == 21)
+                        val memoryBytes = byteArrayOf(4, 5, 6)
+                        richService.memory.write(pointer = 8, buffer = memoryBytes)
+                        check(
+                            richService.memory.read(
+                                buffer = ByteArray(memoryBytes.size),
+                                memoryPointer = 8,
+                            ).contentEquals(memoryBytes),
+                        )
+
+                        val failureEvents = mutableListOf<Int>()
+                        val failureVirtualMachine = TrackingVirtualMachine(suspendingVirtualMachineFactory()).apply {
+                            failInitializer = "start"
+                        }
+                        var failedService: RichService? = null
+                        val initializerFailure = runCatching {
+                            failedService = richService(
+                                binary = richBinary,
+                                imports = listOf(recordingImport(failureEvents)),
+                                virtualMachine = failureVirtualMachine,
+                            )
+                        }.exceptionOrNull()
+                        check(initializerFailure != null)
+                        check(failedService == null)
+                        check(failureVirtualMachine.storeInitCalls == 1)
+                        check(failureVirtualMachine.moduleDecodeCalls == 1)
+                        check(failureVirtualMachine.moduleInstantiateCalls == 1)
+                        check(failureVirtualMachine.allocateFunctionCalls == 1)
+                        check(failureVirtualMachine.prepareFunctionCalls == 1)
+                        check(failureVirtualMachine.initializerInvocations == listOf("initialize", "start"))
+                        check(failureEvents == listOf(1))
+
+                        val decodeFailureVirtualMachine = TrackingVirtualMachine(
+                            suspendingVirtualMachineFactory(),
+                        ).apply {
+                            failDecode = true
+                        }
+                        var decodeFailureService: RichService? = null
+                        val decodeFailure = runCatching {
+                            decodeFailureService = richService(
+                                binary = richBinary,
+                                imports = listOf(recordingImport(mutableListOf())),
+                                virtualMachine = decodeFailureVirtualMachine,
+                            )
+                        }.exceptionOrNull()
+                        check(decodeFailure != null)
+                        check(decodeFailureService == null)
+                        check(decodeFailureVirtualMachine.storeInitCalls == 1)
+                        check(decodeFailureVirtualMachine.moduleDecodeCalls == 1)
+                        check(decodeFailureVirtualMachine.allocateFunctionCalls == 0)
+                        check(decodeFailureVirtualMachine.moduleInstantiateCalls == 0)
+                        check(decodeFailureVirtualMachine.prepareFunctionCalls == 0)
+                        check(decodeFailureVirtualMachine.initializerInvocations.isEmpty())
+
+                        val instantiateFailureVirtualMachine = TrackingVirtualMachine(
+                            suspendingVirtualMachineFactory(),
+                        ).apply {
+                            failInstantiate = true
+                        }
+                        var instantiateFailureService: RichService? = null
+                        val instantiateFailure = runCatching {
+                            instantiateFailureService = richService(
+                                binary = richBinary,
+                                imports = listOf(recordingImport(mutableListOf())),
+                                virtualMachine = instantiateFailureVirtualMachine,
+                            )
+                        }.exceptionOrNull()
+                        check(instantiateFailure != null)
+                        check(instantiateFailureService == null)
+                        check(instantiateFailureVirtualMachine.storeInitCalls == 1)
+                        check(instantiateFailureVirtualMachine.moduleDecodeCalls == 1)
+                        check(instantiateFailureVirtualMachine.allocateFunctionCalls == 1)
+                        check(instantiateFailureVirtualMachine.moduleInstantiateCalls == 1)
+                        check(instantiateFailureVirtualMachine.prepareFunctionCalls == 0)
+                        check(instantiateFailureVirtualMachine.initializerInvocations.isEmpty())
+
+                        println("FACTORIES_OK")
+                    }
+                }
+            """,
+        )
+
+        val result = project.build("run")
+
+        assertContains(result.output, "FACTORIES_OK")
+    }
+
+    @Test
+    fun `private implementation cannot be called from consumer source`() {
+        val project = project(
+            build = """
+                plugins {
+                    id("$pluginId")
+                    id("org.jetbrains.kotlin.jvm")
+                }
+
+                chasm {
+                    modules.create("HiddenService") {
+                        packageName.set("test.chasm")
+                    }
+                }
+            """,
+        )
+        project.write(
+            "src/main/kotlin/test/consumer/Consumer.kt",
+            """
+                package test.consumer
+
+                import test.chasm.HiddenServiceImpl
+
+                fun construct(binary: ByteArray) = HiddenServiceImpl(binary)
+            """,
+        )
+
+        val result = project.buildAndFail("compileKotlin")
+
+        assertContains(
+            project.readGenerated("main", "HiddenService", "HiddenServiceImpl.kt"),
+            "private class HiddenServiceImpl(",
+        )
+        assertContains(result.output, "HiddenServiceImpl")
+        assertContains(result.output, "private")
+    }
+
+    @Test
+    fun `configured implementations compile at their intended boundaries`() {
+        val directory = createTempDirectory("chasm-gradle-plugin-test")
+        directory.write(
+            "settings.gradle.kts",
+            settings(includedProjects = listOf(":producer", ":consumer")),
+        )
+        directory.write("build.gradle.kts", "")
+
+        Files.createDirectories(directory.resolve("producer/src/main/wasm"))
+        Files.write(directory.resolve("producer/src/main/wasm/module.wasm"), ANSWER_WASM_MODULE)
+        directory.write(
+            "producer/build.gradle.kts",
+            """
+                import io.github.charlietap.chasm.gradle.CodegenConfig
+                import io.github.charlietap.chasm.gradle.FactoryVisibility
+                import io.github.charlietap.chasm.gradle.ImplementationVisibility
+                import io.github.charlietap.chasm.gradle.InterfaceVisibility
+                import io.github.charlietap.chasm.gradle.RuntimeDependencyConfiguration
+
+                plugins {
+                    id("$pluginId")
+                    id("org.jetbrains.kotlin.jvm")
+                    `java-library`
+                }
+
+                chasm {
+                    runtimeDependencyConfiguration.set(RuntimeDependencyConfiguration.API)
+                    modules.create("PublicService") {
+                        packageName.set("test.generated")
+                        implementationVisibility.set(ImplementationVisibility.PUBLIC)
+                    }
+                    modules.create("InternalSuspendingService") {
+                        packageName.set("test.generated")
+                        interfaceVisibility.set(InterfaceVisibility.INTERNAL)
+                        implementationVisibility.set(ImplementationVisibility.INTERNAL)
+                        factoryVisibility.set(FactoryVisibility.INTERNAL)
+                        codegenConfig.set(CodegenConfig(generateSuspendingFactories = true))
+                    }
+                }
+            """,
+        )
+        directory.write(
+            "producer/src/main/kotlin/test/producer/InternalAccess.kt",
+            """
+                package test.producer
+
+                import io.github.charlietap.chasm.vm.Import
+                import io.github.charlietap.chasm.vm.Instance
+                import io.github.charlietap.chasm.vm.Store
+                import io.github.charlietap.chasm.vm.WasmVirtualMachine
+                import test.generated.InternalSuspendingService
+                import test.generated.InternalSuspendingServiceImpl
+                import test.generated.internalSuspendingService
+
+                internal fun constructInternal(
+                    imports: List<Import>,
+                    instance: Instance,
+                    store: Store,
+                    virtualMachine: WasmVirtualMachine,
+                ): InternalSuspendingServiceImpl = InternalSuspendingServiceImpl(
+                    imports,
+                    instance,
+                    store,
+                    virtualMachine,
+                )
+
+                internal suspend fun createInternal(binary: ByteArray): InternalSuspendingService =
+                    internalSuspendingService(binary)
+            """,
+        )
+
+        Files.createDirectories(directory.resolve("consumer"))
+        directory.write(
+            "consumer/build.gradle.kts",
+            """
+                plugins {
+                    id("org.jetbrains.kotlin.jvm")
+                }
+
+                dependencies {
+                    implementation(project(":producer"))
+                }
+            """,
+        )
+        directory.write(
+            "consumer/src/main/kotlin/test/consumer/Consumer.kt",
+            """
+                package test.consumer
+
+                import io.github.charlietap.chasm.vm.Import
+                import io.github.charlietap.chasm.vm.Instance
+                import io.github.charlietap.chasm.vm.Store
+                import io.github.charlietap.chasm.vm.WasmVirtualMachine
+                import test.generated.PublicService
+                import test.generated.PublicServiceImpl
+                import test.generated.publicService
+
+                fun constructWithFactory(binary: ByteArray): PublicService = publicService(binary)
+
+                fun constructImplementation(
+                    imports: List<Import>,
+                    instance: Instance,
+                    store: Store,
+                    virtualMachine: WasmVirtualMachine,
+                ): PublicServiceImpl = PublicServiceImpl(imports, instance, store, virtualMachine)
+            """,
+        )
+        val project = FunctionalProject(directory, WarningMode.FAIL)
+
+        project.build(":consumer:compileKotlin")
+    }
+
+    @Test
     fun `configuration cache is reused with configured modules`() {
         val project = project(
             build = """
@@ -146,6 +683,82 @@ class ChasmPluginFunctionalTest {
         assertContains(reused.output, "Configuration cache entry reused.")
         assertContains(reused.output, "codegenModuleMainCachedService")
         project.assertGenerated("main", "CachedService")
+    }
+
+    @Test
+    fun `factory and implementation visibility are independent codegen inputs`() {
+        fun build(
+            factoryVisibility: String,
+            implementationVisibility: String,
+        ) = """
+            import io.github.charlietap.chasm.gradle.FactoryVisibility
+            import io.github.charlietap.chasm.gradle.ImplementationVisibility
+
+            plugins {
+                id("org.jetbrains.kotlin.jvm")
+                id("$pluginId")
+            }
+
+            chasm {
+                modules.create("StableService") {
+                    packageName.set("test.chasm")
+                }
+                modules.create("ChangingService") {
+                    packageName.set("test.chasm")
+                    factoryVisibility.set(FactoryVisibility.$factoryVisibility)
+                    implementationVisibility.set(ImplementationVisibility.$implementationVisibility)
+                }
+            }
+        """
+        val project = project(build = build("INTERNAL", "INTERNAL"))
+
+        project.build("compileKotlin", "--configuration-cache")
+        assertContains(
+            project.readGenerated("main", "StableService", "StableServiceImpl.kt"),
+            "public fun stableService(",
+        )
+        assertContains(
+            project.readGenerated("main", "ChangingService", "ChangingServiceImpl.kt"),
+            "internal fun changingService(",
+        )
+        assertContains(
+            project.readGenerated("main", "ChangingService", "ChangingServiceImpl.kt"),
+            "internal class ChangingServiceImpl(",
+        )
+
+        project.write("build.gradle.kts", build("INTERNAL", "PUBLIC"))
+        val implementationChanged = project.build("compileKotlin", "--configuration-cache")
+
+        assertTrue(implementationChanged.task(":codegenModuleMainStableService")?.outcome == TaskOutcome.UP_TO_DATE)
+        assertTrue(implementationChanged.task(":codegenModuleMainChangingService")?.outcome == TaskOutcome.SUCCESS)
+        assertContains(
+            project.readGenerated("main", "ChangingService", "ChangingServiceImpl.kt"),
+            "internal fun changingService(",
+        )
+        assertContains(
+            project.readGenerated("main", "ChangingService", "ChangingServiceImpl.kt"),
+            "public class ChangingServiceImpl(",
+        )
+
+        project.write("build.gradle.kts", build("PUBLIC", "PUBLIC"))
+        val factoryChanged = project.build("compileKotlin", "--configuration-cache")
+
+        assertTrue(factoryChanged.task(":codegenModuleMainStableService")?.outcome == TaskOutcome.UP_TO_DATE)
+        assertTrue(factoryChanged.task(":codegenModuleMainChangingService")?.outcome == TaskOutcome.SUCCESS)
+        assertContains(
+            project.readGenerated("main", "ChangingService", "ChangingServiceImpl.kt"),
+            "public fun changingService(",
+        )
+        assertContains(
+            project.readGenerated("main", "ChangingService", "ChangingServiceImpl.kt"),
+            "public class ChangingServiceImpl(",
+        )
+
+        val unchanged = project.build("compileKotlin", "--configuration-cache")
+
+        assertContains(unchanged.output, "Configuration cache entry reused.")
+        assertTrue(unchanged.task(":codegenModuleMainStableService")?.outcome == TaskOutcome.UP_TO_DATE)
+        assertTrue(unchanged.task(":codegenModuleMainChangingService")?.outcome == TaskOutcome.UP_TO_DATE)
     }
 
     @Test
@@ -279,12 +892,13 @@ class ChasmPluginFunctionalTest {
         gradleProperties: String? = null,
         minimumAgp: Boolean = false,
         warningMode: WarningMode = WarningMode.FAIL,
+        binary: ByteArray = MINIMAL_WASM_MODULE,
     ): FunctionalProject {
         val directory = createTempDirectory("chasm-gradle-plugin-test")
         directory.write("settings.gradle.kts", settings(minimumAgp = minimumAgp))
         directory.write("build.gradle.kts", build)
         Files.createDirectories(directory.resolve("src/main/wasm"))
-        Files.write(directory.resolve("src/main/wasm/module.wasm"), MINIMAL_WASM_MODULE)
+        Files.write(directory.resolve("src/main/wasm/module.wasm"), binary)
         gradleProperties?.let { directory.write("gradle.properties", it) }
         return FunctionalProject(
             directory = directory,
@@ -458,6 +1072,28 @@ class ChasmPluginFunctionalTest {
             }
         }
 
+        fun buildAndFail(vararg arguments: String): BuildResult {
+            return GradleRunner.create()
+                .withProjectDir(directory.toFile())
+                .withArguments(
+                    *arguments,
+                    "--stacktrace",
+                    warningMode.argument,
+                ).buildAndFail()
+        }
+
+        fun write(relativePath: String, content: String) {
+            val path = directory.resolve(relativePath)
+            Files.createDirectories(requireNotNull(path.parent))
+            Files.writeString(path, content.trimIndent())
+        }
+
+        fun writeBytes(relativePath: String, content: ByteArray) {
+            val path = directory.resolve(relativePath)
+            Files.createDirectories(requireNotNull(path.parent))
+            Files.write(path, content)
+        }
+
         fun assertGenerated(
             sourceSetName: String,
             moduleName: String,
@@ -481,6 +1117,17 @@ class ChasmPluginFunctionalTest {
                 files.sorted(Comparator.reverseOrder()).forEach(Files::delete)
             }
         }
+
+        fun readGenerated(
+            sourceSetName: String,
+            moduleName: String,
+            fileName: String,
+        ): String {
+            val path = directory.resolve(
+                "build/generated/kotlin/$sourceSetName/$moduleName/test/chasm/$fileName",
+            )
+            return Files.readString(path)
+        }
     }
 
     private enum class WarningMode(val argument: String) {
@@ -490,6 +1137,248 @@ class ChasmPluginFunctionalTest {
 
     private companion object {
         val MINIMAL_WASM_MODULE = byteArrayOf(0, 97, 115, 109, 1, 0, 0, 0)
+        val ANSWER_WASM_MODULE = byteArrayOf(
+            0,
+            97,
+            115,
+            109,
+            1,
+            0,
+            0,
+            0,
+            1,
+            5,
+            1,
+            96,
+            0,
+            1,
+            127,
+            3,
+            2,
+            1,
+            0,
+            7,
+            10,
+            1,
+            6,
+            97,
+            110,
+            115,
+            119,
+            101,
+            114,
+            0,
+            0,
+            10,
+            6,
+            1,
+            4,
+            0,
+            65,
+            42,
+            11,
+        )
+
+        // Imports record(i32); initializers record 1/2/3 and set counter to 10/+5/+1.
+        // Exports mutable counter, memory, and answer() so construction and bindings run for real.
+        val RICH_WASM_MODULE = byteArrayOf(
+            0,
+            97,
+            115,
+            109,
+            1,
+            0,
+            0,
+            0,
+            1,
+            12,
+            3,
+            96,
+            1,
+            127,
+            0,
+            96,
+            0,
+            0,
+            96,
+            0,
+            1,
+            127,
+            2,
+            14,
+            1,
+            3,
+            101,
+            110,
+            118,
+            6,
+            114,
+            101,
+            99,
+            111,
+            114,
+            100,
+            0,
+            0,
+            3,
+            5,
+            4,
+            1,
+            1,
+            1,
+            2,
+            5,
+            3,
+            1,
+            0,
+            1,
+            6,
+            6,
+            1,
+            127,
+            1,
+            65,
+            0,
+            11,
+            7,
+            59,
+            6,
+            6,
+            109,
+            101,
+            109,
+            111,
+            114,
+            121,
+            2,
+            0,
+            7,
+            99,
+            111,
+            117,
+            110,
+            116,
+            101,
+            114,
+            3,
+            0,
+            10,
+            105,
+            110,
+            105,
+            116,
+            105,
+            97,
+            108,
+            105,
+            122,
+            101,
+            0,
+            1,
+            5,
+            115,
+            116,
+            97,
+            114,
+            116,
+            0,
+            2,
+            6,
+            102,
+            105,
+            110,
+            105,
+            115,
+            104,
+            0,
+            3,
+            6,
+            97,
+            110,
+            115,
+            119,
+            101,
+            114,
+            0,
+            4,
+            10,
+            45,
+            4,
+            10,
+            0,
+            65,
+            1,
+            16,
+            0,
+            65,
+            10,
+            36,
+            0,
+            11,
+            13,
+            0,
+            65,
+            2,
+            16,
+            0,
+            35,
+            0,
+            65,
+            5,
+            106,
+            36,
+            0,
+            11,
+            13,
+            0,
+            65,
+            3,
+            16,
+            0,
+            35,
+            0,
+            65,
+            1,
+            106,
+            36,
+            0,
+            11,
+            4,
+            0,
+            35,
+            0,
+            11,
+            0,
+            28,
+            4,
+            110,
+            97,
+            109,
+            101,
+            1,
+            9,
+            1,
+            0,
+            6,
+            114,
+            101,
+            99,
+            111,
+            114,
+            100,
+            7,
+            10,
+            1,
+            0,
+            7,
+            99,
+            111,
+            117,
+            110,
+            116,
+            101,
+            114,
+        )
         val functionalTestRepository = requiredSystemProperty("chasm.functionalTest.repository")
         val pluginRepository = requiredSystemProperty("chasm.functionalTest.pluginRepository")
         val pluginPom = Path.of(requiredSystemProperty("chasm.functionalTest.pluginPom"))
@@ -499,6 +1388,7 @@ class ChasmPluginFunctionalTest {
         val pluginId = requiredSystemProperty("chasm.functionalTest.pluginId")
         val pluginVersion = requiredSystemProperty("chasm.functionalTest.pluginVersion")
         val kotlinPluginVersion = requiredSystemProperty("chasm.functionalTest.kotlinPluginVersion")
+        val coroutinesVersion = requiredSystemProperty("chasm.functionalTest.coroutinesVersion")
         val androidPluginVersion = requiredSystemProperty("chasm.functionalTest.androidPluginVersion")
         val minimumAgpPluginVersion = requiredSystemProperty("chasm.functionalTest.minimumAgpPluginVersion")
         val minimumGradleVersion = requiredSystemProperty("chasm.functionalTest.minimumGradleVersion")
@@ -518,5 +1408,7 @@ private fun Path.write(
     relativePath: String,
     content: String,
 ) {
-    Files.writeString(resolve(relativePath), content.trimIndent())
+    val path = resolve(relativePath)
+    Files.createDirectories(requireNotNull(path.parent))
+    Files.writeString(path, content.trimIndent())
 }

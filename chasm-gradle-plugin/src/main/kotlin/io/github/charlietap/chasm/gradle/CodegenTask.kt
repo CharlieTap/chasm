@@ -48,10 +48,13 @@ abstract class CodegenTask
         abstract val packageName: Property<String>
 
         @get:Input
-        abstract val interfaceVisibility: Property<TypeVisibility>
+        abstract val interfaceVisibility: Property<InterfaceVisibility>
 
         @get:Input
-        abstract val implementationVisibility: Property<TypeVisibility>
+        abstract val implementationVisibility: Property<ImplementationVisibility>
+
+        @get:Input
+        abstract val factoryVisibility: Property<FactoryVisibility>
 
         @get:Input
         abstract val initializers: SetProperty<String>
@@ -78,6 +81,7 @@ abstract class CodegenTask
                 workParameters.packageName.set(this@CodegenTask.packageName)
                 workParameters.interfaceVisibility.set(this@CodegenTask.interfaceVisibility)
                 workParameters.implementationVisibility.set(this@CodegenTask.implementationVisibility)
+                workParameters.factoryVisibility.set(this@CodegenTask.factoryVisibility)
                 workParameters.config.set(this@CodegenTask.config)
                 workParameters.allocator.set(this@CodegenTask.allocator)
                 workParameters.initializers.set(this@CodegenTask.initializers)

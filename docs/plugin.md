@@ -60,6 +60,27 @@ A file pointing to the wasm binary the codegen should use to generate the kotlin
 
 The package name for each of the code generated files
 
+### `interfaceVisibility: InterfaceVisibility`
+
+default = `InterfaceVisibility.PUBLIC`
+
+Controls whether the generated service interface is `public` or `internal`.
+
+### `factoryVisibility: FactoryVisibility`
+
+default = `FactoryVisibility.PUBLIC`
+
+Controls whether the generated top-level factory is `public` or `internal`. A
+public factory requires a public interface.
+
+### `implementationVisibility: ImplementationVisibility`
+
+default = `ImplementationVisibility.PRIVATE`
+
+Controls whether the generated implementation class is `private`, `internal`,
+or `public`, independently of the factory visibility. A public implementation
+requires a public interface.
+
 ### `initializers: Set<String>`
 
 This property takes a set of strings, each string should be the name of a function appearing in the wasm binary. Each initializer

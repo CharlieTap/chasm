@@ -19,8 +19,9 @@ internal interface CodegenWorkParameters : WorkParameters {
     val outputDirectory: DirectoryProperty
     val interfaceName: Property<String>
     val packageName: Property<String>
-    val interfaceVisibility: Property<TypeVisibility>
-    val implementationVisibility: Property<TypeVisibility>
+    val interfaceVisibility: Property<InterfaceVisibility>
+    val implementationVisibility: Property<ImplementationVisibility>
+    val factoryVisibility: Property<FactoryVisibility>
     val config: Property<CodegenConfig>
     val allocator: Property<ExportedAllocator>
     val initializers: SetProperty<String>
@@ -58,6 +59,7 @@ internal abstract class CodegenWorkAction : WorkAction<CodegenWorkParameters> {
         val specs = WasmInterfaceGenerator()(
             interfaceVisibility = params.interfaceVisibility.get(),
             implementationVisibility = params.implementationVisibility.get(),
+            factoryVisibility = params.factoryVisibility.get(),
             wasmInterface = data,
             config = config,
         )
