@@ -11,39 +11,78 @@ import java.nio.ByteOrder
 import java.nio.MappedByteBuffer
 import java.nio.channels.FileChannel
 import java.nio.channels.FileChannel.MapMode.READ_WRITE
-import java.nio.file.Files
+import java.nio.file.FileAlreadyExistsException
+import java.nio.file.FileSystems
+import java.nio.file.Path
 import java.nio.file.StandardOpenOption.CREATE_NEW
 import java.nio.file.StandardOpenOption.DELETE_ON_CLOSE
 import java.nio.file.StandardOpenOption.READ
 import java.nio.file.StandardOpenOption.SPARSE
 import java.nio.file.StandardOpenOption.WRITE
+import java.nio.file.attribute.PosixFilePermission.OWNER_READ
+import java.nio.file.attribute.PosixFilePermission.OWNER_WRITE
+import java.nio.file.attribute.PosixFilePermissions
+import java.util.EnumSet
+import java.util.concurrent.ThreadLocalRandom
 import java.lang.OutOfMemoryError as PlatformOutOfMemoryError
 
 internal const val MAX_JVM_MEMORY_PAGES = Int.MAX_VALUE / LinearMemory.PAGE_SIZE
 internal const val MAX_JVM_MEMORY_BYTES = MAX_JVM_MEMORY_PAGES * LinearMemory.PAGE_SIZE
 
 @OptIn(UnsafeHostApi::class)
-class ByteBufferLinearMemory private constructor(
-    state: ByteBufferState,
+class ByteBufferLinearMemory(
+    pages: LinearMemory.Pages,
+    maximumPages: LinearMemory.Pages? = null,
+    config: LinearMemoryConfig = LinearMemoryConfig(),
 ) : LinearMemory, ByteBufferHostMemory {
 
-    internal var mapping: ByteBuffer = state.mapping
+    internal var mapping: ByteBuffer
         private set
 
-    private var maximumByteSize: Long = state.maximumByteSize
-    private var prefault: Boolean = state.prefault
-    private var logicalMemory: ByteBuffer = state.memory
-    private var copySource: ByteBuffer = duplicate(state.memory)
+    private var maximumByteSize: Long
+    private var prefault: Boolean
+    private var logicalMemory: ByteBuffer
+    private var copySource: ByteBuffer
+
+    init {
+        val initialPages = pages.amount.toLong()
+        require(initialPages <= MAX_JVM_MEMORY_PAGES) {
+            "JVM linear memory cannot exceed $MAX_JVM_MEMORY_PAGES pages"
+        }
+        val declaredMaximumPages = maximumPages?.amount?.toLong()
+        require(declaredMaximumPages == null || declaredMaximumPages >= initialPages) {
+            "Linear memory maximum cannot be smaller than its initial size"
+        }
+
+        val maximumPageCount = minOf(
+            declaredMaximumPages ?: MAX_JVM_MEMORY_PAGES.toLong(),
+            MAX_JVM_MEMORY_PAGES.toLong(),
+        )
+        val initialByteSize = (initialPages * LinearMemory.PAGE_SIZE).toInt()
+        val initialMaximumByteSize = (maximumPageCount * LinearMemory.PAGE_SIZE).toInt()
+        val initialMapping: ByteBuffer
+        val initialLogicalMemory: ByteBuffer
+
+        try {
+            initialMapping = mapBackingFile(initialMaximumByteSize)
+            if (config.prefault) {
+                prefaultRange(initialMapping, 0, initialByteSize)
+            }
+            initialLogicalMemory = bufferForSize(initialMapping, initialByteSize)
+        } catch (error: PlatformOutOfMemoryError) {
+            throw OutOfMemoryError(error.message, error)
+        }
+
+        mapping = initialMapping
+        maximumByteSize = initialMaximumByteSize.toLong()
+        prefault = config.prefault
+        logicalMemory = initialLogicalMemory
+        copySource = duplicate(logicalMemory)
+    }
 
     @PublishedApi
     internal val memory: ByteBuffer
         get() = logicalMemory
-
-    constructor(
-        pages: LinearMemory.Pages,
-        maximumPages: LinearMemory.Pages? = null,
-        config: LinearMemoryConfig = LinearMemoryConfig(),
-    ) : this(createMappedByteBufferState(pages, maximumPages, config))
 
     override val byteSize: Int
         get() = logicalMemory.limit()
@@ -60,7 +99,7 @@ class ByteBufferLinearMemory private constructor(
 
         try {
             if (prefault) {
-                loadMappedRange(mapping, previousByteSize, (nextByteSize - previousByteSize).toInt())
+                prefaultRange(mapping, previousByteSize, (nextByteSize - previousByteSize).toInt())
             }
             replaceLogicalMemory(bufferForSize(mapping, nextByteSize.toInt()))
         } catch (error: PlatformOutOfMemoryError) {
@@ -280,91 +319,54 @@ class ByteBufferLinearMemory private constructor(
     }
 
     private companion object {
-        const val BULK_COPY_THRESHOLD = 64
-        const val REPEATED_BYTE_MASK = 0x0101010101010101L
-        const val UNROLLED_BYTES = 4 * Long.SIZE_BYTES
+        private const val BULK_COPY_THRESHOLD = 64
+        private const val REPEATED_BYTE_MASK = 0x0101010101010101L
+        private const val UNROLLED_BYTES = 4 * Long.SIZE_BYTES
 
-        fun duplicate(buffer: ByteBuffer): ByteBuffer = buffer.duplicate().order(buffer.order())
-    }
-}
-
-private class ByteBufferState(
-    val mapping: ByteBuffer,
-    val memory: ByteBuffer,
-    val maximumByteSize: Long,
-    val prefault: Boolean,
-)
-
-private fun createMappedByteBufferState(
-    pages: LinearMemory.Pages,
-    maximumPages: LinearMemory.Pages?,
-    config: LinearMemoryConfig,
-): ByteBufferState {
-    val initialPages = pages.amount.toLong()
-    require(initialPages <= MAX_JVM_MEMORY_PAGES) {
-        "JVM linear memory cannot exceed $MAX_JVM_MEMORY_PAGES pages"
-    }
-    val declaredMaximumPages = maximumPages?.amount?.toLong()
-    require(declaredMaximumPages == null || declaredMaximumPages >= initialPages) {
-        "Linear memory maximum cannot be smaller than its initial size"
-    }
-
-    val maximumPageCount = minOf(declaredMaximumPages ?: MAX_JVM_MEMORY_PAGES.toLong(), MAX_JVM_MEMORY_PAGES.toLong())
-    val initialByteSize = (initialPages * LinearMemory.PAGE_SIZE).toInt()
-    val maximumByteSize = (maximumPageCount * LinearMemory.PAGE_SIZE).toInt()
-
-    // SPARSE is only considered while creating a file. Reserve a unique name
-    // with the default provider, then recreate that path through FileChannel.
-    val backingFile = Files.createTempFile("chasm-memory-", ".bin")
-    Files.delete(backingFile)
-    val channel = FileChannel.open(backingFile, READ, WRITE, CREATE_NEW, SPARSE, DELETE_ON_CLOSE)
-
-    try {
-        val mapping = mapBackingFile(channel, maximumByteSize)
-        channel.close()
-        if (config.prefault) loadMappedRange(mapping, 0, initialByteSize)
-        return ByteBufferState(
-            mapping = mapping,
-            memory = bufferForSize(mapping, initialByteSize),
-            maximumByteSize = maximumByteSize.toLong(),
-            prefault = config.prefault,
-        )
-    } catch (error: Throwable) {
-        try {
-            channel.close()
-        } catch (closeError: Throwable) {
-            error.addSuppressed(closeError)
+        private val FILE_MAPPING_OPTIONS = EnumSet.of(READ, WRITE, CREATE_NEW, SPARSE, DELETE_ON_CLOSE)
+        private val FILE_MAPPING_ATTRIBUTES = if (FileSystems.getDefault().supportedFileAttributeViews().contains("posix")) {
+            arrayOf(PosixFilePermissions.asFileAttribute(EnumSet.of(OWNER_READ, OWNER_WRITE)))
+        } else {
+            emptyArray()
         }
-        try {
-            Files.deleteIfExists(backingFile)
-        } catch (deleteError: Throwable) {
-            error.addSuppressed(deleteError)
+
+        private fun mapBackingFile(byteSize: Int): ByteBuffer {
+            if (byteSize == 0) {
+                return ByteBuffer.allocateDirect(0).order(ByteOrder.LITTLE_ENDIAN)
+            }
+
+            return openBackingFile().use { channel ->
+                channel.map(READ_WRITE, 0, byteSize.toLong()).order(ByteOrder.LITTLE_ENDIAN)
+            }
         }
-        if (error is PlatformOutOfMemoryError) {
-            throw OutOfMemoryError(error.message, error)
+
+        private fun openBackingFile(): FileChannel {
+            val directory = Path.of(System.getProperty("java.io.tmpdir"))
+            val random = ThreadLocalRandom.current()
+            while (true) {
+                val suffix = java.lang.Long.toUnsignedString(random.nextLong(), 16)
+                val path = directory.resolve("chasm-memory-$suffix.bin")
+                try {
+                    return FileChannel.open(path, FILE_MAPPING_OPTIONS, *FILE_MAPPING_ATTRIBUTES)
+                } catch (_: FileAlreadyExistsException) {
+                    // Retry with a new name without modifying the existing file.
+                }
+            }
         }
-        throw error
-    }
-}
 
-private fun mapBackingFile(
-    channel: FileChannel,
-    byteSize: Int,
-): ByteBuffer = if (byteSize == 0) {
-    ByteBuffer.allocateDirect(0).order(ByteOrder.LITTLE_ENDIAN)
-} else {
-    channel.map(READ_WRITE, 0, byteSize.toLong()).order(ByteOrder.LITTLE_ENDIAN)
-}
+        private fun duplicate(buffer: ByteBuffer): ByteBuffer = buffer.duplicate().order(buffer.order())
 
-private fun bufferForSize(
-    mapping: ByteBuffer,
-    byteSize: Int,
-): ByteBuffer = mapping
-    .slice(0, byteSize)
-    .order(ByteOrder.LITTLE_ENDIAN)
+        private fun bufferForSize(
+            mapping: ByteBuffer,
+            byteSize: Int,
+        ): ByteBuffer = mapping
+            .slice(0, byteSize)
+            .order(ByteOrder.LITTLE_ENDIAN)
 
-private fun loadMappedRange(mapping: ByteBuffer, offset: Int, byteCount: Int) {
-    if (byteCount > 0 && mapping is MappedByteBuffer) {
-        mapping.slice(offset, byteCount).load()
+        private fun prefaultRange(mapping: ByteBuffer, offset: Int, byteCount: Int) {
+            if (byteCount > 0 && mapping is MappedByteBuffer) {
+                mapping.slice(offset, byteCount).load()
+            }
+        }
     }
 }

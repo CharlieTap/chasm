@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.memory
 
+import io.github.charlietap.chasm.config.LinearMemoryConfig
 import io.github.charlietap.chasm.host.UnsafeHostApi
 import io.github.charlietap.chasm.host.readU16
 import io.github.charlietap.chasm.host.readU32
@@ -112,6 +113,52 @@ class ByteBufferLinearMemoryHostTest {
             ByteArray(PAGE_SIZE * 2),
             memory.read(ByteArray(PAGE_SIZE * 2), PAGE_SIZE * 2, PAGE_SIZE * 2),
         )
+    }
+
+    @Test
+    fun `prefaulting preserves existing contents and keeps reservations independent`() {
+        val memory = ByteBufferLinearMemory(
+            pages = LinearMemory.Pages(1u),
+            maximumPages = LinearMemory.Pages(2u),
+            config = LinearMemoryConfig(prefault = true),
+        ).also(memories::add)
+        val other = memory()
+
+        assertContentEquals(ByteArray(PAGE_SIZE), memory.read(ByteArray(PAGE_SIZE), 0, PAGE_SIZE))
+        memory.fill(0, 0x5A, PAGE_SIZE)
+        memory.grow(1)
+
+        assertEquals(0x5A.toByte(), memory.readI8(PAGE_SIZE - 1))
+        assertContentEquals(ByteArray(PAGE_SIZE), memory.read(ByteArray(PAGE_SIZE), PAGE_SIZE, PAGE_SIZE))
+        assertContentEquals(ByteArray(PAGE_SIZE), other.read(ByteArray(PAGE_SIZE), 0, PAGE_SIZE))
+    }
+
+    @Test
+    fun `new allocations cannot observe data from previous mappings`() {
+        val first = memory()
+        first.grow(1)
+        first.fill(0, 0x5A, first.byteSize)
+
+        val second = memory()
+        second.grow(1)
+
+        assertContentEquals(ByteArray(second.byteSize), second.read(ByteArray(second.byteSize), 0, second.byteSize))
+        second.fill(0, 0x6B, second.byteSize)
+        assertEquals(0x5A.toByte(), first.readI8(0))
+        assertEquals(0x5A.toByte(), first.readI8(first.byteSize - 1))
+    }
+
+    @Test
+    fun `zero maximum needs no mapping`() {
+        val memory = ByteBufferLinearMemory(
+            pages = LinearMemory.Pages(0u),
+            maximumPages = LinearMemory.Pages(0u),
+        ).also(memories::add)
+
+        assertEquals(0, memory.byteSize)
+        assertEquals(0, memory.mapping.capacity())
+        assertSame(memory, memory.grow(0))
+        assertFailsWith<IllegalArgumentException> { memory.grow(1) }
     }
 
     @Test
