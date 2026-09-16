@@ -1,5 +1,6 @@
 package com.test.chasm
 
+import io.github.charlietap.chasm.vm.Global
 import io.github.charlietap.chasm.vm.Import
 import io.github.charlietap.chasm.vm.Instance
 import io.github.charlietap.chasm.vm.InstanceFactory
@@ -100,21 +101,20 @@ private class TestServiceImpl(
   private val _memory: Memory =
       virtualMachine.exportMemory(instance, "memory").`expect`("Failed to find memory export with name memory")
 
+  private val _mutableGlobal: Global =
+      virtualMachine.exportGlobal(instance, "mutable_global").`expect`("Failed to find global export with name mutable_global")
+
   override var mutableGlobal: Int
-    get() {
-      val global = virtualMachine.exportGlobal(instance, "mutable_global").`expect`("Failed to find global export with name mutable_global")
-      return virtualMachine.globalRead(store, global).map { (it as WasmVirtualMachine.Value.I32).value }.`expect`("Failed to read global mutable_global")
-    }
+    get() = virtualMachine.globalRead(store, _mutableGlobal).map { (it as WasmVirtualMachine.Value.I32).value }.`expect`("Failed to read global mutable_global")
     set(newValue) {
-      val global = virtualMachine.exportGlobal(instance, "mutable_global").`expect`("Failed to find global export with name mutable_global")
-      virtualMachine.globalWrite(store, global, WasmVirtualMachine.Value.I32(newValue))
+      virtualMachine.globalWrite(store, _mutableGlobal, WasmVirtualMachine.Value.I32(newValue))
     }
 
+  private val _immutableGlobal: Global =
+      virtualMachine.exportGlobal(instance, "immutable_global").`expect`("Failed to find global export with name immutable_global")
+
   override val immutableGlobal: Int
-    get() {
-      val global = virtualMachine.exportGlobal(instance, "immutable_global").`expect`("Failed to find global export with name immutable_global")
-      return virtualMachine.globalRead(store, global).map { (it as WasmVirtualMachine.Value.I32).value }.`expect`("Failed to read global immutable_global")
-    }
+    get() = virtualMachine.globalRead(store, _immutableGlobal).map { (it as WasmVirtualMachine.Value.I32).value }.`expect`("Failed to read global immutable_global")
 
   override val memory: TestService.Memory = MemoryImpl(store, _memory, virtualMachine)
 

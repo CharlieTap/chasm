@@ -82,18 +82,13 @@ internal class InitializerBlockGenerator() {
 
 internal class GlobalPropertyGetterImplementationGenerator {
     operator fun invoke(
+        property: Property,
         proxy: GlobalProxy,
     ) = FunSpec.getterBuilder().apply {
         addStatement(
-            """val global = virtualMachine.%L(instance, %S).%M(%S)""",
-            EXPORT_GLOBAL,
-            proxy.name,
-            EXPECT_RESULT_FUNCTION,
-            "Failed to find global export with name ${proxy.name}",
-        )
-        addStatement(
-            "return virtualMachine.%L(store, global).%M { (it as %T).value }.%M(%S)",
+            "return virtualMachine.%L(store, %N).%M { (it as %T).value }.%M(%S)",
             READ_GLOBAL_FUNCTION,
+            "_${property.name}",
             MAP_RESULT_FUNCTION,
             proxy.source,
             EXPECT_RESULT_FUNCTION,
@@ -104,18 +99,16 @@ internal class GlobalPropertyGetterImplementationGenerator {
 
 internal class GlobalPropertySetterImplementationGenerator {
     operator fun invoke(
-        type: Type,
+        property: Property,
         proxy: GlobalProxy,
     ) = FunSpec.setterBuilder().apply {
-        addParameter("newValue", type.asTypeName())
+        addParameter("newValue", property.type.asTypeName())
         addStatement(
-            """val global = virtualMachine.%L(instance, %S).%M(%S)""",
-            EXPORT_GLOBAL,
-            proxy.name,
-            EXPECT_RESULT_FUNCTION,
-            "Failed to find global export with name ${proxy.name}",
+            "virtualMachine.%L(store, %N, %T(newValue))",
+            WRITE_GLOBAL_FUNCTION,
+            "_${property.name}",
+            proxy.source,
         )
-        addStatement("virtualMachine.%L(store, global, %T(newValue))", WRITE_GLOBAL_FUNCTION, proxy.source)
     }.build()
 }
 
@@ -130,9 +123,9 @@ internal class PropertyImplementationGenerator(
         mutable(property.const.not())
         when (val implementation = property.implementation) {
             is GlobalProxy -> {
-                getter(globalPropertyGetter(implementation))
+                getter(globalPropertyGetter(property, implementation))
                 if (!property.const) {
-                    setter(globalPropertySetter(property.type, implementation))
+                    setter(globalPropertySetter(property, implementation))
                 }
             }
         }
@@ -581,6 +574,19 @@ internal class ClassPropertiesGenerator(
         }
 
         wasmInterface.properties.forEach { property ->
+            when (val implementation = property.implementation) {
+                is GlobalProxy -> add(
+                    PropertySpec.builder("_${property.name}", GLOBAL_CLASS_NAME)
+                        .addModifiers(KModifier.PRIVATE)
+                        .initializer(
+                            "virtualMachine.%L(instance, %S).%M(%S)",
+                            EXPORT_GLOBAL,
+                            implementation.name,
+                            EXPECT_RESULT_FUNCTION,
+                            "Failed to find global export with name ${implementation.name}",
+                        ).build(),
+                )
+            }
             add(propertyImplementationGenerator(property))
         }
 

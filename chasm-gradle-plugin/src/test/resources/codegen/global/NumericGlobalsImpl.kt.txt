@@ -1,5 +1,6 @@
 package com.test
 
+import io.github.charlietap.chasm.vm.Global
 import io.github.charlietap.chasm.vm.Import
 import io.github.charlietap.chasm.vm.Instance
 import io.github.charlietap.chasm.vm.InstanceFactory
@@ -48,27 +49,27 @@ private class NumericGlobalsImpl(
   private val store: Store,
   private val virtualMachine: WasmVirtualMachine,
 ) : NumericGlobals {
+  private val _intValue: Global =
+      virtualMachine.exportGlobal(instance, "int_value").`expect`("Failed to find global export with name int_value")
+
   override val intValue: Int
-    get() {
-      val global = virtualMachine.exportGlobal(instance, "int_value").`expect`("Failed to find global export with name int_value")
-      return virtualMachine.globalRead(store, global).map { (it as WasmVirtualMachine.Value.I32).value }.`expect`("Failed to read global int_value")
-    }
+    get() = virtualMachine.globalRead(store, _intValue).map { (it as WasmVirtualMachine.Value.I32).value }.`expect`("Failed to read global int_value")
+
+  private val _longValue: Global =
+      virtualMachine.exportGlobal(instance, "long_value").`expect`("Failed to find global export with name long_value")
 
   override val longValue: Long
-    get() {
-      val global = virtualMachine.exportGlobal(instance, "long_value").`expect`("Failed to find global export with name long_value")
-      return virtualMachine.globalRead(store, global).map { (it as WasmVirtualMachine.Value.I64).value }.`expect`("Failed to read global long_value")
-    }
+    get() = virtualMachine.globalRead(store, _longValue).map { (it as WasmVirtualMachine.Value.I64).value }.`expect`("Failed to read global long_value")
+
+  private val _floatValue: Global =
+      virtualMachine.exportGlobal(instance, "float_value").`expect`("Failed to find global export with name float_value")
 
   override val floatValue: Float
-    get() {
-      val global = virtualMachine.exportGlobal(instance, "float_value").`expect`("Failed to find global export with name float_value")
-      return virtualMachine.globalRead(store, global).map { (it as WasmVirtualMachine.Value.F32).value }.`expect`("Failed to read global float_value")
-    }
+    get() = virtualMachine.globalRead(store, _floatValue).map { (it as WasmVirtualMachine.Value.F32).value }.`expect`("Failed to read global float_value")
+
+  private val _doubleValue: Global =
+      virtualMachine.exportGlobal(instance, "double_value").`expect`("Failed to find global export with name double_value")
 
   override val doubleValue: Double
-    get() {
-      val global = virtualMachine.exportGlobal(instance, "double_value").`expect`("Failed to find global export with name double_value")
-      return virtualMachine.globalRead(store, global).map { (it as WasmVirtualMachine.Value.F64).value }.`expect`("Failed to read global double_value")
-    }
+    get() = virtualMachine.globalRead(store, _doubleValue).map { (it as WasmVirtualMachine.Value.F64).value }.`expect`("Failed to read global double_value")
 }

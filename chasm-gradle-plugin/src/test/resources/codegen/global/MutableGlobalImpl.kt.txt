@@ -1,5 +1,6 @@
 package com.test
 
+import io.github.charlietap.chasm.vm.Global
 import io.github.charlietap.chasm.vm.Import
 import io.github.charlietap.chasm.vm.Instance
 import io.github.charlietap.chasm.vm.InstanceFactory
@@ -45,13 +46,12 @@ private class MutableGlobalImpl(
   private val store: Store,
   private val virtualMachine: WasmVirtualMachine,
 ) : MutableGlobal {
+  private val _value: Global =
+      virtualMachine.exportGlobal(instance, "value").`expect`("Failed to find global export with name value")
+
   override var `value`: Int
-    get() {
-      val global = virtualMachine.exportGlobal(instance, "value").`expect`("Failed to find global export with name value")
-      return virtualMachine.globalRead(store, global).map { (it as WasmVirtualMachine.Value.I32).value }.`expect`("Failed to read global value")
-    }
+    get() = virtualMachine.globalRead(store, _value).map { (it as WasmVirtualMachine.Value.I32).value }.`expect`("Failed to read global value")
     set(newValue) {
-      val global = virtualMachine.exportGlobal(instance, "value").`expect`("Failed to find global export with name value")
-      virtualMachine.globalWrite(store, global, WasmVirtualMachine.Value.I32(newValue))
+      virtualMachine.globalWrite(store, _value, WasmVirtualMachine.Value.I32(newValue))
     }
 }

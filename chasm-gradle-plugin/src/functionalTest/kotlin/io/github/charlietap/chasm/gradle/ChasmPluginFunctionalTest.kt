@@ -209,6 +209,7 @@ class ChasmPluginFunctionalTest {
                     var moduleInstantiateCalls = 0
                     var allocateFunctionCalls = 0
                     var prepareFunctionCalls = 0
+                    var exportGlobalCalls = 0
                     var failDecode = false
                     var failInstantiate = false
                     var failInitializer: String? = null
@@ -295,6 +296,7 @@ class ChasmPluginFunctionalTest {
                         instance: Instance,
                         name: String,
                     ): WasmVirtualMachine.Result<Global> {
+                        exportGlobalCalls += 1
                         check(instance === expectedInstance)
                         return delegate.exportGlobal(instance, name)
                     }
@@ -414,15 +416,19 @@ class ChasmPluginFunctionalTest {
                         check(virtualMachine.moduleInstantiateCalls == 0)
                         check(virtualMachine.allocateFunctionCalls == 1)
                         check(virtualMachine.prepareFunctionCalls == 1)
+                        check(virtualMachine.exportGlobalCalls == 1)
                         check(virtualMachine.initializerInvocations == listOf("initialize", "start", "finish"))
                         check(initializerEvents == listOf(1, 2, 3))
+                        check(richService.counter == 16)
                         check(richService.counter == 16)
                         check(richService.answer() == 16)
                         check(richService.answer() == 16)
                         check(virtualMachine.prepareFunctionCalls == 1)
 
                         richService.counter = 21
+                        check(richService.counter == 21)
                         check(richService.answer() == 21)
+                        check(virtualMachine.exportGlobalCalls == 1)
                         val memoryBytes = byteArrayOf(4, 5, 6)
                         richService.memory.write(pointer = 8, buffer = memoryBytes)
                         check(

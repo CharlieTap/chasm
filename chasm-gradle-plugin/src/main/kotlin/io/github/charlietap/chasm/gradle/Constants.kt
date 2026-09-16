@@ -4,6 +4,7 @@ import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.MemberName
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.asClassName
+import io.github.charlietap.chasm.vm.Global
 import io.github.charlietap.chasm.vm.Import
 import io.github.charlietap.chasm.vm.Instance
 import io.github.charlietap.chasm.vm.Memory
@@ -21,6 +22,7 @@ internal val SUSPENDING_WASM_VIRTUAL_MACHINE_CLASS_NAME =
 internal val STORE_CLASS_NAME = Store::class.asClassName()
 internal val MODULE_CLASS_NAME = Module::class.asClassName()
 internal val INSTANCE_CLASS_NAME = Instance::class.asClassName()
+internal val GLOBAL_CLASS_NAME = Global::class.asClassName()
 internal val MEMORY_CLASS_NAME = Memory::class.asClassName()
 internal val PREPARED_FUNCTION_CLASS_NAME = PreparedFunction::class.asClassName()
 internal val VALUE_CLASS_NAME = WasmVirtualMachine.Value::class.asClassName()

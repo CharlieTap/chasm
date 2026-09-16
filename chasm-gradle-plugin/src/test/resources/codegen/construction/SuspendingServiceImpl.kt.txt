@@ -1,5 +1,6 @@
 package com.test
 
+import io.github.charlietap.chasm.vm.Global
 import io.github.charlietap.chasm.vm.Import
 import io.github.charlietap.chasm.vm.Instance
 import io.github.charlietap.chasm.vm.Memory
@@ -58,14 +59,13 @@ private class SuspendingServiceImpl(
   private val _memory: Memory =
       virtualMachine.exportMemory(instance, "memory").`expect`("Failed to find memory export with name memory")
 
+  private val _counter: Global =
+      virtualMachine.exportGlobal(instance, "counter").`expect`("Failed to find global export with name counter")
+
   override var counter: Int
-    get() {
-      val global = virtualMachine.exportGlobal(instance, "counter").`expect`("Failed to find global export with name counter")
-      return virtualMachine.globalRead(store, global).map { (it as WasmVirtualMachine.Value.I32).value }.`expect`("Failed to read global counter")
-    }
+    get() = virtualMachine.globalRead(store, _counter).map { (it as WasmVirtualMachine.Value.I32).value }.`expect`("Failed to read global counter")
     set(newValue) {
-      val global = virtualMachine.exportGlobal(instance, "counter").`expect`("Failed to find global export with name counter")
-      virtualMachine.globalWrite(store, global, WasmVirtualMachine.Value.I32(newValue))
+      virtualMachine.globalWrite(store, _counter, WasmVirtualMachine.Value.I32(newValue))
     }
 
   override val memory: SuspendingService.Memory = MemoryImpl(store, _memory, virtualMachine)
