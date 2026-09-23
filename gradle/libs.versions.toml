@@ -59,7 +59,7 @@ kotlinx-test-resources = "0.15.0"
 metro = "1.4.2"
 
 result = "2.2.0"
-wasi-emscripten-host-chasm-wasip1 = "0.7.0-SNAPSHOT"
+wasi-emscripten-host-chasm-wasip1 = "0.7.0"
 wasm-corpus-ref = "13f6c9049f35df5430516691f9ee0a69ad5d573a"
 
 [plugins]

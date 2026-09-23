@@ -32,13 +32,6 @@ dependencyResolutionManagement {
         gradlePluginPortal()
         google()
         mavenCentral()
-        maven {
-            name = "MavenCentralSnapshots"
-            url = uri("https://central.sonatype.com/repository/maven-snapshots/")
-            mavenContent {
-                snapshotsOnly()
-            }
-        }
         mavenLocal()
         maven(url = "https://jitpack.io" )
     }
