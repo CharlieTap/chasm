@@ -201,11 +201,21 @@ chasm {
             codegenConfig = CodegenConfig(
                 generateTypesafeGlobalProperties = true,
                 generateSuspendingFactories = true,
+                runtime = CodegenRuntime.CHASM,
             )
         }
     }
 }
 ```
+
+### `runtime: CodegenRuntime`
+
+default = `CodegenRuntime.PORTABLE_VM`
+
+Controls the runtime API targeted by the generated module bindings.
+`PORTABLE_VM` supports every plugin target through the VM abstraction. `CHASM`
+generates directly against Chasm's embedding API and supports JVM, Android, and
+Kotlin/Native targets, but not Kotlin/JS or Kotlin/Wasm JS.
 
 ### `generateSuspendingFactories: Boolean`
 

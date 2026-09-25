@@ -1,4 +1,5 @@
 import io.github.charlietap.chasm.gradle.CodegenConfig
+import io.github.charlietap.chasm.gradle.CodegenRuntime
 import io.github.charlietap.chasm.gradle.CodegenTask
 import io.github.charlietap.chasm.gradle.StringEncodingStrategy
 import org.gradle.kotlin.dsl.withType
@@ -20,6 +21,7 @@ chasm {
             codegenConfig = CodegenConfig(
                 generateTypesafeGlobalProperties = true,
                 generateTypesafeMemoryProperties = true,
+                runtime = CodegenRuntime.CHASM,
             )
             function("pal_string_function") {
                 stringReturnType(StringEncodingStrategy.POINTER_AND_LENGTH)
