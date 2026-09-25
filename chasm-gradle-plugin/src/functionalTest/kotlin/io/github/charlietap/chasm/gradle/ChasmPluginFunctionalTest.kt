@@ -941,6 +941,7 @@ class ChasmPluginFunctionalTest {
                 android.newDsl=true
             """,
             minimumAgp = minimumAgp,
+            warningMode = WarningMode.KNOWN_AGP_DEPRECATION,
         )
     }
 
@@ -993,7 +994,7 @@ class ChasmPluginFunctionalTest {
         )
         return FunctionalProject(
             directory = directory,
-            warningMode = WarningMode.FAIL,
+            warningMode = WarningMode.KNOWN_AGP_DEPRECATION,
         )
     }
 
@@ -1075,6 +1076,21 @@ class ChasmPluginFunctionalTest {
                 if (warningMode == WarningMode.KNOWN_KMP_DEPRECATION) {
                     assertContains(result.output, "getTaskDependencyFromProjectDependency")
                 }
+                if (warningMode == WarningMode.KNOWN_AGP_DEPRECATION) {
+                    // AGP 9.3.1 calls setVisible; Gradle 9.8 now consistently reports it.
+                    val unexpectedDeprecations = result.output.lineSequence()
+                        .filter { it.contains("deprecat", ignoreCase = true) }
+                        .filterNot { line ->
+                            line.startsWith("The Configuration.setVisible(boolean) method has been deprecated.") ||
+                                line.startsWith("Deprecated Gradle features were used") ||
+                                line.trimStart().startsWith("at ")
+                        }
+                        .toList()
+                    assertTrue(
+                        unexpectedDeprecations.isEmpty(),
+                        "Unexpected deprecations: ${unexpectedDeprecations.joinToString("\n")}",
+                    )
+                }
             }
         }
 
@@ -1138,6 +1154,7 @@ class ChasmPluginFunctionalTest {
 
     private enum class WarningMode(val argument: String) {
         FAIL("--warning-mode=fail"),
+        KNOWN_AGP_DEPRECATION("--warning-mode=all"),
         KNOWN_KMP_DEPRECATION("--warning-mode=all"),
     }
 

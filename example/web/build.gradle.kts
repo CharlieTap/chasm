@@ -47,9 +47,9 @@ val copyWasmBinaries = tasks.register<Copy>("copyWasmBinaries") {
     from(wasmResources) {
         include("*.wasm")
     }
-    into(layout.buildDirectory.dir("wasm"))
+    destinationDirectory.set(layout.buildDirectory.dir("wasm"))
 }
 
 kotlin.sourceSets.named("commonMain") {
-    resources.srcDir(copyWasmBinaries.map { it.destinationDir })
+    resources.srcDir(copyWasmBinaries.flatMap { it.destinationDirectory })
 }

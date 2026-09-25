@@ -40,7 +40,7 @@ publishingConventions.apply {
 val chasmPluginId = libs.plugins.chasm.get().pluginId
 val minimumGradleVersion = "9.1"
 val minimumAgpGradleVersion = "9.1.0"
-val testedGradleVersions = listOf("9.5.0", "9.6.1", "9.7.1")
+val testedGradleVersions = listOf("9.5.0", "9.6.1", "9.7.1", "9.8.0")
 val kotlinStdlibModule = libs.kotlin.stdlib.get().module
 
 gradlePlugin {
