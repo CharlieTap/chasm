@@ -135,6 +135,7 @@ val functionalTestRepositories = configurations.resolvable("functionalTestReposi
 
 dependencies {
     add(functionalTestRepositoryDependencies.name, projects.chasm)
+    add(functionalTestRepositoryDependencies.name, projects.chasmCoroutines)
     add(functionalTestRepositoryDependencies.name, projects.vm)
 }
 

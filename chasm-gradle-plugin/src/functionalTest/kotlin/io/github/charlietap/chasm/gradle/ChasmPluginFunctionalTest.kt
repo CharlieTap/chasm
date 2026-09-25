@@ -9,6 +9,7 @@ import java.util.Comparator
 import kotlin.io.path.createTempDirectory
 import kotlin.test.Test
 import kotlin.test.assertContains
+import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
@@ -102,12 +103,185 @@ class ChasmPluginFunctionalTest {
     }
 
     @Test
-    fun `runtime dependency selection remains lazy`() {
-        RuntimeDependencyConfiguration.entries.forEach { selection ->
-            val configurationName = selection.name.lowercase()
+    fun `Chasm runtime rejects multiplatform web targets`() {
+        listOf("js()", "wasmJs()").forEach { target ->
             val project = project(
                 build = """
-                    import io.github.charlietap.chasm.gradle.RuntimeDependencyConfiguration
+                    import io.github.charlietap.chasm.gradle.CodegenConfig
+                    import io.github.charlietap.chasm.gradle.CodegenRuntime
+
+                    plugins {
+                        id("$pluginId")
+                        id("org.jetbrains.kotlin.multiplatform")
+                    }
+
+                    chasm {
+                        modules.create("DirectService") {
+                            packageName.set("test.chasm")
+                            codegenConfig.set(CodegenConfig(runtime = CodegenRuntime.CHASM))
+                        }
+                    }
+
+                    kotlin {
+                        jvm()
+                        $target
+                    }
+                """,
+            )
+
+            val result = project.buildAndFail("codegenModuleCommonMainDirectService")
+
+            assertContains(
+                result.output,
+                "CodegenRuntime.CHASM only supports Chasm's JVM, Android, and Kotlin/Native targets.",
+            )
+        }
+    }
+
+    @Test
+    fun `portable runtime supports multiplatform web targets`() {
+        val project = project(
+            build = """
+                plugins {
+                    id("$pluginId")
+                    id("org.jetbrains.kotlin.multiplatform")
+                }
+
+                chasm {
+                    modules.create("PortableService") {
+                        packageName.set("test.chasm")
+                    }
+                }
+
+                kotlin {
+                    js()
+                    wasmJs()
+                }
+            """,
+        )
+
+        val result = project.build("codegenModuleCommonMainPortableService")
+
+        assertContains(result.output, "codegenModuleCommonMainPortableService")
+    }
+
+    @Test
+    fun `Chasm multiplatform runtime supports configuration cache and isolated projects`() {
+        val project = project(
+            build = """
+                import io.github.charlietap.chasm.gradle.CodegenConfig
+                import io.github.charlietap.chasm.gradle.CodegenRuntime
+
+                plugins {
+                    id("$pluginId")
+                    id("org.jetbrains.kotlin.multiplatform")
+                }
+
+                kotlin {
+                    jvm()
+                }
+
+                chasm {
+                    modules.create("DirectService") {
+                        packageName.set("test.chasm")
+                        codegenConfig.set(CodegenConfig(runtime = CodegenRuntime.CHASM))
+                    }
+                }
+            """,
+        )
+        val arguments = arrayOf(
+            "codegenModuleCommonMainDirectService",
+            "--configuration-cache",
+            "--isolated-projects",
+            "-Dorg.gradle.isolated-projects.diagnostics=true",
+        )
+
+        project.build(*arguments)
+        val reused = project.build(*arguments)
+
+        assertContains(reused.output, "Configuration cache entry reused.")
+    }
+
+    @Test
+    fun `JVM runtime dependency selection remains lazy`() {
+        RuntimeDependencyConfiguration.entries.forEach { selection ->
+            val configurationName = selection.name.lowercase()
+            listOf(
+                "PORTABLE_VM" to "vm-jvm",
+                "CHASM" to "chasm-jvm",
+            ).forEach { (runtime, artifact) ->
+                val project = project(
+                    build = """
+                        import io.github.charlietap.chasm.gradle.CodegenConfig
+                        import io.github.charlietap.chasm.gradle.CodegenRuntime
+                        import io.github.charlietap.chasm.gradle.RuntimeDependencyConfiguration
+
+                        plugins {
+                            id("$pluginId")
+                            id("org.jetbrains.kotlin.jvm")
+                        }
+
+                        chasm {
+                            runtimeDependencyConfiguration.set(RuntimeDependencyConfiguration.${selection.name})
+                            modules.create("RuntimeService") {
+                                packageName.set("test.chasm")
+                                codegenConfig.set(CodegenConfig(runtime = CodegenRuntime.$runtime))
+                            }
+                        }
+                    """,
+                )
+
+                val result = project.build("dependencies", "--configuration=$configurationName")
+                assertContains(result.output, "io.github.charlietap.chasm:$artifact:")
+                val otherArtifact = if (artifact == "vm-jvm") "chasm-jvm" else "vm-jvm"
+                assertFalse(result.output.contains("io.github.charlietap.chasm:$otherArtifact:"))
+            }
+        }
+    }
+
+    @Test
+    fun `multiplatform runtime selects the matching dependency`() {
+        listOf(
+            "PORTABLE_VM" to "vm",
+            "CHASM" to "chasm",
+        ).forEach { (runtime, artifact) ->
+            val project = project(
+                build = """
+                    import io.github.charlietap.chasm.gradle.CodegenConfig
+                    import io.github.charlietap.chasm.gradle.CodegenRuntime
+
+                    plugins {
+                        id("$pluginId")
+                        id("org.jetbrains.kotlin.multiplatform")
+                    }
+
+                    kotlin {
+                        jvm()
+                    }
+
+                    chasm {
+                        modules.create("RuntimeService") {
+                            packageName.set("test.chasm")
+                            codegenConfig.set(CodegenConfig(runtime = CodegenRuntime.$runtime))
+                        }
+                    }
+                """,
+            )
+
+            val result = project.build("dependencies", "--configuration=commonMainImplementation")
+            assertContains(result.output, "io.github.charlietap.chasm:$artifact:")
+            val otherArtifact = if (artifact == "vm") "chasm" else "vm"
+            assertFalse(result.output.contains("io.github.charlietap.chasm:$otherArtifact:"))
+        }
+    }
+
+    @Test
+    fun `Chasm coroutine dependency follows suspending factory generation`() {
+        listOf(false, true).forEach { suspending ->
+            val project = project(
+                build = """
+                    import io.github.charlietap.chasm.gradle.CodegenConfig
+                    import io.github.charlietap.chasm.gradle.CodegenRuntime
 
                     plugins {
                         id("$pluginId")
@@ -115,13 +289,24 @@ class ChasmPluginFunctionalTest {
                     }
 
                     chasm {
-                        runtimeDependencyConfiguration.set(RuntimeDependencyConfiguration.${selection.name})
+                        modules.create("RuntimeService") {
+                            packageName.set("test.chasm")
+                            codegenConfig.set(
+                                CodegenConfig(
+                                    generateSuspendingFactories = $suspending,
+                                    runtime = CodegenRuntime.CHASM,
+                                ),
+                            )
+                        }
                     }
                 """,
             )
 
-            val result = project.build("dependencies", "--configuration=$configurationName")
-            assertContains(result.output, "io.github.charlietap.chasm:vm-jvm:")
+            val result = project.build("dependencies", "--configuration=implementation")
+            assertEquals(
+                suspending,
+                result.output.contains("io.github.charlietap.chasm:chasm-coroutines-jvm:"),
+            )
         }
     }
 
@@ -792,7 +977,7 @@ class ChasmPluginFunctionalTest {
     }
 
     @Test
-    fun `Android runtime selects the multiplatform coordinate`() {
+    fun `Android portable runtime selects the multiplatform coordinate`() {
         val project = androidProject(
             androidPluginId = "com.android.library",
             moduleName = "AndroidService",
@@ -801,6 +986,20 @@ class ChasmPluginFunctionalTest {
         val result = project.build("dependencies", "--configuration=implementation")
         assertContains(result.output, "io.github.charlietap.chasm:vm:")
         assertFalse(result.output.contains("io.github.charlietap.chasm:vm-jvm:"))
+    }
+
+    @Test
+    fun `Android Chasm runtime selects the multiplatform coordinate`() {
+        val project = androidProject(
+            androidPluginId = "com.android.library",
+            moduleName = "AndroidService",
+            compileSdk = currentCompileSdk,
+            runtime = "CHASM",
+        )
+        val result = project.build("dependencies", "--configuration=implementation")
+        assertContains(result.output, "io.github.charlietap.chasm:chasm:")
+        assertFalse(result.output.contains("io.github.charlietap.chasm:chasm-jvm:"))
+        assertFalse(result.output.contains("io.github.charlietap.chasm:vm:"))
     }
 
     @Test
@@ -917,9 +1116,13 @@ class ChasmPluginFunctionalTest {
         moduleName: String,
         compileSdk: Int,
         minimumAgp: Boolean = false,
+        runtime: String = "PORTABLE_VM",
     ): FunctionalProject {
         return project(
             build = """
+                import io.github.charlietap.chasm.gradle.CodegenConfig
+                import io.github.charlietap.chasm.gradle.CodegenRuntime
+
                 plugins {
                     id("$pluginId")
                     id("$androidPluginId")
@@ -933,6 +1136,7 @@ class ChasmPluginFunctionalTest {
                 chasm {
                     modules.create("$moduleName") {
                         packageName.set("test.chasm")
+                        codegenConfig.set(CodegenConfig(runtime = CodegenRuntime.$runtime))
                     }
                 }
             """,
