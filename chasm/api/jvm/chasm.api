@@ -81,6 +81,32 @@ public final class io/github/charlietap/chasm/embedding/ValidateKt {
 	public static final fun validate (Lio/github/charlietap/chasm/embedding/shapes/Module;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 }
 
+public abstract interface class io/github/charlietap/chasm/embedding/codegen/CodegenImport {
+	public abstract fun getEntityName ()Ljava/lang/String;
+	public abstract fun getModuleName ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/embedding/codegen/CodegenImportKt {
+	public static final fun allocateImports (Lio/github/charlietap/chasm/embedding/shapes/Store;Ljava/util/List;)Ljava/util/List;
+}
+
+public final class io/github/charlietap/chasm/embedding/codegen/FunctionImport : io/github/charlietap/chasm/embedding/codegen/CodegenImport {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Lio/github/charlietap/chasm/type/FunctionType;Lio/github/charlietap/chasm/host/HostFunction;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Lio/github/charlietap/chasm/type/FunctionType;
+	public final fun component4 ()Lio/github/charlietap/chasm/host/HostFunction;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Lio/github/charlietap/chasm/type/FunctionType;Lio/github/charlietap/chasm/host/HostFunction;)Lio/github/charlietap/chasm/embedding/codegen/FunctionImport;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/embedding/codegen/FunctionImport;Ljava/lang/String;Ljava/lang/String;Lio/github/charlietap/chasm/type/FunctionType;Lio/github/charlietap/chasm/host/HostFunction;ILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/codegen/FunctionImport;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getEntityName ()Ljava/lang/String;
+	public final fun getFunction ()Lio/github/charlietap/chasm/host/HostFunction;
+	public fun getModuleName ()Ljava/lang/String;
+	public final fun getType ()Lio/github/charlietap/chasm/type/FunctionType;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
 public final class io/github/charlietap/chasm/embedding/dsl/FunctionImportBuilder {
 	public field entityName Ljava/lang/String;
 	public field moduleName Ljava/lang/String;
