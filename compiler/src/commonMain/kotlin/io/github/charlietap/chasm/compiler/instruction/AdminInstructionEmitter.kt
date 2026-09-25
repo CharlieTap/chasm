@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.compiler.instruction
 import io.github.charlietap.chasm.compiler.context.FunctionCompilationContext
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.CopySlotDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.CopySlotsDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.admin.FuelCheckDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numeric.F32ConstDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numeric.F64ConstDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numeric.I32ConstDispatcher
@@ -62,4 +63,11 @@ internal fun FunctionCompilationContext.emitF32Constant(bits: Int, destinationSl
 internal fun FunctionCompilationContext.emitF64Constant(bits: Long, destinationSlot: Int) {
     val instruction = NumericInstruction.F64ConstS(bits, destinationSlot)
     emit(instruction, ::F64ConstDispatcher)
+}
+
+internal fun FunctionCompilationContext.emitFuelCheck() {
+    val fuel = compiler.fuel ?: return
+    emit(AdminInstruction.FuelCheck) {
+        FuelCheckDispatcher(it, fuel)
+    }
 }

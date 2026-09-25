@@ -23,6 +23,7 @@ import io.github.charlietap.chasm.compiler.instruction.emitCall
 import io.github.charlietap.chasm.compiler.instruction.emitCallIndirect
 import io.github.charlietap.chasm.compiler.instruction.emitCallRef
 import io.github.charlietap.chasm.compiler.instruction.emitCopies
+import io.github.charlietap.chasm.compiler.instruction.emitFuelCheck
 import io.github.charlietap.chasm.compiler.instruction.emitFunctionReturn
 import io.github.charlietap.chasm.compiler.instruction.emitJump
 import io.github.charlietap.chasm.compiler.instruction.emitReturnCallIndirect
@@ -201,7 +202,11 @@ private fun enterBlock(
     } else {
         resultSlots
     }
-    if (kind == BlockKind.Loop) state.bind(branchTarget)
+    if (kind == BlockKind.Loop) {
+        state.bind(branchTarget)
+        // At the loop's branch target, so every iteration spends fuel.
+        state.emitFuelCheck()
+    }
 
     state.controls.push(
         kind = kind,

@@ -180,3 +180,16 @@ final class io.github.charlietap.chasm.config/RuntimeConfig { // io.github.charl
     final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.config/RuntimeConfig.hashCode|hashCode(){}[0]
     final fun toString(): kotlin/String // io.github.charlietap.chasm.config/RuntimeConfig.toString|toString(){}[0]
 }
+
+final class io.github.charlietap.chasm.config/StoreConfig { // io.github.charlietap.chasm.config/StoreConfig|null[0]
+    constructor <init>(kotlin/Boolean = ...) // io.github.charlietap.chasm.config/StoreConfig.<init>|<init>(kotlin.Boolean){}[0]
+
+    final val meterFuel // io.github.charlietap.chasm.config/StoreConfig.meterFuel|{}meterFuel[0]
+        final fun <get-meterFuel>(): kotlin/Boolean // io.github.charlietap.chasm.config/StoreConfig.meterFuel.<get-meterFuel>|<get-meterFuel>(){}[0]
+
+    final fun component1(): kotlin/Boolean // io.github.charlietap.chasm.config/StoreConfig.component1|component1(){}[0]
+    final fun copy(kotlin/Boolean = ...): io.github.charlietap.chasm.config/StoreConfig // io.github.charlietap.chasm.config/StoreConfig.copy|copy(kotlin.Boolean){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.config/StoreConfig.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.config/StoreConfig.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.charlietap.chasm.config/StoreConfig.toString|toString(){}[0]
+}

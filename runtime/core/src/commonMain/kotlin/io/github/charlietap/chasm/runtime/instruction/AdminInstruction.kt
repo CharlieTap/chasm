@@ -21,6 +21,9 @@ sealed interface AdminInstruction : LinkedInstruction {
 
     data class Jump(val targetIp: Int) : AdminInstruction
 
+    /** Takes a unit of the store's [io.github.charlietap.chasm.runtime.store.Fuel]; emitted only for metered stores. */
+    data object FuelCheck : AdminInstruction
+
     data class JumpCopies(
         val operands: OperandTransfer,
         val destinationSlotBase: Int,
