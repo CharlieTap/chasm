@@ -6,7 +6,7 @@ import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterSpec
 
-internal class FactoryFunctionGenerator {
+internal class PortableVmFactoryFunctionGenerator {
     operator fun invoke(
         packageName: String,
         interfaceName: String,

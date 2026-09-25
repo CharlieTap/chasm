@@ -25,7 +25,10 @@ fun MinimalExternalModuleDependency.notation(): String {
 }
 
 buildConfig {
+    buildConfigField("CHASM_DEPENDENCY", libs.chasm.kmp.get().notation())
     buildConfigField("CHASM_JVM_DEPENDENCY", libs.chasm.jvm.get().notation())
+    buildConfigField("CHASM_COROUTINES_DEPENDENCY", libs.chasm.coroutines.kmp.get().notation())
+    buildConfigField("CHASM_COROUTINES_JVM_DEPENDENCY", libs.chasm.coroutines.jvm.get().notation())
     buildConfigField("VM_DEPENDENCY", libs.vm.kmp.get().notation())
     buildConfigField("VM_JVM_DEPENDENCY", libs.vm.jvm.get().notation())
     buildConfigField("KOTLIN_POET_DEPENDENCY", libs.kotlin.poet.get().notation())

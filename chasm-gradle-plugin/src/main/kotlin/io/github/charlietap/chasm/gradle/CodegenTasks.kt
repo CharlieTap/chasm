@@ -10,6 +10,7 @@ internal fun registerCodegenTask(
     module: WasmModule,
     sourceSetName: String,
     classpath: Provider<out Configuration>,
+    config: Provider<CodegenConfig>,
 ): TaskProvider<CodegenTask> {
     val capitalizedSourceName = sourceSetName.replaceFirstChar { it.uppercase() }
     return project.tasks.register("codegenModule$capitalizedSourceName${module.name}", CodegenTask::class.java) { task ->
@@ -19,7 +20,7 @@ internal fun registerCodegenTask(
         task.workerClasspath.from(classpath)
         task.binary.set(module.binary)
         task.allocator.set(module.allocator)
-        task.config.set(module.codegenConfig)
+        task.config.set(config)
         task.interfaceName.set(module.name)
         task.packageName.set(module.packageName)
         task.interfaceVisibility.set(module.interfaceVisibility)

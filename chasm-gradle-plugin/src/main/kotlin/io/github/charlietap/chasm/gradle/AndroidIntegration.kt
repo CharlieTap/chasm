@@ -21,10 +21,11 @@ internal fun configureAndroid(
 
         extension.modules.configureEach { module ->
             val task = registerCodegenTask(
-                project,
-                module,
-                variant.name,
-                workerClasspath,
+                project = project,
+                module = module,
+                sourceSetName = variant.name,
+                classpath = workerClasspath,
+                config = module.codegenConfig,
             )
             kotlinSources.addGeneratedSourceDirectory(task, CodegenTask::outputDirectory)
         }

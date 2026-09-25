@@ -35,8 +35,10 @@ internal class DataClassGenerator {
 internal class WasmInterfaceGenerator(
     private val dataClassGenerator: DataClassGenerator = DataClassGenerator(),
     private val classInterfaceGenerator: ClassInterfaceGenerator = ClassInterfaceGenerator(),
-    private val factoryFunctionGenerator: FactoryFunctionGenerator = FactoryFunctionGenerator(),
-    private val classImplementationGenerator: ClassImplementationGenerator = ClassImplementationGenerator(),
+    private val portableVmFactoryFunctionGenerator: PortableVmFactoryFunctionGenerator = PortableVmFactoryFunctionGenerator(),
+    private val portableVmClassImplementationGenerator: PortableVmClassImplementationGenerator = PortableVmClassImplementationGenerator(),
+    private val chasmFactoryFunctionGenerator: ChasmFactoryFunctionGenerator = ChasmFactoryFunctionGenerator(),
+    private val chasmClassImplementationGenerator: ChasmClassImplementationGenerator = ChasmClassImplementationGenerator(),
     private val visibilityValidator: VisibilityValidator = VisibilityValidator(),
 ) {
     operator fun invoke(
@@ -62,20 +64,36 @@ internal class WasmInterfaceGenerator(
 
         val implementationFile = FileSpec.builder(wasmInterface.packageName, wasmInterface.interfaceName + "Impl").apply {
             addFunction(
-                factoryFunctionGenerator(
-                    packageName = wasmInterface.packageName,
-                    interfaceName = wasmInterface.interfaceName,
-                    visibility = factoryVisibility,
-                    generateSuspendingFactory = config.generateSuspendingFactories,
-                ),
+                when (config.runtime) {
+                    CodegenRuntime.PORTABLE_VM -> portableVmFactoryFunctionGenerator(
+                        packageName = wasmInterface.packageName,
+                        interfaceName = wasmInterface.interfaceName,
+                        visibility = factoryVisibility,
+                        generateSuspendingFactory = config.generateSuspendingFactories,
+                    )
+                    CodegenRuntime.CHASM -> chasmFactoryFunctionGenerator(
+                        packageName = wasmInterface.packageName,
+                        interfaceName = wasmInterface.interfaceName,
+                        visibility = factoryVisibility,
+                        generateSuspendingFactory = config.generateSuspendingFactories,
+                    )
+                },
             )
             addType(
-                classImplementationGenerator(
-                    packageName = wasmInterface.packageName,
-                    interfaceName = wasmInterface.interfaceName,
-                    visibility = implementationVisibility,
-                    wasmInterface = wasmInterface,
-                ),
+                when (config.runtime) {
+                    CodegenRuntime.PORTABLE_VM -> portableVmClassImplementationGenerator(
+                        packageName = wasmInterface.packageName,
+                        interfaceName = wasmInterface.interfaceName,
+                        visibility = implementationVisibility,
+                        wasmInterface = wasmInterface,
+                    )
+                    CodegenRuntime.CHASM -> chasmClassImplementationGenerator(
+                        packageName = wasmInterface.packageName,
+                        interfaceName = wasmInterface.interfaceName,
+                        visibility = implementationVisibility,
+                        wasmInterface = wasmInterface,
+                    )
+                },
             )
         }.build()
 

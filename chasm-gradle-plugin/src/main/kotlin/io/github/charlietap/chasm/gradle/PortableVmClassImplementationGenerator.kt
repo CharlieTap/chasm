@@ -151,10 +151,6 @@ private fun resultTypesExpression(function: Function): CodeBlock {
     }
 }
 
-internal fun preparedFunctionPropertyName(function: Function): String {
-    return function.name + "PreparedFunction"
-}
-
 internal class FunctionProxyImplementationGenerator(
     private val returnImplementationGenerator: FunctionReturnImplementationGenerator = FunctionReturnImplementationGenerator(),
 ) {
@@ -596,7 +592,7 @@ internal class ClassPropertiesGenerator(
     }
 }
 
-internal class ClassImplementationGenerator(
+internal class PortableVmClassImplementationGenerator(
     private val constructorGenerator: ConstructorGenerator = ConstructorGenerator(),
     private val initializerBlockGenerator: InitializerBlockGenerator = InitializerBlockGenerator(),
     private val functionImplementationGenerator: FunctionImplementationGenerator = FunctionImplementationGenerator(),

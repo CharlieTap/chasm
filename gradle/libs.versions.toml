@@ -117,6 +117,8 @@ androidx-compose-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-
 
 chasm-jvm = { module = "io.github.charlietap.chasm:chasm-jvm", version.ref = "version-name"}
 chasm-kmp = { module = "io.github.charlietap.chasm:chasm", version.ref = "version-name"}
+chasm-coroutines-jvm = { module = "io.github.charlietap.chasm:chasm-coroutines-jvm", version.ref = "version-name"}
+chasm-coroutines-kmp = { module = "io.github.charlietap.chasm:chasm-coroutines", version.ref = "version-name"}
 vm-jvm = { module = "io.github.charlietap.chasm:vm-jvm", version.ref = "version-name"}
 vm-kmp = { module = "io.github.charlietap.chasm:vm", version.ref = "version-name"}
 

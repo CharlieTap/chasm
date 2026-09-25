@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.gradle
 
 import io.github.charlietap.chasm.chasm_gradle_plugin.BuildConfig
+import org.gradle.api.InvalidUserCodeException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
@@ -10,6 +11,7 @@ import org.gradle.api.provider.Provider
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation.Companion.MAIN_COMPILATION_NAME
+import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import kotlin.jvm.java
 
 class ChasmPlugin : Plugin<Project> {
@@ -21,20 +23,33 @@ class ChasmPlugin : Plugin<Project> {
         project.pluginManager.withPlugin(KOTLIN_MULTIPLATFORM_PLUGIN_ID) {
             val multiplatform = project.extensions.getByType(KotlinMultiplatformExtension::class.java)
             val commonMain = multiplatform.sourceSets.getByName(COMMON_MAIN_SOURCE_SET_NAME)
+            val hasWebTarget = project.objects.property(Boolean::class.java).convention(false)
+            hasWebTarget.disallowUnsafeRead()
 
-            addVMRuntime(
-                project = project,
-                selection = extension.runtimeDependencyConfiguration,
-                apiConfigurationName = commonMain.apiConfigurationName,
-                implementationConfigurationName = commonMain.implementationConfigurationName,
-            )
+            multiplatform.targets.configureEach { target ->
+                if (target.platformType == KotlinPlatformType.js || target.platformType == KotlinPlatformType.wasm) {
+                    hasWebTarget.set(true)
+                }
+            }
 
             extension.modules.configureEach { module ->
+                val config = validatedCodegenConfig(
+                    module.codegenConfig,
+                    hasWebTarget,
+                )
+                addRuntime(
+                    project = project,
+                    config = config,
+                    selection = extension.runtimeDependencyConfiguration,
+                    apiConfigurationName = commonMain.apiConfigurationName,
+                    implementationConfigurationName = commonMain.implementationConfigurationName,
+                )
                 val task = registerCodegenTask(
-                    project,
-                    module,
-                    COMMON_MAIN_SOURCE_SET_NAME,
-                    workerClasspath,
+                    project = project,
+                    module = module,
+                    sourceSetName = COMMON_MAIN_SOURCE_SET_NAME,
+                    classpath = workerClasspath,
+                    config = config,
                 )
                 commonMain.kotlin.srcDir(task.flatMap(CodegenTask::outputDirectory))
             }
@@ -44,32 +59,36 @@ class ChasmPlugin : Plugin<Project> {
             val kotlin = project.extensions.getByType(KotlinJvmProjectExtension::class.java)
             val mainCompilation = kotlin.target.compilations.getByName(MAIN_COMPILATION_NAME)
 
-            addVMRuntime(
-                project = project,
-                selection = extension.runtimeDependencyConfiguration,
-                apiConfigurationName = API_CONFIGURATION_NAME,
-                implementationConfigurationName = IMPLEMENTATION_CONFIGURATION_NAME,
-                jvmArtifact = true,
-            )
-
             extension.modules.configureEach { module ->
+                addRuntime(
+                    project = project,
+                    config = module.codegenConfig,
+                    selection = extension.runtimeDependencyConfiguration,
+                    apiConfigurationName = API_CONFIGURATION_NAME,
+                    implementationConfigurationName = IMPLEMENTATION_CONFIGURATION_NAME,
+                    jvmArtifact = true,
+                )
                 val task = registerCodegenTask(
-                    project,
-                    module,
-                    MAIN_COMPILATION_NAME,
-                    workerClasspath,
+                    project = project,
+                    module = module,
+                    sourceSetName = MAIN_COMPILATION_NAME,
+                    classpath = workerClasspath,
+                    config = module.codegenConfig,
                 )
                 mainCompilation.defaultSourceSet.kotlin.srcDir(task.flatMap(CodegenTask::outputDirectory))
             }
         }
 
         project.pluginManager.withPlugin(ANDROID_BASE_PLUGIN_ID) {
-            addVMRuntime(
-                project = project,
-                selection = extension.runtimeDependencyConfiguration,
-                apiConfigurationName = API_CONFIGURATION_NAME,
-                implementationConfigurationName = IMPLEMENTATION_CONFIGURATION_NAME,
-            )
+            extension.modules.configureEach { module ->
+                addRuntime(
+                    project = project,
+                    config = module.codegenConfig,
+                    selection = extension.runtimeDependencyConfiguration,
+                    apiConfigurationName = API_CONFIGURATION_NAME,
+                    implementationConfigurationName = IMPLEMENTATION_CONFIGURATION_NAME,
+                )
+            }
             configureAndroid(project, extension, workerClasspath)
         }
     }
@@ -78,7 +97,7 @@ class ChasmPlugin : Plugin<Project> {
         val dependencies = project.configurations.dependencyScope(WORKER_DEPENDENCIES_CONFIGURATION_NAME) { configuration ->
             configuration.description = "Dependencies for the Chasm codegen worker"
         }
-        project.dependencies.add(dependencies.name, resolveChasmRuntimeNotation())
+        project.dependencies.add(dependencies.name, resolveChasmRuntimeNotation(jvmArtifact = true))
         project.dependencies.add(dependencies.name, resolveVMRuntimeNotation(jvmArtifact = true))
         project.dependencies.add(dependencies.name, resolveKotlinPoetNotation())
 
@@ -98,30 +117,70 @@ class ChasmPlugin : Plugin<Project> {
         }
     }
 
-    private fun addVMRuntime(
+    private fun addRuntime(
         project: Project,
+        config: Provider<CodegenConfig>,
         selection: Provider<RuntimeDependencyConfiguration>,
         apiConfigurationName: String,
         implementationConfigurationName: String,
         jvmArtifact: Boolean = false,
     ) {
-        val notation = resolveVMRuntimeNotation(jvmArtifact)
+        val runtimeNotation = config.map { value ->
+            when (value.runtime) {
+                CodegenRuntime.PORTABLE_VM -> resolveVMRuntimeNotation(jvmArtifact)
+                CodegenRuntime.CHASM -> resolveChasmRuntimeNotation(jvmArtifact)
+            }
+        }
         project.dependencies.addProvider(
             apiConfigurationName,
-            selection.filter { it == RuntimeDependencyConfiguration.API }.map { notation },
+            selection.filter { it == RuntimeDependencyConfiguration.API }.flatMap { runtimeNotation },
         )
         project.dependencies.addProvider(
             implementationConfigurationName,
-            selection.filter { it == RuntimeDependencyConfiguration.IMPLEMENTATION }.map { notation },
+            selection.filter { it == RuntimeDependencyConfiguration.IMPLEMENTATION }.flatMap { runtimeNotation },
         )
+
+        val coroutineNotation = config.filter { value ->
+            value.runtime == CodegenRuntime.CHASM && value.generateSuspendingFactories
+        }
+            .map { resolveChasmCoroutinesRuntimeNotation(jvmArtifact) }
+        project.dependencies.addProvider(
+            apiConfigurationName,
+            selection.filter { it == RuntimeDependencyConfiguration.API }.flatMap { coroutineNotation },
+        )
+        project.dependencies.addProvider(
+            implementationConfigurationName,
+            selection.filter { it == RuntimeDependencyConfiguration.IMPLEMENTATION }.flatMap { coroutineNotation },
+        )
+    }
+
+    private fun validatedCodegenConfig(
+        config: Provider<CodegenConfig>,
+        hasWebTarget: Provider<Boolean>,
+    ): Provider<CodegenConfig> = config.zip(hasWebTarget) { value, webTarget ->
+        if (value.runtime == CodegenRuntime.CHASM && webTarget) {
+            throw InvalidUserCodeException(
+                "CodegenRuntime.CHASM only supports Chasm's JVM, Android, and Kotlin/Native targets. " +
+                    "Use CodegenRuntime.PORTABLE_VM for modules generated in a source set shared with JS or Wasm JS.",
+            )
+        }
+        value
     }
 
     private fun resolveVMRuntimeNotation(jvmArtifact: Boolean = false): String {
         return if (jvmArtifact) BuildConfig.VM_JVM_DEPENDENCY else BuildConfig.VM_DEPENDENCY
     }
 
-    private fun resolveChasmRuntimeNotation(): String {
-        return BuildConfig.CHASM_JVM_DEPENDENCY
+    private fun resolveChasmRuntimeNotation(jvmArtifact: Boolean = false): String {
+        return if (jvmArtifact) BuildConfig.CHASM_JVM_DEPENDENCY else BuildConfig.CHASM_DEPENDENCY
+    }
+
+    private fun resolveChasmCoroutinesRuntimeNotation(jvmArtifact: Boolean = false): String {
+        return if (jvmArtifact) {
+            BuildConfig.CHASM_COROUTINES_JVM_DEPENDENCY
+        } else {
+            BuildConfig.CHASM_COROUTINES_DEPENDENCY
+        }
     }
 
     private fun resolveKotlinPoetNotation(): String {

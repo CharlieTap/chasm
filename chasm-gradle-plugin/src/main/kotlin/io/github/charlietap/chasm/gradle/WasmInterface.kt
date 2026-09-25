@@ -50,6 +50,10 @@ internal fun functionInputBufferName(inputCount: Int): String {
     return FUNCTION_INPUT_BUFFER_NAME + inputCount
 }
 
+internal fun preparedFunctionPropertyName(function: Function): String {
+    return function.name + "PreparedFunction"
+}
+
 internal data class Field(
     val name: String,
     val type: Type,
