@@ -1,0 +1,47 @@
+package com.test
+
+import io.github.charlietap.chasm.embedding.codegen.CodegenImport
+import io.github.charlietap.chasm.embedding.codegen.InstanceFactory
+import io.github.charlietap.chasm.embedding.codegen.ModuleFactory
+import io.github.charlietap.chasm.embedding.codegen.allocateImports
+import io.github.charlietap.chasm.embedding.instance
+import io.github.charlietap.chasm.embedding.module
+import io.github.charlietap.chasm.embedding.prepareFunction
+import io.github.charlietap.chasm.embedding.shapes.Instance
+import io.github.charlietap.chasm.embedding.shapes.PreparedFunction
+import io.github.charlietap.chasm.embedding.shapes.Store
+import io.github.charlietap.chasm.embedding.shapes.`expect`
+import io.github.charlietap.chasm.embedding.store
+import io.github.charlietap.chasm.runtime.`value`.ExecutionValue
+import io.github.charlietap.chasm.runtime.`value`.NumberValue
+import kotlin.ByteArray
+import kotlin.Double
+import kotlin.collections.List
+
+public fun doubleReturn(
+  binary: ByteArray,
+  imports: List<CodegenImport> = emptyList(),
+  moduleFactory: ModuleFactory? = null,
+  instanceFactory: InstanceFactory? = null,
+): DoubleReturn {
+  val store = store()
+  val module = moduleFactory?.invoke(binary) ?: module(binary).`expect`("Failed to decode binary")
+  val allocatedImports = allocateImports(store, imports)
+  val instance = instanceFactory?.invoke(store, module, allocatedImports) ?: instance(store, module, allocatedImports).`expect`("Failed to instantiate module")
+  return DoubleReturnImpl(store = store, instance = instance)
+}
+
+private class DoubleReturnImpl(
+  private val store: Store,
+  private val instance: Instance,
+) : DoubleReturn {
+  private val invokePreparedFunction: PreparedFunction =
+      prepareFunction(store, instance, "invoke").`expect`("Failed to prepare function invoke")
+
+  override fun invoke(): Double {
+    val args = emptyList<ExecutionValue>()
+    val values = invokePreparedFunction(args).`expect`("Failed to invoke function invoke")
+    val result = (values.first() as NumberValue.F64).value
+    return result
+  }
+}

@@ -11,25 +11,53 @@ internal fun assertGenerates(
     implementationVisibility: ImplementationVisibility = ImplementationVisibility.PRIVATE,
     config: CodegenConfig = CodegenConfig(),
 ) {
-    val generated = WasmInterfaceGenerator()(
-        interfaceVisibility = interfaceVisibility,
-        factoryVisibility = factoryVisibility,
-        implementationVisibility = implementationVisibility,
-        wasmInterface = wasmInterface,
-        config = config,
-    )
     val expectedFileNames = listOf(
         wasmInterface.interfaceName,
         wasmInterface.interfaceName + "Impl",
     )
-    assertEquals(expectedFileNames, generated.map { file -> file.name })
+    val generatedByRuntime = CodegenRuntime.entries.associateWith { runtime ->
+        WasmInterfaceGenerator()(
+            interfaceVisibility = interfaceVisibility,
+            factoryVisibility = factoryVisibility,
+            implementationVisibility = implementationVisibility,
+            wasmInterface = wasmInterface,
+            config = config.copy(runtime = runtime),
+        ).also { generated ->
+            assertEquals(expectedFileNames, generated.map { file -> file.name })
+        }.associateBy { file -> file.name }
+    }
 
-    generated.forEach { file ->
-        val resourcePath = "codegen/$category/${file.name}.kt.txt"
-        assertEquals(
-            Resource(resourcePath).readText(),
-            file.toString(),
-            "Generated source did not match $resourcePath",
+    val interfacesByRuntime = generatedByRuntime.mapValues { (_, files) ->
+        files.getValue(wasmInterface.interfaceName).toString()
+    }
+    assertEquals(
+        1,
+        interfacesByRuntime.values.toSet().size,
+        "Generated interface differs by runtime: ${interfacesByRuntime.keys}",
+    )
+    assertGolden(
+        path = "codegen/interface/$category/${wasmInterface.interfaceName}.kt.txt",
+        actual = interfacesByRuntime.values.first(),
+    )
+
+    generatedByRuntime.forEach { (runtime, files) ->
+        assertGolden(
+            path = "codegen/implementation/${runtime.goldenDirectory}/$category/${wasmInterface.interfaceName}Impl.kt.txt",
+            actual = files.getValue(wasmInterface.interfaceName + "Impl").toString(),
         )
     }
+}
+
+private val CodegenRuntime.goldenDirectory: String
+    get() = when (this) {
+        CodegenRuntime.PORTABLE_VM -> "vm"
+        CodegenRuntime.CHASM -> "chasm"
+    }
+
+private fun assertGolden(path: String, actual: String) {
+    assertEquals(
+        Resource(path).readText(),
+        actual,
+        "Generated source did not match $path",
+    )
 }

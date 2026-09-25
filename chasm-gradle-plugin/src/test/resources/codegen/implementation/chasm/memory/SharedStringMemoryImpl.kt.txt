@@ -1,0 +1,79 @@
+package com.test
+
+import io.github.charlietap.chasm.embedding.codegen.CodegenImport
+import io.github.charlietap.chasm.embedding.codegen.InstanceFactory
+import io.github.charlietap.chasm.embedding.codegen.ModuleFactory
+import io.github.charlietap.chasm.embedding.codegen.allocateImports
+import io.github.charlietap.chasm.embedding.instance
+import io.github.charlietap.chasm.embedding.memory.readBytes
+import io.github.charlietap.chasm.embedding.memory.readNullTerminatedUtf8String
+import io.github.charlietap.chasm.embedding.memory.writeBytes
+import io.github.charlietap.chasm.embedding.module
+import io.github.charlietap.chasm.embedding.prepareFunction
+import io.github.charlietap.chasm.embedding.shapes.Instance
+import io.github.charlietap.chasm.embedding.shapes.Memory
+import io.github.charlietap.chasm.embedding.shapes.PreparedFunction
+import io.github.charlietap.chasm.embedding.shapes.Store
+import io.github.charlietap.chasm.embedding.shapes.`expect`
+import io.github.charlietap.chasm.embedding.store
+import io.github.charlietap.chasm.runtime.`value`.ExecutionValue
+import io.github.charlietap.chasm.runtime.`value`.NumberValue
+import kotlin.ByteArray
+import kotlin.Int
+import kotlin.String
+import kotlin.collections.List
+
+public fun sharedStringMemory(
+  binary: ByteArray,
+  imports: List<CodegenImport> = emptyList(),
+  moduleFactory: ModuleFactory? = null,
+  instanceFactory: InstanceFactory? = null,
+): SharedStringMemory {
+  val store = store()
+  val module = moduleFactory?.invoke(binary) ?: module(binary).`expect`("Failed to decode binary")
+  val allocatedImports = allocateImports(store, imports)
+  val instance = instanceFactory?.invoke(store, module, allocatedImports) ?: instance(store, module, allocatedImports).`expect`("Failed to instantiate module")
+  return SharedStringMemoryImpl(store = store, instance = instance)
+}
+
+private class SharedStringMemoryImpl(
+  private val store: Store,
+  private val instance: Instance,
+) : SharedStringMemory {
+  private val readStringPreparedFunction: PreparedFunction =
+      prepareFunction(store, instance, "read_string").`expect`("Failed to prepare function read_string")
+
+  private val _memory: Memory =
+      (instance.exports.firstOrNull { export -> export.name == "memory" }?.value as? Memory) ?: error("Failed to find memory export with name memory")
+
+  override val memory: SharedStringMemory.Memory = MemoryImpl(store, _memory)
+
+  override fun readString(): String {
+    val args = emptyList<ExecutionValue>()
+    val values = readStringPreparedFunction(args).`expect`("Failed to invoke function readString")
+    val pointer = (values[0] as NumberValue.I32).value
+    val result = readNullTerminatedUtf8String(store, _memory, pointer).`expect`("Failed to read string result for readString")
+    return result
+  }
+
+  private class MemoryImpl(
+    private val store: Store,
+    private val memory: Memory,
+  ) : SharedStringMemory.Memory {
+    override fun read(
+      buffer: ByteArray,
+      memoryPointer: Int,
+      bufferPointer: Int,
+      bytesToRead: Int,
+    ): ByteArray = readBytes(store, memory, buffer, memoryPointer, bytesToRead, bufferPointer).`expect`("Failed to read memory")
+
+    override fun write(
+      pointer: Int,
+      buffer: ByteArray,
+      bufferPointer: Int,
+      bytesToWrite: Int,
+    ) {
+      writeBytes(store, memory, pointer, buffer, bufferPointer, bytesToWrite).`expect`("Failed to write memory")
+    }
+  }
+}

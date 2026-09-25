@@ -1,0 +1,62 @@
+package com.test
+
+import io.github.charlietap.chasm.embedding.codegen.CodegenImport
+import io.github.charlietap.chasm.embedding.codegen.InstanceFactory
+import io.github.charlietap.chasm.embedding.codegen.ModuleFactory
+import io.github.charlietap.chasm.embedding.codegen.allocateImports
+import io.github.charlietap.chasm.embedding.instance
+import io.github.charlietap.chasm.embedding.memory.readBytes
+import io.github.charlietap.chasm.embedding.memory.writeBytes
+import io.github.charlietap.chasm.embedding.module
+import io.github.charlietap.chasm.embedding.shapes.Instance
+import io.github.charlietap.chasm.embedding.shapes.Memory
+import io.github.charlietap.chasm.embedding.shapes.Store
+import io.github.charlietap.chasm.embedding.shapes.`expect`
+import io.github.charlietap.chasm.embedding.store
+import kotlin.ByteArray
+import kotlin.Int
+import kotlin.collections.List
+
+public fun singleMemory(
+  binary: ByteArray,
+  imports: List<CodegenImport> = emptyList(),
+  moduleFactory: ModuleFactory? = null,
+  instanceFactory: InstanceFactory? = null,
+): SingleMemory {
+  val store = store()
+  val module = moduleFactory?.invoke(binary) ?: module(binary).`expect`("Failed to decode binary")
+  val allocatedImports = allocateImports(store, imports)
+  val instance = instanceFactory?.invoke(store, module, allocatedImports) ?: instance(store, module, allocatedImports).`expect`("Failed to instantiate module")
+  return SingleMemoryImpl(store = store, instance = instance)
+}
+
+private class SingleMemoryImpl(
+  private val store: Store,
+  private val instance: Instance,
+) : SingleMemory {
+  private val _memory: Memory =
+      (instance.exports.firstOrNull { export -> export.name == "memory" }?.value as? Memory) ?: error("Failed to find memory export with name memory")
+
+  override val memory: SingleMemory.Memory = MemoryImpl(store, _memory)
+
+  private class MemoryImpl(
+    private val store: Store,
+    private val memory: Memory,
+  ) : SingleMemory.Memory {
+    override fun read(
+      buffer: ByteArray,
+      memoryPointer: Int,
+      bufferPointer: Int,
+      bytesToRead: Int,
+    ): ByteArray = readBytes(store, memory, buffer, memoryPointer, bytesToRead, bufferPointer).`expect`("Failed to read memory")
+
+    override fun write(
+      pointer: Int,
+      buffer: ByteArray,
+      bufferPointer: Int,
+      bytesToWrite: Int,
+    ) {
+      writeBytes(store, memory, pointer, buffer, bufferPointer, bytesToWrite).`expect`("Failed to write memory")
+    }
+  }
+}

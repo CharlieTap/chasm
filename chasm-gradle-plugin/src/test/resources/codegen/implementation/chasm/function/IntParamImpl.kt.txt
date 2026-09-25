@@ -1,0 +1,52 @@
+package com.test
+
+import io.github.charlietap.chasm.embedding.codegen.CodegenImport
+import io.github.charlietap.chasm.embedding.codegen.InstanceFactory
+import io.github.charlietap.chasm.embedding.codegen.ModuleFactory
+import io.github.charlietap.chasm.embedding.codegen.allocateImports
+import io.github.charlietap.chasm.embedding.instance
+import io.github.charlietap.chasm.embedding.module
+import io.github.charlietap.chasm.embedding.prepareFunction
+import io.github.charlietap.chasm.embedding.shapes.Instance
+import io.github.charlietap.chasm.embedding.shapes.PreparedFunction
+import io.github.charlietap.chasm.embedding.shapes.Store
+import io.github.charlietap.chasm.embedding.shapes.`expect`
+import io.github.charlietap.chasm.embedding.store
+import io.github.charlietap.chasm.runtime.`value`.ExecutionValue
+import io.github.charlietap.chasm.runtime.`value`.NumberValue
+import kotlin.ByteArray
+import kotlin.Int
+import kotlin.collections.List
+import kotlin.collections.MutableList
+
+public fun intParam(
+  binary: ByteArray,
+  imports: List<CodegenImport> = emptyList(),
+  moduleFactory: ModuleFactory? = null,
+  instanceFactory: InstanceFactory? = null,
+): IntParam {
+  val store = store()
+  val module = moduleFactory?.invoke(binary) ?: module(binary).`expect`("Failed to decode binary")
+  val allocatedImports = allocateImports(store, imports)
+  val instance = instanceFactory?.invoke(store, module, allocatedImports) ?: instance(store, module, allocatedImports).`expect`("Failed to instantiate module")
+  return IntParamImpl(store = store, instance = instance)
+}
+
+private class IntParamImpl(
+  private val store: Store,
+  private val instance: Instance,
+) : IntParam {
+  private val invokePreparedFunction: PreparedFunction =
+      prepareFunction(store, instance, "invoke").`expect`("Failed to prepare function invoke")
+
+  private val functionInputBuffer: MutableList<ExecutionValue> =
+      MutableList<ExecutionValue>(1) { NumberValue.I32(0) }
+
+  private val functionInputBuffer1: MutableList<ExecutionValue> = functionInputBuffer
+
+  override fun invoke(`value`: Int) {
+    functionInputBuffer[0] = NumberValue.I32(value)
+    val args = functionInputBuffer1
+    val values = invokePreparedFunction(args).`expect`("Failed to invoke function invoke")
+  }
+}

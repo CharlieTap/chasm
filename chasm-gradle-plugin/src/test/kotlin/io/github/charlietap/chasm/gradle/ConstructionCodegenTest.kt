@@ -107,17 +107,20 @@ class ConstructionCodegenTest {
         listOf(false, true).forEach { suspending ->
             ImplementationVisibility.entries.forEach { visibility ->
                 FactoryVisibility.entries.forEach { factoryVisibility ->
-                    val files = WasmInterfaceGenerator()(
-                        interfaceVisibility = InterfaceVisibility.PUBLIC,
-                        implementationVisibility = visibility,
-                        factoryVisibility = factoryVisibility,
-                        wasmInterface = wasmInterface(interfaceName = "Service"),
-                        config = codegenConfig(generateSuspendingFactories = suspending),
-                    )
-                    val implementation = files.last().toString()
-                    val suspendModifier = if (suspending) "suspend " else ""
-                    assertContains(implementation, "${visibility.name.lowercase()} class ServiceImpl(")
-                    assertContains(implementation, "${factoryVisibility.name.lowercase()} ${suspendModifier}fun service(")
+                    CodegenRuntime.entries.forEach { runtime ->
+                        val files = WasmInterfaceGenerator()(
+                            interfaceVisibility = InterfaceVisibility.PUBLIC,
+                            implementationVisibility = visibility,
+                            factoryVisibility = factoryVisibility,
+                            wasmInterface = wasmInterface(interfaceName = "Service"),
+                            config = codegenConfig(generateSuspendingFactories = suspending)
+                                .copy(runtime = runtime),
+                        )
+                        val implementation = files.last().toString()
+                        val suspendModifier = if (suspending) "suspend " else ""
+                        assertContains(implementation, "${visibility.name.lowercase()} class ServiceImpl(")
+                        assertContains(implementation, "${factoryVisibility.name.lowercase()} ${suspendModifier}fun service(")
+                    }
                 }
             }
         }

@@ -1,0 +1,81 @@
+package com.test
+
+import io.github.charlietap.chasm.embedding.codegen.CodegenImport
+import io.github.charlietap.chasm.embedding.codegen.InstanceFactory
+import io.github.charlietap.chasm.embedding.codegen.ModuleFactory
+import io.github.charlietap.chasm.embedding.codegen.allocateImports
+import io.github.charlietap.chasm.embedding.instance
+import io.github.charlietap.chasm.embedding.module
+import io.github.charlietap.chasm.embedding.prepareFunction
+import io.github.charlietap.chasm.embedding.shapes.Instance
+import io.github.charlietap.chasm.embedding.shapes.PreparedFunction
+import io.github.charlietap.chasm.embedding.shapes.Store
+import io.github.charlietap.chasm.embedding.shapes.`expect`
+import io.github.charlietap.chasm.embedding.store
+import io.github.charlietap.chasm.runtime.`value`.ExecutionValue
+import io.github.charlietap.chasm.runtime.`value`.NumberValue
+import kotlin.ByteArray
+import kotlin.Int
+import kotlin.collections.List
+import kotlin.collections.MutableList
+
+public fun multipleArities(
+  binary: ByteArray,
+  imports: List<CodegenImport> = emptyList(),
+  moduleFactory: ModuleFactory? = null,
+  instanceFactory: InstanceFactory? = null,
+): MultipleArities {
+  val store = store()
+  val module = moduleFactory?.invoke(binary) ?: module(binary).`expect`("Failed to decode binary")
+  val allocatedImports = allocateImports(store, imports)
+  val instance = instanceFactory?.invoke(store, module, allocatedImports) ?: instance(store, module, allocatedImports).`expect`("Failed to instantiate module")
+  return MultipleAritiesImpl(store = store, instance = instance)
+}
+
+private class MultipleAritiesImpl(
+  private val store: Store,
+  private val instance: Instance,
+) : MultipleArities {
+  private val onePreparedFunction: PreparedFunction =
+      prepareFunction(store, instance, "one").`expect`("Failed to prepare function one")
+
+  private val twoPreparedFunction: PreparedFunction =
+      prepareFunction(store, instance, "two").`expect`("Failed to prepare function two")
+
+  private val threePreparedFunction: PreparedFunction =
+      prepareFunction(store, instance, "three").`expect`("Failed to prepare function three")
+
+  private val functionInputBuffer: MutableList<ExecutionValue> =
+      MutableList<ExecutionValue>(3) { NumberValue.I32(0) }
+
+  private val functionInputBuffer1: MutableList<ExecutionValue> = functionInputBuffer.subList(0, 1)
+
+  private val functionInputBuffer2: MutableList<ExecutionValue> = functionInputBuffer.subList(0, 2)
+
+  private val functionInputBuffer3: MutableList<ExecutionValue> = functionInputBuffer
+
+  override fun one(p0: Int) {
+    functionInputBuffer[0] = NumberValue.I32(p0)
+    val args = functionInputBuffer1
+    val values = onePreparedFunction(args).`expect`("Failed to invoke function one")
+  }
+
+  override fun two(p0: Int, p1: Int) {
+    functionInputBuffer[0] = NumberValue.I32(p0)
+    functionInputBuffer[1] = NumberValue.I32(p1)
+    val args = functionInputBuffer2
+    val values = twoPreparedFunction(args).`expect`("Failed to invoke function two")
+  }
+
+  override fun three(
+    p0: Int,
+    p1: Int,
+    p2: Int,
+  ) {
+    functionInputBuffer[0] = NumberValue.I32(p0)
+    functionInputBuffer[1] = NumberValue.I32(p1)
+    functionInputBuffer[2] = NumberValue.I32(p2)
+    val args = functionInputBuffer3
+    val values = threePreparedFunction(args).`expect`("Failed to invoke function three")
+  }
+}

@@ -1,0 +1,97 @@
+package com.test
+
+import io.github.charlietap.chasm.coroutines.instance
+import io.github.charlietap.chasm.coroutines.module
+import io.github.charlietap.chasm.embedding.codegen.CodegenImport
+import io.github.charlietap.chasm.embedding.codegen.SuspendInstanceFactory
+import io.github.charlietap.chasm.embedding.codegen.SuspendModuleFactory
+import io.github.charlietap.chasm.embedding.codegen.allocateImports
+import io.github.charlietap.chasm.embedding.global.readGlobal
+import io.github.charlietap.chasm.embedding.global.writeGlobal
+import io.github.charlietap.chasm.embedding.invoke
+import io.github.charlietap.chasm.embedding.memory.readBytes
+import io.github.charlietap.chasm.embedding.memory.readNullTerminatedUtf8String
+import io.github.charlietap.chasm.embedding.memory.writeBytes
+import io.github.charlietap.chasm.embedding.prepareFunction
+import io.github.charlietap.chasm.embedding.shapes.Global
+import io.github.charlietap.chasm.embedding.shapes.Instance
+import io.github.charlietap.chasm.embedding.shapes.Memory
+import io.github.charlietap.chasm.embedding.shapes.PreparedFunction
+import io.github.charlietap.chasm.embedding.shapes.Store
+import io.github.charlietap.chasm.embedding.shapes.`expect`
+import io.github.charlietap.chasm.embedding.store
+import io.github.charlietap.chasm.runtime.`value`.ExecutionValue
+import io.github.charlietap.chasm.runtime.`value`.NumberValue
+import kotlin.ByteArray
+import kotlin.Int
+import kotlin.String
+import kotlin.collections.List
+
+public suspend fun suspendingService(
+  binary: ByteArray,
+  imports: List<CodegenImport> = emptyList(),
+  moduleFactory: SuspendModuleFactory? = null,
+  instanceFactory: SuspendInstanceFactory? = null,
+): SuspendingService {
+  val store = store()
+  val module = moduleFactory?.invoke(binary) ?: module(binary).`expect`("Failed to decode binary")
+  val allocatedImports = allocateImports(store, imports)
+  val instance = instanceFactory?.invoke(store, module, allocatedImports) ?: instance(store, module, allocatedImports).`expect`("Failed to instantiate module")
+  return SuspendingServiceImpl(store = store, instance = instance)
+}
+
+private class SuspendingServiceImpl(
+  private val store: Store,
+  private val instance: Instance,
+) : SuspendingService {
+  private val readStringPreparedFunction: PreparedFunction =
+      prepareFunction(store, instance, "read_string").`expect`("Failed to prepare function read_string")
+
+  private val _memory: Memory =
+      (instance.exports.firstOrNull { export -> export.name == "memory" }?.value as? Memory) ?: error("Failed to find memory export with name memory")
+
+  private val _counter: Global =
+      (instance.exports.firstOrNull { export -> export.name == "counter" }?.value as? Global) ?: error("Failed to find global export with name counter")
+
+  override var counter: Int
+    get() = (readGlobal(store, _counter).`expect`("Failed to read global counter") as NumberValue.I32).value
+    set(newValue) {
+      writeGlobal(store, _counter, NumberValue.I32(newValue)).`expect`("Failed to write global counter")
+    }
+
+  override val memory: SuspendingService.Memory = MemoryImpl(store, _memory)
+
+  init {
+    invoke(store, instance, "initialize").`expect`("Initializer function initialize failed")
+    invoke(store, instance, "start").`expect`("Initializer function start failed")
+  }
+
+  override fun readString(): String {
+    val args = emptyList<ExecutionValue>()
+    val values = readStringPreparedFunction(args).`expect`("Failed to invoke function readString")
+    val pointer = (values[0] as NumberValue.I32).value
+    val result = readNullTerminatedUtf8String(store, _memory, pointer).`expect`("Failed to read string result for readString")
+    return result
+  }
+
+  private class MemoryImpl(
+    private val store: Store,
+    private val memory: Memory,
+  ) : SuspendingService.Memory {
+    override fun read(
+      buffer: ByteArray,
+      memoryPointer: Int,
+      bufferPointer: Int,
+      bytesToRead: Int,
+    ): ByteArray = readBytes(store, memory, buffer, memoryPointer, bytesToRead, bufferPointer).`expect`("Failed to read memory")
+
+    override fun write(
+      pointer: Int,
+      buffer: ByteArray,
+      bufferPointer: Int,
+      bytesToWrite: Int,
+    ) {
+      writeBytes(store, memory, pointer, buffer, bufferPointer, bytesToWrite).`expect`("Failed to write memory")
+    }
+  }
+}

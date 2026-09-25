@@ -1,0 +1,56 @@
+package com.test
+
+import io.github.charlietap.chasm.embedding.codegen.CodegenImport
+import io.github.charlietap.chasm.embedding.codegen.InstanceFactory
+import io.github.charlietap.chasm.embedding.codegen.ModuleFactory
+import io.github.charlietap.chasm.embedding.codegen.allocateImports
+import io.github.charlietap.chasm.embedding.instance
+import io.github.charlietap.chasm.embedding.module
+import io.github.charlietap.chasm.embedding.prepareFunction
+import io.github.charlietap.chasm.embedding.shapes.Instance
+import io.github.charlietap.chasm.embedding.shapes.PreparedFunction
+import io.github.charlietap.chasm.embedding.shapes.Store
+import io.github.charlietap.chasm.embedding.shapes.`expect`
+import io.github.charlietap.chasm.embedding.store
+import io.github.charlietap.chasm.runtime.`value`.ExecutionValue
+import io.github.charlietap.chasm.runtime.`value`.NumberValue
+import kotlin.ByteArray
+import kotlin.Double
+import kotlin.Int
+import kotlin.collections.List
+import kotlin.collections.MutableList
+
+public fun multipleParameters(
+  binary: ByteArray,
+  imports: List<CodegenImport> = emptyList(),
+  moduleFactory: ModuleFactory? = null,
+  instanceFactory: InstanceFactory? = null,
+): MultipleParameters {
+  val store = store()
+  val module = moduleFactory?.invoke(binary) ?: module(binary).`expect`("Failed to decode binary")
+  val allocatedImports = allocateImports(store, imports)
+  val instance = instanceFactory?.invoke(store, module, allocatedImports) ?: instance(store, module, allocatedImports).`expect`("Failed to instantiate module")
+  return MultipleParametersImpl(store = store, instance = instance)
+}
+
+private class MultipleParametersImpl(
+  private val store: Store,
+  private val instance: Instance,
+) : MultipleParameters {
+  private val invokePreparedFunction: PreparedFunction =
+      prepareFunction(store, instance, "invoke").`expect`("Failed to prepare function invoke")
+
+  private val functionInputBuffer: MutableList<ExecutionValue> =
+      MutableList<ExecutionValue>(2) { NumberValue.I32(0) }
+
+  private val functionInputBuffer2: MutableList<ExecutionValue> = functionInputBuffer
+
+  override fun invoke(p0: Int, p1: Double): Double {
+    functionInputBuffer[0] = NumberValue.I32(p0)
+    functionInputBuffer[1] = NumberValue.F64(p1)
+    val args = functionInputBuffer2
+    val values = invokePreparedFunction(args).`expect`("Failed to invoke function invoke")
+    val result = (values.first() as NumberValue.F64).value
+    return result
+  }
+}

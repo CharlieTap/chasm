@@ -1,0 +1,63 @@
+package com.test
+
+import io.github.charlietap.chasm.embedding.codegen.CodegenImport
+import io.github.charlietap.chasm.embedding.codegen.InstanceFactory
+import io.github.charlietap.chasm.embedding.codegen.ModuleFactory
+import io.github.charlietap.chasm.embedding.codegen.allocateImports
+import io.github.charlietap.chasm.embedding.instance
+import io.github.charlietap.chasm.embedding.memory.writeBytes
+import io.github.charlietap.chasm.embedding.module
+import io.github.charlietap.chasm.embedding.prepareFunction
+import io.github.charlietap.chasm.embedding.shapes.Instance
+import io.github.charlietap.chasm.embedding.shapes.Memory
+import io.github.charlietap.chasm.embedding.shapes.PreparedFunction
+import io.github.charlietap.chasm.embedding.shapes.Store
+import io.github.charlietap.chasm.embedding.shapes.Wasm32Allocator
+import io.github.charlietap.chasm.embedding.shapes.`expect`
+import io.github.charlietap.chasm.embedding.store
+import io.github.charlietap.chasm.runtime.`value`.ExecutionValue
+import io.github.charlietap.chasm.runtime.`value`.NumberValue
+import kotlin.ByteArray
+import kotlin.String
+import kotlin.collections.List
+import kotlin.collections.MutableList
+
+public fun packedStringParam(
+  binary: ByteArray,
+  imports: List<CodegenImport> = emptyList(),
+  moduleFactory: ModuleFactory? = null,
+  instanceFactory: InstanceFactory? = null,
+): PackedStringParam {
+  val store = store()
+  val module = moduleFactory?.invoke(binary) ?: module(binary).`expect`("Failed to decode binary")
+  val allocatedImports = allocateImports(store, imports)
+  val instance = instanceFactory?.invoke(store, module, allocatedImports) ?: instance(store, module, allocatedImports).`expect`("Failed to instantiate module")
+  return PackedStringParamImpl(store = store, instance = instance)
+}
+
+private class PackedStringParamImpl(
+  private val store: Store,
+  private val instance: Instance,
+) : PackedStringParam {
+  private val invokePreparedFunction: PreparedFunction =
+      prepareFunction(store, instance, "invoke").`expect`("Failed to prepare function invoke")
+
+  private val functionInputBuffer: MutableList<ExecutionValue> =
+      MutableList<ExecutionValue>(1) { NumberValue.I32(0) }
+
+  private val functionInputBuffer1: MutableList<ExecutionValue> = functionInputBuffer
+
+  private val _memory: Memory =
+      (instance.exports.firstOrNull { export -> export.name == "memory" }?.value as? Memory) ?: error("Failed to find memory export with name memory")
+
+  private val allocator: Wasm32Allocator = Wasm32Allocator(instance, store, "alloc", "free")
+
+  override fun invoke(`value`: String) {
+    val valueBytes = value.encodeToByteArray()
+    val valueAlloc = allocator.alloc(valueBytes.size)
+    writeBytes(store, _memory, valueAlloc, valueBytes).`expect`("Failed to write string")
+    functionInputBuffer[0] = NumberValue.I64((valueAlloc.toLong() shl 32) or (valueBytes.size.toLong() and 0xFFFFFFFFL))
+    val args = functionInputBuffer1
+    val values = invokePreparedFunction(args).`expect`("Failed to invoke function invoke")
+  }
+}
