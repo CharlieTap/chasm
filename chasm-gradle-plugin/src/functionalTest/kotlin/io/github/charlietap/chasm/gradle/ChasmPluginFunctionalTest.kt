@@ -311,6 +311,317 @@ class ChasmPluginFunctionalTest {
     }
 
     @Test
+    fun `multiplatform Chasm coroutine dependency follows suspending factory generation`() {
+        listOf(false, true).forEach { suspending ->
+            val project = project(
+                build = """
+                    import io.github.charlietap.chasm.gradle.CodegenConfig
+                    import io.github.charlietap.chasm.gradle.CodegenRuntime
+
+                    plugins {
+                        id("$pluginId")
+                        id("org.jetbrains.kotlin.multiplatform")
+                    }
+
+                    kotlin {
+                        jvm()
+                    }
+
+                    chasm {
+                        modules.create("RuntimeService") {
+                            packageName.set("test.chasm")
+                            codegenConfig.set(
+                                CodegenConfig(
+                                    generateSuspendingFactories = $suspending,
+                                    runtime = CodegenRuntime.CHASM,
+                                ),
+                            )
+                        }
+                    }
+                """,
+            )
+
+            val result = project.build("dependencies", "--configuration=commonMainImplementation")
+            assertEquals(
+                suspending,
+                result.output.contains("io.github.charlietap.chasm:chasm-coroutines:"),
+            )
+            assertFalse(result.output.contains("io.github.charlietap.chasm:chasm-coroutines-jvm:"))
+        }
+    }
+
+    @Test
+    fun `runtime change invalidates generated output`() {
+        fun build(runtime: String) = """
+            import io.github.charlietap.chasm.gradle.CodegenConfig
+            import io.github.charlietap.chasm.gradle.CodegenRuntime
+
+            plugins {
+                id("$pluginId")
+                id("org.jetbrains.kotlin.jvm")
+            }
+
+            chasm {
+                modules.create("SwitchingService") {
+                    packageName.set("test.chasm")
+                    codegenConfig.set(CodegenConfig(runtime = CodegenRuntime.$runtime))
+                }
+            }
+        """
+        val project = project(build = build("PORTABLE_VM"))
+        val task = "codegenModuleMainSwitchingService"
+
+        project.build(task, "--configuration-cache")
+        assertContains(
+            project.readGenerated("main", "SwitchingService", "SwitchingServiceImpl.kt"),
+            "io.github.charlietap.chasm.vm",
+        )
+
+        project.write("build.gradle.kts", build("CHASM"))
+        val changed = project.build(task, "--configuration-cache")
+
+        assertTrue(changed.task(":$task")?.outcome == TaskOutcome.SUCCESS)
+        val generated = project.readGenerated("main", "SwitchingService", "SwitchingServiceImpl.kt")
+        assertContains(generated, "io.github.charlietap.chasm.embedding")
+        assertFalse(generated.contains("io.github.charlietap.chasm.vm"))
+    }
+
+    @Test
+    fun `Chasm runtime generates and executes direct bindings`() {
+        val project = project(
+            build = """
+                import io.github.charlietap.chasm.gradle.CodegenConfig
+                import io.github.charlietap.chasm.gradle.CodegenRuntime
+
+                plugins {
+                    id("$pluginId")
+                    id("org.jetbrains.kotlin.jvm")
+                    application
+                }
+
+                application {
+                    mainClass.set("test.consumer.Main")
+                }
+
+                chasm {
+                    modules.create("DirectService") {
+                        binary.set(layout.projectDirectory.file("src/main/wasm/rich.wasm"))
+                        packageName.set("test.generated")
+                        initializers.set(linkedSetOf("initialize", "start", "finish"))
+                        codegenConfig.set(
+                            CodegenConfig(
+                                generateTypesafeGlobalProperties = true,
+                                generateTypesafeMemoryProperties = true,
+                                runtime = CodegenRuntime.CHASM,
+                            ),
+                        )
+                    }
+                }
+            """,
+            binary = RICH_WASM_MODULE,
+        )
+        project.writeBytes("src/main/wasm/rich.wasm", RICH_WASM_MODULE)
+        project.writeBytes("src/main/resources/module.wasm", RICH_WASM_MODULE)
+        project.write(
+            "src/main/kotlin/test/consumer/Main.kt",
+            """
+                package test.consumer
+
+                import io.github.charlietap.chasm.embedding.codegen.FunctionImport
+                import io.github.charlietap.chasm.host.HostFunction
+                import io.github.charlietap.chasm.host.readI32
+                import io.github.charlietap.chasm.type.FunctionType
+                import io.github.charlietap.chasm.type.NumberType
+                import io.github.charlietap.chasm.type.ResultType
+                import io.github.charlietap.chasm.type.ValueType
+                import test.generated.directService
+
+                object Main {
+                    @JvmStatic
+                    fun main(args: Array<String>) {
+                        val binary = requireNotNull(Main::class.java.getResourceAsStream("/module.wasm")).readBytes()
+                        val events = mutableListOf<Int>()
+                        val record = FunctionImport(
+                            moduleName = "env",
+                            entityName = "record",
+                            type = FunctionType(
+                                params = ResultType(listOf(ValueType.Number(NumberType.I32))),
+                                results = ResultType(emptyList()),
+                            ),
+                            function = HostFunction { parameters, _ ->
+                                events += parameters.readI32(0)
+                            },
+                        )
+                        val service = directService(binary, imports = listOf(record))
+                        check(events == listOf(1, 2, 3))
+                        check(service.answer() == 16)
+                        check(service.counter == 16)
+                        service.counter = 21
+                        check(service.answer() == 21)
+                        val bytes = byteArrayOf(4, 5, 6)
+                        service.memory.write(pointer = 8, buffer = bytes)
+                        check(service.memory.read(ByteArray(3), memoryPointer = 8).contentEquals(bytes))
+                        println("DIRECT_CHASM_OK")
+                    }
+                }
+            """,
+        )
+
+        val result = project.build("run")
+
+        assertContains(result.output, "DIRECT_CHASM_OK")
+    }
+
+    @Test
+    fun `suspending Chasm factory executes custom module and instance factories`() {
+        val project = project(
+            build = """
+                import io.github.charlietap.chasm.gradle.CodegenConfig
+                import io.github.charlietap.chasm.gradle.CodegenRuntime
+
+                plugins {
+                    id("$pluginId")
+                    id("org.jetbrains.kotlin.jvm")
+                    application
+                }
+
+                application {
+                    mainClass.set("test.consumer.Main")
+                }
+
+                chasm {
+                    modules.create("SuspendingDirectService") {
+                        packageName.set("test.generated")
+                        codegenConfig.set(
+                            CodegenConfig(
+                                generateSuspendingFactories = true,
+                                runtime = CodegenRuntime.CHASM,
+                            ),
+                        )
+                    }
+                }
+            """,
+            binary = ANSWER_WASM_MODULE,
+        )
+        project.writeBytes("src/main/resources/module.wasm", ANSWER_WASM_MODULE)
+        project.write(
+            "src/main/kotlin/test/consumer/Main.kt",
+            """
+                package test.consumer
+
+                import io.github.charlietap.chasm.coroutines.instance
+                import io.github.charlietap.chasm.coroutines.module
+                import io.github.charlietap.chasm.embedding.shapes.Module
+                import io.github.charlietap.chasm.embedding.shapes.`expect`
+                import kotlinx.coroutines.runBlocking
+                import kotlinx.coroutines.yield
+                import test.generated.suspendingDirectService
+
+                object Main {
+                    @JvmStatic
+                    fun main(args: Array<String>) = runBlocking {
+                        val binary = requireNotNull(Main::class.java.getResourceAsStream("/module.wasm")).readBytes()
+                        var moduleFactoryCalls = 0
+                        var instanceFactoryCalls = 0
+                        var decodedModule: Module? = null
+
+                        val service = suspendingDirectService(
+                            binary = binary,
+                            moduleFactory = { bytes ->
+                                yield()
+                                moduleFactoryCalls += 1
+                                check(bytes === binary)
+                                module(bytes).`expect`("module factory").also { decodedModule = it }
+                            },
+                            instanceFactory = { store, module, imports ->
+                                yield()
+                                instanceFactoryCalls += 1
+                                check(module === decodedModule)
+                                check(imports.isEmpty())
+                                instance(store, module, imports).`expect`("instance factory")
+                            },
+                        )
+
+                        check(moduleFactoryCalls == 1)
+                        check(instanceFactoryCalls == 1)
+                        check(service.answer() == 42)
+                        println("SUSPENDING_DIRECT_CHASM_OK")
+                    }
+                }
+            """,
+        )
+
+        val result = project.build("run")
+
+        assertContains(result.output, "SUSPENDING_DIRECT_CHASM_OK")
+    }
+
+    @Test
+    fun `complete Chasm codegen surface compiles`() {
+        val project = project(
+            build = """
+                import io.github.charlietap.chasm.gradle.CodegenConfig
+                import io.github.charlietap.chasm.gradle.CodegenRuntime
+                import io.github.charlietap.chasm.gradle.ExportedAllocator
+                import io.github.charlietap.chasm.gradle.StringEncodingStrategy
+
+                plugins {
+                    id("$pluginId")
+                    id("org.jetbrains.kotlin.jvm")
+                }
+
+                chasm {
+                    modules.create("FullSurfaceService") {
+                        packageName.set("test.generated")
+                        allocator.set(ExportedAllocator("alloc", "free"))
+                        codegenConfig.set(
+                            CodegenConfig(
+                                generateTypesafeGlobalProperties = true,
+                                generateTypesafeMemoryProperties = true,
+                                runtime = CodegenRuntime.CHASM,
+                            ),
+                        )
+                        function("pointer_string_param") {
+                            stringParam("value", StringEncodingStrategy.POINTER_AND_LENGTH)
+                        }
+                        function("length_prefixed_string_param") {
+                            stringParam("value", StringEncodingStrategy.LENGTH_PREFIXED)
+                        }
+                        function("null_terminated_string_param") {
+                            stringParam("value", StringEncodingStrategy.NULL_TERMINATED)
+                        }
+                        function("packed_string_param") {
+                            stringParam("value", StringEncodingStrategy.PACKED_POINTER_AND_LENGTH)
+                        }
+                        function("free_string_param") {
+                            stringParam(
+                                "value",
+                                StringEncodingStrategy.POINTER_AND_LENGTH,
+                                freeAfterCall = true,
+                            )
+                        }
+                        function("pointer_string_return") {
+                            stringReturnType(StringEncodingStrategy.POINTER_AND_LENGTH)
+                        }
+                        function("length_prefixed_string_return") {
+                            stringReturnType(StringEncodingStrategy.LENGTH_PREFIXED)
+                        }
+                        function("null_terminated_string_return") {
+                            stringReturnType(StringEncodingStrategy.NULL_TERMINATED)
+                        }
+                        function("packed_string_return") {
+                            stringReturnType(StringEncodingStrategy.PACKED_POINTER_AND_LENGTH)
+                        }
+                    }
+                }
+            """,
+            binary = FULL_SURFACE_WASM_MODULE,
+        )
+
+        project.build("compileKotlin")
+    }
+
+    @Test
     fun `top-level factories construct and execute synchronous and suspending services`() {
         val project = project(
             build = """
@@ -739,115 +1050,80 @@ class ChasmPluginFunctionalTest {
 
     @Test
     fun `configured implementations compile at their intended boundaries`() {
-        val directory = createTempDirectory("chasm-gradle-plugin-test")
-        directory.write(
-            "settings.gradle.kts",
-            settings(includedProjects = listOf(":producer", ":consumer")),
-        )
-        directory.write("build.gradle.kts", "")
+        CodegenRuntime.entries.forEach { runtime ->
+            val directory = createTempDirectory("chasm-gradle-plugin-${runtime.name.lowercase()}")
+            directory.write(
+                "settings.gradle.kts",
+                settings(includedProjects = listOf(":producer", ":consumer")),
+            )
+            directory.write("build.gradle.kts", "")
 
-        Files.createDirectories(directory.resolve("producer/src/main/wasm"))
-        Files.write(directory.resolve("producer/src/main/wasm/module.wasm"), ANSWER_WASM_MODULE)
-        directory.write(
-            "producer/build.gradle.kts",
-            """
-                import io.github.charlietap.chasm.gradle.CodegenConfig
-                import io.github.charlietap.chasm.gradle.FactoryVisibility
-                import io.github.charlietap.chasm.gradle.ImplementationVisibility
-                import io.github.charlietap.chasm.gradle.InterfaceVisibility
-                import io.github.charlietap.chasm.gradle.RuntimeDependencyConfiguration
+            Files.createDirectories(directory.resolve("producer/src/main/wasm"))
+            Files.write(directory.resolve("producer/src/main/wasm/module.wasm"), ANSWER_WASM_MODULE)
+            directory.write(
+                "producer/build.gradle.kts",
+                """
+                    import io.github.charlietap.chasm.gradle.CodegenConfig
+                    import io.github.charlietap.chasm.gradle.CodegenRuntime
+                    import io.github.charlietap.chasm.gradle.FactoryVisibility
+                    import io.github.charlietap.chasm.gradle.ImplementationVisibility
+                    import io.github.charlietap.chasm.gradle.InterfaceVisibility
+                    import io.github.charlietap.chasm.gradle.RuntimeDependencyConfiguration
 
-                plugins {
-                    id("$pluginId")
-                    id("org.jetbrains.kotlin.jvm")
-                    `java-library`
-                }
-
-                chasm {
-                    runtimeDependencyConfiguration.set(RuntimeDependencyConfiguration.API)
-                    modules.create("PublicService") {
-                        packageName.set("test.generated")
-                        implementationVisibility.set(ImplementationVisibility.PUBLIC)
+                    plugins {
+                        id("$pluginId")
+                        id("org.jetbrains.kotlin.jvm")
+                        `java-library`
                     }
-                    modules.create("InternalSuspendingService") {
-                        packageName.set("test.generated")
-                        interfaceVisibility.set(InterfaceVisibility.INTERNAL)
-                        implementationVisibility.set(ImplementationVisibility.INTERNAL)
-                        factoryVisibility.set(FactoryVisibility.INTERNAL)
-                        codegenConfig.set(CodegenConfig(generateSuspendingFactories = true))
+
+                    chasm {
+                        runtimeDependencyConfiguration.set(RuntimeDependencyConfiguration.API)
+                        modules.create("PublicService") {
+                            packageName.set("test.generated")
+                            implementationVisibility.set(ImplementationVisibility.PUBLIC)
+                            codegenConfig.set(CodegenConfig(runtime = CodegenRuntime.${runtime.name}))
+                        }
+                        modules.create("InternalSuspendingService") {
+                            packageName.set("test.generated")
+                            interfaceVisibility.set(InterfaceVisibility.INTERNAL)
+                            implementationVisibility.set(ImplementationVisibility.INTERNAL)
+                            factoryVisibility.set(FactoryVisibility.INTERNAL)
+                            codegenConfig.set(
+                                CodegenConfig(
+                                    generateSuspendingFactories = true,
+                                    runtime = CodegenRuntime.${runtime.name},
+                                ),
+                            )
+                        }
                     }
-                }
-            """,
-        )
-        directory.write(
-            "producer/src/main/kotlin/test/producer/InternalAccess.kt",
-            """
-                package test.producer
+                """,
+            )
+            directory.write(
+                "producer/src/main/kotlin/test/producer/InternalAccess.kt",
+                internalAccessSource(runtime),
+            )
 
-                import io.github.charlietap.chasm.vm.Import
-                import io.github.charlietap.chasm.vm.Instance
-                import io.github.charlietap.chasm.vm.Store
-                import io.github.charlietap.chasm.vm.WasmVirtualMachine
-                import test.generated.InternalSuspendingService
-                import test.generated.InternalSuspendingServiceImpl
-                import test.generated.internalSuspendingService
+            Files.createDirectories(directory.resolve("consumer"))
+            directory.write(
+                "consumer/build.gradle.kts",
+                """
+                    plugins {
+                        id("org.jetbrains.kotlin.jvm")
+                    }
 
-                internal fun constructInternal(
-                    imports: List<Import>,
-                    instance: Instance,
-                    store: Store,
-                    virtualMachine: WasmVirtualMachine,
-                ): InternalSuspendingServiceImpl = InternalSuspendingServiceImpl(
-                    imports,
-                    instance,
-                    store,
-                    virtualMachine,
-                )
+                    dependencies {
+                        implementation(project(":producer"))
+                    }
+                """,
+            )
+            directory.write(
+                "consumer/src/main/kotlin/test/consumer/Consumer.kt",
+                consumerSource(runtime),
+            )
+            val project = FunctionalProject(directory, WarningMode.FAIL)
 
-                internal suspend fun createInternal(binary: ByteArray): InternalSuspendingService =
-                    internalSuspendingService(binary)
-            """,
-        )
-
-        Files.createDirectories(directory.resolve("consumer"))
-        directory.write(
-            "consumer/build.gradle.kts",
-            """
-                plugins {
-                    id("org.jetbrains.kotlin.jvm")
-                }
-
-                dependencies {
-                    implementation(project(":producer"))
-                }
-            """,
-        )
-        directory.write(
-            "consumer/src/main/kotlin/test/consumer/Consumer.kt",
-            """
-                package test.consumer
-
-                import io.github.charlietap.chasm.vm.Import
-                import io.github.charlietap.chasm.vm.Instance
-                import io.github.charlietap.chasm.vm.Store
-                import io.github.charlietap.chasm.vm.WasmVirtualMachine
-                import test.generated.PublicService
-                import test.generated.PublicServiceImpl
-                import test.generated.publicService
-
-                fun constructWithFactory(binary: ByteArray): PublicService = publicService(binary)
-
-                fun constructImplementation(
-                    imports: List<Import>,
-                    instance: Instance,
-                    store: Store,
-                    virtualMachine: WasmVirtualMachine,
-                ): PublicServiceImpl = PublicServiceImpl(imports, instance, store, virtualMachine)
-            """,
-        )
-        val project = FunctionalProject(directory, WarningMode.FAIL)
-
-        project.build(":consumer:compileKotlin")
+            project.build(":consumer:compileKotlin")
+        }
     }
 
     @Test
@@ -1090,6 +1366,95 @@ class ChasmPluginFunctionalTest {
 
         val result = project.build("tasks", "--group=chasm")
         assertContains(result.output, "codegenModuleCommonMainKmpAndroidService")
+    }
+
+    private fun internalAccessSource(runtime: CodegenRuntime): String = when (runtime) {
+        CodegenRuntime.PORTABLE_VM ->
+            """
+            package test.producer
+
+            import io.github.charlietap.chasm.vm.Import
+            import io.github.charlietap.chasm.vm.Instance
+            import io.github.charlietap.chasm.vm.Store
+            import io.github.charlietap.chasm.vm.WasmVirtualMachine
+            import test.generated.InternalSuspendingService
+            import test.generated.InternalSuspendingServiceImpl
+            import test.generated.internalSuspendingService
+
+            internal fun constructInternal(
+                imports: List<Import>,
+                instance: Instance,
+                store: Store,
+                virtualMachine: WasmVirtualMachine,
+            ): InternalSuspendingServiceImpl = InternalSuspendingServiceImpl(
+                imports,
+                instance,
+                store,
+                virtualMachine,
+            )
+
+            internal suspend fun createInternal(binary: ByteArray): InternalSuspendingService =
+                internalSuspendingService(binary)
+        """
+        CodegenRuntime.CHASM ->
+            """
+            package test.producer
+
+            import io.github.charlietap.chasm.embedding.shapes.Instance
+            import io.github.charlietap.chasm.embedding.shapes.Store
+            import test.generated.InternalSuspendingService
+            import test.generated.InternalSuspendingServiceImpl
+            import test.generated.internalSuspendingService
+
+            internal fun constructInternal(
+                store: Store,
+                instance: Instance,
+            ): InternalSuspendingServiceImpl = InternalSuspendingServiceImpl(store, instance)
+
+            internal suspend fun createInternal(binary: ByteArray): InternalSuspendingService =
+                internalSuspendingService(binary)
+        """
+    }
+
+    private fun consumerSource(runtime: CodegenRuntime): String = when (runtime) {
+        CodegenRuntime.PORTABLE_VM ->
+            """
+            package test.consumer
+
+            import io.github.charlietap.chasm.vm.Import
+            import io.github.charlietap.chasm.vm.Instance
+            import io.github.charlietap.chasm.vm.Store
+            import io.github.charlietap.chasm.vm.WasmVirtualMachine
+            import test.generated.PublicService
+            import test.generated.PublicServiceImpl
+            import test.generated.publicService
+
+            fun constructWithFactory(binary: ByteArray): PublicService = publicService(binary)
+
+            fun constructImplementation(
+                imports: List<Import>,
+                instance: Instance,
+                store: Store,
+                virtualMachine: WasmVirtualMachine,
+            ): PublicServiceImpl = PublicServiceImpl(imports, instance, store, virtualMachine)
+        """
+        CodegenRuntime.CHASM ->
+            """
+            package test.consumer
+
+            import io.github.charlietap.chasm.embedding.shapes.Instance
+            import io.github.charlietap.chasm.embedding.shapes.Store
+            import test.generated.PublicService
+            import test.generated.PublicServiceImpl
+            import test.generated.publicService
+
+            fun constructWithFactory(binary: ByteArray): PublicService = publicService(binary)
+
+            fun constructImplementation(
+                store: Store,
+                instance: Instance,
+            ): PublicServiceImpl = PublicServiceImpl(store, instance)
+        """
     }
 
     private fun project(
@@ -1606,6 +1971,9 @@ class ChasmPluginFunctionalTest {
             101,
             114,
         )
+        val FULL_SURFACE_WASM_MODULE = requireNotNull(
+            ChasmPluginFunctionalTest::class.java.getResourceAsStream("/codegen/full-surface.wasm"),
+        ).readBytes()
         val functionalTestRepository = requiredSystemProperty("chasm.functionalTest.repository")
         val pluginRepository = requiredSystemProperty("chasm.functionalTest.pluginRepository")
         val pluginPom = Path.of(requiredSystemProperty("chasm.functionalTest.pluginPom"))
