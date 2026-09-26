@@ -81,6 +81,29 @@ internal inline fun FunctionInvoker(
     crossinline threadExecutor: ThreadExecutor,
 ): Result<List<ExecutionValue>, InvocationError> {
     store.heap.clearPendingException()
+    val interrupt = store.interrupt
+    if (!interrupt.enabled) return invokeFunction(config, store, instance, function, values, threadExecutor)
+
+    val depth = interrupt.depth
+    // Clear before publishing the new depth; see Interrupt.depth. Reading first avoids a volatile write per call.
+    if (depth == 0 && interrupt.requested) interrupt.requested = false
+    interrupt.depth = depth + 1
+    return try {
+        invokeFunction(config, store, instance, function, values, threadExecutor)
+    } finally {
+        interrupt.depth = depth
+    }
+}
+
+@OptIn(UnsafeHostApi::class)
+private inline fun invokeFunction(
+    config: RuntimeConfig,
+    store: Store,
+    instance: ModuleInstance,
+    function: FunctionInstance,
+    values: List<ExecutionValue>,
+    crossinline threadExecutor: ThreadExecutor,
+): Result<List<ExecutionValue>, InvocationError> {
     return when (function) {
         is FunctionInstance.HostFunction -> {
             val resultCount = function.functionType.results.types.size

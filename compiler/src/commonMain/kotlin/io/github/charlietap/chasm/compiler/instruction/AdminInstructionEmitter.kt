@@ -3,7 +3,9 @@ package io.github.charlietap.chasm.compiler.instruction
 import io.github.charlietap.chasm.compiler.context.FunctionCompilationContext
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.CopySlotDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.CopySlotsDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.admin.FuelAndInterruptCheckDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.FuelCheckDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.admin.InterruptCheckDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numeric.F32ConstDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numeric.F64ConstDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numeric.I32ConstDispatcher
@@ -65,9 +67,18 @@ internal fun FunctionCompilationContext.emitF64Constant(bits: Long, destinationS
     emit(instruction, ::F64ConstDispatcher)
 }
 
-internal fun FunctionCompilationContext.emitFuelCheck() {
-    val fuel = compiler.fuel ?: return
-    emit(AdminInstruction.FuelCheck) {
-        FuelCheckDispatcher(it, fuel)
+internal fun FunctionCompilationContext.emitCheckpoint() {
+    val fuel = compiler.fuel
+    val interrupt = compiler.interrupt
+    when {
+        fuel != null && interrupt != null -> emit(AdminInstruction.FuelAndInterruptCheck) {
+            FuelAndInterruptCheckDispatcher(it, fuel, interrupt)
+        }
+        fuel != null -> emit(AdminInstruction.FuelCheck) {
+            FuelCheckDispatcher(it, fuel)
+        }
+        interrupt != null -> emit(AdminInstruction.InterruptCheck) {
+            InterruptCheckDispatcher(it, interrupt)
+        }
     }
 }
