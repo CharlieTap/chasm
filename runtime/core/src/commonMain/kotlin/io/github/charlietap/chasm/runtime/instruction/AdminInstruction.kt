@@ -24,6 +24,12 @@ sealed interface AdminInstruction : LinkedInstruction {
     /** Takes a unit of the store's [io.github.charlietap.chasm.runtime.store.Fuel]; emitted only for metered stores. */
     data object FuelCheck : AdminInstruction
 
+    /** Traps if the store's [io.github.charlietap.chasm.runtime.store.Interrupt] is requested; emitted only for interruptible stores. */
+    data object InterruptCheck : AdminInstruction
+
+    /** A [FuelCheck] and an [InterruptCheck] in one dispatch, for stores that are both metered and interruptible. */
+    data object FuelAndInterruptCheck : AdminInstruction
+
     data class JumpCopies(
         val operands: OperandTransfer,
         val destinationSlotBase: Int,

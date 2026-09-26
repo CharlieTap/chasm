@@ -54,6 +54,8 @@ class CompilerInstructionTagTranslator {
         is AdminInstruction.CopySlot -> "admin.copy_slot"
         is AdminInstruction.CopySlots -> "admin.copy_slots"
         AdminInstruction.FuelCheck -> "admin.fuel_check"
+        AdminInstruction.InterruptCheck -> "admin.interrupt_check"
+        AdminInstruction.FuelAndInterruptCheck -> "admin.fuel_and_interrupt_check"
         is AdminInstruction.Jump -> "admin.jump"
         is AdminInstruction.JumpCopies -> "admin.jump_copies"
         is AdminInstruction.JumpIfI -> "admin.jump_if.i"

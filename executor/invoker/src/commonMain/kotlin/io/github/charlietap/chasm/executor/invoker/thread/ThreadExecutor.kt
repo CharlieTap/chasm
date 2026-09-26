@@ -56,12 +56,17 @@ internal inline fun ThreadExecutor(
         vstack.setFrameSlot(index, value.toLongFromBoxed())
     }
     initializeLocals(vstack, callStrategy, ROOT_FP)
+    val interrupt = store.interrupt
+    // An interrupt stops the call running when it is made; one made while none ran is dropped.
+    if (interrupt.enabled && interrupt.depth++ == 0) interrupt.requested = false
     try {
         interpret(callStrategy.entryIp, context)
     } catch (exception: InvocationException) {
         Err(exception.error).bind()
     } catch (_: GuestHeapOutOfMemoryException) {
         Err(InvocationError.GuestHeapOutOfMemory).bind()
+    } finally {
+        if (interrupt.enabled) interrupt.depth--
     }
 
     if (vstack.fp != ROOT_FP || vstack.sp != results) {
