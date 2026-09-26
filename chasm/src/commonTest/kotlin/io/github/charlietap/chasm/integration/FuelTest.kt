@@ -161,7 +161,7 @@ class FuelTest {
     }
 
     @Test
-    fun `a metered store compiles a check per function and loop, an unmetered one none`() {
+    fun `a metered store compiles a check per function and loop and an unmetered store compiles none`() {
         val (metered, _) = instantiate(meterFuel = true)
         val (unmetered, _) = instantiate(meterFuel = false)
 
