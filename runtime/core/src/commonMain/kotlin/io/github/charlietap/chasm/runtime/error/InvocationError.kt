@@ -170,6 +170,8 @@ sealed interface InvocationError : ModuleTrapError {
 
     data object GuestHeapOutOfMemory : InvocationError
 
+    data object FuelExhausted : InvocationError
+
     @JvmInline
     value class UnimplementedInstruction(val instruction: LinkedInstruction) : InvocationError
 

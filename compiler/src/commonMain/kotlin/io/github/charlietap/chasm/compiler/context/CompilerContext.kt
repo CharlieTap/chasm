@@ -16,6 +16,7 @@ import io.github.charlietap.chasm.runtime.instance.MemoryInstance
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.instance.TableInstance
 import io.github.charlietap.chasm.runtime.instance.TagInstance
+import io.github.charlietap.chasm.runtime.store.Fuel
 import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.runtime.type.ModuleTypeResolver
 import io.github.charlietap.chasm.runtime.type.RuntimeTypeMap
@@ -36,6 +37,8 @@ internal class CompilerContext(
     val globals: Array<GlobalInstance> = emptyArray(),
     val elements: Array<ElementInstance> = emptyArray(),
     val data: Array<DataInstance> = emptyArray(),
+    /** A metered store's fuel, which the checks emitted at function entries and loop headers take from. */
+    val fuel: Fuel? = null,
 ) {
     val emptyBlockType: FunctionType = types.blockType(BlockType.Empty)
     val instructionObserver = diagnostics?.instructionObserver
@@ -66,4 +69,5 @@ internal fun createCompilerContext(
     globals = Array(instance.globalAddresses.size) { index -> store.global(instance.globalAddresses[index]) },
     elements = Array(instance.elemAddresses.size) { index -> store.element(instance.elemAddresses[index]) },
     data = Array(instance.dataAddresses.size) { index -> store.data(instance.dataAddresses[index]) },
+    fuel = store.fuel.takeIf { it.metered },
 )

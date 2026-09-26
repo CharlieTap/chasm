@@ -18,4 +18,5 @@ class Store(
     val data: MutableList<DataInstance> = [],
     val program: Program = Program(),
     val heap: WasmHeap = WasmHeap(),
+    val fuel: Fuel = Fuel(),
 )
