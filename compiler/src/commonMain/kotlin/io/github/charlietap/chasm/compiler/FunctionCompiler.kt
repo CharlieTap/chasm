@@ -21,6 +21,7 @@ import io.github.charlietap.chasm.compiler.context.CompilerContext
 import io.github.charlietap.chasm.compiler.context.FunctionCompilationContext
 import io.github.charlietap.chasm.compiler.context.FunctionCompilerWorkspace
 import io.github.charlietap.chasm.compiler.context.global
+import io.github.charlietap.chasm.compiler.instruction.emitCheckpoint
 import io.github.charlietap.chasm.compiler.instruction.emitCopy
 import io.github.charlietap.chasm.compiler.instruction.emitDeferredBranchPaths
 import io.github.charlietap.chasm.compiler.instruction.emitF32Constant
@@ -71,6 +72,7 @@ internal fun FunctionCompiler(
             program = programBuilder,
         )
         beginFunctionControl(state)
+        state.emitCheckpoint()
 
         var index = 0
         while (index < function.body.instructions.size) {

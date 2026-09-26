@@ -20,6 +20,12 @@ public final class io/github/charlietap/chasm/embedding/ExportsKt {
 	public static final fun exports (Lio/github/charlietap/chasm/embedding/shapes/Instance;)Ljava/util/List;
 }
 
+public final class io/github/charlietap/chasm/embedding/FuelKt {
+	public static final fun addFuel (Lio/github/charlietap/chasm/embedding/shapes/Store;J)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+	public static final fun remainingFuel (Lio/github/charlietap/chasm/embedding/shapes/Store;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+	public static final fun resetFuel (Lio/github/charlietap/chasm/embedding/shapes/Store;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+}
+
 public final class io/github/charlietap/chasm/embedding/FunctionKt {
 	public static final fun function (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/type/FunctionType;Lio/github/charlietap/chasm/host/HostFunction;)Lio/github/charlietap/chasm/embedding/shapes/Function;
 }
@@ -35,6 +41,10 @@ public final class io/github/charlietap/chasm/embedding/GlobalKt {
 public final class io/github/charlietap/chasm/embedding/InstanceKt {
 	public static final fun instance (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Module;Ljava/util/List;Lio/github/charlietap/chasm/config/RuntimeConfig;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 	public static synthetic fun instance$default (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Module;Ljava/util/List;Lio/github/charlietap/chasm/config/RuntimeConfig;ILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+}
+
+public final class io/github/charlietap/chasm/embedding/InterruptKt {
+	public static final fun interrupt (Lio/github/charlietap/chasm/embedding/shapes/Store;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 }
 
 public final class io/github/charlietap/chasm/embedding/InvokeKt {
@@ -66,6 +76,7 @@ public final class io/github/charlietap/chasm/embedding/PrepareFunctionKt {
 
 public final class io/github/charlietap/chasm/embedding/StoreKt {
 	public static final fun store ()Lio/github/charlietap/chasm/embedding/shapes/Store;
+	public static final fun store (Lio/github/charlietap/chasm/config/StoreConfig;)Lio/github/charlietap/chasm/embedding/shapes/Store;
 }
 
 public final class io/github/charlietap/chasm/embedding/TableKt {
