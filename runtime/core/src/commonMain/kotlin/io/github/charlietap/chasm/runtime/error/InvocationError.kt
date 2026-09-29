@@ -172,6 +172,8 @@ sealed interface InvocationError : ModuleTrapError {
 
     data object FuelExhausted : InvocationError
 
+    data object Interrupted : InvocationError
+
     @JvmInline
     value class UnimplementedInstruction(val instruction: LinkedInstruction) : InvocationError
 
