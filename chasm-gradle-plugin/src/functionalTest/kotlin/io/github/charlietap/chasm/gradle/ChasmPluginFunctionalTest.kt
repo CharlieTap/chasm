@@ -166,31 +166,10 @@ class ChasmPluginFunctionalTest {
     }
 
     @Test
-    fun `Chasm multiplatform runtime supports configuration cache and isolated projects`() {
-        val project = project(
-            build = """
-                import io.github.charlietap.chasm.gradle.CodegenConfig
-                import io.github.charlietap.chasm.gradle.CodegenRuntime
-
-                plugins {
-                    id("$pluginId")
-                    id("org.jetbrains.kotlin.multiplatform")
-                }
-
-                kotlin {
-                    jvm()
-                }
-
-                chasm {
-                    modules.create("DirectService") {
-                        packageName.set("test.chasm")
-                        codegenConfig.set(CodegenConfig(runtime = CodegenRuntime.CHASM))
-                    }
-                }
-            """,
-        )
+    fun `Chasm WASI runtime supports configuration cache and isolated projects`() {
+        val project = wasiMultiplatformProject()
         val arguments = arrayOf(
-            "codegenModuleCommonMainDirectService",
+            ":consumer:codegenModuleCommonMainWasiService",
             "--configuration-cache",
             "--isolated-projects",
             "-Dorg.gradle.isolated-projects.diagnostics=true",
@@ -200,6 +179,20 @@ class ChasmPluginFunctionalTest {
         val reused = project.build(*arguments)
 
         assertContains(reused.output, "Configuration cache entry reused.")
+    }
+
+    @Test
+    fun `Chasm WASI runtime supports configuration on demand`() {
+        val project = wasiMultiplatformProject(
+            unrelatedBuild = """
+                error("Unrelated project was configured")
+            """,
+        )
+
+        project.build(
+            ":consumer:codegenModuleCommonMainWasiService",
+            "--configure-on-demand",
+        )
     }
 
     @Test
@@ -236,6 +229,173 @@ class ChasmPluginFunctionalTest {
                 val otherArtifact = if (artifact == "vm-jvm") "chasm-jvm" else "vm-jvm"
                 assertFalse(result.output.contains("io.github.charlietap.chasm:$otherArtifact:"))
             }
+        }
+    }
+
+    @Test
+    fun `JVM WASI dependency follows automatic linking`() {
+        RuntimeDependencyConfiguration.entries.forEach { selection ->
+            val configurationName = selection.name.lowercase()
+            listOf("DISABLED", "AUTOMATIC").forEach { wasi ->
+                val project = project(
+                    build = """
+                        import io.github.charlietap.chasm.gradle.CodegenConfig
+                        import io.github.charlietap.chasm.gradle.CodegenRuntime
+                        import io.github.charlietap.chasm.gradle.RuntimeDependencyConfiguration
+                        import io.github.charlietap.chasm.gradle.WasiLinking
+
+                        plugins {
+                            id("$pluginId")
+                            id("org.jetbrains.kotlin.jvm")
+                        }
+
+                        chasm {
+                            runtimeDependencyConfiguration.set(RuntimeDependencyConfiguration.${selection.name})
+                            modules.create("WasiService") {
+                                packageName.set("test.chasm")
+                                codegenConfig.set(
+                                    CodegenConfig(
+                                        runtime = CodegenRuntime.CHASM,
+                                        wasi = WasiLinking.$wasi,
+                                    ),
+                                )
+                            }
+                        }
+                    """,
+                )
+
+                val result = project.build("dependencies", "--configuration=$configurationName")
+                assertEquals(
+                    wasi == "AUTOMATIC",
+                    result.output.contains(wasiPreview1Dependency),
+                )
+                assertFalse(result.output.contains("bindings-chasm-wasip1-jvm"))
+            }
+        }
+    }
+
+    @Test
+    fun `portable runtime rejects WASI Preview 1 linking`() {
+        val project = project(
+            build = """
+                import io.github.charlietap.chasm.gradle.CodegenConfig
+                import io.github.charlietap.chasm.gradle.WasiLinking
+
+                plugins {
+                    id("$pluginId")
+                    id("org.jetbrains.kotlin.jvm")
+                }
+
+                chasm {
+                    modules.create("WasiService") {
+                        packageName.set("test.chasm")
+                        codegenConfig.set(CodegenConfig(wasi = WasiLinking.AUTOMATIC))
+                    }
+                }
+            """,
+        )
+
+        val result = project.buildAndFail("codegenModuleMainWasiService")
+
+        assertContains(
+            result.output,
+            "WasiLinking.AUTOMATIC requires CodegenRuntime.CHASM",
+        )
+    }
+
+    @Test
+    fun `WASI Preview 1 linking accepts every published multiplatform target`() {
+        val project = project(
+            gradleProperties = "kotlin.native.ignoreDisabledTargets=true",
+            build = """
+                import io.github.charlietap.chasm.gradle.CodegenConfig
+                import io.github.charlietap.chasm.gradle.CodegenRuntime
+                import io.github.charlietap.chasm.gradle.WasiLinking
+
+                plugins {
+                    id("$pluginId")
+                    id("org.jetbrains.kotlin.multiplatform")
+                }
+
+                kotlin {
+                    jvm()
+                    linuxX64()
+                    linuxArm64()
+                    macosArm64()
+                    iosArm64()
+                    iosSimulatorArm64()
+                }
+
+                chasm {
+                    modules.create("WasiService") {
+                        packageName.set("test.chasm")
+                        codegenConfig.set(
+                            CodegenConfig(
+                                runtime = CodegenRuntime.CHASM,
+                                wasi = WasiLinking.AUTOMATIC,
+                            ),
+                        )
+                    }
+                }
+            """,
+        )
+
+        val result = project.build(
+            "dependencies",
+            "--configuration=commonMainImplementation",
+            gradleVersion = "9.7.1",
+        )
+
+        assertContains(
+            result.output,
+            wasiPreview1Dependency,
+        )
+        assertFalse(result.output.contains("bindings-chasm-wasip1-jvm"))
+    }
+
+    @Test
+    fun `WASI Preview 1 linking rejects unsupported multiplatform targets`() {
+        listOf("js()" to "js", "mingwX64()" to "mingwX64").forEach { (target, targetName) ->
+            val project = project(
+                gradleProperties = "kotlin.native.ignoreDisabledTargets=true",
+                build = """
+                    import io.github.charlietap.chasm.gradle.CodegenConfig
+                    import io.github.charlietap.chasm.gradle.CodegenRuntime
+                    import io.github.charlietap.chasm.gradle.WasiLinking
+
+                    plugins {
+                        id("$pluginId")
+                        id("org.jetbrains.kotlin.multiplatform")
+                    }
+
+                    kotlin {
+                        jvm()
+                        $target
+                    }
+
+                    chasm {
+                        modules.create("WasiService") {
+                            packageName.set("test.chasm")
+                            codegenConfig.set(
+                                CodegenConfig(
+                                    runtime = CodegenRuntime.CHASM,
+                                    wasi = WasiLinking.AUTOMATIC,
+                                ),
+                            )
+                        }
+                    }
+                """,
+            )
+
+            val result = project.buildAndFail(
+                "codegenModuleCommonMainWasiService",
+                gradleVersion = "9.7.1",
+            )
+
+            assertContains(
+                result.output,
+                "The current Preview 1 provider for WasiLinking.AUTOMATIC does not support targets: $targetName",
+            )
         }
     }
 
@@ -387,6 +547,40 @@ class ChasmPluginFunctionalTest {
     }
 
     @Test
+    fun `WASI linking without matching imports preserves the factory API`() {
+        val project = project(
+            build = """
+                import io.github.charlietap.chasm.gradle.CodegenConfig
+                import io.github.charlietap.chasm.gradle.CodegenRuntime
+                import io.github.charlietap.chasm.gradle.WasiLinking
+
+                plugins {
+                    id("$pluginId")
+                    id("org.jetbrains.kotlin.jvm")
+                }
+
+                chasm {
+                    modules.create("WasiService") {
+                        packageName.set("test.chasm")
+                        codegenConfig.set(
+                            CodegenConfig(
+                                runtime = CodegenRuntime.CHASM,
+                                wasi = WasiLinking.AUTOMATIC,
+                            ),
+                        )
+                    }
+                }
+            """,
+        )
+
+        project.build("codegenModuleMainWasiService")
+
+        val generated = project.readGenerated("main", "WasiService", "WasiServiceImpl.kt")
+        assertFalse(generated.contains("EmbedderHost"))
+        assertFalse(generated.contains("ChasmWasiPreview1Builder"))
+    }
+
+    @Test
     fun `Chasm runtime generates and executes direct bindings`() {
         val project = project(
             build = """
@@ -470,6 +664,95 @@ class ChasmPluginFunctionalTest {
         val result = project.build("run")
 
         assertContains(result.output, "DIRECT_CHASM_OK")
+    }
+
+    @Test
+    fun `Chasm runtime automatically links required WASI Preview 1 imports`() {
+        val project = project(
+            build = """
+                import io.github.charlietap.chasm.gradle.CodegenConfig
+                import io.github.charlietap.chasm.gradle.CodegenRuntime
+                import io.github.charlietap.chasm.gradle.WasiLinking
+
+                plugins {
+                    id("$pluginId")
+                    id("org.jetbrains.kotlin.jvm")
+                    application
+                }
+
+                application {
+                    mainClass.set("test.consumer.Main")
+                }
+
+                chasm {
+                    modules.create("WasiService") {
+                        packageName.set("test.generated")
+                        codegenConfig.set(
+                            CodegenConfig(
+                                runtime = CodegenRuntime.CHASM,
+                                wasi = WasiLinking.AUTOMATIC,
+                            ),
+                        )
+                    }
+                }
+            """,
+            binary = WASI_PREVIEW1_WASM_MODULE,
+        )
+        project.writeBytes("src/main/resources/module.wasm", WASI_PREVIEW1_WASM_MODULE)
+        project.write(
+            "src/main/kotlin/test/consumer/Main.kt",
+            """
+                package test.consumer
+
+                import at.released.weh.filesystem.stdio.StdioSink
+                import at.released.weh.host.EmbedderHost
+                import kotlinx.io.Buffer
+                import kotlinx.io.readString
+                import test.generated.wasiService
+
+                object Main {
+                    @JvmStatic
+                    fun main(args: Array<String>) {
+                        val binary = requireNotNull(Main::class.java.getResourceAsStream("/module.wasm")).readBytes()
+                        val stdout = RecordingSinkProvider()
+                        EmbedderHost { this.stdout = stdout }.use { host ->
+                            val service = wasiService(binary, wasiHost = host)
+                            check(service.write() == 0)
+                            check(stdout.readContent() == "hello")
+
+                            val failure = runCatching { service.terminate() }.exceptionOrNull()
+                            check(failure is IllegalStateException)
+                            check(failure.message?.contains("HostFunctionError(error=7)") == true)
+                        }
+                        println("WASI_PREVIEW1_AUTOLINK_OK")
+                    }
+                }
+
+                private class RecordingSinkProvider : StdioSink.Provider {
+                    private val sink = RecordingSink()
+
+                    override fun open(): StdioSink = sink
+
+                    fun readContent(): String = sink.buffer.readString()
+
+                    private class RecordingSink : StdioSink {
+                        val buffer = Buffer()
+
+                        override fun close(): Unit = Unit
+
+                        override fun flush(): Unit = Unit
+
+                        override fun write(source: Buffer, byteCount: Long) {
+                            buffer.write(source, byteCount)
+                        }
+                    }
+                }
+            """,
+        )
+
+        val result = project.build("run")
+
+        assertContains(result.output, "WASI_PREVIEW1_AUTOLINK_OK")
     }
 
     @Test
@@ -1229,30 +1512,6 @@ class ChasmPluginFunctionalTest {
     }
 
     @Test
-    fun `plugin is compatible with isolated projects`() {
-        val project = project(
-            build = """
-                plugins {
-                    id("$pluginId")
-                    id("org.jetbrains.kotlin.jvm")
-                }
-
-                chasm {
-                    modules.create("IsolatedService") {
-                        packageName.set("test.chasm")
-                    }
-                }
-            """,
-        )
-
-        project.build(
-            "help",
-            "--isolated-projects",
-            "-Dorg.gradle.isolated-projects.diagnostics=true",
-        )
-    }
-
-    @Test
     fun `Android portable runtime selects the multiplatform coordinate`() {
         val project = androidProject(
             androidPluginId = "com.android.library",
@@ -1279,8 +1538,25 @@ class ChasmPluginFunctionalTest {
     }
 
     @Test
+    fun `Android WASI linking selects the multiplatform coordinate`() {
+        val project = androidProject(
+            androidPluginId = "com.android.library",
+            moduleName = "AndroidWasiService",
+            compileSdk = currentCompileSdk,
+            runtime = "CHASM",
+            wasi = "AUTOMATIC",
+        )
+        val result = project.build("dependencies", "--configuration=implementation")
+        assertContains(
+            result.output,
+            wasiPreview1Dependency,
+        )
+        assertFalse(result.output.contains("bindings-chasm-wasip1-jvm"))
+    }
+
+    @Test
     fun `current AGP 9 registers generated Kotlin sources on supported Gradle versions`() {
-        testedGradleVersions.forEach { gradleVersion ->
+        testedAgpGradleVersions.forEach { gradleVersion ->
             val project = androidProject(
                 androidPluginId = "com.android.library",
                 moduleName = "AndroidService",
@@ -1476,17 +1752,65 @@ class ChasmPluginFunctionalTest {
         )
     }
 
+    private fun wasiMultiplatformProject(unrelatedBuild: String = ""): FunctionalProject {
+        val directory = createTempDirectory("chasm-gradle-plugin-wasi-test")
+        directory.write(
+            "settings.gradle.kts",
+            settings(includedProjects = listOf(":consumer", ":unrelated")),
+        )
+        directory.write("build.gradle.kts", "")
+        Files.createDirectories(directory.resolve("consumer/src/main/wasm"))
+        Files.write(directory.resolve("consumer/src/main/wasm/module.wasm"), MINIMAL_WASM_MODULE)
+        directory.write(
+            "consumer/build.gradle.kts",
+            """
+                import io.github.charlietap.chasm.gradle.CodegenConfig
+                import io.github.charlietap.chasm.gradle.CodegenRuntime
+                import io.github.charlietap.chasm.gradle.WasiLinking
+
+                plugins {
+                    id("$pluginId")
+                    id("org.jetbrains.kotlin.multiplatform")
+                }
+
+                kotlin {
+                    jvm()
+                }
+
+                chasm {
+                    modules.create("WasiService") {
+                        packageName.set("test.chasm")
+                        codegenConfig.set(
+                            CodegenConfig(
+                                runtime = CodegenRuntime.CHASM,
+                                wasi = WasiLinking.AUTOMATIC,
+                            ),
+                        )
+                    }
+                }
+            """,
+        )
+        Files.createDirectories(directory.resolve("unrelated"))
+        directory.write("unrelated/build.gradle.kts", unrelatedBuild)
+        return FunctionalProject(
+            directory = directory,
+            warningMode = WarningMode.FAIL,
+        )
+    }
+
     private fun androidProject(
         androidPluginId: String,
         moduleName: String,
         compileSdk: Int,
         minimumAgp: Boolean = false,
         runtime: String = "PORTABLE_VM",
+        wasi: String = "DISABLED",
     ): FunctionalProject {
         return project(
             build = """
                 import io.github.charlietap.chasm.gradle.CodegenConfig
                 import io.github.charlietap.chasm.gradle.CodegenRuntime
+                import io.github.charlietap.chasm.gradle.WasiLinking
 
                 plugins {
                     id("$pluginId")
@@ -1501,7 +1825,12 @@ class ChasmPluginFunctionalTest {
                 chasm {
                     modules.create("$moduleName") {
                         packageName.set("test.chasm")
-                        codegenConfig.set(CodegenConfig(runtime = CodegenRuntime.$runtime))
+                        codegenConfig.set(
+                            CodegenConfig(
+                                runtime = CodegenRuntime.$runtime,
+                                wasi = WasiLinking.$wasi,
+                            ),
+                        )
                     }
                 }
             """,
@@ -1606,6 +1935,7 @@ class ChasmPluginFunctionalTest {
                     maven {
                         url = uri("$functionalTestRepository")
                         metadataSources {
+                            gradleMetadata()
                             mavenPom()
                             artifact()
                         }
@@ -1663,14 +1993,20 @@ class ChasmPluginFunctionalTest {
             }
         }
 
-        fun buildAndFail(vararg arguments: String): BuildResult {
-            return GradleRunner.create()
+        fun buildAndFail(
+            vararg arguments: String,
+            gradleVersion: String? = null,
+        ): BuildResult {
+            val runner = GradleRunner.create()
                 .withProjectDir(directory.toFile())
                 .withArguments(
                     *arguments,
                     "--stacktrace",
                     warningMode.argument,
-                ).buildAndFail()
+                )
+
+            gradleVersion?.let(runner::withGradleVersion)
+            return runner.buildAndFail()
         }
 
         fun write(relativePath: String, content: String) {
@@ -1974,6 +2310,9 @@ class ChasmPluginFunctionalTest {
         val FULL_SURFACE_WASM_MODULE = requireNotNull(
             ChasmPluginFunctionalTest::class.java.getResourceAsStream("/codegen/full-surface.wasm"),
         ).readBytes()
+        val WASI_PREVIEW1_WASM_MODULE = requireNotNull(
+            ChasmPluginFunctionalTest::class.java.getResourceAsStream("/codegen/wasi-preview1.wasm"),
+        ).readBytes()
         val functionalTestRepository = requiredSystemProperty("chasm.functionalTest.repository")
         val pluginRepository = requiredSystemProperty("chasm.functionalTest.pluginRepository")
         val pluginPom = Path.of(requiredSystemProperty("chasm.functionalTest.pluginPom"))
@@ -1982,6 +2321,7 @@ class ChasmPluginFunctionalTest {
         )
         val pluginId = requiredSystemProperty("chasm.functionalTest.pluginId")
         val pluginVersion = requiredSystemProperty("chasm.functionalTest.pluginVersion")
+        val wasiPreview1Dependency = requiredSystemProperty("chasm.functionalTest.wasiPreview1Dependency")
         val kotlinPluginVersion = requiredSystemProperty("chasm.functionalTest.kotlinPluginVersion")
         val coroutinesVersion = requiredSystemProperty("chasm.functionalTest.coroutinesVersion")
         val androidPluginVersion = requiredSystemProperty("chasm.functionalTest.androidPluginVersion")
@@ -1989,6 +2329,7 @@ class ChasmPluginFunctionalTest {
         val minimumGradleVersion = requiredSystemProperty("chasm.functionalTest.minimumGradleVersion")
         val minimumAgpGradleVersion = requiredSystemProperty("chasm.functionalTest.minimumAgpGradleVersion")
         val testedGradleVersions = requiredSystemProperty("chasm.functionalTest.testedGradleVersions").split(',')
+        val testedAgpGradleVersions = requiredSystemProperty("chasm.functionalTest.testedAgpGradleVersions").split(',')
         val currentCompileSdk = requiredSystemProperty("chasm.functionalTest.compileSdk").toInt()
         val minimumAgpCompileSdk = requiredSystemProperty("chasm.functionalTest.minimumAgpCompileSdk").toInt()
         val currentMinSdk = requiredSystemProperty("chasm.functionalTest.minSdk").toInt()

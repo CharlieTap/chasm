@@ -1,7 +1,7 @@
 [versions]
 
-version-name = "2.0.1-SNAPSHOT"
-plugin-version-name = "3.0.1-2.0.1-SNAPSHOT"
+version-name = "2.1.0"
+plugin-version-name = "3.1.0-2.1.0"
 
 application-id = "com.tap.chasm"
 application-namespace = "com.tap.chasm"
@@ -45,7 +45,7 @@ junit = "4.13.2"
 jna = "5.19.1"
 jmh = "1.37"
 
-kotlin = "2.4.0"
+kotlin = "2.4.10"
 k-poet = "2.3.0"
 kotlinter = "5.6.0"
 
@@ -59,7 +59,7 @@ kotlinx-test-resources = "0.15.0"
 metro = "1.4.2"
 
 result = "2.2.0"
-wasi-emscripten-host-chasm-wasip1 = "0.7.0"
+wasi-emscripten-host-chasm-wasip1 = "0.8.1"
 wasm-corpus-ref = "13f6c9049f35df5430516691f9ee0a69ad5d573a"
 
 [plugins]
@@ -153,7 +153,8 @@ result = { module = "com.michael-bull.kotlin-result:kotlin-result", version.ref 
 
 sweet-lib = { module = "io.github.charlietap.sweet:lib" }
 corpus-lib = { module = "io.github.charlietap.corpus:lib" }
-wasi-emscripten-host-chasm-wasip1 = { module = "io.github.charlietap.wasi.emscripten.host:bindings-chasm-wasip1", version.ref = "wasi-emscripten-host-chasm-wasip1" }
+wasi-emscripten-host-chasm-wasip1-kmp = { module = "io.github.charlietap.wasi.emscripten.host:bindings-chasm-wasip1", version.ref = "wasi-emscripten-host-chasm-wasip1" }
+wasi-emscripten-host-chasm-wasip1-jvm = { module = "io.github.charlietap.wasi.emscripten.host:bindings-chasm-wasip1-jvm", version.ref = "wasi-emscripten-host-chasm-wasip1" }
 
 androidx-test-junit = { module = "androidx.test.ext:junit", version.ref = "androidx-junit" }
 

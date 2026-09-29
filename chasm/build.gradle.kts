@@ -156,7 +156,7 @@ kotlin {
             dependencies {
                 implementation(projects.chasmCoroutines)
                 implementation(libs.corpus.lib)
-                implementation(libs.wasi.emscripten.host.chasm.wasip1)
+                implementation(libs.wasi.emscripten.host.chasm.wasip1.kmp)
             }
         }
     }

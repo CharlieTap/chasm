@@ -28,6 +28,21 @@ class ConstructionCodegenTest {
     )
 
     @Test
+    fun `generates WASI Preview 1 construction`() = assertConstruction(
+        scenario = "WasiPreview1Construction",
+        linksWasiPreview1 = true,
+        runtimes = listOf(CodegenRuntime.CHASM),
+    )
+
+    @Test
+    fun `generates suspending WASI Preview 1 construction`() = assertConstruction(
+        scenario = "SuspendingWasiPreview1Construction",
+        linksWasiPreview1 = true,
+        config = codegenConfig(generateSuspendingFactories = true),
+        runtimes = listOf(CodegenRuntime.CHASM),
+    )
+
+    @Test
     fun `generates initializers`() = assertGenerates(
         category = "construction",
         wasmInterface = wasmInterface(
@@ -146,15 +161,19 @@ class ConstructionCodegenTest {
         factoryVisibility: FactoryVisibility = FactoryVisibility.PUBLIC,
         implementationVisibility: ImplementationVisibility = ImplementationVisibility.PRIVATE,
         config: CodegenConfig = codegenConfig(),
+        linksWasiPreview1: Boolean = false,
+        runtimes: Iterable<CodegenRuntime> = CodegenRuntime.entries,
     ) = assertGenerates(
         category = "construction",
         wasmInterface = wasmInterface(
             interfaceName = scenario,
             packageName = "com.test",
+            linksWasiPreview1 = linksWasiPreview1,
         ),
         interfaceVisibility = interfaceVisibility,
         factoryVisibility = factoryVisibility,
         implementationVisibility = implementationVisibility,
         config = config,
+        runtimes = runtimes,
     )
 }

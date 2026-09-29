@@ -144,6 +144,7 @@ internal fun wasmInterface(
     properties: List<Property> = [],
     memories: List<MemoryBinding> = [],
     allocator: ExportedAllocator? = null,
+    linksWasiPreview1: Boolean = false,
 ) = WasmInterface(
     interfaceName = interfaceName,
     packageName = packageName,
@@ -153,4 +154,5 @@ internal fun wasmInterface(
     functions = functions,
     properties = properties,
     memories = memories,
+    linksWasiPreview1 = linksWasiPreview1,
 )

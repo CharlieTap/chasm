@@ -14,6 +14,7 @@ internal class ChasmFactoryFunctionGenerator {
         interfaceName: String,
         visibility: FactoryVisibility,
         generateSuspendingFactory: Boolean,
+        linksWasiPreview1: Boolean,
     ): FunSpec {
         val moduleFactoryType = if (generateSuspendingFactory) {
             CHASM_SUSPEND_MODULE_FACTORY_CLASS_NAME
@@ -36,6 +37,9 @@ internal class ChasmFactoryFunctionGenerator {
             addModifiers(visibilityModifier)
             if (generateSuspendingFactory) addModifiers(KModifier.SUSPEND)
             addParameter("binary", ByteArray::class)
+            if (linksWasiPreview1) {
+                addParameter("wasiHost", WASI_EMBEDDER_HOST_CLASS_NAME)
+            }
             addParameter(
                 ParameterSpec.builder("imports", CHASM_CODEGEN_IMPORT_LIST_CLASS_NAME)
                     .defaultValue("emptyList()")
@@ -60,7 +64,17 @@ internal class ChasmFactoryFunctionGenerator {
                 CHASM_EXPECT,
                 "Failed to decode binary",
             )
-            addStatement("val allocatedImports = %M(store, imports)", CHASM_ALLOCATE_IMPORTS)
+            if (linksWasiPreview1) {
+                addStatement("val explicitImports = %M(store, imports)", CHASM_ALLOCATE_IMPORTS)
+                addStatement(
+                    "val wasiImports = %T(store, module) { host = wasiHost }" +
+                        ".buildRequired(providedImports = explicitImports)",
+                    WASI_PREVIEW1_BUILDER_CLASS_NAME,
+                )
+                addStatement("val allocatedImports = explicitImports + wasiImports")
+            } else {
+                addStatement("val allocatedImports = %M(store, imports)", CHASM_ALLOCATE_IMPORTS)
+            }
             addStatement(
                 "val instance = instanceFactory?.invoke(store, module, allocatedImports) ?: " +
                     "%M(store, module, allocatedImports).%M(%S)",
@@ -98,6 +112,9 @@ internal val CHASM_INSTANCE_FACTORY_CLASS_NAME =
     ClassName("io.github.charlietap.chasm.embedding.codegen", "InstanceFactory")
 internal val CHASM_SUSPEND_INSTANCE_FACTORY_CLASS_NAME =
     ClassName("io.github.charlietap.chasm.embedding.codegen", "SuspendInstanceFactory")
+internal val WASI_EMBEDDER_HOST_CLASS_NAME = ClassName("at.released.weh.host", "EmbedderHost")
+internal val WASI_PREVIEW1_BUILDER_CLASS_NAME =
+    ClassName("at.released.weh.bindings.chasm.wasip1", "ChasmWasiPreview1Builder")
 
 internal val CHASM_STORE = MemberName("io.github.charlietap.chasm.embedding", "store")
 internal val CHASM_MODULE = MemberName("io.github.charlietap.chasm.embedding", "module")

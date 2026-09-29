@@ -76,6 +76,7 @@ internal class WasmInterfaceGenerator(
                         interfaceName = wasmInterface.interfaceName,
                         visibility = factoryVisibility,
                         generateSuspendingFactory = config.generateSuspendingFactories,
+                        linksWasiPreview1 = wasmInterface.linksWasiPreview1,
                     )
                 },
             )

@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.gradle
 
 import io.github.charlietap.chasm.fixture.chasm.embedding.exportDefinition
+import io.github.charlietap.chasm.fixture.chasm.embedding.importDefinition
 import io.github.charlietap.chasm.fixture.chasm.embedding.moduleInfo
 import io.github.charlietap.chasm.fixture.host.memoryIndex
 import io.github.charlietap.chasm.fixture.runtime.type.functionExternalType
@@ -41,6 +42,59 @@ import kotlin.test.fail
 class WasmInterfaceFactoryTest {
 
     @Test
+    fun `detects enabled WASI Preview 1 imports`() {
+        val actual = createInterface(
+            config = codegenConfig(wasi = WasiLinking.AUTOMATIC),
+            info = moduleInfo(
+                imports = listOf(
+                    importDefinition(
+                        moduleName = "wasi_snapshot_preview1",
+                        entityName = "args_get",
+                        type = functionExternalType(),
+                    ),
+                ),
+            ),
+        )
+
+        assertEquals(true, actual.linksWasiPreview1)
+    }
+
+    @Test
+    fun `does not link WASI when linking is disabled`() {
+        val actual = createInterface(
+            info = moduleInfo(
+                imports = listOf(
+                    importDefinition(
+                        moduleName = "wasi_snapshot_preview1",
+                        entityName = "args_get",
+                        type = functionExternalType(),
+                    ),
+                ),
+            ),
+        )
+
+        assertEquals(false, actual.linksWasiPreview1)
+    }
+
+    @Test
+    fun `does not link WASI when the namespace is absent`() {
+        val actual = createInterface(
+            config = codegenConfig(wasi = WasiLinking.AUTOMATIC),
+            info = moduleInfo(
+                imports = listOf(
+                    importDefinition(
+                        moduleName = "env",
+                        entityName = "args_get",
+                        type = functionExternalType(),
+                    ),
+                ),
+            ),
+        )
+
+        assertEquals(false, actual.linksWasiPreview1)
+    }
+
+    @Test
     fun `can generate properties for exported memories`() {
         val info = moduleInfo(
             exports = listOf(
@@ -78,6 +132,21 @@ class WasmInterfaceFactoryTest {
 
         assertEquals(expected, actual)
     }
+
+    private fun createInterface(
+        config: CodegenConfig = codegenConfig(),
+        info: io.github.charlietap.chasm.embedding.shapes.ModuleInfo,
+    ): WasmInterface = WasmInterfaceFactory()(
+        interfaceName = "TestService",
+        packageName = "com.test",
+        config = config,
+        info = info,
+        allocator = null,
+        initializers = emptySet(),
+        wasmFunctions = emptyList(),
+        ignoredExports = emptySet(),
+        logger = NeverLogger,
+    )
 
     @Test
     fun `memory names do not collide with bindings or implementation properties`() {

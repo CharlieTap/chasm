@@ -10,12 +10,13 @@ internal fun assertGenerates(
     factoryVisibility: FactoryVisibility = FactoryVisibility.PUBLIC,
     implementationVisibility: ImplementationVisibility = ImplementationVisibility.PRIVATE,
     config: CodegenConfig = CodegenConfig(),
+    runtimes: Iterable<CodegenRuntime> = CodegenRuntime.entries,
 ) {
     val expectedFileNames = listOf(
         wasmInterface.interfaceName,
         wasmInterface.interfaceName + "Impl",
     )
-    val generatedByRuntime = CodegenRuntime.entries.associateWith { runtime ->
+    val generatedByRuntime = runtimes.associateWith { runtime ->
         WasmInterfaceGenerator()(
             interfaceVisibility = interfaceVisibility,
             factoryVisibility = factoryVisibility,
