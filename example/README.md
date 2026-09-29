@@ -24,11 +24,11 @@ fibonacci implementation
 ### consumer-jvm 🧮
 
 A kotlin jvm module which creates and injects a TestService, this service wraps a wasm binary that exposes a variety of
-different wasm exports. It demonstrates functions with multiple returns, string returns, immutable and mutable globals etc.
+different wasm exports. It demonstrates functions with multiple returns, string returns, immutable and mutable globals, and
+automatic WASI Preview 1 linking with the Chasm codegen runtime.
 
 ### consumer-multiplatform 🧮
 
 A kotlin multiplatform module which creates and injects services that can be used by Android, JS, and WasmJS consumers. It wraps wasm
 binaries for factorial, string encoding, and interop coverage across numeric values, multiple returns, strings, and globals.
-
 

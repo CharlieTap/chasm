@@ -24,6 +24,8 @@ fun MinimalExternalModuleDependency.notation(): String {
     return "$module:${versionConstraint.requiredVersion}"
 }
 
+val wasiPreview1Dependency = libs.wasi.emscripten.host.chasm.wasip1.kmp.get().notation()
+
 buildConfig {
     buildConfigField("CHASM_DEPENDENCY", libs.chasm.kmp.get().notation())
     buildConfigField("CHASM_JVM_DEPENDENCY", libs.chasm.jvm.get().notation())
@@ -31,6 +33,7 @@ buildConfig {
     buildConfigField("CHASM_COROUTINES_JVM_DEPENDENCY", libs.chasm.coroutines.jvm.get().notation())
     buildConfigField("VM_DEPENDENCY", libs.vm.kmp.get().notation())
     buildConfigField("VM_JVM_DEPENDENCY", libs.vm.jvm.get().notation())
+    buildConfigField("WASI_PREVIEW1_DEPENDENCY", wasiPreview1Dependency)
     buildConfigField("KOTLIN_POET_DEPENDENCY", libs.kotlin.poet.get().notation())
 }
 
@@ -43,7 +46,8 @@ publishingConventions.apply {
 val chasmPluginId = libs.plugins.chasm.get().pluginId
 val minimumGradleVersion = "9.1"
 val minimumAgpGradleVersion = "9.1.0"
-val testedGradleVersions = listOf("9.5.0", "9.6.1", "9.7.1", "9.8.0")
+val testedGradleVersions = listOf("9.1.0", "9.5.0", "9.6.1", "9.7.1", "9.8.0")
+val testedAgpGradleVersions = listOf("9.5.0", "9.6.1", "9.7.1", "9.8.0")
 val kotlinStdlibModule = libs.kotlin.stdlib.get().module
 
 gradlePlugin {
@@ -196,6 +200,7 @@ functionalTest.configure {
     )
     systemProperty("chasm.functionalTest.pluginId", chasmPluginId)
     systemProperty("chasm.functionalTest.pluginVersion", pluginVersion)
+    systemProperty("chasm.functionalTest.wasiPreview1Dependency", wasiPreview1Dependency)
     systemProperty("chasm.functionalTest.kotlinPluginVersion", libs.versions.kotlin.get())
     systemProperty("chasm.functionalTest.coroutinesVersion", libs.versions.kotlinx.coroutines.get())
     systemProperty("chasm.functionalTest.androidPluginVersion", libs.versions.android.build.tools.plugin.get())
@@ -203,6 +208,7 @@ functionalTest.configure {
     systemProperty("chasm.functionalTest.minimumGradleVersion", minimumGradleVersion)
     systemProperty("chasm.functionalTest.minimumAgpGradleVersion", minimumAgpGradleVersion)
     systemProperty("chasm.functionalTest.testedGradleVersions", testedGradleVersions.joinToString(","))
+    systemProperty("chasm.functionalTest.testedAgpGradleVersions", testedAgpGradleVersions.joinToString(","))
     systemProperty("chasm.functionalTest.compileSdk", libs.versions.compile.sdk.get())
     systemProperty(
         "chasm.functionalTest.minimumAgpCompileSdk",

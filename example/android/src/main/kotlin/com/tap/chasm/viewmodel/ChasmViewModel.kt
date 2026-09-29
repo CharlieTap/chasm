@@ -135,6 +135,9 @@ class ChasmViewModel(
         val unitFunction = testService.unitFunction()
         Log.d("ChasmViewModel", "unit function: $unitFunction ${testService.mutableGlobal}")
 
+        val random = testService.generateRandom()
+        Log.d("ChasmViewModel", "random: $random")
+
         val multipleParamFunction = testService.multipleParamFunction(5, 2.2)
         Log.d("ChasmViewModel", "multiple param function: $multipleParamFunction")
 

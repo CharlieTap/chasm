@@ -1,0 +1,37 @@
+package com.test
+
+import at.released.weh.bindings.chasm.wasip1.ChasmWasiPreview1Builder
+import at.released.weh.host.EmbedderHost
+import io.github.charlietap.chasm.embedding.codegen.CodegenImport
+import io.github.charlietap.chasm.embedding.codegen.InstanceFactory
+import io.github.charlietap.chasm.embedding.codegen.ModuleFactory
+import io.github.charlietap.chasm.embedding.codegen.allocateImports
+import io.github.charlietap.chasm.embedding.instance
+import io.github.charlietap.chasm.embedding.module
+import io.github.charlietap.chasm.embedding.shapes.Instance
+import io.github.charlietap.chasm.embedding.shapes.Store
+import io.github.charlietap.chasm.embedding.shapes.`expect`
+import io.github.charlietap.chasm.embedding.store
+import kotlin.ByteArray
+import kotlin.collections.List
+
+public fun wasiPreview1Construction(
+  binary: ByteArray,
+  wasiHost: EmbedderHost,
+  imports: List<CodegenImport> = emptyList(),
+  moduleFactory: ModuleFactory? = null,
+  instanceFactory: InstanceFactory? = null,
+): WasiPreview1Construction {
+  val store = store()
+  val module = moduleFactory?.invoke(binary) ?: module(binary).`expect`("Failed to decode binary")
+  val explicitImports = allocateImports(store, imports)
+  val wasiImports = ChasmWasiPreview1Builder(store, module) { host = wasiHost }.buildRequired(providedImports = explicitImports)
+  val allocatedImports = explicitImports + wasiImports
+  val instance = instanceFactory?.invoke(store, module, allocatedImports) ?: instance(store, module, allocatedImports).`expect`("Failed to instantiate module")
+  return WasiPreview1ConstructionImpl(store = store, instance = instance)
+}
+
+private class WasiPreview1ConstructionImpl(
+  private val store: Store,
+  private val instance: Instance,
+) : WasiPreview1Construction

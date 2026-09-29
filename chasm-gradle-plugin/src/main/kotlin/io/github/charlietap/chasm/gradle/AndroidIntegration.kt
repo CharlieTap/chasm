@@ -10,6 +10,7 @@ internal fun configureAndroid(
     project: Project,
     extension: ChasmExtension,
     workerClasspath: Provider<out Configuration>,
+    validatedConfig: (Provider<CodegenConfig>) -> Provider<CodegenConfig>,
 ) {
     val androidComponents = project.extensions.getByType(AndroidComponentsExtension::class.java)
 
@@ -25,7 +26,7 @@ internal fun configureAndroid(
                 module = module,
                 sourceSetName = variant.name,
                 classpath = workerClasspath,
-                config = module.codegenConfig,
+                config = validatedConfig(module.codegenConfig),
             )
             kotlinSources.addGeneratedSourceDirectory(task, CodegenTask::outputDirectory)
         }

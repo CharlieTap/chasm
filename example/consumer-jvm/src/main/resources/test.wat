@@ -1,4 +1,6 @@
 (module
+  (import "wasi_snapshot_preview1" "random_get"
+    (func $random_get (param i32 i32) (result i32)))
   (global $mutable_global (export "mutable_global") (mut i32) (i32.const 117))
   (global $immutable_global (export "immutable_global") i32 (i32.const 117))
   (memory $memory (export "memory") 2)
@@ -46,6 +48,17 @@
    (func $unit_function (export "unit_function")
      i32.const 316
      global.set $mutable_global
+   )
+
+   (func $generate_random (export "generate_random") (result i32)
+     i32.const 160
+     i32.const 4
+     call $random_get
+     if
+       unreachable
+     end
+     i32.const 160
+     i32.load
    )
 
    (func $multiple_param_function (export "multiple_param_function") (param i32 f64) (result f64)

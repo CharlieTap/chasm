@@ -434,6 +434,13 @@ internal class WasmInterfaceFactory(
             properties = properties,
             memories = memories,
             types = types,
+            linksWasiPreview1 = config.wasi == WasiLinking.AUTOMATIC && info.imports.any { definition ->
+                definition.moduleName == WASI_SNAPSHOT_PREVIEW1_MODULE_NAME
+            },
         )
+    }
+
+    private companion object {
+        private const val WASI_SNAPSHOT_PREVIEW1_MODULE_NAME = "wasi_snapshot_preview1"
     }
 }

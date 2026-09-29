@@ -202,6 +202,7 @@ chasm {
                 generateTypesafeGlobalProperties = true,
                 generateSuspendingFactories = true,
                 runtime = CodegenRuntime.CHASM,
+                wasi = WasiLinking.AUTOMATIC,
             )
         }
     }
@@ -216,6 +217,31 @@ Controls the runtime API targeted by the generated module bindings.
 `PORTABLE_VM` supports every plugin target through the VM abstraction. `CHASM`
 generates directly against Chasm's embedding API and supports JVM, Android, and
 Kotlin/Native targets, but not Kotlin/JS or Kotlin/Wasm JS.
+
+### `wasi: WasiLinking`
+
+default = `WasiLinking.DISABLED`
+
+Controls automatic WASI host linking. `AUTOMATIC` detects supported WASI
+imports required by the configured binary. Currently, it detects imports from
+`wasi_snapshot_preview1`, adds the direct Chasm WASI binding dependency, and
+generates a required `EmbedderHost` factory parameter only when the binary
+contains matching imports:
+
+```kotlin
+val host = EmbedderHost()
+val service = fooService(binary, wasiHost = host)
+```
+
+The application owns the host and must close it at the appropriate lifecycle
+boundary. Explicit `CodegenImport` values take precedence over matching
+automatic imports, allowing individual WASI functions to be overridden.
+
+Preview 1 linking requires `CodegenRuntime.CHASM`. It supports JVM, Android,
+Linux x64 and ARM64, macOS ARM64, iOS ARM64, and iOS Simulator ARM64. It does
+not support JS, Wasm JS, Windows, macOS x64, or iOS x64. Merely enabling the
+option for a module without Preview 1 imports does not alter its generated
+factory API.
 
 ### `generateSuspendingFactories: Boolean`
 

@@ -97,4 +97,5 @@ internal data class WasmInterface(
     val functions: List<Function>,
     val properties: List<Property>,
     val memories: List<MemoryBinding> = emptyList(),
+    val linksWasiPreview1: Boolean = false,
 )
