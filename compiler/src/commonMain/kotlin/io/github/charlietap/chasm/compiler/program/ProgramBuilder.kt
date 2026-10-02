@@ -28,6 +28,9 @@ internal class ProgramBuilder(
     private val relocationFactories = ArrayList<TargetInstructionFactory>()
     private var multiTargetRelocations: MutableList<MultiTargetRelocation>? = null
 
+    /** Set only when recompiling for trap diagnostics. */
+    internal var provenance: SourceProvenanceRecorder? = null
+
     val baseIp: Int = program.size
 
     val size: Int
@@ -64,7 +67,9 @@ internal class ProgramBuilder(
 
     fun append(instruction: DispatchableInstruction): Int {
         checkNotFinished()
-        return program.append(instruction)
+        val index = program.append(instruction)
+        provenance?.record(index - baseIp)
+        return index
     }
 
     fun append(
@@ -74,6 +79,7 @@ internal class ProgramBuilder(
         checkNotFinished()
         val index = program.size
         checkTarget(target)
+        provenance?.record(index - baseIp)
         val targetIp = targetIps[target.index]
         if (targetIp != UNBOUND_IP) {
             program.append(instruction.create(targetIp))
@@ -101,6 +107,7 @@ internal class ProgramBuilder(
     ): Int {
         checkNotFinished()
         val index = program.size
+        provenance?.record(index - baseIp)
         var remainingTargetCount = 0
         for (targetIndex in targetIndices) {
             checkTargetIndex(targetIndex)

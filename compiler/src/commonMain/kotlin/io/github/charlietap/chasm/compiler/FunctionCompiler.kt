@@ -74,8 +74,10 @@ internal fun FunctionCompiler(
         beginFunctionControl(state)
         state.emitCheckpoint()
 
+        val provenance = programBuilder.provenance
         var index = 0
         while (index < function.body.instructions.size) {
+            provenance?.beginStep(index)
             val instruction = function.body.instructions[index]
             val nextInstruction = function.body.instructions.getOrNull(index + 1)
             val consumedInstructionCount = compileInstructionChain(context, state, function, index) ?: run {
@@ -192,6 +194,7 @@ internal fun FunctionCompiler(
 
             state.rewindFrame()
             index += consumedInstructionCount
+            provenance?.endStep(index)
         }
 
         finishFunctionControl(state)
