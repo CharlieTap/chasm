@@ -21,6 +21,7 @@ internal fun ExpressionDecoder(
 internal inline fun ExpressionDecoder(
     context: CodeBodyDecoderContext,
     crossinline instructionDecoder: CodeBodyDecoder<Instruction>,
+    crossinline onInstruction: () -> Unit = {},
 ): Result<Expression, WasmDecodeError> = binding {
     val builder = InstructionBlockBuilder()
     var depth = 0
@@ -28,12 +29,13 @@ internal inline fun ExpressionDecoder(
     while (true) {
         when (context.reader.peekUByte()) {
             END -> {
-                context.reader.ubyte()
-
                 if (depth == 0) {
+                    context.reader.ubyte()
                     break
                 }
 
+                onInstruction()
+                context.reader.ubyte()
                 depth--
                 var endCount = 1
 
@@ -46,10 +48,12 @@ internal inline fun ExpressionDecoder(
                 builder.appendEnd(endCount)
             }
             ELSE -> {
+                onInstruction()
                 context.reader.ubyte()
                 builder.append(ControlInstruction.Else)
             }
             else -> {
+                onInstruction()
                 val instruction = instructionDecoder(context).bind()
                 builder.append(instruction)
 
