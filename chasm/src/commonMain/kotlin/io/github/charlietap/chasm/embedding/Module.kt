@@ -48,6 +48,7 @@ internal fun <Source> module(
             Module(
                 config = config,
                 module = internal,
+                binary = source as? ByteArray,
             )
         }.fold(::Success, ::Error)
 }

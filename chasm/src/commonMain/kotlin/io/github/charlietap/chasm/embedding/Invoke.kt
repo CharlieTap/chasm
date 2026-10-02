@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.embedding
 
 import com.github.michaelbull.result.fold
 import com.github.michaelbull.result.mapError
+import io.github.charlietap.chasm.embedding.diagnostic.executionError
 import io.github.charlietap.chasm.embedding.error.ChasmError
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Error
@@ -12,7 +13,6 @@ import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.executor.invoker.FunctionInvoker
 import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.runtime.error.InvocationError
-import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
 
@@ -133,7 +133,6 @@ private inline fun invokeExported(
     invoker: FunctionInvoker,
 ): ChasmResult<List<ExecutionValue>, ChasmError.ExecutionError> {
     return invoker(instance.config, store.store, instance.instance, address, args)
-        .mapError(ModuleTrapError::toString)
-        .mapError(ChasmError::ExecutionError)
+        .mapError { error -> executionError(store, error) }
         .fold(::Success, ::Error)
 }

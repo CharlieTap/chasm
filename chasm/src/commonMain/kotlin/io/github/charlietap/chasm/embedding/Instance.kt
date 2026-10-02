@@ -5,6 +5,8 @@ import com.github.michaelbull.result.fold
 import com.github.michaelbull.result.map
 import com.github.michaelbull.result.mapError
 import io.github.charlietap.chasm.config.RuntimeConfig
+import io.github.charlietap.chasm.embedding.diagnostic.Instantiation
+import io.github.charlietap.chasm.embedding.diagnostic.executionError
 import io.github.charlietap.chasm.embedding.error.ChasmError
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Error
@@ -52,9 +54,10 @@ internal fun instance(
     }
 
     val mappedImports = imports.mapImports(importableMapper)
+    val firstFunctionAddress = store.store.functions.size
 
     return instantiator(config, store.store, module.module, mappedImports)
-        .toChasmResult(config, store)
+        .toChasmResult(config, store, module, firstFunctionAddress)
 }
 
 internal fun List<Import>.mapImports(
@@ -70,11 +73,13 @@ internal fun List<Import>.mapImports(
 internal fun Result<RuntimeModuleInstance, ModuleTrapError>.toChasmResult(
     config: RuntimeConfig,
     store: Store,
+    module: Module,
+    firstFunctionAddress: Int,
 ): ChasmResult<Instance, ChasmError.ExecutionError> =
     this
-        .mapError(ModuleTrapError::toString)
-        .mapError(ChasmError::ExecutionError)
+        .mapError { error -> executionError(store, error, Instantiation(module, firstFunctionAddress)) }
         .map { internal ->
+            if (config.debugInfo) store.diagnostics.register(internal, module)
             Instance(
                 config = config,
                 instance = internal,

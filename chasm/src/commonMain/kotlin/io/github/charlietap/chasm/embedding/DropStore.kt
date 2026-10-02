@@ -21,6 +21,7 @@ internal fun dropStore(
 ): ChasmResult<Unit, ChasmError.ExecutionError> {
 
     store.isDropped = true
+    store.diagnostics.clear()
 
     val store = store.store
 

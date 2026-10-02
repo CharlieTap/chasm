@@ -19,6 +19,8 @@ fun dropInstance(
         return Error(ChasmError.ExecutionError("Instance belongs to a different Store"))
     }
 
+    store.diagnostics.unregister(instance.instance)
+
     val instance = instance.instance
     val store = store.store
 

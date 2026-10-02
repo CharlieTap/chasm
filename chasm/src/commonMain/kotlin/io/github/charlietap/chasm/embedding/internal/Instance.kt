@@ -27,11 +27,13 @@ suspend fun _instance(
         return Error(ChasmError.ExecutionError("Importable belongs to a different Store"))
     }
 
+    val firstFunctionAddress = store.store.functions.size
+
     return ParallelModuleInstantiator(
         config = config,
         store = store.store,
         module = module.module,
         imports = imports.mapImports(ImportableMapper(store.store)),
         taskExecutor = taskExecutor,
-    ).toChasmResult(config, store)
+    ).toChasmResult(config, store, module, firstFunctionAddress)
 }

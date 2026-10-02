@@ -50,6 +50,20 @@ sealed interface io.github.charlietap.chasm.embedding.error/ChasmError { // io.g
     abstract val error // io.github.charlietap.chasm.embedding.error/ChasmError.error|{}error[0]
         abstract fun <get-error>(): kotlin/String // io.github.charlietap.chasm.embedding.error/ChasmError.error.<get-error>|<get-error>(){}[0]
 
+    final class ExecutionError : io.github.charlietap.chasm.embedding.error/ChasmError { // io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError|null[0]
+        constructor <init>(kotlin/String) // io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError.<init>|<init>(kotlin.String){}[0]
+        constructor <init>(kotlin/String, io.github.charlietap.chasm.embedding.error/WasmTrap?) // io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError.<init>|<init>(kotlin.String;io.github.charlietap.chasm.embedding.error.WasmTrap?){}[0]
+
+        final val error // io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError.error|{}error[0]
+            final fun <get-error>(): kotlin/String // io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError.error.<get-error>|<get-error>(){}[0]
+        final val trap // io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError.trap|{}trap[0]
+            final fun <get-trap>(): io.github.charlietap.chasm.embedding.error/WasmTrap? // io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError.trap.<get-trap>|<get-trap>(){}[0]
+
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError.toString|toString(){}[0]
+    }
+
     final value class DecodeError : io.github.charlietap.chasm.embedding.error/ChasmError { // io.github.charlietap.chasm.embedding.error/ChasmError.DecodeError|null[0]
         constructor <init>(kotlin/String) // io.github.charlietap.chasm.embedding.error/ChasmError.DecodeError.<init>|<init>(kotlin.String){}[0]
 
@@ -59,17 +73,6 @@ sealed interface io.github.charlietap.chasm.embedding.error/ChasmError { // io.g
         final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.embedding.error/ChasmError.DecodeError.equals|equals(kotlin.Any?){}[0]
         final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.embedding.error/ChasmError.DecodeError.hashCode|hashCode(){}[0]
         final fun toString(): kotlin/String // io.github.charlietap.chasm.embedding.error/ChasmError.DecodeError.toString|toString(){}[0]
-    }
-
-    final value class ExecutionError : io.github.charlietap.chasm.embedding.error/ChasmError { // io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError|null[0]
-        constructor <init>(kotlin/String) // io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError.<init>|<init>(kotlin.String){}[0]
-
-        final val error // io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError.error|{}error[0]
-            final fun <get-error>(): kotlin/String // io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError.error.<get-error>|<get-error>(){}[0]
-
-        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError.equals|equals(kotlin.Any?){}[0]
-        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError.hashCode|hashCode(){}[0]
-        final fun toString(): kotlin/String // io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError.toString|toString(){}[0]
     }
 
     final value class ValidationError : io.github.charlietap.chasm.embedding.error/ChasmError { // io.github.charlietap.chasm.embedding.error/ChasmError.ValidationError|null[0]
@@ -285,6 +288,74 @@ final class io.github.charlietap.chasm.embedding.dsl/ValueTypeListBuilder { // i
     final fun structref() // io.github.charlietap.chasm.embedding.dsl/ValueTypeListBuilder.structref|structref(){}[0]
 }
 
+final class io.github.charlietap.chasm.embedding.error/MemoryAccess { // io.github.charlietap.chasm.embedding.error/MemoryAccess|null[0]
+    final val address // io.github.charlietap.chasm.embedding.error/MemoryAccess.address|{}address[0]
+        final fun <get-address>(): kotlin/Long // io.github.charlietap.chasm.embedding.error/MemoryAccess.address.<get-address>|<get-address>(){}[0]
+    final val kind // io.github.charlietap.chasm.embedding.error/MemoryAccess.kind|{}kind[0]
+        final fun <get-kind>(): io.github.charlietap.chasm.embedding.error/MemoryAccess.Kind // io.github.charlietap.chasm.embedding.error/MemoryAccess.kind.<get-kind>|<get-kind>(){}[0]
+    final val memoryIndex // io.github.charlietap.chasm.embedding.error/MemoryAccess.memoryIndex|{}memoryIndex[0]
+        final fun <get-memoryIndex>(): kotlin/Int // io.github.charlietap.chasm.embedding.error/MemoryAccess.memoryIndex.<get-memoryIndex>|<get-memoryIndex>(){}[0]
+    final val memorySize // io.github.charlietap.chasm.embedding.error/MemoryAccess.memorySize|{}memorySize[0]
+        final fun <get-memorySize>(): kotlin/Long // io.github.charlietap.chasm.embedding.error/MemoryAccess.memorySize.<get-memorySize>|<get-memorySize>(){}[0]
+    final val width // io.github.charlietap.chasm.embedding.error/MemoryAccess.width|{}width[0]
+        final fun <get-width>(): kotlin/Long // io.github.charlietap.chasm.embedding.error/MemoryAccess.width.<get-width>|<get-width>(){}[0]
+
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.embedding.error/MemoryAccess.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.embedding.error/MemoryAccess.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.charlietap.chasm.embedding.error/MemoryAccess.toString|toString(){}[0]
+
+    final enum class Kind : kotlin/Enum<io.github.charlietap.chasm.embedding.error/MemoryAccess.Kind> { // io.github.charlietap.chasm.embedding.error/MemoryAccess.Kind|null[0]
+        enum entry COPY // io.github.charlietap.chasm.embedding.error/MemoryAccess.Kind.COPY|null[0]
+        enum entry FILL // io.github.charlietap.chasm.embedding.error/MemoryAccess.Kind.FILL|null[0]
+        enum entry INIT // io.github.charlietap.chasm.embedding.error/MemoryAccess.Kind.INIT|null[0]
+        enum entry READ // io.github.charlietap.chasm.embedding.error/MemoryAccess.Kind.READ|null[0]
+        enum entry WRITE // io.github.charlietap.chasm.embedding.error/MemoryAccess.Kind.WRITE|null[0]
+
+        final val entries // io.github.charlietap.chasm.embedding.error/MemoryAccess.Kind.entries|#static{}entries[0]
+            final fun <get-entries>(): kotlin.enums/EnumEntries<io.github.charlietap.chasm.embedding.error/MemoryAccess.Kind> // io.github.charlietap.chasm.embedding.error/MemoryAccess.Kind.entries.<get-entries>|<get-entries>#static(){}[0]
+
+        final fun valueOf(kotlin/String): io.github.charlietap.chasm.embedding.error/MemoryAccess.Kind // io.github.charlietap.chasm.embedding.error/MemoryAccess.Kind.valueOf|valueOf#static(kotlin.String){}[0]
+        final fun values(): kotlin/Array<io.github.charlietap.chasm.embedding.error/MemoryAccess.Kind> // io.github.charlietap.chasm.embedding.error/MemoryAccess.Kind.values|values#static(){}[0]
+    }
+}
+
+final class io.github.charlietap.chasm.embedding.error/WasmFrame { // io.github.charlietap.chasm.embedding.error/WasmFrame|null[0]
+    final val functionIndex // io.github.charlietap.chasm.embedding.error/WasmFrame.functionIndex|{}functionIndex[0]
+        final fun <get-functionIndex>(): kotlin/Int // io.github.charlietap.chasm.embedding.error/WasmFrame.functionIndex.<get-functionIndex>|<get-functionIndex>(){}[0]
+    final val functionName // io.github.charlietap.chasm.embedding.error/WasmFrame.functionName|{}functionName[0]
+        final fun <get-functionName>(): kotlin/String? // io.github.charlietap.chasm.embedding.error/WasmFrame.functionName.<get-functionName>|<get-functionName>(){}[0]
+    final val moduleName // io.github.charlietap.chasm.embedding.error/WasmFrame.moduleName|{}moduleName[0]
+        final fun <get-moduleName>(): kotlin/String? // io.github.charlietap.chasm.embedding.error/WasmFrame.moduleName.<get-moduleName>|<get-moduleName>(){}[0]
+    final val wasmOffset // io.github.charlietap.chasm.embedding.error/WasmFrame.wasmOffset|{}wasmOffset[0]
+        final fun <get-wasmOffset>(): kotlin/Int? // io.github.charlietap.chasm.embedding.error/WasmFrame.wasmOffset.<get-wasmOffset>|<get-wasmOffset>(){}[0]
+
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.embedding.error/WasmFrame.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.embedding.error/WasmFrame.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.charlietap.chasm.embedding.error/WasmFrame.toString|toString(){}[0]
+}
+
+final class io.github.charlietap.chasm.embedding.error/WasmTrap { // io.github.charlietap.chasm.embedding.error/WasmTrap|null[0]
+    final val frames // io.github.charlietap.chasm.embedding.error/WasmTrap.frames|{}frames[0]
+        final fun <get-frames>(): kotlin.collections/List<io.github.charlietap.chasm.embedding.error/WasmFrame> // io.github.charlietap.chasm.embedding.error/WasmTrap.frames.<get-frames>|<get-frames>(){}[0]
+    final val memoryAccess // io.github.charlietap.chasm.embedding.error/WasmTrap.memoryAccess|{}memoryAccess[0]
+        final fun <get-memoryAccess>(): io.github.charlietap.chasm.embedding.error/MemoryAccess? // io.github.charlietap.chasm.embedding.error/WasmTrap.memoryAccess.<get-memoryAccess>|<get-memoryAccess>(){}[0]
+    final val omittedFrames // io.github.charlietap.chasm.embedding.error/WasmTrap.omittedFrames|{}omittedFrames[0]
+        final fun <get-omittedFrames>(): kotlin/Int // io.github.charlietap.chasm.embedding.error/WasmTrap.omittedFrames.<get-omittedFrames>|<get-omittedFrames>(){}[0]
+    final val reason // io.github.charlietap.chasm.embedding.error/WasmTrap.reason|{}reason[0]
+        final fun <get-reason>(): io.github.charlietap.chasm.embedding.error/TrapReason // io.github.charlietap.chasm.embedding.error/WasmTrap.reason.<get-reason>|<get-reason>(){}[0]
+    final val traceComplete // io.github.charlietap.chasm.embedding.error/WasmTrap.traceComplete|{}traceComplete[0]
+        final fun <get-traceComplete>(): kotlin/Boolean // io.github.charlietap.chasm.embedding.error/WasmTrap.traceComplete.<get-traceComplete>|<get-traceComplete>(){}[0]
+
+    final fun toString(): kotlin/String // io.github.charlietap.chasm.embedding.error/WasmTrap.toString|toString(){}[0]
+}
+
+final class io.github.charlietap.chasm.embedding.error/WasmTrapException : kotlin/IllegalStateException { // io.github.charlietap.chasm.embedding.error/WasmTrapException|null[0]
+    constructor <init>(io.github.charlietap.chasm.embedding.error/WasmTrap, kotlin/String) // io.github.charlietap.chasm.embedding.error/WasmTrapException.<init>|<init>(io.github.charlietap.chasm.embedding.error.WasmTrap;kotlin.String){}[0]
+
+    final val trap // io.github.charlietap.chasm.embedding.error/WasmTrapException.trap|{}trap[0]
+        final fun <get-trap>(): io.github.charlietap.chasm.embedding.error/WasmTrap // io.github.charlietap.chasm.embedding.error/WasmTrapException.trap.<get-trap>|<get-trap>(){}[0]
+}
+
 final class io.github.charlietap.chasm.embedding.shapes/Component // io.github.charlietap.chasm.embedding.shapes/Component|null[0]
 
 final class io.github.charlietap.chasm.embedding.shapes/Export { // io.github.charlietap.chasm.embedding.shapes/Export|null[0]
@@ -452,6 +523,52 @@ final class io.github.charlietap.chasm.embedding.shapes/Wasm32Allocator : io.git
 
     final fun alloc(kotlin/Int): kotlin/Int // io.github.charlietap.chasm.embedding.shapes/Wasm32Allocator.alloc|alloc(kotlin.Int){}[0]
     final fun free(kotlin/Int) // io.github.charlietap.chasm.embedding.shapes/Wasm32Allocator.free|free(kotlin.Int){}[0]
+}
+
+final value class io.github.charlietap.chasm.embedding.error/TrapReason { // io.github.charlietap.chasm.embedding.error/TrapReason|null[0]
+    final val description // io.github.charlietap.chasm.embedding.error/TrapReason.description|{}description[0]
+        final fun <get-description>(): kotlin/String // io.github.charlietap.chasm.embedding.error/TrapReason.description.<get-description>|<get-description>(){}[0]
+
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.embedding.error/TrapReason.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.embedding.error/TrapReason.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.charlietap.chasm.embedding.error/TrapReason.toString|toString(){}[0]
+
+    final object Companion { // io.github.charlietap.chasm.embedding.error/TrapReason.Companion|null[0]
+        final val ARRAY_OUT_OF_BOUNDS // io.github.charlietap.chasm.embedding.error/TrapReason.Companion.ARRAY_OUT_OF_BOUNDS|{}ARRAY_OUT_OF_BOUNDS[0]
+            final fun <get-ARRAY_OUT_OF_BOUNDS>(): io.github.charlietap.chasm.embedding.error/TrapReason // io.github.charlietap.chasm.embedding.error/TrapReason.Companion.ARRAY_OUT_OF_BOUNDS.<get-ARRAY_OUT_OF_BOUNDS>|<get-ARRAY_OUT_OF_BOUNDS>(){}[0]
+        final val CALL_STACK_EXHAUSTED // io.github.charlietap.chasm.embedding.error/TrapReason.Companion.CALL_STACK_EXHAUSTED|{}CALL_STACK_EXHAUSTED[0]
+            final fun <get-CALL_STACK_EXHAUSTED>(): io.github.charlietap.chasm.embedding.error/TrapReason // io.github.charlietap.chasm.embedding.error/TrapReason.Companion.CALL_STACK_EXHAUSTED.<get-CALL_STACK_EXHAUSTED>|<get-CALL_STACK_EXHAUSTED>(){}[0]
+        final val CAST_FAILURE // io.github.charlietap.chasm.embedding.error/TrapReason.Companion.CAST_FAILURE|{}CAST_FAILURE[0]
+            final fun <get-CAST_FAILURE>(): io.github.charlietap.chasm.embedding.error/TrapReason // io.github.charlietap.chasm.embedding.error/TrapReason.Companion.CAST_FAILURE.<get-CAST_FAILURE>|<get-CAST_FAILURE>(){}[0]
+        final val FUEL_EXHAUSTED // io.github.charlietap.chasm.embedding.error/TrapReason.Companion.FUEL_EXHAUSTED|{}FUEL_EXHAUSTED[0]
+            final fun <get-FUEL_EXHAUSTED>(): io.github.charlietap.chasm.embedding.error/TrapReason // io.github.charlietap.chasm.embedding.error/TrapReason.Companion.FUEL_EXHAUSTED.<get-FUEL_EXHAUSTED>|<get-FUEL_EXHAUSTED>(){}[0]
+        final val GUEST_HEAP_EXHAUSTED // io.github.charlietap.chasm.embedding.error/TrapReason.Companion.GUEST_HEAP_EXHAUSTED|{}GUEST_HEAP_EXHAUSTED[0]
+            final fun <get-GUEST_HEAP_EXHAUSTED>(): io.github.charlietap.chasm.embedding.error/TrapReason // io.github.charlietap.chasm.embedding.error/TrapReason.Companion.GUEST_HEAP_EXHAUSTED.<get-GUEST_HEAP_EXHAUSTED>|<get-GUEST_HEAP_EXHAUSTED>(){}[0]
+        final val HOST_FUNCTION_FAILURE // io.github.charlietap.chasm.embedding.error/TrapReason.Companion.HOST_FUNCTION_FAILURE|{}HOST_FUNCTION_FAILURE[0]
+            final fun <get-HOST_FUNCTION_FAILURE>(): io.github.charlietap.chasm.embedding.error/TrapReason // io.github.charlietap.chasm.embedding.error/TrapReason.Companion.HOST_FUNCTION_FAILURE.<get-HOST_FUNCTION_FAILURE>|<get-HOST_FUNCTION_FAILURE>(){}[0]
+        final val INDIRECT_CALL_TYPE_MISMATCH // io.github.charlietap.chasm.embedding.error/TrapReason.Companion.INDIRECT_CALL_TYPE_MISMATCH|{}INDIRECT_CALL_TYPE_MISMATCH[0]
+            final fun <get-INDIRECT_CALL_TYPE_MISMATCH>(): io.github.charlietap.chasm.embedding.error/TrapReason // io.github.charlietap.chasm.embedding.error/TrapReason.Companion.INDIRECT_CALL_TYPE_MISMATCH.<get-INDIRECT_CALL_TYPE_MISMATCH>|<get-INDIRECT_CALL_TYPE_MISMATCH>(){}[0]
+        final val INTEGER_DIVIDE_BY_ZERO // io.github.charlietap.chasm.embedding.error/TrapReason.Companion.INTEGER_DIVIDE_BY_ZERO|{}INTEGER_DIVIDE_BY_ZERO[0]
+            final fun <get-INTEGER_DIVIDE_BY_ZERO>(): io.github.charlietap.chasm.embedding.error/TrapReason // io.github.charlietap.chasm.embedding.error/TrapReason.Companion.INTEGER_DIVIDE_BY_ZERO.<get-INTEGER_DIVIDE_BY_ZERO>|<get-INTEGER_DIVIDE_BY_ZERO>(){}[0]
+        final val INTEGER_OVERFLOW // io.github.charlietap.chasm.embedding.error/TrapReason.Companion.INTEGER_OVERFLOW|{}INTEGER_OVERFLOW[0]
+            final fun <get-INTEGER_OVERFLOW>(): io.github.charlietap.chasm.embedding.error/TrapReason // io.github.charlietap.chasm.embedding.error/TrapReason.Companion.INTEGER_OVERFLOW.<get-INTEGER_OVERFLOW>|<get-INTEGER_OVERFLOW>(){}[0]
+        final val INTERRUPTED // io.github.charlietap.chasm.embedding.error/TrapReason.Companion.INTERRUPTED|{}INTERRUPTED[0]
+            final fun <get-INTERRUPTED>(): io.github.charlietap.chasm.embedding.error/TrapReason // io.github.charlietap.chasm.embedding.error/TrapReason.Companion.INTERRUPTED.<get-INTERRUPTED>|<get-INTERRUPTED>(){}[0]
+        final val INVALID_CONVERSION // io.github.charlietap.chasm.embedding.error/TrapReason.Companion.INVALID_CONVERSION|{}INVALID_CONVERSION[0]
+            final fun <get-INVALID_CONVERSION>(): io.github.charlietap.chasm.embedding.error/TrapReason // io.github.charlietap.chasm.embedding.error/TrapReason.Companion.INVALID_CONVERSION.<get-INVALID_CONVERSION>|<get-INVALID_CONVERSION>(){}[0]
+        final val MEMORY_OUT_OF_BOUNDS // io.github.charlietap.chasm.embedding.error/TrapReason.Companion.MEMORY_OUT_OF_BOUNDS|{}MEMORY_OUT_OF_BOUNDS[0]
+            final fun <get-MEMORY_OUT_OF_BOUNDS>(): io.github.charlietap.chasm.embedding.error/TrapReason // io.github.charlietap.chasm.embedding.error/TrapReason.Companion.MEMORY_OUT_OF_BOUNDS.<get-MEMORY_OUT_OF_BOUNDS>|<get-MEMORY_OUT_OF_BOUNDS>(){}[0]
+        final val NULL_REFERENCE // io.github.charlietap.chasm.embedding.error/TrapReason.Companion.NULL_REFERENCE|{}NULL_REFERENCE[0]
+            final fun <get-NULL_REFERENCE>(): io.github.charlietap.chasm.embedding.error/TrapReason // io.github.charlietap.chasm.embedding.error/TrapReason.Companion.NULL_REFERENCE.<get-NULL_REFERENCE>|<get-NULL_REFERENCE>(){}[0]
+        final val OTHER // io.github.charlietap.chasm.embedding.error/TrapReason.Companion.OTHER|{}OTHER[0]
+            final fun <get-OTHER>(): io.github.charlietap.chasm.embedding.error/TrapReason // io.github.charlietap.chasm.embedding.error/TrapReason.Companion.OTHER.<get-OTHER>|<get-OTHER>(){}[0]
+        final val TABLE_OUT_OF_BOUNDS // io.github.charlietap.chasm.embedding.error/TrapReason.Companion.TABLE_OUT_OF_BOUNDS|{}TABLE_OUT_OF_BOUNDS[0]
+            final fun <get-TABLE_OUT_OF_BOUNDS>(): io.github.charlietap.chasm.embedding.error/TrapReason // io.github.charlietap.chasm.embedding.error/TrapReason.Companion.TABLE_OUT_OF_BOUNDS.<get-TABLE_OUT_OF_BOUNDS>|<get-TABLE_OUT_OF_BOUNDS>(){}[0]
+        final val UNCAUGHT_EXCEPTION // io.github.charlietap.chasm.embedding.error/TrapReason.Companion.UNCAUGHT_EXCEPTION|{}UNCAUGHT_EXCEPTION[0]
+            final fun <get-UNCAUGHT_EXCEPTION>(): io.github.charlietap.chasm.embedding.error/TrapReason // io.github.charlietap.chasm.embedding.error/TrapReason.Companion.UNCAUGHT_EXCEPTION.<get-UNCAUGHT_EXCEPTION>|<get-UNCAUGHT_EXCEPTION>(){}[0]
+        final val UNREACHABLE // io.github.charlietap.chasm.embedding.error/TrapReason.Companion.UNREACHABLE|{}UNREACHABLE[0]
+            final fun <get-UNREACHABLE>(): io.github.charlietap.chasm.embedding.error/TrapReason // io.github.charlietap.chasm.embedding.error/TrapReason.Companion.UNREACHABLE.<get-UNREACHABLE>|<get-UNREACHABLE>(){}[0]
+    }
 }
 
 sealed class io.github.charlietap.chasm.embedding.shapes/Importable // io.github.charlietap.chasm.embedding.shapes/Importable|null[0]

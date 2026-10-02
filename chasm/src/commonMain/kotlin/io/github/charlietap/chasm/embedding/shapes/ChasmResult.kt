@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.embedding.shapes
 
 import io.github.charlietap.chasm.embedding.error.ChasmError
+import io.github.charlietap.chasm.embedding.error.WasmTrapException
 import kotlin.jvm.JvmInline
 
 sealed interface ChasmResult<out S, out E>
@@ -50,10 +51,17 @@ fun <S, E : ChasmError> ChasmResult<S, E>.getOrElse(defaultValue: S): S {
     }
 }
 
+/** If the error has a stack trace, throws a [WasmTrapException] that includes it. */
 fun <S, E : ChasmError> ChasmResult<S, E>.expect(message: String): S {
     return when (this) {
         is ChasmResult.Success -> this.result
-        is ChasmResult.Error -> throw IllegalStateException("$message: ${this.error}")
+        is ChasmResult.Error -> {
+            val trap = (this.error as? ChasmError.ExecutionError)?.trap
+            if (trap != null) {
+                throw WasmTrapException(trap, "$message: ${this.error}\n$trap")
+            }
+            throw IllegalStateException("$message: ${this.error}")
+        }
     }
 }
 

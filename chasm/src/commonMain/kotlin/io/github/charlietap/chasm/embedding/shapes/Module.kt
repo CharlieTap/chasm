@@ -7,6 +7,8 @@ import io.github.charlietap.chasm.ast.module.Module as InternalModule
 class Module internal constructor(
     internal val config: ModuleConfig,
     internal val module: InternalModule,
+    /** Null for streamed modules. */
+    internal val binary: ByteArray? = null,
 ) {
     private val info by lazy {
         moduleInfo(this)

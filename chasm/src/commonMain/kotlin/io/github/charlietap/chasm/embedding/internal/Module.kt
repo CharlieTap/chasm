@@ -23,6 +23,6 @@ suspend fun _module(
     return ParallelWasmModuleDecoder(config, bytes, taskExecutor)
         .mapError(ModuleDecoderError::toString)
         .mapError(::DecodeError)
-        .map { internal -> Module(config, internal) }
+        .map { internal -> Module(config, internal, bytes) }
         .fold(::Success, ::Error)
 }

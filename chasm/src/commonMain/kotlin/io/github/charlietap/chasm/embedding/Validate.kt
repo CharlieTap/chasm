@@ -59,6 +59,7 @@ internal fun validate(
             Module(
                 config = module.config,
                 module = internal,
+                binary = module.binary,
             )
         }.fold(::Success, ::Error)
 }
