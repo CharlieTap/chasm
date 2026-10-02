@@ -50,3 +50,7 @@ internal inline fun activationCallerFrameDelta(header: Long): Int =
 
 /** Returns the encoded return-IP field. */
 internal inline fun activationReturnIp(header: Long): Int = (header ushr RETURN_IP_SHIFT).toInt()
+
+fun decodeActivationCallerFrameDelta(header: Long): Int = activationCallerFrameDelta(header)
+
+fun decodeActivationReturnIp(header: Long): Int = activationReturnIp(header)

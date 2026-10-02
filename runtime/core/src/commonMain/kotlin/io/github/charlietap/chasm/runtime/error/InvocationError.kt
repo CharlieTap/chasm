@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.runtime.error
 
 import io.github.charlietap.chasm.runtime.address.Address
+import io.github.charlietap.chasm.runtime.diagnostic.TrapSnapshot
 import io.github.charlietap.chasm.runtime.instruction.LinkedInstruction
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.type.ValueType
@@ -193,4 +194,11 @@ sealed interface InvocationError : ModuleTrapError {
 
     @JvmInline
     value class GarbageCollectionFailed(val message: String) : InvocationError
+
+    class Trapped(
+        val error: InvocationError,
+        val snapshot: TrapSnapshot,
+    ) : InvocationError {
+        override fun toString(): String = error.toString()
+    }
 }
