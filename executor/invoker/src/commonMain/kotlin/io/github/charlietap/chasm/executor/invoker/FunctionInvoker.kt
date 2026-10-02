@@ -7,6 +7,7 @@ import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.executor.invoker.function.withHostCallbackScope
 import io.github.charlietap.chasm.executor.invoker.thread.ThreadExecutor
+import io.github.charlietap.chasm.executor.invoker.thread.TraceableThreadExecutor
 import io.github.charlietap.chasm.host.HostFunctionException
 import io.github.charlietap.chasm.host.UnsafeHostApi
 import io.github.charlietap.chasm.runtime.address.Address
@@ -44,7 +45,16 @@ fun FunctionInvoker(
     instance: ModuleInstance,
     function: FunctionInstance,
     values: List<ExecutionValue>,
-): Result<List<ExecutionValue>, InvocationError> =
+): Result<List<ExecutionValue>, InvocationError> = if (config.debugInfo) {
+    FunctionInvoker(
+        config = config,
+        store = store,
+        instance = instance,
+        function = function,
+        values = values,
+        threadExecutor = ::TraceableThreadExecutor,
+    )
+} else {
     FunctionInvoker(
         config = config,
         store = store,
@@ -53,6 +63,7 @@ fun FunctionInvoker(
         values = values,
         threadExecutor = ::ThreadExecutor,
     )
+}
 
 @OptIn(UnsafeHostApi::class)
 internal inline fun FunctionInvoker(
