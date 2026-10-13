@@ -6,11 +6,14 @@ sealed interface ChasmError {
 
     val error: String
 
-    @JvmInline
-    value class DecodeError(override val error: String) : ChasmError
+    /** A module could not be created from its binary. */
+    sealed interface ModuleError : ChasmError
 
     @JvmInline
-    value class ValidationError(override val error: String) : ChasmError
+    value class DecodeError(override val error: String) : ModuleError
+
+    @JvmInline
+    value class ValidationError(override val error: String) : ModuleError
 
     class ExecutionError(
         override val error: String,

@@ -61,6 +61,8 @@ include(":libs:mmap")
 
 include(":memory")
 
+include(":module")
+
 include(":compiler")
 
 include(":runtime:address")

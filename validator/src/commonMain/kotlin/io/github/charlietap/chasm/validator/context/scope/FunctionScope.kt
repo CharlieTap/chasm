@@ -1,14 +1,17 @@
 package io.github.charlietap.chasm.validator.context.scope
 
 import com.github.michaelbull.result.Err
+import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.getOrElse
 import io.github.charlietap.chasm.ast.module.Function
+import io.github.charlietap.chasm.ast.module.Index
+import io.github.charlietap.chasm.ast.module.Local
 import io.github.charlietap.chasm.type.InitializationStatus
 import io.github.charlietap.chasm.type.LocalType
 import io.github.charlietap.chasm.type.ReferenceType
+import io.github.charlietap.chasm.type.ResultType
 import io.github.charlietap.chasm.type.ValueType
-import io.github.charlietap.chasm.validator.context.FunctionContextImpl
 import io.github.charlietap.chasm.validator.context.Label
 import io.github.charlietap.chasm.validator.context.LabelKind
 import io.github.charlietap.chasm.validator.context.ModuleValidationContext
@@ -20,8 +23,26 @@ internal fun FunctionScope(
     function: Function,
     block: (ModuleValidationContext) -> Result<Unit, ModuleValidatorError>,
 ): Result<Unit, ModuleValidatorError> {
+    val resultType = context.functionContext.result
 
-    val functionType = context.functionType(function.typeIndex).getOrElse { error ->
+    EnterFunctionScope(context, function.typeIndex, function.locals).getOrElse { error ->
+        return Err(error)
+    }
+
+    val result = block(context)
+
+    ExitFunctionScope(context, resultType)
+
+    return result
+}
+
+internal fun EnterFunctionScope(
+    context: ModuleValidationContext,
+    typeIndex: Index.TypeIndex,
+    locals: List<Local>,
+): Result<Unit, ModuleValidatorError> {
+
+    val functionType = context.functionType(typeIndex).getOrElse { error ->
         return Err(error)
     }
     val label = Label(
@@ -36,7 +57,7 @@ internal fun FunctionScope(
     functionType.params.types.forEach { param ->
         context.locals += LocalType(InitializationStatus.SET, param)
     }
-    function.locals.forEach { local ->
+    locals.forEach { local ->
         val status = when (val type = local.type) {
             is ValueType.Number,
             is ValueType.Vector,
@@ -49,18 +70,20 @@ internal fun FunctionScope(
         }
         context.locals += LocalType(status, local.type)
     }
-    val resultType = context.functionContext.result
 
     context.functionContext.labels.push(label)
     context.functionContext.result = functionType.results
 
-    val result = block(context)
+    return Ok(Unit)
+}
 
+internal fun ExitFunctionScope(
+    context: ModuleValidationContext,
+    resultType: ResultType?,
+) {
     context.functionContext.labels.clear()
     context.functionContext.locals.clear()
     context.functionContext.localChanges.clear()
     context.functionContext.operands.clear()
     context.functionContext.result = resultType
-
-    return result
 }

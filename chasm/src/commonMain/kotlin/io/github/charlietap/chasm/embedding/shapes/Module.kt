@@ -9,6 +9,7 @@ class Module internal constructor(
     internal val module: InternalModule,
     /** Null for streamed modules. */
     internal val binary: ByteArray? = null,
+    internal val validated: Boolean = false,
 ) {
     private val info by lazy {
         moduleInfo(this)

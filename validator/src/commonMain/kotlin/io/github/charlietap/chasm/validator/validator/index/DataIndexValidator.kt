@@ -12,7 +12,7 @@ internal inline fun DataIndexValidator(
     context: ModuleValidationContext,
     index: Index.DataIndex,
 ): Result<Unit, ModuleValidatorError> = binding {
-    if (index.idx.toInt() !in context.datas.indices) {
+    if (index.idx >= context.dataCount) {
         Err(InstructionValidatorError.UnknownDataSegment).bind<Unit>()
     }
 }

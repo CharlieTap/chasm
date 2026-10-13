@@ -50,6 +50,8 @@ sealed interface io.github.charlietap.chasm.embedding.error/ChasmError { // io.g
     abstract val error // io.github.charlietap.chasm.embedding.error/ChasmError.error|{}error[0]
         abstract fun <get-error>(): kotlin/String // io.github.charlietap.chasm.embedding.error/ChasmError.error.<get-error>|<get-error>(){}[0]
 
+    sealed interface ModuleError : io.github.charlietap.chasm.embedding.error/ChasmError // io.github.charlietap.chasm.embedding.error/ChasmError.ModuleError|null[0]
+
     final class ExecutionError : io.github.charlietap.chasm.embedding.error/ChasmError { // io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError|null[0]
         constructor <init>(kotlin/String) // io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError.<init>|<init>(kotlin.String){}[0]
         constructor <init>(kotlin/String, io.github.charlietap.chasm.embedding.error/WasmTrap?) // io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError.<init>|<init>(kotlin.String;io.github.charlietap.chasm.embedding.error.WasmTrap?){}[0]
@@ -64,7 +66,7 @@ sealed interface io.github.charlietap.chasm.embedding.error/ChasmError { // io.g
         final fun toString(): kotlin/String // io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError.toString|toString(){}[0]
     }
 
-    final value class DecodeError : io.github.charlietap.chasm.embedding.error/ChasmError { // io.github.charlietap.chasm.embedding.error/ChasmError.DecodeError|null[0]
+    final value class DecodeError : io.github.charlietap.chasm.embedding.error/ChasmError.ModuleError { // io.github.charlietap.chasm.embedding.error/ChasmError.DecodeError|null[0]
         constructor <init>(kotlin/String) // io.github.charlietap.chasm.embedding.error/ChasmError.DecodeError.<init>|<init>(kotlin.String){}[0]
 
         final val error // io.github.charlietap.chasm.embedding.error/ChasmError.DecodeError.error|{}error[0]
@@ -75,7 +77,7 @@ sealed interface io.github.charlietap.chasm.embedding.error/ChasmError { // io.g
         final fun toString(): kotlin/String // io.github.charlietap.chasm.embedding.error/ChasmError.DecodeError.toString|toString(){}[0]
     }
 
-    final value class ValidationError : io.github.charlietap.chasm.embedding.error/ChasmError { // io.github.charlietap.chasm.embedding.error/ChasmError.ValidationError|null[0]
+    final value class ValidationError : io.github.charlietap.chasm.embedding.error/ChasmError.ModuleError { // io.github.charlietap.chasm.embedding.error/ChasmError.ValidationError|null[0]
         constructor <init>(kotlin/String) // io.github.charlietap.chasm.embedding.error/ChasmError.ValidationError.<init>|<init>(kotlin.String){}[0]
 
         final val error // io.github.charlietap.chasm.embedding.error/ChasmError.ValidationError.error|{}error[0]
@@ -648,4 +650,5 @@ final fun io.github.charlietap.chasm.embedding/validate(io.github.charlietap.cha
 final inline fun <#A: reified kotlin/Any> (io.github.charlietap.chasm.embedding.shapes/ExternRef).io.github.charlietap.chasm.embedding.shapes/hostValueAs(): io.github.charlietap.chasm.embedding.shapes/ChasmResult<#A?, io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError> // io.github.charlietap.chasm.embedding.shapes/hostValueAs|hostValueAs@io.github.charlietap.chasm.embedding.shapes.ExternRef(){0§<kotlin.Any>}[0]
 final suspend fun io.github.charlietap.chasm.embedding.internal/_instance(io.github.charlietap.chasm.embedding.shapes/Store, io.github.charlietap.chasm.embedding.shapes/Module, kotlin.collections/List<io.github.charlietap.chasm.embedding.shapes/Import>, io.github.charlietap.chasm.config/RuntimeConfig, io.github.charlietap.chasm.parallel/ParallelTaskExecutor): io.github.charlietap.chasm.embedding.shapes/ChasmResult<io.github.charlietap.chasm.embedding.shapes/Instance, io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError> // io.github.charlietap.chasm.embedding.internal/_instance|_instance(io.github.charlietap.chasm.embedding.shapes.Store;io.github.charlietap.chasm.embedding.shapes.Module;kotlin.collections.List<io.github.charlietap.chasm.embedding.shapes.Import>;io.github.charlietap.chasm.config.RuntimeConfig;io.github.charlietap.chasm.parallel.ParallelTaskExecutor){}[0]
 final suspend fun io.github.charlietap.chasm.embedding.internal/_module(kotlin/ByteArray, io.github.charlietap.chasm.config/ModuleConfig, io.github.charlietap.chasm.parallel/ParallelTaskExecutor): io.github.charlietap.chasm.embedding.shapes/ChasmResult<io.github.charlietap.chasm.embedding.shapes/Module, io.github.charlietap.chasm.embedding.error/ChasmError.DecodeError> // io.github.charlietap.chasm.embedding.internal/_module|_module(kotlin.ByteArray;io.github.charlietap.chasm.config.ModuleConfig;io.github.charlietap.chasm.parallel.ParallelTaskExecutor){}[0]
+final suspend fun io.github.charlietap.chasm.embedding.internal/_module(kotlin/ByteArray, io.github.charlietap.chasm.config/ModuleConfig, io.github.charlietap.chasm.parallel/ParallelTaskExecutor, kotlin/Boolean): io.github.charlietap.chasm.embedding.shapes/ChasmResult<io.github.charlietap.chasm.embedding.shapes/Module, io.github.charlietap.chasm.embedding.error/ChasmError.ModuleError> // io.github.charlietap.chasm.embedding.internal/_module|_module(kotlin.ByteArray;io.github.charlietap.chasm.config.ModuleConfig;io.github.charlietap.chasm.parallel.ParallelTaskExecutor;kotlin.Boolean){}[0]
 final suspend fun io.github.charlietap.chasm.embedding.internal/_validate(io.github.charlietap.chasm.embedding.shapes/Module, io.github.charlietap.chasm.parallel/ParallelTaskExecutor): io.github.charlietap.chasm.embedding.shapes/ChasmResult<io.github.charlietap.chasm.embedding.shapes/Module, io.github.charlietap.chasm.embedding.error/ChasmError.ValidationError> // io.github.charlietap.chasm.embedding.internal/_validate|_validate(io.github.charlietap.chasm.embedding.shapes.Module;io.github.charlietap.chasm.parallel.ParallelTaskExecutor){}[0]

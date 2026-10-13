@@ -50,6 +50,14 @@ internal class BufferedWasmBinaryReader private constructor(
         sourceExhausted = false,
     )
 
+    fun reset(start: Int, end: Int) {
+        require(source == null)
+        require(start in 0..end && end <= buffer.size)
+        cursor = start
+        this.end = end
+        logicalLimit = end.toULong()
+    }
+
     override fun byte(): Byte {
         if (cursor < end && (logicalLimit == ULong.MAX_VALUE || absolutePosition() < logicalLimit)) {
             return buffer[cursor++]

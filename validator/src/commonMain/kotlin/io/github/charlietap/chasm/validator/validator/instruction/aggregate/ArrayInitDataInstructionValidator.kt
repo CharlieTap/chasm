@@ -40,7 +40,7 @@ internal fun ArrayInitDataInstructionValidator(
         Err(TypeValidatorError.TypeMismatch).bind<Unit>()
     }
 
-    if (instruction.dataIndex.idx.toInt() !in context.datas.indices) {
+    if (instruction.dataIndex.idx >= context.dataCount) {
         Err(TypeValidatorError.TypeMismatch).bind<Unit>()
     }
 

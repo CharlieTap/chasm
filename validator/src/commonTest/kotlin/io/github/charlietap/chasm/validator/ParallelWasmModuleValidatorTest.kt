@@ -14,6 +14,7 @@ import io.github.charlietap.chasm.fixture.type.definedType
 import io.github.charlietap.chasm.fixture.type.functionRecursiveType
 import io.github.charlietap.chasm.parallel.ParallelTaskExecutor
 import io.github.charlietap.chasm.parallel.ParallelTaskScope
+import io.github.charlietap.chasm.parallel.ParallelismPolicy
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -33,10 +34,11 @@ class ParallelWasmModuleValidatorTest {
             taskExecutor = executor,
             mode = ValidationMode.AUTO,
             availableProcessors = 4,
+            policy = ParallelismPolicy(minimumWork = 10_000, workPerWorker = 10_000),
         )
 
         assertEquals(serial, parallel)
-        assertEquals(3, executor.taskCount)
+        assertEquals(4, executor.taskCount)
     }
 
     @Test

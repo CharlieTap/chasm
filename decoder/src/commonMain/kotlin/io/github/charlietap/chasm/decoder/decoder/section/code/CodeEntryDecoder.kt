@@ -29,6 +29,7 @@ internal inline fun CodeEntryDecoder(
     noinline localEntryDecoder: CodeBodyDecoder<LocalEntry>,
     crossinline expressionDecoder: CodeBodyDecoder<Expression>,
     crossinline vectorDecoder: CodeBodyVectorDecoder<LocalEntry>,
+    crossinline onLocals: (List<Local>) -> Unit = {},
 ): Result<CodeEntry, WasmDecodeError> = binding {
 
     val size = context.reader.uint()
@@ -49,6 +50,7 @@ internal inline fun CodeEntryDecoder(
                 }
             }
 
+            onLocals(locals)
             val expression = expressionDecoder(scopedContext).bind()
 
             CodeEntry(size, locals, expression)

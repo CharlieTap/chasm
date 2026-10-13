@@ -122,13 +122,43 @@ internal fun ModuleSectionsDecoder(
     sectionDecoder: Decoder<Section> = ::SectionDecoder,
     scope: ScopedDecoder<Pair<SectionSize, SectionType>, Section> = ::SectionScope,
 ): Result<ModuleBuilder, WasmDecodeError> = binding {
+    val builder = ModuleHeaderDecoder(context, magicNumberValidator, versionDecoder).bind()
+    ModuleSectionsDecoder(
+        context = context,
+        builder = builder,
+        previous = SectionType.Custom,
+        sectionTypeDecoder = sectionTypeDecoder,
+        sectionDecoder = sectionDecoder,
+        scope = scope,
+    ).bind()
+
+    builder
+}
+
+internal fun ModuleHeaderDecoder(
+    context: ModuleDecoderContext,
+    magicNumberValidator: MagicNumberValidator = ::BinaryMagicNumberValidator,
+    versionDecoder: Decoder<Version> = ::VersionDecoder,
+): Result<ModuleBuilder, WasmDecodeError> = binding {
     magicNumberValidator(context.reader).bind()
 
     val version = versionDecoder(context).bind()
-    val builder = ModuleBuilder(version)
-    var previousSectionType = SectionType.Custom
+    ModuleBuilder(version)
+}
 
-    while (context.reader.exhausted().not()) {
+/** Decodes sections until the input is exhausted or the next one is [until], returning the last one decoded. */
+internal fun ModuleSectionsDecoder(
+    context: ModuleDecoderContext,
+    builder: ModuleBuilder,
+    previous: SectionType,
+    until: SectionType? = null,
+    sectionTypeDecoder: Decoder<SectionType> = ::SectionTypeDecoder,
+    sectionDecoder: Decoder<Section> = ::SectionDecoder,
+    scope: ScopedDecoder<Pair<SectionSize, SectionType>, Section> = ::SectionScope,
+): Result<SectionType, WasmDecodeError> = binding {
+    var previousSectionType = previous
+
+    while (context.reader.exhausted().not() && (until == null || context.reader.peekUByte() != until.id)) {
         val sectionType = sectionTypeDecoder(context).bind()
         if (sectionType.ordinal <= previousSectionType.ordinal && sectionType != SectionType.Custom) {
             Err(ModuleDecodeError.ModuleMalformed).bind<Unit>()
@@ -144,5 +174,5 @@ internal fun ModuleSectionsDecoder(
         previousSectionType = sectionType
     }
 
-    builder
+    previousSectionType
 }

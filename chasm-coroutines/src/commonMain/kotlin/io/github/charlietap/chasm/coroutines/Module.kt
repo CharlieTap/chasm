@@ -4,6 +4,7 @@ import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.coroutines.internal.DefaultCoroutineParallelTaskExecutor
 import io.github.charlietap.chasm.embedding.error.ChasmError.DecodeError
+import io.github.charlietap.chasm.embedding.error.ChasmError.ModuleError
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Module
 import io.github.charlietap.chasm.embedding.internal._module as internalModule
@@ -14,9 +15,9 @@ import io.github.charlietap.chasm.embedding.internal._module as internalModule
  * This function uses a heuristic to decide whether decoding should run
  * serially or in parallel. It estimates the work from the number and encoded
  * sizes of the module's function bodies. When parallel decoding is expected to
- * repay its coordination cost, those bodies are balanced across a bounded
- * number of workers on [kotlinx.coroutines.Dispatchers.Default], while the
- * remaining sections are decoded serially.
+ * repay its coordination cost, those bodies are decoded by up to one worker
+ * per available processor on [kotlinx.coroutines.Dispatchers.Default], while
+ * the remaining sections are decoded serially.
  *
  * The heuristic cannot predict the exact cost of every module. In particular,
  * total module size is not a reliable measure of parallel decoding work. Data,
@@ -38,4 +39,24 @@ suspend fun module(
         bytes = bytes,
         config = config,
         taskExecutor = DefaultCoroutineParallelTaskExecutor,
+    )
+
+/**
+ * Decodes a Wasm module with potential parallelism and, when [validate] is set, validates
+ * it in the same pass.
+ *
+ * This is faster than decoding a module and then validating it, and a module validated here
+ * does not need to be validated again.
+ */
+@OptIn(InternalChasmApi::class)
+suspend fun module(
+    bytes: ByteArray,
+    config: ModuleConfig = ModuleConfig(),
+    validate: Boolean,
+): ChasmResult<Module, ModuleError> =
+    internalModule(
+        bytes = bytes,
+        config = config,
+        taskExecutor = DefaultCoroutineParallelTaskExecutor,
+        validate = validate,
     )

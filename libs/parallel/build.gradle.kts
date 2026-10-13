@@ -9,6 +9,14 @@ kotlin {
     android {
         namespace = "io.github.charlietap.chasm.parallel"
     }
+
+    sourceSets {
+        commonTest {
+            dependencies {
+                implementation(libs.kotlin.test)
+            }
+        }
+    }
 }
 
 configure<PublishingConventionsExtension> {

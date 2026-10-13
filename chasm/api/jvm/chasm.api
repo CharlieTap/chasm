@@ -308,7 +308,7 @@ public abstract interface class io/github/charlietap/chasm/embedding/error/Chasm
 	public abstract fun getError ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/embedding/error/ChasmError$DecodeError : io/github/charlietap/chasm/embedding/error/ChasmError {
+public final class io/github/charlietap/chasm/embedding/error/ChasmError$DecodeError : io/github/charlietap/chasm/embedding/error/ChasmError$ModuleError {
 	public static final synthetic fun box-impl (Ljava/lang/String;)Lio/github/charlietap/chasm/embedding/error/ChasmError$DecodeError;
 	public static fun constructor-impl (Ljava/lang/String;)Ljava/lang/String;
 	public fun equals (Ljava/lang/Object;)Z
@@ -332,7 +332,10 @@ public final class io/github/charlietap/chasm/embedding/error/ChasmError$Executi
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/embedding/error/ChasmError$ValidationError : io/github/charlietap/chasm/embedding/error/ChasmError {
+public abstract interface class io/github/charlietap/chasm/embedding/error/ChasmError$ModuleError : io/github/charlietap/chasm/embedding/error/ChasmError {
+}
+
+public final class io/github/charlietap/chasm/embedding/error/ChasmError$ValidationError : io/github/charlietap/chasm/embedding/error/ChasmError$ModuleError {
 	public static final synthetic fun box-impl (Ljava/lang/String;)Lio/github/charlietap/chasm/embedding/error/ChasmError$ValidationError;
 	public static fun constructor-impl (Ljava/lang/String;)Ljava/lang/String;
 	public fun equals (Ljava/lang/Object;)Z
@@ -444,6 +447,7 @@ public final class io/github/charlietap/chasm/embedding/internal/InstanceKt {
 
 public final class io/github/charlietap/chasm/embedding/internal/ModuleKt {
 	public static final fun _module ([BLio/github/charlietap/chasm/config/ModuleConfig;Lio/github/charlietap/chasm/parallel/ParallelTaskExecutor;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun _module ([BLio/github/charlietap/chasm/config/ModuleConfig;Lio/github/charlietap/chasm/parallel/ParallelTaskExecutor;ZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public final class io/github/charlietap/chasm/embedding/internal/ValidateKt {

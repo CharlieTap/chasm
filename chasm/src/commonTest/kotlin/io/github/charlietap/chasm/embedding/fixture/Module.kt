@@ -9,7 +9,9 @@ import io.github.charlietap.chasm.ast.module.Module as InternalModule
 fun publicModule(
     config: ModuleConfig = moduleConfig(),
     module: InternalModule = module(),
+    validated: Boolean = false,
 ) = Module(
     config = config,
     module = module,
+    validated = validated,
 )

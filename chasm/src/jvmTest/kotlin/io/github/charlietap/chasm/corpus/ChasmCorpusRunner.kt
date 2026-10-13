@@ -105,6 +105,7 @@ class ChasmCorpusRunner(
         )
     }
 
+    @Suppress("DEPRECATION")
     private suspend fun executeFixture(
         corpusRoot: String,
         fixture: Fixture,

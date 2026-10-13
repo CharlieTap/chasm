@@ -13,8 +13,8 @@ import io.github.charlietap.chasm.embedding.internal._validate as internalValida
  * This function uses a heuristic to decide whether function validation should
  * run serially or in parallel. It estimates the work from the module's function
  * instruction and local counts. When parallel validation is expected to repay
- * its coordination cost, the largest functions are balanced across a bounded
- * number of workers on [kotlinx.coroutines.Dispatchers.Default]. Non-function
+ * its coordination cost, the functions are validated by up to one worker per
+ * available processor on [kotlinx.coroutines.Dispatchers.Default]. Non-function
  * module sections remain serial, and validation errors are reported in module
  * order.
  *
@@ -30,6 +30,7 @@ import io.github.charlietap.chasm.embedding.internal._validate as internalValida
  * [io.github.charlietap.chasm.embedding.validate] function to ascertain which
  * is faster.
  */
+@Deprecated("Validate a module while decoding it by calling module with validate = true")
 @OptIn(InternalChasmApi::class)
 suspend fun validate(
     module: Module,

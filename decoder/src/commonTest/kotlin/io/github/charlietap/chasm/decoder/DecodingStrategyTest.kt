@@ -1,49 +1,87 @@
 package io.github.charlietap.chasm.decoder
 
 import io.github.charlietap.chasm.decoder.layout.CodeBodyRanges
+import io.github.charlietap.chasm.parallel.ParallelismPolicy
 import kotlin.test.Test
-import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
-import kotlin.test.assertIs
 
 class selectDecodingStrategyTest {
 
+    private val policy = ParallelismPolicy(
+        minimumWork = 64 * 1024L,
+        workPerWorker = 32 * 1024L,
+        maximumWorkers = 6,
+    )
+
     @Test
     fun `keeps small modules serial`() {
-        val strategy = selectDecodingStrategy(
-            moduleSize = 1024,
+        val workers = selectDecodingWorkers(
             bodies = bodyRanges(512, 512),
             mode = DecodingMode.AUTO,
+            policy = policy,
             availableProcessors = 8,
         )
 
-        assertEquals(DecodingStrategy.Serial, strategy)
+        assertEquals(1, workers)
     }
 
     @Test
-    fun `balances large bodies before small bodies`() {
-        val strategy = selectDecodingStrategy(
-            moduleSize = 256 * 1024,
-            bodies = bodyRanges(1000, 900, 100, 100),
-            mode = DecodingMode.PARALLEL,
-            availableProcessors = 3,
+    fun `uses a worker for every share of body bytes`() {
+        val workers = selectDecodingWorkers(
+            bodies = bodyRanges(32 * 1024, 32 * 1024, 32 * 1024, 32 * 1024),
+            mode = DecodingMode.AUTO,
+            policy = policy,
+            availableProcessors = 8,
         )
 
-        val assignments = assertIs<DecodingStrategy.Parallel>(strategy).assignments
-        assertContentEquals(intArrayOf(0, 3), assignments[0])
-        assertContentEquals(intArrayOf(1, 2), assignments[1])
+        assertEquals(4, workers)
     }
 
     @Test
-    fun `requires two body workers`() {
-        val strategy = selectDecodingStrategy(
-            moduleSize = 256 * 1024,
-            bodies = bodyRanges(1024, 1024),
-            mode = DecodingMode.PARALLEL,
-            availableProcessors = 2,
+    fun `never uses more workers than the platform is tuned for`() {
+        val workers = selectDecodingWorkers(
+            bodies = bodyRanges(*IntArray(16) { 32 * 1024 }),
+            mode = DecodingMode.AUTO,
+            policy = policy,
+            availableProcessors = 8,
         )
 
-        assertEquals(DecodingStrategy.Serial, strategy)
+        assertEquals(6, workers)
+    }
+
+    @Test
+    fun `one large body leaves only the rest to share`() {
+        val workers = selectDecodingWorkers(
+            bodies = bodyRanges(300 * 1024, *IntArray(100) { 1024 }),
+            mode = DecodingMode.AUTO,
+            policy = policy,
+            availableProcessors = 8,
+        )
+
+        assertEquals(4, workers)
+    }
+
+    @Test
+    fun `a forced strategy ignores how little there is to decode`() {
+        val bodies = bodyRanges(1024, 1024)
+
+        assertEquals(2, selectDecodingWorkers(bodies, DecodingMode.PARALLEL, policy, availableProcessors = 4))
+        assertEquals(1, selectDecodingWorkers(bodies, DecodingMode.PARALLEL, policy, availableProcessors = 1))
+        assertEquals(1, selectDecodingWorkers(bodies, DecodingMode.SERIAL, policy, availableProcessors = 4))
+    }
+
+    @Test
+    fun `batches bodies in the order they appear`() {
+        val batches = batchBodies(bodyRanges(6000, 6000, 100, 9000, 100), workerCount = 2)
+
+        assertEquals(listOf(0 to 2, 2 to 4, 4 to 5), List(batches.count) { batches.start(it) to batches.end(it) })
+    }
+
+    @Test
+    fun `a single worker has every body in one batch`() {
+        val batches = batchBodies(bodyRanges(6000, 6000, 100, 9000, 100), workerCount = 1)
+
+        assertEquals(listOf(0 to 5), List(batches.count) { batches.start(it) to batches.end(it) })
     }
 
     private fun bodyRanges(vararg sizes: Int): CodeBodyRanges = CodeBodyRanges(

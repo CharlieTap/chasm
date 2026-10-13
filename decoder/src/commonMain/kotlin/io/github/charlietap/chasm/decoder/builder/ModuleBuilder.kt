@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.decoder.builder
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
+import io.github.charlietap.chasm.ast.instruction.Expression
 import io.github.charlietap.chasm.ast.module.Custom
 import io.github.charlietap.chasm.ast.module.DataSegment
 import io.github.charlietap.chasm.ast.module.ElementSegment
@@ -75,6 +76,40 @@ internal class ModuleBuilder(private val version: Version) {
     fun custom(custom: Custom) = apply { customs.add(custom) }
 
     fun dataCount(count: UInt) = apply { dataCount = count }
+
+    val declaredDataCount: UInt?
+        get() = dataCount
+
+    val decodedDataSegments: List<DataSegment>
+        get() = dataSegments
+
+    /** The module as it stands ahead of the code section: functions have their types but no bodies. */
+    fun prelude(): Module {
+        val functionImports = imports.count { it.descriptor is Import.Descriptor.Function }
+        return Module(
+            version = version,
+            types = types,
+            definedTypes = definedTypes,
+            functions = functionHeaders.map { header ->
+                Function(
+                    Index.FunctionIndex(functionImports.toUInt() + header.idx.idx),
+                    header.typeIndex,
+                    emptyList(),
+                    Expression.EMPTY,
+                )
+            },
+            tables = tables,
+            memories = memories,
+            tags = tags,
+            globals = globals,
+            elementSegments = elementSegments,
+            dataSegments = emptyList(),
+            startFunction = startFunctions.firstOrNull(),
+            exports = exports,
+            imports = imports,
+            customs = customs,
+        )
+    }
 
     fun build(requiresDataCount: Boolean): Result<Module, WasmDecodeError> = binding {
 

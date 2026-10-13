@@ -126,6 +126,7 @@ kotlin {
                 implementation(projects.executor.instantiator)
                 implementation(projects.executor.invoker)
                 implementation(projects.memory)
+                implementation(projects.module)
                 implementation(projects.runtime.core)
                 implementation(projects.runtime.address)
                 implementation(projects.typeSystem)

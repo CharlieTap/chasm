@@ -45,6 +45,8 @@ internal fun validate(
     module: Module,
     validator: WasmModuleValidator,
 ): ChasmResult<Module, ValidationError> {
+    if (module.validated) return Success(module)
+
     return validate(module, validator(module.config, module.module))
 }
 
@@ -60,6 +62,7 @@ internal fun validate(
                 config = module.config,
                 module = internal,
                 binary = module.binary,
+                validated = true,
             )
         }.fold(::Success, ::Error)
 }

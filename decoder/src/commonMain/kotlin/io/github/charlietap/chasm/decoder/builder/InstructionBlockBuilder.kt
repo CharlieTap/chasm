@@ -24,8 +24,10 @@ internal class InstructionBlockBuilder {
         instructions[size++] = instruction
     }
 
-    fun appendEnd(count: Int) {
-        append(ControlInstruction.End(count))
+    fun appendEnd(count: Int): Instruction {
+        val end: Instruction = ControlInstruction.End(count)
+        append(end)
+        return end
     }
 
     @Suppress("UNCHECKED_CAST")

@@ -6,6 +6,7 @@ import kotlin.test.Test
 
 class ValidateTest {
 
+    @Suppress("DEPRECATION")
     @Test
     fun `validates a module through the coroutine API`() = runTest {
         val module = module(EMPTY_MODULE).expect("expected module to decode")

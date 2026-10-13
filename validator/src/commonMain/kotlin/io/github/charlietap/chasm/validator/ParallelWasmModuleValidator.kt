@@ -4,28 +4,25 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.getOrElse
+import io.github.charlietap.chasm.ast.module.Function
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.config.ModuleConfig
+import io.github.charlietap.chasm.parallel.EarliestFailure
 import io.github.charlietap.chasm.parallel.ParallelTaskExecutor
 import io.github.charlietap.chasm.parallel.ParallelTaskScope
+import io.github.charlietap.chasm.parallel.ParallelismPolicy
+import io.github.charlietap.chasm.parallel.WorkCursor
 import io.github.charlietap.chasm.parallel.availableParallelProcessors
+import io.github.charlietap.chasm.parallel.claimEach
+import io.github.charlietap.chasm.parallel.executeWorkers
 import io.github.charlietap.chasm.validator.context.ImmutableModuleValidationContext
 import io.github.charlietap.chasm.validator.context.ModuleValidationContext
 import io.github.charlietap.chasm.validator.error.ModuleValidationException
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError
 import io.github.charlietap.chasm.validator.error.getOrThrowValidation
-import io.github.charlietap.chasm.validator.validator.data.DataSegmentValidator
-import io.github.charlietap.chasm.validator.validator.element.ElementSegmentValidator
-import io.github.charlietap.chasm.validator.validator.export.ExportValidator
 import io.github.charlietap.chasm.validator.validator.function.FunctionValidator
-import io.github.charlietap.chasm.validator.validator.global.GlobalValidator
-import io.github.charlietap.chasm.validator.validator.import.ImportValidator
-import io.github.charlietap.chasm.validator.validator.memory.MemoryValidator
-import io.github.charlietap.chasm.validator.validator.module.validateModuleSection
-import io.github.charlietap.chasm.validator.validator.start.StartFunctionValidator
-import io.github.charlietap.chasm.validator.validator.table.TableValidator
-import io.github.charlietap.chasm.validator.validator.tag.TagValidator
-import io.github.charlietap.chasm.validator.validator.type.TypeValidator
+import io.github.charlietap.chasm.validator.validator.module.ModulePreludeValidator
+import io.github.charlietap.chasm.validator.validator.module.ModuleRemainderValidator
 
 suspend fun ParallelWasmModuleValidator(
     config: ModuleConfig,
@@ -40,96 +37,55 @@ internal suspend fun ParallelWasmModuleValidator(
     taskExecutor: ParallelTaskExecutor,
     mode: ValidationMode,
     availableProcessors: Int = availableParallelProcessors(),
+    policy: ParallelismPolicy = validationParallelism(),
 ): Result<Module, ModuleValidatorError> {
-    val strategy = selectValidationStrategy(module.functions, mode, availableProcessors)
-    val assignments = when (strategy) {
-        ValidationStrategy.Serial -> return WasmModuleValidator(config, module)
-        is ValidationStrategy.Parallel -> strategy.assignments
-    }
+    val workerCount = selectValidationWorkers(module.functions, mode, policy, availableProcessors)
+    if (workerCount == 1) return WasmModuleValidator(config, module)
 
     val context = ModuleValidationContext(config, module)
     return try {
-        validateModuleSection(context, module.types, ::TypeValidator).getOrThrowValidation()
-        validateModuleSection(context, module.imports, ::ImportValidator).getOrThrowValidation()
+        ModulePreludeValidator(context, module).getOrThrowValidation()
 
-        val failure = taskExecutor.validateFunctions(
-            immutableContext = context.immutableContext,
-            definedTypesValidated = context.definedTypesValidated,
-            assignments = assignments,
-        ).earliestFailure()
-        if (failure != null) return Err(failure.error)
+        val parallelContext = ParallelValidationContext(module.functions, context.immutableContext, context.definedTypesValidated)
+        taskExecutor.executeWorkers(workerCount) { validateFunctions(parallelContext) }
+        parallelContext.failures.error?.let { error -> return Err(error) }
 
-        validateModuleSection(context, module.tables, ::TableValidator).getOrThrowValidation()
-        validateModuleSection(context, module.memories, ::MemoryValidator).getOrThrowValidation()
-        validateModuleSection(context, module.globals, ::GlobalValidator).getOrThrowValidation()
-        validateModuleSection(context, module.dataSegments, ::DataSegmentValidator).getOrThrowValidation()
-        validateModuleSection(context, module.elementSegments, ::ElementSegmentValidator).getOrThrowValidation()
-        validateModuleSection(context, module.exports, ::ExportValidator).getOrThrowValidation()
-        validateModuleSection(context, module.tags, ::TagValidator).getOrThrowValidation()
-        module.startFunction?.let { function ->
-            StartFunctionValidator(context, function).getOrThrowValidation()
-        }
+        ModuleRemainderValidator(context, module, module.dataSegments).getOrThrowValidation()
         Ok(module)
     } catch (exception: ModuleValidationException) {
         Err(exception.error)
     }
 }
 
-private suspend fun ParallelTaskExecutor.validateFunctions(
-    immutableContext: ImmutableModuleValidationContext,
-    definedTypesValidated: Int,
-    assignments: Array<IntArray>,
-): List<ValidationTaskResult> {
-    val tasks = List<ParallelTaskScope.() -> ValidationTaskResult>(assignments.size) { assignmentIndex ->
-        {
-            validateAssignedFunctions(
-                immutableContext = immutableContext,
-                definedTypesValidated = definedTypesValidated,
-                assignment = assignments[assignmentIndex],
-            )
-        }
-    }
-    return execute(tasks)
+private class ParallelValidationContext(
+    val functions: List<Function>,
+    val immutableContext: ImmutableModuleValidationContext,
+    val definedTypesValidated: Int,
+) {
+    val batches = batchFunctions(functions)
+    val cursor = WorkCursor(batches.count)
+    val failures = EarliestFailure<ModuleValidatorError>()
 }
 
-private fun List<ValidationTaskResult>.earliestFailure(): ValidationTaskResult.Failure? {
-    var earliest: ValidationTaskResult.Failure? = null
-    for (result in this) {
-        if (result is ValidationTaskResult.Failure &&
-            (earliest == null || result.functionIndex < earliest.functionIndex)
-        ) {
-            earliest = result
+private fun ParallelTaskScope.validateFunctions(parallelContext: ParallelValidationContext) {
+    val context = ModuleValidationContext(parallelContext.immutableContext, parallelContext.definedTypesValidated)
+
+    claimEach(parallelContext.cursor) { batch ->
+        for (functionIndex in parallelContext.batches.start(batch) until parallelContext.batches.end(batch)) {
+            if (parallelContext.failures.isBeyond(functionIndex)) continue
+
+            validateFunction(context, parallelContext.functions[functionIndex]).getOrElse { error ->
+                parallelContext.failures.report(functionIndex, error)
+            }
         }
     }
-    return earliest
 }
 
-private fun ParallelTaskScope.validateAssignedFunctions(
-    immutableContext: ImmutableModuleValidationContext,
-    definedTypesValidated: Int,
-    assignment: IntArray,
-): ValidationTaskResult {
-    val context = ModuleValidationContext(immutableContext, definedTypesValidated)
-    val functions = immutableContext.module.functions
-    for (functionIndex in assignment) {
-        ensureActive()
-        val result = try {
-            FunctionValidator(context, functions[functionIndex])
-        } catch (exception: ModuleValidationException) {
-            return ValidationTaskResult.Failure(functionIndex, exception.error)
-        }
-        result.getOrElse { error ->
-            return ValidationTaskResult.Failure(functionIndex, error)
-        }
-    }
-    return ValidationTaskResult.Success
-}
-
-private sealed interface ValidationTaskResult {
-    data object Success : ValidationTaskResult
-
-    class Failure(
-        val functionIndex: Int,
-        val error: ModuleValidatorError,
-    ) : ValidationTaskResult
+private fun validateFunction(
+    context: ModuleValidationContext,
+    function: Function,
+): Result<Unit, ModuleValidatorError> = try {
+    FunctionValidator(context, function)
+} catch (exception: ModuleValidationException) {
+    Err(exception.error)
 }

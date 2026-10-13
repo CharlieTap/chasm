@@ -44,6 +44,13 @@ internal inline fun InstructionBlockValidator(
         index++
     }
 
+    return FinishInstructionBlock(context, labelsDepth)
+}
+
+internal fun FinishInstructionBlock(
+    context: ModuleValidationContext,
+    labelsDepth: Int,
+): Result<Unit, ModuleValidatorError> {
     if (context.labels.depth() != labelsDepth) {
         return Err(TypeValidatorError.TypeMismatch)
     }

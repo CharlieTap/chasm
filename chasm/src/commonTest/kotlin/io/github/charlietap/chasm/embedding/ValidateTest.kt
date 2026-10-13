@@ -92,6 +92,29 @@ class ValidateTest {
     }
 
     @Test
+    fun `calling validate on a validated module does not validate it again`() {
+
+        val module = publicModule(validated = true)
+        val validator: WasmModuleValidator = { _, _ -> error("validator must not be called") }
+
+        val actual = validate(module, validator)
+
+        assertEquals(ChasmResult.Success(module), actual)
+    }
+
+    @Test
+    fun `calling validate on a module marks it as validated`() {
+
+        val module = publicModule()
+        val validator: WasmModuleValidator = { _, _ -> Ok(module.module) }
+
+        val actual = validate(module, validator)
+
+        assertIs<ChasmResult.Success<Module>>(actual)
+        assertEquals(true, actual.result.validated)
+    }
+
+    @Test
     fun `calling validate on a module calls WasmModuleValidator and propagates error result`() {
 
         val config = moduleConfig()

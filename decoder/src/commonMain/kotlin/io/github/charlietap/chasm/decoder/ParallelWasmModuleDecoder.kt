@@ -1,28 +1,26 @@
+@file:OptIn(ExperimentalAtomicApi::class)
+
 package io.github.charlietap.chasm.decoder
 
 import com.github.michaelbull.result.Err
-import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.fold
-import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.config.ModuleConfig
-import io.github.charlietap.chasm.decoder.builder.ModuleBuilder
-import io.github.charlietap.chasm.decoder.context.CodeBodyDecoderContext
-import io.github.charlietap.chasm.decoder.context.ModuleDecoderContext
-import io.github.charlietap.chasm.decoder.decoder.section.SectionDecoder
-import io.github.charlietap.chasm.decoder.decoder.section.code.CodeEntryDecoder
-import io.github.charlietap.chasm.decoder.decoder.section.code.FunctionBody
 import io.github.charlietap.chasm.decoder.error.ModuleDecoderError
-import io.github.charlietap.chasm.decoder.error.WasmDecodeError
-import io.github.charlietap.chasm.decoder.error.WasmDecodeException
-import io.github.charlietap.chasm.decoder.layout.CodeBodyRanges
 import io.github.charlietap.chasm.decoder.layout.ModuleLayoutScanner
-import io.github.charlietap.chasm.decoder.reader.BufferedWasmBinaryReader
-import io.github.charlietap.chasm.decoder.section.CodeSection
+import io.github.charlietap.chasm.decoder.parallel.BodyWorker
+import io.github.charlietap.chasm.decoder.parallel.ObserverState
+import io.github.charlietap.chasm.decoder.parallel.ParallelDecoderContext
+import io.github.charlietap.chasm.decoder.parallel.decodeSections
+import io.github.charlietap.chasm.decoder.parallel.replayBatch
 import io.github.charlietap.chasm.parallel.ParallelTaskExecutor
 import io.github.charlietap.chasm.parallel.ParallelTaskScope
+import io.github.charlietap.chasm.parallel.ParallelismPolicy
+import io.github.charlietap.chasm.parallel.WorkCursor
 import io.github.charlietap.chasm.parallel.availableParallelProcessors
+import io.github.charlietap.chasm.parallel.claimEach
+import io.github.charlietap.chasm.parallel.executeWorkers
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
 
 suspend fun ParallelWasmModuleDecoder(
     config: ModuleConfig,
@@ -31,169 +29,65 @@ suspend fun ParallelWasmModuleDecoder(
 ): Result<Module, ModuleDecoderError> =
     ParallelWasmModuleDecoder(config, bytes, taskExecutor, DecodingMode.AUTO)
 
+/**
+ * Decodes [bytes] while [observer] follows along. The observer is not called at all for a
+ * binary whose section framing cannot be read up front, or which lacks a function type for
+ * one of its bodies.
+ */
+suspend fun ParallelWasmModuleDecoder(
+    config: ModuleConfig,
+    bytes: ByteArray,
+    taskExecutor: ParallelTaskExecutor,
+    observer: ModuleDecodeObserver,
+): Result<Module, ModuleDecoderError> =
+    ParallelWasmModuleDecoder(config, bytes, taskExecutor, DecodingMode.AUTO, observer = observer)
+
 internal suspend fun ParallelWasmModuleDecoder(
     config: ModuleConfig,
     bytes: ByteArray,
     taskExecutor: ParallelTaskExecutor,
     mode: DecodingMode,
     availableProcessors: Int = availableParallelProcessors(),
+    observer: ModuleDecodeObserver? = null,
+    policy: ParallelismPolicy = decodingParallelism(observed = observer != null),
 ): Result<Module, ModuleDecoderError> {
-    if (!shouldScanParallelLayout(bytes.size, mode)) return WasmModuleDecoder(config, bytes)
-    val codeBodies = ModuleLayoutScanner(bytes) ?: return WasmModuleDecoder(config, bytes)
-    val strategy = selectDecodingStrategy(bytes.size, codeBodies, mode, availableProcessors)
-    val assignments = when (strategy) {
-        DecodingStrategy.Serial -> return WasmModuleDecoder(config, bytes)
-        is DecodingStrategy.Parallel -> strategy.assignments
-    }
+    if (observer == null && !shouldScanParallelLayout(bytes.size, mode, policy)) return WasmModuleDecoder(config, bytes)
+    val ranges = ModuleLayoutScanner(bytes) ?: return WasmModuleDecoder(config, bytes)
+    val workerCount = selectDecodingWorkers(ranges, mode, policy, availableProcessors)
+    if (workerCount == 1 && observer == null) return WasmModuleDecoder(config, bytes)
 
-    val tasks = ArrayList<ParallelTaskScope.() -> DecodeTaskResult>(assignments.size + 1)
-    tasks += { decodeModuleSections(config, bytes) }
-    for (assignment in assignments) {
-        tasks += { decodeCodeBodies(config, bytes, codeBodies, assignment) }
-    }
+    val context = ParallelDecoderContext(config, bytes, ranges, batchBodies(ranges, workerCount), observer)
+    val results = taskExecutor.executeWorkers(workerCount) { decodeModule(context) }
+    context.failures.error?.let { error -> return Err(error) }
 
-    val results = taskExecutor.execute(tasks)
-    val sections = results.first() as DecodeTaskResult.Sections
-    var earliestError = sections.result.errorOrNull(sections.offset)
-    var requiresDataCount = sections.requiresDataCount
-    val bodies = arrayOfNulls<FunctionBody>(codeBodies.size)
-
-    for (resultIndex in 1 until results.size) {
-        val result = results[resultIndex] as DecodeTaskResult.Bodies
-        requiresDataCount = requiresDataCount || result.requiresDataCount
-        for (body in result.bodies) {
-            val error = body.result.errorOrNull(body.offset)
-            if (error != null && (earliestError == null || error.offset < earliestError.offset)) {
-                earliestError = error
-            }
-            body.result.fold(
-                success = { bodies[body.index] = it },
-                failure = {},
-            )
+    val unobserved = results.flatMap(DecodeTaskResult::unobserved)
+    if (unobserved.isNotEmpty() && observer != null && context.observerState.load() == ObserverState.FOLLOWING) {
+        val cursor = WorkCursor(unobserved.size)
+        taskExecutor.executeWorkers(minOf(workerCount, unobserved.size)) {
+            val bodyObserver = observer.bodyObserver()
+            claimEach(cursor) { claimed -> replayBatch(context, unobserved[claimed], bodyObserver) }
         }
     }
 
-    if (earliestError != null) return Err(earliestError.error)
-    return sections.result.fold(
-        success = { builder ->
-            builder.functionBodies(List(bodies.size) { index -> checkNotNull(bodies[index]) })
-            builder.build(requiresDataCount)
-        },
-        failure = ::Err,
-    )
+    context.builder.functionBodies(List(ranges.size) { index -> checkNotNull(context.decodedBodies[index]) })
+    return context.builder.build(results.any(DecodeTaskResult::requiresDataCount))
 }
 
-private fun ParallelTaskScope.decodeModuleSections(
-    config: ModuleConfig,
-    bytes: ByteArray,
-): DecodeTaskResult.Sections {
-    ensureActive()
-    val reader = BufferedWasmBinaryReader(bytes)
-    val context = ModuleDecoderContext(config, reader)
-    val result = try {
-        ModuleSectionsDecoder(
-            context = context,
-            sectionDecoder = { sectionContext ->
-                SectionDecoder(sectionContext) { codeContext ->
-                    reader.skip(codeContext.sectionSize.size.toInt())
-                    Ok(CodeSection(emptyList()))
-                }
-            },
-        )
-    } catch (error: WasmDecodeException) {
-        Err(error.error)
-    } catch (error: Throwable) {
-        Err(WasmDecodeError.IOError(error))
-    }
-    return DecodeTaskResult.Sections(
-        result = result,
-        offset = reader.position().toInt(),
-        requiresDataCount = context.requiresDataCount,
-    )
-}
-
-private fun ParallelTaskScope.decodeCodeBodies(
-    config: ModuleConfig,
-    bytes: ByteArray,
-    ranges: CodeBodyRanges,
-    assignment: IntArray,
-): DecodeTaskResult.Bodies {
-    val firstReader = BufferedWasmBinaryReader(bytes, ranges.starts[assignment[0]], ranges.ends[assignment[0]])
-    val context = CodeBodyDecoderContext(
-        config = config,
-        reader = firstReader,
-    )
-    val bodies = ArrayList<DecodedBody>(assignment.size)
-    for (assignmentIndex in assignment.indices) {
-        ensureActive()
-        val bodyIndex = assignment[assignmentIndex]
-        val reader = if (assignmentIndex == 0) {
-            firstReader
-        } else {
-            BufferedWasmBinaryReader(bytes, ranges.starts[bodyIndex], ranges.ends[bodyIndex])
-        }
-        val body = decodeCodeBody(context, reader, bodyIndex)
-        bodies += body
-        val failed = body.result.fold(success = { false }, failure = { true })
-        if (failed) break
-    }
-    return DecodeTaskResult.Bodies(
-        bodies = bodies.toTypedArray(),
-        requiresDataCount = context.requiresDataCount,
-    )
-}
-
-private fun decodeCodeBody(
-    context: CodeBodyDecoderContext,
-    reader: BufferedWasmBinaryReader,
-    bodyIndex: Int,
-): DecodedBody {
-    context.reader = reader
-    val result = try {
-        CodeEntryDecoder(context).fold(
-            success = { entry ->
-                Ok(FunctionBody(Index.FunctionIndex(bodyIndex.toUInt()), entry.locals, entry.body))
-            },
-            failure = ::Err,
-        )
-    } catch (error: WasmDecodeException) {
-        Err(error.error)
-    } catch (error: Throwable) {
-        Err(WasmDecodeError.IOError(error))
-    }
-    return DecodedBody(
-        index = bodyIndex,
-        offset = reader.position().toInt(),
-        result = result,
-    )
-}
-
-private fun <T> Result<T, WasmDecodeError>.errorOrNull(offset: Int): DecodeError? = fold(
-    success = { null },
-    failure = { DecodeError(offset, it) },
+private class DecodeTaskResult(
+    val requiresDataCount: Boolean,
+    // batches decoded before the observer was ready that the worker never got back to
+    val unobserved: List<Int>,
 )
 
-private sealed interface DecodeTaskResult {
+private fun ParallelTaskScope.decodeModule(context: ParallelDecoderContext): DecodeTaskResult {
+    val decodedSections = context.sectionsClaimed.compareAndSet(expectedValue = false, newValue = true)
+    if (decodedSections) decodeSections(context)
 
-    class Sections(
-        val result: Result<ModuleBuilder, WasmDecodeError>,
-        val offset: Int,
-        val requiresDataCount: Boolean,
-    ) : DecodeTaskResult
+    val worker = BodyWorker(context)
+    claimEach(context.cursor) { batch -> worker.decode(batch) }
 
-    class Bodies(
-        val bodies: Array<DecodedBody>,
-        val requiresDataCount: Boolean,
-    ) : DecodeTaskResult
+    return DecodeTaskResult(
+        requiresDataCount = worker.requiresDataCount || (decodedSections && context.sectionContext.requiresDataCount),
+        unobserved = worker.finish(),
+    )
 }
-
-private class DecodedBody(
-    val index: Int,
-    val offset: Int,
-    val result: Result<FunctionBody, WasmDecodeError>,
-)
-
-private class DecodeError(
-    val offset: Int,
-    val error: WasmDecodeError,
-)

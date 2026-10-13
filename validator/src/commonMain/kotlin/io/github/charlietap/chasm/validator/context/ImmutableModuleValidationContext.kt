@@ -26,15 +26,17 @@ internal class ImmutableModuleValidationContext(
     val memories: List<MemoryType>,
     val tables: List<TableType>,
     val tags: List<TagType>,
-    val datas: List<Index.DataIndex>,
+    val dataCount: UInt,
     val elems: List<ReferenceType>,
     val importedGlobalCount: Int,
     val refs: Set<Index.FunctionIndex>,
 )
 
+/** [dataCount] stands in for the data segments of a [module] that does not have them yet. */
 internal fun ImmutableModuleValidationContext(
     config: ModuleConfig,
     module: Module,
+    dataCount: UInt? = null,
 ): ImmutableModuleValidationContext {
     val types = module.definedTypes
     val functions = mutableListOf<DefinedType>()
@@ -71,7 +73,7 @@ internal fun ImmutableModuleValidationContext(
         memories = memories,
         tables = tables,
         tags = tags,
-        datas = module.dataSegments.map(DataSegment::idx),
+        dataCount = dataCount ?: module.dataSegments.size.toUInt(),
         elems = module.elementSegments.map(ElementSegment::type),
         importedGlobalCount = importedGlobalCount,
         refs = collectDeclaredFunctionReferences(module),

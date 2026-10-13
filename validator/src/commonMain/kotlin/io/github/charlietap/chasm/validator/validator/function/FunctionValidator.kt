@@ -4,6 +4,7 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
+import com.github.michaelbull.result.getOrElse
 import io.github.charlietap.chasm.ast.instruction.Instruction
 import io.github.charlietap.chasm.ast.module.Function
 import io.github.charlietap.chasm.type.ValueType
@@ -46,15 +47,28 @@ internal inline fun FunctionValidator(
 
         instructionBlockValidator(scopedContext, function.body.instructions).bind()
 
-        val resultType = scopedContext.resultType().bind()
-        scopedContext.popValues(resultType.types).bind()
-
-        if (scopedContext.operands.depth() > 0) {
-            Err(TypeValidatorError.TypeMismatch).bind<Unit>()
-        }
-
-        scopedContext.labels.pop().bind()
+        FinishFunction(scopedContext).bind()
 
         Ok(Unit)
     }.bind()
+}
+
+internal fun FinishFunction(
+    context: ModuleValidationContext,
+): Result<Unit, ModuleValidatorError> {
+    val resultType = context.resultType().getOrElse { error ->
+        return Err(error)
+    }
+    context.popValues(resultType.types).getOrElse { error ->
+        return Err(error)
+    }
+
+    if (context.operands.depth() > 0) {
+        return Err(TypeValidatorError.TypeMismatch)
+    }
+
+    context.labels.pop().getOrElse { error ->
+        return Err(error)
+    }
+    return Ok(Unit)
 }

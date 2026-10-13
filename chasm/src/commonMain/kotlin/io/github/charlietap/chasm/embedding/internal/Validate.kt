@@ -13,6 +13,8 @@ suspend fun _validate(
     module: Module,
     taskExecutor: ParallelTaskExecutor,
 ): ChasmResult<Module, ValidationError> {
+    if (module.validated) return ChasmResult.Success(module)
+
     val result = ParallelWasmModuleValidator(
         config = module.config,
         module = module.module,

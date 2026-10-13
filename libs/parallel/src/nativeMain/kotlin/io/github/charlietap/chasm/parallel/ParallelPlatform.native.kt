@@ -5,3 +5,5 @@ import kotlin.native.Platform
 
 @OptIn(ExperimentalNativeApi::class)
 actual fun availableParallelProcessors(): Int = Platform.getAvailableProcessors()
+
+actual val parallelPlatform: ParallelPlatform = ParallelPlatform.NATIVE

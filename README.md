@@ -94,6 +94,13 @@ val wasmFileAsByteArray = ...
 val module = module(wasmFileAsByteArray)
 ```
 
+Decoding does not check that a module is valid. Unless the binary comes
+from a source you trust, validate it before instantiating it:
+
+```kotlin
+val validated = validate(module)
+```
+
 Once a module has been decoded you'll need to instantiate it, and for
 that you'll also need a store:
 

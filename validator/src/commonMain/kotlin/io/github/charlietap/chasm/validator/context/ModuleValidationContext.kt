@@ -57,7 +57,7 @@ internal class ModuleValidationContext private constructor(
     var tags: List<TagType> = immutableContext.tags
         private set
 
-    var datas: List<Index.DataIndex> = immutableContext.datas
+    var dataCount: UInt = immutableContext.dataCount
         private set
 
     var elems: List<ReferenceType> = immutableContext.elems
@@ -147,7 +147,7 @@ internal class ModuleValidationContext private constructor(
         memories = context.memories
         tables = context.tables
         tags = context.tags
-        datas = context.datas
+        dataCount = context.dataCount
         elems = context.elems
         importedGlobalCount = context.importedGlobalCount
         refs = context.refs
