@@ -5,7 +5,6 @@ import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
 import io.github.charlietap.chasm.ast.instruction.Expression
 import io.github.charlietap.chasm.ast.instruction.Instruction
-import io.github.charlietap.chasm.decoder.builder.InstructionBlockBuilder
 import io.github.charlietap.chasm.decoder.context.CodeBodyDecoderContext
 import io.github.charlietap.chasm.decoder.decoder.CodeBodyDecoder
 import io.github.charlietap.chasm.decoder.error.WasmDecodeError
@@ -23,7 +22,8 @@ internal inline fun ExpressionDecoder(
     crossinline instructionDecoder: CodeBodyDecoder<Instruction>,
     crossinline onInstruction: () -> Unit = {},
 ): Result<Expression, WasmDecodeError> = binding {
-    val builder = InstructionBlockBuilder()
+    val builder = context.instructionBlockBuilder
+    builder.clear()
     var depth = 0
 
     while (true) {
