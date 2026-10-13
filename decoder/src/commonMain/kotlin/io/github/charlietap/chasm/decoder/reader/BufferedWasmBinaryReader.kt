@@ -122,6 +122,9 @@ internal class BufferedWasmBinaryReader private constructor(
     override fun position(): UInt = absolutePosition().toUInt()
 
     override fun peekUByte(): UByte {
+        if (cursor < end && (logicalLimit == ULong.MAX_VALUE || absolutePosition() < logicalLimit)) {
+            return buffer[cursor].toUByte()
+        }
         if (request(1).not()) noMoreElements()
         return buffer[cursor].toUByte()
     }
