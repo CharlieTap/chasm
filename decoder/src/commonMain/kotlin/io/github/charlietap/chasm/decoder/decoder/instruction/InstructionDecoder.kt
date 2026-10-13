@@ -2,7 +2,6 @@ package io.github.charlietap.chasm.decoder.decoder.instruction
 
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
 import io.github.charlietap.chasm.ast.instruction.Instruction
 import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
@@ -52,26 +51,31 @@ internal inline fun InstructionDecoder(
     crossinline memoryInstructionDecoder: CodeBodyDecoder<MemoryInstruction>,
     crossinline controlInstructionDecoder: CodeBodyDecoder<ControlInstruction>,
     crossinline prefixInstructionDecoder: CodeBodyDecoder<Instruction>,
-): Result<Instruction, WasmDecodeError> = binding {
+): Result<Instruction, WasmDecodeError> {
     val opcode = context.reader
         .peekUByte()
-    when {
-        NUMERIC_OPCODES.contains(opcode) -> numericInstructionDecoder(context).bind()
-        REFERENCE_OPCODES.contains(opcode) -> referenceInstructionDecoder(context).bind()
-        PARAMETRIC_OPCODES.contains(opcode) -> parametricInstructionDecoder(context).bind()
-        VARIABLE_OPCODES.contains(opcode) -> variableInstructionDecoder(context).bind()
-        TABLE_OPCODES.contains(opcode) -> tableInstructionDecoder(context).bind()
-        MEMORY_OPCODES.contains(opcode) -> memoryInstructionDecoder(context).bind()
-        CONTROL_OPCODES.contains(opcode) -> controlInstructionDecoder(context).bind()
-        PREFIXED_OPCODES.contains(opcode) -> prefixInstructionDecoder(context).bind()
+    return when (OPCODE_GROUPS[opcode.toInt()]) {
+        NUMERIC_GROUP -> numericInstructionDecoder(context)
+        REFERENCE_GROUP -> referenceInstructionDecoder(context)
+        PARAMETRIC_GROUP -> parametricInstructionDecoder(context)
+        VARIABLE_GROUP -> variableInstructionDecoder(context)
+        TABLE_GROUP -> tableInstructionDecoder(context)
+        MEMORY_GROUP -> memoryInstructionDecoder(context)
+        CONTROL_GROUP -> controlInstructionDecoder(context)
+        PREFIXED_GROUP -> prefixInstructionDecoder(context)
 
-        else -> Err(InstructionDecodeError.UnknownInstruction(opcode)).bind<Instruction>()
+        else -> Err(InstructionDecodeError.UnknownInstruction(opcode))
     }
 }
 
-private fun Set<UIntRange>.contains(opcode: UByte): Boolean = any { range ->
-    range.contains(opcode)
-}
+internal const val NUMERIC_GROUP: Byte = 1
+internal const val REFERENCE_GROUP: Byte = 2
+internal const val PARAMETRIC_GROUP: Byte = 3
+internal const val VARIABLE_GROUP: Byte = 4
+internal const val TABLE_GROUP: Byte = 5
+internal const val MEMORY_GROUP: Byte = 6
+internal const val CONTROL_GROUP: Byte = 7
+internal const val PREFIXED_GROUP: Byte = 8
 
 internal val CONTROL_OPCODES: Set<UIntRange> by lazy {
     setOf(
@@ -124,4 +128,19 @@ internal val PREFIXED_OPCODES by lazy {
     setOf(
         PREFIX_FB..PREFIX_FE,
     )
+}
+
+// Maps every opcode to the group that decodes it so dispatch is a single lookup per instruction
+internal val OPCODE_GROUPS: ByteArray = ByteArray(UByte.MAX_VALUE.toInt() + 1).also { groups ->
+    fun Set<UIntRange>.assign(group: Byte) = forEach { range ->
+        range.forEach { opcode -> groups[opcode.toInt()] = group }
+    }
+    PREFIXED_OPCODES.assign(PREFIXED_GROUP)
+    CONTROL_OPCODES.assign(CONTROL_GROUP)
+    MEMORY_OPCODES.assign(MEMORY_GROUP)
+    TABLE_OPCODES.assign(TABLE_GROUP)
+    VARIABLE_OPCODES.assign(VARIABLE_GROUP)
+    PARAMETRIC_OPCODES.assign(PARAMETRIC_GROUP)
+    REFERENCE_OPCODES.assign(REFERENCE_GROUP)
+    NUMERIC_OPCODES.assign(NUMERIC_GROUP)
 }
