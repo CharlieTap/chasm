@@ -30,15 +30,16 @@ internal fun InstructionValidator(
     instruction: Instruction,
 ): Result<Unit, ModuleValidatorError> {
     return when (instruction) {
-        is AggregateInstruction -> AggregateInstructionValidator(context, instruction)
-        is AtomicMemoryInstruction -> AtomicMemoryInstructionValidator(context, instruction)
-        is ControlInstruction -> ControlInstructionValidator(context, instruction)
+        // Groups are ordered by how often they occur in real modules
+        is VariableInstruction -> VariableInstructionValidator(context, instruction)
         is NumericInstruction -> NumericInstructionValidator(context, instruction)
+        is ControlInstruction -> ControlInstructionValidator(context, instruction)
         is MemoryInstruction -> MemoryInstructionValidator(context, instruction)
+        is AggregateInstruction -> AggregateInstructionValidator(context, instruction)
         is ParametricInstruction -> ParametricInstructionValidator(context, instruction)
         is ReferenceInstruction -> ReferenceInstructionValidator(context, instruction)
         is TableInstruction -> TableInstructionValidator(context, instruction)
-        is VariableInstruction -> VariableInstructionValidator(context, instruction)
         is VectorInstruction -> VectorInstructionValidator(context, instruction)
+        is AtomicMemoryInstruction -> AtomicMemoryInstructionValidator(context, instruction)
     }
 }

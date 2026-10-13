@@ -254,10 +254,10 @@ internal fun NumericInstructionValidator(
             context.pushI64()
         }
         null -> when (instruction) {
-            is NumericInstruction.F32Const -> context.pushF32()
-            is NumericInstruction.F64Const -> context.pushF64()
             is NumericInstruction.I32Const -> context.pushI32()
             is NumericInstruction.I64Const -> context.pushI64()
+            is NumericInstruction.F32Const -> context.pushF32()
+            is NumericInstruction.F64Const -> context.pushF64()
             is NumericInstruction.Operator -> error("Unexpected numeric operator")
         }
     }

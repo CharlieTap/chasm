@@ -30,10 +30,10 @@ internal inline fun VariableInstructionValidator(
     crossinline localTeeValidator: ModuleValidator<VariableInstruction.LocalTee>,
 ): Result<Unit, ModuleValidatorError> {
     return when (instruction) {
-        is VariableInstruction.GlobalGet -> globalGetValidator(context, instruction)
-        is VariableInstruction.GlobalSet -> globalSetValidator(context, instruction)
         is VariableInstruction.LocalGet -> localGetValidator(context, instruction)
         is VariableInstruction.LocalSet -> localSetValidator(context, instruction)
         is VariableInstruction.LocalTee -> localTeeValidator(context, instruction)
+        is VariableInstruction.GlobalGet -> globalGetValidator(context, instruction)
+        is VariableInstruction.GlobalSet -> globalSetValidator(context, instruction)
     }
 }
