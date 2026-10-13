@@ -2,7 +2,7 @@ package io.github.charlietap.chasm.decoder.decoder.instruction.variable
 
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.binding
+import com.github.michaelbull.result.map
 import io.github.charlietap.chasm.ast.instruction.VariableInstruction
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.decoder.context.CodeBodyDecoderContext
@@ -30,24 +30,13 @@ internal inline fun VariableInstructionDecoder(
     context: CodeBodyDecoderContext,
     crossinline localIndexDecoder: CodeBodyDecoder<Index.LocalIndex>,
     crossinline globalIndexDecoder: CodeBodyDecoder<Index.GlobalIndex>,
-): Result<VariableInstruction, WasmDecodeError> = binding {
+): Result<VariableInstruction, WasmDecodeError> =
     when (val opcode = context.reader.ubyte()) {
-        LOCAL_GET -> {
-            VariableInstruction.LocalGet(localIndexDecoder(context).bind())
-        }
-        LOCAL_SET -> {
-            VariableInstruction.LocalSet(localIndexDecoder(context).bind())
-        }
-        LOCAL_TEE -> {
-            VariableInstruction.LocalTee(localIndexDecoder(context).bind())
-        }
-        GLOBAL_GET -> {
-            VariableInstruction.GlobalGet(globalIndexDecoder(context).bind())
-        }
-        GLOBAL_SET -> {
-            VariableInstruction.GlobalSet(globalIndexDecoder(context).bind())
-        }
+        LOCAL_GET -> localIndexDecoder(context).map(VariableInstruction::LocalGet)
+        LOCAL_SET -> localIndexDecoder(context).map(VariableInstruction::LocalSet)
+        LOCAL_TEE -> localIndexDecoder(context).map(VariableInstruction::LocalTee)
+        GLOBAL_GET -> globalIndexDecoder(context).map(VariableInstruction::GlobalGet)
+        GLOBAL_SET -> globalIndexDecoder(context).map(VariableInstruction::GlobalSet)
 
-        else -> Err(InstructionDecodeError.InvalidVariableInstruction(opcode)).bind<VariableInstruction>()
+        else -> Err(InstructionDecodeError.InvalidVariableInstruction(opcode))
     }
-}
