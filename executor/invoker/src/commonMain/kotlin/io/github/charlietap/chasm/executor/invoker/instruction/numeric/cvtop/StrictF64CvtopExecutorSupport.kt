@@ -58,19 +58,3 @@ internal inline fun executeF32ToF64S(
     val operand = Float.fromBits(vstack.getFrameSlot(operandSlot).toInt())
     vstack.setFrameSlot(destinationSlot, operation(operand).toRawBits())
 }
-
-internal inline fun executeI64BitsToF64I(
-    vstack: ValueStack,
-    destinationSlot: Int,
-    operand: Long,
-) {
-    vstack.setFrameSlot(destinationSlot, operand)
-}
-
-internal inline fun executeI64BitsToF64S(
-    vstack: ValueStack,
-    destinationSlot: Int,
-    operandSlot: Int,
-) {
-    vstack.setFrameSlot(destinationSlot, vstack.getFrameSlot(operandSlot))
-}
