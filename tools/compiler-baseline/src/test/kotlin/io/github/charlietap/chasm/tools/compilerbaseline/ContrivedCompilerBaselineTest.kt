@@ -13,11 +13,11 @@ class ContrivedCompilerBaselineTest {
     fun `covers compiler fusions and lowering variants`() {
         val module = generateContrivedBaseline().modules.single()
         val functions = module.functions.associateBy(CompilerBaselineFunction::name)
-        val instructions = module.functions.flatMap(CompilerBaselineFunction::instructions).toSet()
+        val instructions = module.functions.flatMap(CompilerBaselineFunction::tags).toSet()
 
         val loweredNamedFunctions = module.functions
             .filter { function -> function.name.substringBefore('.') in tagNamespaces }
-            .filterNot { function -> function.name in function.instructions }
+            .filterNot { function -> function.name in function.tags }
             .mapTo(mutableSetOf(), CompilerBaselineFunction::name)
         assertEquals(expectedLoweredNamedFunctions, loweredNamedFunctions)
 
@@ -45,25 +45,25 @@ class ContrivedCompilerBaselineTest {
 
         assertEquals(
             listOf("numeric.i32.add.ss", "control.return"),
-            functions.getValue("lowering.producer_to_local").instructions,
+            functions.getValue("lowering.producer_to_local").tags,
         )
         assertFalse(
-            functions.getValue("lowering.producer_to_local_tee").instructions.any { tag ->
+            functions.getValue("lowering.producer_to_local_tee").tags.any { tag ->
                 tag.startsWith("variable.local_set")
             },
         )
         assertEquals(
             listOf("control.return"),
-            functions.getValue("lowering.identity_local_write").instructions,
+            functions.getValue("lowering.identity_local_write").tags,
         )
         assertFalse(
-            functions.getValue("lowering.no_op_reinterpret").instructions.any { tag ->
+            functions.getValue("lowering.no_op_reinterpret").tags.any { tag ->
                 "reinterpret" in tag
             },
         )
-        assertEquals("control.call_indirect.s", functions.getValue("lowering.indirect_target_staging").instructions.first())
+        assertEquals("control.call_indirect.s", functions.getValue("lowering.indirect_target_staging").tags.first())
 
-        val takenOnlyBranch = functions.getValue("lowering.taken_only_branch_copy").instructions
+        val takenOnlyBranch = functions.getValue("lowering.taken_only_branch_copy").tags
         assertTrue(takenOnlyBranch.indexOf("admin.end_function") < takenOnlyBranch.lastIndex)
         assertEquals("admin.jump_copies", takenOnlyBranch.last())
     }
@@ -76,9 +76,8 @@ class ContrivedCompilerBaselineTest {
             importResolver = EmptyCompilerBaselineImportResolver(),
             moduleDecoder = ChasmModuleDecoder(),
             moduleInstantiator = ChasmModuleInstantiator(),
-            instructionCollectorFactory = DefaultProgramInstructionCollectorFactory(
-                tagTranslator = CompilerInstructionTagTranslator(),
-            ),
+            instructionCollectorFactory = ::IdentityProgramInstructionCollector,
+            tagTranslator = CompilerInstructionTagTranslator(),
             runtimeConfig = RuntimeConfig(gcStrategy = GCStrategy.TRADITIONAL),
         ).generate(
             CompilerBaselineFixture(
@@ -172,3 +171,6 @@ private fun shapes(arity: Int): List<String> = if (arity == 0) {
 } else {
     shapes(arity - 1).flatMap { prefix -> listOf("${prefix}i", "${prefix}s") }
 }
+
+internal val CompilerBaselineFunction.tags: List<String>
+    get() = instructions.map(CompilerBaselineInstruction::tag)

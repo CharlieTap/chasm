@@ -12,23 +12,25 @@ interface ProgramInstructionCollector : CompilerInstructionObserver {
         program: Program,
         fromIndex: Int,
         toIndex: Int,
-    ): List<String>
+    ): List<ObservedInstruction>
 }
 
-class IdentityProgramInstructionCollector(
-    private val tagTranslator: CompilerInstructionTagTranslator,
-) : ProgramInstructionCollector {
+class ObservedInstruction(
+    val dispatchable: DispatchableInstruction,
+    val instruction: LinkedInstruction,
+)
 
-    private val instructionTags = IdentityHashMap<DispatchableInstruction, String>()
+class IdentityProgramInstructionCollector : ProgramInstructionCollector {
+
+    private val instructions = IdentityHashMap<DispatchableInstruction, LinkedInstruction>()
 
     override fun onInstruction(
         dispatchableInstruction: DispatchableInstruction,
         instruction: LinkedInstruction,
     ) {
-        val tag = tagTranslator.translate(instruction)
-        val previousTag = instructionTags.put(dispatchableInstruction, tag)
-        check(previousTag == null || previousTag == tag) {
-            "dispatchable instruction was associated with both $previousTag and $tag"
+        val previous = instructions.putIfAbsent(dispatchableInstruction, instruction)
+        check(previous == null || previous == instruction) {
+            "dispatchable instruction was associated with both $previous and $instruction"
         }
     }
 
@@ -36,9 +38,11 @@ class IdentityProgramInstructionCollector(
         program: Program,
         fromIndex: Int,
         toIndex: Int,
-    ): List<String> = (fromIndex until toIndex).map { index ->
-        checkNotNull(instructionTags[program.instructions[index]]) {
+    ): List<ObservedInstruction> = (fromIndex until toIndex).map { index ->
+        val dispatchable = program.instructions[index]
+        val instruction = checkNotNull(instructions[dispatchable]) {
             "no compiler instruction was recorded at program index $index"
         }
+        ObservedInstruction(dispatchable, instruction)
     }
 }

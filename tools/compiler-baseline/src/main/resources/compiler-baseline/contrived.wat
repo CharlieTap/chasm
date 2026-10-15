@@ -1172,4 +1172,24 @@
       br_if 0
       nop
     end)
+
+  (tag $failure (param i32))
+
+  (func $exceptions.catch_payload (param $p0 i32) (result i32)
+    (block $handler (result i32)
+      (try_table (catch $failure $handler)
+        local.get $p0
+        throw $failure)
+      i32.const 0))
+
+  (func $exceptions.catch_all_ref_tail_call (result i32)
+    (block $handler (result exnref)
+      (try_table (catch_all_ref $handler)
+        return_call $callee.no_locals)
+      unreachable)
+    drop
+    i32.const 1)
+
+  (func $locals.reference_default (result externref) (local externref)
+    local.get 0)
 )

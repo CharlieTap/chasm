@@ -77,11 +77,42 @@ abstract class CheckCompilerBaselineTask : DefaultTask() {
 
     @TaskAction
     fun verify() {
-        if (!baselineFile.get().asFile.readBytes().contentEquals(generatedFile.get().asFile.readBytes())) {
-            throw GradleException(
-                "Compiler output differs from the checked-in baseline. " +
-                    "Run updateCompilerBaseline to accept the new output.",
-            )
-        }
+        val baseline = baselineFile.get().asFile
+        val generated = generatedFile.get().asFile
+        if (baseline.readBytes().contentEquals(generated.readBytes())) return
+
+        throw GradleException(
+            buildString {
+                appendLine("Compiler output differs from ${baseline.name}. Run updateCompilerBaseline to accept the new output.")
+                appendLine("Generated output: ${generated.path}")
+                append(changedLines(baseline.readLines(), generated.readLines()))
+            },
+        )
     }
 }
+
+private fun changedLines(expected: List<String>, actual: List<String>): String {
+    var start = 0
+    while (start < expected.size && start < actual.size && expected[start] == actual[start]) start++
+    var expectedEnd = expected.size
+    var actualEnd = actual.size
+    while (expectedEnd > start && actualEnd > start && expected[expectedEnd - 1] == actual[actualEnd - 1]) {
+        expectedEnd--
+        actualEnd--
+    }
+    val name = expected.subList(0, start)
+        .lastOrNull { line -> line.trimStart().startsWith(NAME_KEY) }
+        ?.trim()
+        ?.removePrefix(NAME_KEY)
+        ?.removeSuffix(",")
+    return buildString {
+        appendLine("First difference at line ${start + 1}${name?.let { " in $it" } ?: ""}:")
+        expected.subList(start, expectedEnd).take(CHANGED_LINE_LIMIT).forEach { line -> appendLine("- ${line.trim()}") }
+        actual.subList(start, actualEnd).take(CHANGED_LINE_LIMIT).forEach { line -> appendLine("+ ${line.trim()}") }
+        val omitted = maxOf(expectedEnd - start - CHANGED_LINE_LIMIT, 0) + maxOf(actualEnd - start - CHANGED_LINE_LIMIT, 0)
+        if (omitted > 0) appendLine("... $omitted more changed lines")
+    }
+}
+
+private const val CHANGED_LINE_LIMIT = 20
+private const val NAME_KEY = "\"name\": "

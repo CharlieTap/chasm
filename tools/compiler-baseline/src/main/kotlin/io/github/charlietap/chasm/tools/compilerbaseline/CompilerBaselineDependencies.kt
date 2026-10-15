@@ -1,7 +1,9 @@
 package io.github.charlietap.chasm.tools.compilerbaseline
 
 import io.github.charlietap.chasm.config.RuntimeConfig
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonNamingStrategy
 
 internal fun compilerBaselineWriter(
     importResolver: CompilerBaselineImportResolver,
@@ -11,13 +13,17 @@ internal fun compilerBaselineWriter(
         importResolver = importResolver,
         moduleDecoder = ChasmModuleDecoder(),
         moduleInstantiator = ChasmModuleInstantiator(),
-        instructionCollectorFactory = DefaultProgramInstructionCollectorFactory(
-            tagTranslator = CompilerInstructionTagTranslator(),
-        ),
+        instructionCollectorFactory = ::IdentityProgramInstructionCollector,
+        tagTranslator = CompilerInstructionTagTranslator(),
         runtimeConfig = runtimeConfig,
     ),
-    json = Json {
-        prettyPrint = true
-        prettyPrintIndent = "    "
-    },
+    json = compilerBaselineJson,
 )
+
+@OptIn(ExperimentalSerializationApi::class)
+internal val compilerBaselineJson = Json {
+    prettyPrint = true
+    prettyPrintIndent = "    "
+    explicitNulls = false
+    namingStrategy = JsonNamingStrategy.SnakeCase
+}

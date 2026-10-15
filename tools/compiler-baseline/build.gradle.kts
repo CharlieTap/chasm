@@ -17,7 +17,12 @@ kotlin {
         implementation(projects.config)
         implementation(projects.decoder)
         implementation(projects.executor.instantiator)
+        implementation(projects.executor.invoker)
+        implementation(projects.runtime.address)
         implementation(projects.runtime.core)
+        implementation(projects.runtime.type)
+        implementation(projects.runtime.value)
+        implementation(libs.kotlin.reflection)
         implementation(libs.kotlinx.serialization)
         implementation(libs.result)
 

@@ -15,9 +15,8 @@ class ModuleCompilerBaselineGeneratorTest {
             importResolver = CoremarkImportResolver(ChasmHostFunctionAllocator()),
             moduleDecoder = ChasmModuleDecoder(),
             moduleInstantiator = ChasmModuleInstantiator(),
-            instructionCollectorFactory = DefaultProgramInstructionCollectorFactory(
-                tagTranslator = CompilerInstructionTagTranslator(),
-            ),
+            instructionCollectorFactory = ::IdentityProgramInstructionCollector,
+            tagTranslator = CompilerInstructionTagTranslator(),
         )
 
         val baseline = generator.generate(
@@ -28,9 +27,9 @@ class ModuleCompilerBaselineGeneratorTest {
         )
 
         val module = baseline.modules.single()
-        assertEquals(1, baseline.schemaVersion)
+        assertEquals(2, baseline.schemaVersion)
         assertEquals("coremark", module.name)
         assertEquals(15, module.functions.size)
-        assertTrue(module.functions.all { function -> "control.return" in function.instructions })
+        assertTrue(module.functions.all { function -> "control.return" in function.tags })
     }
 }

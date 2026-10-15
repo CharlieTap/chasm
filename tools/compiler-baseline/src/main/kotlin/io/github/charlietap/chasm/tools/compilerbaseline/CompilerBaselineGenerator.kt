@@ -18,6 +18,7 @@ import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.Import
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.store.Store
+import kotlinx.serialization.json.JsonObject
 
 fun interface CompilerModuleDecoder {
     fun decode(config: ModuleConfig, bytes: ByteArray): Result<Module, ModuleDecoderError>
@@ -52,12 +53,6 @@ fun interface ProgramInstructionCollectorFactory {
     fun create(): ProgramInstructionCollector
 }
 
-class DefaultProgramInstructionCollectorFactory(
-    private val tagTranslator: CompilerInstructionTagTranslator,
-) : ProgramInstructionCollectorFactory {
-    override fun create(): ProgramInstructionCollector = IdentityProgramInstructionCollector(tagTranslator)
-}
-
 fun interface CompilerBaselineGenerator {
     fun generate(fixture: CompilerBaselineFixture): CompilerBaseline
 }
@@ -67,6 +62,7 @@ class ModuleCompilerBaselineGenerator(
     private val moduleDecoder: CompilerModuleDecoder,
     private val moduleInstantiator: CompilerModuleInstantiator,
     private val instructionCollectorFactory: ProgramInstructionCollectorFactory,
+    private val tagTranslator: CompilerInstructionTagTranslator,
     private val runtimeConfig: RuntimeConfig = RuntimeConfig(),
 ) : CompilerBaselineGenerator {
 
@@ -110,24 +106,40 @@ class ModuleCompilerBaselineGenerator(
             ?.associate { association -> association.idx.toInt() to association.name.name }
             .orEmpty()
 
+        val renderer = InstructionRenderer(ModuleSymbols(instance, store))
+        val supplements = DispatchSupplements()
         val functions = module.functions.map { function ->
             val functionIndex = function.idx.toInt()
             val address = instance.functionAddresses[functionIndex]
-            val functionInstance = store.function(address) as FunctionInstance.WasmFunction
-            functionIndex to functionInstance.callStrategy.entryIp
+            functionIndex to (store.function(address) as FunctionInstance.WasmFunction).callStrategy
         }
 
-        return functions.mapIndexed { index, (functionIndex, entryIp) ->
-            val endIp = functions.getOrNull(index + 1)?.second ?: store.program.size
+        return functions.mapIndexed { index, (functionIndex, strategy) ->
+            val entryIp = strategy.entryIp
+            val endIp = functions.getOrNull(index + 1)?.second?.entryIp ?: store.program.size
+            val instructions = instructionCollector.instructions(store.program, entryIp, endIp)
+            val exceptions = store.program.exceptionTable(entryIp)?.takeIf { table -> table.entryIp == entryIp }
             CompilerBaselineFunction(
                 index = functionIndex,
                 name = functionNames[functionIndex] ?: "\$func$functionIndex",
-                instructions = instructionCollector.instructions(store.program, entryIp, endIp),
+                frameSlots = strategy.frameSlots,
+                activationHeaderSlot = strategy.interfaceSlotCount,
+                localInitialization = renderer.localInitialization(strategy.localInitialization),
+                exceptions = exceptions?.let(renderer::exceptions),
+                instructions = instructions.mapIndexed { offset, observed ->
+                    val immediates = renderer.immediates(observed.instruction, entryIp) +
+                        supplements.immediates(observed.instruction, observed.dispatchable)
+                    CompilerBaselineInstruction(
+                        offset = offset,
+                        tag = tagTranslator.translate(observed.instruction),
+                        immediates = immediates.takeIf { it.isNotEmpty() }?.let(::JsonObject),
+                    )
+                },
             )
         }
     }
 
     private companion object {
-        const val SCHEMA_VERSION = 1
+        const val SCHEMA_VERSION = 2
     }
 }
