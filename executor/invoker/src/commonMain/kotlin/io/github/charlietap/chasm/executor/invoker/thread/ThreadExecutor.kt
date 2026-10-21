@@ -65,6 +65,7 @@ internal fun TraceableThreadExecutor(
     trap = { exception, vstack -> traceableTrap(store, vstack, exception) },
 )
 
+@Suppress("DEPRECATION")
 internal inline fun executeThread(
     config: RuntimeConfig,
     store: Store,

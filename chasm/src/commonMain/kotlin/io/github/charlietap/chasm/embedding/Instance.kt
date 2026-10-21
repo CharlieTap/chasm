@@ -8,6 +8,7 @@ import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.embedding.diagnostic.Instantiation
 import io.github.charlietap.chasm.embedding.diagnostic.executionError
 import io.github.charlietap.chasm.embedding.error.ChasmError
+import io.github.charlietap.chasm.embedding.ext.withStoreSettings
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Error
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Success
@@ -55,9 +56,10 @@ internal fun instance(
 
     val mappedImports = imports.mapImports(importableMapper)
     val firstFunctionAddress = store.store.functions.size
+    val effectiveConfig = config.withStoreSettings(store.store.config)
 
-    return instantiator(config, store.store, module.module, mappedImports)
-        .toChasmResult(config, store, module, firstFunctionAddress)
+    return instantiator(effectiveConfig, store.store, module.module, mappedImports)
+        .toChasmResult(effectiveConfig, store, module, firstFunctionAddress)
 }
 
 internal fun List<Import>.mapImports(

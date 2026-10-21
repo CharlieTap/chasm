@@ -1089,6 +1089,7 @@ class WasmHeap internal constructor(
         )
     }
 
+    @Suppress("DEPRECATION")
     private fun prepareStructAllocation(
         context: ExecutionContext,
         runtimeType: RTT,
@@ -1102,6 +1103,7 @@ class WasmHeap internal constructor(
         )
     }
 
+    @Suppress("DEPRECATION")
     private fun prepareArrayAllocation(
         context: ExecutionContext,
         runtimeType: RTT,
@@ -1117,6 +1119,7 @@ class WasmHeap internal constructor(
         )
     }
 
+    @Suppress("DEPRECATION")
     private fun prepareExceptionAllocation(
         context: ExecutionContext,
         tagAddress: Address.Tag,

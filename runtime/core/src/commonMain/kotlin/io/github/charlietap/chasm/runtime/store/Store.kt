@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.runtime.store
 
+import io.github.charlietap.chasm.config.StoreConfig
 import io.github.charlietap.chasm.runtime.heap.WasmHeap
 import io.github.charlietap.chasm.runtime.instance.DataInstance
 import io.github.charlietap.chasm.runtime.instance.ElementInstance
@@ -17,7 +18,8 @@ class Store(
     val elements: MutableList<ElementInstance> = [],
     val data: MutableList<DataInstance> = [],
     val program: Program = Program(),
+    val config: StoreConfig = StoreConfig(),
     val heap: WasmHeap = WasmHeap(),
-    val fuel: Fuel = Fuel(),
-    val interrupt: Interrupt = Interrupt(),
+    val fuel: Fuel = Fuel(metered = config.meterFuel),
+    val interrupt: Interrupt = Interrupt(enabled = config.interruptible),
 )

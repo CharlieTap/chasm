@@ -6,7 +6,9 @@ data class RuntimeConfig(
      * it failed. This adds some overhead. roughly 1% to execution time.
      */
     val debugInfo: Boolean = false,
+    @Deprecated("Set the strategy on the store with StoreConfig.gcStrategy, which takes precedence")
     val gcStrategy: GCStrategy = GCStrategy.ARENA,
+    @Deprecated("Set the threshold on the store with StoreConfig.gcThreshold, which takes precedence")
     val gcThreshold: GCThreshold = GCThreshold.MB(8),
     val linearMemory: LinearMemoryConfig = LinearMemoryConfig(),
 )

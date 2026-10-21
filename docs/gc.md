@@ -15,12 +15,25 @@ inside a host-function callback is not supported.
 
 ## Collection strategies
 
-Choose a strategy with `RuntimeConfig.gcStrategy`.
+Choose a strategy with `StoreConfig.gcStrategy` and its threshold with
+`StoreConfig.gcThreshold`. The heap belongs to the store, so these settings
+apply to every instance in it. `RuntimeConfig.gcStrategy` and
+`RuntimeConfig.gcThreshold` are deprecated; an instance still uses either one
+when its store leaves the matching setting unset.
+
+```kotlin
+val store = store(
+    StoreConfig(
+        gcStrategy = GCStrategy.TRADITIONAL,
+        gcThreshold = GCThreshold.MB(8),
+    ),
+)
+```
 
 ### Arena (default)
 
 At the end of a top-level WebAssembly invocation, Chasm checks the managed heap
-against `RuntimeConfig.gcThreshold` and collects when the threshold has been
+against the configured threshold and collects when the threshold has been
 reached. Arena adds no per-allocation policy check.
 
 ### Manual

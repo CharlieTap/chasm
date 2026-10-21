@@ -9,8 +9,27 @@ package io.github.charlietap.chasm.config
  * @property interruptible compiles an interrupt check at every function entry and loop iteration
  * of the store's code, so another thread can stop a running call. A store with both settings
  * makes one combined check at each site.
+ * @property gcStrategy decides when the store's GC heap is collected. When `null`, each instance
+ * uses the strategy from the [RuntimeConfig] it was instantiated with.
+ * @property gcThreshold sets how much the store's GC heap may hold before an automatic
+ * collection. When `null`, each instance uses the threshold from the [RuntimeConfig] it was
+ * instantiated with.
  */
 data class StoreConfig(
     val meterFuel: Boolean = false,
     val interruptible: Boolean = false,
-)
+    val gcStrategy: GCStrategy? = null,
+    val gcThreshold: GCThreshold? = null,
+) {
+    @Deprecated("Kept for binary compatibility", level = DeprecationLevel.HIDDEN)
+    constructor(
+        meterFuel: Boolean = false,
+        interruptible: Boolean = false,
+    ) : this(meterFuel, interruptible, null, null)
+
+    @Deprecated("Kept for binary compatibility", level = DeprecationLevel.HIDDEN)
+    fun copy(
+        meterFuel: Boolean = this.meterFuel,
+        interruptible: Boolean = this.interruptible,
+    ): StoreConfig = copy(meterFuel, interruptible, gcStrategy, gcThreshold)
+}

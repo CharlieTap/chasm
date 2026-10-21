@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.embedding.internal
 import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.embedding.error.ChasmError
+import io.github.charlietap.chasm.embedding.ext.withStoreSettings
 import io.github.charlietap.chasm.embedding.mapImports
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Error
@@ -28,12 +29,13 @@ suspend fun _instance(
     }
 
     val firstFunctionAddress = store.store.functions.size
+    val effectiveConfig = config.withStoreSettings(store.store.config)
 
     return ParallelModuleInstantiator(
-        config = config,
+        config = effectiveConfig,
         store = store.store,
         module = module.module,
         imports = imports.mapImports(ImportableMapper(store.store)),
         taskExecutor = taskExecutor,
-    ).toChasmResult(config, store, module, firstFunctionAddress)
+    ).toChasmResult(effectiveConfig, store, module, firstFunctionAddress)
 }
