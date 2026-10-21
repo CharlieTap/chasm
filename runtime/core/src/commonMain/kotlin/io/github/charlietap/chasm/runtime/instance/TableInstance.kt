@@ -28,7 +28,11 @@ data class TableInstance(
             return -1
         }
 
-        val grown = elements.copyOf(newSize)
+        val grown = try {
+            elements.copyOf(newSize)
+        } catch (_: Error) {
+            return -1
+        }
         grown.fill(value, currentSize, newSize)
 
         elements = grown

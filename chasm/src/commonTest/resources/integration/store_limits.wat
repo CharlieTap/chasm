@@ -2,7 +2,7 @@
   (type $bytes (array (mut i8)))
   (type $node (struct (field (ref null $node)) (field (ref $bytes))))
   (memory (export "memory") 1 10)
-  (table (export "table") 1 100 funcref)
+  (table (export "table") 1 funcref)
   (global $kept (mut (ref null $bytes)) (ref.null $bytes))
   (global $head (mut (ref null $node)) (ref.null $node))
 
