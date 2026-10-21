@@ -12,7 +12,6 @@ import io.github.charlietap.chasm.compiler.operand.sourceSlot
 import io.github.charlietap.chasm.executor.invoker.dispatch.memory.MemoryInstructionDispatcher
 import io.github.charlietap.chasm.runtime.instance.DataInstance
 import io.github.charlietap.chasm.runtime.instance.MemoryInstance
-import io.github.charlietap.chasm.runtime.memory.LinearMemory
 import io.github.charlietap.chasm.ast.instruction.MemArg as AstMemArg
 import io.github.charlietap.chasm.runtime.instruction.MemArg as RuntimeMemArg
 import io.github.charlietap.chasm.runtime.instruction.MemoryInstruction as RuntimeMemoryInstruction
@@ -83,11 +82,10 @@ internal fun FunctionCompilationContext.emitMemoryGrow(
     memory: MemoryInstance,
     destinationSlot: Int,
 ) {
-    val max = memory.type.limits.max?.toInt() ?: LinearMemory.MAX_PAGES
     val instruction = if (pages.sourceKind == OperandSourceKind.I32Immediate) {
-        RuntimeMemoryInstruction.MemoryGrowI(pages.i32Immediate, destinationSlot, memory, max)
+        RuntimeMemoryInstruction.MemoryGrowI(pages.i32Immediate, destinationSlot, memory)
     } else {
-        RuntimeMemoryInstruction.MemoryGrowS(pages.sourceSlot, destinationSlot, memory, max)
+        RuntimeMemoryInstruction.MemoryGrowS(pages.sourceSlot, destinationSlot, memory)
     }
     emit(instruction, ::MemoryInstructionDispatcher)
 }

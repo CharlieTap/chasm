@@ -14,11 +14,7 @@ import io.github.charlietap.chasm.host.HostTable
 import io.github.charlietap.chasm.host.HostTag
 import io.github.charlietap.chasm.host.ModuleIndex
 import io.github.charlietap.chasm.runtime.heap.WasmHeap
-import io.github.charlietap.chasm.runtime.instance.MemoryInstance
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
-import io.github.charlietap.chasm.runtime.instance.TableInstance
-import io.github.charlietap.chasm.runtime.memory.LinearMemory.Companion.MAX_PAGES
-import io.github.charlietap.chasm.runtime.memory.OutOfMemoryError
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
 
@@ -76,56 +72,4 @@ data class ExecutionContext(
         val address = (module as ModuleInstance).tagAddresses[index.index]
         return HostTag(address.address)
     }
-}
-
-private fun MemoryInstance.grow(pagesToAdd: Int): Int {
-    val currentSize = type.limits.min.toInt()
-
-    if (pagesToAdd == 0) {
-        return currentSize
-    }
-
-    val newSize = currentSize + pagesToAdd
-    val maximumSize = type.limits.max?.toInt() ?: MAX_PAGES
-
-    if (pagesToAdd < 0 || newSize < currentSize || newSize > maximumSize) {
-        return -1
-    }
-
-    val grown = try {
-        data.grow(pagesToAdd)
-    } catch (_: IllegalArgumentException) {
-        return -1
-    } catch (_: OutOfMemoryError) {
-        return -1
-    }
-
-    data = grown
-    type.limits.min = newSize.toULong()
-    refresh()
-
-    return currentSize
-}
-
-private fun TableInstance.grow(elementsToAdd: Int, value: HostReference): Int {
-    val currentSize = elements.size
-
-    if (elementsToAdd == 0) {
-        return currentSize
-    }
-
-    val newSize = currentSize + elementsToAdd
-    val maximumSize = type.limits.max?.toInt() ?: Int.MAX_VALUE
-
-    if (elementsToAdd < 0 || newSize < currentSize || newSize > maximumSize) {
-        return -1
-    }
-
-    val grown = elements.copyOf(newSize)
-    grown.fill(value, currentSize, newSize)
-
-    elements = grown
-    type.limits.min = newSize.toULong()
-
-    return currentSize
 }

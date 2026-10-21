@@ -7,7 +7,9 @@ import io.github.charlietap.chasm.type.TableType
 fun tableInstance(
     type: TableType = tableType(),
     elements: LongArray = longArrayOf(),
+    maximumElements: Int = TableInstance.declaredMaximumElements(type),
 ) = TableInstance(
     type = type,
     elements = elements,
+    maximumElements = maximumElements,
 )

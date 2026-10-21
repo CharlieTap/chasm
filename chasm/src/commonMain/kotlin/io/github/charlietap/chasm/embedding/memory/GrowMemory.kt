@@ -12,9 +12,6 @@ import io.github.charlietap.chasm.embedding.shapes.Memory
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.ext.memory
-import io.github.charlietap.chasm.runtime.instance.MemoryInstance
-import io.github.charlietap.chasm.runtime.memory.LinearMemory.Companion.MAX_PAGES
-import io.github.charlietap.chasm.runtime.memory.OutOfMemoryError
 
 fun growMemory(
     store: Store,
@@ -36,37 +33,5 @@ internal fun growMemoryResult(
 ): Result<Int, ModuleTrapError> {
 
     val instance = store.store.memory(memory.reference.address)
-    return Ok(growMemoryInstance(instance, pagesToAdd))
-}
-
-internal inline fun growMemoryInstance(
-    instance: MemoryInstance,
-    pagesToAdd: Int,
-): Int {
-    val current = instance.type.limits.min.toInt()
-
-    if (pagesToAdd == 0) {
-        return current
-    }
-
-    val new = current + pagesToAdd
-    val max = instance.type.limits.max?.toInt() ?: MAX_PAGES
-
-    if (pagesToAdd < 0 || new < current || new > max) {
-        return -1
-    }
-
-    val grown = try {
-        instance.data.grow(pagesToAdd)
-    } catch (_: IllegalArgumentException) {
-        return -1
-    } catch (_: OutOfMemoryError) {
-        return -1
-    }
-
-    instance.data = grown
-    instance.type.limits.min = new.toULong()
-    instance.refresh()
-
-    return current
+    return Ok(instance.grow(pagesToAdd))
 }

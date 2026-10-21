@@ -103,7 +103,6 @@ sealed interface TableInstruction : LinkedInstruction {
         val referenceValueSlot: Int,
         val destinationSlot: Int,
         val table: TableInstance,
-        val max: Int,
     ) : TableInstruction
 
     data class TableGrowSs(
@@ -111,7 +110,6 @@ sealed interface TableInstruction : LinkedInstruction {
         val referenceValueSlot: Int,
         val destinationSlot: Int,
         val table: TableInstance,
-        val max: Int,
     ) : TableInstruction
 
     data class TableInitIii(

@@ -277,13 +277,11 @@ fun tableGrowIsRuntimeInstruction(
     referenceValueSlot: Int = 0,
     destinationSlot: Int = 0,
     table: TableInstance = tableInstance(),
-    max: Int = 0,
 ) = TableInstruction.TableGrowIs(
     elementsToAdd = elementsToAdd,
     referenceValueSlot = referenceValueSlot,
     destinationSlot = destinationSlot,
     table = table,
-    max = max,
 )
 
 fun tableGrowSsRuntimeInstruction(
@@ -291,13 +289,11 @@ fun tableGrowSsRuntimeInstruction(
     referenceValueSlot: Int = 0,
     destinationSlot: Int = 0,
     table: TableInstance = tableInstance(),
-    max: Int = 0,
 ) = TableInstruction.TableGrowSs(
     elementsToAddSlot = elementsToAddSlot,
     referenceValueSlot = referenceValueSlot,
     destinationSlot = destinationSlot,
     table = table,
-    max = max,
 )
 
 fun tableSizeSRuntimeInstruction(

@@ -7,7 +7,6 @@ import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.instance.DataInstance
 import io.github.charlietap.chasm.runtime.instance.MemoryInstance
 import io.github.charlietap.chasm.runtime.instruction.MemoryInstruction
-import io.github.charlietap.chasm.runtime.memory.OutOfMemoryError
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 
 internal fun MemoryGrowExecutor(
@@ -19,7 +18,6 @@ internal fun MemoryGrowExecutor(
     pagesToAdd = instruction.pagesToAdd,
     destinationSlot = instruction.destinationSlot,
     memory = instruction.memory,
-    max = instruction.max,
 )
 
 internal fun MemoryGrowExecutor(
@@ -31,7 +29,6 @@ internal fun MemoryGrowExecutor(
     pagesToAdd = vstack.getFrameSlot(instruction.pagesToAddSlot).toInt(),
     destinationSlot = instruction.destinationSlot,
     memory = instruction.memory,
-    max = instruction.max,
 )
 
 internal fun MemoryInitExecutor(
@@ -631,29 +628,8 @@ private inline fun executeMemoryGrow(
     pagesToAdd: Int,
     destinationSlot: Int,
     memory: MemoryInstance,
-    max: Int,
 ) {
-    val originalSizeInPages = memory.type.limits.min.toInt()
-    val newSizeInPages = originalSizeInPages + pagesToAdd
-
-    if (pagesToAdd < 0 || newSizeInPages < originalSizeInPages || newSizeInPages > max) {
-        vstack.setFrameSlot(destinationSlot, -1L)
-    } else {
-        val grown = try {
-            memory.data.grow(pagesToAdd)
-        } catch (_: IllegalArgumentException) {
-            vstack.setFrameSlot(destinationSlot, -1L)
-            return
-        } catch (_: OutOfMemoryError) {
-            vstack.setFrameSlot(destinationSlot, -1L)
-            return
-        }
-
-        memory.data = grown
-        memory.type.limits.min = newSizeInPages.toULong()
-        memory.refresh()
-        vstack.setFrameSlot(destinationSlot, originalSizeInPages.toLong())
-    }
+    vstack.setFrameSlot(destinationSlot, memory.grow(pagesToAdd).toLong())
 }
 
 private inline fun executeMemoryInit(

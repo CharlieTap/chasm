@@ -159,7 +159,6 @@ internal fun TableGrowExecutor(
     elementsToAdd = instruction.elementsToAdd,
     referenceValue = vstack.getFrameSlot(instruction.referenceValueSlot),
     destinationSlot = instruction.destinationSlot,
-    max = instruction.max,
 )
 
 internal fun TableGrowExecutor(
@@ -172,7 +171,6 @@ internal fun TableGrowExecutor(
     elementsToAdd = vstack.getFrameSlot(instruction.elementsToAddSlot).toInt(),
     referenceValue = vstack.getFrameSlot(instruction.referenceValueSlot),
     destinationSlot = instruction.destinationSlot,
-    max = instruction.max,
 )
 
 internal fun TableInitExecutor(
@@ -363,19 +361,8 @@ private fun executeTableGrow(
     elementsToAdd: Int,
     referenceValue: Long,
     destinationSlot: Int,
-    max: Int,
 ) {
-    val tableSize = table.elements.size
-    val proposedLength = tableSize + elementsToAdd
-
-    if (proposedLength < tableSize || proposedLength > max) {
-        vstack.setFrameSlot(destinationSlot, -1L)
-        return
-    }
-
-    table.type.limits.min = proposedLength.toULong()
-    table.elements += LongArray(elementsToAdd) { referenceValue }
-    vstack.setFrameSlot(destinationSlot, tableSize.toLong())
+    vstack.setFrameSlot(destinationSlot, table.grow(elementsToAdd, referenceValue).toLong())
 }
 
 private fun executeTableInit(

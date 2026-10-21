@@ -8,7 +8,6 @@ import io.github.charlietap.chasm.fixture.type.limits
 import io.github.charlietap.chasm.fixture.type.memoryType
 import io.github.charlietap.chasm.runtime.instruction.MemoryInstruction
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
-import io.github.charlietap.chasm.runtime.memory.LinearMemory.Companion.MAX_PAGES
 import io.github.charlietap.chasm.runtime.memory.LinearMemory.Companion.PAGE_SIZE
 import io.github.charlietap.chasm.runtime.memory.OutOfMemoryError
 import kotlin.test.Test
@@ -34,7 +33,7 @@ class MemoryGrowExecutorTest {
             MemoryGrowExecutor(
                 vstack = vstack,
                 context = executionContext(vstack = vstack),
-                instruction = MemoryInstruction.MemoryGrowS(0, 1, memory, MAX_PAGES),
+                instruction = MemoryInstruction.MemoryGrowS(0, 1, memory),
             )
 
             assertEquals(-1L, vstack.getFrameSlot(1))
@@ -58,7 +57,7 @@ class MemoryGrowExecutorTest {
             MemoryGrowExecutor(
                 vstack = vstack,
                 context = executionContext(vstack = vstack),
-                instruction = MemoryInstruction.MemoryGrowI(1, 0, memory, 3),
+                instruction = MemoryInstruction.MemoryGrowI(1, 0, memory),
             )
 
             assertEquals(-1L, vstack.getFrameSlot(0))

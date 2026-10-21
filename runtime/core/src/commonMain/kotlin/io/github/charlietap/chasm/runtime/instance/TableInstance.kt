@@ -9,10 +9,33 @@ import io.github.charlietap.chasm.type.TableType
 data class TableInstance(
     var type: TableType,
     var elements: LongArray,
+    val maximumElements: Int = declaredMaximumElements(type),
 ) : HostTable {
 
     override val size: Int
         get() = elements.size
+
+    fun grow(elementsToAdd: Int, value: Long): Int {
+        val currentSize = elements.size
+
+        if (elementsToAdd == 0) {
+            return currentSize
+        }
+
+        val newSize = currentSize + elementsToAdd
+
+        if (elementsToAdd < 0 || newSize < currentSize || newSize > maximumElements) {
+            return -1
+        }
+
+        val grown = elements.copyOf(newSize)
+        grown.fill(value, currentSize, newSize)
+
+        elements = grown
+        type.limits.min = newSize.toULong()
+
+        return currentSize
+    }
 
     override fun readRaw(index: Int): Long = elements[index]
 
@@ -93,6 +116,7 @@ data class TableInstance(
 
         if (type != other.type) return false
         if (!elements.contentEquals(other.elements)) return false
+        if (maximumElements != other.maximumElements) return false
 
         return true
     }
@@ -100,6 +124,12 @@ data class TableInstance(
     override fun hashCode(): Int {
         var result = type.hashCode()
         result = 31 * result + elements.contentHashCode()
+        result = 31 * result + maximumElements
         return result
+    }
+
+    companion object {
+        fun declaredMaximumElements(type: TableType): Int =
+            type.limits.max?.let { maximum -> minOf(maximum, Int.MAX_VALUE.toULong()).toInt() } ?: Int.MAX_VALUE
     }
 }

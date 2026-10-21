@@ -9,7 +9,9 @@ import io.github.charlietap.chasm.type.MemoryType
 fun memoryInstance(
     type: MemoryType = memoryType(),
     data: LinearMemory = linearMemory(),
+    maximumPages: Int = MemoryInstance.declaredMaximumPages(type),
 ) = MemoryInstance(
     type = type,
     data = data,
+    maximumPages = maximumPages,
 )

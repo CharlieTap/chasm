@@ -211,14 +211,12 @@ sealed interface MemoryInstruction : LinkedInstruction {
         val pagesToAdd: Int,
         val destinationSlot: Int,
         val memory: MemoryInstance,
-        val max: Int,
     ) : MemoryInstruction
 
     data class MemoryGrowS(
         val pagesToAddSlot: Int,
         val destinationSlot: Int,
         val memory: MemoryInstance,
-        val max: Int,
     ) : MemoryInstruction
 
     data class MemoryInitIii(

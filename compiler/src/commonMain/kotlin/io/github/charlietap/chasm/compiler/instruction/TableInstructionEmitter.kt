@@ -51,11 +51,10 @@ internal fun FunctionCompilationContext.emitTableGrow(
 ) {
     check(!value.isImmediate)
     val elementsImmediate = elements.sourceKind == OperandSourceKind.I32Immediate
-    val max = table.type.limits.max?.toInt() ?: Int.MAX_VALUE
     val instruction = if (elementsImmediate) {
-        RuntimeTableInstruction.TableGrowIs(elements.i32Immediate, value.sourceSlot, destinationSlot, table, max)
+        RuntimeTableInstruction.TableGrowIs(elements.i32Immediate, value.sourceSlot, destinationSlot, table)
     } else {
-        RuntimeTableInstruction.TableGrowSs(elements.sourceSlot, value.sourceSlot, destinationSlot, table, max)
+        RuntimeTableInstruction.TableGrowSs(elements.sourceSlot, value.sourceSlot, destinationSlot, table)
     }
     emitTableInstruction(instruction)
 }

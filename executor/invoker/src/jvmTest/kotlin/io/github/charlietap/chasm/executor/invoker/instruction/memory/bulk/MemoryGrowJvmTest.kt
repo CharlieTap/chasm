@@ -34,7 +34,7 @@ class MemoryGrowJvmTest {
             MemoryGrowExecutor(
                 vstack = vstack,
                 context = executionContext(vstack = vstack),
-                instruction = MemoryInstruction.MemoryGrowI(1, 0, memory, MAX_PAGES),
+                instruction = MemoryInstruction.MemoryGrowI(1, 0, memory),
             )
 
             assertEquals(-1L, vstack.getFrameSlot(0))
