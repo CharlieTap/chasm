@@ -89,6 +89,6 @@ everything allocated since the last collection counts; with a tight limit,
 prefer Traditional.
 
 The limit covers the guest heap only. Linear memories and tables have their own
-limits in `StoreLimits`, and Kotlin host values referenced through `externref`
-are not counted.
+limits, described in [Resource limits](./limits.md), and Kotlin host values
+referenced through `externref` are not counted.
 
