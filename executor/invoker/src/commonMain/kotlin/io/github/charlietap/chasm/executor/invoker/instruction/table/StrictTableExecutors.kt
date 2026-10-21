@@ -155,6 +155,7 @@ internal fun TableGrowExecutor(
     instruction: TableInstruction.TableGrowIs,
 ) = executeTableGrow(
     vstack = vstack,
+    context = context,
     table = instruction.table,
     elementsToAdd = instruction.elementsToAdd,
     referenceValue = vstack.getFrameSlot(instruction.referenceValueSlot),
@@ -167,6 +168,7 @@ internal fun TableGrowExecutor(
     instruction: TableInstruction.TableGrowSs,
 ) = executeTableGrow(
     vstack = vstack,
+    context = context,
     table = instruction.table,
     elementsToAdd = vstack.getFrameSlot(instruction.elementsToAddSlot).toInt(),
     referenceValue = vstack.getFrameSlot(instruction.referenceValueSlot),
@@ -357,12 +359,17 @@ private fun executeTableFill(
 
 private fun executeTableGrow(
     vstack: ValueStack,
+    context: ExecutionContext,
     table: TableInstance,
     elementsToAdd: Int,
     referenceValue: Long,
     destinationSlot: Int,
 ) {
-    vstack.setFrameSlot(destinationSlot, table.grow(elementsToAdd, referenceValue).toLong())
+    val previousSize = table.grow(elementsToAdd, referenceValue)
+    if (previousSize < 0 && context.store.config.limits.trapOnGrowFailure) {
+        throw InvocationException(InvocationError.TableGrowFailed)
+    }
+    vstack.setFrameSlot(destinationSlot, previousSize.toLong())
 }
 
 private fun executeTableInit(

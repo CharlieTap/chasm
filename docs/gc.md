@@ -57,3 +57,38 @@ max(configured threshold, 2 * live words, 2 * pending allocation words)
 Reusable swept capacity can satisfy an allocation without another collection.
 If the configured heap is exhausted, Chasm makes one collection attempt before
 reporting guest heap exhaustion as an invocation error.
+
+## Heap limit
+
+`StoreLimits.gcHeapBytes` caps the heap so that a guest cannot exhaust host
+memory by allocating:
+
+```kotlin
+val store = store(
+    StoreConfig(
+        gcStrategy = GCStrategy.TRADITIONAL,
+        limits = StoreLimits(gcHeapBytes = 64L * 1024 * 1024),
+    ),
+)
+```
+
+An allocation that does not fit traps with `GuestHeapOutOfMemory`; the store
+remains usable, and the host can release references or collect before calling
+into it again. Every struct field and array element occupies eight bytes,
+packed `i8` and `i16` values included.
+
+The limit counts the storage the heap has reserved, not just live objects.
+Small objects are placed in 16 KiB pages, and collection makes freed space
+reusable without giving it back, so a limit below 16 KiB admits only large
+arrays.
+
+How much garbage builds up before the limit is reached depends on the
+strategy. Traditional collects before reporting exhaustion, so reclaimable
+garbage is reused first. Arena and Manual never collect during a call, so
+everything allocated since the last collection counts; with a tight limit,
+prefer Traditional.
+
+The limit covers the guest heap only. Linear memories and tables have their own
+limits in `StoreLimits`, and Kotlin host values referenced through `externref`
+are not counted.
+

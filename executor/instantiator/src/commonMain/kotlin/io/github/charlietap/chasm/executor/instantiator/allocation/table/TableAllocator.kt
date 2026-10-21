@@ -14,7 +14,12 @@ fun TableAllocator(
 ): Address.Table {
 
     val elements = LongArray(type.limits.min.toInt()) { reference }
-    val instance = TableInstance(type, elements)
+    val limit = store.config.limits.tableElements
+    val effectiveMaximum = maxOf(
+        elements.size,
+        minOf(TableInstance.declaredMaximumElements(type), limit ?: Int.MAX_VALUE),
+    )
+    val instance = TableInstance(type, elements, effectiveMaximum)
 
     store.tables.add(instance)
 

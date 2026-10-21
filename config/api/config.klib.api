@@ -183,7 +183,7 @@ final class io.github.charlietap.chasm.config/RuntimeConfig { // io.github.charl
 
 final class io.github.charlietap.chasm.config/StoreConfig { // io.github.charlietap.chasm.config/StoreConfig|null[0]
     constructor <init>(kotlin/Boolean = ..., kotlin/Boolean = ...) // io.github.charlietap.chasm.config/StoreConfig.<init>|<init>(kotlin.Boolean;kotlin.Boolean){}[0]
-    constructor <init>(kotlin/Boolean = ..., kotlin/Boolean = ..., io.github.charlietap.chasm.config/GCStrategy? = ..., io.github.charlietap.chasm.config/GCThreshold? = ...) // io.github.charlietap.chasm.config/StoreConfig.<init>|<init>(kotlin.Boolean;kotlin.Boolean;io.github.charlietap.chasm.config.GCStrategy?;io.github.charlietap.chasm.config.GCThreshold?){}[0]
+    constructor <init>(kotlin/Boolean = ..., kotlin/Boolean = ..., io.github.charlietap.chasm.config/GCStrategy? = ..., io.github.charlietap.chasm.config/GCThreshold? = ..., io.github.charlietap.chasm.config/StoreLimits = ...) // io.github.charlietap.chasm.config/StoreConfig.<init>|<init>(kotlin.Boolean;kotlin.Boolean;io.github.charlietap.chasm.config.GCStrategy?;io.github.charlietap.chasm.config.GCThreshold?;io.github.charlietap.chasm.config.StoreLimits){}[0]
 
     final val gcStrategy // io.github.charlietap.chasm.config/StoreConfig.gcStrategy|{}gcStrategy[0]
         final fun <get-gcStrategy>(): io.github.charlietap.chasm.config/GCStrategy? // io.github.charlietap.chasm.config/StoreConfig.gcStrategy.<get-gcStrategy>|<get-gcStrategy>(){}[0]
@@ -191,6 +191,8 @@ final class io.github.charlietap.chasm.config/StoreConfig { // io.github.charlie
         final fun <get-gcThreshold>(): io.github.charlietap.chasm.config/GCThreshold? // io.github.charlietap.chasm.config/StoreConfig.gcThreshold.<get-gcThreshold>|<get-gcThreshold>(){}[0]
     final val interruptible // io.github.charlietap.chasm.config/StoreConfig.interruptible|{}interruptible[0]
         final fun <get-interruptible>(): kotlin/Boolean // io.github.charlietap.chasm.config/StoreConfig.interruptible.<get-interruptible>|<get-interruptible>(){}[0]
+    final val limits // io.github.charlietap.chasm.config/StoreConfig.limits|{}limits[0]
+        final fun <get-limits>(): io.github.charlietap.chasm.config/StoreLimits // io.github.charlietap.chasm.config/StoreConfig.limits.<get-limits>|<get-limits>(){}[0]
     final val meterFuel // io.github.charlietap.chasm.config/StoreConfig.meterFuel|{}meterFuel[0]
         final fun <get-meterFuel>(): kotlin/Boolean // io.github.charlietap.chasm.config/StoreConfig.meterFuel.<get-meterFuel>|<get-meterFuel>(){}[0]
 
@@ -198,9 +200,32 @@ final class io.github.charlietap.chasm.config/StoreConfig { // io.github.charlie
     final fun component2(): kotlin/Boolean // io.github.charlietap.chasm.config/StoreConfig.component2|component2(){}[0]
     final fun component3(): io.github.charlietap.chasm.config/GCStrategy? // io.github.charlietap.chasm.config/StoreConfig.component3|component3(){}[0]
     final fun component4(): io.github.charlietap.chasm.config/GCThreshold? // io.github.charlietap.chasm.config/StoreConfig.component4|component4(){}[0]
+    final fun component5(): io.github.charlietap.chasm.config/StoreLimits // io.github.charlietap.chasm.config/StoreConfig.component5|component5(){}[0]
     final fun copy(kotlin/Boolean = ..., kotlin/Boolean = ...): io.github.charlietap.chasm.config/StoreConfig // io.github.charlietap.chasm.config/StoreConfig.copy|copy(kotlin.Boolean;kotlin.Boolean){}[0]
-    final fun copy(kotlin/Boolean = ..., kotlin/Boolean = ..., io.github.charlietap.chasm.config/GCStrategy? = ..., io.github.charlietap.chasm.config/GCThreshold? = ...): io.github.charlietap.chasm.config/StoreConfig // io.github.charlietap.chasm.config/StoreConfig.copy|copy(kotlin.Boolean;kotlin.Boolean;io.github.charlietap.chasm.config.GCStrategy?;io.github.charlietap.chasm.config.GCThreshold?){}[0]
+    final fun copy(kotlin/Boolean = ..., kotlin/Boolean = ..., io.github.charlietap.chasm.config/GCStrategy? = ..., io.github.charlietap.chasm.config/GCThreshold? = ..., io.github.charlietap.chasm.config/StoreLimits = ...): io.github.charlietap.chasm.config/StoreConfig // io.github.charlietap.chasm.config/StoreConfig.copy|copy(kotlin.Boolean;kotlin.Boolean;io.github.charlietap.chasm.config.GCStrategy?;io.github.charlietap.chasm.config.GCThreshold?;io.github.charlietap.chasm.config.StoreLimits){}[0]
     final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.config/StoreConfig.equals|equals(kotlin.Any?){}[0]
     final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.config/StoreConfig.hashCode|hashCode(){}[0]
     final fun toString(): kotlin/String // io.github.charlietap.chasm.config/StoreConfig.toString|toString(){}[0]
+}
+
+final class io.github.charlietap.chasm.config/StoreLimits { // io.github.charlietap.chasm.config/StoreLimits|null[0]
+    constructor <init>(kotlin/Long? = ..., kotlin/Int? = ..., kotlin/Int? = ..., kotlin/Boolean = ...) // io.github.charlietap.chasm.config/StoreLimits.<init>|<init>(kotlin.Long?;kotlin.Int?;kotlin.Int?;kotlin.Boolean){}[0]
+
+    final val gcHeapBytes // io.github.charlietap.chasm.config/StoreLimits.gcHeapBytes|{}gcHeapBytes[0]
+        final fun <get-gcHeapBytes>(): kotlin/Long? // io.github.charlietap.chasm.config/StoreLimits.gcHeapBytes.<get-gcHeapBytes>|<get-gcHeapBytes>(){}[0]
+    final val memoryPages // io.github.charlietap.chasm.config/StoreLimits.memoryPages|{}memoryPages[0]
+        final fun <get-memoryPages>(): kotlin/Int? // io.github.charlietap.chasm.config/StoreLimits.memoryPages.<get-memoryPages>|<get-memoryPages>(){}[0]
+    final val tableElements // io.github.charlietap.chasm.config/StoreLimits.tableElements|{}tableElements[0]
+        final fun <get-tableElements>(): kotlin/Int? // io.github.charlietap.chasm.config/StoreLimits.tableElements.<get-tableElements>|<get-tableElements>(){}[0]
+    final val trapOnGrowFailure // io.github.charlietap.chasm.config/StoreLimits.trapOnGrowFailure|{}trapOnGrowFailure[0]
+        final fun <get-trapOnGrowFailure>(): kotlin/Boolean // io.github.charlietap.chasm.config/StoreLimits.trapOnGrowFailure.<get-trapOnGrowFailure>|<get-trapOnGrowFailure>(){}[0]
+
+    final fun component1(): kotlin/Long? // io.github.charlietap.chasm.config/StoreLimits.component1|component1(){}[0]
+    final fun component2(): kotlin/Int? // io.github.charlietap.chasm.config/StoreLimits.component2|component2(){}[0]
+    final fun component3(): kotlin/Int? // io.github.charlietap.chasm.config/StoreLimits.component3|component3(){}[0]
+    final fun component4(): kotlin/Boolean // io.github.charlietap.chasm.config/StoreLimits.component4|component4(){}[0]
+    final fun copy(kotlin/Long? = ..., kotlin/Int? = ..., kotlin/Int? = ..., kotlin/Boolean = ...): io.github.charlietap.chasm.config/StoreLimits // io.github.charlietap.chasm.config/StoreLimits.copy|copy(kotlin.Long?;kotlin.Int?;kotlin.Int?;kotlin.Boolean){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.config/StoreLimits.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.config/StoreLimits.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.charlietap.chasm.config/StoreLimits.toString|toString(){}[0]
 }

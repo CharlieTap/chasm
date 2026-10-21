@@ -32,9 +32,20 @@ internal inline fun MemoryAllocator(
     crossinline memoryFactory: LinearMemoryFactory,
 ): Address.Memory {
     val pages = LinearMemory.Pages(type.limits.min.toUInt())
-    val maximumPages = type.limits.max?.let { maximum -> LinearMemory.Pages(maximum.toUInt()) }
+    val limit = store.config.limits.memoryPages
+    // A memory never starts above its maximum; the instantiator rejects
+    // modules whose memories exceed the limit before reaching here.
+    val effectiveMaximum = maxOf(
+        type.limits.min.toInt(),
+        minOf(MemoryInstance.declaredMaximumPages(type), limit ?: Int.MAX_VALUE),
+    )
+    val maximumPages = if (type.limits.max == null && limit == null) {
+        null
+    } else {
+        LinearMemory.Pages(effectiveMaximum.toUInt())
+    }
     val memory = memoryFactory(pages, maximumPages, config)
-    val instance = MemoryInstance(type, memory)
+    val instance = MemoryInstance(type, memory, effectiveMaximum)
 
     store.memories.add(instance)
 

@@ -99,21 +99,27 @@ class GarbageCollectedHeap(
 
     /**
      * [maximumPageCount] sets the payload limit for ordinary pages and dedicated
-     * arrays. [initialPageDirectoryCapacity] includes page zero. Both initial
-     * directory capacities grow as needed.
+     * arrays, and [maximumPayloadWords] tightens it to a word budget that need
+     * not be a whole number of pages. [initialPageDirectoryCapacity] includes
+     * page zero. Both initial directory capacities grow as needed.
      */
     class Configuration(
         initialPageDirectoryCapacity: Int = DEFAULT_INITIAL_PAGE_DIRECTORY_CAPACITY,
         initialDescriptorDirectoryCapacity: Int = DEFAULT_INITIAL_DESCRIPTOR_DIRECTORY_CAPACITY,
         maximumPageCount: Int = MAXIMUM_PAGE_COUNT,
+        maximumPayloadWords: Long = maximumPageCount.toLong() * PAGE_WORDS,
     ) {
         internal val initialPageDirectoryCapacity = initialPageDirectoryCapacity
         internal val initialDescriptorDirectoryCapacity = initialDescriptorDirectoryCapacity
         internal val maximumPageCount = maximumPageCount
+        internal val maximumPayloadWords = minOf(maximumPayloadWords, maximumPageCount.toLong() * PAGE_WORDS)
 
         init {
             require(maximumPageCount in 1..MAXIMUM_PAGE_COUNT) {
                 "maximumPageCount must be between 1 and $MAXIMUM_PAGE_COUNT"
+            }
+            require(maximumPayloadWords >= 0) {
+                "maximumPayloadWords must not be negative"
             }
             require(initialPageDirectoryCapacity in 2..maximumPageCount + 1) {
                 "initialPageDirectoryCapacity must include page zero and fit maximumPageCount"
@@ -163,6 +169,7 @@ class GarbageCollectedHeap(
     )
 
     private val maximumPageCount = configuration.maximumPageCount
+    private val retainedWordLimit = configuration.maximumPayloadWords
     private var pages = arrayOfNulls<Page>(configuration.initialPageDirectoryCapacity)
     private var pageIdTop = 1
     private var activePageIds = IntArray(configuration.initialPageDirectoryCapacity - 1)
@@ -336,7 +343,7 @@ class GarbageCollectedHeap(
 
     fun allocatedPayloadWords(): Long = allocatedSlotWords
 
-    fun maximumPayloadWords(): Long = maximumPageCount.toLong() * PAGE_WORDS
+    fun maximumPayloadWords(): Long = retainedWordLimit
 
     fun fixedAllocationSlotWords(descriptorKey: Int): Int {
         val descriptor = requireNotNull(fixedDescriptor(descriptorKey)) {
@@ -378,7 +385,6 @@ class GarbageCollectedHeap(
         validateArrayLength(length)
         if (length >= ARRAY_DEDICATED_CUTOFF) {
             val requestedWords = length + 1
-            val retainedWordLimit = maximumPayloadWords()
             val hasPayloadCapacity =
                 payloadWords.size.toLong() + dedicatedPayloadWords + requestedWords <= retainedWordLimit
             val hasIdCapacity =
@@ -1611,7 +1617,6 @@ class GarbageCollectedHeap(
     }
 
     private fun requireDedicatedCapacity(requestedWords: Int) {
-        val retainedWordLimit = maximumPageCount.toLong() * PAGE_WORDS
         if (payloadWords.size + dedicatedPayloadWords + requestedWords > retainedWordLimit) {
             throw GuestHeapOutOfMemoryException("retained guest payload capacity exhausted")
         }
@@ -2005,7 +2010,6 @@ class GarbageCollectedHeap(
         val requiredWords = requiredPageCount.toLong() * PAGE_WORDS
         if (requiredWords <= payloadWords.size) return payloadWords
 
-        val retainedWordLimit = maximumPageCount.toLong() * PAGE_WORDS
         val maximumWords = retainedWordLimit - dedicatedPayloadWords
         if (requiredWords > maximumWords) {
             throw GuestHeapOutOfMemoryException("retained guest payload capacity exhausted")
@@ -2420,9 +2424,9 @@ class GarbageCollectedHeap(
         check(pages[0] == null)
         check(pageIdTop in 1..pages.size)
         check(payloadWords.size and PAGE_MASK == 0)
-        check(payloadWords.size.toLong() <= maximumPageCount.toLong() * PAGE_WORDS)
+        check(payloadWords.size.toLong() <= retainedWordLimit)
         check((pageIdTop - 1).toLong() * PAGE_WORDS <= payloadWords.size)
-        check(payloadWords.size + dedicatedPayloadWords <= maximumPageCount.toLong() * PAGE_WORDS)
+        check(payloadWords.size + dedicatedPayloadWords <= retainedWordLimit)
         check(activePageCount in 0..activePageIds.size)
         check(recycledPageCount in 0..recycledPageIds.size)
         check(dedicatedPayloads[0] == null)

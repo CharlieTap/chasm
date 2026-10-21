@@ -294,6 +294,8 @@ private fun reasonOf(error: InvocationError): TrapReason = when (error) {
     InvocationError.ArrayOperationOutOfBounds -> TrapReason.ARRAY_OUT_OF_BOUNDS
     InvocationError.CallStackExhausted -> TrapReason.CALL_STACK_EXHAUSTED
     InvocationError.GuestHeapOutOfMemory -> TrapReason.GUEST_HEAP_EXHAUSTED
+    InvocationError.MemoryGrowFailed -> TrapReason.MEMORY_GROW_FAILED
+    InvocationError.TableGrowFailed -> TrapReason.TABLE_GROW_FAILED
     InvocationError.FuelExhausted -> TrapReason.FUEL_EXHAUSTED
     InvocationError.Interrupted -> TrapReason.INTERRUPTED
     is InvocationError.HostFunctionError,

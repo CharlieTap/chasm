@@ -29,4 +29,10 @@ sealed interface InstantiationError : ModuleTrapError {
     data object UnsupportedSIMDModule : InstantiationError
 
     data object UnsupportedThreadsModule : InstantiationError
+
+    @JvmInline
+    value class MemoryLimitExceeded(val maximumPages: Int) : InstantiationError
+
+    @JvmInline
+    value class TableLimitExceeded(val maximumElements: Int) : InstantiationError
 }

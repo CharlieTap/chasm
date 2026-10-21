@@ -1,5 +1,7 @@
 package io.github.charlietap.chasm.host
 
+import io.github.charlietap.chasm.config.StoreConfig
+import io.github.charlietap.chasm.config.StoreLimits
 import io.github.charlietap.chasm.fixture.runtime.execution.executionContext
 import io.github.charlietap.chasm.fixture.runtime.instance.memoryAddress
 import io.github.charlietap.chasm.fixture.runtime.instance.memoryInstance
@@ -76,5 +78,59 @@ class HostGrowthExtensionsTest {
 
         assertContentEquals(longArrayOf(7L, 9L, 11L, 11L), tableInstance.elements)
         assertEquals(4u, tableInstance.type.limits.min)
+    }
+
+    @Test
+    fun `host memory growth past the store limit returns minus one even when guest growth traps`() {
+        val memory = LinearMemoryFactory(LinearMemory.Pages(1u), LinearMemory.Pages(2u))
+        val targetInstance = memoryInstance(
+            type = memoryType(limits = limits(min = 1u, max = 10u)),
+            data = memory,
+            maximumPages = 2,
+        )
+        val store = store(
+            memories = mutableListOf(targetInstance),
+            config = StoreConfig(limits = StoreLimits(memoryPages = 2, trapOnGrowFailure = true)),
+        )
+        val module = moduleInstance(memAddresses = mutableListOf(memoryAddress(0)))
+        val resources = executionContext(store = store)
+
+        context(module, resources) {
+            withMemory(0) {
+                assertEquals(1, grow(1))
+                assertEquals(-1, grow(1))
+                assertSame(memory, this)
+                assertEquals(PAGE_SIZE * 2, byteSize)
+            }
+        }
+
+        assertSame(memory, targetInstance.data)
+        assertEquals(2u, targetInstance.type.limits.min)
+    }
+
+    @Test
+    fun `host table growth past the store limit returns minus one and keeps the elements`() {
+        val tableInstance = tableInstance(
+            type = tableType(limits = limits(min = 2u)),
+            elements = longArrayOf(7L, 9L),
+            maximumElements = 3,
+        )
+        val store = store(
+            tables = mutableListOf(tableInstance),
+            config = StoreConfig(limits = StoreLimits(tableElements = 3, trapOnGrowFailure = true)),
+        )
+        val module = moduleInstance(tableAddresses = mutableListOf(tableAddress()))
+        val resources = executionContext(store = store)
+
+        context(module, resources) {
+            withTable(0) {
+                assertEquals(-1, grow(2, 11L))
+                assertEquals(2, grow(1, 11L))
+                assertEquals(3, size)
+            }
+        }
+
+        assertContentEquals(longArrayOf(7L, 9L, 11L), tableInstance.elements)
+        assertEquals(3u, tableInstance.type.limits.min)
     }
 }

@@ -3,6 +3,8 @@ package io.github.charlietap.chasm.executor.invoker.instruction.memory.bulk
 import io.github.charlietap.chasm.memory.copy.LinearMemoryCopier
 import io.github.charlietap.chasm.memory.fill.LinearMemoryFiller
 import io.github.charlietap.chasm.memory.init.LinearMemoryInitialiser
+import io.github.charlietap.chasm.runtime.error.InvocationError
+import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.instance.DataInstance
 import io.github.charlietap.chasm.runtime.instance.MemoryInstance
@@ -15,6 +17,7 @@ internal fun MemoryGrowExecutor(
     instruction: MemoryInstruction.MemoryGrowI,
 ) = executeMemoryGrow(
     vstack = vstack,
+    context = context,
     pagesToAdd = instruction.pagesToAdd,
     destinationSlot = instruction.destinationSlot,
     memory = instruction.memory,
@@ -26,6 +29,7 @@ internal fun MemoryGrowExecutor(
     instruction: MemoryInstruction.MemoryGrowS,
 ) = executeMemoryGrow(
     vstack = vstack,
+    context = context,
     pagesToAdd = vstack.getFrameSlot(instruction.pagesToAddSlot).toInt(),
     destinationSlot = instruction.destinationSlot,
     memory = instruction.memory,
@@ -625,11 +629,16 @@ internal inline fun MemoryFillExecutor(
 
 private inline fun executeMemoryGrow(
     vstack: ValueStack,
+    context: ExecutionContext,
     pagesToAdd: Int,
     destinationSlot: Int,
     memory: MemoryInstance,
 ) {
-    vstack.setFrameSlot(destinationSlot, memory.grow(pagesToAdd).toLong())
+    val previousSize = memory.grow(pagesToAdd)
+    if (previousSize < 0 && context.store.config.limits.trapOnGrowFailure) {
+        throw InvocationException(InvocationError.MemoryGrowFailed)
+    }
+    vstack.setFrameSlot(destinationSlot, previousSize.toLong())
 }
 
 private inline fun executeMemoryInit(

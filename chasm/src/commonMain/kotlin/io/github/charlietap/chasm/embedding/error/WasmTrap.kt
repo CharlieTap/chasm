@@ -159,6 +159,8 @@ value class TrapReason private constructor(val description: String) {
         val ARRAY_OUT_OF_BOUNDS = TrapReason("array out of bounds")
         val CALL_STACK_EXHAUSTED = TrapReason("call stack exhausted")
         val GUEST_HEAP_EXHAUSTED = TrapReason("guest heap exhausted")
+        val MEMORY_GROW_FAILED = TrapReason("memory grow failed")
+        val TABLE_GROW_FAILED = TrapReason("table grow failed")
         val FUEL_EXHAUSTED = TrapReason("fuel exhausted")
         val INTERRUPTED = TrapReason("interrupted")
         val HOST_FUNCTION_FAILURE = TrapReason("host function failed")

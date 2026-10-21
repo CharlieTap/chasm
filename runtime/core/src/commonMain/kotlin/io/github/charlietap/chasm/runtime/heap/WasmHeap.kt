@@ -59,7 +59,7 @@ import io.github.charlietap.chasm.type.VectorType
 class WasmHeap internal constructor(
     private val garbageCollectedHeap: GarbageCollectedHeap,
 ) : HostReferences, HostGc, HostExterns, HostExceptions, GcHostReferenceMarker {
-    constructor() : this(GarbageCollectedHeap())
+    constructor(maximumBytes: Long? = null) : this(GarbageCollectedHeap(heapConfiguration(maximumBytes)))
 
     private val runtimeTypes = RuntimeTypeRegistry()
     private var tagInstances = arrayOfNulls<TagInstance>(0)
@@ -1542,3 +1542,10 @@ class WasmHeap internal constructor(
             (HEAP_TYPE_EXTERN.toLong() shl RV_SHIFT_BITS) or RV_TYPE_NULL
     }
 }
+
+private fun heapConfiguration(maximumBytes: Long?): GarbageCollectedHeap.Configuration =
+    if (maximumBytes == null) {
+        GarbageCollectedHeap.Configuration()
+    } else {
+        GarbageCollectedHeap.Configuration(maximumPayloadWords = maximumBytes / Long.SIZE_BYTES)
+    }

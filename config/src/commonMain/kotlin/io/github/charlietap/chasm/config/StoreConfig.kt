@@ -14,22 +14,24 @@ package io.github.charlietap.chasm.config
  * @property gcThreshold sets how much the store's GC heap may hold before an automatic
  * collection. When `null`, each instance uses the threshold from the [RuntimeConfig] it was
  * instantiated with.
+ * @property limits bounds the memory that code running in the store can consume.
  */
 data class StoreConfig(
     val meterFuel: Boolean = false,
     val interruptible: Boolean = false,
     val gcStrategy: GCStrategy? = null,
     val gcThreshold: GCThreshold? = null,
+    val limits: StoreLimits = StoreLimits(),
 ) {
     @Deprecated("Kept for binary compatibility", level = DeprecationLevel.HIDDEN)
     constructor(
         meterFuel: Boolean = false,
         interruptible: Boolean = false,
-    ) : this(meterFuel, interruptible, null, null)
+    ) : this(meterFuel, interruptible, null, null, StoreLimits())
 
     @Deprecated("Kept for binary compatibility", level = DeprecationLevel.HIDDEN)
     fun copy(
         meterFuel: Boolean = this.meterFuel,
         interruptible: Boolean = this.interruptible,
-    ): StoreConfig = copy(meterFuel, interruptible, gcStrategy, gcThreshold)
+    ): StoreConfig = copy(meterFuel, interruptible, gcStrategy, gcThreshold, limits)
 }

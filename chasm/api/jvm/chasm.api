@@ -397,9 +397,11 @@ public final class io/github/charlietap/chasm/embedding/error/TrapReason$Compani
 	public final fun getINTEGER_OVERFLOW-DDcXK-Q ()Ljava/lang/String;
 	public final fun getINTERRUPTED-DDcXK-Q ()Ljava/lang/String;
 	public final fun getINVALID_CONVERSION-DDcXK-Q ()Ljava/lang/String;
+	public final fun getMEMORY_GROW_FAILED-DDcXK-Q ()Ljava/lang/String;
 	public final fun getMEMORY_OUT_OF_BOUNDS-DDcXK-Q ()Ljava/lang/String;
 	public final fun getNULL_REFERENCE-DDcXK-Q ()Ljava/lang/String;
 	public final fun getOTHER-DDcXK-Q ()Ljava/lang/String;
+	public final fun getTABLE_GROW_FAILED-DDcXK-Q ()Ljava/lang/String;
 	public final fun getTABLE_OUT_OF_BOUNDS-DDcXK-Q ()Ljava/lang/String;
 	public final fun getUNCAUGHT_EXCEPTION-DDcXK-Q ()Ljava/lang/String;
 	public final fun getUNREACHABLE-DDcXK-Q ()Ljava/lang/String;

@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.fixture.runtime
 
+import io.github.charlietap.chasm.config.StoreConfig
 import io.github.charlietap.chasm.runtime.instance.DataInstance
 import io.github.charlietap.chasm.runtime.instance.ElementInstance
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
@@ -17,6 +18,7 @@ fun store(
     memories: MutableList<MemoryInstance> = [],
     tables: MutableList<TableInstance> = [],
     program: Program = Program(),
+    config: StoreConfig = StoreConfig(),
 ) = Store(
     data = data,
     elements = elements,
@@ -25,4 +27,5 @@ fun store(
     memories = memories,
     tables = tables,
     program = program,
+    config = config,
 )

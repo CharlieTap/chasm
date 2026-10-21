@@ -19,7 +19,7 @@ class Store(
     val data: MutableList<DataInstance> = [],
     val program: Program = Program(),
     val config: StoreConfig = StoreConfig(),
-    val heap: WasmHeap = WasmHeap(),
+    val heap: WasmHeap = WasmHeap(config.limits.gcHeapBytes),
     val fuel: Fuel = Fuel(metered = config.meterFuel),
     val interrupt: Interrupt = Interrupt(enabled = config.interruptible),
 )

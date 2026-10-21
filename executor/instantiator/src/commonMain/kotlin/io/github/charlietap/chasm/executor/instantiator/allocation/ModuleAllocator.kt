@@ -2,6 +2,8 @@
 
 package io.github.charlietap.chasm.executor.instantiator.allocation
 
+import com.github.michaelbull.result.Err
+import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import com.github.michaelbull.result.toResultOr
@@ -17,6 +19,7 @@ import io.github.charlietap.chasm.executor.instantiator.allocation.memory.Memory
 import io.github.charlietap.chasm.executor.instantiator.allocation.table.TableAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.tag.TagAllocator
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
+import io.github.charlietap.chasm.runtime.error.InstantiationError
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.ext.addDataAddress
 import io.github.charlietap.chasm.runtime.ext.addElementAddress
@@ -180,4 +183,24 @@ internal inline fun AllocateModuleExports(
         val externalValue = exportAllocator(context, export.descriptor).bind()
         instance.addExport(ExportInstance(export.name, externalValue))
     }
+}
+
+// Runs before instantiation touches the store, so a module the store cannot
+// hold leaves no functions, types or initial memory and table storage behind.
+internal fun checkStoreLimits(
+    store: Store,
+    module: Module,
+): Result<Unit, ModuleTrapError> {
+    val limits = store.config.limits
+    val memoryPages = limits.memoryPages
+    if (memoryPages != null) {
+        val exceeded = module.memories.any { memory -> memory.type.limits.min > memoryPages.toULong() }
+        if (exceeded) return Err(InstantiationError.MemoryLimitExceeded(memoryPages))
+    }
+    val tableElements = limits.tableElements
+    if (tableElements != null) {
+        val exceeded = module.tables.any { table -> table.type.limits.min > tableElements.toULong() }
+        if (exceeded) return Err(InstantiationError.TableLimitExceeded(tableElements))
+    }
+    return Ok(Unit)
 }

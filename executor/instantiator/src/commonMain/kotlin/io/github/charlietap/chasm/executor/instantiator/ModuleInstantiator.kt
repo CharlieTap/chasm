@@ -7,6 +7,7 @@ import io.github.charlietap.chasm.compiler.diagnostic.CompilerDiagnostics
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.executor.instantiator.allocation.ModuleAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.PartialModuleAllocator
+import io.github.charlietap.chasm.executor.instantiator.allocation.checkStoreLimits
 import io.github.charlietap.chasm.executor.instantiator.allocation.type.TypeAllocator
 import io.github.charlietap.chasm.executor.instantiator.compat.CompatibilityChecker
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
@@ -119,6 +120,7 @@ internal inline fun PrepareModuleInstantiation(
 ): Result<ModuleInstantiationPreparation, ModuleTrapError> = binding {
 
     compatibilityChecker(module).bind()
+    checkStoreLimits(store, module).bind()
 
     val runtimeTypes = typeAllocator(module, store)
 

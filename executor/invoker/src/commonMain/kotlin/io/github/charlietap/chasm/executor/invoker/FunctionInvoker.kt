@@ -8,6 +8,7 @@ import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.executor.invoker.function.withHostCallbackScope
 import io.github.charlietap.chasm.executor.invoker.thread.ThreadExecutor
 import io.github.charlietap.chasm.executor.invoker.thread.TraceableThreadExecutor
+import io.github.charlietap.chasm.gc.GuestHeapOutOfMemoryException
 import io.github.charlietap.chasm.host.HostFunctionException
 import io.github.charlietap.chasm.host.UnsafeHostApi
 import io.github.charlietap.chasm.runtime.address.Address
@@ -137,6 +138,8 @@ private inline fun invokeFunction(
                 Err(InvocationError.ThrownException)
             } catch (e: HostFunctionException) {
                 Err(InvocationError.HostFunctionError(e.reason))
+            } catch (_: GuestHeapOutOfMemoryException) {
+                Err(InvocationError.GuestHeapOutOfMemory)
             }
         }
         is FunctionInstance.WasmFunction -> binding {

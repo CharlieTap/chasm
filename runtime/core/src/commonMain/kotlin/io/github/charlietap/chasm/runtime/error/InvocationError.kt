@@ -171,6 +171,8 @@ sealed interface InvocationError : ModuleTrapError {
 
     data object GuestHeapOutOfMemory : InvocationError
 
+    data object TableGrowFailed : InvocationError
+
     data object FuelExhausted : InvocationError
 
     data object Interrupted : InvocationError
