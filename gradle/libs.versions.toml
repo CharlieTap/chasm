@@ -14,7 +14,7 @@ java-library-bytecode-version = "17"
 android-library-bytecode-version = "11"
 java-plugin-bytecode-version = "17"
 
-android-build-tools-plugin = "9.3.1"
+android-build-tools-plugin = "9.4.1"
 minimum-android-build-tools-plugin = "9.0.1"
 minimum-android-compile-sdk = "36"
 build-config-plugin = "6.0.10"

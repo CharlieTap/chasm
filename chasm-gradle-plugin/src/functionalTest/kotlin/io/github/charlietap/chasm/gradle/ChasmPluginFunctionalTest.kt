@@ -1973,7 +1973,7 @@ class ChasmPluginFunctionalTest {
             gradleVersion?.let(runner::withGradleVersion)
             return runner.build().also { result ->
                 if (warningMode == WarningMode.KNOWN_AGP_DEPRECATION) {
-                    // AGP 9.3.1 calls setVisible; Gradle 9.8 now consistently reports it.
+                    // AGP 9 calls setVisible; Gradle 9.8 now consistently reports it.
                     val unexpectedDeprecations = result.output.lineSequence()
                         .filter { it.contains("deprecat", ignoreCase = true) }
                         .filterNot { line ->
