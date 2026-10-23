@@ -17,7 +17,8 @@ android {
     defaultConfig {
 
         applicationId = libs.versions.application.id.get()
-        minSdk = libs.versions.min.sdk.get().toInt()
+        // Metro's metrox-android needs API 28, one above Chasm's own minimum.
+        minSdk = maxOf(libs.versions.min.sdk.get().toInt(), 28)
         targetSdk = libs.versions.target.sdk.get().toInt()
         versionName = libs.versions.version.name.get()
 
