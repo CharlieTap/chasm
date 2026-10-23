@@ -1,0 +1,439 @@
+public abstract interface class io/github/charlietap/chasm/host/ByteArrayHostMemory : io/github/charlietap/chasm/host/HostMemory {
+	public abstract fun unsafeBorrowByteArray ()[B
+}
+
+public final class io/github/charlietap/chasm/host/HostContextExtensionsKt {
+	public static final fun withExceptions (Lio/github/charlietap/chasm/host/HostResources;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun withExterns (Lio/github/charlietap/chasm/host/HostResources;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun withGc (Lio/github/charlietap/chasm/host/HostResources;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun withGlobal (Lio/github/charlietap/chasm/host/HostModuleInstance;Lio/github/charlietap/chasm/host/HostResources;ILkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun withGlobal-uPsiw88 (Lio/github/charlietap/chasm/host/HostModuleInstance;Lio/github/charlietap/chasm/host/HostResources;ILkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun withMemory (Lio/github/charlietap/chasm/host/HostModuleInstance;Lio/github/charlietap/chasm/host/HostResources;ILkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public static final fun withMemory-rS8l3Lg (Lio/github/charlietap/chasm/host/HostModuleInstance;Lio/github/charlietap/chasm/host/HostResources;ILkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public static final fun withReferences (Lio/github/charlietap/chasm/host/HostResources;ILkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static synthetic fun withReferences$default (Lio/github/charlietap/chasm/host/HostResources;ILkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ljava/lang/Object;
+	public static final fun withTable (Lio/github/charlietap/chasm/host/HostModuleInstance;Lio/github/charlietap/chasm/host/HostResources;ILkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public static final fun withTable-TRVmjgw (Lio/github/charlietap/chasm/host/HostModuleInstance;Lio/github/charlietap/chasm/host/HostResources;ILkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public static final fun withTag (Lio/github/charlietap/chasm/host/HostModuleInstance;Lio/github/charlietap/chasm/host/HostResources;ILkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun withTag-Bg0A7HA (Lio/github/charlietap/chasm/host/HostModuleInstance;Lio/github/charlietap/chasm/host/HostResources;ILkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+}
+
+public final class io/github/charlietap/chasm/host/HostException {
+	public static final synthetic fun box-impl (J)Lio/github/charlietap/chasm/host/HostException;
+	public static fun constructor-impl (J)J
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (JLjava/lang/Object;)Z
+	public static final fun equals-impl0 (JJ)Z
+	public final fun getRawReference ()J
+	public fun hashCode ()I
+	public static fun hashCode-impl (J)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (J)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()J
+}
+
+public abstract interface class io/github/charlietap/chasm/host/HostExceptions {
+	public abstract fun create-jDW8ye0 (Lio/github/charlietap/chasm/host/HostResources;I[JI)J
+	public abstract fun getHasPending ()Z
+	public abstract fun payloadSize-4DeFWus (J)I
+	public abstract fun raise-4DeFWus (J)Ljava/lang/Void;
+	public abstract fun raisePending ()Ljava/lang/Void;
+	public abstract fun readPayload-VUYYV5o (JI[JII)[J
+	public abstract fun readPayload-nvx_kU4 (JI)J
+	public abstract fun tag-Y91bqTg (J)I
+	public abstract fun takePending-EyTNJns ()J
+}
+
+public final class io/github/charlietap/chasm/host/HostExceptionsKt {
+	public static final fun createException-sCw2Xk4 ([JLio/github/charlietap/chasm/host/HostResources;II)J
+	public static final fun raise-UAKqVcM (Lio/github/charlietap/chasm/host/HostResources;J)Ljava/lang/Void;
+	public static final fun raise-sCw2Xk4 ([JLio/github/charlietap/chasm/host/HostResources;II)Ljava/lang/Void;
+}
+
+public final class io/github/charlietap/chasm/host/HostExternKind {
+	public static final field Companion Lio/github/charlietap/chasm/host/HostExternKind$Companion;
+	public static final synthetic fun box-impl (I)Lio/github/charlietap/chasm/host/HostExternKind;
+	public static fun constructor-impl (I)I
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (ILjava/lang/Object;)Z
+	public static final fun equals-impl0 (II)Z
+	public final fun getId ()I
+	public fun hashCode ()I
+	public static fun hashCode-impl (I)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (I)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()I
+}
+
+public final class io/github/charlietap/chasm/host/HostExternKind$Companion {
+	public final fun getEXTERNALIZED_REFERENCE-loPX09w ()I
+	public final fun getHOST_VALUE-loPX09w ()I
+	public final fun getNULL-loPX09w ()I
+}
+
+public final class io/github/charlietap/chasm/host/HostExternReference {
+	public static final synthetic fun box-impl (J)Lio/github/charlietap/chasm/host/HostExternReference;
+	public static fun constructor-impl (J)J
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (JLjava/lang/Object;)Z
+	public static final fun equals-impl0 (JJ)Z
+	public final fun getRaw ()J
+	public fun hashCode ()I
+	public static fun hashCode-impl (J)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (J)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()J
+}
+
+public abstract interface class io/github/charlietap/chasm/host/HostExterns {
+	public abstract fun create-B_G5d2c (Lio/github/charlietap/chasm/host/HostResources;Ljava/lang/Object;)J
+	public abstract fun externalize-HlTrvjQ (J)J
+	public abstract fun externalizedReference-vIBlfvE (J)J
+	public abstract fun kind-YKMCaqk (J)I
+	public abstract fun nullReference-WvoliTw ()J
+	public abstract fun value-vIBlfvE (J)Ljava/lang/Object;
+}
+
+public final class io/github/charlietap/chasm/host/HostExternsKt {
+	public static final fun createNullable (Lio/github/charlietap/chasm/host/HostResources;Lio/github/charlietap/chasm/host/HostExterns;Ljava/lang/Object;)J
+	public static final fun createRetained (Lio/github/charlietap/chasm/host/HostResources;Lio/github/charlietap/chasm/host/HostExterns;Ljava/lang/Object;)I
+}
+
+public abstract interface class io/github/charlietap/chasm/host/HostFunction {
+	public abstract fun invoke ([JLio/github/charlietap/chasm/host/HostModuleInstance;Lio/github/charlietap/chasm/host/HostResources;II)V
+}
+
+public final class io/github/charlietap/chasm/host/HostFunctionException : java/lang/Exception {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun getReason ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/charlietap/chasm/host/HostGc {
+	public abstract fun allocateArray-ZQKKFEA (Lio/github/charlietap/chasm/host/HostResources;I[JII)J
+	public static synthetic fun allocateArray-ZQKKFEA$default (Lio/github/charlietap/chasm/host/HostGc;Lio/github/charlietap/chasm/host/HostResources;I[JIIILjava/lang/Object;)J
+	public abstract fun allocateArray-jKMjgpE (Lio/github/charlietap/chasm/host/HostResources;IIJ)J
+	public abstract fun allocateStruct-jKMjgpE (Lio/github/charlietap/chasm/host/HostResources;I[JI)J
+	public static synthetic fun allocateStruct-jKMjgpE$default (Lio/github/charlietap/chasm/host/HostGc;Lio/github/charlietap/chasm/host/HostResources;I[JIILjava/lang/Object;)J
+	public abstract fun arrayElementInfo-hoROfXE (I)I
+	public abstract fun arrayLength (J)I
+	public abstract fun arrayType-QF3mtew (J)I
+	public abstract fun collect (Lio/github/charlietap/chasm/host/HostResources;)V
+	public abstract fun collect (Lio/github/charlietap/chasm/host/HostResources;[JII)V
+	public static synthetic fun collect$default (Lio/github/charlietap/chasm/host/HostGc;Lio/github/charlietap/chasm/host/HostResources;[JIIILjava/lang/Object;)V
+	public abstract fun copyArray (JIJII)V
+	public abstract fun fillArray (JIIJ)V
+	public abstract fun getAllocatedBytes ()J
+	public abstract fun isSubtype-hm7B2HE (II)Z
+	public abstract fun readArrayElement (JI)J
+	public abstract fun readArrayElements (JI[JII)[J
+	public abstract fun readStructField (JI)J
+	public abstract fun runtimeType-y4m60lM (Lio/github/charlietap/chasm/host/HostModuleInstance;I)I
+	public abstract fun structFieldCount-wsPCB8A (I)I
+	public abstract fun structFieldInfo-JSNsNYI (II)I
+	public abstract fun structType-QF3mtew (J)I
+	public abstract fun writeArrayElement (JIJ)V
+	public abstract fun writeArrayElements (JI[JII)V
+	public abstract fun writeStructField (JIJ)V
+}
+
+public final class io/github/charlietap/chasm/host/HostGc$DefaultImpls {
+	public static synthetic fun allocateArray-ZQKKFEA$default (Lio/github/charlietap/chasm/host/HostGc;Lio/github/charlietap/chasm/host/HostResources;I[JIIILjava/lang/Object;)J
+	public static synthetic fun allocateStruct-jKMjgpE$default (Lio/github/charlietap/chasm/host/HostGc;Lio/github/charlietap/chasm/host/HostResources;I[JIILjava/lang/Object;)J
+	public static synthetic fun collect$default (Lio/github/charlietap/chasm/host/HostGc;Lio/github/charlietap/chasm/host/HostResources;[JIIILjava/lang/Object;)V
+}
+
+public final class io/github/charlietap/chasm/host/HostGcFieldInfo {
+	public static final field Companion Lio/github/charlietap/chasm/host/HostGcFieldInfo$Companion;
+	public static final field F32 I
+	public static final field F64 I
+	public static final field I32 I
+	public static final field I64 I
+	public static final field MUTABLE_MASK I
+	public static final field PACKED_I16 I
+	public static final field PACKED_I8 I
+	public static final field REFERENCE I
+	public static final field STORAGE_KIND_MASK I
+	public static final field V128 I
+	public static final synthetic fun box-impl (I)Lio/github/charlietap/chasm/host/HostGcFieldInfo;
+	public static fun constructor-impl (I)I
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (ILjava/lang/Object;)Z
+	public static final fun equals-impl0 (II)Z
+	public final fun getEncoding ()I
+	public static final fun getMutable-impl (I)Z
+	public static final fun getStorageKind-impl (I)I
+	public fun hashCode ()I
+	public static fun hashCode-impl (I)I
+	public static final fun isF32-impl (I)Z
+	public static final fun isF64-impl (I)Z
+	public static final fun isI32-impl (I)Z
+	public static final fun isI64-impl (I)Z
+	public static final fun isPackedI16-impl (I)Z
+	public static final fun isPackedI8-impl (I)Z
+	public static final fun isReference-impl (I)Z
+	public static final fun isV128-impl (I)Z
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (I)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()I
+}
+
+public final class io/github/charlietap/chasm/host/HostGcFieldInfo$Companion {
+}
+
+public final class io/github/charlietap/chasm/host/HostGcType {
+	public static final synthetic fun box-impl (I)Lio/github/charlietap/chasm/host/HostGcType;
+	public static fun constructor-impl (I)I
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (ILjava/lang/Object;)Z
+	public static final fun equals-impl0 (II)Z
+	public final fun getId ()I
+	public fun hashCode ()I
+	public static fun hashCode-impl (I)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (I)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()I
+}
+
+public abstract interface class io/github/charlietap/chasm/host/HostGlobal {
+	public abstract fun getRawValue ()J
+	public abstract fun setRawValue (J)V
+}
+
+public abstract interface class io/github/charlietap/chasm/host/HostMemory {
+	public abstract fun copy (IIILio/github/charlietap/chasm/host/HostMemory;)V
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/host/HostMemory;IIILio/github/charlietap/chasm/host/HostMemory;ILjava/lang/Object;)V
+	public abstract fun fill (IBI)V
+	public abstract fun getByteSize ()I
+	public abstract fun move (IIILio/github/charlietap/chasm/host/HostMemory;)V
+	public static synthetic fun move$default (Lio/github/charlietap/chasm/host/HostMemory;IIILio/github/charlietap/chasm/host/HostMemory;ILjava/lang/Object;)V
+	public abstract fun read ([BIII)[B
+	public static synthetic fun read$default (Lio/github/charlietap/chasm/host/HostMemory;[BIIIILjava/lang/Object;)[B
+	public abstract fun readF32 (I)F
+	public abstract fun readF64 (I)D
+	public abstract fun readI16 (I)S
+	public abstract fun readI32 (I)I
+	public abstract fun readI64 (I)J
+	public abstract fun readI8 (I)B
+	public abstract fun write (I[BII)V
+	public static synthetic fun write$default (Lio/github/charlietap/chasm/host/HostMemory;I[BIIILjava/lang/Object;)V
+	public abstract fun writeF32 (IF)V
+	public abstract fun writeF64 (ID)V
+	public abstract fun writeI16 (IS)V
+	public abstract fun writeI32 (II)V
+	public abstract fun writeI64 (IJ)V
+	public abstract fun writeI8 (IB)V
+}
+
+public final class io/github/charlietap/chasm/host/HostMemory$DefaultImpls {
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/host/HostMemory;IIILio/github/charlietap/chasm/host/HostMemory;ILjava/lang/Object;)V
+	public static synthetic fun move$default (Lio/github/charlietap/chasm/host/HostMemory;IIILio/github/charlietap/chasm/host/HostMemory;ILjava/lang/Object;)V
+	public static synthetic fun read$default (Lio/github/charlietap/chasm/host/HostMemory;[BIIIILjava/lang/Object;)[B
+	public static synthetic fun write$default (Lio/github/charlietap/chasm/host/HostMemory;I[BIIILjava/lang/Object;)V
+}
+
+public final class io/github/charlietap/chasm/host/HostMemoryExtensionsKt {
+	public static final fun readNullTerminatedUtf8String (Lio/github/charlietap/chasm/host/HostMemory;I)Ljava/lang/String;
+	public static final fun readU16 (Lio/github/charlietap/chasm/host/HostMemory;I)S
+	public static final fun readU32 (Lio/github/charlietap/chasm/host/HostMemory;I)I
+	public static final fun readU64 (Lio/github/charlietap/chasm/host/HostMemory;I)J
+	public static final fun readU8 (Lio/github/charlietap/chasm/host/HostMemory;I)B
+	public static final fun readUtf8String (Lio/github/charlietap/chasm/host/HostMemory;II)Ljava/lang/String;
+	public static final fun writeUtf8String (Lio/github/charlietap/chasm/host/HostMemory;ILjava/lang/String;)V
+}
+
+public abstract interface class io/github/charlietap/chasm/host/HostModuleInstance {
+}
+
+public final class io/github/charlietap/chasm/host/HostReferenceRoot {
+	public static final synthetic fun box-impl (I)Lio/github/charlietap/chasm/host/HostReferenceRoot;
+	public static fun constructor-impl (I)I
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (ILjava/lang/Object;)Z
+	public static final fun equals-impl0 (II)Z
+	public final fun getSlot ()I
+	public fun hashCode ()I
+	public static fun hashCode-impl (I)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (I)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()I
+}
+
+public abstract interface class io/github/charlietap/chasm/host/HostReferences {
+	public abstract fun beginScope (I)I
+	public static synthetic fun beginScope$default (Lio/github/charlietap/chasm/host/HostReferences;IILjava/lang/Object;)I
+	public abstract fun endScope (I)V
+	public abstract fun reference-bZNBitQ (I)J
+	public abstract fun release-bZNBitQ (I)V
+	public abstract fun retain-umLyUtQ (J)I
+	public abstract fun rootScoped (J)J
+}
+
+public final class io/github/charlietap/chasm/host/HostReferences$DefaultImpls {
+	public static synthetic fun beginScope$default (Lio/github/charlietap/chasm/host/HostReferences;IILjava/lang/Object;)I
+}
+
+public final class io/github/charlietap/chasm/host/HostReferencesKt {
+	public static final fun withScope (Lio/github/charlietap/chasm/host/HostReferences;ILkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static synthetic fun withScope$default (Lio/github/charlietap/chasm/host/HostReferences;ILkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class io/github/charlietap/chasm/host/HostResourceGrowthExtensionsKt {
+	public static final fun grow-K3fX9XY (Lio/github/charlietap/chasm/host/HostModuleInstance;Lio/github/charlietap/chasm/host/HostResources;ILio/github/charlietap/chasm/host/HostTable;IJ)I
+	public static final fun grow-k8QCdgQ (Lio/github/charlietap/chasm/host/HostModuleInstance;Lio/github/charlietap/chasm/host/HostResources;ILio/github/charlietap/chasm/host/HostMemory;I)I
+	public static final fun growMemory (Lio/github/charlietap/chasm/host/HostModuleInstance;Lio/github/charlietap/chasm/host/HostResources;II)I
+	public static final fun growMemory-rS8l3Lg (Lio/github/charlietap/chasm/host/HostModuleInstance;Lio/github/charlietap/chasm/host/HostResources;II)I
+	public static final fun growTable (Lio/github/charlietap/chasm/host/HostModuleInstance;Lio/github/charlietap/chasm/host/HostResources;IIJ)I
+	public static final fun growTable-_69jjMQ (Lio/github/charlietap/chasm/host/HostModuleInstance;Lio/github/charlietap/chasm/host/HostResources;IIJ)I
+}
+
+public final class io/github/charlietap/chasm/host/HostResourceLookupExtensionsKt {
+	public static final fun global (Lio/github/charlietap/chasm/host/HostModuleInstance;Lio/github/charlietap/chasm/host/HostResources;I)Lio/github/charlietap/chasm/host/HostGlobal;
+	public static final fun global-fFnRdl8 (Lio/github/charlietap/chasm/host/HostModuleInstance;Lio/github/charlietap/chasm/host/HostResources;I)Lio/github/charlietap/chasm/host/HostGlobal;
+	public static final fun memory (Lio/github/charlietap/chasm/host/HostModuleInstance;Lio/github/charlietap/chasm/host/HostResources;I)Lio/github/charlietap/chasm/host/HostMemory;
+	public static final fun memory-ywxmMWo (Lio/github/charlietap/chasm/host/HostModuleInstance;Lio/github/charlietap/chasm/host/HostResources;I)Lio/github/charlietap/chasm/host/HostMemory;
+	public static final fun table (Lio/github/charlietap/chasm/host/HostModuleInstance;Lio/github/charlietap/chasm/host/HostResources;I)Lio/github/charlietap/chasm/host/HostTable;
+	public static final fun table-UCLtGCk (Lio/github/charlietap/chasm/host/HostModuleInstance;Lio/github/charlietap/chasm/host/HostResources;I)Lio/github/charlietap/chasm/host/HostTable;
+	public static final fun tag (Lio/github/charlietap/chasm/host/HostModuleInstance;Lio/github/charlietap/chasm/host/HostResources;I)I
+	public static final fun tag-h2KSNLg (Lio/github/charlietap/chasm/host/HostModuleInstance;Lio/github/charlietap/chasm/host/HostResources;I)I
+}
+
+public abstract interface class io/github/charlietap/chasm/host/HostResources {
+	public abstract fun getExceptions ()Lio/github/charlietap/chasm/host/HostExceptions;
+	public abstract fun getExterns ()Lio/github/charlietap/chasm/host/HostExterns;
+	public abstract fun getGc ()Lio/github/charlietap/chasm/host/HostGc;
+	public abstract fun getReferences ()Lio/github/charlietap/chasm/host/HostReferences;
+	public abstract fun global-F_spUYk (Lio/github/charlietap/chasm/host/HostModuleInstance;I)Lio/github/charlietap/chasm/host/HostGlobal;
+	public abstract fun growMemory-hTSzG6M (Lio/github/charlietap/chasm/host/HostModuleInstance;II)I
+	public abstract fun growTable-ztOt1vk (Lio/github/charlietap/chasm/host/HostModuleInstance;IIJ)I
+	public abstract fun memory-dlIRw0U (Lio/github/charlietap/chasm/host/HostModuleInstance;I)Lio/github/charlietap/chasm/host/HostMemory;
+	public abstract fun table-ytdIF_o (Lio/github/charlietap/chasm/host/HostModuleInstance;I)Lio/github/charlietap/chasm/host/HostTable;
+	public abstract fun tag-s5-adI0 (Lio/github/charlietap/chasm/host/HostModuleInstance;I)I
+}
+
+public final class io/github/charlietap/chasm/host/HostStackExtensionsKt {
+	public static final fun readF32 ([JII)F
+	public static final fun readF64 ([JII)D
+	public static final fun readI32 ([JII)I
+	public static final fun readI64 ([JII)J
+	public static final fun readRawReference ([JII)J
+	public static final fun writeF32 ([JIIF)V
+	public static final fun writeF64 ([JIID)V
+	public static final fun writeI32 ([JIII)V
+	public static final fun writeI64 ([JIIJ)V
+	public static final fun writeRawReference ([JIIJ)V
+}
+
+public abstract interface class io/github/charlietap/chasm/host/HostTable {
+	public abstract fun copy (IIILio/github/charlietap/chasm/host/HostTable;)V
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/host/HostTable;IIILio/github/charlietap/chasm/host/HostTable;ILjava/lang/Object;)V
+	public abstract fun fill (IJI)V
+	public abstract fun getSize ()I
+	public abstract fun move (IIILio/github/charlietap/chasm/host/HostTable;)V
+	public static synthetic fun move$default (Lio/github/charlietap/chasm/host/HostTable;IIILio/github/charlietap/chasm/host/HostTable;ILjava/lang/Object;)V
+	public abstract fun read ([JIII)[J
+	public static synthetic fun read$default (Lio/github/charlietap/chasm/host/HostTable;[JIIIILjava/lang/Object;)[J
+	public abstract fun readRaw (I)J
+	public abstract fun unsafeBorrowElements ()[J
+	public abstract fun write (I[JII)V
+	public static synthetic fun write$default (Lio/github/charlietap/chasm/host/HostTable;I[JIIILjava/lang/Object;)V
+	public abstract fun writeRaw (IJ)V
+}
+
+public final class io/github/charlietap/chasm/host/HostTable$DefaultImpls {
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/host/HostTable;IIILio/github/charlietap/chasm/host/HostTable;ILjava/lang/Object;)V
+	public static synthetic fun move$default (Lio/github/charlietap/chasm/host/HostTable;IIILio/github/charlietap/chasm/host/HostTable;ILjava/lang/Object;)V
+	public static synthetic fun read$default (Lio/github/charlietap/chasm/host/HostTable;[JIIIILjava/lang/Object;)[J
+	public static synthetic fun write$default (Lio/github/charlietap/chasm/host/HostTable;I[JIIILjava/lang/Object;)V
+}
+
+public final class io/github/charlietap/chasm/host/HostTag {
+	public static final synthetic fun box-impl (I)Lio/github/charlietap/chasm/host/HostTag;
+	public static fun constructor-impl (I)I
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (ILjava/lang/Object;)Z
+	public static final fun equals-impl0 (II)Z
+	public final fun getRawAddress ()I
+	public fun hashCode ()I
+	public static fun hashCode-impl (I)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (I)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()I
+}
+
+public abstract interface class io/github/charlietap/chasm/host/ModuleIndex {
+	public abstract fun getIndex ()I
+}
+
+public final class io/github/charlietap/chasm/host/ModuleIndex$FunctionIndex : io/github/charlietap/chasm/host/ModuleIndex {
+	public static final synthetic fun box-impl (I)Lio/github/charlietap/chasm/host/ModuleIndex$FunctionIndex;
+	public static fun constructor-impl (I)I
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (ILjava/lang/Object;)Z
+	public static final fun equals-impl0 (II)Z
+	public fun getIndex ()I
+	public fun hashCode ()I
+	public static fun hashCode-impl (I)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (I)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()I
+}
+
+public final class io/github/charlietap/chasm/host/ModuleIndex$GlobalIndex : io/github/charlietap/chasm/host/ModuleIndex {
+	public static final synthetic fun box-impl (I)Lio/github/charlietap/chasm/host/ModuleIndex$GlobalIndex;
+	public static fun constructor-impl (I)I
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (ILjava/lang/Object;)Z
+	public static final fun equals-impl0 (II)Z
+	public fun getIndex ()I
+	public fun hashCode ()I
+	public static fun hashCode-impl (I)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (I)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()I
+}
+
+public final class io/github/charlietap/chasm/host/ModuleIndex$MemoryIndex : io/github/charlietap/chasm/host/ModuleIndex {
+	public static final synthetic fun box-impl (I)Lio/github/charlietap/chasm/host/ModuleIndex$MemoryIndex;
+	public static fun constructor-impl (I)I
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (ILjava/lang/Object;)Z
+	public static final fun equals-impl0 (II)Z
+	public fun getIndex ()I
+	public fun hashCode ()I
+	public static fun hashCode-impl (I)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (I)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()I
+}
+
+public final class io/github/charlietap/chasm/host/ModuleIndex$TableIndex : io/github/charlietap/chasm/host/ModuleIndex {
+	public static final synthetic fun box-impl (I)Lio/github/charlietap/chasm/host/ModuleIndex$TableIndex;
+	public static fun constructor-impl (I)I
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (ILjava/lang/Object;)Z
+	public static final fun equals-impl0 (II)Z
+	public fun getIndex ()I
+	public fun hashCode ()I
+	public static fun hashCode-impl (I)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (I)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()I
+}
+
+public final class io/github/charlietap/chasm/host/ModuleIndex$TagIndex : io/github/charlietap/chasm/host/ModuleIndex {
+	public static final synthetic fun box-impl (I)Lio/github/charlietap/chasm/host/ModuleIndex$TagIndex;
+	public static fun constructor-impl (I)I
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (ILjava/lang/Object;)Z
+	public static final fun equals-impl0 (II)Z
+	public fun getIndex ()I
+	public fun hashCode ()I
+	public static fun hashCode-impl (I)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (I)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()I
+}
+
+public abstract interface annotation class io/github/charlietap/chasm/host/UnsafeHostApi : java/lang/annotation/Annotation {
+}
+

@@ -1637,7 +1637,7 @@ class ChasmPluginFunctionalTest {
                 android.builtInKotlin=true
                 android.newDsl=true
             """,
-            warningMode = WarningMode.KNOWN_KMP_DEPRECATION,
+            warningMode = WarningMode.KNOWN_AGP_DEPRECATION,
         )
 
         val result = project.build("tasks", "--group=chasm")
@@ -1972,9 +1972,6 @@ class ChasmPluginFunctionalTest {
 
             gradleVersion?.let(runner::withGradleVersion)
             return runner.build().also { result ->
-                if (warningMode == WarningMode.KNOWN_KMP_DEPRECATION) {
-                    assertContains(result.output, "getTaskDependencyFromProjectDependency")
-                }
                 if (warningMode == WarningMode.KNOWN_AGP_DEPRECATION) {
                     // AGP 9.3.1 calls setVisible; Gradle 9.8 now consistently reports it.
                     val unexpectedDeprecations = result.output.lineSequence()
@@ -2060,7 +2057,6 @@ class ChasmPluginFunctionalTest {
     private enum class WarningMode(val argument: String) {
         FAIL("--warning-mode=fail"),
         KNOWN_AGP_DEPRECATION("--warning-mode=all"),
-        KNOWN_KMP_DEPRECATION("--warning-mode=all"),
     }
 
     private companion object {

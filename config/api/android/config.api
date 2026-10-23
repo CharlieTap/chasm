@@ -1,0 +1,204 @@
+public final class io/github/charlietap/chasm/config/ComponentConfig {
+	public fun <init> ()V
+	public fun <init> (Lio/github/charlietap/chasm/config/ModuleConfig;Ljava/util/Set;Z)V
+	public synthetic fun <init> (Lio/github/charlietap/chasm/config/ModuleConfig;Ljava/util/Set;ZILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Lio/github/charlietap/chasm/config/ModuleConfig;
+	public final fun component2 ()Ljava/util/Set;
+	public final fun component3 ()Z
+	public final fun copy (Lio/github/charlietap/chasm/config/ModuleConfig;Ljava/util/Set;Z)Lio/github/charlietap/chasm/config/ComponentConfig;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/config/ComponentConfig;Lio/github/charlietap/chasm/config/ModuleConfig;Ljava/util/Set;ZILjava/lang/Object;)Lio/github/charlietap/chasm/config/ComponentConfig;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getDecodeNameSection ()Z
+	public final fun getFeatures ()Ljava/util/Set;
+	public final fun getModuleConfig ()Lio/github/charlietap/chasm/config/ModuleConfig;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/config/ComponentFeature : java/lang/Enum {
+	public static final field Async Lio/github/charlietap/chasm/config/ComponentFeature;
+	public static final field FixedLengthLists Lio/github/charlietap/chasm/config/ComponentFeature;
+	public static final field Maps Lio/github/charlietap/chasm/config/ComponentFeature;
+	public static final field Memory64 Lio/github/charlietap/chasm/config/ComponentFeature;
+	public static final field MoreAsyncBuiltins Lio/github/charlietap/chasm/config/ComponentFeature;
+	public static final field StackfulAsync Lio/github/charlietap/chasm/config/ComponentFeature;
+	public static final field Threading Lio/github/charlietap/chasm/config/ComponentFeature;
+	public static final field Values Lio/github/charlietap/chasm/config/ComponentFeature;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/charlietap/chasm/config/ComponentFeature;
+	public static fun values ()[Lio/github/charlietap/chasm/config/ComponentFeature;
+}
+
+public final class io/github/charlietap/chasm/config/Config {
+	public fun <init> ()V
+	public fun <init> (Lio/github/charlietap/chasm/config/ModuleConfig;Lio/github/charlietap/chasm/config/RuntimeConfig;)V
+	public synthetic fun <init> (Lio/github/charlietap/chasm/config/ModuleConfig;Lio/github/charlietap/chasm/config/RuntimeConfig;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Lio/github/charlietap/chasm/config/ModuleConfig;
+	public final fun component2 ()Lio/github/charlietap/chasm/config/RuntimeConfig;
+	public final fun copy (Lio/github/charlietap/chasm/config/ModuleConfig;Lio/github/charlietap/chasm/config/RuntimeConfig;)Lio/github/charlietap/chasm/config/Config;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/config/Config;Lio/github/charlietap/chasm/config/ModuleConfig;Lio/github/charlietap/chasm/config/RuntimeConfig;ILjava/lang/Object;)Lio/github/charlietap/chasm/config/Config;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getModuleConfig ()Lio/github/charlietap/chasm/config/ModuleConfig;
+	public final fun getRuntimeConfig ()Lio/github/charlietap/chasm/config/RuntimeConfig;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/config/GCStrategy : java/lang/Enum {
+	public static final field ARENA Lio/github/charlietap/chasm/config/GCStrategy;
+	public static final field MANUAL Lio/github/charlietap/chasm/config/GCStrategy;
+	public static final field TRADITIONAL Lio/github/charlietap/chasm/config/GCStrategy;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/charlietap/chasm/config/GCStrategy;
+	public static fun values ()[Lio/github/charlietap/chasm/config/GCStrategy;
+}
+
+public abstract interface class io/github/charlietap/chasm/config/GCThreshold {
+	public abstract fun getBytes ()J
+}
+
+public final class io/github/charlietap/chasm/config/GCThreshold$KB : io/github/charlietap/chasm/config/GCThreshold {
+	public static final synthetic fun box-impl (I)Lio/github/charlietap/chasm/config/GCThreshold$KB;
+	public static fun constructor-impl (I)I
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (ILjava/lang/Object;)Z
+	public static final fun equals-impl0 (II)Z
+	public fun getBytes ()J
+	public static fun getBytes-impl (I)J
+	public final fun getValue ()I
+	public fun hashCode ()I
+	public static fun hashCode-impl (I)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (I)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()I
+}
+
+public final class io/github/charlietap/chasm/config/GCThreshold$MB : io/github/charlietap/chasm/config/GCThreshold {
+	public static final synthetic fun box-impl (I)Lio/github/charlietap/chasm/config/GCThreshold$MB;
+	public static fun constructor-impl (I)I
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (ILjava/lang/Object;)Z
+	public static final fun equals-impl0 (II)Z
+	public fun getBytes ()J
+	public static fun getBytes-impl (I)J
+	public final fun getValue ()I
+	public fun hashCode ()I
+	public static fun hashCode-impl (I)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (I)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()I
+}
+
+public final class io/github/charlietap/chasm/config/LinearMemoryConfig {
+	public fun <init> ()V
+	public fun <init> (Z)V
+	public synthetic fun <init> (ZILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Z
+	public final fun copy (Z)Lio/github/charlietap/chasm/config/LinearMemoryConfig;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/config/LinearMemoryConfig;ZILjava/lang/Object;)Lio/github/charlietap/chasm/config/LinearMemoryConfig;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getPrefault ()Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/config/ModuleConfig {
+	public fun <init> ()V
+	public fun <init> (Lio/github/charlietap/chasm/config/Profile;Ljava/util/Set;Z)V
+	public synthetic fun <init> (Lio/github/charlietap/chasm/config/Profile;Ljava/util/Set;ZILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Lio/github/charlietap/chasm/config/Profile;
+	public final fun component2 ()Ljava/util/Set;
+	public final fun component3 ()Z
+	public final fun copy (Lio/github/charlietap/chasm/config/Profile;Ljava/util/Set;Z)Lio/github/charlietap/chasm/config/ModuleConfig;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/config/ModuleConfig;Lio/github/charlietap/chasm/config/Profile;Ljava/util/Set;ZILjava/lang/Object;)Lio/github/charlietap/chasm/config/ModuleConfig;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getDecodeNameSection ()Z
+	public final fun getProfile ()Lio/github/charlietap/chasm/config/Profile;
+	public final fun getProposals ()Ljava/util/Set;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/config/Profile : java/lang/Enum {
+	public static final field Default Lio/github/charlietap/chasm/config/Profile;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/charlietap/chasm/config/Profile;
+	public static fun values ()[Lio/github/charlietap/chasm/config/Profile;
+}
+
+public final class io/github/charlietap/chasm/config/Proposal : java/lang/Enum {
+	public static final field ExceptionHandling Lio/github/charlietap/chasm/config/Proposal;
+	public static final field ExtendedConstExpression Lio/github/charlietap/chasm/config/Proposal;
+	public static final field MultipleMemories Lio/github/charlietap/chasm/config/Proposal;
+	public static final field TailCall Lio/github/charlietap/chasm/config/Proposal;
+	public static final field Threads Lio/github/charlietap/chasm/config/Proposal;
+	public static final field TypedFunctionReferences Lio/github/charlietap/chasm/config/Proposal;
+	public static final field WasmGC Lio/github/charlietap/chasm/config/Proposal;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/charlietap/chasm/config/Proposal;
+	public static fun values ()[Lio/github/charlietap/chasm/config/Proposal;
+}
+
+public final class io/github/charlietap/chasm/config/RuntimeConfig {
+	public fun <init> ()V
+	public fun <init> (ZLio/github/charlietap/chasm/config/GCStrategy;Lio/github/charlietap/chasm/config/GCThreshold;Lio/github/charlietap/chasm/config/LinearMemoryConfig;)V
+	public synthetic fun <init> (ZLio/github/charlietap/chasm/config/GCStrategy;Lio/github/charlietap/chasm/config/GCThreshold;Lio/github/charlietap/chasm/config/LinearMemoryConfig;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Z
+	public final fun component2 ()Lio/github/charlietap/chasm/config/GCStrategy;
+	public final fun component3 ()Lio/github/charlietap/chasm/config/GCThreshold;
+	public final fun component4 ()Lio/github/charlietap/chasm/config/LinearMemoryConfig;
+	public final fun copy (ZLio/github/charlietap/chasm/config/GCStrategy;Lio/github/charlietap/chasm/config/GCThreshold;Lio/github/charlietap/chasm/config/LinearMemoryConfig;)Lio/github/charlietap/chasm/config/RuntimeConfig;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/config/RuntimeConfig;ZLio/github/charlietap/chasm/config/GCStrategy;Lio/github/charlietap/chasm/config/GCThreshold;Lio/github/charlietap/chasm/config/LinearMemoryConfig;ILjava/lang/Object;)Lio/github/charlietap/chasm/config/RuntimeConfig;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getDebugInfo ()Z
+	public final fun getGcStrategy ()Lio/github/charlietap/chasm/config/GCStrategy;
+	public final fun getGcThreshold ()Lio/github/charlietap/chasm/config/GCThreshold;
+	public final fun getLinearMemory ()Lio/github/charlietap/chasm/config/LinearMemoryConfig;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/config/StoreConfig {
+	public fun <init> ()V
+	public synthetic fun <init> (ZZ)V
+	public synthetic fun <init> (ZZILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (ZZLio/github/charlietap/chasm/config/GCStrategy;Lio/github/charlietap/chasm/config/GCThreshold;Lio/github/charlietap/chasm/config/StoreLimits;)V
+	public synthetic fun <init> (ZZLio/github/charlietap/chasm/config/GCStrategy;Lio/github/charlietap/chasm/config/GCThreshold;Lio/github/charlietap/chasm/config/StoreLimits;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Z
+	public final fun component2 ()Z
+	public final fun component3 ()Lio/github/charlietap/chasm/config/GCStrategy;
+	public final fun component4 ()Lio/github/charlietap/chasm/config/GCThreshold;
+	public final fun component5 ()Lio/github/charlietap/chasm/config/StoreLimits;
+	public final synthetic fun copy (ZZ)Lio/github/charlietap/chasm/config/StoreConfig;
+	public final fun copy (ZZLio/github/charlietap/chasm/config/GCStrategy;Lio/github/charlietap/chasm/config/GCThreshold;Lio/github/charlietap/chasm/config/StoreLimits;)Lio/github/charlietap/chasm/config/StoreConfig;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/config/StoreConfig;ZZILjava/lang/Object;)Lio/github/charlietap/chasm/config/StoreConfig;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/config/StoreConfig;ZZLio/github/charlietap/chasm/config/GCStrategy;Lio/github/charlietap/chasm/config/GCThreshold;Lio/github/charlietap/chasm/config/StoreLimits;ILjava/lang/Object;)Lio/github/charlietap/chasm/config/StoreConfig;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getGcStrategy ()Lio/github/charlietap/chasm/config/GCStrategy;
+	public final fun getGcThreshold ()Lio/github/charlietap/chasm/config/GCThreshold;
+	public final fun getInterruptible ()Z
+	public final fun getLimits ()Lio/github/charlietap/chasm/config/StoreLimits;
+	public final fun getMeterFuel ()Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/config/StoreLimits {
+	public fun <init> ()V
+	public fun <init> (Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;Z)V
+	public synthetic fun <init> (Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;ZILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/Long;
+	public final fun component2 ()Ljava/lang/Integer;
+	public final fun component3 ()Ljava/lang/Integer;
+	public final fun component4 ()Z
+	public final fun copy (Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;Z)Lio/github/charlietap/chasm/config/StoreLimits;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/config/StoreLimits;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;ZILjava/lang/Object;)Lio/github/charlietap/chasm/config/StoreLimits;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getGcHeapBytes ()Ljava/lang/Long;
+	public final fun getMemoryPages ()Ljava/lang/Integer;
+	public final fun getTableElements ()Ljava/lang/Integer;
+	public final fun getTrapOnGrowFailure ()Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
