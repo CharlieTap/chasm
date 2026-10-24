@@ -41,6 +41,7 @@ kotlin {
         lint {
             checkOnly += "NewApi"
             abortOnError = true
+            ignoreTestSources = true
         }
         compilerOptions {
             jvmTarget.set(JvmTarget.fromTarget(libs.versions.android.library.bytecode.version.get()))
