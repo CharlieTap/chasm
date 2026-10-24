@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.memory.load
 
+import io.github.charlietap.chasm.executor.invoker.instruction.memory.effectiveAddress
 import io.github.charlietap.chasm.memory.OptimisticBoundsChecker
 import io.github.charlietap.chasm.memory.read.F32Reader
 import io.github.charlietap.chasm.memory.read.F64Reader
@@ -15,8 +16,6 @@ import io.github.charlietap.chasm.memory.read.I6432UReader
 import io.github.charlietap.chasm.memory.read.I648SReader
 import io.github.charlietap.chasm.memory.read.I648UReader
 import io.github.charlietap.chasm.memory.read.I64Reader
-import io.github.charlietap.chasm.runtime.error.InvocationError
-import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.instance.MemoryInstance
 import io.github.charlietap.chasm.runtime.instruction.MemoryInstruction
@@ -263,11 +262,7 @@ private inline fun executeMemoryLoad(
     bytes: Int,
     crossinline operation: (Int) -> Long,
 ) {
-    if (address < 0 || offset < 0) {
-        throw InvocationException(InvocationError.MemoryOperationOutOfBounds)
-    }
-
-    val effectiveAddress = address + offset
+    val effectiveAddress = effectiveAddress(address, offset)
     val result = OptimisticBoundsChecker(effectiveAddress, bytes, memory.size) {
         operation(effectiveAddress)
     }

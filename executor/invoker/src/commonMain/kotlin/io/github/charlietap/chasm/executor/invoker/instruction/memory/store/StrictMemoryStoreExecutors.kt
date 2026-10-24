@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.memory.store
 
+import io.github.charlietap.chasm.executor.invoker.instruction.memory.effectiveAddress
 import io.github.charlietap.chasm.memory.OptimisticBoundsChecker
 import io.github.charlietap.chasm.memory.write.F32Writer
 import io.github.charlietap.chasm.memory.write.F64Writer
@@ -310,7 +311,7 @@ private inline fun executeMemoryStore(
     bytes: Int,
     crossinline operation: (Int) -> Unit,
 ) {
-    val effectiveAddress = address + offset
+    val effectiveAddress = effectiveAddress(address, offset)
     OptimisticBoundsChecker(effectiveAddress, bytes, memory.size) {
         operation(effectiveAddress)
     }
