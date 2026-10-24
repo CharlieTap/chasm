@@ -24,7 +24,7 @@ internal fun FinishLabel(
     }
 
     while (context.localChanges.size > label.localChangesDepth) {
-        val localIndex = context.localChanges.removeLast()
+        val localIndex = context.localChanges.removeAt(context.localChanges.lastIndex)
         context.locals[localIndex].status = InitializationStatus.UNSET
     }
 
