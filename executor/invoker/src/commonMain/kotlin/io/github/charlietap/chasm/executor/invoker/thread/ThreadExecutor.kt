@@ -76,7 +76,11 @@ internal inline fun executeThread(
     crossinline trap: (InvocationException, ValueStack) -> InvocationError,
 ): Result<List<Long>, InvocationError> = binding {
     val callStrategy = instance.callStrategy
-    val vstack = ValueStack(callStrategy.frameSlots)
+    val vstack = try {
+        ValueStack(callStrategy.frameSlots, store.maxStackSlots)
+    } catch (exception: InvocationException) {
+        Err(exception.error).bind()
+    }
     val context = ExecutionContext(
         vstack = vstack,
         store = store,

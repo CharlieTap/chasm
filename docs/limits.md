@@ -24,13 +24,15 @@ val store = store(
 ```
 
 Every limit defaults to `null`, which leaves that resource bounded only by the
-module and the platform.
+module and the platform. The exception is `stackBytes` on Android; see
+[Stack](#stack).
 
 | Limit               | Bounds                            | When a guest exceeds it                                   |
 |---------------------|-----------------------------------|-----------------------------------------------------------|
 | `memoryPages`       | each linear memory, in 64 KiB pages | `memory.grow` returns -1                                |
 | `tableElements`     | each table, in elements           | `table.grow` returns -1                                   |
 | `gcHeapBytes`       | the store's GC heap, in bytes     | the allocation traps with `GuestHeapOutOfMemory`          |
+| `stackBytes`        | the stack of each call, in bytes  | the call traps with `CallStackExhausted`                  |
 | `trapOnGrowFailure` | —                                 | turns a failed `memory.grow` or `table.grow` into a trap  |
 
 ## Linear memory
@@ -64,6 +66,20 @@ every instance in the store. Every field and array element occupies eight
 bytes, packed `i8` and `i16` values included. The collection strategy decides
 how much garbage counts against the cap; see [the GC documentation](./gc.md#heap-limit).
 
+## Stack
+
+`stackBytes` caps the stack of each call the host makes into the store. The
+stack holds the parameters, locals and operands of every active Wasm function,
+eight bytes each, plus a small record per call. A call that would push it past
+the cap traps with `CallStackExhausted`, which is how runaway recursion ends.
+
+A call made from inside a host function gets a stack of its own with the same
+cap. Chasm never lets a stack exceed 256 MiB, so `null`, or a larger value, has
+the effect of 256 MiB.
+
+On Android `stackBytes` defaults to 16 MiB, which keeps a runaway guest well
+inside a default app heap; elsewhere it defaults to `null`.
+
 ## Trapping on grow failure
 
 The WebAssembly specification says a failed `memory.grow` or `table.grow`
@@ -91,6 +107,5 @@ not a bound on total process memory. They do not count:
 - Data and element segments, whose size is fixed by the module binary.
 - Temporary copies made while a memory, table, or heap grows.
 
-Call depth and running time are bounded separately: deep recursion traps with
-`CallStackExhausted`, and fuel and interrupts, configured with
+Running time is bounded separately: fuel and interrupts, configured with
 `StoreConfig.meterFuel` and `StoreConfig.interruptible`, stop long-running code.

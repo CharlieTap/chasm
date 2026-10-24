@@ -14,6 +14,7 @@ import io.github.charlietap.chasm.host.UnsafeHostApi
 import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.HostRaisedWasmException
+import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.ext.function
 import io.github.charlietap.chasm.runtime.ext.toExecutionValue
@@ -119,7 +120,8 @@ private inline fun invokeFunction(
     return when (function) {
         is FunctionInstance.HostFunction -> {
             val resultCount = function.functionType.results.types.size
-            val stack = ValueStack(maxOf(values.size, resultCount))
+            val stack = hostValueStack(maxOf(values.size, resultCount), store.maxStackSlots)
+                ?: return Err(InvocationError.CallStackExhausted)
             stack.push(LongArray(values.size) { index -> values[index].toLongFromBoxed() })
             stack.reserveDepth(resultCount)
             val context = ExecutionContext(stack, store, instance, config)
@@ -149,4 +151,14 @@ private inline fun invokeFunction(
             }
         }
     }
+}
+
+// Null when the store's stack limit cannot hold the host function's operands.
+private fun hostValueStack(
+    minCapacity: Int,
+    maxCapacity: Int,
+): ValueStack? = try {
+    ValueStack(minCapacity, maxCapacity)
+} catch (_: InvocationException) {
+    null
 }

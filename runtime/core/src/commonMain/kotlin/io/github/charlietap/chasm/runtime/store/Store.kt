@@ -9,6 +9,7 @@ import io.github.charlietap.chasm.runtime.instance.GlobalInstance
 import io.github.charlietap.chasm.runtime.instance.MemoryInstance
 import io.github.charlietap.chasm.runtime.instance.TableInstance
 import io.github.charlietap.chasm.runtime.program.Program
+import io.github.charlietap.chasm.runtime.stack.ValueStack
 
 class Store(
     val functions: MutableList<FunctionInstance> = [],
@@ -22,4 +23,7 @@ class Store(
     val heap: WasmHeap = WasmHeap(config.limits.gcHeapBytes),
     val fuel: Fuel = Fuel(metered = config.meterFuel),
     val interrupt: Interrupt = Interrupt(enabled = config.interruptible),
-)
+) {
+    // The most slots any one invocation's ValueStack may hold.
+    val maxStackSlots: Int = ValueStack.maxCapacityFor(config.limits.stackBytes)
+}

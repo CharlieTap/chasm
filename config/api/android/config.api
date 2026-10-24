@@ -185,17 +185,23 @@ public final class io/github/charlietap/chasm/config/StoreConfig {
 
 public final class io/github/charlietap/chasm/config/StoreLimits {
 	public fun <init> ()V
-	public fun <init> (Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;Z)V
+	public synthetic fun <init> (Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;Z)V
 	public synthetic fun <init> (Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;ZILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;ZLjava/lang/Long;)V
+	public synthetic fun <init> (Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;ZLjava/lang/Long;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1 ()Ljava/lang/Long;
 	public final fun component2 ()Ljava/lang/Integer;
 	public final fun component3 ()Ljava/lang/Integer;
 	public final fun component4 ()Z
-	public final fun copy (Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;Z)Lio/github/charlietap/chasm/config/StoreLimits;
+	public final fun component5 ()Ljava/lang/Long;
+	public final synthetic fun copy (Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;Z)Lio/github/charlietap/chasm/config/StoreLimits;
+	public final fun copy (Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;ZLjava/lang/Long;)Lio/github/charlietap/chasm/config/StoreLimits;
 	public static synthetic fun copy$default (Lio/github/charlietap/chasm/config/StoreLimits;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;ZILjava/lang/Object;)Lio/github/charlietap/chasm/config/StoreLimits;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/config/StoreLimits;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;ZLjava/lang/Long;ILjava/lang/Object;)Lio/github/charlietap/chasm/config/StoreLimits;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getGcHeapBytes ()Ljava/lang/Long;
 	public final fun getMemoryPages ()Ljava/lang/Integer;
+	public final fun getStackBytes ()Ljava/lang/Long;
 	public final fun getTableElements ()Ljava/lang/Integer;
 	public final fun getTrapOnGrowFailure ()Z
 	public fun hashCode ()I

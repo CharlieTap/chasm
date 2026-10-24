@@ -16,6 +16,7 @@ import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.value.NumberValue
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 // The JVM rejects an array of Int.MAX_VALUE elements without allocating it,
 // so these tests reach the platform allocation failure cheaply.
@@ -38,6 +39,11 @@ class StoreLimitsJvmTest {
             grow(store, instance, Int.MAX_VALUE - 1),
         )
         assertEquals(success(1), grow(store, instance, 0))
+    }
+
+    @Test
+    fun `the stack limit defaults to the platform ceiling on the jvm`() {
+        assertNull(StoreLimits().stackBytes)
     }
 
     private fun grow(store: Store, instance: Instance, elements: Int) =

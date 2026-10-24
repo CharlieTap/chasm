@@ -67,8 +67,15 @@ import io.github.charlietap.chasm.runtime.instruction.OperandTransfer
  * Compiled execution uses assigned slots rather than dynamically pushing Wasm
  * operands. Push/pop operations remain for API boundaries and constant
  * expressions.
+ *
+ * [maxCapacity] caps the stack in slots. Growth past it traps with
+ * [InvocationError.CallStackExhausted]. The backing array never exceeds the
+ * cap, so only the grow path needs to check it.
  */
-class ValueStack(minCapacity: Int = MIN_CAPACITY) {
+class ValueStack(
+    minCapacity: Int = 0,
+    maxCapacity: Int = MAX_CAPACITY,
+) {
 
     /** `FP`: absolute index of slot 0 in the active activation frame. */
     var fp = 0
@@ -77,20 +84,16 @@ class ValueStack(minCapacity: Int = MIN_CAPACITY) {
     var sp = 0
         private set
 
+    private val maxCapacity = maxCapacity.coerceIn(0, MAX_CAPACITY)
+
     private var elements: LongArray
 
     init {
-        val minimumCapacity = maxOf(minCapacity, MIN_CAPACITY)
-        if (minimumCapacity > MAX_CAPACITY) {
+        if (minCapacity > this.maxCapacity) {
             throw InvocationException(InvocationError.CallStackExhausted)
         }
-        val arrayCapacity: Int =
-            if (minimumCapacity.countOneBits() != 1) {
-                (minimumCapacity - 1).takeHighestOneBit() shl 1
-            } else {
-                minimumCapacity
-            }
-        elements = LongArray(arrayCapacity)
+        val minimumCapacity = maxOf(minCapacity, MIN_CAPACITY)
+        elements = LongArray(minOf(powerOfTwoAtLeast(minimumCapacity), this.maxCapacity))
     }
 
     fun getLocal(localIndex: Int): Long = getFrameSlot(localIndex)
@@ -606,18 +609,18 @@ class ValueStack(minCapacity: Int = MIN_CAPACITY) {
     }
 
     private fun doubleCapacity() {
-        if (elements.size == MAX_CAPACITY) {
+        if (elements.size >= maxCapacity) {
             throw InvocationException(InvocationError.CallStackExhausted)
         }
-        val newCapacity = minOf(elements.size * 2, MAX_CAPACITY)
+        val newCapacity = minOf(maxOf(elements.size * 2, MIN_CAPACITY), maxCapacity)
         elements = elements.copyOf(newCapacity)
     }
 
     private fun growCapacity(requiredCapacity: Int) {
-        if (requiredCapacity > MAX_CAPACITY) {
+        if (requiredCapacity > maxCapacity) {
             throw InvocationException(InvocationError.CallStackExhausted)
         }
-        val newCapacity = (requiredCapacity - 1).takeHighestOneBit() shl 1
+        val newCapacity = minOf(powerOfTwoAtLeast(requiredCapacity), maxCapacity)
         elements = elements.copyOf(newCapacity)
     }
 
@@ -636,5 +639,20 @@ class ValueStack(minCapacity: Int = MIN_CAPACITY) {
         private val ROOT_ACTIVATION_HEADER = activationHeader(Int.MAX_VALUE, 0)
         private const val MIN_CAPACITY = 32
         private const val MAX_CAPACITY = 1 shl 25
+        private const val SLOT_BYTES = 8L
+
+        /** Converts a stack limit in bytes to whole slots; `null` means the ceiling. */
+        fun maxCapacityFor(bytes: Long?): Int = if (bytes == null) {
+            MAX_CAPACITY
+        } else {
+            minOf(bytes / SLOT_BYTES, MAX_CAPACITY.toLong()).toInt()
+        }
+
+        // Callers keep capacity at or below MAX_CAPACITY, so this cannot overflow.
+        private fun powerOfTwoAtLeast(capacity: Int): Int = if (capacity.countOneBits() == 1) {
+            capacity
+        } else {
+            (capacity - 1).takeHighestOneBit() shl 1
+        }
     }
 }
