@@ -48,7 +48,7 @@ jobs:
           - os: macos-latest
             task: iosSimulatorArm64Test
           - os: macos-latest
-            task: testAndroidHostTest
+            task: testAndroidHostTest lintAndroidMain
           - os: ubuntu-latest
             task: linuxX64Test
           - os: windows-latest
