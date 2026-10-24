@@ -1620,7 +1620,7 @@ class ChasmPluginFunctionalTest {
 
                 kotlin {
                     jvm()
-                    androidLibrary {
+                    android {
                         namespace = "test.chasm"
                         compileSdk = $currentCompileSdk
                         minSdk = $currentMinSdk
