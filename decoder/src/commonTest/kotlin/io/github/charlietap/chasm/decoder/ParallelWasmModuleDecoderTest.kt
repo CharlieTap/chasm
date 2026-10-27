@@ -7,6 +7,7 @@ import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.parallel.ParallelTaskExecutor
 import io.github.charlietap.chasm.parallel.ParallelTaskScope
+import io.github.charlietap.chasm.parallel.ParallelismPolicy
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -37,6 +38,44 @@ class ParallelWasmModuleDecoderTest {
 
         assertEquals(serial, parallel)
         assertEquals(2, executor.taskCount)
+    }
+
+    @Test
+    fun `automatic decoding starts a worker for the sections and each batch at most`() = runTest {
+        val module = nopModule(8_000, 40_000, 8_000, 40_000)
+        val executor = TestParallelTaskExecutor()
+
+        val serial = WasmModuleDecoder(ModuleConfig(), module)
+        val parallel = ParallelWasmModuleDecoder(
+            config = ModuleConfig(),
+            bytes = module,
+            taskExecutor = executor,
+            mode = DecodingMode.AUTO,
+            availableProcessors = 8,
+            policy = ParallelismPolicy(minimumWork = 64 * 1024L, workPerWorker = 16 * 1024L),
+        )
+
+        assertEquals(serial, parallel)
+        assertEquals(3, executor.taskCount)
+    }
+
+    @Test
+    fun `automatic decoding is serial when the batches are below the policy minimum`() = runTest {
+        val module = nopModule(8_000, 280_000, 8_000, 280_000)
+        val executor = TestParallelTaskExecutor()
+
+        val serial = WasmModuleDecoder(ModuleConfig(), module)
+        val parallel = ParallelWasmModuleDecoder(
+            config = ModuleConfig(),
+            bytes = module,
+            taskExecutor = executor,
+            mode = DecodingMode.AUTO,
+            availableProcessors = 8,
+            policy = ParallelismPolicy(minimumWork = 560 * 1024L, workPerWorker = 64 * 1024L, minimumWorkers = 4),
+        )
+
+        assertEquals(serial, parallel)
+        assertEquals(0, executor.taskCount)
     }
 
     @Test
@@ -218,6 +257,35 @@ class ParallelWasmModuleDecoderTest {
         assertTrue(observed.toString().contains("Err"))
         assertEquals(emptyList(), observer.preludeFunctionCounts)
         assertEquals(0, observer.remainders)
+    }
+
+    private fun nopModule(vararg nopCounts: Int): ByteArray {
+        val code = nopCounts.fold(uleb(nopCounts.size)) { section, nops ->
+            val body = byteArrayOf(0x00) + ByteArray(nops) { NOP.toByte() } + byteArrayOf(0x0B)
+            section + uleb(body.size) + body
+        }
+        val functions = uleb(nopCounts.size) + ByteArray(nopCounts.size)
+        val types = byteArrayOf(0x01, 0x60, 0x00, 0x00)
+        return byteArrayOf(0x00, 0x61, 0x73, 0x6D, 0x01, 0x00, 0x00, 0x00) +
+            section(0x01, types) +
+            section(0x03, functions) +
+            section(0x0A, code)
+    }
+
+    private fun section(
+        id: Int,
+        content: ByteArray,
+    ): ByteArray = byteArrayOf(id.toByte()) + uleb(content.size) + content
+
+    private fun uleb(value: Int): ByteArray {
+        val bytes = mutableListOf<Byte>()
+        var remaining = value
+        do {
+            val byte = remaining and 0x7F
+            remaining = remaining ushr 7
+            bytes += (if (remaining == 0) byte else byte or 0x80).toByte()
+        } while (remaining != 0)
+        return bytes.toByteArray()
     }
 
     private class RecordingObserver(

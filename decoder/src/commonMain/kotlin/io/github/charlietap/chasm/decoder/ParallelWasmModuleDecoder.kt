@@ -20,6 +20,7 @@ import io.github.charlietap.chasm.parallel.WorkCursor
 import io.github.charlietap.chasm.parallel.availableParallelProcessors
 import io.github.charlietap.chasm.parallel.claimEach
 import io.github.charlietap.chasm.parallel.executeWorkers
+import io.github.charlietap.chasm.parallel.workersForBatches
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
 
 suspend fun ParallelWasmModuleDecoder(
@@ -53,10 +54,19 @@ internal suspend fun ParallelWasmModuleDecoder(
 ): Result<Module, ModuleDecoderError> {
     if (observer == null && !shouldScanParallelLayout(bytes.size, mode, policy)) return WasmModuleDecoder(config, bytes)
     val ranges = ModuleLayoutScanner(bytes) ?: return WasmModuleDecoder(config, bytes)
-    val workerCount = selectDecodingWorkers(ranges, mode, policy, availableProcessors)
+    val selectedWorkers = selectDecodingWorkers(ranges, mode, policy, availableProcessors)
+    if (selectedWorkers == 1 && observer == null) return WasmModuleDecoder(config, bytes)
+
+    val batches = batchBodies(ranges, selectedWorkers)
+    val sectionsAndBatches = batches.count + 1
+    val workerCount = if (mode == DecodingMode.AUTO) {
+        workersForBatches(selectedWorkers, sectionsAndBatches, policy)
+    } else {
+        selectedWorkers
+    }
     if (workerCount == 1 && observer == null) return WasmModuleDecoder(config, bytes)
 
-    val context = ParallelDecoderContext(config, bytes, ranges, batchBodies(ranges, workerCount), observer)
+    val context = ParallelDecoderContext(config, bytes, ranges, batches, observer)
     val results = taskExecutor.executeWorkers(workerCount) { decodeModule(context) }
     context.failures.error?.let { error -> return Err(error) }
 

@@ -17,5 +17,16 @@ fun selectWorkerCount(
     val additionalWorkers = (totalWork - largestItem) / policy.workPerWorker
     val workerCount = if (additionalWorkers >= workerLimit) workerLimit else additionalWorkers.toInt() + 1
 
-    return if (workerCount < maxOf(policy.minimumWorkers, 2)) 1 else workerCount
+    return enforceMinimumWorkers(workerCount, policy)
 }
+
+fun workersForBatches(
+    workerCount: Int,
+    batchCount: Int,
+    policy: ParallelismPolicy,
+): Int = enforceMinimumWorkers(minOf(workerCount, batchCount), policy)
+
+private fun enforceMinimumWorkers(
+    workerCount: Int,
+    policy: ParallelismPolicy,
+): Int = if (workerCount < maxOf(policy.minimumWorkers, 2)) 1 else workerCount

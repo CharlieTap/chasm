@@ -66,4 +66,17 @@ class WorkerCountTest {
     fun `one processor is never shared`() {
         assertEquals(1, selectWorkerCount(100_000, 10, 100, policy, availableProcessors = 1))
     }
+
+    @Test
+    fun `workers are limited to the batches there are to share`() {
+        assertEquals(3, workersForBatches(8, 3, policy))
+    }
+
+    @Test
+    fun `too few batches for the policy's minimum are not shared`() {
+        val wide = ParallelismPolicy(minimumWork = 1_000, workPerWorker = 250, minimumWorkers = 4)
+
+        assertEquals(1, workersForBatches(4, 2, wide))
+        assertEquals(4, workersForBatches(8, 4, wide))
+    }
 }

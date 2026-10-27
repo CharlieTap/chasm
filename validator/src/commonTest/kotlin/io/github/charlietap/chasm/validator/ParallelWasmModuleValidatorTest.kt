@@ -42,6 +42,44 @@ class ParallelWasmModuleValidatorTest {
     }
 
     @Test
+    fun `automatic validation starts no more workers than there are batches`() = runTest {
+        val module = validModule(functionCount = 6, instructionCount = 4_095)
+        val executor = TestParallelTaskExecutor()
+
+        val serial = WasmModuleValidator(ModuleConfig(), module)
+        val parallel = ParallelWasmModuleValidator(
+            config = ModuleConfig(),
+            module = module,
+            taskExecutor = executor,
+            mode = ValidationMode.AUTO,
+            availableProcessors = 8,
+            policy = ParallelismPolicy(minimumWork = 20_000, workPerWorker = 5_000),
+        )
+
+        assertEquals(serial, parallel)
+        assertEquals(3, executor.taskCount)
+    }
+
+    @Test
+    fun `automatic validation is serial when the batches are below the policy minimum`() = runTest {
+        val module = validModule(functionCount = 6, instructionCount = 4_095)
+        val executor = TestParallelTaskExecutor()
+
+        val serial = WasmModuleValidator(ModuleConfig(), module)
+        val parallel = ParallelWasmModuleValidator(
+            config = ModuleConfig(),
+            module = module,
+            taskExecutor = executor,
+            mode = ValidationMode.AUTO,
+            availableProcessors = 8,
+            policy = ParallelismPolicy(minimumWork = 20_000, workPerWorker = 5_000, minimumWorkers = 4),
+        )
+
+        assertEquals(serial, parallel)
+        assertEquals(0, executor.taskCount)
+    }
+
+    @Test
     fun `function errors are independent of task completion order`() = runTest {
         val module = validModule(functionCount = 4, instructionCount = 128).let { valid ->
             valid.copy(

@@ -11,10 +11,12 @@ import io.github.charlietap.chasm.parallel.EarliestFailure
 import io.github.charlietap.chasm.parallel.ParallelTaskExecutor
 import io.github.charlietap.chasm.parallel.ParallelTaskScope
 import io.github.charlietap.chasm.parallel.ParallelismPolicy
+import io.github.charlietap.chasm.parallel.WorkBatches
 import io.github.charlietap.chasm.parallel.WorkCursor
 import io.github.charlietap.chasm.parallel.availableParallelProcessors
 import io.github.charlietap.chasm.parallel.claimEach
 import io.github.charlietap.chasm.parallel.executeWorkers
+import io.github.charlietap.chasm.parallel.workersForBatches
 import io.github.charlietap.chasm.validator.context.ImmutableModuleValidationContext
 import io.github.charlietap.chasm.validator.context.ModuleValidationContext
 import io.github.charlietap.chasm.validator.error.ModuleValidationException
@@ -39,14 +41,22 @@ internal suspend fun ParallelWasmModuleValidator(
     availableProcessors: Int = availableParallelProcessors(),
     policy: ParallelismPolicy = validationParallelism(),
 ): Result<Module, ModuleValidatorError> {
-    val workerCount = selectValidationWorkers(module.functions, mode, policy, availableProcessors)
+    val selectedWorkers = selectValidationWorkers(module.functions, mode, policy, availableProcessors)
+    if (selectedWorkers == 1) return WasmModuleValidator(config, module)
+
+    val batches = batchFunctions(module.functions)
+    val workerCount = if (mode == ValidationMode.AUTO) {
+        workersForBatches(selectedWorkers, batches.count, policy)
+    } else {
+        selectedWorkers
+    }
     if (workerCount == 1) return WasmModuleValidator(config, module)
 
     val context = ModuleValidationContext(config, module)
     return try {
         ModulePreludeValidator(context, module).getOrThrowValidation()
 
-        val parallelContext = ParallelValidationContext(module.functions, context.immutableContext, context.definedTypesValidated)
+        val parallelContext = ParallelValidationContext(module.functions, batches, context.immutableContext, context.definedTypesValidated)
         taskExecutor.executeWorkers(workerCount) { validateFunctions(parallelContext) }
         parallelContext.failures.error?.let { error -> return Err(error) }
 
@@ -59,10 +69,10 @@ internal suspend fun ParallelWasmModuleValidator(
 
 private class ParallelValidationContext(
     val functions: List<Function>,
+    val batches: WorkBatches,
     val immutableContext: ImmutableModuleValidationContext,
     val definedTypesValidated: Int,
 ) {
-    val batches = batchFunctions(functions)
     val cursor = WorkCursor(batches.count)
     val failures = EarliestFailure<ModuleValidatorError>()
 }
