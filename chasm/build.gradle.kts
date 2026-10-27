@@ -114,6 +114,7 @@ kotlin {
        commonMain {
             dependencies {
                 api(projects.config)
+                api(projects.embeddingApi)
                 api(projects.host)
                 api(projects.libs.parallel)
                 api(projects.runtime.type)

@@ -46,6 +46,8 @@ include(":config")
 
 include(":decoder")
 
+include(":embedding-api")
+
 include(":executor:instantiator")
 include(":executor:invoker")
 
