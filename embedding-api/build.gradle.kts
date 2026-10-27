@@ -34,5 +34,5 @@ kotlin {
 
 configure<PublishingConventionsExtension> {
     name = "embedding-api"
-    description = "The module information and type builders Chasm's entry points share"
+    description = "The results, errors, imports, module information and type builders Chasm's entry points share"
 }

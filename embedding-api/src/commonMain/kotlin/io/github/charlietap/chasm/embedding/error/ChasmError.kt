@@ -17,7 +17,7 @@ sealed interface ChasmError {
 
     class ExecutionError(
         override val error: String,
-        /** Present only for traps raised with [io.github.charlietap.chasm.config.RuntimeConfig.debugInfo] enabled. */
+        /** Present only for traps raised with `RuntimeConfig.debugInfo` enabled. */
         val trap: WasmTrap?,
     ) : ChasmError {
 

@@ -5,20 +5,6 @@ import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.Instance
 import io.github.charlietap.chasm.embedding.shapes.Module
 import io.github.charlietap.chasm.embedding.shapes.Store
-import io.github.charlietap.chasm.host.HostFunction
-import io.github.charlietap.chasm.type.FunctionType
-
-sealed interface CodegenImport {
-    val moduleName: String
-    val entityName: String
-}
-
-data class FunctionImport(
-    override val moduleName: String,
-    override val entityName: String,
-    val type: FunctionType,
-    val function: HostFunction,
-) : CodegenImport
 
 typealias ModuleFactory = (ByteArray) -> Module
 typealias SuspendModuleFactory = suspend (ByteArray) -> Module

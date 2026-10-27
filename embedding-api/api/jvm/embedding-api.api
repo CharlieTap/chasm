@@ -1,6 +1,28 @@
 public abstract interface annotation class io/github/charlietap/chasm/InternalChasmApi : java/lang/annotation/Annotation {
 }
 
+public abstract interface class io/github/charlietap/chasm/embedding/codegen/CodegenImport {
+	public abstract fun getEntityName ()Ljava/lang/String;
+	public abstract fun getModuleName ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/embedding/codegen/FunctionImport : io/github/charlietap/chasm/embedding/codegen/CodegenImport {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Lio/github/charlietap/chasm/type/FunctionType;Lio/github/charlietap/chasm/host/HostFunction;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Lio/github/charlietap/chasm/type/FunctionType;
+	public final fun component4 ()Lio/github/charlietap/chasm/host/HostFunction;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Lio/github/charlietap/chasm/type/FunctionType;Lio/github/charlietap/chasm/host/HostFunction;)Lio/github/charlietap/chasm/embedding/codegen/FunctionImport;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/embedding/codegen/FunctionImport;Ljava/lang/String;Ljava/lang/String;Lio/github/charlietap/chasm/type/FunctionType;Lio/github/charlietap/chasm/host/HostFunction;ILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/codegen/FunctionImport;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getEntityName ()Ljava/lang/String;
+	public final fun getFunction ()Lio/github/charlietap/chasm/host/HostFunction;
+	public fun getModuleName ()Ljava/lang/String;
+	public final fun getType ()Lio/github/charlietap/chasm/type/FunctionType;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
 public final class io/github/charlietap/chasm/embedding/dsl/FunctionTypeBuilder {
 	public fun <init> ()V
 	public final fun build ()Lio/github/charlietap/chasm/type/FunctionType;
@@ -30,6 +52,178 @@ public final class io/github/charlietap/chasm/embedding/dsl/ValueTypeListBuilder
 
 public final class io/github/charlietap/chasm/embedding/dsl/ValueTypeListKt {
 	public static final fun valueTypeList (Lkotlin/jvm/functions/Function1;)Ljava/util/List;
+}
+
+public abstract interface class io/github/charlietap/chasm/embedding/error/ChasmError {
+	public abstract fun getError ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/embedding/error/ChasmError$DecodeError : io/github/charlietap/chasm/embedding/error/ChasmError$ModuleError {
+	public static final synthetic fun box-impl (Ljava/lang/String;)Lio/github/charlietap/chasm/embedding/error/ChasmError$DecodeError;
+	public static fun constructor-impl (Ljava/lang/String;)Ljava/lang/String;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Ljava/lang/String;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Ljava/lang/String;Ljava/lang/String;)Z
+	public fun getError ()Ljava/lang/String;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Ljava/lang/String;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Ljava/lang/String;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/embedding/error/ChasmError$ExecutionError : io/github/charlietap/chasm/embedding/error/ChasmError {
+	public fun <init> (Ljava/lang/String;)V
+	public fun <init> (Ljava/lang/String;Lio/github/charlietap/chasm/embedding/error/WasmTrap;)V
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getError ()Ljava/lang/String;
+	public final fun getTrap ()Lio/github/charlietap/chasm/embedding/error/WasmTrap;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/charlietap/chasm/embedding/error/ChasmError$ModuleError : io/github/charlietap/chasm/embedding/error/ChasmError {
+}
+
+public final class io/github/charlietap/chasm/embedding/error/ChasmError$ValidationError : io/github/charlietap/chasm/embedding/error/ChasmError$ModuleError {
+	public static final synthetic fun box-impl (Ljava/lang/String;)Lio/github/charlietap/chasm/embedding/error/ChasmError$ValidationError;
+	public static fun constructor-impl (Ljava/lang/String;)Ljava/lang/String;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Ljava/lang/String;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Ljava/lang/String;Ljava/lang/String;)Z
+	public fun getError ()Ljava/lang/String;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Ljava/lang/String;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Ljava/lang/String;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/embedding/error/MemoryAccess {
+	public fun <init> (Lio/github/charlietap/chasm/embedding/error/MemoryAccess$Kind;IJJJ)V
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAddress ()J
+	public final fun getKind ()Lio/github/charlietap/chasm/embedding/error/MemoryAccess$Kind;
+	public final fun getMemoryIndex ()I
+	public final fun getMemorySize ()J
+	public final fun getWidth ()J
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/embedding/error/MemoryAccess$Kind : java/lang/Enum {
+	public static final field COPY Lio/github/charlietap/chasm/embedding/error/MemoryAccess$Kind;
+	public static final field FILL Lio/github/charlietap/chasm/embedding/error/MemoryAccess$Kind;
+	public static final field INIT Lio/github/charlietap/chasm/embedding/error/MemoryAccess$Kind;
+	public static final field READ Lio/github/charlietap/chasm/embedding/error/MemoryAccess$Kind;
+	public static final field WRITE Lio/github/charlietap/chasm/embedding/error/MemoryAccess$Kind;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/charlietap/chasm/embedding/error/MemoryAccess$Kind;
+	public static fun values ()[Lio/github/charlietap/chasm/embedding/error/MemoryAccess$Kind;
+}
+
+public final class io/github/charlietap/chasm/embedding/error/TrapReason {
+	public static final field Companion Lio/github/charlietap/chasm/embedding/error/TrapReason$Companion;
+	public static final synthetic fun box-impl (Ljava/lang/String;)Lio/github/charlietap/chasm/embedding/error/TrapReason;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Ljava/lang/String;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Ljava/lang/String;Ljava/lang/String;)Z
+	public final fun getDescription ()Ljava/lang/String;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Ljava/lang/String;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Ljava/lang/String;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/embedding/error/TrapReason$Companion {
+	public final fun getARRAY_OUT_OF_BOUNDS-DDcXK-Q ()Ljava/lang/String;
+	public final fun getCALL_STACK_EXHAUSTED-DDcXK-Q ()Ljava/lang/String;
+	public final fun getCAST_FAILURE-DDcXK-Q ()Ljava/lang/String;
+	public final fun getFUEL_EXHAUSTED-DDcXK-Q ()Ljava/lang/String;
+	public final fun getGUEST_HEAP_EXHAUSTED-DDcXK-Q ()Ljava/lang/String;
+	public final fun getHOST_FUNCTION_FAILURE-DDcXK-Q ()Ljava/lang/String;
+	public final fun getINDIRECT_CALL_TYPE_MISMATCH-DDcXK-Q ()Ljava/lang/String;
+	public final fun getINTEGER_DIVIDE_BY_ZERO-DDcXK-Q ()Ljava/lang/String;
+	public final fun getINTEGER_OVERFLOW-DDcXK-Q ()Ljava/lang/String;
+	public final fun getINTERRUPTED-DDcXK-Q ()Ljava/lang/String;
+	public final fun getINVALID_CONVERSION-DDcXK-Q ()Ljava/lang/String;
+	public final fun getMEMORY_GROW_FAILED-DDcXK-Q ()Ljava/lang/String;
+	public final fun getMEMORY_OUT_OF_BOUNDS-DDcXK-Q ()Ljava/lang/String;
+	public final fun getNULL_REFERENCE-DDcXK-Q ()Ljava/lang/String;
+	public final fun getOTHER-DDcXK-Q ()Ljava/lang/String;
+	public final fun getTABLE_GROW_FAILED-DDcXK-Q ()Ljava/lang/String;
+	public final fun getTABLE_OUT_OF_BOUNDS-DDcXK-Q ()Ljava/lang/String;
+	public final fun getUNCAUGHT_EXCEPTION-DDcXK-Q ()Ljava/lang/String;
+	public final fun getUNREACHABLE-DDcXK-Q ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/embedding/error/WasmFrame {
+	public fun <init> (Ljava/lang/String;ILjava/lang/String;Ljava/lang/Integer;)V
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getFunctionIndex ()I
+	public final fun getFunctionName ()Ljava/lang/String;
+	public final fun getModuleName ()Ljava/lang/String;
+	public final fun getWasmOffset ()Ljava/lang/Integer;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/embedding/error/WasmTrap {
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;IZLio/github/charlietap/chasm/embedding/error/MemoryAccess;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun getFrames ()Ljava/util/List;
+	public final fun getMemoryAccess ()Lio/github/charlietap/chasm/embedding/error/MemoryAccess;
+	public final fun getOmittedFrames ()I
+	public final fun getReason-DDcXK-Q ()Ljava/lang/String;
+	public final fun getTraceComplete ()Z
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/embedding/error/WasmTrapException : java/lang/IllegalStateException {
+	public fun <init> (Lio/github/charlietap/chasm/embedding/error/WasmTrap;Ljava/lang/String;)V
+	public final fun getTrap ()Lio/github/charlietap/chasm/embedding/error/WasmTrap;
+}
+
+public abstract interface class io/github/charlietap/chasm/embedding/shapes/ChasmResult {
+}
+
+public final class io/github/charlietap/chasm/embedding/shapes/ChasmResult$Error : io/github/charlietap/chasm/embedding/shapes/ChasmResult {
+	public static final synthetic fun box-impl (Lio/github/charlietap/chasm/embedding/error/ChasmError;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult$Error;
+	public static fun constructor-impl (Lio/github/charlietap/chasm/embedding/error/ChasmError;)Lio/github/charlietap/chasm/embedding/error/ChasmError;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Lio/github/charlietap/chasm/embedding/error/ChasmError;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Lio/github/charlietap/chasm/embedding/error/ChasmError;Lio/github/charlietap/chasm/embedding/error/ChasmError;)Z
+	public final fun getError ()Lio/github/charlietap/chasm/embedding/error/ChasmError;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Lio/github/charlietap/chasm/embedding/error/ChasmError;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Lio/github/charlietap/chasm/embedding/error/ChasmError;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Lio/github/charlietap/chasm/embedding/error/ChasmError;
+}
+
+public final class io/github/charlietap/chasm/embedding/shapes/ChasmResult$Success : io/github/charlietap/chasm/embedding/shapes/ChasmResult {
+	public static final synthetic fun box-impl (Ljava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult$Success;
+	public static fun constructor-impl (Ljava/lang/Object;)Ljava/lang/Object;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Ljava/lang/Object;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Ljava/lang/Object;Ljava/lang/Object;)Z
+	public final fun getResult ()Ljava/lang/Object;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Ljava/lang/Object;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Ljava/lang/Object;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Ljava/lang/Object;
+}
+
+public final class io/github/charlietap/chasm/embedding/shapes/ChasmResultKt {
+	public static final fun expect (Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;Ljava/lang/String;)Ljava/lang/Object;
+	public static final fun flatMap (Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;Lkotlin/jvm/functions/Function1;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+	public static final fun fold (Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun getOrElse (Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;Ljava/lang/Object;)Ljava/lang/Object;
+	public static final fun getOrNull (Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;)Ljava/lang/Object;
+	public static final fun map (Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;Lkotlin/jvm/functions/Function1;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+	public static final fun onError (Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;Lkotlin/jvm/functions/Function1;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+	public static final fun onSuccess (Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;Lkotlin/jvm/functions/Function1;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 }
 
 public final class io/github/charlietap/chasm/embedding/shapes/ExportDefinition {
