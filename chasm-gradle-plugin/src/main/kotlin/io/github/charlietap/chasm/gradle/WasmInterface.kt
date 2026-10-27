@@ -1,8 +1,7 @@
 package io.github.charlietap.chasm.gradle
 
+import com.squareup.kotlinpoet.ClassName
 import io.github.charlietap.chasm.type.ValueType
-import io.github.charlietap.chasm.vm.WasmVirtualMachine
-import kotlin.reflect.KClass
 
 internal data class Aggregate(
     val generated: GeneratedType,
@@ -68,7 +67,7 @@ internal sealed interface PropertyImplementation
 
 internal data class GlobalProxy(
     val name: String,
-    val source: KClass<out WasmVirtualMachine.Value>,
+    val source: ClassName,
 ) : PropertyImplementation
 
 internal data class Property(

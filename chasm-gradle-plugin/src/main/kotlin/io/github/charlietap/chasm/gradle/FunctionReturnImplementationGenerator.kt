@@ -5,7 +5,6 @@ import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.joinToCode
 import io.github.charlietap.chasm.gradle.ext.asValue
-import io.github.charlietap.chasm.vm.WasmVirtualMachine
 
 internal class PointerAndLengthStringFunctionReturnGenerator {
     operator fun invoke(
@@ -19,8 +18,8 @@ internal class PointerAndLengthStringFunctionReturnGenerator {
             FLATMAP_RESULT_FUNCTION,
             READ_STRING_FUNCTION,
             DEFAULT_MEMORY_BACKING_NAME,
-            WasmVirtualMachine.Value.I32::class,
-            WasmVirtualMachine.Value.I32::class,
+            VALUE_I32_CLASS_NAME,
+            VALUE_I32_CLASS_NAME,
             "Failed to invoke function ${function.name}",
         )
     }.build()
@@ -38,7 +37,7 @@ internal class NullTerminatedStringFunctionReturnGenerator {
             FLATMAP_RESULT_FUNCTION,
             READ_NULL_STRING_FUNCTION,
             DEFAULT_MEMORY_BACKING_NAME,
-            WasmVirtualMachine.Value.I32::class,
+            VALUE_I32_CLASS_NAME,
             "Failed to invoke function ${function.name}",
         )
     }.build()
@@ -57,12 +56,12 @@ internal class LengthPrefixedStringFunctionReturnGenerator {
             FLATMAP_RESULT_FUNCTION,
             READ_INT_FUNCTION,
             DEFAULT_MEMORY_BACKING_NAME,
-            WasmVirtualMachine.Value.I32::class,
+            VALUE_I32_CLASS_NAME,
             EXPECT_RESULT_FUNCTION,
             "Failed to read string length",
             READ_STRING_FUNCTION,
             DEFAULT_MEMORY_BACKING_NAME,
-            WasmVirtualMachine.Value.I32::class,
+            VALUE_I32_CLASS_NAME,
             "Failed to invoke function ${function.name}",
         )
     }.build()
@@ -81,7 +80,7 @@ internal class PackedStringFunctionReturnGenerator {
                 "}.expect(%S)",
             preparedFunctionPropertyName(function),
             FLATMAP_RESULT_FUNCTION,
-            WasmVirtualMachine.Value.I64::class,
+            VALUE_I64_CLASS_NAME,
             READ_STRING_FUNCTION,
             DEFAULT_MEMORY_BACKING_NAME,
             "Failed to invoke function ${function.name}",

@@ -85,7 +85,6 @@ kotlin {
         compileOnly(projects.chasm) {
             because("We use the module and moduleInfo calls during codegen")
         }
-        compileOnly(projects.vm)
         compileOnly(libs.kotlin.poet)
 
         testImplementation(libs.kotlin.test)

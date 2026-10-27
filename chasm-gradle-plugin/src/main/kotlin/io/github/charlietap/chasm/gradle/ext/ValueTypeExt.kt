@@ -1,19 +1,22 @@
 package io.github.charlietap.chasm.gradle.ext
 
+import com.squareup.kotlinpoet.ClassName
 import io.github.charlietap.chasm.gradle.Scalar
 import io.github.charlietap.chasm.gradle.Type
+import io.github.charlietap.chasm.gradle.VALUE_F32_CLASS_NAME
+import io.github.charlietap.chasm.gradle.VALUE_F64_CLASS_NAME
+import io.github.charlietap.chasm.gradle.VALUE_I32_CLASS_NAME
+import io.github.charlietap.chasm.gradle.VALUE_I64_CLASS_NAME
 import io.github.charlietap.chasm.type.NumberType
 import io.github.charlietap.chasm.type.ValueType
-import io.github.charlietap.chasm.vm.WasmVirtualMachine
-import kotlin.reflect.KClass
 
-internal fun ValueType.asValue(): KClass<out WasmVirtualMachine.Value> {
+internal fun ValueType.asValue(): ClassName {
     return when (this) {
         is ValueType.Number -> when (this.numberType) {
-            NumberType.I32 -> WasmVirtualMachine.Value.I32::class
-            NumberType.I64 -> WasmVirtualMachine.Value.I64::class
-            NumberType.F32 -> WasmVirtualMachine.Value.F32::class
-            NumberType.F64 -> WasmVirtualMachine.Value.F64::class
+            NumberType.I32 -> VALUE_I32_CLASS_NAME
+            NumberType.I64 -> VALUE_I64_CLASS_NAME
+            NumberType.F32 -> VALUE_F32_CLASS_NAME
+            NumberType.F64 -> VALUE_F64_CLASS_NAME
         }
         is ValueType.Bottom,
         is ValueType.Reference,

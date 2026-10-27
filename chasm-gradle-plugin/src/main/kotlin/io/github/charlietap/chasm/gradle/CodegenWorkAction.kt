@@ -36,7 +36,6 @@ internal abstract class CodegenWorkAction : WorkAction<CodegenWorkParameters> {
     override fun execute() {
         val params = parameters
         val binaryFile = params.binary.get().asFile
-        val config = params.config.get()
         val info = module(
             binaryFile.readBytes(),
             ModuleConfig(decodeNameSection = true),
@@ -44,25 +43,19 @@ internal abstract class CodegenWorkAction : WorkAction<CodegenWorkParameters> {
             moduleInfo(wasmModule)
         }.expect("Failed to find module at path: ${binaryFile.absolutePath}")
 
-        val data = WasmInterfaceFactory()(
+        val options = BindingOptions(
             interfaceName = params.interfaceName.get(),
             packageName = params.packageName.get(),
-            config = config,
-            info = info,
-            allocator = params.allocator.orNull,
-            initializers = params.initializers.get(),
-            wasmFunctions = params.functions.get(),
-            ignoredExports = params.ignoredExports.get(),
-            logger = PluginLogger(logger),
-        )
-
-        val specs = WasmInterfaceGenerator()(
+            config = params.config.get(),
             interfaceVisibility = params.interfaceVisibility.get(),
             implementationVisibility = params.implementationVisibility.get(),
             factoryVisibility = params.factoryVisibility.get(),
-            wasmInterface = data,
-            config = config,
+            allocator = params.allocator.orNull,
+            initializers = params.initializers.get(),
+            functions = params.functions.get(),
+            ignoredExports = params.ignoredExports.get(),
         )
+        val specs = BindingGenerator(PluginLogger(logger)).generate(info, options)
 
         val outputDirectory = params.outputDirectory.get().asFile
         specs.forEach { spec ->

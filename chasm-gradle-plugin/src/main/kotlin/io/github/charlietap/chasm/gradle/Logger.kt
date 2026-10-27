@@ -2,15 +2,9 @@ package io.github.charlietap.chasm.gradle
 
 import org.gradle.api.logging.Logger as GradleLogger
 
-internal interface Logger {
-    fun lifecycle(message: String)
-
-    fun error(message: String)
-}
-
 internal class PluginLogger(
     private val logger: GradleLogger,
-) : Logger {
+) : BindgenLogger {
     override fun lifecycle(message: String) {
         logger.lifecycle(message)
     }

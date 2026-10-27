@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.gradle.ext
 
+import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.DOUBLE
 import com.squareup.kotlinpoet.FLOAT
 import com.squareup.kotlinpoet.INT
@@ -9,13 +10,16 @@ import com.squareup.kotlinpoet.UNIT
 import io.github.charlietap.chasm.gradle.Aggregate
 import io.github.charlietap.chasm.gradle.Scalar
 import io.github.charlietap.chasm.gradle.Type
-import io.github.charlietap.chasm.vm.WasmVirtualMachine
+import io.github.charlietap.chasm.gradle.VALUE_F32_CLASS_NAME
+import io.github.charlietap.chasm.gradle.VALUE_F64_CLASS_NAME
+import io.github.charlietap.chasm.gradle.VALUE_I32_CLASS_NAME
+import io.github.charlietap.chasm.gradle.VALUE_I64_CLASS_NAME
 
-internal fun Type.asValue() = when (this) {
-    Scalar.Integer -> WasmVirtualMachine.Value.I32::class
-    Scalar.Long -> WasmVirtualMachine.Value.I64::class
-    Scalar.Float -> WasmVirtualMachine.Value.F32::class
-    Scalar.Double -> WasmVirtualMachine.Value.F64::class
+internal fun Type.asValue(): ClassName = when (this) {
+    Scalar.Integer -> VALUE_I32_CLASS_NAME
+    Scalar.Long -> VALUE_I64_CLASS_NAME
+    Scalar.Float -> VALUE_F32_CLASS_NAME
+    Scalar.Double -> VALUE_F64_CLASS_NAME
     Scalar.String,
     Scalar.Unit,
     is Aggregate,

@@ -21,7 +21,6 @@ import io.github.charlietap.chasm.gradle.fixture.property
 import io.github.charlietap.chasm.gradle.fixture.stringScalarType
 import io.github.charlietap.chasm.gradle.fixture.wasmInterface
 import io.github.charlietap.chasm.type.ValueType
-import io.github.charlietap.chasm.vm.WasmVirtualMachine
 import kotlin.test.Test
 
 class AggregateCodegenTest {
@@ -93,13 +92,13 @@ class AggregateCodegenTest {
                         "mutableGlobal",
                         integerScalarType(),
                         false,
-                        globalProxy("mutable_global", WasmVirtualMachine.Value.I32::class),
+                        globalProxy("mutable_global", VALUE_I32_CLASS_NAME),
                     ),
                     property(
                         "immutableGlobal",
                         integerScalarType(),
                         true,
-                        globalProxy("immutable_global", WasmVirtualMachine.Value.I32::class),
+                        globalProxy("immutable_global", VALUE_I32_CLASS_NAME),
                     ),
                 ),
                 memories = listOf(memoryBinding("memory", "memory")),

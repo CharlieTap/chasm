@@ -7,7 +7,6 @@ import io.github.charlietap.chasm.gradle.fixture.integerScalarType
 import io.github.charlietap.chasm.gradle.fixture.longScalarType
 import io.github.charlietap.chasm.gradle.fixture.property
 import io.github.charlietap.chasm.gradle.fixture.wasmInterface
-import io.github.charlietap.chasm.vm.WasmVirtualMachine
 import kotlin.test.Test
 
 class GlobalCodegenTest {
@@ -20,7 +19,7 @@ class GlobalCodegenTest {
                 name = "value",
                 type = integerScalarType(),
                 const = false,
-                implementation = globalProxy("value", WasmVirtualMachine.Value.I32::class),
+                implementation = globalProxy("value", VALUE_I32_CLASS_NAME),
             ),
         ),
     )
@@ -33,7 +32,7 @@ class GlobalCodegenTest {
                 name = "value",
                 type = integerScalarType(),
                 const = true,
-                implementation = globalProxy("value", WasmVirtualMachine.Value.I32::class),
+                implementation = globalProxy("value", VALUE_I32_CLASS_NAME),
             ),
         ),
     )
@@ -42,10 +41,10 @@ class GlobalCodegenTest {
     fun `generates every numeric global type`() = assertGlobal(
         scenario = "NumericGlobals",
         properties = listOf(
-            property("intValue", integerScalarType(), true, globalProxy("int_value", WasmVirtualMachine.Value.I32::class)),
-            property("longValue", longScalarType(), true, globalProxy("long_value", WasmVirtualMachine.Value.I64::class)),
-            property("floatValue", floatScalarType(), true, globalProxy("float_value", WasmVirtualMachine.Value.F32::class)),
-            property("doubleValue", doubleScalarType(), true, globalProxy("double_value", WasmVirtualMachine.Value.F64::class)),
+            property("intValue", integerScalarType(), true, globalProxy("int_value", VALUE_I32_CLASS_NAME)),
+            property("longValue", longScalarType(), true, globalProxy("long_value", VALUE_I64_CLASS_NAME)),
+            property("floatValue", floatScalarType(), true, globalProxy("float_value", VALUE_F32_CLASS_NAME)),
+            property("doubleValue", doubleScalarType(), true, globalProxy("double_value", VALUE_F64_CLASS_NAME)),
         ),
     )
 

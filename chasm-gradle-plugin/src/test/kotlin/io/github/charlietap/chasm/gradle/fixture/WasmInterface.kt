@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.gradle.fixture
 
+import com.squareup.kotlinpoet.ClassName
 import io.github.charlietap.chasm.gradle.Aggregate
 import io.github.charlietap.chasm.gradle.ExportedAllocator
 import io.github.charlietap.chasm.gradle.Field
@@ -17,9 +18,8 @@ import io.github.charlietap.chasm.gradle.Scalar
 import io.github.charlietap.chasm.gradle.StringAllocationStrategy
 import io.github.charlietap.chasm.gradle.StringEncodingStrategy
 import io.github.charlietap.chasm.gradle.Type
+import io.github.charlietap.chasm.gradle.VALUE_CLASS_NAME
 import io.github.charlietap.chasm.gradle.WasmInterface
-import io.github.charlietap.chasm.vm.WasmVirtualMachine
-import kotlin.reflect.KClass
 
 internal fun integerScalarType() = Scalar.Integer
 
@@ -103,7 +103,7 @@ internal fun function(
 
 internal fun globalProxy(
     name: String = "",
-    source: KClass<out WasmVirtualMachine.Value> = WasmVirtualMachine.Value::class,
+    source: ClassName = VALUE_CLASS_NAME,
 ) = GlobalProxy(
     name = name,
     source = source,

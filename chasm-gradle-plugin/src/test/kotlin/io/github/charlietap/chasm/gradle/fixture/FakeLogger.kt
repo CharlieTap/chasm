@@ -1,9 +1,9 @@
 package io.github.charlietap.chasm.gradle.fixture
 
-import io.github.charlietap.chasm.gradle.Logger
+import io.github.charlietap.chasm.gradle.BindgenLogger
 import kotlin.test.assertEquals
 
-class FakeLogger : Logger {
+class FakeLogger : BindgenLogger {
 
     private sealed interface Message {
         val message: String

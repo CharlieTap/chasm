@@ -350,7 +350,7 @@ internal class WasmInterfaceFactory(
         initializers: Set<String>,
         wasmFunctions: List<WasmFunction>,
         ignoredExports: Set<String>,
-        logger: Logger,
+        logger: BindgenLogger,
     ): WasmInterface {
 
         val functions = mutableListOf<Function>()

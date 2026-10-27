@@ -11,7 +11,6 @@ import io.github.charlietap.chasm.gradle.fixture.memoryBinding
 import io.github.charlietap.chasm.gradle.fixture.property
 import io.github.charlietap.chasm.gradle.fixture.stringScalarType
 import io.github.charlietap.chasm.gradle.fixture.wasmInterface
-import io.github.charlietap.chasm.vm.WasmVirtualMachine
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertFailsWith
@@ -96,7 +95,7 @@ class ConstructionCodegenTest {
                     name = "counter",
                     type = integerScalarType(),
                     const = false,
-                    implementation = globalProxy("counter", WasmVirtualMachine.Value.I32::class),
+                    implementation = globalProxy("counter", VALUE_I32_CLASS_NAME),
                 ),
             ),
             memories = listOf(memoryBinding("memory", "memory")),

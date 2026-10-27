@@ -16,8 +16,6 @@ import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.UNIT
 import io.github.charlietap.chasm.gradle.ext.asTypeName
 import io.github.charlietap.chasm.gradle.ext.asValue
-import io.github.charlietap.chasm.vm.Wasm32Allocator
-import io.github.charlietap.chasm.vm.WasmVirtualMachine
 import io.github.charlietap.chasm.type.NumberType as WasmNumberType
 import io.github.charlietap.chasm.type.ValueType as WasmValueType
 
@@ -230,7 +228,7 @@ internal class FunctionProxyImplementationGenerator(
         }
 
         if (function.params.isEmpty()) {
-            addStatement("val args = emptyList<%T>()", WasmVirtualMachine.Value::class)
+            addStatement("val args = emptyList<%T>()", VALUE_CLASS_NAME)
         } else {
             var inputIndex = 0
             function.params.forEach { param ->
@@ -243,14 +241,14 @@ internal class FunctionProxyImplementationGenerator(
                                 "%L[%L] = %T(%L)",
                                 FUNCTION_INPUT_BUFFER_NAME,
                                 inputIndex++,
-                                WasmVirtualMachine.Value.I32::class,
+                                VALUE_I32_CLASS_NAME,
                                 allocVar,
                             )
                             addStatement(
                                 "%L[%L] = %T(%L.size)",
                                 FUNCTION_INPUT_BUFFER_NAME,
                                 inputIndex++,
-                                WasmVirtualMachine.Value.I32::class,
+                                VALUE_I32_CLASS_NAME,
                                 bytesVar,
                             )
                         }
@@ -260,7 +258,7 @@ internal class FunctionProxyImplementationGenerator(
                                 "%L[%L] = %T(%L)",
                                 FUNCTION_INPUT_BUFFER_NAME,
                                 inputIndex++,
-                                WasmVirtualMachine.Value.I32::class,
+                                VALUE_I32_CLASS_NAME,
                                 allocVar,
                             )
                         }
@@ -270,7 +268,7 @@ internal class FunctionProxyImplementationGenerator(
                                 "%L[%L] = %T(%L)",
                                 FUNCTION_INPUT_BUFFER_NAME,
                                 inputIndex++,
-                                WasmVirtualMachine.Value.I32::class,
+                                VALUE_I32_CLASS_NAME,
                                 allocVar,
                             )
                         }
@@ -280,7 +278,7 @@ internal class FunctionProxyImplementationGenerator(
                                 "%L[%L] = %T((%L.toLong() shl 32) or (%L.size.toLong() and 0xFFFFFFFFL))",
                                 FUNCTION_INPUT_BUFFER_NAME,
                                 inputIndex++,
-                                WasmVirtualMachine.Value.I64::class,
+                                VALUE_I64_CLASS_NAME,
                                 allocVar,
                                 bytesVar,
                             )
@@ -533,7 +531,7 @@ internal class ClassPropertiesGenerator(
                         "MutableList<%T>(%L) { %T(0) }",
                         VALUE_CLASS_NAME,
                         maximumInputCount,
-                        WasmVirtualMachine.Value.I32::class,
+                        VALUE_I32_CLASS_NAME,
                     ).build(),
             )
             inputCounts.forEach { inputCount ->
@@ -556,12 +554,12 @@ internal class ClassPropertiesGenerator(
         }
 
         wasmInterface.allocator?.let { allocator ->
-            val allocationProperty = PropertySpec.builder("allocator", Wasm32Allocator::class)
+            val allocationProperty = PropertySpec.builder("allocator", WASM32_ALLOCATOR_CLASS_NAME)
                 .addModifiers(KModifier.PRIVATE)
                 .initializer(
                     CodeBlock.of(
                         "%T(virtualMachine, store, instance, %S, %S)",
-                        Wasm32Allocator::class,
+                        WASM32_ALLOCATOR_CLASS_NAME,
                         allocator.allocationFunction,
                         allocator.deallocationFunction,
                     ),
