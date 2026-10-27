@@ -1,12 +1,14 @@
 package io.github.charlietap.chasm.type
 
 import io.github.charlietap.chasm.type.rolling.DefinedTypeUnroller
+import kotlin.concurrent.Volatile
 
 data class DefinedType(
     val recursiveType: RecursiveType,
     val recursiveTypeIndex: Int,
     val typeIndex: Int = -1,
 ) {
+    @Volatile
     private var expandedSubType: SubType? = null
 
     val asSubType: SubType
