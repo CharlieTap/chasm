@@ -121,6 +121,20 @@ class BufferedWasmBinaryReaderTest {
     }
 
     @Test
+    fun `peek near a limit refills without moving the bytes it peeks`() {
+        val reader = BinaryReader(shortReadSource(byteArrayOf(0x01, 0xE5.toByte(), 0x0E, 0x02), 1))
+        val parentLimit = reader.pushLimit(3u)
+
+        assertEquals(1.toByte(), reader.byte())
+        assertEquals(1_893u, reader.peekUInt())
+        assertEquals(1u, reader.position())
+        assertEquals(1_893u, reader.uint())
+        assertEquals(true, reader.exhausted())
+        reader.restoreLimit(parentLimit)
+        assertEquals(2.toByte(), reader.byte())
+    }
+
+    @Test
     fun `logical limits retain source bytes read ahead for the parent`() {
         val reader = BinaryReader(shortReadSource(byteArrayOf(1, 2, 3), 3))
         val parentLimit = reader.pushLimit(2u)

@@ -138,7 +138,9 @@ internal class BufferedWasmBinaryReader private constructor(
     }
 
     override fun peekUInt(): UInt {
-        request(U32_MAX_BYTES)
+        if (end - cursor < U32_MAX_BYTES) {
+            request(minOf(U32_MAX_BYTES.toULong(), remainingInLimit()).toInt())
+        }
         val currentPosition = cursor
         val value = uint()
         cursor = currentPosition
