@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.memory.load
 
-import io.github.charlietap.chasm.executor.invoker.instruction.memory.effectiveAddress
 import io.github.charlietap.chasm.memory.OptimisticBoundsChecker
 import io.github.charlietap.chasm.memory.read.F32Reader
 import io.github.charlietap.chasm.memory.read.F64Reader
@@ -19,6 +18,7 @@ import io.github.charlietap.chasm.memory.read.I64Reader
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.instance.MemoryInstance
 import io.github.charlietap.chasm.runtime.instruction.MemoryInstruction
+import io.github.charlietap.chasm.runtime.operations.effectiveAddress
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 
 internal inline fun MemorySizeExecutor(

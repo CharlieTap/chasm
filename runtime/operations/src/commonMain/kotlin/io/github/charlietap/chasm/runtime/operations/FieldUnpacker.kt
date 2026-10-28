@@ -1,10 +1,10 @@
-package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
+package io.github.charlietap.chasm.runtime.operations
 
 import io.github.charlietap.chasm.type.PackedType
 
-internal typealias FieldUnpacker = (Long, PackedType, Boolean) -> Long
+typealias FieldUnpacker = (Long, PackedType, Boolean) -> Long
 
-internal fun FieldUnpacker(
+fun FieldUnpacker(
     value: Long,
     type: PackedType,
     signedUnpack: Boolean,

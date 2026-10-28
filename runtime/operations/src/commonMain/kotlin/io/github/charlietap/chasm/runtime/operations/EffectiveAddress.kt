@@ -1,9 +1,9 @@
-package io.github.charlietap.chasm.executor.invoker.instruction.memory
+package io.github.charlietap.chasm.runtime.operations
 
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 
-internal inline fun effectiveAddress(
+inline fun effectiveAddress(
     address: Int,
     offset: Int,
 ): Int {

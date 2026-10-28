@@ -1,12 +1,12 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.admin
 
-import io.github.charlietap.chasm.executor.invoker.type.Caster
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.ext.isNullableReference
 import io.github.charlietap.chasm.runtime.instruction.AdminInstruction
 import io.github.charlietap.chasm.runtime.instruction.FusedOperand
 import io.github.charlietap.chasm.runtime.instruction.NumericCondition
 import io.github.charlietap.chasm.runtime.instruction.TransferSource
+import io.github.charlietap.chasm.runtime.operations.Caster
 
 fun JumpDispatcher(
     instruction: AdminInstruction.Jump,

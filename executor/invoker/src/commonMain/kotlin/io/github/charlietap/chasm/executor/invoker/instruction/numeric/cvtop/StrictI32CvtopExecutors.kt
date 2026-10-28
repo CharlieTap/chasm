@@ -1,14 +1,14 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.numeric.cvtop
 
-import io.github.charlietap.chasm.executor.invoker.ext.truncI32s
-import io.github.charlietap.chasm.executor.invoker.ext.truncI32sTrapping
-import io.github.charlietap.chasm.executor.invoker.ext.truncI32u
-import io.github.charlietap.chasm.executor.invoker.ext.truncI32uTrapping
-import io.github.charlietap.chasm.executor.invoker.ext.wrap
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.instruction.NumericInstruction
+import io.github.charlietap.chasm.runtime.operations.ext.truncI32s
+import io.github.charlietap.chasm.runtime.operations.ext.truncI32sTrapping
+import io.github.charlietap.chasm.runtime.operations.ext.truncI32u
+import io.github.charlietap.chasm.runtime.operations.ext.truncI32uTrapping
+import io.github.charlietap.chasm.runtime.operations.ext.wrap
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 
 internal inline fun I32TruncF32SExecutor(

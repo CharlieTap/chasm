@@ -1,17 +1,17 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.numeric.relop
 
-import io.github.charlietap.chasm.executor.invoker.ext.eq
-import io.github.charlietap.chasm.executor.invoker.ext.ge
-import io.github.charlietap.chasm.executor.invoker.ext.gt
-import io.github.charlietap.chasm.executor.invoker.ext.le
-import io.github.charlietap.chasm.executor.invoker.ext.lt
-import io.github.charlietap.chasm.executor.invoker.ext.ne
 import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.executeF64RelopIi
 import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.executeF64RelopIs
 import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.executeF64RelopSi
 import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.executeF64RelopSs
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.instruction.NumericInstruction
+import io.github.charlietap.chasm.runtime.operations.ext.eq
+import io.github.charlietap.chasm.runtime.operations.ext.ge
+import io.github.charlietap.chasm.runtime.operations.ext.gt
+import io.github.charlietap.chasm.runtime.operations.ext.le
+import io.github.charlietap.chasm.runtime.operations.ext.lt
+import io.github.charlietap.chasm.runtime.operations.ext.ne
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 
 internal inline fun F64EqExecutor(

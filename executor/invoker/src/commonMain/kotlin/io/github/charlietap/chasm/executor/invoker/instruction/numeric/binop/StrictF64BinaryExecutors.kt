@@ -1,10 +1,10 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop
 
-import io.github.charlietap.chasm.executor.invoker.ext.copySign
-import io.github.charlietap.chasm.executor.invoker.ext.max
-import io.github.charlietap.chasm.executor.invoker.ext.min
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.instruction.NumericInstruction
+import io.github.charlietap.chasm.runtime.operations.ext.copySign
+import io.github.charlietap.chasm.runtime.operations.ext.max
+import io.github.charlietap.chasm.runtime.operations.ext.min
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 
 internal inline fun F64AddExecutor(

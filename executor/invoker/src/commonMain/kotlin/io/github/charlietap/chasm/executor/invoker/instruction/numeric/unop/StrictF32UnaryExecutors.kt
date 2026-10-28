@@ -1,12 +1,12 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.numeric.unop
 
-import io.github.charlietap.chasm.executor.invoker.ext.ceil
-import io.github.charlietap.chasm.executor.invoker.ext.floor
-import io.github.charlietap.chasm.executor.invoker.ext.nearest
-import io.github.charlietap.chasm.executor.invoker.ext.sqrt
-import io.github.charlietap.chasm.executor.invoker.ext.trunc
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.instruction.NumericInstruction
+import io.github.charlietap.chasm.runtime.operations.ext.ceil
+import io.github.charlietap.chasm.runtime.operations.ext.floor
+import io.github.charlietap.chasm.runtime.operations.ext.nearest
+import io.github.charlietap.chasm.runtime.operations.ext.sqrt
+import io.github.charlietap.chasm.runtime.operations.ext.trunc
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import kotlin.math.absoluteValue
 

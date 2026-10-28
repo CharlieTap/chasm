@@ -1,4 +1,4 @@
-package io.github.charlietap.chasm.executor.invoker.type
+package io.github.charlietap.chasm.runtime.operations
 
 import io.github.charlietap.chasm.runtime.encoder.RV_SHIFT_BITS
 import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_ARRAY
@@ -10,9 +10,9 @@ import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.type.RTT
 import io.github.charlietap.chasm.runtime.type.ReferenceTypeTest
 
-internal typealias Caster = (Long, ReferenceTypeTest, ExecutionContext) -> Boolean
+typealias Caster = (Long, ReferenceTypeTest, ExecutionContext) -> Boolean
 
-internal inline fun Caster(
+inline fun Caster(
     referenceValue: Long,
     typeTest: ReferenceTypeTest,
     context: ExecutionContext,
@@ -30,7 +30,8 @@ internal inline fun Caster(
     }
 }
 
-private fun Long.isInstanceOf(
+@PublishedApi
+internal fun Long.isInstanceOf(
     referenceTag: Int,
     castRuntimeType: RTT,
     context: ExecutionContext,

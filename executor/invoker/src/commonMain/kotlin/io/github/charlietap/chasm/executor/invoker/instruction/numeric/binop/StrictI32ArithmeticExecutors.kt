@@ -2,6 +2,10 @@ package io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop
 
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.instruction.NumericInstruction
+import io.github.charlietap.chasm.runtime.operations.strictI32DivS
+import io.github.charlietap.chasm.runtime.operations.strictI32DivU
+import io.github.charlietap.chasm.runtime.operations.strictI32RemS
+import io.github.charlietap.chasm.runtime.operations.strictI32RemU
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 
 internal inline fun I32AddExecutor(

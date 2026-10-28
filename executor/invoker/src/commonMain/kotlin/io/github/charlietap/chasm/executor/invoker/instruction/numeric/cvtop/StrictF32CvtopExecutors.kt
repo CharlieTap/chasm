@@ -1,9 +1,9 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.numeric.cvtop
 
-import io.github.charlietap.chasm.executor.invoker.ext.convertF32s
-import io.github.charlietap.chasm.executor.invoker.ext.convertF32u
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.instruction.NumericInstruction
+import io.github.charlietap.chasm.runtime.operations.ext.convertF32s
+import io.github.charlietap.chasm.runtime.operations.ext.convertF32u
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 
 internal inline fun F32ConvertI32SExecutor(

@@ -1,4 +1,4 @@
-package io.github.charlietap.chasm.executor.invoker.type
+package io.github.charlietap.chasm.runtime.operations
 
 import io.github.charlietap.chasm.fixture.runtime.execution.executionContext
 import io.github.charlietap.chasm.runtime.encoder.RV_SHIFT_BITS
