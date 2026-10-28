@@ -16,15 +16,17 @@ internal fun grownArrayCapacity(capacity: Int, required: Int, maximumPages: Int)
     return minOf(maximumPages, maxOf(required / LinearMemory.PAGE_SIZE, pages + extraPages)) * LinearMemory.PAGE_SIZE
 }
 
+const val OVERREAD_BYTES = 8
+
 internal fun allocateMemoryArray(capacity: Int, required: Int, allocate: (Int) -> ByteArray = ::ByteArray): ByteArray =
     try {
-        allocate(capacity)
+        allocate(capacity + OVERREAD_BYTES)
     } catch (error: PlatformOutOfMemoryError) {
         // If reserving headroom fails, fall back to the required size and accept
         // more expensive future growth.
         if (capacity == required) throw OutOfMemoryError(error.message, error)
         try {
-            allocate(required)
+            allocate(required + OVERREAD_BYTES)
         } catch (fallbackError: PlatformOutOfMemoryError) {
             throw OutOfMemoryError(fallbackError.message, fallbackError)
         }

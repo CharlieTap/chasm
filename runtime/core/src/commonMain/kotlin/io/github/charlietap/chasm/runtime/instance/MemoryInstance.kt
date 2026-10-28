@@ -1,10 +1,13 @@
 package io.github.charlietap.chasm.runtime.instance
 
+import io.github.charlietap.chasm.host.ByteArrayHostMemory
+import io.github.charlietap.chasm.host.UnsafeHostApi
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
 import io.github.charlietap.chasm.runtime.memory.LinearMemory.Companion.MAX_PAGES
 import io.github.charlietap.chasm.runtime.memory.LinearMemory.Companion.PAGE_SIZE
 import io.github.charlietap.chasm.runtime.memory.OutOfMemoryError
 import io.github.charlietap.chasm.type.MemoryType
+import kotlin.jvm.JvmField
 
 data class MemoryInstance(
     var type: MemoryType,
@@ -17,9 +20,13 @@ data class MemoryInstance(
     var bounds: IntRange = bounds()
         private set
 
+    @JvmField
+    var byteArray: ByteArray? = byteArray()
+
     fun refresh() {
         size = size()
         bounds = bounds()
+        byteArray = byteArray()
     }
 
     fun grow(pagesToAdd: Int): Int {
@@ -54,7 +61,14 @@ data class MemoryInstance(
 
     private fun bounds() = 0 until size
 
+    @OptIn(UnsafeHostApi::class)
+    private fun byteArray() = (data as? ByteArrayHostMemory)?.unsafeBorrowByteArray()?.takeIf { array ->
+        array.size.toLong() >= size.toLong() + REQUIRED_OVERREAD_BYTES
+    }
+
     companion object {
+        const val REQUIRED_OVERREAD_BYTES = 4
+
         fun declaredMaximumPages(type: MemoryType): Int =
             type.limits.max?.let { maximum -> minOf(maximum, MAX_PAGES.toULong()).toInt() } ?: MAX_PAGES
     }

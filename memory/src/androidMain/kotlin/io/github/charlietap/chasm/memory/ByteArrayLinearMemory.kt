@@ -45,8 +45,9 @@ class ByteArrayLinearMemory(
     internal fun growStorage(newSize: Int) = growStorage(newSize, ::ByteArray)
 
     internal fun growStorage(newSize: Int, allocate: (Int) -> ByteArray) {
-        if (newSize > bytes.size) {
-            val capacity = grownArrayCapacity(bytes.size, newSize, maximumPages)
+        val currentCapacity = bytes.size - OVERREAD_BYTES
+        if (newSize > currentCapacity) {
+            val capacity = grownArrayCapacity(currentCapacity, newSize, maximumPages)
             // All fallible work precedes publication. On failure the old array,
             // logical size and existing host views remain usable.
             val newBytes = allocateMemoryArray(capacity, newSize, allocate)

@@ -22,4 +22,5 @@ internal inline fun MemoryInstanceDropper(
     )
     instance.refresh()
     destructor(instance.data)
+    instance.refresh()
 }
