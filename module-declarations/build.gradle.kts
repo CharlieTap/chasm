@@ -18,6 +18,7 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
+                api(projects.embeddingApi)
                 api(projects.typeSystem)
             }
         }
@@ -26,5 +27,5 @@ kotlin {
 
 configure<PublishingConventionsExtension> {
     name = "module-declarations"
-    description = "The indices, imports and names a wasm module declares, for Kotlin Multiplatform"
+    description = "The declarations of a wasm module, as Chasm's runtime instantiates them, for Kotlin Multiplatform"
 }

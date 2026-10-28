@@ -709,6 +709,10 @@ public final class io/github/charlietap/chasm/declarations/ModuleDeclarations {
 	public fun hashCode ()I
 }
 
+public final class io/github/charlietap/chasm/declarations/ModuleInfoKt {
+	public static final fun moduleInfo (Lio/github/charlietap/chasm/declarations/ModuleDeclarations;)Lio/github/charlietap/chasm/embedding/shapes/ModuleInfo;
+}
+
 public final class io/github/charlietap/chasm/declarations/ModuleNames {
 	public static final field Companion Lio/github/charlietap/chasm/declarations/ModuleNames$Companion;
 	public fun <init> (Ljava/lang/String;[I[Ljava/lang/String;Ljava/util/Map;[I[Ljava/lang/String;)V

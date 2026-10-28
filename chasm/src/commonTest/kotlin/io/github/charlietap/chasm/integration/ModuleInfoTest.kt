@@ -51,10 +51,12 @@ import io.github.charlietap.chasm.fixture.type.resultType
 import io.github.charlietap.chasm.fixture.type.tableType
 import io.github.charlietap.chasm.fixture.type.tagType
 import io.github.charlietap.chasm.fixture.type.varMutability
+import io.github.charlietap.chasm.runtime.type.ExternalType
 import io.github.charlietap.chasm.type.AbstractHeapType
 import io.github.charlietap.chasm.type.RecursiveType
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 import io.github.charlietap.chasm.fixture.ast.module.module as astModule
 import io.github.charlietap.chasm.fixture.host.functionIndex as moduleFunctionIndex
 import io.github.charlietap.chasm.fixture.host.globalIndex as moduleGlobalIndex
@@ -226,6 +228,28 @@ class ModuleInfoTest {
         )
 
         assertEquals(expected, actual)
+    }
+
+    @Test
+    fun `changing returned module info does not change the module`() {
+        val byteStream = Resource(FILE_DIR + "module_info.wasm").readBytes()
+        val module = module(FakeSourceReader(byteStream), moduleConfig(decodeNameSection = true)).getOrNull()!!
+        val unchanged = module(FakeSourceReader(byteStream), moduleConfig(decodeNameSection = true)).getOrNull()!!
+
+        val before = moduleInfo(unchanged)
+        val changed = moduleInfo(module)
+        (changed.imports.map { import -> import.type } + changed.exports.map { export -> export.type }).forEach { type ->
+            when (type) {
+                is ExternalType.Memory -> type.memoryType.limits.min = 99u
+                is ExternalType.Table -> type.tableType.limits.min = 99u
+                is ExternalType.Function -> type.functionType.params = resultType(emptyList())
+                is ExternalType.Tag -> type.tagType.functionType.results = resultType(emptyList())
+                is ExternalType.Global -> Unit
+            }
+        }
+
+        assertTrue(before != changed, "the returned info was changed")
+        assertEquals(before, moduleInfo(module))
     }
 
     @Test
