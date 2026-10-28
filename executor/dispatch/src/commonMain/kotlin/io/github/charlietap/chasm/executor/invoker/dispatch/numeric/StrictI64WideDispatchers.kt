@@ -1,248 +1,723 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.numeric
 
 import io.github.charlietap.chasm.executor.invoker.dispatch.dispatchInstruction
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.I64Add128Executor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.I64MulWideSExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.I64MulWideUExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.I64Sub128Executor
-import io.github.charlietap.chasm.runtime.instruction.NumericInstruction
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.executeI64Add128
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.executeI64MulWideSigned
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.executeI64MulWideUnsigned
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.executeI64Sub128
 
-fun I64Add128Dispatcher(
-    instruction: NumericInstruction.I64Add128Iiii,
+fun I64Add128IiiiDispatcher(
+    leftLow: Long,
+    leftHigh: Long,
+    rightLow: Long,
+    rightHigh: Long,
+    destinationLowSlot: Int,
+    destinationHighSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64Add128Executor(vstack, context, instruction)
+    executeI64Add128(
+        vstack,
+        destinationLowSlot,
+        destinationHighSlot,
+        leftLow,
+        leftHigh,
+        rightLow,
+        rightHigh,
+    )
 }
 
-fun I64Add128Dispatcher(
-    instruction: NumericInstruction.I64Add128Iiis,
+fun I64Add128IiisDispatcher(
+    leftLow: Long,
+    leftHigh: Long,
+    rightLow: Long,
+    rightHighSlot: Int,
+    destinationLowSlot: Int,
+    destinationHighSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64Add128Executor(vstack, context, instruction)
+    executeI64Add128(
+        vstack,
+        destinationLowSlot,
+        destinationHighSlot,
+        leftLow,
+        leftHigh,
+        rightLow,
+        vstack.getFrameSlot(rightHighSlot),
+    )
 }
 
-fun I64Add128Dispatcher(
-    instruction: NumericInstruction.I64Add128Iisi,
+fun I64Add128IisiDispatcher(
+    leftLow: Long,
+    leftHigh: Long,
+    rightLowSlot: Int,
+    rightHigh: Long,
+    destinationLowSlot: Int,
+    destinationHighSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64Add128Executor(vstack, context, instruction)
+    executeI64Add128(
+        vstack,
+        destinationLowSlot,
+        destinationHighSlot,
+        leftLow,
+        leftHigh,
+        vstack.getFrameSlot(rightLowSlot),
+        rightHigh,
+    )
 }
 
-fun I64Add128Dispatcher(
-    instruction: NumericInstruction.I64Add128Iiss,
+fun I64Add128IissDispatcher(
+    leftLow: Long,
+    leftHigh: Long,
+    rightLowSlot: Int,
+    rightHighSlot: Int,
+    destinationLowSlot: Int,
+    destinationHighSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64Add128Executor(vstack, context, instruction)
+    executeI64Add128(
+        vstack,
+        destinationLowSlot,
+        destinationHighSlot,
+        leftLow,
+        leftHigh,
+        vstack.getFrameSlot(rightLowSlot),
+        vstack.getFrameSlot(rightHighSlot),
+    )
 }
 
-fun I64Add128Dispatcher(
-    instruction: NumericInstruction.I64Add128Isii,
+fun I64Add128IsiiDispatcher(
+    leftLow: Long,
+    leftHighSlot: Int,
+    rightLow: Long,
+    rightHigh: Long,
+    destinationLowSlot: Int,
+    destinationHighSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64Add128Executor(vstack, context, instruction)
+    executeI64Add128(
+        vstack,
+        destinationLowSlot,
+        destinationHighSlot,
+        leftLow,
+        vstack.getFrameSlot(leftHighSlot),
+        rightLow,
+        rightHigh,
+    )
 }
 
-fun I64Add128Dispatcher(
-    instruction: NumericInstruction.I64Add128Isis,
+fun I64Add128IsisDispatcher(
+    leftLow: Long,
+    leftHighSlot: Int,
+    rightLow: Long,
+    rightHighSlot: Int,
+    destinationLowSlot: Int,
+    destinationHighSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64Add128Executor(vstack, context, instruction)
+    executeI64Add128(
+        vstack,
+        destinationLowSlot,
+        destinationHighSlot,
+        leftLow,
+        vstack.getFrameSlot(leftHighSlot),
+        rightLow,
+        vstack.getFrameSlot(rightHighSlot),
+    )
 }
 
-fun I64Add128Dispatcher(
-    instruction: NumericInstruction.I64Add128Issi,
+fun I64Add128IssiDispatcher(
+    leftLow: Long,
+    leftHighSlot: Int,
+    rightLowSlot: Int,
+    rightHigh: Long,
+    destinationLowSlot: Int,
+    destinationHighSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64Add128Executor(vstack, context, instruction)
+    executeI64Add128(
+        vstack,
+        destinationLowSlot,
+        destinationHighSlot,
+        leftLow,
+        vstack.getFrameSlot(leftHighSlot),
+        vstack.getFrameSlot(rightLowSlot),
+        rightHigh,
+    )
 }
 
-fun I64Add128Dispatcher(
-    instruction: NumericInstruction.I64Add128Isss,
+fun I64Add128IsssDispatcher(
+    leftLow: Long,
+    leftHighSlot: Int,
+    rightLowSlot: Int,
+    rightHighSlot: Int,
+    destinationLowSlot: Int,
+    destinationHighSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64Add128Executor(vstack, context, instruction)
+    executeI64Add128(
+        vstack,
+        destinationLowSlot,
+        destinationHighSlot,
+        leftLow,
+        vstack.getFrameSlot(leftHighSlot),
+        vstack.getFrameSlot(rightLowSlot),
+        vstack.getFrameSlot(rightHighSlot),
+    )
 }
 
-fun I64Add128Dispatcher(
-    instruction: NumericInstruction.I64Add128Siii,
+fun I64Add128SiiiDispatcher(
+    leftLowSlot: Int,
+    leftHigh: Long,
+    rightLow: Long,
+    rightHigh: Long,
+    destinationLowSlot: Int,
+    destinationHighSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64Add128Executor(vstack, context, instruction)
+    executeI64Add128(
+        vstack,
+        destinationLowSlot,
+        destinationHighSlot,
+        vstack.getFrameSlot(leftLowSlot),
+        leftHigh,
+        rightLow,
+        rightHigh,
+    )
 }
 
-fun I64Add128Dispatcher(
-    instruction: NumericInstruction.I64Add128Siis,
+fun I64Add128SiisDispatcher(
+    leftLowSlot: Int,
+    leftHigh: Long,
+    rightLow: Long,
+    rightHighSlot: Int,
+    destinationLowSlot: Int,
+    destinationHighSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64Add128Executor(vstack, context, instruction)
+    executeI64Add128(
+        vstack,
+        destinationLowSlot,
+        destinationHighSlot,
+        vstack.getFrameSlot(leftLowSlot),
+        leftHigh,
+        rightLow,
+        vstack.getFrameSlot(rightHighSlot),
+    )
 }
 
-fun I64Add128Dispatcher(
-    instruction: NumericInstruction.I64Add128Sisi,
+fun I64Add128SisiDispatcher(
+    leftLowSlot: Int,
+    leftHigh: Long,
+    rightLowSlot: Int,
+    rightHigh: Long,
+    destinationLowSlot: Int,
+    destinationHighSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64Add128Executor(vstack, context, instruction)
+    executeI64Add128(
+        vstack,
+        destinationLowSlot,
+        destinationHighSlot,
+        vstack.getFrameSlot(leftLowSlot),
+        leftHigh,
+        vstack.getFrameSlot(rightLowSlot),
+        rightHigh,
+    )
 }
 
-fun I64Add128Dispatcher(
-    instruction: NumericInstruction.I64Add128Siss,
+fun I64Add128SissDispatcher(
+    leftLowSlot: Int,
+    leftHigh: Long,
+    rightLowSlot: Int,
+    rightHighSlot: Int,
+    destinationLowSlot: Int,
+    destinationHighSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64Add128Executor(vstack, context, instruction)
+    executeI64Add128(
+        vstack,
+        destinationLowSlot,
+        destinationHighSlot,
+        vstack.getFrameSlot(leftLowSlot),
+        leftHigh,
+        vstack.getFrameSlot(rightLowSlot),
+        vstack.getFrameSlot(rightHighSlot),
+    )
 }
 
-fun I64Add128Dispatcher(
-    instruction: NumericInstruction.I64Add128Ssii,
+fun I64Add128SsiiDispatcher(
+    leftLowSlot: Int,
+    leftHighSlot: Int,
+    rightLow: Long,
+    rightHigh: Long,
+    destinationLowSlot: Int,
+    destinationHighSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64Add128Executor(vstack, context, instruction)
+    executeI64Add128(
+        vstack,
+        destinationLowSlot,
+        destinationHighSlot,
+        vstack.getFrameSlot(leftLowSlot),
+        vstack.getFrameSlot(leftHighSlot),
+        rightLow,
+        rightHigh,
+    )
 }
 
-fun I64Add128Dispatcher(
-    instruction: NumericInstruction.I64Add128Ssis,
+fun I64Add128SsisDispatcher(
+    leftLowSlot: Int,
+    leftHighSlot: Int,
+    rightLow: Long,
+    rightHighSlot: Int,
+    destinationLowSlot: Int,
+    destinationHighSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64Add128Executor(vstack, context, instruction)
+    executeI64Add128(
+        vstack,
+        destinationLowSlot,
+        destinationHighSlot,
+        vstack.getFrameSlot(leftLowSlot),
+        vstack.getFrameSlot(leftHighSlot),
+        rightLow,
+        vstack.getFrameSlot(rightHighSlot),
+    )
 }
 
-fun I64Add128Dispatcher(
-    instruction: NumericInstruction.I64Add128Sssi,
+fun I64Add128SssiDispatcher(
+    leftLowSlot: Int,
+    leftHighSlot: Int,
+    rightLowSlot: Int,
+    rightHigh: Long,
+    destinationLowSlot: Int,
+    destinationHighSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64Add128Executor(vstack, context, instruction)
+    executeI64Add128(
+        vstack,
+        destinationLowSlot,
+        destinationHighSlot,
+        vstack.getFrameSlot(leftLowSlot),
+        vstack.getFrameSlot(leftHighSlot),
+        vstack.getFrameSlot(rightLowSlot),
+        rightHigh,
+    )
 }
 
-fun I64Add128Dispatcher(
-    instruction: NumericInstruction.I64Add128Ssss,
+fun I64Add128SsssDispatcher(
+    leftLowSlot: Int,
+    leftHighSlot: Int,
+    rightLowSlot: Int,
+    rightHighSlot: Int,
+    destinationLowSlot: Int,
+    destinationHighSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64Add128Executor(vstack, context, instruction)
+    executeI64Add128(
+        vstack,
+        destinationLowSlot,
+        destinationHighSlot,
+        vstack.getFrameSlot(leftLowSlot),
+        vstack.getFrameSlot(leftHighSlot),
+        vstack.getFrameSlot(rightLowSlot),
+        vstack.getFrameSlot(rightHighSlot),
+    )
 }
 
-fun I64Sub128Dispatcher(
-    instruction: NumericInstruction.I64Sub128Iiii,
+fun I64Sub128IiiiDispatcher(
+    leftLow: Long,
+    leftHigh: Long,
+    rightLow: Long,
+    rightHigh: Long,
+    destinationLowSlot: Int,
+    destinationHighSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64Sub128Executor(vstack, context, instruction)
+    executeI64Sub128(
+        vstack,
+        destinationLowSlot,
+        destinationHighSlot,
+        leftLow,
+        leftHigh,
+        rightLow,
+        rightHigh,
+    )
 }
 
-fun I64Sub128Dispatcher(
-    instruction: NumericInstruction.I64Sub128Iiis,
+fun I64Sub128IiisDispatcher(
+    leftLow: Long,
+    leftHigh: Long,
+    rightLow: Long,
+    rightHighSlot: Int,
+    destinationLowSlot: Int,
+    destinationHighSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64Sub128Executor(vstack, context, instruction)
+    executeI64Sub128(
+        vstack,
+        destinationLowSlot,
+        destinationHighSlot,
+        leftLow,
+        leftHigh,
+        rightLow,
+        vstack.getFrameSlot(rightHighSlot),
+    )
 }
 
-fun I64Sub128Dispatcher(
-    instruction: NumericInstruction.I64Sub128Iisi,
+fun I64Sub128IisiDispatcher(
+    leftLow: Long,
+    leftHigh: Long,
+    rightLowSlot: Int,
+    rightHigh: Long,
+    destinationLowSlot: Int,
+    destinationHighSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64Sub128Executor(vstack, context, instruction)
+    executeI64Sub128(
+        vstack,
+        destinationLowSlot,
+        destinationHighSlot,
+        leftLow,
+        leftHigh,
+        vstack.getFrameSlot(rightLowSlot),
+        rightHigh,
+    )
 }
 
-fun I64Sub128Dispatcher(
-    instruction: NumericInstruction.I64Sub128Iiss,
+fun I64Sub128IissDispatcher(
+    leftLow: Long,
+    leftHigh: Long,
+    rightLowSlot: Int,
+    rightHighSlot: Int,
+    destinationLowSlot: Int,
+    destinationHighSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64Sub128Executor(vstack, context, instruction)
+    executeI64Sub128(
+        vstack,
+        destinationLowSlot,
+        destinationHighSlot,
+        leftLow,
+        leftHigh,
+        vstack.getFrameSlot(rightLowSlot),
+        vstack.getFrameSlot(rightHighSlot),
+    )
 }
 
-fun I64Sub128Dispatcher(
-    instruction: NumericInstruction.I64Sub128Isii,
+fun I64Sub128IsiiDispatcher(
+    leftLow: Long,
+    leftHighSlot: Int,
+    rightLow: Long,
+    rightHigh: Long,
+    destinationLowSlot: Int,
+    destinationHighSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64Sub128Executor(vstack, context, instruction)
+    executeI64Sub128(
+        vstack,
+        destinationLowSlot,
+        destinationHighSlot,
+        leftLow,
+        vstack.getFrameSlot(leftHighSlot),
+        rightLow,
+        rightHigh,
+    )
 }
 
-fun I64Sub128Dispatcher(
-    instruction: NumericInstruction.I64Sub128Isis,
+fun I64Sub128IsisDispatcher(
+    leftLow: Long,
+    leftHighSlot: Int,
+    rightLow: Long,
+    rightHighSlot: Int,
+    destinationLowSlot: Int,
+    destinationHighSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64Sub128Executor(vstack, context, instruction)
+    executeI64Sub128(
+        vstack,
+        destinationLowSlot,
+        destinationHighSlot,
+        leftLow,
+        vstack.getFrameSlot(leftHighSlot),
+        rightLow,
+        vstack.getFrameSlot(rightHighSlot),
+    )
 }
 
-fun I64Sub128Dispatcher(
-    instruction: NumericInstruction.I64Sub128Issi,
+fun I64Sub128IssiDispatcher(
+    leftLow: Long,
+    leftHighSlot: Int,
+    rightLowSlot: Int,
+    rightHigh: Long,
+    destinationLowSlot: Int,
+    destinationHighSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64Sub128Executor(vstack, context, instruction)
+    executeI64Sub128(
+        vstack,
+        destinationLowSlot,
+        destinationHighSlot,
+        leftLow,
+        vstack.getFrameSlot(leftHighSlot),
+        vstack.getFrameSlot(rightLowSlot),
+        rightHigh,
+    )
 }
 
-fun I64Sub128Dispatcher(
-    instruction: NumericInstruction.I64Sub128Isss,
+fun I64Sub128IsssDispatcher(
+    leftLow: Long,
+    leftHighSlot: Int,
+    rightLowSlot: Int,
+    rightHighSlot: Int,
+    destinationLowSlot: Int,
+    destinationHighSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64Sub128Executor(vstack, context, instruction)
+    executeI64Sub128(
+        vstack,
+        destinationLowSlot,
+        destinationHighSlot,
+        leftLow,
+        vstack.getFrameSlot(leftHighSlot),
+        vstack.getFrameSlot(rightLowSlot),
+        vstack.getFrameSlot(rightHighSlot),
+    )
 }
 
-fun I64Sub128Dispatcher(
-    instruction: NumericInstruction.I64Sub128Siii,
+fun I64Sub128SiiiDispatcher(
+    leftLowSlot: Int,
+    leftHigh: Long,
+    rightLow: Long,
+    rightHigh: Long,
+    destinationLowSlot: Int,
+    destinationHighSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64Sub128Executor(vstack, context, instruction)
+    executeI64Sub128(
+        vstack,
+        destinationLowSlot,
+        destinationHighSlot,
+        vstack.getFrameSlot(leftLowSlot),
+        leftHigh,
+        rightLow,
+        rightHigh,
+    )
 }
 
-fun I64Sub128Dispatcher(
-    instruction: NumericInstruction.I64Sub128Siis,
+fun I64Sub128SiisDispatcher(
+    leftLowSlot: Int,
+    leftHigh: Long,
+    rightLow: Long,
+    rightHighSlot: Int,
+    destinationLowSlot: Int,
+    destinationHighSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64Sub128Executor(vstack, context, instruction)
+    executeI64Sub128(
+        vstack,
+        destinationLowSlot,
+        destinationHighSlot,
+        vstack.getFrameSlot(leftLowSlot),
+        leftHigh,
+        rightLow,
+        vstack.getFrameSlot(rightHighSlot),
+    )
 }
 
-fun I64Sub128Dispatcher(
-    instruction: NumericInstruction.I64Sub128Sisi,
+fun I64Sub128SisiDispatcher(
+    leftLowSlot: Int,
+    leftHigh: Long,
+    rightLowSlot: Int,
+    rightHigh: Long,
+    destinationLowSlot: Int,
+    destinationHighSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64Sub128Executor(vstack, context, instruction)
+    executeI64Sub128(
+        vstack,
+        destinationLowSlot,
+        destinationHighSlot,
+        vstack.getFrameSlot(leftLowSlot),
+        leftHigh,
+        vstack.getFrameSlot(rightLowSlot),
+        rightHigh,
+    )
 }
 
-fun I64Sub128Dispatcher(
-    instruction: NumericInstruction.I64Sub128Siss,
+fun I64Sub128SissDispatcher(
+    leftLowSlot: Int,
+    leftHigh: Long,
+    rightLowSlot: Int,
+    rightHighSlot: Int,
+    destinationLowSlot: Int,
+    destinationHighSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64Sub128Executor(vstack, context, instruction)
+    executeI64Sub128(
+        vstack,
+        destinationLowSlot,
+        destinationHighSlot,
+        vstack.getFrameSlot(leftLowSlot),
+        leftHigh,
+        vstack.getFrameSlot(rightLowSlot),
+        vstack.getFrameSlot(rightHighSlot),
+    )
 }
 
-fun I64Sub128Dispatcher(
-    instruction: NumericInstruction.I64Sub128Ssii,
+fun I64Sub128SsiiDispatcher(
+    leftLowSlot: Int,
+    leftHighSlot: Int,
+    rightLow: Long,
+    rightHigh: Long,
+    destinationLowSlot: Int,
+    destinationHighSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64Sub128Executor(vstack, context, instruction)
+    executeI64Sub128(
+        vstack,
+        destinationLowSlot,
+        destinationHighSlot,
+        vstack.getFrameSlot(leftLowSlot),
+        vstack.getFrameSlot(leftHighSlot),
+        rightLow,
+        rightHigh,
+    )
 }
 
-fun I64Sub128Dispatcher(
-    instruction: NumericInstruction.I64Sub128Ssis,
+fun I64Sub128SsisDispatcher(
+    leftLowSlot: Int,
+    leftHighSlot: Int,
+    rightLow: Long,
+    rightHighSlot: Int,
+    destinationLowSlot: Int,
+    destinationHighSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64Sub128Executor(vstack, context, instruction)
+    executeI64Sub128(
+        vstack,
+        destinationLowSlot,
+        destinationHighSlot,
+        vstack.getFrameSlot(leftLowSlot),
+        vstack.getFrameSlot(leftHighSlot),
+        rightLow,
+        vstack.getFrameSlot(rightHighSlot),
+    )
 }
 
-fun I64Sub128Dispatcher(
-    instruction: NumericInstruction.I64Sub128Sssi,
+fun I64Sub128SssiDispatcher(
+    leftLowSlot: Int,
+    leftHighSlot: Int,
+    rightLowSlot: Int,
+    rightHigh: Long,
+    destinationLowSlot: Int,
+    destinationHighSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64Sub128Executor(vstack, context, instruction)
+    executeI64Sub128(
+        vstack,
+        destinationLowSlot,
+        destinationHighSlot,
+        vstack.getFrameSlot(leftLowSlot),
+        vstack.getFrameSlot(leftHighSlot),
+        vstack.getFrameSlot(rightLowSlot),
+        rightHigh,
+    )
 }
 
-fun I64Sub128Dispatcher(
-    instruction: NumericInstruction.I64Sub128Ssss,
+fun I64Sub128SsssDispatcher(
+    leftLowSlot: Int,
+    leftHighSlot: Int,
+    rightLowSlot: Int,
+    rightHighSlot: Int,
+    destinationLowSlot: Int,
+    destinationHighSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64Sub128Executor(vstack, context, instruction)
+    executeI64Sub128(
+        vstack,
+        destinationLowSlot,
+        destinationHighSlot,
+        vstack.getFrameSlot(leftLowSlot),
+        vstack.getFrameSlot(leftHighSlot),
+        vstack.getFrameSlot(rightLowSlot),
+        vstack.getFrameSlot(rightHighSlot),
+    )
 }
 
-fun I64MulWideSDispatcher(
-    instruction: NumericInstruction.I64MulWideSIi,
+fun I64MulWideSIiDispatcher(
+    left: Long,
+    right: Long,
+    destinationLowSlot: Int,
+    destinationHighSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64MulWideSExecutor(vstack, context, instruction)
+    executeI64MulWideSigned(vstack, destinationLowSlot, destinationHighSlot, left, right)
 }
 
-fun I64MulWideSDispatcher(
-    instruction: NumericInstruction.I64MulWideSIs,
+fun I64MulWideSIsDispatcher(
+    left: Long,
+    rightSlot: Int,
+    destinationLowSlot: Int,
+    destinationHighSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64MulWideSExecutor(vstack, context, instruction)
+    executeI64MulWideSigned(
+        vstack,
+        destinationLowSlot,
+        destinationHighSlot,
+        left,
+        vstack.getFrameSlot(rightSlot),
+    )
 }
 
-fun I64MulWideSDispatcher(
-    instruction: NumericInstruction.I64MulWideSSi,
+fun I64MulWideSSiDispatcher(
+    leftSlot: Int,
+    right: Long,
+    destinationLowSlot: Int,
+    destinationHighSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64MulWideSExecutor(vstack, context, instruction)
+    executeI64MulWideSigned(
+        vstack,
+        destinationLowSlot,
+        destinationHighSlot,
+        vstack.getFrameSlot(leftSlot),
+        right,
+    )
 }
 
-fun I64MulWideSDispatcher(
-    instruction: NumericInstruction.I64MulWideSSs,
+fun I64MulWideSSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationLowSlot: Int,
+    destinationHighSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64MulWideSExecutor(vstack, context, instruction)
+    executeI64MulWideSigned(
+        vstack,
+        destinationLowSlot,
+        destinationHighSlot,
+        vstack.getFrameSlot(leftSlot),
+        vstack.getFrameSlot(rightSlot),
+    )
 }
 
-fun I64MulWideUDispatcher(
-    instruction: NumericInstruction.I64MulWideUIi,
+fun I64MulWideUIiDispatcher(
+    left: Long,
+    right: Long,
+    destinationLowSlot: Int,
+    destinationHighSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64MulWideUExecutor(vstack, context, instruction)
+    executeI64MulWideUnsigned(vstack, destinationLowSlot, destinationHighSlot, left, right)
 }
 
-fun I64MulWideUDispatcher(
-    instruction: NumericInstruction.I64MulWideUIs,
+fun I64MulWideUIsDispatcher(
+    left: Long,
+    rightSlot: Int,
+    destinationLowSlot: Int,
+    destinationHighSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64MulWideUExecutor(vstack, context, instruction)
+    executeI64MulWideUnsigned(
+        vstack,
+        destinationLowSlot,
+        destinationHighSlot,
+        left,
+        vstack.getFrameSlot(rightSlot),
+    )
 }
 
-fun I64MulWideUDispatcher(
-    instruction: NumericInstruction.I64MulWideUSi,
+fun I64MulWideUSiDispatcher(
+    leftSlot: Int,
+    right: Long,
+    destinationLowSlot: Int,
+    destinationHighSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64MulWideUExecutor(vstack, context, instruction)
+    executeI64MulWideUnsigned(
+        vstack,
+        destinationLowSlot,
+        destinationHighSlot,
+        vstack.getFrameSlot(leftSlot),
+        right,
+    )
 }
 
-fun I64MulWideUDispatcher(
-    instruction: NumericInstruction.I64MulWideUSs,
+fun I64MulWideUSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationLowSlot: Int,
+    destinationHighSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64MulWideUExecutor(vstack, context, instruction)
+    executeI64MulWideUnsigned(
+        vstack,
+        destinationLowSlot,
+        destinationHighSlot,
+        vstack.getFrameSlot(leftSlot),
+        vstack.getFrameSlot(rightSlot),
+    )
 }

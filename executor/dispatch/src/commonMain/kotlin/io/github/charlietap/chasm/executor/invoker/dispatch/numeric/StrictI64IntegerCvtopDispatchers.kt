@@ -1,30 +1,39 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.numeric
 
 import io.github.charlietap.chasm.executor.invoker.dispatch.dispatchInstruction
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.cvtop.I64ExtendI32SExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.cvtop.I64ExtendI32UExecutor
-import io.github.charlietap.chasm.runtime.instruction.NumericInstruction
 
-fun I64ExtendI32SDispatcher(
-    instruction: NumericInstruction.I64ExtendI32SI,
+fun I64ExtendI32SIDispatcher(
+    operand: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64ExtendI32SExecutor(vstack, context, instruction)
+    run {
+        vstack.setFrameSlot(destinationSlot, operand.toLong())
+    }
 }
 
-fun I64ExtendI32SDispatcher(
-    instruction: NumericInstruction.I64ExtendI32SS,
+fun I64ExtendI32SSDispatcher(
+    operandSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64ExtendI32SExecutor(vstack, context, instruction)
+    run {
+        vstack.setFrameSlot(destinationSlot, vstack.getFrameSlot(operandSlot).toInt().toLong())
+    }
 }
 
-fun I64ExtendI32UDispatcher(
-    instruction: NumericInstruction.I64ExtendI32UI,
+fun I64ExtendI32UIDispatcher(
+    operand: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64ExtendI32UExecutor(vstack, context, instruction)
+    run {
+        vstack.setFrameSlot(destinationSlot, operand.toUInt().toLong())
+    }
 }
 
-fun I64ExtendI32UDispatcher(
-    instruction: NumericInstruction.I64ExtendI32US,
+fun I64ExtendI32USDispatcher(
+    operandSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64ExtendI32UExecutor(vstack, context, instruction)
+    run {
+        vstack.setFrameSlot(destinationSlot, vstack.getFrameSlot(operandSlot).toInt().toUInt().toLong())
+    }
 }
