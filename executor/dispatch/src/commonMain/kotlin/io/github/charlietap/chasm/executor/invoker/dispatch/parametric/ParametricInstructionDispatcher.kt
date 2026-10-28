@@ -6,12 +6,12 @@ import io.github.charlietap.chasm.runtime.instruction.ParametricInstruction
 fun ParametricInstructionDispatcher(
     instruction: ParametricInstruction,
 ): DispatchableInstruction = when (instruction) {
-    is ParametricInstruction.SelectIii -> SelectDispatcher(instruction)
-    is ParametricInstruction.SelectIis -> SelectDispatcher(instruction)
-    is ParametricInstruction.SelectIsi -> SelectDispatcher(instruction)
-    is ParametricInstruction.SelectIss -> SelectDispatcher(instruction)
-    is ParametricInstruction.SelectSii -> SelectDispatcher(instruction)
-    is ParametricInstruction.SelectSis -> SelectDispatcher(instruction)
-    is ParametricInstruction.SelectSsi -> SelectDispatcher(instruction)
-    is ParametricInstruction.SelectSss -> SelectDispatcher(instruction)
+    is ParametricInstruction.SelectIii -> SelectIiiDispatcher(instruction.condition, instruction.val1, instruction.val2, instruction.destinationSlot)
+    is ParametricInstruction.SelectIis -> SelectIisDispatcher(instruction.condition, instruction.val1, instruction.val2Slot, instruction.destinationSlot)
+    is ParametricInstruction.SelectIsi -> SelectIsiDispatcher(instruction.condition, instruction.val1Slot, instruction.val2, instruction.destinationSlot)
+    is ParametricInstruction.SelectIss -> SelectIssDispatcher(instruction.condition, instruction.val1Slot, instruction.val2Slot, instruction.destinationSlot)
+    is ParametricInstruction.SelectSii -> SelectSiiDispatcher(instruction.conditionSlot, instruction.val1, instruction.val2, instruction.destinationSlot)
+    is ParametricInstruction.SelectSis -> SelectSisDispatcher(instruction.conditionSlot, instruction.val1, instruction.val2Slot, instruction.destinationSlot)
+    is ParametricInstruction.SelectSsi -> SelectSsiDispatcher(instruction.conditionSlot, instruction.val1Slot, instruction.val2, instruction.destinationSlot)
+    is ParametricInstruction.SelectSss -> SelectSssDispatcher(instruction.conditionSlot, instruction.val1Slot, instruction.val2Slot, instruction.destinationSlot)
 }

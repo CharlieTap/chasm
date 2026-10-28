@@ -1,173 +1,415 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.table
 
 import io.github.charlietap.chasm.executor.invoker.dispatch.dispatchInstruction
-import io.github.charlietap.chasm.executor.invoker.instruction.table.TableCopyExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.table.TableFillExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.table.TableGetExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.table.TableGrowExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.table.TableInitExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.table.TableSetExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.table.TableSizeExecutor
-import io.github.charlietap.chasm.runtime.instruction.TableInstruction
+import io.github.charlietap.chasm.executor.invoker.instruction.table.executeTableCopy
+import io.github.charlietap.chasm.executor.invoker.instruction.table.executeTableFill
+import io.github.charlietap.chasm.executor.invoker.instruction.table.executeTableGet
+import io.github.charlietap.chasm.executor.invoker.instruction.table.executeTableGrow
+import io.github.charlietap.chasm.executor.invoker.instruction.table.executeTableInit
+import io.github.charlietap.chasm.executor.invoker.instruction.table.executeTableSet
+import io.github.charlietap.chasm.runtime.ext.element
+import io.github.charlietap.chasm.runtime.instance.ElementInstance
+import io.github.charlietap.chasm.runtime.instance.TableInstance
 
-fun TableCopyDispatcher(
-    instruction: TableInstruction.TableCopyIii,
+fun TableCopyIiiDispatcher(
+    elementsToCopy: Int,
+    srcOffset: Int,
+    dstOffset: Int,
+    srcTable: TableInstance,
+    destTable: TableInstance,
 ) = dispatchInstruction { vstack, context ->
-    TableCopyExecutor(vstack, context, instruction)
+    executeTableCopy(
+        srcTable = srcTable,
+        destTable = destTable,
+        elementsToCopy = elementsToCopy,
+        srcOffset = srcOffset,
+        dstOffset = dstOffset,
+    )
 }
 
-fun TableCopyDispatcher(
-    instruction: TableInstruction.TableCopyIis,
+fun TableCopyIisDispatcher(
+    elementsToCopy: Int,
+    srcOffset: Int,
+    dstOffsetSlot: Int,
+    srcTable: TableInstance,
+    destTable: TableInstance,
 ) = dispatchInstruction { vstack, context ->
-    TableCopyExecutor(vstack, context, instruction)
+    executeTableCopy(
+        srcTable = srcTable,
+        destTable = destTable,
+        elementsToCopy = elementsToCopy,
+        srcOffset = srcOffset,
+        dstOffset = vstack.getFrameSlot(dstOffsetSlot).toInt(),
+    )
 }
 
-fun TableCopyDispatcher(
-    instruction: TableInstruction.TableCopyIsi,
+fun TableCopyIsiDispatcher(
+    elementsToCopy: Int,
+    srcOffsetSlot: Int,
+    dstOffset: Int,
+    srcTable: TableInstance,
+    destTable: TableInstance,
 ) = dispatchInstruction { vstack, context ->
-    TableCopyExecutor(vstack, context, instruction)
+    executeTableCopy(
+        srcTable = srcTable,
+        destTable = destTable,
+        elementsToCopy = elementsToCopy,
+        srcOffset = vstack.getFrameSlot(srcOffsetSlot).toInt(),
+        dstOffset = dstOffset,
+    )
 }
 
-fun TableCopyDispatcher(
-    instruction: TableInstruction.TableCopyIss,
+fun TableCopyIssDispatcher(
+    elementsToCopy: Int,
+    srcOffsetSlot: Int,
+    dstOffsetSlot: Int,
+    srcTable: TableInstance,
+    destTable: TableInstance,
 ) = dispatchInstruction { vstack, context ->
-    TableCopyExecutor(vstack, context, instruction)
+    executeTableCopy(
+        srcTable = srcTable,
+        destTable = destTable,
+        elementsToCopy = elementsToCopy,
+        srcOffset = vstack.getFrameSlot(srcOffsetSlot).toInt(),
+        dstOffset = vstack.getFrameSlot(dstOffsetSlot).toInt(),
+    )
 }
 
-fun TableCopyDispatcher(
-    instruction: TableInstruction.TableCopySii,
+fun TableCopySiiDispatcher(
+    elementsToCopySlot: Int,
+    srcOffset: Int,
+    dstOffset: Int,
+    srcTable: TableInstance,
+    destTable: TableInstance,
 ) = dispatchInstruction { vstack, context ->
-    TableCopyExecutor(vstack, context, instruction)
+    executeTableCopy(
+        srcTable = srcTable,
+        destTable = destTable,
+        elementsToCopy = vstack.getFrameSlot(elementsToCopySlot).toInt(),
+        srcOffset = srcOffset,
+        dstOffset = dstOffset,
+    )
 }
 
-fun TableCopyDispatcher(
-    instruction: TableInstruction.TableCopySis,
+fun TableCopySisDispatcher(
+    elementsToCopySlot: Int,
+    srcOffset: Int,
+    dstOffsetSlot: Int,
+    srcTable: TableInstance,
+    destTable: TableInstance,
 ) = dispatchInstruction { vstack, context ->
-    TableCopyExecutor(vstack, context, instruction)
+    executeTableCopy(
+        srcTable = srcTable,
+        destTable = destTable,
+        elementsToCopy = vstack.getFrameSlot(elementsToCopySlot).toInt(),
+        srcOffset = srcOffset,
+        dstOffset = vstack.getFrameSlot(dstOffsetSlot).toInt(),
+    )
 }
 
-fun TableCopyDispatcher(
-    instruction: TableInstruction.TableCopySsi,
+fun TableCopySsiDispatcher(
+    elementsToCopySlot: Int,
+    srcOffsetSlot: Int,
+    dstOffset: Int,
+    srcTable: TableInstance,
+    destTable: TableInstance,
 ) = dispatchInstruction { vstack, context ->
-    TableCopyExecutor(vstack, context, instruction)
+    executeTableCopy(
+        srcTable = srcTable,
+        destTable = destTable,
+        elementsToCopy = vstack.getFrameSlot(elementsToCopySlot).toInt(),
+        srcOffset = vstack.getFrameSlot(srcOffsetSlot).toInt(),
+        dstOffset = dstOffset,
+    )
 }
 
-fun TableCopyDispatcher(
-    instruction: TableInstruction.TableCopySss,
+fun TableCopySssDispatcher(
+    elementsToCopySlot: Int,
+    srcOffsetSlot: Int,
+    dstOffsetSlot: Int,
+    srcTable: TableInstance,
+    destTable: TableInstance,
 ) = dispatchInstruction { vstack, context ->
-    TableCopyExecutor(vstack, context, instruction)
+    executeTableCopy(
+        srcTable = srcTable,
+        destTable = destTable,
+        elementsToCopy = vstack.getFrameSlot(elementsToCopySlot).toInt(),
+        srcOffset = vstack.getFrameSlot(srcOffsetSlot).toInt(),
+        dstOffset = vstack.getFrameSlot(dstOffsetSlot).toInt(),
+    )
 }
 
-fun TableFillDispatcher(
-    instruction: TableInstruction.TableFillIsi,
+fun TableFillIsiDispatcher(
+    elementsToFill: Int,
+    fillValueSlot: Int,
+    tableOffset: Int,
+    table: TableInstance,
 ) = dispatchInstruction { vstack, context ->
-    TableFillExecutor(vstack, context, instruction)
+    executeTableFill(
+        table = table,
+        elementsToFill = elementsToFill,
+        fillValue = vstack.getFrameSlot(fillValueSlot),
+        tableOffset = tableOffset,
+    )
 }
 
-fun TableFillDispatcher(
-    instruction: TableInstruction.TableFillIss,
+fun TableFillIssDispatcher(
+    elementsToFill: Int,
+    fillValueSlot: Int,
+    tableOffsetSlot: Int,
+    table: TableInstance,
 ) = dispatchInstruction { vstack, context ->
-    TableFillExecutor(vstack, context, instruction)
+    executeTableFill(
+        table = table,
+        elementsToFill = elementsToFill,
+        fillValue = vstack.getFrameSlot(fillValueSlot),
+        tableOffset = vstack.getFrameSlot(tableOffsetSlot).toInt(),
+    )
 }
 
-fun TableFillDispatcher(
-    instruction: TableInstruction.TableFillSsi,
+fun TableFillSsiDispatcher(
+    elementsToFillSlot: Int,
+    fillValueSlot: Int,
+    tableOffset: Int,
+    table: TableInstance,
 ) = dispatchInstruction { vstack, context ->
-    TableFillExecutor(vstack, context, instruction)
+    executeTableFill(
+        table = table,
+        elementsToFill = vstack.getFrameSlot(elementsToFillSlot).toInt(),
+        fillValue = vstack.getFrameSlot(fillValueSlot),
+        tableOffset = tableOffset,
+    )
 }
 
-fun TableFillDispatcher(
-    instruction: TableInstruction.TableFillSss,
+fun TableFillSssDispatcher(
+    elementsToFillSlot: Int,
+    fillValueSlot: Int,
+    tableOffsetSlot: Int,
+    table: TableInstance,
 ) = dispatchInstruction { vstack, context ->
-    TableFillExecutor(vstack, context, instruction)
+    executeTableFill(
+        table = table,
+        elementsToFill = vstack.getFrameSlot(elementsToFillSlot).toInt(),
+        fillValue = vstack.getFrameSlot(fillValueSlot),
+        tableOffset = vstack.getFrameSlot(tableOffsetSlot).toInt(),
+    )
 }
 
-fun TableGrowDispatcher(
-    instruction: TableInstruction.TableGrowIs,
+fun TableGrowIsDispatcher(
+    elementsToAdd: Int,
+    referenceValueSlot: Int,
+    destinationSlot: Int,
+    table: TableInstance,
 ) = dispatchInstruction { vstack, context ->
-    TableGrowExecutor(vstack, context, instruction)
+    executeTableGrow(
+        vstack = vstack,
+        context = context,
+        table = table,
+        elementsToAdd = elementsToAdd,
+        referenceValue = vstack.getFrameSlot(referenceValueSlot),
+        destinationSlot = destinationSlot,
+    )
 }
 
-fun TableGrowDispatcher(
-    instruction: TableInstruction.TableGrowSs,
+fun TableGrowSsDispatcher(
+    elementsToAddSlot: Int,
+    referenceValueSlot: Int,
+    destinationSlot: Int,
+    table: TableInstance,
 ) = dispatchInstruction { vstack, context ->
-    TableGrowExecutor(vstack, context, instruction)
+    executeTableGrow(
+        vstack = vstack,
+        context = context,
+        table = table,
+        elementsToAdd = vstack.getFrameSlot(elementsToAddSlot).toInt(),
+        referenceValue = vstack.getFrameSlot(referenceValueSlot),
+        destinationSlot = destinationSlot,
+    )
 }
 
-fun TableInitDispatcher(
-    instruction: TableInstruction.TableInitIii,
+fun TableInitIiiDispatcher(
+    elementsToInitialise: Int,
+    segmentOffset: Int,
+    tableOffset: Int,
+    element: ElementInstance,
+    table: TableInstance,
 ) = dispatchInstruction { vstack, context ->
-    TableInitExecutor(vstack, context, instruction)
+    executeTableInit(
+        table = table,
+        element = element,
+        elementsToInitialise = elementsToInitialise,
+        segmentOffset = segmentOffset,
+        tableOffset = tableOffset,
+    )
 }
 
-fun TableInitDispatcher(
-    instruction: TableInstruction.TableInitIis,
+fun TableInitIisDispatcher(
+    elementsToInitialise: Int,
+    segmentOffset: Int,
+    tableOffsetSlot: Int,
+    element: ElementInstance,
+    table: TableInstance,
 ) = dispatchInstruction { vstack, context ->
-    TableInitExecutor(vstack, context, instruction)
+    executeTableInit(
+        table = table,
+        element = element,
+        elementsToInitialise = elementsToInitialise,
+        segmentOffset = segmentOffset,
+        tableOffset = vstack.getFrameSlot(tableOffsetSlot).toInt(),
+    )
 }
 
-fun TableInitDispatcher(
-    instruction: TableInstruction.TableInitIsi,
+fun TableInitIsiDispatcher(
+    elementsToInitialise: Int,
+    segmentOffsetSlot: Int,
+    tableOffset: Int,
+    element: ElementInstance,
+    table: TableInstance,
 ) = dispatchInstruction { vstack, context ->
-    TableInitExecutor(vstack, context, instruction)
+    executeTableInit(
+        table = table,
+        element = element,
+        elementsToInitialise = elementsToInitialise,
+        segmentOffset = vstack.getFrameSlot(segmentOffsetSlot).toInt(),
+        tableOffset = tableOffset,
+    )
 }
 
-fun TableInitDispatcher(
-    instruction: TableInstruction.TableInitIss,
+fun TableInitIssDispatcher(
+    elementsToInitialise: Int,
+    segmentOffsetSlot: Int,
+    tableOffsetSlot: Int,
+    element: ElementInstance,
+    table: TableInstance,
 ) = dispatchInstruction { vstack, context ->
-    TableInitExecutor(vstack, context, instruction)
+    executeTableInit(
+        table = table,
+        element = element,
+        elementsToInitialise = elementsToInitialise,
+        segmentOffset = vstack.getFrameSlot(segmentOffsetSlot).toInt(),
+        tableOffset = vstack.getFrameSlot(tableOffsetSlot).toInt(),
+    )
 }
 
-fun TableInitDispatcher(
-    instruction: TableInstruction.TableInitSii,
+fun TableInitSiiDispatcher(
+    elementsToInitialiseSlot: Int,
+    segmentOffset: Int,
+    tableOffset: Int,
+    element: ElementInstance,
+    table: TableInstance,
 ) = dispatchInstruction { vstack, context ->
-    TableInitExecutor(vstack, context, instruction)
+    executeTableInit(
+        table = table,
+        element = element,
+        elementsToInitialise = vstack.getFrameSlot(elementsToInitialiseSlot).toInt(),
+        segmentOffset = segmentOffset,
+        tableOffset = tableOffset,
+    )
 }
 
-fun TableInitDispatcher(
-    instruction: TableInstruction.TableInitSis,
+fun TableInitSisDispatcher(
+    elementsToInitialiseSlot: Int,
+    segmentOffset: Int,
+    tableOffsetSlot: Int,
+    element: ElementInstance,
+    table: TableInstance,
 ) = dispatchInstruction { vstack, context ->
-    TableInitExecutor(vstack, context, instruction)
+    executeTableInit(
+        table = table,
+        element = element,
+        elementsToInitialise = vstack.getFrameSlot(elementsToInitialiseSlot).toInt(),
+        segmentOffset = segmentOffset,
+        tableOffset = vstack.getFrameSlot(tableOffsetSlot).toInt(),
+    )
 }
 
-fun TableInitDispatcher(
-    instruction: TableInstruction.TableInitSsi,
+fun TableInitSsiDispatcher(
+    elementsToInitialiseSlot: Int,
+    segmentOffsetSlot: Int,
+    tableOffset: Int,
+    element: ElementInstance,
+    table: TableInstance,
 ) = dispatchInstruction { vstack, context ->
-    TableInitExecutor(vstack, context, instruction)
+    executeTableInit(
+        table = table,
+        element = element,
+        elementsToInitialise = vstack.getFrameSlot(elementsToInitialiseSlot).toInt(),
+        segmentOffset = vstack.getFrameSlot(segmentOffsetSlot).toInt(),
+        tableOffset = tableOffset,
+    )
 }
 
-fun TableInitDispatcher(
-    instruction: TableInstruction.TableInitSss,
+fun TableInitSssDispatcher(
+    elementsToInitialiseSlot: Int,
+    segmentOffsetSlot: Int,
+    tableOffsetSlot: Int,
+    element: ElementInstance,
+    table: TableInstance,
 ) = dispatchInstruction { vstack, context ->
-    TableInitExecutor(vstack, context, instruction)
+    executeTableInit(
+        table = table,
+        element = element,
+        elementsToInitialise = vstack.getFrameSlot(elementsToInitialiseSlot).toInt(),
+        segmentOffset = vstack.getFrameSlot(segmentOffsetSlot).toInt(),
+        tableOffset = vstack.getFrameSlot(tableOffsetSlot).toInt(),
+    )
 }
 
-fun TableGetDispatcher(
-    instruction: TableInstruction.TableGetI,
+fun TableGetIDispatcher(
+    elementIndex: Int,
+    destinationSlot: Int,
+    table: TableInstance,
 ) = dispatchInstruction { vstack, context ->
-    TableGetExecutor(vstack, context, instruction)
+    executeTableGet(
+        vstack = vstack,
+        table = table,
+        elementIndex = elementIndex,
+        destinationSlot = destinationSlot,
+    )
 }
 
-fun TableGetDispatcher(
-    instruction: TableInstruction.TableGetS,
+fun TableGetSDispatcher(
+    elementIndexSlot: Int,
+    destinationSlot: Int,
+    table: TableInstance,
 ) = dispatchInstruction { vstack, context ->
-    TableGetExecutor(vstack, context, instruction)
+    executeTableGet(
+        vstack = vstack,
+        table = table,
+        elementIndex = vstack.getFrameSlot(elementIndexSlot).toInt(),
+        destinationSlot = destinationSlot,
+    )
 }
 
-fun TableSetDispatcher(
-    instruction: TableInstruction.TableSetSi,
+fun TableSetSiDispatcher(
+    valueSlot: Int,
+    elementIndex: Int,
+    table: TableInstance,
 ) = dispatchInstruction { vstack, context ->
-    TableSetExecutor(vstack, context, instruction)
+    executeTableSet(
+        table = table,
+        elementIndex = elementIndex,
+        value = vstack.getFrameSlot(valueSlot),
+    )
 }
 
-fun TableSetDispatcher(
-    instruction: TableInstruction.TableSetSs,
+fun TableSetSsDispatcher(
+    valueSlot: Int,
+    elementIndexSlot: Int,
+    table: TableInstance,
 ) = dispatchInstruction { vstack, context ->
-    TableSetExecutor(vstack, context, instruction)
+    executeTableSet(
+        table = table,
+        elementIndex = vstack.getFrameSlot(elementIndexSlot).toInt(),
+        value = vstack.getFrameSlot(valueSlot),
+    )
 }
 
-fun TableSizeDispatcher(
-    instruction: TableInstruction.TableSizeS,
+fun TableSizeSDispatcher(
+    destinationSlot: Int,
+    table: TableInstance,
 ) = dispatchInstruction { vstack, context ->
-    TableSizeExecutor(vstack, context, instruction)
+    run {
+        vstack.setFrameSlot(destinationSlot, table.elements.size.toLong())
+    }
 }

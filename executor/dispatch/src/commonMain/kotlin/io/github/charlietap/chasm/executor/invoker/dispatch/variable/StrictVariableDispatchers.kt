@@ -1,24 +1,31 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.variable
 
 import io.github.charlietap.chasm.executor.invoker.dispatch.dispatchInstruction
-import io.github.charlietap.chasm.executor.invoker.instruction.variable.GlobalGetExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.variable.GlobalSetExecutor
-import io.github.charlietap.chasm.runtime.instruction.VariableInstruction
+import io.github.charlietap.chasm.runtime.instance.GlobalInstance
 
-fun GlobalGetDispatcher(
-    instruction: VariableInstruction.GlobalGetS,
+fun GlobalGetSDispatcher(
+    global: GlobalInstance,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    GlobalGetExecutor(vstack, context, instruction)
+    run {
+        vstack.setFrameSlot(destinationSlot, global.value)
+    }
 }
 
-fun GlobalSetDispatcher(
-    instruction: VariableInstruction.GlobalSetI,
+fun GlobalSetIDispatcher(
+    value: Long,
+    global: GlobalInstance,
 ) = dispatchInstruction { vstack, context ->
-    GlobalSetExecutor(vstack, context, instruction)
+    run {
+        global.value = value
+    }
 }
 
-fun GlobalSetDispatcher(
-    instruction: VariableInstruction.GlobalSetS,
+fun GlobalSetSDispatcher(
+    sourceSlot: Int,
+    global: GlobalInstance,
 ) = dispatchInstruction { vstack, context ->
-    GlobalSetExecutor(vstack, context, instruction)
+    run {
+        global.value = vstack.getFrameSlot(sourceSlot)
+    }
 }
