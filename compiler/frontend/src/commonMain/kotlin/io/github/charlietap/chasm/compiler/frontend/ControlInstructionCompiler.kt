@@ -1,0 +1,788 @@
+package io.github.charlietap.chasm.compiler.frontend
+
+import io.github.charlietap.chasm.ast.instruction.ControlInstruction
+import io.github.charlietap.chasm.ast.instruction.Instruction
+import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
+import io.github.charlietap.chasm.ast.instruction.VariableInstruction
+import io.github.charlietap.chasm.ast.module.toInt
+import io.github.charlietap.chasm.cir.AdminInstruction
+import io.github.charlietap.chasm.cir.NumericCondition
+import io.github.charlietap.chasm.compiler.frontend.context.BlockContext
+import io.github.charlietap.chasm.compiler.frontend.context.BlockKind
+import io.github.charlietap.chasm.compiler.frontend.context.FunctionCompilationContext
+import io.github.charlietap.chasm.compiler.frontend.context.function
+import io.github.charlietap.chasm.compiler.frontend.context.functionType
+import io.github.charlietap.chasm.compiler.frontend.context.table
+import io.github.charlietap.chasm.compiler.frontend.context.tag
+import io.github.charlietap.chasm.compiler.frontend.context.tagType
+import io.github.charlietap.chasm.compiler.frontend.context.type
+import io.github.charlietap.chasm.compiler.frontend.emptyIntArray
+import io.github.charlietap.chasm.compiler.frontend.ext.toCir
+import io.github.charlietap.chasm.compiler.frontend.instruction.BranchOutcome
+import io.github.charlietap.chasm.compiler.frontend.instruction.callFrameOffset
+import io.github.charlietap.chasm.compiler.frontend.instruction.emitBranchIf
+import io.github.charlietap.chasm.compiler.frontend.instruction.emitBranchOnCast
+import io.github.charlietap.chasm.compiler.frontend.instruction.emitBranchOnNull
+import io.github.charlietap.chasm.compiler.frontend.instruction.emitBranchTable
+import io.github.charlietap.chasm.compiler.frontend.instruction.emitCall
+import io.github.charlietap.chasm.compiler.frontend.instruction.emitCallIndirect
+import io.github.charlietap.chasm.compiler.frontend.instruction.emitCallRef
+import io.github.charlietap.chasm.compiler.frontend.instruction.emitCheckpoint
+import io.github.charlietap.chasm.compiler.frontend.instruction.emitCopies
+import io.github.charlietap.chasm.compiler.frontend.instruction.emitFunctionReturn
+import io.github.charlietap.chasm.compiler.frontend.instruction.emitJump
+import io.github.charlietap.chasm.compiler.frontend.instruction.emitReturnCall
+import io.github.charlietap.chasm.compiler.frontend.instruction.emitReturnCallIndirect
+import io.github.charlietap.chasm.compiler.frontend.instruction.emitReturnCallRef
+import io.github.charlietap.chasm.compiler.frontend.instruction.emitThrow
+import io.github.charlietap.chasm.compiler.frontend.instruction.emitThrowRef
+import io.github.charlietap.chasm.compiler.frontend.instruction.emptySlotTransfer
+import io.github.charlietap.chasm.compiler.frontend.instruction.prepareBranchTarget
+import io.github.charlietap.chasm.compiler.frontend.instruction.slotTransferTo
+import io.github.charlietap.chasm.compiler.frontend.operand.OperandSourceKind
+import io.github.charlietap.chasm.compiler.frontend.operand.isImmediate
+import io.github.charlietap.chasm.compiler.frontend.operand.sourceSlot
+import io.github.charlietap.chasm.compiler.frontend.program.ProgramTarget
+import io.github.charlietap.chasm.type.BlockType
+import io.github.charlietap.chasm.type.ValueType
+import io.github.charlietap.chasm.cir.ControlInstruction as CirControlInstruction
+import io.github.charlietap.chasm.cir.ReferenceType as CirReferenceType
+
+internal fun beginFunctionControl(state: FunctionCompilationContext) {
+    val target = state.program.target()
+    val root = BlockContext(
+        kind = BlockKind.Function,
+        baseHeight = 0,
+        branchSlots = state.layout.returnSlots,
+        resultSlots = state.layout.returnSlots,
+        parameterSlots = emptyIntArray,
+        branchTypes = state.layout.resultTypes,
+        resultTypes = state.layout.resultTypes,
+        parameterTypes = emptyList(),
+        branchTarget = target,
+        continuationTarget = target,
+    )
+    state.rootControl = root
+}
+
+internal fun finishFunctionControl(state: FunctionCompilationContext) {
+    check(state.controls.isEmpty()) {
+        "function ended with unclosed controls: ${state.controls}"
+    }
+    val root = state.rootControl
+        ?: error("function control root is unavailable")
+    check(root.kind == BlockKind.Function)
+    state.rootControl = null
+
+    if (state.reachable) {
+        check(state.operands.size == root.resultSlots.size) {
+            "function result stack does not match its type: stack=${state.operands} results=${root.resultTypes}"
+        }
+        val transfer = state.slotTransferTo(root.resultSlots)
+        if (root.reachedByBranch) {
+            if (transfer.isIdentity()) {
+                state.bind(root.continuationTarget)
+                state.emit(
+                    AdminInstruction.EndFunction(root.resultSlots.size, state.layout.activationHeaderSlot),
+                )
+                return
+            }
+            state.emitFunctionReturn(transfer)
+            state.bind(root.continuationTarget)
+            state.emit(
+                AdminInstruction.EndFunction(root.resultSlots.size, state.layout.activationHeaderSlot),
+            )
+            return
+        }
+        state.bind(root.continuationTarget)
+        state.emitFunctionReturn(transfer)
+        return
+    }
+    state.bind(root.continuationTarget)
+    if (root.reachedByBranch) {
+        state.emit(
+            AdminInstruction.EndFunction(root.resultSlots.size, state.layout.activationHeaderSlot),
+        )
+    }
+}
+
+internal fun compileControlInstruction(
+    state: FunctionCompilationContext,
+    instruction: ControlInstruction,
+) {
+    if (!state.reachable && instruction !is ControlInstruction.Block && instruction !is ControlInstruction.Loop &&
+        instruction !is ControlInstruction.If && instruction !is ControlInstruction.TryTable &&
+        instruction !is ControlInstruction.Else && instruction !is ControlInstruction.End
+    ) {
+        return
+    }
+
+    when (instruction) {
+        is ControlInstruction.End -> repeat(instruction.count) { exitControl(state) }
+        is ControlInstruction.Call -> compileCall(state, instruction)
+        is ControlInstruction.BrIf -> compileBranchIf(state, instruction)
+        is ControlInstruction.If -> enterIf(state, instruction)
+        is ControlInstruction.Block -> enterBlock(state, BlockKind.Block, instruction.blockType)
+        is ControlInstruction.Br -> compileBranch(state, instruction)
+        is ControlInstruction.Loop -> enterBlock(state, BlockKind.Loop, instruction.blockType)
+        is ControlInstruction.Else -> enterElse(state)
+        is ControlInstruction.Unreachable -> {
+            state.emit(
+                CirControlInstruction.Unreachable,
+            )
+            state.reachable = false
+        }
+        is ControlInstruction.Return -> compileReturn(state)
+        is ControlInstruction.CallIndirect -> compileCallIndirect(state, instruction)
+        is ControlInstruction.CallRef -> compileCallRef(state, instruction)
+        is ControlInstruction.BrTable -> compileBranchTable(state, instruction)
+        is ControlInstruction.BrOnCast -> compileBranchOnCast(state, instruction, onSuccess = true)
+        is ControlInstruction.BrOnCastFail -> compileBranchOnCast(state, instruction, onSuccess = false)
+        is ControlInstruction.BrOnNonNull -> compileBranchOnNonNull(state, instruction)
+        is ControlInstruction.BrOnNull -> compileBranchOnNull(state, instruction)
+        is ControlInstruction.Nop -> Unit
+        is ControlInstruction.ReturnCall -> compileReturnCall(state, instruction)
+        is ControlInstruction.ReturnCallIndirect -> compileReturnCallIndirect(state, instruction)
+        is ControlInstruction.ReturnCallRef -> compileReturnCallRef(state, instruction)
+        is ControlInstruction.Throw -> compileThrow(state, instruction)
+        is ControlInstruction.ThrowRef -> compileThrowRef(state)
+        is ControlInstruction.TryTable -> enterTryTable(state, instruction)
+    }
+}
+
+private fun enterBlock(
+    state: FunctionCompilationContext,
+    kind: BlockKind,
+    blockType: BlockType,
+) {
+    if (!state.reachable) {
+        state.controls.pushInert(kind)
+        return
+    }
+
+    val type = state.blockType(blockType)
+    val parameterCount = type.params.types.size
+    val baseHeight = state.operands.size - parameterCount
+    check(baseHeight >= 0)
+    state.materializeBelow(parameterCount)
+
+    val resultSlots = state.resultRegionSlots(baseHeight, type.results.types.size)
+    val parameterSlots = if (parameterCount == 0) {
+        emptyIntArray
+    } else {
+        IntArray(parameterCount) { index ->
+            state.operands[state.operands.size - parameterCount + index].reservedSlot
+        }
+    }
+    val branchTarget = state.program.target()
+    val continuationTarget = if (kind == BlockKind.Loop) state.program.target() else branchTarget
+    val branchSlots = if (kind == BlockKind.Loop) {
+        if (parameterCount == 0) {
+            emptyIntArray
+        } else {
+            IntArray(parameterCount) { index ->
+                state.materialize(state.operands[state.operands.size - parameterCount + index])
+            }
+        }
+    } else {
+        resultSlots
+    }
+    if (kind == BlockKind.Loop) {
+        state.bind(branchTarget)
+        // At the loop's branch target, so every iteration passes the checkpoint.
+        state.emitCheckpoint()
+    }
+
+    state.controls.push(
+        kind = kind,
+        baseHeight = baseHeight,
+        branchSlots = branchSlots,
+        resultSlots = resultSlots,
+        parameterSlots = parameterSlots,
+        branchTypes = if (kind == BlockKind.Loop) type.params.types else type.results.types,
+        resultTypes = type.results.types,
+        parameterTypes = type.params.types,
+        branchTarget = branchTarget,
+        continuationTarget = continuationTarget,
+    )
+}
+
+private fun enterIf(
+    state: FunctionCompilationContext,
+    instruction: ControlInstruction.If,
+) {
+    if (!state.reachable) {
+        state.controls.pushInert(BlockKind.If)
+        return
+    }
+
+    val condition = state.pop()
+    enterIf(state, instruction) { elseTarget ->
+        state.emitBranchIf(condition, elseTarget, emptySlotTransfer, whenZero = true)
+    }
+}
+
+internal fun compileIfCondition(
+    state: FunctionCompilationContext,
+    instruction: ControlInstruction.If,
+    condition: NumericCondition,
+) {
+    enterIf(state, instruction) { elseTarget ->
+        state.emitBranchIf(condition, elseTarget, emptySlotTransfer, branchOnMatch = false)
+    }
+}
+
+private inline fun enterIf(
+    state: FunctionCompilationContext,
+    instruction: ControlInstruction.If,
+    emitCondition: (ProgramTarget) -> BranchOutcome,
+) {
+    val type = state.blockType(instruction.blockType)
+    val parameterCount = type.params.types.size
+    val baseHeight = state.operands.size - parameterCount
+    check(baseHeight >= 0)
+    state.materializeBelow(0)
+    state.rewindFrame()
+
+    val resultSlots = state.resultRegionSlots(baseHeight, type.results.types.size)
+    val parameterSlots = if (parameterCount == 0) {
+        emptyIntArray
+    } else {
+        IntArray(parameterCount) { index ->
+            state.operands[state.operands.size - parameterCount + index].reservedSlot
+        }
+    }
+    val continuationTarget = state.program.target()
+    val elseTarget = state.program.target()
+    val block = state.controls.push(
+        kind = BlockKind.If,
+        baseHeight = baseHeight,
+        branchSlots = resultSlots,
+        resultSlots = resultSlots,
+        parameterSlots = parameterSlots,
+        branchTypes = type.results.types,
+        resultTypes = type.results.types,
+        parameterTypes = type.params.types,
+        branchTarget = continuationTarget,
+        continuationTarget = continuationTarget,
+    )
+    block.elseTarget = elseTarget
+    block.entryFrameHeight = state.frame.snapshot()
+    when (emitCondition(elseTarget)) {
+        BranchOutcome.Always -> {
+            block.thenReachableFromCondition = false
+            state.reachable = false
+        }
+        BranchOutcome.Never -> block.elseReachableFromCondition = false
+        BranchOutcome.Dynamic -> Unit
+    }
+}
+
+private fun enterTryTable(
+    state: FunctionCompilationContext,
+    instruction: ControlInstruction.TryTable,
+) {
+    if (!state.reachable) {
+        state.controls.pushInert(BlockKind.TryTable)
+        return
+    }
+    val catches = Array(instruction.handlers.size) { index ->
+        val handler = instruction.handlers[index]
+        val target = state.target(handler.labelIndex.toInt())
+        val tag = when (handler) {
+            is ControlInstruction.CatchHandler.Catch -> state.compiler.tag(handler.tagIndex)
+            is ControlInstruction.CatchHandler.CatchRef -> state.compiler.tag(handler.tagIndex)
+            else -> null
+        }
+        val includeReference = handler is ControlInstruction.CatchHandler.CatchRef ||
+            handler is ControlInstruction.CatchHandler.CatchAllRef
+        val payloadArity = when (handler) {
+            is ControlInstruction.CatchHandler.Catch -> state.compiler.tagType(handler.tagIndex).functionType.params.types.size
+            is ControlInstruction.CatchHandler.CatchRef -> state.compiler.tagType(handler.tagIndex).functionType.params.types.size + 1
+            is ControlInstruction.CatchHandler.CatchAll -> 0
+            is ControlInstruction.CatchHandler.CatchAllRef -> 1
+        }
+        check(target.branchSlots.size == payloadArity)
+        target.reachedByBranch = true
+        val prefixEnd = state.operands.highestReservedSlot(target.baseHeight) + 1
+        val payloadEnd = (target.branchSlots.maxOrNull() ?: -1) + 1
+        CatchTarget(
+            tag = tag,
+            target = target.branchTarget,
+            payloadSlots = target.branchSlots,
+            includeExceptionReference = includeReference,
+            stackSlotCount = maxOf(state.layout.temporarySlotBase, prefixEnd, payloadEnd),
+        )
+    }
+    enterBlock(state, BlockKind.TryTable, instruction.blockType)
+    enterExceptionRegion(state, catches)
+}
+
+private fun enterElse(state: FunctionCompilationContext) {
+    val frame = state.controls.lastOrNull()
+        ?: error("else does not match an if")
+    check(frame.kind == BlockKind.If) {
+        "else does not match an if"
+    }
+    if (frame.inert) {
+        check(!frame.inElse)
+        frame.inElse = true
+    } else {
+        transitionToElse(state, frame)
+    }
+}
+
+private fun transitionToElse(
+    state: FunctionCompilationContext,
+    frame: BlockContext,
+) {
+    check(!frame.inElse)
+    finalizeFallthrough(state, frame)
+    frame.thenReachable = state.reachable && frame.thenReachableFromCondition
+    if (frame.thenReachable) {
+        state.emitJump(frame.continuationTarget)
+    }
+    state.bind(frame.elseTarget)
+    state.unwindToHeight(frame.baseHeight)
+    state.frame.restore(frame.entryFrameHeight)
+    for (index in frame.parameterTypes.indices) {
+        state.pushFrame(frame.parameterTypes[index], frame.parameterSlots[index])
+    }
+    state.reachable = frame.elseReachableFromCondition
+    frame.inElse = true
+}
+
+private fun exitControl(state: FunctionCompilationContext) {
+    if (state.controls.isEmpty()) {
+        error("end does not match an open control")
+    }
+    val frame = state.controls.pop()
+    when {
+        frame.inert -> Unit
+        frame.kind == BlockKind.If -> exitIf(state, frame)
+        else -> exitStructured(state, frame)
+    }
+}
+
+private fun exitStructured(
+    state: FunctionCompilationContext,
+    block: BlockContext,
+) {
+    finalizeFallthrough(state, block)
+    val continuesFromBranch = block.kind != BlockKind.Loop && block.reachedByBranch
+    if (!state.reachable && continuesFromBranch) {
+        restoreBlockResults(state, block)
+    }
+    if (block.kind == BlockKind.TryTable) exitExceptionRegion(state)
+    state.bind(block.continuationTarget)
+    state.rewindFrame()
+}
+
+private fun exitIf(
+    state: FunctionCompilationContext,
+    frame: BlockContext,
+) {
+    if (!frame.inElse) transitionToElse(state, frame)
+    finalizeFallthrough(state, frame)
+    val elseReachable = state.reachable
+    when {
+        elseReachable -> Unit
+        frame.thenReachable -> restoreBlockResults(state, frame)
+        frame.reachedByBranch -> restoreBlockResults(state, frame)
+        else -> state.reachable = false
+    }
+    state.bind(frame.continuationTarget)
+    state.rewindFrame()
+}
+
+private fun finalizeFallthrough(
+    state: FunctionCompilationContext,
+    block: BlockContext,
+) {
+    if (!state.reachable) return
+    check(state.operands.size == block.baseHeight + block.resultSlots.size) {
+        "control fallthrough does not match its result type: block=${block.kind} stack=${state.operands}"
+    }
+    val resultCount = block.resultSlots.size
+    if (resultCount > 0) {
+        val sourceSlots = IntArray(resultCount) { index ->
+            state.materialize(state.operands[state.operands.size - resultCount + index])
+        }
+        state.emitCopies(sourceSlots, block.resultSlots)
+    }
+    state.replaceStack(block.baseHeight, block.resultTypes, block.resultSlots)
+}
+
+private fun restoreBlockResults(
+    state: FunctionCompilationContext,
+    block: BlockContext,
+) {
+    state.replaceStack(block.baseHeight, block.resultTypes, block.resultSlots)
+    state.reachable = true
+}
+
+private fun compileBranch(
+    state: FunctionCompilationContext,
+    instruction: ControlInstruction.Br,
+) {
+    val target = state.target(instruction.labelIndex.toInt())
+    state.emitJump(
+        target.branchTarget,
+        state.slotTransferTo(target.branchSlots),
+    )
+    target.reachedByBranch = true
+    state.reachable = false
+}
+
+private fun compileBranchIf(
+    state: FunctionCompilationContext,
+    instruction: ControlInstruction.BrIf,
+) {
+    val condition = state.pop()
+    val target = state.target(instruction.labelIndex.toInt())
+    val outcome = state.emitBranchIf(
+        condition = condition,
+        target = target.branchTarget,
+        transfer = state.slotTransferTo(target.branchSlots),
+    )
+    if (outcome != BranchOutcome.Never) target.reachedByBranch = true
+    if (outcome == BranchOutcome.Always) state.reachable = false
+}
+
+internal fun compileBranchIfCondition(
+    state: FunctionCompilationContext,
+    instruction: ControlInstruction.BrIf,
+    condition: NumericCondition,
+) {
+    val target = state.target(instruction.labelIndex.toInt())
+    val outcome = state.emitBranchIf(
+        condition = condition,
+        target = target.branchTarget,
+        transfer = state.slotTransferTo(target.branchSlots),
+    )
+    if (outcome != BranchOutcome.Never) target.reachedByBranch = true
+    if (outcome == BranchOutcome.Always) state.reachable = false
+}
+
+private fun compileBranchTable(
+    state: FunctionCompilationContext,
+    instruction: ControlInstruction.BrTable,
+) {
+    val selector = state.pop()
+    if (selector.sourceKind == OperandSourceKind.I32Immediate) {
+        val selectorIndex = selector.sourceBits.toInt()
+        val labelIndex = instruction.labelIndices.getOrNull(selectorIndex) ?: instruction.defaultLabelIndex
+        val target = state.target(labelIndex.toInt())
+        state.emitJump(
+            target = target.branchTarget,
+            transfer = state.slotTransferTo(target.branchSlots),
+        )
+        target.reachedByBranch = true
+        state.reachable = false
+        return
+    }
+
+    val defaultTarget = state.target(instruction.defaultLabelIndex.toInt())
+    val arity = defaultTarget.branchSlots.size
+    val targetIndices = IntArray(instruction.labelIndices.size + 1)
+    for (index in instruction.labelIndices.indices) {
+        val target = state.target(instruction.labelIndices[index].toInt())
+        check(target.branchSlots.size == arity)
+        targetIndices[index] = state.prepareBranchTarget(
+            target = target.branchTarget,
+            transfer = state.slotTransferTo(target.branchSlots),
+        ).index
+        target.reachedByBranch = true
+    }
+    targetIndices[instruction.labelIndices.size] = state.prepareBranchTarget(
+        target = defaultTarget.branchTarget,
+        transfer = state.slotTransferTo(defaultTarget.branchSlots),
+    ).index
+    state.emitBranchTable(
+        selector = selector,
+        targetIndices = targetIndices,
+    )
+    defaultTarget.reachedByBranch = true
+    state.reachable = false
+}
+
+private fun compileReturn(state: FunctionCompilationContext) {
+    val root = checkNotNull(state.rootControl)
+    state.emitFunctionReturn(state.slotTransferTo(root.branchSlots))
+    state.reachable = false
+}
+
+private fun compileBranchOnNull(
+    state: FunctionCompilationContext,
+    instruction: ControlInstruction.BrOnNull,
+) {
+    val operand = state.operands.last()
+    val target = state.target(instruction.labelIndex.toInt())
+    state.emitBranchOnNull(
+        operand = operand,
+        target = target.branchTarget,
+        transfer = state.slotTransferTo(target.branchSlots, excludedTrailingOperandCount = 1),
+        onNull = true,
+    )
+    target.reachedByBranch = true
+}
+
+private fun compileBranchOnNonNull(
+    state: FunctionCompilationContext,
+    instruction: ControlInstruction.BrOnNonNull,
+) {
+    val operand = state.operands.last()
+    val target = state.target(instruction.labelIndex.toInt())
+    state.emitBranchOnNull(
+        operand = operand,
+        target = target.branchTarget,
+        transfer = state.slotTransferTo(target.branchSlots),
+        onNull = false,
+    )
+    state.pop()
+    target.reachedByBranch = true
+}
+
+private fun compileBranchOnCast(
+    state: FunctionCompilationContext,
+    instruction: ControlInstruction,
+    onSuccess: Boolean,
+) {
+    val (labelIndex, destinationType) = when (instruction) {
+        is ControlInstruction.BrOnCast -> instruction.labelIndex to instruction.dstReferenceType
+        is ControlInstruction.BrOnCastFail -> instruction.labelIndex to instruction.dstReferenceType
+        else -> error("not a cast branch: $instruction")
+    }
+    val operand = state.operands.last()
+    val target = state.target(labelIndex.toInt())
+    state.emitBranchOnCast(
+        operand = operand,
+        target = target.branchTarget,
+        transfer = state.slotTransferTo(target.branchSlots),
+        typeTest = destinationType.toCir(),
+        onSuccess = onSuccess,
+    )
+    target.reachedByBranch = true
+}
+
+private fun compileThrow(
+    state: FunctionCompilationContext,
+    instruction: ControlInstruction.Throw,
+) {
+    val payloads = state.pop(state.compiler.tagType(instruction.tagIndex).functionType.params.types.size)
+    val contiguousSource = state.contiguousFrameSourceOrNull(payloads)
+    val materializedPayloads = payloads.isNotEmpty() && contiguousSource == null
+    val firstPayloadSlot = contiguousSource ?: if (payloads.isEmpty()) {
+        0
+    } else {
+        state.materializeContiguous(payloads)
+    }
+    state.emitThrow(
+        tagIndex = instruction.tagIndex,
+        firstPayloadSlot = firstPayloadSlot,
+    )
+    if (materializedPayloads) state.releaseContiguous(firstPayloadSlot, payloads.size)
+    state.reachable = false
+}
+
+private fun compileThrowRef(state: FunctionCompilationContext) {
+    state.emitThrowRef(state.materialize(state.pop()))
+    state.reachable = false
+}
+
+private fun compileCall(
+    state: FunctionCompilationContext,
+    instruction: ControlInstruction.Call,
+) {
+    val type = state.compiler.functionType(instruction.functionIndex)
+    val operands = state.pop(type.params.types.size)
+    val callFrameOffset = state.callFrameOffset()
+    val interfaceSlotCount = maxOf(type.params.types.size, type.results.types.size)
+    reserveCallInterface(state, callFrameOffset, interfaceSlotCount)
+    val destination = callResultDestination(state, type.results.types)
+    state.emitCall(
+        function = state.compiler.function(instruction.functionIndex),
+        operands = operands,
+        callFrameOffset = callFrameOffset,
+        resultDestinationSlot = destination?.slot,
+    )
+    completeCallResults(state, type.results.types, callFrameOffset, destination)
+}
+
+private fun compileCallIndirect(
+    state: FunctionCompilationContext,
+    instruction: ControlInstruction.CallIndirect,
+) {
+    val type = state.compiler.functionTypeAt(instruction.typeIndex.toInt())
+    val elementIndex = state.pop()
+    val operands = state.pop(type.params.types.size)
+    val callFrameOffset = state.callFrameOffset()
+    val interfaceSlotCount = maxOf(type.params.types.size, type.results.types.size)
+    reserveCallInterface(state, callFrameOffset, interfaceSlotCount)
+    val destination = callResultDestination(state, type.results.types)
+    state.emitCallIndirect(
+        elementIndex = elementIndex,
+        operands = operands,
+        type = state.compiler.type(instruction.typeIndex),
+        table = state.compiler.table(instruction.tableIndex),
+        callFrameOffset = callFrameOffset,
+        resultDestinationSlot = destination?.slot,
+    )
+    completeCallResults(state, type.results.types, callFrameOffset, destination)
+}
+
+private fun compileCallRef(
+    state: FunctionCompilationContext,
+    instruction: ControlInstruction.CallRef,
+) {
+    val type = state.compiler.functionTypeAt(instruction.typeIndex.toInt())
+    val functionReference = state.pop()
+    val operands = state.pop(type.params.types.size)
+    val callFrameOffset = state.callFrameOffset()
+    val interfaceSlotCount = maxOf(type.params.types.size, type.results.types.size)
+    reserveCallInterface(state, callFrameOffset, interfaceSlotCount)
+    val destination = callResultDestination(state, type.results.types)
+    check(!functionReference.isImmediate)
+    state.emitCallRef(
+        functionSlot = functionReference.sourceSlot,
+        operands = operands,
+        type = state.compiler.type(instruction.typeIndex),
+        callFrameOffset = callFrameOffset,
+        resultDestinationSlot = destination?.slot,
+    )
+    completeCallResults(state, type.results.types, callFrameOffset, destination)
+}
+
+internal fun compileKnownReferenceCall(
+    state: FunctionCompilationContext,
+    reference: ReferenceInstruction.RefFunc,
+    instruction: ControlInstruction.CallRef,
+) {
+    val type = state.compiler.functionTypeAt(instruction.typeIndex.toInt())
+    val operands = state.pop(type.params.types.size)
+    val callFrameOffset = state.callFrameOffset()
+    val interfaceSlotCount = maxOf(type.params.types.size, type.results.types.size)
+    reserveCallInterface(state, callFrameOffset, interfaceSlotCount)
+    val destination = callResultDestination(state, type.results.types)
+    state.emitCall(
+        function = state.compiler.function(reference.funcIdx),
+        operands = operands,
+        callFrameOffset = callFrameOffset,
+        resultDestinationSlot = destination?.slot,
+    )
+    completeCallResults(state, type.results.types, callFrameOffset, destination)
+}
+
+private fun compileReturnCall(
+    state: FunctionCompilationContext,
+    instruction: ControlInstruction.ReturnCall,
+) {
+    val operands = state.pop(state.compiler.functionType(instruction.functionIndex).params.types.size)
+    state.emitReturnCall(state.compiler.function(instruction.functionIndex), operands, state.callFrameOffset())
+    state.exceptionTableBuilder?.excludeTailCall(state.program.size - 1)
+    state.reachable = false
+}
+
+private fun compileReturnCallIndirect(
+    state: FunctionCompilationContext,
+    instruction: ControlInstruction.ReturnCallIndirect,
+) {
+    val type = state.compiler.functionTypeAt(instruction.typeIndex.toInt())
+    val elementIndex = state.pop()
+    val operands = state.pop(type.params.types.size)
+    val callFrameOffset = state.callFrameOffset()
+    reserveCallInterface(state, callFrameOffset, type.params.types.size)
+    state.emitReturnCallIndirect(
+        elementIndex = elementIndex,
+        operands = operands,
+        type = state.compiler.type(instruction.typeIndex),
+        table = state.compiler.table(instruction.tableIndex),
+        callFrameOffset = callFrameOffset,
+    )
+    state.exceptionTableBuilder?.excludeTailCall(state.program.size - 1)
+    state.reachable = false
+}
+
+private fun compileReturnCallRef(
+    state: FunctionCompilationContext,
+    instruction: ControlInstruction.ReturnCallRef,
+) {
+    val type = state.compiler.functionTypeAt(instruction.typeIndex.toInt())
+    val functionReference = state.pop()
+    val operands = state.pop(type.params.types.size)
+    val callFrameOffset = state.callFrameOffset()
+    reserveCallInterface(state, callFrameOffset, type.params.types.size)
+    state.emitReturnCallRef(
+        functionSlot = state.materialize(functionReference),
+        operands = operands,
+        type = state.compiler.type(instruction.typeIndex),
+        callFrameOffset = callFrameOffset,
+    )
+    state.exceptionTableBuilder?.excludeTailCall(state.program.size - 1)
+    state.reachable = false
+}
+
+internal fun compileKnownReferenceReturnCall(
+    state: FunctionCompilationContext,
+    reference: ReferenceInstruction.RefFunc,
+    instruction: ControlInstruction.ReturnCallRef,
+) {
+    val type = state.compiler.functionTypeAt(instruction.typeIndex.toInt())
+    val operands = state.pop(type.params.types.size)
+    state.emitReturnCall(state.compiler.function(reference.funcIdx), operands, state.callFrameOffset())
+    state.exceptionTableBuilder?.excludeTailCall(state.program.size - 1)
+    state.reachable = false
+}
+
+private fun reserveCallInterface(state: FunctionCompilationContext, base: Int, size: Int) {
+    state.frame.reserve(base + size)
+}
+
+private fun pushCallResults(
+    state: FunctionCompilationContext,
+    types: List<ValueType>,
+    slotBase: Int,
+) {
+    for (index in types.indices) {
+        state.pushFrame(types[index], slotBase + index)
+    }
+}
+
+private fun callResultDestination(
+    state: FunctionCompilationContext,
+    types: List<ValueType>,
+): Destination? = if (
+    types.size == 1 &&
+    state.instructions.next().let { next -> next is VariableInstruction.LocalSet || next is VariableInstruction.LocalTee }
+) {
+    destination(state, null).takeIf(Destination::isLocal)
+} else {
+    null
+}
+
+private fun completeCallResults(
+    state: FunctionCompilationContext,
+    types: List<ValueType>,
+    slotBase: Int,
+    destination: Destination?,
+) {
+    if (destination == null) {
+        pushCallResults(state, types, slotBase)
+    } else {
+        completeDestination(state, types.single(), destination)
+    }
+}
+
+private fun FunctionCompilationContext.target(depth: Int): BlockContext {
+    check(depth >= 0)
+    val controlIndex = controls.lastIndex - depth
+    if (controlIndex >= 0) {
+        return controls[controlIndex].also { control ->
+            check(!control.inert) {
+                "reachable code cannot target an inert control"
+            }
+        }
+    }
+    if (controlIndex == -1) return checkNotNull(rootControl)
+    error("label depth is outside the active control stack: $depth")
+}

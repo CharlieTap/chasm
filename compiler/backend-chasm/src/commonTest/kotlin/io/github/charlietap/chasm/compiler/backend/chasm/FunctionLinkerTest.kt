@@ -1,0 +1,1520 @@
+package io.github.charlietap.chasm.compiler.backend.chasm
+
+import io.github.charlietap.chasm.ast.instruction.AggregateInstruction
+import io.github.charlietap.chasm.ast.instruction.ControlInstruction
+import io.github.charlietap.chasm.ast.instruction.Expression
+import io.github.charlietap.chasm.ast.instruction.NumericInstruction
+import io.github.charlietap.chasm.ast.instruction.ParametricInstruction
+import io.github.charlietap.chasm.ast.instruction.VariableInstruction
+import io.github.charlietap.chasm.ast.module.Function
+import io.github.charlietap.chasm.ast.module.Index
+import io.github.charlietap.chasm.ast.module.Local
+import io.github.charlietap.chasm.ast.module.Module
+import io.github.charlietap.chasm.ast.module.typeResolver
+import io.github.charlietap.chasm.compiler.backend.chasm.ext.localInitialValues
+import io.github.charlietap.chasm.compiler.backend.chasm.ext.toRuntime
+import io.github.charlietap.chasm.fixture.ast.instruction.brIfInstruction
+import io.github.charlietap.chasm.fixture.ast.instruction.dropInstruction
+import io.github.charlietap.chasm.fixture.ast.instruction.expression
+import io.github.charlietap.chasm.fixture.ast.instruction.i32AddInstruction
+import io.github.charlietap.chasm.fixture.ast.instruction.i32ConstInstruction
+import io.github.charlietap.chasm.fixture.ast.instruction.localGetInstruction
+import io.github.charlietap.chasm.fixture.ast.module.export
+import io.github.charlietap.chasm.fixture.ast.module.function
+import io.github.charlietap.chasm.fixture.ast.module.labelIndex
+import io.github.charlietap.chasm.fixture.ast.module.localIndex
+import io.github.charlietap.chasm.fixture.ast.module.module
+import io.github.charlietap.chasm.fixture.runtime.execution.executionContext
+import io.github.charlietap.chasm.fixture.runtime.stack.vstack
+import io.github.charlietap.chasm.fixture.runtime.store
+import io.github.charlietap.chasm.fixture.type.arrayCompositeType
+import io.github.charlietap.chasm.fixture.type.arrayType
+import io.github.charlietap.chasm.fixture.type.definedType
+import io.github.charlietap.chasm.fixture.type.finalSubType
+import io.github.charlietap.chasm.fixture.type.functionRecursiveType
+import io.github.charlietap.chasm.fixture.type.functionType
+import io.github.charlietap.chasm.fixture.type.i32ValueType
+import io.github.charlietap.chasm.fixture.type.i64ValueType
+import io.github.charlietap.chasm.fixture.type.immutableFieldType
+import io.github.charlietap.chasm.fixture.type.recursiveType
+import io.github.charlietap.chasm.fixture.type.refNonNullReferenceType
+import io.github.charlietap.chasm.fixture.type.refNullReferenceType
+import io.github.charlietap.chasm.fixture.type.referenceValueType
+import io.github.charlietap.chasm.fixture.type.resultType
+import io.github.charlietap.chasm.fixture.type.structCompositeType
+import io.github.charlietap.chasm.fixture.type.structType
+import io.github.charlietap.chasm.fixture.type.valueStorageType
+import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
+import io.github.charlietap.chasm.runtime.exception.InvocationException
+import io.github.charlietap.chasm.runtime.instruction.TransferSource
+import io.github.charlietap.chasm.runtime.program.EXIT_IP
+import io.github.charlietap.chasm.runtime.program.Program
+import io.github.charlietap.chasm.runtime.store.Store
+import io.github.charlietap.chasm.type.AbstractHeapType
+import io.github.charlietap.chasm.type.BlockType
+import io.github.charlietap.chasm.type.ValueType
+import kotlin.test.Test
+import kotlin.test.assertContentEquals
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.assertTrue
+import io.github.charlietap.chasm.cir.AdminInstruction as CirAdminInstruction
+import io.github.charlietap.chasm.cir.ControlInstruction as CirControlInstruction
+
+class FunctionLinkerTest {
+
+    @Test
+    fun placesASingleCallResultDirectlyInItsLocal() {
+        val targetType = functionType(results = resultType(listOf(i32ValueType())))
+        val callerType = functionType(results = resultType(listOf(i32ValueType())))
+        val caller = function(
+            idx = Index.FunctionIndex(1u),
+            typeIndex = Index.TypeIndex(1u),
+            locals = listOf(Local(Index.LocalIndex(0u), i32ValueType())),
+            body = Expression(
+                ControlInstruction.Call(Index.FunctionIndex(0u)),
+                VariableInstruction.LocalSet(Index.LocalIndex(0u)),
+                VariableInstruction.LocalGet(Index.LocalIndex(0u)),
+            ),
+        )
+        val module = module(
+            definedTypes = listOf(
+                definedType(recursiveType = functionRecursiveType(targetType), typeIndex = 0),
+                definedType(recursiveType = functionRecursiveType(callerType), typeIndex = 1),
+            ),
+            functions = listOf(function(), caller),
+        )
+        val lowered = linkFunction(module = module, definedFunctionIndex = 1).function.instructions
+
+        assertEquals(1, lowered.filterIsInstance<CirControlInstruction.Call>().size)
+        assertTrue(lowered.none { it is CirAdminInstruction.CopySlot })
+    }
+
+    @Test
+    fun lowersMaterializedCallParametersInPlaceBeforeTheActivationHeader() {
+        val targetType = functionType(
+            params = resultType(listOf(i32ValueType(), i32ValueType())),
+            results = resultType(listOf(i32ValueType())),
+        )
+        val callerType = functionType(
+            params = resultType(List(4) { i32ValueType() }),
+            results = resultType(listOf(i32ValueType())),
+        )
+        val caller = function(
+            idx = Index.FunctionIndex(1u),
+            typeIndex = Index.TypeIndex(1u),
+            body = Expression(
+                VariableInstruction.LocalGet(Index.LocalIndex(0u)),
+                VariableInstruction.LocalGet(Index.LocalIndex(1u)),
+                NumericInstruction.I32Add,
+                VariableInstruction.LocalGet(Index.LocalIndex(2u)),
+                VariableInstruction.LocalGet(Index.LocalIndex(3u)),
+                NumericInstruction.I32Add,
+                ControlInstruction.Call(Index.FunctionIndex(0u)),
+            ),
+        )
+        val module = module(
+            definedTypes = listOf(
+                definedType(recursiveType = functionRecursiveType(targetType), typeIndex = 0),
+                definedType(recursiveType = functionRecursiveType(callerType), typeIndex = 1),
+            ),
+            functions = listOf(function(), caller),
+        )
+        val lowered = linkFunction(module = module, definedFunctionIndex = 1).function.instructions
+
+        val call = lowered.filterIsInstance<CirControlInstruction.Call>().single()
+        val operands = call.operands.toRuntime()
+        assertTrue(operands.isInPlace)
+        assertEquals(5, call.callFrameOffset)
+        assertEquals(listOf(5, 6), operands.sources.map { (it as TransferSource.Slot).slot })
+    }
+
+    @Test
+    fun writesAFinalNumericResultDirectlyIntoTheFunctionInterface() {
+        val module = module(
+            definedTypes = listOf(
+                definedType(
+                    recursiveType = functionRecursiveType(
+                        functionType = functionType(
+                            params = resultType(listOf(i32ValueType(), i32ValueType())),
+                            results = resultType(listOf(i32ValueType())),
+                        ),
+                    ),
+                ),
+            ),
+        )
+        val function = function(
+            body = expression(
+                instructions = listOf(
+                    localGetInstruction(localIndex(0u)),
+                    localGetInstruction(localIndex(1u)),
+                    i32AddInstruction(),
+                ),
+            ),
+        )
+
+        val compiled = compileFunction(module, function)
+        val vstack = vstack().apply {
+            reserveDepth(compiled.frameSlots)
+            setFrameSlot(0, 20)
+            setFrameSlot(1, 22)
+        }
+        val store = store()
+        val executionContext = executionContext(vstack = vstack, store = store)
+
+        compiled.instructions.first()(vstack, executionContext, 1)
+
+        assertEquals(42, vstack.getFrameSlot(0).toInt())
+    }
+
+    @Test
+    fun preservesAnEarlierResultAliasedToAFinalResultSlot() {
+        val module = module(
+            definedTypes = listOf(
+                definedType(
+                    recursiveType = functionRecursiveType(
+                        functionType = functionType(
+                            params = resultType(listOf(i32ValueType(), i32ValueType(), i32ValueType())),
+                            results = resultType(listOf(i32ValueType(), i32ValueType())),
+                        ),
+                    ),
+                ),
+            ),
+        )
+        val function = function(
+            body = Expression(
+                VariableInstruction.LocalGet(Index.LocalIndex(1u)),
+                VariableInstruction.LocalGet(Index.LocalIndex(0u)),
+                VariableInstruction.LocalGet(Index.LocalIndex(2u)),
+                NumericInstruction.I32Add,
+            ),
+        )
+
+        val compiled = compileFunction(module, function)
+        val vstack = execute(compiled) {
+            setFrameSlot(0, 20)
+            setFrameSlot(1, 7)
+            setFrameSlot(2, 22)
+        }
+
+        assertEquals(7, vstack.getFrameSlot(0).toInt())
+        assertEquals(42, vstack.getFrameSlot(1).toInt())
+    }
+
+    @Test
+    fun foldsDeferredConstantArithmeticIntoAFrameResult() {
+        val module = module(
+            definedTypes = listOf(
+                definedType(
+                    recursiveType = functionRecursiveType(
+                        functionType = functionType(
+                            results = resultType(listOf(i32ValueType())),
+                        ),
+                    ),
+                ),
+            ),
+        )
+        val function = function(
+            body = Expression(
+                NumericInstruction.I32Const(20),
+                NumericInstruction.I32Const(22),
+                NumericInstruction.I32Add,
+            ),
+        )
+
+        val compiled = compileFunction(
+            module = module,
+            function = function,
+            baseIp = 7,
+        )
+
+        assertEquals(1, compiled.instructions.size)
+        assertEquals(4, compiled.frameSlots)
+        val vstack = execute(compiled)
+
+        assertEquals(42, vstack.getFrameSlot(0).toInt())
+    }
+
+    @Test
+    fun reusesTheLowestConsumedSlotForChainedExpressions() {
+        val module = module(
+            definedTypes = listOf(
+                definedType(
+                    recursiveType = functionRecursiveType(
+                        functionType = functionType(
+                            results = resultType(listOf(i32ValueType())),
+                        ),
+                    ),
+                ),
+            ),
+        )
+        val function = function(
+            body = Expression(
+                NumericInstruction.I32Const(1),
+                NumericInstruction.I32Const(2),
+                NumericInstruction.I32Add,
+                NumericInstruction.I32Const(3),
+                NumericInstruction.I32Add,
+                NumericInstruction.I32Const(4),
+                NumericInstruction.I32Add,
+            ),
+        )
+
+        val compiled = compileFunction(module, function)
+        val vstack = execute(compiled)
+
+        assertEquals(4, compiled.frameSlots)
+        assertEquals(10, vstack.getFrameSlot(0).toInt())
+    }
+
+    @Test
+    fun skipsDefaultInitializationForALocalThatIsOnlyWritten() {
+        val module = module(
+            definedTypes = listOf(
+                definedType(
+                    recursiveType = functionRecursiveType(),
+                ),
+            ),
+        )
+        val function = function(
+            locals = listOf(Local(Index.LocalIndex(0u), i32ValueType())),
+            body = Expression(
+                NumericInstruction.I32Const(20),
+                NumericInstruction.I32Const(22),
+                NumericInstruction.I32Add,
+                VariableInstruction.LocalSet(Index.LocalIndex(0u)),
+            ),
+        )
+
+        val compiled = compileFunction(
+            module = module,
+            function = function,
+            baseIp = 0,
+        )
+
+        assertContentEquals(longArrayOf(), compiled.localInitialValues)
+    }
+
+    @Test
+    fun omitsDefaultInitializationAfterAStraightLineWriteBeforeFirstRead() {
+        val module = module(
+            definedTypes = listOf(
+                definedType(
+                    recursiveType = functionRecursiveType(
+                        functionType = functionType(results = resultType(listOf(i32ValueType()))),
+                    ),
+                ),
+            ),
+        )
+        val function = function(
+            locals = listOf(Local(Index.LocalIndex(0u), i32ValueType())),
+            body = Expression(
+                NumericInstruction.I32Const(42),
+                VariableInstruction.LocalSet(Index.LocalIndex(0u)),
+                VariableInstruction.LocalGet(Index.LocalIndex(0u)),
+            ),
+        )
+
+        val compiled = compileFunction(module, function)
+        val vstack = execute(compiled)
+
+        assertContentEquals(longArrayOf(), compiled.localInitialValues)
+        assertEquals(4, compiled.frameSlots)
+        assertEquals(42, vstack.getFrameSlot(0).toInt())
+    }
+
+    @Test
+    fun preservesTheValueOfATeeIntoAnUnreadLocal() {
+        val module = module(
+            definedTypes = listOf(
+                definedType(
+                    recursiveType = functionRecursiveType(
+                        functionType = functionType(results = resultType(listOf(i32ValueType()))),
+                    ),
+                ),
+            ),
+        )
+        val function = function(
+            locals = listOf(Local(Index.LocalIndex(0u), i32ValueType())),
+            body = Expression(
+                NumericInstruction.I32Const(42),
+                VariableInstruction.LocalTee(Index.LocalIndex(0u)),
+            ),
+        )
+
+        val compiled = compileFunction(module, function)
+        val vstack = execute(compiled)
+
+        assertContentEquals(longArrayOf(), compiled.localInitialValues)
+        assertEquals(42, vstack.getFrameSlot(0).toInt())
+    }
+
+    @Test
+    fun preservesATrappingProducerForAnUnreadLocal() {
+        val module = module(
+            definedTypes = listOf(definedType(recursiveType = functionRecursiveType())),
+        )
+        val function = function(
+            locals = listOf(Local(Index.LocalIndex(0u), i32ValueType())),
+            body = Expression(
+                NumericInstruction.I32Const(1),
+                NumericInstruction.I32Const(0),
+                NumericInstruction.I32DivS,
+                VariableInstruction.LocalSet(Index.LocalIndex(0u)),
+            ),
+        )
+
+        val compiled = compileFunction(module, function)
+
+        assertContentEquals(longArrayOf(), compiled.localInitialValues)
+        assertFailsWith<InvocationException> { execute(compiled) }
+    }
+
+    @Test
+    fun skipsDefaultInitializationForUnusedDefinedLocals() {
+        val module = module(
+            definedTypes = listOf(definedType(recursiveType = functionRecursiveType())),
+        )
+        val function = function(
+            locals = List(8) { index -> Local(Index.LocalIndex(index.toUInt()), i64ValueType()) },
+        )
+
+        val compiled = compileFunction(module, function)
+
+        assertContentEquals(longArrayOf(), compiled.localInitialValues)
+    }
+
+    @Test
+    fun preservesDefaultInitializationAcrossAConditionalWrite() {
+        val module = module(
+            definedTypes = listOf(
+                definedType(
+                    recursiveType = functionRecursiveType(
+                        functionType = functionType(results = resultType(listOf(i32ValueType()))),
+                    ),
+                ),
+            ),
+        )
+        val function = function(
+            locals = listOf(Local(Index.LocalIndex(0u), i32ValueType())),
+            body = Expression(
+                NumericInstruction.I32Const(0),
+                ControlInstruction.If(BlockType.Empty),
+                NumericInstruction.I32Const(42),
+                VariableInstruction.LocalSet(Index.LocalIndex(0u)),
+                ControlInstruction.End(1),
+                VariableInstruction.LocalGet(Index.LocalIndex(0u)),
+            ),
+        )
+
+        val compiled = compileFunction(module, function)
+        val vstack = execute(compiled)
+
+        assertContentEquals(longArrayOf(0), compiled.localInitialValues)
+        assertEquals(0, vstack.getFrameSlot(0).toInt())
+    }
+
+    @Test
+    fun skipsDefaultInitializationForALocalReferencedOnlyInUnreachableCode() {
+        val module = module(
+            definedTypes = listOf(definedType(recursiveType = functionRecursiveType())),
+        )
+        val function = function(
+            locals = listOf(Local(Index.LocalIndex(0u), i32ValueType())),
+            body = Expression(
+                ControlInstruction.Unreachable,
+                VariableInstruction.LocalGet(Index.LocalIndex(0u)),
+                ParametricInstruction.Drop,
+            ),
+        )
+
+        val compiled = compileFunction(module, function)
+
+        assertContentEquals(longArrayOf(), compiled.localInitialValues)
+    }
+
+    @Test
+    fun omitsDefaultInitializationForAStraightLineWriteReadAfterControlFlow() {
+        val module = module(
+            definedTypes = listOf(
+                definedType(
+                    recursiveType = functionRecursiveType(
+                        functionType = functionType(results = resultType(listOf(i32ValueType()))),
+                    ),
+                ),
+            ),
+        )
+        val function = function(
+            locals = listOf(Local(Index.LocalIndex(0u), i32ValueType())),
+            body = Expression(
+                NumericInstruction.I32Const(42),
+                VariableInstruction.LocalSet(Index.LocalIndex(0u)),
+                ControlInstruction.Block(BlockType.Empty),
+                ControlInstruction.End(1),
+                VariableInstruction.LocalGet(Index.LocalIndex(0u)),
+            ),
+        )
+
+        val compiled = compileFunction(module, function)
+        val vstack = execute(compiled)
+
+        assertContentEquals(longArrayOf(), compiled.localInitialValues)
+        assertEquals(42, vstack.getFrameSlot(0).toInt())
+    }
+
+    @Test
+    fun preservesALiveLocalAliasBeforeOverwritingTheLocal() {
+        val module = module(
+            definedTypes = listOf(
+                definedType(
+                    recursiveType = functionRecursiveType(
+                        functionType = functionType(
+                            results = resultType(listOf(i32ValueType())),
+                        ),
+                    ),
+                ),
+            ),
+        )
+        val function = function(
+            locals = listOf(Local(Index.LocalIndex(0u), i32ValueType())),
+            body = Expression(
+                NumericInstruction.I32Const(7),
+                VariableInstruction.LocalSet(Index.LocalIndex(0u)),
+                VariableInstruction.LocalGet(Index.LocalIndex(0u)),
+                NumericInstruction.I32Const(9),
+                VariableInstruction.LocalSet(Index.LocalIndex(0u)),
+                NumericInstruction.I32Const(1),
+                NumericInstruction.I32Add,
+            ),
+        )
+
+        val compiled = compileFunction(module, function)
+        val vstack = execute(compiled)
+
+        assertEquals(8, vstack.getFrameSlot(0).toInt())
+        assertEquals(9, vstack.getFrameSlot(2).toInt())
+    }
+
+    @Test
+    fun compilesSelectFromDeferredImmediates() {
+        val module = module(
+            definedTypes = listOf(
+                definedType(
+                    recursiveType = functionRecursiveType(
+                        functionType = functionType(
+                            results = resultType(listOf(i32ValueType())),
+                        ),
+                    ),
+                ),
+            ),
+        )
+        val function = function(
+            body = Expression(
+                NumericInstruction.I32Const(7),
+                NumericInstruction.I32Const(9),
+                NumericInstruction.I32Const(0),
+                ParametricInstruction.Select,
+            ),
+        )
+
+        val compiled = compileFunction(module, function)
+        val vstack = execute(compiled)
+
+        assertEquals(9, vstack.getFrameSlot(0).toInt())
+    }
+
+    @Test
+    fun eliminatesABitcastOfAMaterializedTemporary() {
+        val module = module(
+            definedTypes = listOf(
+                definedType(
+                    recursiveType = functionRecursiveType(
+                        functionType = functionType(
+                            results = resultType(listOf(i32ValueType())),
+                        ),
+                    ),
+                ),
+            ),
+        )
+        val function = function(
+            body = Expression(
+                NumericInstruction.F32Const(1f, 1f.toRawBits()),
+                NumericInstruction.F32Neg,
+                NumericInstruction.I32ReinterpretF32,
+            ),
+        )
+
+        val compiled = compileFunction(module, function)
+        val vstack = execute(compiled)
+
+        assertEquals((-1f).toRawBits(), vstack.getFrameSlot(0).toInt())
+        assertEquals(2, compiled.instructions.size)
+    }
+
+    @Test
+    fun compilesDualResultWideArithmetic() {
+        val module = module(
+            definedTypes = listOf(
+                definedType(
+                    recursiveType = functionRecursiveType(
+                        functionType = functionType(
+                            results = resultType(listOf(i64ValueType(), i64ValueType())),
+                        ),
+                    ),
+                ),
+            ),
+        )
+        val function = function(
+            body = Expression(
+                NumericInstruction.I64Const(-1),
+                NumericInstruction.I64Const(0),
+                NumericInstruction.I64Const(1),
+                NumericInstruction.I64Const(0),
+                NumericInstruction.I64Add128,
+            ),
+        )
+
+        val compiled = compileFunction(module, function)
+        val vstack = execute(compiled)
+
+        assertEquals(0, vstack.getFrameSlot(0))
+        assertEquals(1, vstack.getFrameSlot(1))
+    }
+
+    @Test
+    fun compilesIfArmsToPatchedProgramTargets() {
+        val module = module(
+            definedTypes = listOf(
+                definedType(
+                    recursiveType = functionRecursiveType(
+                        functionType = functionType(
+                            results = resultType(listOf(i32ValueType())),
+                        ),
+                    ),
+                ),
+            ),
+        )
+        val function = function(
+            body = Expression(
+                NumericInstruction.I32Const(0),
+                ControlInstruction.If(BlockType.ValType(i32ValueType())),
+                NumericInstruction.I32Const(42),
+                ControlInstruction.Else,
+                NumericInstruction.I32Const(7),
+                ControlInstruction.End(1),
+            ),
+        )
+
+        val compiled = compileFunction(module, function)
+        val vstack = execute(compiled)
+
+        assertEquals(7, vstack.getFrameSlot(0).toInt())
+        assertEquals(3, compiled.instructions.size)
+    }
+
+    @Test
+    fun foldsAConstantTrueIfIntoTheReachableArm() {
+        val module = module(
+            definedTypes = listOf(
+                definedType(
+                    recursiveType = functionRecursiveType(
+                        functionType = functionType(
+                            results = resultType(listOf(i32ValueType())),
+                        ),
+                    ),
+                ),
+            ),
+        )
+        val function = function(
+            body = Expression(
+                NumericInstruction.I32Const(1),
+                ControlInstruction.If(BlockType.ValType(i32ValueType())),
+                NumericInstruction.I32Const(42),
+                ControlInstruction.Else,
+                NumericInstruction.I32Const(7),
+                ControlInstruction.End(1),
+            ),
+        )
+
+        val compiled = compileFunction(module, function)
+        val vstack = execute(compiled)
+
+        assertEquals(42, vstack.getFrameSlot(0).toInt())
+        assertEquals(3, compiled.instructions.size)
+    }
+
+    @Test
+    fun foldsAnAlwaysTakenBranchIfIntoUnreachableFallthrough() {
+        val module = module(
+            definedTypes = listOf(
+                definedType(
+                    recursiveType = functionRecursiveType(
+                        functionType = functionType(
+                            results = resultType(listOf(i32ValueType())),
+                        ),
+                    ),
+                ),
+            ),
+        )
+        val function = function(
+            body = Expression(
+                ControlInstruction.Block(BlockType.ValType(i32ValueType())),
+                NumericInstruction.I32Const(42),
+                NumericInstruction.I32Const(1),
+                ControlInstruction.BrIf(Index.LabelIndex(0u)),
+                ParametricInstruction.Drop,
+                NumericInstruction.I32Const(7),
+                ControlInstruction.End(1),
+            ),
+        )
+
+        val compiled = compileFunction(module, function)
+        val vstack = execute(compiled)
+
+        assertEquals(42, vstack.getFrameSlot(0).toInt())
+        assertEquals(2, compiled.instructions.size)
+    }
+
+    @Test
+    fun preservesAPreviouslyReachedTargetAfterFoldingANeverTakenBranch() {
+        val module = module(
+            definedTypes = listOf(
+                definedType(
+                    recursiveType = functionRecursiveType(
+                        functionType = functionType(
+                            params = resultType(listOf(i32ValueType())),
+                        ),
+                    ),
+                ),
+            ),
+        )
+        val function = function(
+            body = Expression(
+                VariableInstruction.LocalGet(Index.LocalIndex(0u)),
+                ControlInstruction.BrIf(Index.LabelIndex(0u)),
+                NumericInstruction.I32Const(0),
+                ControlInstruction.BrIf(Index.LabelIndex(0u)),
+            ),
+        )
+
+        val compiled = compileFunction(module, function)
+        execute(compiled) { setFrameSlot(0, 1) }
+
+        assertEquals(2, compiled.instructions.size)
+    }
+
+    @Test
+    fun preparesOnlyTheSelectedConstantBranchTableTarget() {
+        val module = module(
+            definedTypes = listOf(
+                definedType(
+                    recursiveType = functionRecursiveType(
+                        functionType = functionType(
+                            results = resultType(listOf(i32ValueType())),
+                        ),
+                    ),
+                ),
+            ),
+        )
+        val function = function(
+            body = Expression(
+                ControlInstruction.Block(BlockType.ValType(i32ValueType())),
+                ControlInstruction.Block(BlockType.ValType(i32ValueType())),
+                NumericInstruction.I32Const(42),
+                NumericInstruction.I32Const(1),
+                ControlInstruction.BrTable(
+                    labelIndices = listOf(Index.LabelIndex(0u)),
+                    defaultLabelIndex = Index.LabelIndex(1u),
+                ),
+                ControlInstruction.End(1),
+                NumericInstruction.I32Const(1),
+                NumericInstruction.I32Add,
+                ControlInstruction.End(1),
+            ),
+        )
+
+        val compiled = compileFunction(module, function)
+        val vstack = execute(compiled)
+
+        assertEquals(42, vstack.getFrameSlot(0).toInt())
+        assertEquals(2, compiled.instructions.size)
+    }
+
+    @Test
+    fun compilesBranchResultsThroughTakenOnlyPaths() {
+        val module = module(
+            definedTypes = listOf(
+                definedType(
+                    recursiveType = functionRecursiveType(
+                        functionType = functionType(
+                            results = resultType(listOf(i32ValueType())),
+                        ),
+                    ),
+                ),
+            ),
+        )
+        val function = function(
+            body = Expression(
+                ControlInstruction.Block(BlockType.ValType(i32ValueType())),
+                NumericInstruction.I32Const(42),
+                ControlInstruction.Br(Index.LabelIndex(0u)),
+                NumericInstruction.I32Const(7),
+                ControlInstruction.End(1),
+            ),
+        )
+
+        val compiled = compileFunction(module, function)
+        val vstack = execute(compiled)
+
+        assertEquals(42, vstack.getFrameSlot(0).toInt())
+    }
+
+    @Test
+    fun `branches directly when the result is already in place`() {
+        val module = module(
+            definedTypes = listOf(
+                definedType(
+                    recursiveType = functionRecursiveType(
+                        functionType = functionType(
+                            params = resultType(listOf(i32ValueType(), i32ValueType())),
+                            results = resultType(listOf(i32ValueType())),
+                        ),
+                    ),
+                ),
+            ),
+        )
+        val function = function(
+            body = expression(
+                instructions = listOf(
+                    localGetInstruction(localIndex(0u)),
+                    localGetInstruction(localIndex(1u)),
+                    brIfInstruction(labelIndex(0u)),
+                    dropInstruction(),
+                    i32ConstInstruction(7),
+                ),
+            ),
+        )
+
+        val compiled = compileFunction(module, function)
+        for (condition in listOf(0L, 1L)) {
+            val stack = execute(compiled) {
+                setFrameSlot(0, 42L)
+                setFrameSlot(1, condition)
+            }
+            assertEquals(if (condition == 0L) 7 else 42, stack.getFrameSlot(0).toInt())
+        }
+        assertEquals(3, compiled.instructions.size)
+    }
+
+    @Test
+    fun compilesDeeplyNestedBlocksIteratively() {
+        val depth = 10_000
+        val module = module(
+            definedTypes = listOf(definedType(recursiveType = functionRecursiveType())),
+        )
+        val instructions = List(depth) {
+            ControlInstruction.Block(BlockType.Empty)
+        } + ControlInstruction.End(depth)
+        val function = function(body = Expression(instructions))
+
+        val compiled = compileFunction(module, function)
+
+        assertEquals(1, compiled.instructions.size)
+    }
+
+    @Test
+    fun materializesAGrowingStackAcrossNestedBlocksWithoutRescanningIt() {
+        val depth = 5_000
+        val module = module(
+            definedTypes = listOf(definedType(recursiveType = functionRecursiveType())),
+        )
+        val instructions = buildList {
+            repeat(depth) { value ->
+                add(NumericInstruction.I32Const(value))
+                add(ControlInstruction.Block(BlockType.Empty))
+            }
+            repeat(depth) {
+                add(ControlInstruction.End(1))
+                add(ParametricInstruction.Drop)
+            }
+        }
+        val function = function(body = Expression(instructions))
+
+        val compiled = compileFunction(module, function)
+
+        assertEquals(depth + 1, compiled.instructions.size)
+    }
+
+    @Test
+    fun materializesManyAliasesOfTheSameLocalWithoutScanningTheAliasChain() {
+        val aliasCount = 5_000
+        val module = module(
+            definedTypes = listOf(definedType(recursiveType = functionRecursiveType())),
+        )
+        val function = function(
+            locals = listOf(Local(Index.LocalIndex(0u), i32ValueType())),
+            body = Expression(
+                buildList {
+                    add(NumericInstruction.I32Const(1))
+                    add(VariableInstruction.LocalSet(Index.LocalIndex(0u)))
+                    repeat(aliasCount) {
+                        add(VariableInstruction.LocalGet(Index.LocalIndex(0u)))
+                    }
+                    add(ControlInstruction.Block(BlockType.Empty))
+                    add(ControlInstruction.End(1))
+                    repeat(aliasCount) {
+                        add(ParametricInstruction.Drop)
+                    }
+                },
+            ),
+        )
+
+        val compiled = compileFunction(module, function)
+
+        assertEquals(3, compiled.instructions.size)
+    }
+
+    @Test
+    fun resolvesManyDeepBranchesWithoutScanningTheControlStack() {
+        val depth = 10_000
+        val module = module(
+            definedTypes = listOf(definedType(recursiveType = functionRecursiveType())),
+        )
+        val instructions = buildList {
+            repeat(depth) {
+                add(ControlInstruction.Block(BlockType.Empty))
+            }
+            repeat(depth) {
+                add(NumericInstruction.I32Const(0))
+                add(ControlInstruction.BrIf(Index.LabelIndex(depth.toUInt())))
+            }
+            add(ControlInstruction.End(depth))
+        }
+        val function = function(body = Expression(instructions))
+
+        val compiled = compileFunction(module, function)
+
+        assertEquals(1, compiled.instructions.size)
+    }
+
+    @Test
+    fun doesNotPreserveAMaterializedLocalAliasAfterAnIfResult() {
+        val module = module(
+            definedTypes = listOf(
+                definedType(
+                    recursiveType = functionRecursiveType(
+                        functionType = functionType(
+                            results = resultType(listOf(i32ValueType())),
+                        ),
+                    ),
+                ),
+            ),
+        )
+        val function = function(
+            locals = listOf(Local(Index.LocalIndex(0u), i32ValueType())),
+            body = Expression(
+                NumericInstruction.I32Const(9),
+                VariableInstruction.LocalSet(Index.LocalIndex(0u)),
+                VariableInstruction.LocalGet(Index.LocalIndex(0u)),
+                NumericInstruction.I32Const(1),
+                NumericInstruction.I32And,
+                ControlInstruction.If(BlockType.ValType(i32ValueType())),
+                VariableInstruction.LocalGet(Index.LocalIndex(0u)),
+                NumericInstruction.I32Const(1),
+                NumericInstruction.I32Add,
+                ControlInstruction.Else,
+                VariableInstruction.LocalGet(Index.LocalIndex(0u)),
+                ControlInstruction.End(1),
+                NumericInstruction.I32Const(2),
+                NumericInstruction.I32DivS,
+                VariableInstruction.LocalTee(Index.LocalIndex(0u)),
+            ),
+        )
+
+        val compiled = compileFunction(module, function)
+        val vstack = execute(compiled)
+
+        assertEquals(5, vstack.getFrameSlot(0).toInt())
+    }
+
+    @Test
+    fun fusesANumericConditionIntoAnIfBranch() {
+        val module = module(
+            definedTypes = listOf(
+                definedType(
+                    recursiveType = functionRecursiveType(
+                        functionType = functionType(
+                            results = resultType(listOf(i32ValueType())),
+                        ),
+                    ),
+                ),
+            ),
+        )
+        val function = function(
+            body = Expression(
+                NumericInstruction.F32Const(Float.NaN, Float.NaN.toRawBits()),
+                NumericInstruction.F32Const(0f, 0f.toRawBits()),
+                NumericInstruction.F32Lt,
+                ControlInstruction.If(BlockType.ValType(i32ValueType())),
+                NumericInstruction.I32Const(42),
+                ControlInstruction.Else,
+                NumericInstruction.I32Const(7),
+                ControlInstruction.End(1),
+            ),
+        )
+
+        val compiled = compileFunction(module, function)
+        val vstack = execute(compiled)
+
+        assertEquals(7, vstack.getFrameSlot(0).toInt())
+        assertEquals(3, compiled.instructions.size)
+    }
+
+    @Test
+    fun fusesASingleBranchResultCopyIntoTheConditionalJump() {
+        val module = module(
+            definedTypes = listOf(
+                definedType(
+                    recursiveType = functionRecursiveType(
+                        functionType = functionType(
+                            results = resultType(listOf(i32ValueType())),
+                        ),
+                    ),
+                ),
+            ),
+        )
+        val function = function(
+            body = Expression(
+                NumericInstruction.I32Const(20),
+                NumericInstruction.I32Const(22),
+                NumericInstruction.I32Add,
+                ControlInstruction.Block(BlockType.Empty),
+                NumericInstruction.I32Const(1),
+                ControlInstruction.BrIf(Index.LabelIndex(1u)),
+                ControlInstruction.End(1),
+            ),
+        )
+
+        val compiled = compileFunction(module, function)
+        val vstack = execute(compiled)
+
+        assertEquals(42, vstack.getFrameSlot(0).toInt())
+        assertEquals(3, compiled.instructions.size)
+    }
+
+    @Test
+    fun fusesAReferenceCastIntoAStructGet() {
+        val referenceType = refNullReferenceType(AbstractHeapType.Struct)
+        val module = aggregateModule(
+            parameterTypes = listOf(referenceValueType(referenceType)),
+            resultValueType = i32ValueType(),
+        )
+        val function = function(
+            typeIndex = Index.TypeIndex(2u),
+            body = Expression(
+                VariableInstruction.LocalGet(Index.LocalIndex(0u)),
+                io.github.charlietap.chasm.ast.instruction.ReferenceInstruction.RefCast(
+                    refNonNullReferenceType(AbstractHeapType.Struct),
+                ),
+                io.github.charlietap.chasm.ast.instruction.AggregateInstruction.StructGet(
+                    Index.TypeIndex(1u),
+                    Index.FieldIndex(0u),
+                ),
+            ),
+        )
+
+        val compiled = compileFunction(module, function)
+
+        assertEquals(2, compiled.instructions.size)
+    }
+
+    @Test
+    fun fusesConsecutiveReferenceStructGets() {
+        val referenceType = refNullReferenceType(AbstractHeapType.Struct)
+        val module = aggregateModule(
+            parameterTypes = listOf(referenceValueType(referenceType)),
+            resultValueType = i32ValueType(),
+        )
+        val function = function(
+            typeIndex = Index.TypeIndex(2u),
+            body = Expression(
+                VariableInstruction.LocalGet(Index.LocalIndex(0u)),
+                io.github.charlietap.chasm.ast.instruction.AggregateInstruction.StructGet(
+                    Index.TypeIndex(0u),
+                    Index.FieldIndex(0u),
+                ),
+                io.github.charlietap.chasm.ast.instruction.AggregateInstruction.StructGet(
+                    Index.TypeIndex(1u),
+                    Index.FieldIndex(0u),
+                ),
+            ),
+        )
+
+        val compiled = compileFunction(module, function)
+
+        assertEquals(2, compiled.instructions.size)
+    }
+
+    @Test
+    fun fusesALocalTeeIntoAStructGet() {
+        val referenceType = refNullReferenceType(AbstractHeapType.Struct)
+        val module = aggregateModule(
+            parameterTypes = listOf(
+                referenceValueType(referenceType),
+                referenceValueType(referenceType),
+            ),
+            resultValueType = i32ValueType(),
+        )
+        val function = function(
+            typeIndex = Index.TypeIndex(2u),
+            body = Expression(
+                VariableInstruction.LocalGet(Index.LocalIndex(1u)),
+                VariableInstruction.LocalTee(Index.LocalIndex(0u)),
+                io.github.charlietap.chasm.ast.instruction.AggregateInstruction.StructGet(
+                    Index.TypeIndex(1u),
+                    Index.FieldIndex(0u),
+                ),
+            ),
+        )
+
+        val compiled = compileFunction(module, function)
+
+        assertEquals(2, compiled.instructions.size)
+    }
+
+    @Test
+    fun allocatingInstructionUsesExecutorPreflightWithoutAnExtraProgramInstruction() {
+        val function = allocatingFunction()
+        val module = allocatingModule(function)
+
+        val compiled = compileFunction(
+            module = module,
+            function = function,
+            baseIp = 0,
+        )
+
+        assertEquals(2, compiled.instructions.size)
+    }
+
+    @Test
+    fun materializesMixedStructOperandsIntoAContiguousRangeBeforePublication() {
+        val valueStruct = definedType(
+            recursiveType = recursiveType(
+                listOf(
+                    finalSubType(
+                        compositeType = structCompositeType(
+                            structType(
+                                listOf(
+                                    immutableFieldType(valueStorageType(i32ValueType())),
+                                    immutableFieldType(valueStorageType(i64ValueType())),
+                                    immutableFieldType(valueStorageType(i32ValueType())),
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+            typeIndex = 0,
+        )
+        val functionType = definedType(
+            recursiveType = functionRecursiveType(
+                functionType(
+                    params = resultType(listOf(i32ValueType())),
+                    results = resultType(
+                        listOf(
+                            referenceValueType(refNonNullReferenceType(AbstractHeapType.Struct)),
+                        ),
+                    ),
+                ),
+            ),
+            typeIndex = 1,
+        )
+        val function = function(
+            typeIndex = Index.TypeIndex(1u),
+            body = Expression(
+                VariableInstruction.LocalGet(Index.LocalIndex(0u)),
+                NumericInstruction.I64Const(22L),
+                VariableInstruction.LocalGet(Index.LocalIndex(0u)),
+                NumericInstruction.I32Const(3),
+                NumericInstruction.I32Add,
+                AggregateInstruction.StructNew(Index.TypeIndex(0u)),
+            ),
+        )
+        val module = module(definedTypes = listOf(valueStruct, functionType), functions = listOf(function))
+        val runtimeStore = store()
+        val compiled = compileFunction(module, function, store = runtimeStore)
+
+        val vstack = execute(compiled, runtimeStore) { setFrameSlot(0, 7L) }
+        val reference = vstack.getFrameSlot(0)
+
+        assertEquals(7L, runtimeStore.heap.getStructField(reference, 0))
+        assertEquals(22L, runtimeStore.heap.getStructField(reference, 1))
+        assertEquals(10L, runtimeStore.heap.getStructField(reference, 2))
+    }
+
+    @Test
+    fun reusesAlreadyContiguousFrameOperandsForStructPublication() {
+        val valueStruct = definedType(
+            recursiveType = recursiveType(
+                listOf(
+                    finalSubType(
+                        compositeType = structCompositeType(
+                            structType(
+                                List(2) {
+                                    immutableFieldType(valueStorageType(i32ValueType()))
+                                },
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+            typeIndex = 0,
+        )
+        val functionType = definedType(
+            recursiveType = functionRecursiveType(
+                functionType(
+                    params = resultType(listOf(i32ValueType(), i32ValueType())),
+                    results = resultType(
+                        listOf(
+                            referenceValueType(refNonNullReferenceType(AbstractHeapType.Struct)),
+                        ),
+                    ),
+                ),
+            ),
+            typeIndex = 1,
+        )
+        val function = function(
+            typeIndex = Index.TypeIndex(1u),
+            body = Expression(
+                VariableInstruction.LocalGet(Index.LocalIndex(0u)),
+                NumericInstruction.I32Const(1),
+                NumericInstruction.I32Add,
+                VariableInstruction.LocalGet(Index.LocalIndex(1u)),
+                NumericInstruction.I32Const(2),
+                NumericInstruction.I32Add,
+                AggregateInstruction.StructNew(Index.TypeIndex(0u)),
+            ),
+        )
+        val module = module(definedTypes = listOf(valueStruct, functionType), functions = listOf(function))
+        val runtimeStore = store()
+        val compiled = compileFunction(module, function, store = runtimeStore)
+
+        val vstack = execute(compiled, runtimeStore) {
+            setFrameSlot(0, 10)
+            setFrameSlot(1, 20)
+        }
+        val reference = vstack.getFrameSlot(0)
+
+        assertEquals(4, compiled.instructions.size)
+        assertEquals(11L, runtimeStore.heap.getStructField(reference, 0))
+        assertEquals(22L, runtimeStore.heap.getStructField(reference, 1))
+    }
+
+    @Test
+    fun publishesAZeroFieldStructWithoutReadingATemporaryRange() {
+        val valueStruct = definedType(
+            recursiveType = recursiveType(
+                listOf(
+                    finalSubType(
+                        compositeType = structCompositeType(structType(emptyList())),
+                    ),
+                ),
+            ),
+            typeIndex = 0,
+        )
+        val functionType = definedType(
+            recursiveType = functionRecursiveType(
+                functionType(
+                    results = resultType(
+                        listOf(
+                            referenceValueType(refNonNullReferenceType(AbstractHeapType.Struct)),
+                        ),
+                    ),
+                ),
+            ),
+            typeIndex = 1,
+        )
+        val function = function(
+            typeIndex = Index.TypeIndex(1u),
+            body = Expression(AggregateInstruction.StructNew(Index.TypeIndex(0u))),
+        )
+        val module = module(definedTypes = listOf(valueStruct, functionType), functions = listOf(function))
+        val runtimeStore = store()
+        val compiled = compileFunction(module, function, store = runtimeStore)
+
+        val vstack = execute(compiled, runtimeStore)
+        val reference = vstack.getFrameSlot(0)
+
+        assertEquals(0, runtimeStore.heap.structRuntimeTypeIdOrNegative(reference))
+    }
+
+    @Test
+    fun materializesMixedArrayOperandsIntoAContiguousRangeBeforePublication() {
+        val arrayDefinition = i32ArrayDefinition()
+        val functionType = arrayReturningFunctionType(listOf(i32ValueType()))
+        val function = function(
+            typeIndex = Index.TypeIndex(1u),
+            body = Expression(
+                VariableInstruction.LocalGet(Index.LocalIndex(0u)),
+                NumericInstruction.I32Const(22),
+                VariableInstruction.LocalGet(Index.LocalIndex(0u)),
+                NumericInstruction.I32Const(3),
+                NumericInstruction.I32Add,
+                AggregateInstruction.ArrayNewFixed(Index.TypeIndex(0u), 3u),
+            ),
+        )
+        val module = module(definedTypes = listOf(arrayDefinition, functionType), functions = listOf(function))
+        val runtimeStore = store()
+        val compiled = compileFunction(module, function, store = runtimeStore)
+
+        val vstack = execute(compiled, runtimeStore) { setFrameSlot(0, 7) }
+        val reference = vstack.getFrameSlot(0)
+
+        assertContentEquals(
+            longArrayOf(7, 22, 10),
+            LongArray(3) { runtimeStore.heap.getArrayElement(reference, it) },
+        )
+    }
+
+    @Test
+    fun reusesAlreadyContiguousFrameOperandsForArrayPublication() {
+        val arrayDefinition = i32ArrayDefinition()
+        val functionType = arrayReturningFunctionType(listOf(i32ValueType(), i32ValueType()))
+        val function = function(
+            typeIndex = Index.TypeIndex(1u),
+            body = Expression(
+                VariableInstruction.LocalGet(Index.LocalIndex(0u)),
+                NumericInstruction.I32Const(1),
+                NumericInstruction.I32Add,
+                VariableInstruction.LocalGet(Index.LocalIndex(1u)),
+                NumericInstruction.I32Const(2),
+                NumericInstruction.I32Add,
+                AggregateInstruction.ArrayNewFixed(Index.TypeIndex(0u), 2u),
+            ),
+        )
+        val module = module(definedTypes = listOf(arrayDefinition, functionType), functions = listOf(function))
+        val runtimeStore = store()
+        val compiled = compileFunction(module, function, store = runtimeStore)
+
+        val vstack = execute(compiled, runtimeStore) {
+            setFrameSlot(0, 10)
+            setFrameSlot(1, 20)
+        }
+        val reference = vstack.getFrameSlot(0)
+
+        assertEquals(4, compiled.instructions.size)
+        assertContentEquals(
+            longArrayOf(11, 22),
+            LongArray(2) { runtimeStore.heap.getArrayElement(reference, it) },
+        )
+    }
+
+    @Test
+    fun publishesAZeroLengthArrayWithoutReadingATemporaryRange() {
+        val arrayDefinition = i32ArrayDefinition()
+        val functionType = arrayReturningFunctionType()
+        val function = function(
+            typeIndex = Index.TypeIndex(1u),
+            body = Expression(AggregateInstruction.ArrayNewFixed(Index.TypeIndex(0u), 0u)),
+        )
+        val module = module(definedTypes = listOf(arrayDefinition, functionType), functions = listOf(function))
+        val runtimeStore = store()
+        val compiled = compileFunction(module, function, store = runtimeStore)
+
+        val vstack = execute(compiled, runtimeStore)
+        val reference = vstack.getFrameSlot(0)
+
+        assertEquals(0, runtimeStore.heap.arrayLength(reference))
+    }
+
+    @Test
+    fun nonAllocatingGcInstructionDoesNotEmitACollectionInstruction() {
+        val function = function(
+            typeIndex = Index.TypeIndex(1u),
+            body = Expression(
+                NumericInstruction.I32Const(1),
+                AggregateInstruction.RefI31,
+                ParametricInstruction.Drop,
+            ),
+        )
+        val module = allocatingModule(function)
+
+        val compiled = compileFunction(
+            module = module,
+            function = function,
+            baseIp = 0,
+        )
+
+        assertEquals(2, compiled.instructions.size)
+    }
+}
+
+private fun aggregateModule(
+    parameterTypes: List<ValueType>,
+    resultValueType: ValueType,
+): Module {
+    val referenceType = refNullReferenceType(AbstractHeapType.Struct)
+    val referenceStruct = definedType(
+        recursiveType = recursiveType(
+            listOf(
+                finalSubType(
+                    compositeType = structCompositeType(
+                        structType(
+                            listOf(
+                                immutableFieldType(
+                                    valueStorageType(referenceValueType(referenceType)),
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        ),
+        typeIndex = 0,
+    )
+    val valueStruct = definedType(
+        recursiveType = recursiveType(
+            listOf(
+                finalSubType(
+                    compositeType = structCompositeType(
+                        structType(
+                            listOf(immutableFieldType(valueStorageType(i32ValueType()))),
+                        ),
+                    ),
+                ),
+            ),
+        ),
+        typeIndex = 1,
+    )
+    val functionType = definedType(
+        recursiveType = functionRecursiveType(
+            functionType(
+                params = resultType(parameterTypes),
+                results = resultType(listOf(resultValueType)),
+            ),
+        ),
+        typeIndex = 2,
+    )
+    return module(definedTypes = listOf(referenceStruct, valueStruct, functionType))
+}
+
+private fun allocatingModule(
+    function: Function,
+    exported: Boolean = false,
+): Module {
+    val valueStruct = definedType(
+        recursiveType = recursiveType(
+            listOf(
+                finalSubType(
+                    compositeType = structCompositeType(
+                        structType(
+                            listOf(immutableFieldType(valueStorageType(i32ValueType()))),
+                        ),
+                    ),
+                ),
+            ),
+        ),
+        typeIndex = 0,
+    )
+    val functionType = definedType(
+        recursiveType = functionRecursiveType(),
+        typeIndex = 1,
+    )
+    return module(
+        definedTypes = listOf(valueStruct, functionType),
+        functions = listOf(function),
+        exports = if (exported) listOf(export()) else emptyList(),
+    )
+}
+
+private fun i32ArrayDefinition() = definedType(
+    recursiveType = recursiveType(
+        listOf(
+            finalSubType(
+                compositeType = arrayCompositeType(
+                    arrayType(immutableFieldType(valueStorageType(i32ValueType()))),
+                ),
+            ),
+        ),
+    ),
+    typeIndex = 0,
+)
+
+private fun arrayReturningFunctionType(
+    parameters: List<ValueType> = emptyList(),
+) = definedType(
+    recursiveType = functionRecursiveType(
+        functionType(
+            params = resultType(parameters),
+            results = resultType(
+                listOf(referenceValueType(refNonNullReferenceType(AbstractHeapType.Array))),
+            ),
+        ),
+    ),
+    typeIndex = 1,
+)
+
+private fun allocatingFunction() = function(
+    typeIndex = Index.TypeIndex(1u),
+    body = Expression(
+        AggregateInstruction.StructNewDefault(Index.TypeIndex(0u)),
+        ParametricInstruction.Drop,
+    ),
+)
+
+private fun compileFunction(
+    module: Module,
+    function: Function,
+    baseIp: Int = 0,
+    store: Store = store(),
+): TestCompiledFunction {
+    val definedModule = if (function in module.functions) module else module.copy(functions = module.functions + function)
+    val program = Program(maxOf(baseIp + 1, 256))
+    repeat(baseIp) {
+        program.append(noOpInstruction)
+    }
+    val linked = linkFunction(
+        module = definedModule,
+        definedFunctionIndex = definedModule.functions.indexOf(function),
+        store = store,
+        program = program,
+    )
+    val instructions = List(program.size - baseIp) { index -> program.instructions[baseIp + index] }
+    val functionType = module.typeResolver().functionType(function.typeIndex)
+    return TestCompiledFunction(
+        linked = linked,
+        instructions = instructions,
+        activationHeaderSlot = maxOf(functionType.params.types.size, functionType.results.types.size),
+    )
+}
+
+private fun execute(
+    compiled: TestCompiledFunction,
+    store: Store = store(),
+    configure: io.github.charlietap.chasm.runtime.stack.ValueStack.() -> Unit = {},
+): io.github.charlietap.chasm.runtime.stack.ValueStack {
+    val vstack = vstack().apply {
+        reserveDepth(compiled.frameSlots)
+        writeRootActivationHeader(compiled.activationHeaderSlot)
+        activateFrame(fp = 0, frameSlots = compiled.frameSlots)
+        configure()
+    }
+    val executionContext = executionContext(vstack = vstack, store = store)
+    var ip = 0
+    while (ip != EXIT_IP) {
+        ip = compiled.instructions[ip](vstack, executionContext, ip + 1)
+    }
+    vstack.fp = 0
+    return vstack
+}
+
+private class TestCompiledFunction(
+    linked: LinkedFunction,
+    val instructions: List<DispatchableInstruction>,
+    val activationHeaderSlot: Int,
+) {
+    val frameSlots = linked.frameSlots
+    val localInitialValues = linked.function.frame.localInitialValues()
+}
+
+private val noOpInstruction = DispatchableInstruction { _, _, nextIp -> nextIp }

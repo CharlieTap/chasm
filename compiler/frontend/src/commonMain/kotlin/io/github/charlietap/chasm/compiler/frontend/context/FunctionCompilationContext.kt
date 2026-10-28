@@ -1,0 +1,335 @@
+package io.github.charlietap.chasm.compiler.frontend.context
+
+import io.github.charlietap.chasm.cir.Instruction
+import io.github.charlietap.chasm.cir.InstructionIndex
+import io.github.charlietap.chasm.compiler.frontend.ExceptionTableBuilder
+import io.github.charlietap.chasm.compiler.frontend.emptyIntArray
+import io.github.charlietap.chasm.compiler.frontend.instruction.CopyInstructionBuffer
+import io.github.charlietap.chasm.compiler.frontend.instruction.DeferredBranchPaths
+import io.github.charlietap.chasm.compiler.frontend.instruction.emitCopies
+import io.github.charlietap.chasm.compiler.frontend.instruction.emitCopy
+import io.github.charlietap.chasm.compiler.frontend.instruction.emitF32Constant
+import io.github.charlietap.chasm.compiler.frontend.instruction.emitF64Constant
+import io.github.charlietap.chasm.compiler.frontend.instruction.emitI32Constant
+import io.github.charlietap.chasm.compiler.frontend.instruction.emitI64Constant
+import io.github.charlietap.chasm.compiler.frontend.operand.FrameAllocator
+import io.github.charlietap.chasm.compiler.frontend.operand.FunctionFrameLayout
+import io.github.charlietap.chasm.compiler.frontend.operand.Operand
+import io.github.charlietap.chasm.compiler.frontend.operand.OperandSourceKind
+import io.github.charlietap.chasm.compiler.frontend.operand.i32Immediate
+import io.github.charlietap.chasm.compiler.frontend.operand.i64Immediate
+import io.github.charlietap.chasm.compiler.frontend.operand.sourceSlot
+import io.github.charlietap.chasm.compiler.frontend.program.ProgramBuilder
+import io.github.charlietap.chasm.compiler.frontend.program.ProgramTarget
+import io.github.charlietap.chasm.type.ValueType
+
+internal class FunctionCompilationContext(
+    val compiler: CompilerContext,
+    val workspace: FunctionCompilerWorkspace,
+    val layout: FunctionFrameLayout,
+    val frame: FrameAllocator,
+    val program: ProgramBuilder,
+    val instructions: InstructionCursor,
+) {
+
+    val operands = OperandStack(workspace.operandPool)
+    private val poppedOperands = PoppedOperands(operands)
+    private var copyInstructionBuffer: CopyInstructionBuffer? = null
+    internal var deferredBranchPaths: DeferredBranchPaths? = null
+    val localAliases = arrayOfNulls<Operand>(layout.localCount)
+    val controls = ControlStack(workspace.controlPool)
+    var rootControl: BlockContext? = null
+    var reachable = true
+    var exceptionTableBuilder: ExceptionTableBuilder? = null
+
+    fun blockType(type: io.github.charlietap.chasm.type.BlockType): io.github.charlietap.chasm.type.FunctionType =
+        workspace.blockType(compiler, type)
+
+    fun emit(
+        instruction: Instruction,
+    ) {
+        flushCopies()
+        program.append(instruction)
+    }
+
+    fun appendCopy(sourceSlot: Int, destinationSlot: Int) {
+        val buffer = copyInstructionBuffer ?: CopyInstructionBuffer(program).also {
+            copyInstructionBuffer = it
+        }
+        buffer.append(sourceSlot, destinationSlot)
+    }
+
+    fun bind(target: ProgramTarget) {
+        flushCopies()
+        program.bind(target)
+    }
+
+    inline fun append(
+        target: ProgramTarget,
+        crossinline instruction: (InstructionIndex) -> Instruction,
+    ): Int {
+        flushCopies()
+        return program.append(target) { targetPosition -> instruction(InstructionIndex(targetPosition)) }
+    }
+
+    fun append(
+        targetIndices: IntArray,
+        instruction: (IntArray) -> Instruction,
+    ): Int {
+        flushCopies()
+        return program.append(targetIndices, instruction)
+    }
+
+    fun finishProgram() {
+        flushCopies()
+        program.finish()
+    }
+
+    fun flushCopies() {
+        copyInstructionBuffer?.flush()
+    }
+
+    fun pushFrame(type: ValueType?, reservedSlot: Int, sourceSlot: Int = reservedSlot) {
+        push(type, reservedSlot, OperandSourceKind.Frame, sourceSlot.toLong())
+    }
+
+    fun pushLocal(
+        type: ValueType?,
+        reservedSlot: Int,
+        localIndex: Int,
+        sourceSlot: Int,
+    ) {
+        push(type, reservedSlot, OperandSourceKind.Local, sourceSlot.toLong(), localIndex)
+    }
+
+    fun pushI32(type: ValueType?, reservedSlot: Int, value: Int) {
+        push(type, reservedSlot, OperandSourceKind.I32Immediate, value.toLong())
+    }
+
+    fun pushI64(type: ValueType?, reservedSlot: Int, value: Long) {
+        push(type, reservedSlot, OperandSourceKind.I64Immediate, value)
+    }
+
+    fun pushF32(type: ValueType?, reservedSlot: Int, value: Float) {
+        push(type, reservedSlot, OperandSourceKind.F32Immediate, value.toRawBits().toLong())
+    }
+
+    fun pushF64(type: ValueType?, reservedSlot: Int, value: Double) {
+        push(type, reservedSlot, OperandSourceKind.F64Immediate, value.toRawBits())
+    }
+
+    fun push(operand: Operand) {
+        push(
+            type = operand.type,
+            reservedSlot = operand.reservedSlot,
+            sourceKind = operand.sourceKind,
+            sourceBits = operand.sourceBits,
+            sourceLocalIndex = operand.sourceLocalIndex,
+        )
+    }
+
+    private fun push(
+        type: ValueType?,
+        reservedSlot: Int,
+        sourceKind: OperandSourceKind,
+        sourceBits: Long,
+        sourceLocalIndex: Int = Operand.NO_LOCAL_INDEX,
+    ) {
+        val operand = operands.push(type, reservedSlot, sourceKind, sourceBits, sourceLocalIndex)
+        frame.reserve(operand.reservedSlot)
+        trackLocalAlias(operand)
+    }
+
+    fun pop(): Operand {
+        val operand = operands.pop()
+        untrackLocalAlias(operand)
+        frame.release(operand.reservedSlot)
+        return operand
+    }
+
+    fun pop(count: Int): List<Operand> {
+        check(count in 0..operands.size)
+        val startIndex = operands.size - count
+        repeat(count) {
+            pop()
+        }
+        return poppedOperands.reset(startIndex, count)
+    }
+
+    fun preserveLocal(index: Int) {
+        var alias = localAliases[index] ?: return
+        var destinationSlots = IntArray(4)
+        var destinationCount = 0
+        while (true) {
+            if (destinationCount == destinationSlots.size) {
+                destinationSlots = destinationSlots.copyOf(destinationSlots.size * 2)
+            }
+            destinationSlots[destinationCount++] = alias.reservedSlot
+            materializeOperand(alias)
+            alias.tracksLocal = false
+            val nextAlias = alias.nextLocalAlias ?: break
+            nextAlias.previousLocalAlias = null
+            alias.previousLocalAlias = null
+            alias.nextLocalAlias = null
+            alias = nextAlias
+        }
+        alias.previousLocalAlias = null
+        alias.nextLocalAlias = null
+        localAliases[index] = null
+        emitCopies(
+            sourceSlots = IntArray(destinationCount) { layout.localSlot(index) },
+            destinationSlots = destinationSlots.copyOf(destinationCount),
+        )
+    }
+
+    fun materialize(operand: Operand): Int {
+        when (operand.sourceKind) {
+            OperandSourceKind.I32Immediate -> emitI32Constant(operand.i32Immediate, operand.reservedSlot)
+            OperandSourceKind.I64Immediate -> emitI64Constant(operand.i64Immediate, operand.reservedSlot)
+            OperandSourceKind.F32Immediate -> emitF32Constant(operand.sourceBits.toInt(), operand.reservedSlot)
+            OperandSourceKind.F64Immediate -> emitF64Constant(operand.sourceBits, operand.reservedSlot)
+            OperandSourceKind.Local -> {
+                emitCopy(operand.sourceSlot, operand.reservedSlot)
+                untrackLocalAlias(operand)
+            }
+            OperandSourceKind.Frame -> Unit
+        }
+        materializeOperand(operand)
+        return operand.reservedSlot
+    }
+
+    /** Copies popped operands into a fresh contiguous temporary range. */
+    fun materializeContiguous(operands: List<Operand>): Int {
+        var highestFrameSource = frame.temporarySlotBase - 1
+        var index = 0
+        while (index < operands.size) {
+            val operand = operands[index]
+            if (operand.sourceKind == OperandSourceKind.Frame) {
+                highestFrameSource = maxOf(highestFrameSource, operand.sourceSlot)
+            }
+            index++
+        }
+        frame.reserve(highestFrameSource)
+
+        val firstSlot = frame.allocate()
+        index = 1
+        while (index < operands.size) {
+            frame.allocate()
+            index++
+        }
+
+        index = 0
+        while (index < operands.size) {
+            val operand = operands[index]
+            val destinationSlot = firstSlot + index
+            when (operand.sourceKind) {
+                OperandSourceKind.I32Immediate -> emitI32Constant(operand.i32Immediate, destinationSlot)
+                OperandSourceKind.I64Immediate -> emitI64Constant(operand.i64Immediate, destinationSlot)
+                OperandSourceKind.F32Immediate -> emitF32Constant(operand.sourceBits.toInt(), destinationSlot)
+                OperandSourceKind.F64Immediate -> emitF64Constant(operand.sourceBits, destinationSlot)
+                OperandSourceKind.Local,
+                OperandSourceKind.Frame,
+                -> if (operand.sourceSlot != destinationSlot) {
+                    emitCopy(operand.sourceSlot, destinationSlot)
+                }
+            }
+            index++
+        }
+        return firstSlot
+    }
+
+    /** Returns the first source slot when every operand already occupies one contiguous range. */
+    fun contiguousFrameSourceOrNull(operands: List<Operand>): Int? {
+        if (operands.isEmpty()) return null
+        val firstSlot = operands[0].sourceSlot
+        var index = 0
+        while (index < operands.size) {
+            val operand = operands[index]
+            if (operand.sourceKind != OperandSourceKind.Frame || operand.sourceSlot != firstSlot + index) {
+                return null
+            }
+            index++
+        }
+        return firstSlot
+    }
+
+    /** Releases a contiguous temporary range after its consuming instruction is emitted. */
+    fun releaseContiguous(
+        firstSlot: Int,
+        count: Int,
+    ) {
+        var index = count - 1
+        while (index >= 0) {
+            frame.release(firstSlot + index)
+            index--
+        }
+    }
+
+    fun rewindFrame() {
+        frame.rewindTo(operands.highestReservedSlot())
+    }
+
+    fun materializeBelow(topCount: Int) {
+        val end = operands.size - topCount
+        if (end <= 0) return
+        while (true) {
+            val index = operands.firstUnmaterializedIndex()
+            if (index !in 0 until end) return
+            materialize(operands[index])
+        }
+    }
+
+    fun unwindToHeight(height: Int) {
+        check(height in 0..operands.size)
+        while (operands.size > height) pop()
+    }
+
+    fun replaceStack(baseHeight: Int, types: List<ValueType>, slots: IntArray) {
+        check(types.size == slots.size)
+        unwindToHeight(baseHeight)
+        for (index in types.indices) {
+            pushFrame(types[index], slots[index])
+        }
+    }
+
+    fun resultRegionSlots(baseHeight: Int, arity: Int): IntArray {
+        if (arity == 0) return emptyIntArray
+        val highestPrefixSlot = maxOf(
+            frame.temporarySlotBase - 1,
+            operands.highestReservedSlot(baseHeight),
+        )
+        val temporaryHeight = highestPrefixSlot - frame.temporarySlotBase + 1
+        return IntArray(arity) { index -> frame.temporarySlotBase + temporaryHeight + index }
+    }
+
+    private fun trackLocalAlias(operand: Operand) {
+        if (operand.sourceKind != OperandSourceKind.Local) return
+        val previousHead = localAliases[operand.sourceLocalIndex]
+        operand.nextLocalAlias = previousHead
+        previousHead?.previousLocalAlias = operand
+        operand.tracksLocal = true
+        localAliases[operand.sourceLocalIndex] = operand
+    }
+
+    private fun untrackLocalAlias(operand: Operand) {
+        if (!operand.tracksLocal) return
+        if (operand.sourceKind != OperandSourceKind.Local) return
+        val localIndex = operand.sourceLocalIndex
+        val previous = operand.previousLocalAlias
+        val next = operand.nextLocalAlias
+        if (previous == null) {
+            localAliases[localIndex] = next
+        } else {
+            previous.nextLocalAlias = next
+        }
+        next?.previousLocalAlias = previous
+        operand.previousLocalAlias = null
+        operand.nextLocalAlias = null
+        operand.tracksLocal = false
+    }
+
+    private fun materializeOperand(operand: Operand, sourceSlot: Int = operand.reservedSlot) {
+        operand.materialize(sourceSlot)
+        operands.markMaterialized(operand)
+    }
+}

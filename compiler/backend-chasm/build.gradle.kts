@@ -25,6 +25,7 @@ kotlin {
 
         commonTest {
             dependencies {
+                implementation(projects.compiler.frontend)
                 implementation(projects.test.fixture.ast)
                 implementation(projects.test.fixture.config)
                 implementation(projects.test.fixture.runtime)
