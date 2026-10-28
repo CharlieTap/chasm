@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.executor.instantiator.initialization
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
+import io.github.charlietap.chasm.ast.module.toInt
 import io.github.charlietap.chasm.declarations.ElementSegmentDeclaration
 import io.github.charlietap.chasm.executor.instantiator.ConstantExpressionEvaluator
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
@@ -37,12 +38,12 @@ internal inline fun TableInitializer(
 
     segments.forEachIndexed { segmentIndex, segment ->
         val mode = segment.mode as? ElementSegmentDeclaration.Mode.Active ?: return@forEachIndexed
-        val offset = constantExpressionEvaluator(store, instance, context.types, mode.offset).bind().toInt()
-        val tableAddress = instance.tableAddress(mode.tableIndex).bind()
+        val offset = constantExpressionEvaluator(store, instance, context.types, mode.offsetExpr).bind().toInt()
+        val tableAddress = instance.tableAddress(mode.tableIndex.toInt()).bind()
         val tableInstance = store.table(tableAddress)
         val elementAddress = instance.elementAddress(segmentIndex).bind()
         val elementInstance = store.element(elementAddress)
-        val elementsToInit = segment.initializers.size
+        val elementsToInit = segment.initExpressions.size
 
         try {
             elementInstance.elements.copyInto(tableInstance.elements, offset, 0, elementsToInit)

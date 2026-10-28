@@ -136,42 +136,42 @@ sealed interface io.github.charlietap.chasm.ast.value/Value // io.github.charlie
 
 sealed interface io.github.charlietap.chasm.declarations/ConstantInstruction { // io.github.charlietap.chasm.declarations/ConstantInstruction|null[0]
     final class ArrayNew : io.github.charlietap.chasm.declarations/ConstantInstruction { // io.github.charlietap.chasm.declarations/ConstantInstruction.ArrayNew|null[0]
-        constructor <init>(kotlin/Int) // io.github.charlietap.chasm.declarations/ConstantInstruction.ArrayNew.<init>|<init>(kotlin.Int){}[0]
+        constructor <init>(io.github.charlietap.chasm.ast.module/Index.TypeIndex) // io.github.charlietap.chasm.declarations/ConstantInstruction.ArrayNew.<init>|<init>(io.github.charlietap.chasm.ast.module.Index.TypeIndex){}[0]
 
         final val typeIndex // io.github.charlietap.chasm.declarations/ConstantInstruction.ArrayNew.typeIndex|{}typeIndex[0]
-            final fun <get-typeIndex>(): kotlin/Int // io.github.charlietap.chasm.declarations/ConstantInstruction.ArrayNew.typeIndex.<get-typeIndex>|<get-typeIndex>(){}[0]
+            final fun <get-typeIndex>(): io.github.charlietap.chasm.ast.module/Index.TypeIndex // io.github.charlietap.chasm.declarations/ConstantInstruction.ArrayNew.typeIndex.<get-typeIndex>|<get-typeIndex>(){}[0]
 
-        final fun component1(): kotlin/Int // io.github.charlietap.chasm.declarations/ConstantInstruction.ArrayNew.component1|component1(){}[0]
-        final fun copy(kotlin/Int = ...): io.github.charlietap.chasm.declarations/ConstantInstruction.ArrayNew // io.github.charlietap.chasm.declarations/ConstantInstruction.ArrayNew.copy|copy(kotlin.Int){}[0]
+        final fun component1(): io.github.charlietap.chasm.ast.module/Index.TypeIndex // io.github.charlietap.chasm.declarations/ConstantInstruction.ArrayNew.component1|component1(){}[0]
+        final fun copy(io.github.charlietap.chasm.ast.module/Index.TypeIndex = ...): io.github.charlietap.chasm.declarations/ConstantInstruction.ArrayNew // io.github.charlietap.chasm.declarations/ConstantInstruction.ArrayNew.copy|copy(io.github.charlietap.chasm.ast.module.Index.TypeIndex){}[0]
         final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.declarations/ConstantInstruction.ArrayNew.equals|equals(kotlin.Any?){}[0]
         final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.declarations/ConstantInstruction.ArrayNew.hashCode|hashCode(){}[0]
         final fun toString(): kotlin/String // io.github.charlietap.chasm.declarations/ConstantInstruction.ArrayNew.toString|toString(){}[0]
     }
 
     final class ArrayNewDefault : io.github.charlietap.chasm.declarations/ConstantInstruction { // io.github.charlietap.chasm.declarations/ConstantInstruction.ArrayNewDefault|null[0]
-        constructor <init>(kotlin/Int) // io.github.charlietap.chasm.declarations/ConstantInstruction.ArrayNewDefault.<init>|<init>(kotlin.Int){}[0]
+        constructor <init>(io.github.charlietap.chasm.ast.module/Index.TypeIndex) // io.github.charlietap.chasm.declarations/ConstantInstruction.ArrayNewDefault.<init>|<init>(io.github.charlietap.chasm.ast.module.Index.TypeIndex){}[0]
 
         final val typeIndex // io.github.charlietap.chasm.declarations/ConstantInstruction.ArrayNewDefault.typeIndex|{}typeIndex[0]
-            final fun <get-typeIndex>(): kotlin/Int // io.github.charlietap.chasm.declarations/ConstantInstruction.ArrayNewDefault.typeIndex.<get-typeIndex>|<get-typeIndex>(){}[0]
+            final fun <get-typeIndex>(): io.github.charlietap.chasm.ast.module/Index.TypeIndex // io.github.charlietap.chasm.declarations/ConstantInstruction.ArrayNewDefault.typeIndex.<get-typeIndex>|<get-typeIndex>(){}[0]
 
-        final fun component1(): kotlin/Int // io.github.charlietap.chasm.declarations/ConstantInstruction.ArrayNewDefault.component1|component1(){}[0]
-        final fun copy(kotlin/Int = ...): io.github.charlietap.chasm.declarations/ConstantInstruction.ArrayNewDefault // io.github.charlietap.chasm.declarations/ConstantInstruction.ArrayNewDefault.copy|copy(kotlin.Int){}[0]
+        final fun component1(): io.github.charlietap.chasm.ast.module/Index.TypeIndex // io.github.charlietap.chasm.declarations/ConstantInstruction.ArrayNewDefault.component1|component1(){}[0]
+        final fun copy(io.github.charlietap.chasm.ast.module/Index.TypeIndex = ...): io.github.charlietap.chasm.declarations/ConstantInstruction.ArrayNewDefault // io.github.charlietap.chasm.declarations/ConstantInstruction.ArrayNewDefault.copy|copy(io.github.charlietap.chasm.ast.module.Index.TypeIndex){}[0]
         final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.declarations/ConstantInstruction.ArrayNewDefault.equals|equals(kotlin.Any?){}[0]
         final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.declarations/ConstantInstruction.ArrayNewDefault.hashCode|hashCode(){}[0]
         final fun toString(): kotlin/String // io.github.charlietap.chasm.declarations/ConstantInstruction.ArrayNewDefault.toString|toString(){}[0]
     }
 
     final class ArrayNewFixed : io.github.charlietap.chasm.declarations/ConstantInstruction { // io.github.charlietap.chasm.declarations/ConstantInstruction.ArrayNewFixed|null[0]
-        constructor <init>(kotlin/Int, kotlin/Int) // io.github.charlietap.chasm.declarations/ConstantInstruction.ArrayNewFixed.<init>|<init>(kotlin.Int;kotlin.Int){}[0]
+        constructor <init>(io.github.charlietap.chasm.ast.module/Index.TypeIndex, kotlin/UInt) // io.github.charlietap.chasm.declarations/ConstantInstruction.ArrayNewFixed.<init>|<init>(io.github.charlietap.chasm.ast.module.Index.TypeIndex;kotlin.UInt){}[0]
 
         final val size // io.github.charlietap.chasm.declarations/ConstantInstruction.ArrayNewFixed.size|{}size[0]
-            final fun <get-size>(): kotlin/Int // io.github.charlietap.chasm.declarations/ConstantInstruction.ArrayNewFixed.size.<get-size>|<get-size>(){}[0]
+            final fun <get-size>(): kotlin/UInt // io.github.charlietap.chasm.declarations/ConstantInstruction.ArrayNewFixed.size.<get-size>|<get-size>(){}[0]
         final val typeIndex // io.github.charlietap.chasm.declarations/ConstantInstruction.ArrayNewFixed.typeIndex|{}typeIndex[0]
-            final fun <get-typeIndex>(): kotlin/Int // io.github.charlietap.chasm.declarations/ConstantInstruction.ArrayNewFixed.typeIndex.<get-typeIndex>|<get-typeIndex>(){}[0]
+            final fun <get-typeIndex>(): io.github.charlietap.chasm.ast.module/Index.TypeIndex // io.github.charlietap.chasm.declarations/ConstantInstruction.ArrayNewFixed.typeIndex.<get-typeIndex>|<get-typeIndex>(){}[0]
 
-        final fun component1(): kotlin/Int // io.github.charlietap.chasm.declarations/ConstantInstruction.ArrayNewFixed.component1|component1(){}[0]
-        final fun component2(): kotlin/Int // io.github.charlietap.chasm.declarations/ConstantInstruction.ArrayNewFixed.component2|component2(){}[0]
-        final fun copy(kotlin/Int = ..., kotlin/Int = ...): io.github.charlietap.chasm.declarations/ConstantInstruction.ArrayNewFixed // io.github.charlietap.chasm.declarations/ConstantInstruction.ArrayNewFixed.copy|copy(kotlin.Int;kotlin.Int){}[0]
+        final fun component1(): io.github.charlietap.chasm.ast.module/Index.TypeIndex // io.github.charlietap.chasm.declarations/ConstantInstruction.ArrayNewFixed.component1|component1(){}[0]
+        final fun component2(): kotlin/UInt // io.github.charlietap.chasm.declarations/ConstantInstruction.ArrayNewFixed.component2|component2(){}[0]
+        final fun copy(io.github.charlietap.chasm.ast.module/Index.TypeIndex = ..., kotlin/UInt = ...): io.github.charlietap.chasm.declarations/ConstantInstruction.ArrayNewFixed // io.github.charlietap.chasm.declarations/ConstantInstruction.ArrayNewFixed.copy|copy(io.github.charlietap.chasm.ast.module.Index.TypeIndex;kotlin.UInt){}[0]
         final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.declarations/ConstantInstruction.ArrayNewFixed.equals|equals(kotlin.Any?){}[0]
         final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.declarations/ConstantInstruction.ArrayNewFixed.hashCode|hashCode(){}[0]
         final fun toString(): kotlin/String // io.github.charlietap.chasm.declarations/ConstantInstruction.ArrayNewFixed.toString|toString(){}[0]
@@ -204,13 +204,13 @@ sealed interface io.github.charlietap.chasm.declarations/ConstantInstruction { /
     }
 
     final class GlobalGet : io.github.charlietap.chasm.declarations/ConstantInstruction { // io.github.charlietap.chasm.declarations/ConstantInstruction.GlobalGet|null[0]
-        constructor <init>(kotlin/Int) // io.github.charlietap.chasm.declarations/ConstantInstruction.GlobalGet.<init>|<init>(kotlin.Int){}[0]
+        constructor <init>(io.github.charlietap.chasm.ast.module/Index.GlobalIndex) // io.github.charlietap.chasm.declarations/ConstantInstruction.GlobalGet.<init>|<init>(io.github.charlietap.chasm.ast.module.Index.GlobalIndex){}[0]
 
-        final val globalIndex // io.github.charlietap.chasm.declarations/ConstantInstruction.GlobalGet.globalIndex|{}globalIndex[0]
-            final fun <get-globalIndex>(): kotlin/Int // io.github.charlietap.chasm.declarations/ConstantInstruction.GlobalGet.globalIndex.<get-globalIndex>|<get-globalIndex>(){}[0]
+        final val globalIdx // io.github.charlietap.chasm.declarations/ConstantInstruction.GlobalGet.globalIdx|{}globalIdx[0]
+            final fun <get-globalIdx>(): io.github.charlietap.chasm.ast.module/Index.GlobalIndex // io.github.charlietap.chasm.declarations/ConstantInstruction.GlobalGet.globalIdx.<get-globalIdx>|<get-globalIdx>(){}[0]
 
-        final fun component1(): kotlin/Int // io.github.charlietap.chasm.declarations/ConstantInstruction.GlobalGet.component1|component1(){}[0]
-        final fun copy(kotlin/Int = ...): io.github.charlietap.chasm.declarations/ConstantInstruction.GlobalGet // io.github.charlietap.chasm.declarations/ConstantInstruction.GlobalGet.copy|copy(kotlin.Int){}[0]
+        final fun component1(): io.github.charlietap.chasm.ast.module/Index.GlobalIndex // io.github.charlietap.chasm.declarations/ConstantInstruction.GlobalGet.component1|component1(){}[0]
+        final fun copy(io.github.charlietap.chasm.ast.module/Index.GlobalIndex = ...): io.github.charlietap.chasm.declarations/ConstantInstruction.GlobalGet // io.github.charlietap.chasm.declarations/ConstantInstruction.GlobalGet.copy|copy(io.github.charlietap.chasm.ast.module.Index.GlobalIndex){}[0]
         final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.declarations/ConstantInstruction.GlobalGet.equals|equals(kotlin.Any?){}[0]
         final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.declarations/ConstantInstruction.GlobalGet.hashCode|hashCode(){}[0]
         final fun toString(): kotlin/String // io.github.charlietap.chasm.declarations/ConstantInstruction.GlobalGet.toString|toString(){}[0]
@@ -243,13 +243,13 @@ sealed interface io.github.charlietap.chasm.declarations/ConstantInstruction { /
     }
 
     final class RefFunc : io.github.charlietap.chasm.declarations/ConstantInstruction { // io.github.charlietap.chasm.declarations/ConstantInstruction.RefFunc|null[0]
-        constructor <init>(kotlin/Int) // io.github.charlietap.chasm.declarations/ConstantInstruction.RefFunc.<init>|<init>(kotlin.Int){}[0]
+        constructor <init>(io.github.charlietap.chasm.ast.module/Index.FunctionIndex) // io.github.charlietap.chasm.declarations/ConstantInstruction.RefFunc.<init>|<init>(io.github.charlietap.chasm.ast.module.Index.FunctionIndex){}[0]
 
-        final val functionIndex // io.github.charlietap.chasm.declarations/ConstantInstruction.RefFunc.functionIndex|{}functionIndex[0]
-            final fun <get-functionIndex>(): kotlin/Int // io.github.charlietap.chasm.declarations/ConstantInstruction.RefFunc.functionIndex.<get-functionIndex>|<get-functionIndex>(){}[0]
+        final val funcIdx // io.github.charlietap.chasm.declarations/ConstantInstruction.RefFunc.funcIdx|{}funcIdx[0]
+            final fun <get-funcIdx>(): io.github.charlietap.chasm.ast.module/Index.FunctionIndex // io.github.charlietap.chasm.declarations/ConstantInstruction.RefFunc.funcIdx.<get-funcIdx>|<get-funcIdx>(){}[0]
 
-        final fun component1(): kotlin/Int // io.github.charlietap.chasm.declarations/ConstantInstruction.RefFunc.component1|component1(){}[0]
-        final fun copy(kotlin/Int = ...): io.github.charlietap.chasm.declarations/ConstantInstruction.RefFunc // io.github.charlietap.chasm.declarations/ConstantInstruction.RefFunc.copy|copy(kotlin.Int){}[0]
+        final fun component1(): io.github.charlietap.chasm.ast.module/Index.FunctionIndex // io.github.charlietap.chasm.declarations/ConstantInstruction.RefFunc.component1|component1(){}[0]
+        final fun copy(io.github.charlietap.chasm.ast.module/Index.FunctionIndex = ...): io.github.charlietap.chasm.declarations/ConstantInstruction.RefFunc // io.github.charlietap.chasm.declarations/ConstantInstruction.RefFunc.copy|copy(io.github.charlietap.chasm.ast.module.Index.FunctionIndex){}[0]
         final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.declarations/ConstantInstruction.RefFunc.equals|equals(kotlin.Any?){}[0]
         final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.declarations/ConstantInstruction.RefFunc.hashCode|hashCode(){}[0]
         final fun toString(): kotlin/String // io.github.charlietap.chasm.declarations/ConstantInstruction.RefFunc.toString|toString(){}[0]
@@ -269,26 +269,26 @@ sealed interface io.github.charlietap.chasm.declarations/ConstantInstruction { /
     }
 
     final class StructNew : io.github.charlietap.chasm.declarations/ConstantInstruction { // io.github.charlietap.chasm.declarations/ConstantInstruction.StructNew|null[0]
-        constructor <init>(kotlin/Int) // io.github.charlietap.chasm.declarations/ConstantInstruction.StructNew.<init>|<init>(kotlin.Int){}[0]
+        constructor <init>(io.github.charlietap.chasm.ast.module/Index.TypeIndex) // io.github.charlietap.chasm.declarations/ConstantInstruction.StructNew.<init>|<init>(io.github.charlietap.chasm.ast.module.Index.TypeIndex){}[0]
 
         final val typeIndex // io.github.charlietap.chasm.declarations/ConstantInstruction.StructNew.typeIndex|{}typeIndex[0]
-            final fun <get-typeIndex>(): kotlin/Int // io.github.charlietap.chasm.declarations/ConstantInstruction.StructNew.typeIndex.<get-typeIndex>|<get-typeIndex>(){}[0]
+            final fun <get-typeIndex>(): io.github.charlietap.chasm.ast.module/Index.TypeIndex // io.github.charlietap.chasm.declarations/ConstantInstruction.StructNew.typeIndex.<get-typeIndex>|<get-typeIndex>(){}[0]
 
-        final fun component1(): kotlin/Int // io.github.charlietap.chasm.declarations/ConstantInstruction.StructNew.component1|component1(){}[0]
-        final fun copy(kotlin/Int = ...): io.github.charlietap.chasm.declarations/ConstantInstruction.StructNew // io.github.charlietap.chasm.declarations/ConstantInstruction.StructNew.copy|copy(kotlin.Int){}[0]
+        final fun component1(): io.github.charlietap.chasm.ast.module/Index.TypeIndex // io.github.charlietap.chasm.declarations/ConstantInstruction.StructNew.component1|component1(){}[0]
+        final fun copy(io.github.charlietap.chasm.ast.module/Index.TypeIndex = ...): io.github.charlietap.chasm.declarations/ConstantInstruction.StructNew // io.github.charlietap.chasm.declarations/ConstantInstruction.StructNew.copy|copy(io.github.charlietap.chasm.ast.module.Index.TypeIndex){}[0]
         final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.declarations/ConstantInstruction.StructNew.equals|equals(kotlin.Any?){}[0]
         final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.declarations/ConstantInstruction.StructNew.hashCode|hashCode(){}[0]
         final fun toString(): kotlin/String // io.github.charlietap.chasm.declarations/ConstantInstruction.StructNew.toString|toString(){}[0]
     }
 
     final class StructNewDefault : io.github.charlietap.chasm.declarations/ConstantInstruction { // io.github.charlietap.chasm.declarations/ConstantInstruction.StructNewDefault|null[0]
-        constructor <init>(kotlin/Int) // io.github.charlietap.chasm.declarations/ConstantInstruction.StructNewDefault.<init>|<init>(kotlin.Int){}[0]
+        constructor <init>(io.github.charlietap.chasm.ast.module/Index.TypeIndex) // io.github.charlietap.chasm.declarations/ConstantInstruction.StructNewDefault.<init>|<init>(io.github.charlietap.chasm.ast.module.Index.TypeIndex){}[0]
 
         final val typeIndex // io.github.charlietap.chasm.declarations/ConstantInstruction.StructNewDefault.typeIndex|{}typeIndex[0]
-            final fun <get-typeIndex>(): kotlin/Int // io.github.charlietap.chasm.declarations/ConstantInstruction.StructNewDefault.typeIndex.<get-typeIndex>|<get-typeIndex>(){}[0]
+            final fun <get-typeIndex>(): io.github.charlietap.chasm.ast.module/Index.TypeIndex // io.github.charlietap.chasm.declarations/ConstantInstruction.StructNewDefault.typeIndex.<get-typeIndex>|<get-typeIndex>(){}[0]
 
-        final fun component1(): kotlin/Int // io.github.charlietap.chasm.declarations/ConstantInstruction.StructNewDefault.component1|component1(){}[0]
-        final fun copy(kotlin/Int = ...): io.github.charlietap.chasm.declarations/ConstantInstruction.StructNewDefault // io.github.charlietap.chasm.declarations/ConstantInstruction.StructNewDefault.copy|copy(kotlin.Int){}[0]
+        final fun component1(): io.github.charlietap.chasm.ast.module/Index.TypeIndex // io.github.charlietap.chasm.declarations/ConstantInstruction.StructNewDefault.component1|component1(){}[0]
+        final fun copy(io.github.charlietap.chasm.ast.module/Index.TypeIndex = ...): io.github.charlietap.chasm.declarations/ConstantInstruction.StructNewDefault // io.github.charlietap.chasm.declarations/ConstantInstruction.StructNewDefault.copy|copy(io.github.charlietap.chasm.ast.module.Index.TypeIndex){}[0]
         final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.declarations/ConstantInstruction.StructNewDefault.equals|equals(kotlin.Any?){}[0]
         final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.declarations/ConstantInstruction.StructNewDefault.hashCode|hashCode(){}[0]
         final fun toString(): kotlin/String // io.github.charlietap.chasm.declarations/ConstantInstruction.StructNewDefault.toString|toString(){}[0]
@@ -379,6 +379,79 @@ sealed interface io.github.charlietap.chasm.declarations/DataPayload { // io.git
 
         final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.declarations/DataPayload.Inline.equals|equals(kotlin.Any?){}[0]
         final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.declarations/DataPayload.Inline.hashCode|hashCode(){}[0]
+    }
+}
+
+final class io.github.charlietap.chasm.ast.module/Export { // io.github.charlietap.chasm.ast.module/Export|null[0]
+    constructor <init>(io.github.charlietap.chasm.ast.value/NameValue, io.github.charlietap.chasm.ast.module/Export.Descriptor) // io.github.charlietap.chasm.ast.module/Export.<init>|<init>(io.github.charlietap.chasm.ast.value.NameValue;io.github.charlietap.chasm.ast.module.Export.Descriptor){}[0]
+
+    final val descriptor // io.github.charlietap.chasm.ast.module/Export.descriptor|{}descriptor[0]
+        final fun <get-descriptor>(): io.github.charlietap.chasm.ast.module/Export.Descriptor // io.github.charlietap.chasm.ast.module/Export.descriptor.<get-descriptor>|<get-descriptor>(){}[0]
+    final val name // io.github.charlietap.chasm.ast.module/Export.name|{}name[0]
+        final fun <get-name>(): io.github.charlietap.chasm.ast.value/NameValue // io.github.charlietap.chasm.ast.module/Export.name.<get-name>|<get-name>(){}[0]
+
+    final fun component1(): io.github.charlietap.chasm.ast.value/NameValue // io.github.charlietap.chasm.ast.module/Export.component1|component1(){}[0]
+    final fun component2(): io.github.charlietap.chasm.ast.module/Export.Descriptor // io.github.charlietap.chasm.ast.module/Export.component2|component2(){}[0]
+    final fun copy(io.github.charlietap.chasm.ast.value/NameValue = ..., io.github.charlietap.chasm.ast.module/Export.Descriptor = ...): io.github.charlietap.chasm.ast.module/Export // io.github.charlietap.chasm.ast.module/Export.copy|copy(io.github.charlietap.chasm.ast.value.NameValue;io.github.charlietap.chasm.ast.module.Export.Descriptor){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.module/Export.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.module/Export.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.module/Export.toString|toString(){}[0]
+
+    sealed interface Descriptor { // io.github.charlietap.chasm.ast.module/Export.Descriptor|null[0]
+        final value class Function : io.github.charlietap.chasm.ast.module/Export.Descriptor { // io.github.charlietap.chasm.ast.module/Export.Descriptor.Function|null[0]
+            constructor <init>(io.github.charlietap.chasm.ast.module/Index.FunctionIndex) // io.github.charlietap.chasm.ast.module/Export.Descriptor.Function.<init>|<init>(io.github.charlietap.chasm.ast.module.Index.FunctionIndex){}[0]
+
+            final val functionIndex // io.github.charlietap.chasm.ast.module/Export.Descriptor.Function.functionIndex|{}functionIndex[0]
+                final fun <get-functionIndex>(): io.github.charlietap.chasm.ast.module/Index.FunctionIndex // io.github.charlietap.chasm.ast.module/Export.Descriptor.Function.functionIndex.<get-functionIndex>|<get-functionIndex>(){}[0]
+
+            final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.module/Export.Descriptor.Function.equals|equals(kotlin.Any?){}[0]
+            final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.module/Export.Descriptor.Function.hashCode|hashCode(){}[0]
+            final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.module/Export.Descriptor.Function.toString|toString(){}[0]
+        }
+
+        final value class Global : io.github.charlietap.chasm.ast.module/Export.Descriptor { // io.github.charlietap.chasm.ast.module/Export.Descriptor.Global|null[0]
+            constructor <init>(io.github.charlietap.chasm.ast.module/Index.GlobalIndex) // io.github.charlietap.chasm.ast.module/Export.Descriptor.Global.<init>|<init>(io.github.charlietap.chasm.ast.module.Index.GlobalIndex){}[0]
+
+            final val globalIndex // io.github.charlietap.chasm.ast.module/Export.Descriptor.Global.globalIndex|{}globalIndex[0]
+                final fun <get-globalIndex>(): io.github.charlietap.chasm.ast.module/Index.GlobalIndex // io.github.charlietap.chasm.ast.module/Export.Descriptor.Global.globalIndex.<get-globalIndex>|<get-globalIndex>(){}[0]
+
+            final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.module/Export.Descriptor.Global.equals|equals(kotlin.Any?){}[0]
+            final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.module/Export.Descriptor.Global.hashCode|hashCode(){}[0]
+            final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.module/Export.Descriptor.Global.toString|toString(){}[0]
+        }
+
+        final value class Memory : io.github.charlietap.chasm.ast.module/Export.Descriptor { // io.github.charlietap.chasm.ast.module/Export.Descriptor.Memory|null[0]
+            constructor <init>(io.github.charlietap.chasm.ast.module/Index.MemoryIndex) // io.github.charlietap.chasm.ast.module/Export.Descriptor.Memory.<init>|<init>(io.github.charlietap.chasm.ast.module.Index.MemoryIndex){}[0]
+
+            final val memoryIndex // io.github.charlietap.chasm.ast.module/Export.Descriptor.Memory.memoryIndex|{}memoryIndex[0]
+                final fun <get-memoryIndex>(): io.github.charlietap.chasm.ast.module/Index.MemoryIndex // io.github.charlietap.chasm.ast.module/Export.Descriptor.Memory.memoryIndex.<get-memoryIndex>|<get-memoryIndex>(){}[0]
+
+            final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.module/Export.Descriptor.Memory.equals|equals(kotlin.Any?){}[0]
+            final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.module/Export.Descriptor.Memory.hashCode|hashCode(){}[0]
+            final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.module/Export.Descriptor.Memory.toString|toString(){}[0]
+        }
+
+        final value class Table : io.github.charlietap.chasm.ast.module/Export.Descriptor { // io.github.charlietap.chasm.ast.module/Export.Descriptor.Table|null[0]
+            constructor <init>(io.github.charlietap.chasm.ast.module/Index.TableIndex) // io.github.charlietap.chasm.ast.module/Export.Descriptor.Table.<init>|<init>(io.github.charlietap.chasm.ast.module.Index.TableIndex){}[0]
+
+            final val tableIndex // io.github.charlietap.chasm.ast.module/Export.Descriptor.Table.tableIndex|{}tableIndex[0]
+                final fun <get-tableIndex>(): io.github.charlietap.chasm.ast.module/Index.TableIndex // io.github.charlietap.chasm.ast.module/Export.Descriptor.Table.tableIndex.<get-tableIndex>|<get-tableIndex>(){}[0]
+
+            final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.module/Export.Descriptor.Table.equals|equals(kotlin.Any?){}[0]
+            final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.module/Export.Descriptor.Table.hashCode|hashCode(){}[0]
+            final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.module/Export.Descriptor.Table.toString|toString(){}[0]
+        }
+
+        final value class Tag : io.github.charlietap.chasm.ast.module/Export.Descriptor { // io.github.charlietap.chasm.ast.module/Export.Descriptor.Tag|null[0]
+            constructor <init>(io.github.charlietap.chasm.ast.module/Index.TagIndex) // io.github.charlietap.chasm.ast.module/Export.Descriptor.Tag.<init>|<init>(io.github.charlietap.chasm.ast.module.Index.TagIndex){}[0]
+
+            final val tagIndex // io.github.charlietap.chasm.ast.module/Export.Descriptor.Tag.tagIndex|{}tagIndex[0]
+                final fun <get-tagIndex>(): io.github.charlietap.chasm.ast.module/Index.TagIndex // io.github.charlietap.chasm.ast.module/Export.Descriptor.Tag.tagIndex.<get-tagIndex>|<get-tagIndex>(){}[0]
+
+            final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.module/Export.Descriptor.Tag.equals|equals(kotlin.Any?){}[0]
+            final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.module/Export.Descriptor.Tag.hashCode|hashCode(){}[0]
+            final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.module/Export.Descriptor.Tag.toString|toString(){}[0]
+        }
     }
 }
 
@@ -488,16 +561,16 @@ final class io.github.charlietap.chasm.declarations/DataSegmentDeclaration { // 
 
     sealed interface Mode { // io.github.charlietap.chasm.declarations/DataSegmentDeclaration.Mode|null[0]
         final class Active : io.github.charlietap.chasm.declarations/DataSegmentDeclaration.Mode { // io.github.charlietap.chasm.declarations/DataSegmentDeclaration.Mode.Active|null[0]
-            constructor <init>(kotlin/Int, io.github.charlietap.chasm.declarations/ConstantExpression) // io.github.charlietap.chasm.declarations/DataSegmentDeclaration.Mode.Active.<init>|<init>(kotlin.Int;io.github.charlietap.chasm.declarations.ConstantExpression){}[0]
+            constructor <init>(io.github.charlietap.chasm.ast.module/Index.MemoryIndex, io.github.charlietap.chasm.declarations/ConstantExpression) // io.github.charlietap.chasm.declarations/DataSegmentDeclaration.Mode.Active.<init>|<init>(io.github.charlietap.chasm.ast.module.Index.MemoryIndex;io.github.charlietap.chasm.declarations.ConstantExpression){}[0]
 
             final val memoryIndex // io.github.charlietap.chasm.declarations/DataSegmentDeclaration.Mode.Active.memoryIndex|{}memoryIndex[0]
-                final fun <get-memoryIndex>(): kotlin/Int // io.github.charlietap.chasm.declarations/DataSegmentDeclaration.Mode.Active.memoryIndex.<get-memoryIndex>|<get-memoryIndex>(){}[0]
+                final fun <get-memoryIndex>(): io.github.charlietap.chasm.ast.module/Index.MemoryIndex // io.github.charlietap.chasm.declarations/DataSegmentDeclaration.Mode.Active.memoryIndex.<get-memoryIndex>|<get-memoryIndex>(){}[0]
             final val offset // io.github.charlietap.chasm.declarations/DataSegmentDeclaration.Mode.Active.offset|{}offset[0]
                 final fun <get-offset>(): io.github.charlietap.chasm.declarations/ConstantExpression // io.github.charlietap.chasm.declarations/DataSegmentDeclaration.Mode.Active.offset.<get-offset>|<get-offset>(){}[0]
 
-            final fun component1(): kotlin/Int // io.github.charlietap.chasm.declarations/DataSegmentDeclaration.Mode.Active.component1|component1(){}[0]
+            final fun component1(): io.github.charlietap.chasm.ast.module/Index.MemoryIndex // io.github.charlietap.chasm.declarations/DataSegmentDeclaration.Mode.Active.component1|component1(){}[0]
             final fun component2(): io.github.charlietap.chasm.declarations/ConstantExpression // io.github.charlietap.chasm.declarations/DataSegmentDeclaration.Mode.Active.component2|component2(){}[0]
-            final fun copy(kotlin/Int = ..., io.github.charlietap.chasm.declarations/ConstantExpression = ...): io.github.charlietap.chasm.declarations/DataSegmentDeclaration.Mode.Active // io.github.charlietap.chasm.declarations/DataSegmentDeclaration.Mode.Active.copy|copy(kotlin.Int;io.github.charlietap.chasm.declarations.ConstantExpression){}[0]
+            final fun copy(io.github.charlietap.chasm.ast.module/Index.MemoryIndex = ..., io.github.charlietap.chasm.declarations/ConstantExpression = ...): io.github.charlietap.chasm.declarations/DataSegmentDeclaration.Mode.Active // io.github.charlietap.chasm.declarations/DataSegmentDeclaration.Mode.Active.copy|copy(io.github.charlietap.chasm.ast.module.Index.MemoryIndex;io.github.charlietap.chasm.declarations.ConstantExpression){}[0]
             final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.declarations/DataSegmentDeclaration.Mode.Active.equals|equals(kotlin.Any?){}[0]
             final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.declarations/DataSegmentDeclaration.Mode.Active.hashCode|hashCode(){}[0]
             final fun toString(): kotlin/String // io.github.charlietap.chasm.declarations/DataSegmentDeclaration.Mode.Active.toString|toString(){}[0]
@@ -514,8 +587,8 @@ final class io.github.charlietap.chasm.declarations/DataSegmentDeclaration { // 
 final class io.github.charlietap.chasm.declarations/ElementSegmentDeclaration { // io.github.charlietap.chasm.declarations/ElementSegmentDeclaration|null[0]
     constructor <init>(io.github.charlietap.chasm.type/ReferenceType, kotlin.collections/List<io.github.charlietap.chasm.declarations/ConstantExpression>, io.github.charlietap.chasm.declarations/ElementSegmentDeclaration.Mode) // io.github.charlietap.chasm.declarations/ElementSegmentDeclaration.<init>|<init>(io.github.charlietap.chasm.type.ReferenceType;kotlin.collections.List<io.github.charlietap.chasm.declarations.ConstantExpression>;io.github.charlietap.chasm.declarations.ElementSegmentDeclaration.Mode){}[0]
 
-    final val initializers // io.github.charlietap.chasm.declarations/ElementSegmentDeclaration.initializers|{}initializers[0]
-        final fun <get-initializers>(): kotlin.collections/List<io.github.charlietap.chasm.declarations/ConstantExpression> // io.github.charlietap.chasm.declarations/ElementSegmentDeclaration.initializers.<get-initializers>|<get-initializers>(){}[0]
+    final val initExpressions // io.github.charlietap.chasm.declarations/ElementSegmentDeclaration.initExpressions|{}initExpressions[0]
+        final fun <get-initExpressions>(): kotlin.collections/List<io.github.charlietap.chasm.declarations/ConstantExpression> // io.github.charlietap.chasm.declarations/ElementSegmentDeclaration.initExpressions.<get-initExpressions>|<get-initExpressions>(){}[0]
     final val mode // io.github.charlietap.chasm.declarations/ElementSegmentDeclaration.mode|{}mode[0]
         final fun <get-mode>(): io.github.charlietap.chasm.declarations/ElementSegmentDeclaration.Mode // io.github.charlietap.chasm.declarations/ElementSegmentDeclaration.mode.<get-mode>|<get-mode>(){}[0]
     final val type // io.github.charlietap.chasm.declarations/ElementSegmentDeclaration.type|{}type[0]
@@ -531,16 +604,16 @@ final class io.github.charlietap.chasm.declarations/ElementSegmentDeclaration { 
 
     sealed interface Mode { // io.github.charlietap.chasm.declarations/ElementSegmentDeclaration.Mode|null[0]
         final class Active : io.github.charlietap.chasm.declarations/ElementSegmentDeclaration.Mode { // io.github.charlietap.chasm.declarations/ElementSegmentDeclaration.Mode.Active|null[0]
-            constructor <init>(kotlin/Int, io.github.charlietap.chasm.declarations/ConstantExpression) // io.github.charlietap.chasm.declarations/ElementSegmentDeclaration.Mode.Active.<init>|<init>(kotlin.Int;io.github.charlietap.chasm.declarations.ConstantExpression){}[0]
+            constructor <init>(io.github.charlietap.chasm.ast.module/Index.TableIndex, io.github.charlietap.chasm.declarations/ConstantExpression) // io.github.charlietap.chasm.declarations/ElementSegmentDeclaration.Mode.Active.<init>|<init>(io.github.charlietap.chasm.ast.module.Index.TableIndex;io.github.charlietap.chasm.declarations.ConstantExpression){}[0]
 
-            final val offset // io.github.charlietap.chasm.declarations/ElementSegmentDeclaration.Mode.Active.offset|{}offset[0]
-                final fun <get-offset>(): io.github.charlietap.chasm.declarations/ConstantExpression // io.github.charlietap.chasm.declarations/ElementSegmentDeclaration.Mode.Active.offset.<get-offset>|<get-offset>(){}[0]
+            final val offsetExpr // io.github.charlietap.chasm.declarations/ElementSegmentDeclaration.Mode.Active.offsetExpr|{}offsetExpr[0]
+                final fun <get-offsetExpr>(): io.github.charlietap.chasm.declarations/ConstantExpression // io.github.charlietap.chasm.declarations/ElementSegmentDeclaration.Mode.Active.offsetExpr.<get-offsetExpr>|<get-offsetExpr>(){}[0]
             final val tableIndex // io.github.charlietap.chasm.declarations/ElementSegmentDeclaration.Mode.Active.tableIndex|{}tableIndex[0]
-                final fun <get-tableIndex>(): kotlin/Int // io.github.charlietap.chasm.declarations/ElementSegmentDeclaration.Mode.Active.tableIndex.<get-tableIndex>|<get-tableIndex>(){}[0]
+                final fun <get-tableIndex>(): io.github.charlietap.chasm.ast.module/Index.TableIndex // io.github.charlietap.chasm.declarations/ElementSegmentDeclaration.Mode.Active.tableIndex.<get-tableIndex>|<get-tableIndex>(){}[0]
 
-            final fun component1(): kotlin/Int // io.github.charlietap.chasm.declarations/ElementSegmentDeclaration.Mode.Active.component1|component1(){}[0]
+            final fun component1(): io.github.charlietap.chasm.ast.module/Index.TableIndex // io.github.charlietap.chasm.declarations/ElementSegmentDeclaration.Mode.Active.component1|component1(){}[0]
             final fun component2(): io.github.charlietap.chasm.declarations/ConstantExpression // io.github.charlietap.chasm.declarations/ElementSegmentDeclaration.Mode.Active.component2|component2(){}[0]
-            final fun copy(kotlin/Int = ..., io.github.charlietap.chasm.declarations/ConstantExpression = ...): io.github.charlietap.chasm.declarations/ElementSegmentDeclaration.Mode.Active // io.github.charlietap.chasm.declarations/ElementSegmentDeclaration.Mode.Active.copy|copy(kotlin.Int;io.github.charlietap.chasm.declarations.ConstantExpression){}[0]
+            final fun copy(io.github.charlietap.chasm.ast.module/Index.TableIndex = ..., io.github.charlietap.chasm.declarations/ConstantExpression = ...): io.github.charlietap.chasm.declarations/ElementSegmentDeclaration.Mode.Active // io.github.charlietap.chasm.declarations/ElementSegmentDeclaration.Mode.Active.copy|copy(io.github.charlietap.chasm.ast.module.Index.TableIndex;io.github.charlietap.chasm.declarations.ConstantExpression){}[0]
             final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.declarations/ElementSegmentDeclaration.Mode.Active.equals|equals(kotlin.Any?){}[0]
             final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.declarations/ElementSegmentDeclaration.Mode.Active.hashCode|hashCode(){}[0]
             final fun toString(): kotlin/String // io.github.charlietap.chasm.declarations/ElementSegmentDeclaration.Mode.Active.toString|toString(){}[0]
@@ -560,40 +633,11 @@ final class io.github.charlietap.chasm.declarations/ElementSegmentDeclaration { 
     }
 }
 
-final class io.github.charlietap.chasm.declarations/ExportDeclarations { // io.github.charlietap.chasm.declarations/ExportDeclarations|null[0]
-    constructor <init>(kotlin/Array<kotlin/String>, kotlin/ByteArray, kotlin/IntArray) // io.github.charlietap.chasm.declarations/ExportDeclarations.<init>|<init>(kotlin.Array<kotlin.String>;kotlin.ByteArray;kotlin.IntArray){}[0]
-
-    final val indices // io.github.charlietap.chasm.declarations/ExportDeclarations.indices|{}indices[0]
-        final fun <get-indices>(): kotlin/IntArray // io.github.charlietap.chasm.declarations/ExportDeclarations.indices.<get-indices>|<get-indices>(){}[0]
-    final val kinds // io.github.charlietap.chasm.declarations/ExportDeclarations.kinds|{}kinds[0]
-        final fun <get-kinds>(): kotlin/ByteArray // io.github.charlietap.chasm.declarations/ExportDeclarations.kinds.<get-kinds>|<get-kinds>(){}[0]
-    final val names // io.github.charlietap.chasm.declarations/ExportDeclarations.names|{}names[0]
-        final fun <get-names>(): kotlin/Array<kotlin/String> // io.github.charlietap.chasm.declarations/ExportDeclarations.names.<get-names>|<get-names>(){}[0]
-    final val size // io.github.charlietap.chasm.declarations/ExportDeclarations.size|{}size[0]
-        final fun <get-size>(): kotlin/Int // io.github.charlietap.chasm.declarations/ExportDeclarations.size.<get-size>|<get-size>(){}[0]
-
-    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.declarations/ExportDeclarations.equals|equals(kotlin.Any?){}[0]
-    final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.declarations/ExportDeclarations.hashCode|hashCode(){}[0]
-
-    final object Companion { // io.github.charlietap.chasm.declarations/ExportDeclarations.Companion|null[0]
-        final const val FUNCTION // io.github.charlietap.chasm.declarations/ExportDeclarations.Companion.FUNCTION|{}FUNCTION[0]
-            final fun <get-FUNCTION>(): kotlin/Byte // io.github.charlietap.chasm.declarations/ExportDeclarations.Companion.FUNCTION.<get-FUNCTION>|<get-FUNCTION>(){}[0]
-        final const val GLOBAL // io.github.charlietap.chasm.declarations/ExportDeclarations.Companion.GLOBAL|{}GLOBAL[0]
-            final fun <get-GLOBAL>(): kotlin/Byte // io.github.charlietap.chasm.declarations/ExportDeclarations.Companion.GLOBAL.<get-GLOBAL>|<get-GLOBAL>(){}[0]
-        final const val MEMORY // io.github.charlietap.chasm.declarations/ExportDeclarations.Companion.MEMORY|{}MEMORY[0]
-            final fun <get-MEMORY>(): kotlin/Byte // io.github.charlietap.chasm.declarations/ExportDeclarations.Companion.MEMORY.<get-MEMORY>|<get-MEMORY>(){}[0]
-        final const val TABLE // io.github.charlietap.chasm.declarations/ExportDeclarations.Companion.TABLE|{}TABLE[0]
-            final fun <get-TABLE>(): kotlin/Byte // io.github.charlietap.chasm.declarations/ExportDeclarations.Companion.TABLE.<get-TABLE>|<get-TABLE>(){}[0]
-        final const val TAG // io.github.charlietap.chasm.declarations/ExportDeclarations.Companion.TAG|{}TAG[0]
-            final fun <get-TAG>(): kotlin/Byte // io.github.charlietap.chasm.declarations/ExportDeclarations.Companion.TAG.<get-TAG>|<get-TAG>(){}[0]
-    }
-}
-
 final class io.github.charlietap.chasm.declarations/GlobalDeclaration { // io.github.charlietap.chasm.declarations/GlobalDeclaration|null[0]
     constructor <init>(io.github.charlietap.chasm.type/GlobalType, io.github.charlietap.chasm.declarations/ConstantExpression) // io.github.charlietap.chasm.declarations/GlobalDeclaration.<init>|<init>(io.github.charlietap.chasm.type.GlobalType;io.github.charlietap.chasm.declarations.ConstantExpression){}[0]
 
-    final val initializer // io.github.charlietap.chasm.declarations/GlobalDeclaration.initializer|{}initializer[0]
-        final fun <get-initializer>(): io.github.charlietap.chasm.declarations/ConstantExpression // io.github.charlietap.chasm.declarations/GlobalDeclaration.initializer.<get-initializer>|<get-initializer>(){}[0]
+    final val initExpression // io.github.charlietap.chasm.declarations/GlobalDeclaration.initExpression|{}initExpression[0]
+        final fun <get-initExpression>(): io.github.charlietap.chasm.declarations/ConstantExpression // io.github.charlietap.chasm.declarations/GlobalDeclaration.initExpression.<get-initExpression>|<get-initExpression>(){}[0]
     final val type // io.github.charlietap.chasm.declarations/GlobalDeclaration.type|{}type[0]
         final fun <get-type>(): io.github.charlietap.chasm.type/GlobalType // io.github.charlietap.chasm.declarations/GlobalDeclaration.type.<get-type>|<get-type>(){}[0]
 
@@ -606,7 +650,7 @@ final class io.github.charlietap.chasm.declarations/GlobalDeclaration { // io.gi
 }
 
 final class io.github.charlietap.chasm.declarations/ModuleDeclarations { // io.github.charlietap.chasm.declarations/ModuleDeclarations|null[0]
-    constructor <init>(kotlin.collections/List<io.github.charlietap.chasm.type/DefinedType>, kotlin.collections/List<io.github.charlietap.chasm.ast.module/Import>, kotlin/IntArray, kotlin.collections/List<io.github.charlietap.chasm.declarations/TableDeclaration>, kotlin.collections/List<io.github.charlietap.chasm.type/MemoryType>, kotlin.collections/List<io.github.charlietap.chasm.type/TagType>, kotlin.collections/List<io.github.charlietap.chasm.declarations/GlobalDeclaration>, io.github.charlietap.chasm.declarations/ExportDeclarations, kotlin/Int?, kotlin.collections/List<io.github.charlietap.chasm.declarations/ElementSegmentDeclaration>, kotlin.collections/List<io.github.charlietap.chasm.declarations/DataSegmentDeclaration>, io.github.charlietap.chasm.declarations/ModuleNames) // io.github.charlietap.chasm.declarations/ModuleDeclarations.<init>|<init>(kotlin.collections.List<io.github.charlietap.chasm.type.DefinedType>;kotlin.collections.List<io.github.charlietap.chasm.ast.module.Import>;kotlin.IntArray;kotlin.collections.List<io.github.charlietap.chasm.declarations.TableDeclaration>;kotlin.collections.List<io.github.charlietap.chasm.type.MemoryType>;kotlin.collections.List<io.github.charlietap.chasm.type.TagType>;kotlin.collections.List<io.github.charlietap.chasm.declarations.GlobalDeclaration>;io.github.charlietap.chasm.declarations.ExportDeclarations;kotlin.Int?;kotlin.collections.List<io.github.charlietap.chasm.declarations.ElementSegmentDeclaration>;kotlin.collections.List<io.github.charlietap.chasm.declarations.DataSegmentDeclaration>;io.github.charlietap.chasm.declarations.ModuleNames){}[0]
+    constructor <init>(kotlin.collections/List<io.github.charlietap.chasm.type/DefinedType>, kotlin.collections/List<io.github.charlietap.chasm.ast.module/Import>, kotlin/IntArray, kotlin.collections/List<io.github.charlietap.chasm.declarations/TableDeclaration>, kotlin.collections/List<io.github.charlietap.chasm.type/MemoryType>, kotlin.collections/List<io.github.charlietap.chasm.type/TagType>, kotlin.collections/List<io.github.charlietap.chasm.declarations/GlobalDeclaration>, kotlin.collections/List<io.github.charlietap.chasm.ast.module/Export>, io.github.charlietap.chasm.ast.module/Index.FunctionIndex?, kotlin.collections/List<io.github.charlietap.chasm.declarations/ElementSegmentDeclaration>, kotlin.collections/List<io.github.charlietap.chasm.declarations/DataSegmentDeclaration>, io.github.charlietap.chasm.declarations/ModuleNames) // io.github.charlietap.chasm.declarations/ModuleDeclarations.<init>|<init>(kotlin.collections.List<io.github.charlietap.chasm.type.DefinedType>;kotlin.collections.List<io.github.charlietap.chasm.ast.module.Import>;kotlin.IntArray;kotlin.collections.List<io.github.charlietap.chasm.declarations.TableDeclaration>;kotlin.collections.List<io.github.charlietap.chasm.type.MemoryType>;kotlin.collections.List<io.github.charlietap.chasm.type.TagType>;kotlin.collections.List<io.github.charlietap.chasm.declarations.GlobalDeclaration>;kotlin.collections.List<io.github.charlietap.chasm.ast.module.Export>;io.github.charlietap.chasm.ast.module.Index.FunctionIndex?;kotlin.collections.List<io.github.charlietap.chasm.declarations.ElementSegmentDeclaration>;kotlin.collections.List<io.github.charlietap.chasm.declarations.DataSegmentDeclaration>;io.github.charlietap.chasm.declarations.ModuleNames){}[0]
 
     final val dataSegments // io.github.charlietap.chasm.declarations/ModuleDeclarations.dataSegments|{}dataSegments[0]
         final fun <get-dataSegments>(): kotlin.collections/List<io.github.charlietap.chasm.declarations/DataSegmentDeclaration> // io.github.charlietap.chasm.declarations/ModuleDeclarations.dataSegments.<get-dataSegments>|<get-dataSegments>(){}[0]
@@ -615,7 +659,7 @@ final class io.github.charlietap.chasm.declarations/ModuleDeclarations { // io.g
     final val elementSegments // io.github.charlietap.chasm.declarations/ModuleDeclarations.elementSegments|{}elementSegments[0]
         final fun <get-elementSegments>(): kotlin.collections/List<io.github.charlietap.chasm.declarations/ElementSegmentDeclaration> // io.github.charlietap.chasm.declarations/ModuleDeclarations.elementSegments.<get-elementSegments>|<get-elementSegments>(){}[0]
     final val exports // io.github.charlietap.chasm.declarations/ModuleDeclarations.exports|{}exports[0]
-        final fun <get-exports>(): io.github.charlietap.chasm.declarations/ExportDeclarations // io.github.charlietap.chasm.declarations/ModuleDeclarations.exports.<get-exports>|<get-exports>(){}[0]
+        final fun <get-exports>(): kotlin.collections/List<io.github.charlietap.chasm.ast.module/Export> // io.github.charlietap.chasm.declarations/ModuleDeclarations.exports.<get-exports>|<get-exports>(){}[0]
     final val functionTypeIndices // io.github.charlietap.chasm.declarations/ModuleDeclarations.functionTypeIndices|{}functionTypeIndices[0]
         final fun <get-functionTypeIndices>(): kotlin/IntArray // io.github.charlietap.chasm.declarations/ModuleDeclarations.functionTypeIndices.<get-functionTypeIndices>|<get-functionTypeIndices>(){}[0]
     final val globals // io.github.charlietap.chasm.declarations/ModuleDeclarations.globals|{}globals[0]
@@ -627,7 +671,7 @@ final class io.github.charlietap.chasm.declarations/ModuleDeclarations { // io.g
     final val names // io.github.charlietap.chasm.declarations/ModuleDeclarations.names|{}names[0]
         final fun <get-names>(): io.github.charlietap.chasm.declarations/ModuleNames // io.github.charlietap.chasm.declarations/ModuleDeclarations.names.<get-names>|<get-names>(){}[0]
     final val startFunction // io.github.charlietap.chasm.declarations/ModuleDeclarations.startFunction|{}startFunction[0]
-        final fun <get-startFunction>(): kotlin/Int? // io.github.charlietap.chasm.declarations/ModuleDeclarations.startFunction.<get-startFunction>|<get-startFunction>(){}[0]
+        final fun <get-startFunction>(): io.github.charlietap.chasm.ast.module/Index.FunctionIndex? // io.github.charlietap.chasm.declarations/ModuleDeclarations.startFunction.<get-startFunction>|<get-startFunction>(){}[0]
     final val tables // io.github.charlietap.chasm.declarations/ModuleDeclarations.tables|{}tables[0]
         final fun <get-tables>(): kotlin.collections/List<io.github.charlietap.chasm.declarations/TableDeclaration> // io.github.charlietap.chasm.declarations/ModuleDeclarations.tables.<get-tables>|<get-tables>(){}[0]
     final val tags // io.github.charlietap.chasm.declarations/ModuleDeclarations.tags|{}tags[0]
@@ -685,8 +729,8 @@ final class io.github.charlietap.chasm.declarations/ModuleTypeResolver { // io.g
 final class io.github.charlietap.chasm.declarations/TableDeclaration { // io.github.charlietap.chasm.declarations/TableDeclaration|null[0]
     constructor <init>(io.github.charlietap.chasm.type/TableType, io.github.charlietap.chasm.declarations/ConstantExpression) // io.github.charlietap.chasm.declarations/TableDeclaration.<init>|<init>(io.github.charlietap.chasm.type.TableType;io.github.charlietap.chasm.declarations.ConstantExpression){}[0]
 
-    final val initializer // io.github.charlietap.chasm.declarations/TableDeclaration.initializer|{}initializer[0]
-        final fun <get-initializer>(): io.github.charlietap.chasm.declarations/ConstantExpression // io.github.charlietap.chasm.declarations/TableDeclaration.initializer.<get-initializer>|<get-initializer>(){}[0]
+    final val initExpression // io.github.charlietap.chasm.declarations/TableDeclaration.initExpression|{}initExpression[0]
+        final fun <get-initExpression>(): io.github.charlietap.chasm.declarations/ConstantExpression // io.github.charlietap.chasm.declarations/TableDeclaration.initExpression.<get-initExpression>|<get-initExpression>(){}[0]
     final val type // io.github.charlietap.chasm.declarations/TableDeclaration.type|{}type[0]
         final fun <get-type>(): io.github.charlietap.chasm.type/TableType // io.github.charlietap.chasm.declarations/TableDeclaration.type.<get-type>|<get-type>(){}[0]
 

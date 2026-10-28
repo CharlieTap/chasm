@@ -5,6 +5,7 @@ import io.github.charlietap.chasm.declarations.ConstantInstruction
 import io.github.charlietap.chasm.declarations.ElementSegmentDeclaration
 import io.github.charlietap.chasm.executor.instantiator.ConstantExpressionEvaluator
 import io.github.charlietap.chasm.executor.instantiator.initialization.TableInitializer
+import io.github.charlietap.chasm.fixture.ast.module.tableIndex
 import io.github.charlietap.chasm.fixture.config.runtimeConfig
 import io.github.charlietap.chasm.fixture.executor.instantiator.constantExpression
 import io.github.charlietap.chasm.fixture.executor.instantiator.elementSegmentDeclaration
@@ -27,8 +28,8 @@ class TableInitializerTest {
         val activeOffsetExpression = constantExpression(ConstantInstruction.I32Const(117))
         val activeSegment = elementSegmentDeclaration(
             mode = ElementSegmentDeclaration.Mode.Active(
-                tableIndex = 0,
-                offset = activeOffsetExpression,
+                tableIndex = tableIndex(0u),
+                offsetExpr = activeOffsetExpression,
             ),
         )
         val declarativeSegment = elementSegmentDeclaration(

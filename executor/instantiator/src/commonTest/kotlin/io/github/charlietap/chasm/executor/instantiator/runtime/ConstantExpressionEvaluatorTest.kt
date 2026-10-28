@@ -5,6 +5,8 @@ import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.declarations.ConstantInstruction
 import io.github.charlietap.chasm.declarations.ModuleTypeResolver
 import io.github.charlietap.chasm.executor.instantiator.ConstantExpressionEvaluator
+import io.github.charlietap.chasm.fixture.ast.module.functionIndex
+import io.github.charlietap.chasm.fixture.ast.module.globalIndex
 import io.github.charlietap.chasm.fixture.executor.instantiator.constantExpression
 import io.github.charlietap.chasm.fixture.runtime.instance.globalInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
@@ -65,10 +67,10 @@ class ConstantExpressionEvaluatorTest {
 
     @Test
     fun `globals and function references resolve through the instance`() {
-        assertEquals(Ok(-5L), evaluate(ConstantInstruction.GlobalGet(0)))
+        assertEquals(Ok(-5L), evaluate(ConstantInstruction.GlobalGet(globalIndex(0u))))
         assertEquals(
             Ok((41L shl RV_SHIFT_BITS) or RV_TYPE_FUNCTION),
-            evaluate(ConstantInstruction.RefFunc(1)),
+            evaluate(ConstantInstruction.RefFunc(functionIndex(1u))),
         )
     }
 
@@ -84,8 +86,8 @@ class ConstantExpressionEvaluatorTest {
 
     @Test
     fun `missing entities and values fail without throwing`() {
-        assertEquals(Err(InvocationError.GlobalAddressLookupFailed(5)), evaluate(ConstantInstruction.GlobalGet(5)))
-        assertEquals(Err(InvocationError.FunctionAddressLookupFailed(9)), evaluate(ConstantInstruction.RefFunc(9)))
+        assertEquals(Err(InvocationError.GlobalAddressLookupFailed(5)), evaluate(ConstantInstruction.GlobalGet(globalIndex(5u))))
+        assertEquals(Err(InvocationError.FunctionAddressLookupFailed(9)), evaluate(ConstantInstruction.RefFunc(functionIndex(9u))))
         assertEquals(Err(InvocationError.MissingStackValue), evaluate())
     }
 

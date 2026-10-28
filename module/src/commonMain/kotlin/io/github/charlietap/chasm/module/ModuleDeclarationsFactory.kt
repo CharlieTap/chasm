@@ -21,7 +21,6 @@ import io.github.charlietap.chasm.declarations.ConstantInstruction
 import io.github.charlietap.chasm.declarations.DataPayload
 import io.github.charlietap.chasm.declarations.DataSegmentDeclaration
 import io.github.charlietap.chasm.declarations.ElementSegmentDeclaration
-import io.github.charlietap.chasm.declarations.ExportDeclarations
 import io.github.charlietap.chasm.declarations.GlobalDeclaration
 import io.github.charlietap.chasm.declarations.ModuleDeclarations
 import io.github.charlietap.chasm.declarations.ModuleNames
@@ -40,56 +39,24 @@ fun ModuleDeclarationsFactory(
     memories = module.memories.map { memory -> memory.type },
     tags = module.tags.map { tag -> tag.type },
     globals = module.globals.map { global -> GlobalDeclaration(global.type, constantExpression(global.initExpression)) },
-    exports = exports(module.exports),
-    startFunction = module.startFunction?.idx?.position(),
+    exports = module.exports,
+    startFunction = module.startFunction?.idx,
     elementSegments = module.elementSegments.map(::elementSegment),
     dataSegments = module.dataSegments.map(::dataSegment),
     names = names(module),
 )
 
-private fun exports(
-    exports: List<Export>,
-): ExportDeclarations {
-    val kinds = ByteArray(exports.size)
-    val indices = IntArray(exports.size)
-    exports.forEachIndexed { position, export ->
-        when (val descriptor = export.descriptor) {
-            is Export.Descriptor.Function -> {
-                kinds[position] = ExportDeclarations.FUNCTION
-                indices[position] = descriptor.functionIndex.position()
-            }
-            is Export.Descriptor.Table -> {
-                kinds[position] = ExportDeclarations.TABLE
-                indices[position] = descriptor.tableIndex.position()
-            }
-            is Export.Descriptor.Memory -> {
-                kinds[position] = ExportDeclarations.MEMORY
-                indices[position] = descriptor.memoryIndex.position()
-            }
-            is Export.Descriptor.Global -> {
-                kinds[position] = ExportDeclarations.GLOBAL
-                indices[position] = descriptor.globalIndex.position()
-            }
-            is Export.Descriptor.Tag -> {
-                kinds[position] = ExportDeclarations.TAG
-                indices[position] = descriptor.tagIndex.position()
-            }
-        }
-    }
-    return ExportDeclarations(Array(exports.size) { position -> exports[position].name.name }, kinds, indices)
-}
-
 private fun elementSegment(
     segment: ElementSegment,
 ): ElementSegmentDeclaration = ElementSegmentDeclaration(
     type = segment.type,
-    initializers = segment.initExpressions.map(::constantExpression),
+    initExpressions = segment.initExpressions.map(::constantExpression),
     mode = when (val mode = segment.mode) {
         ElementSegment.Mode.Passive -> ElementSegmentDeclaration.Mode.Passive
         ElementSegment.Mode.Declarative -> ElementSegmentDeclaration.Mode.Declarative
         is ElementSegment.Mode.Active -> ElementSegmentDeclaration.Mode.Active(
-            tableIndex = mode.tableIndex.position(),
-            offset = constantExpression(mode.offsetExpr),
+            tableIndex = mode.tableIndex,
+            offsetExpr = constantExpression(mode.offsetExpr),
         )
     },
 )
@@ -102,7 +69,7 @@ private fun dataSegment(
     mode = when (val mode = segment.mode) {
         DataSegment.Mode.Passive -> DataSegmentDeclaration.Mode.Passive
         is DataSegment.Mode.Active -> DataSegmentDeclaration.Mode.Active(
-            memoryIndex = mode.memoryIndex.position(),
+            memoryIndex = mode.memoryIndex,
             offset = constantExpression(mode.offset),
         )
     },
@@ -124,17 +91,14 @@ private fun constantExpression(
             is NumericInstruction.I64Sub -> ConstantInstruction.I64Sub
             is NumericInstruction.I64Mul -> ConstantInstruction.I64Mul
             is VectorInstruction.V128Const -> v128Const(instruction.bytes)
-            is VariableInstruction.GlobalGet -> ConstantInstruction.GlobalGet(instruction.globalIdx.position())
+            is VariableInstruction.GlobalGet -> ConstantInstruction.GlobalGet(instruction.globalIdx)
             is ReferenceInstruction.RefNull -> ConstantInstruction.RefNull(instruction.type)
-            is ReferenceInstruction.RefFunc -> ConstantInstruction.RefFunc(instruction.funcIdx.position())
-            is AggregateInstruction.StructNew -> ConstantInstruction.StructNew(instruction.typeIndex.position())
-            is AggregateInstruction.StructNewDefault -> ConstantInstruction.StructNewDefault(instruction.typeIndex.position())
-            is AggregateInstruction.ArrayNew -> ConstantInstruction.ArrayNew(instruction.typeIndex.position())
-            is AggregateInstruction.ArrayNewDefault -> ConstantInstruction.ArrayNewDefault(instruction.typeIndex.position())
-            is AggregateInstruction.ArrayNewFixed -> ConstantInstruction.ArrayNewFixed(
-                typeIndex = instruction.typeIndex.position(),
-                size = instruction.size.toInt(),
-            )
+            is ReferenceInstruction.RefFunc -> ConstantInstruction.RefFunc(instruction.funcIdx)
+            is AggregateInstruction.StructNew -> ConstantInstruction.StructNew(instruction.typeIndex)
+            is AggregateInstruction.StructNewDefault -> ConstantInstruction.StructNewDefault(instruction.typeIndex)
+            is AggregateInstruction.ArrayNew -> ConstantInstruction.ArrayNew(instruction.typeIndex)
+            is AggregateInstruction.ArrayNewDefault -> ConstantInstruction.ArrayNewDefault(instruction.typeIndex)
+            is AggregateInstruction.ArrayNewFixed -> ConstantInstruction.ArrayNewFixed(instruction.typeIndex, instruction.size)
             is AggregateInstruction.RefI31 -> ConstantInstruction.RefI31
             is AggregateInstruction.AnyConvertExtern -> ConstantInstruction.AnyConvertExtern
             is AggregateInstruction.ExternConvertAny -> ConstantInstruction.ExternConvertAny

@@ -31,7 +31,6 @@ import io.github.charlietap.chasm.declarations.ConstantInstruction
 import io.github.charlietap.chasm.declarations.DataPayload
 import io.github.charlietap.chasm.declarations.DataSegmentDeclaration
 import io.github.charlietap.chasm.declarations.ElementSegmentDeclaration
-import io.github.charlietap.chasm.declarations.ExportDeclarations
 import io.github.charlietap.chasm.declarations.GlobalDeclaration
 import io.github.charlietap.chasm.declarations.ModuleDeclarations
 import io.github.charlietap.chasm.declarations.ModuleNames
@@ -61,6 +60,13 @@ class ModuleDeclarationsFactoryTest {
         val tag = tagType()
         val global = globalType()
         val bytes = ubyteArrayOf(1u, 2u, 255u)
+        val exports = listOf(
+            Export(NameValue("run"), Export.Descriptor.Function(Index.FunctionIndex(2u))),
+            Export(NameValue("table"), Export.Descriptor.Table(Index.TableIndex(0u))),
+            Export(NameValue("memory"), Export.Descriptor.Memory(Index.MemoryIndex(0u))),
+            Export(NameValue("global"), Export.Descriptor.Global(Index.GlobalIndex(0u))),
+            Export(NameValue("tag"), Export.Descriptor.Tag(Index.TagIndex(0u))),
+        )
         val module = module(
             definedTypes = types,
             imports = listOf(functionImport, memoryImport),
@@ -69,13 +75,7 @@ class ModuleDeclarationsFactoryTest {
             memories = listOf(Memory(Index.MemoryIndex(1u), memory)),
             tags = listOf(Tag(Index.TagIndex(0u), tag)),
             globals = listOf(Global(Index.GlobalIndex(0u), global, expression(NumericInstruction.I32Const(7)))),
-            exports = listOf(
-                Export(NameValue("run"), Export.Descriptor.Function(Index.FunctionIndex(2u))),
-                Export(NameValue("table"), Export.Descriptor.Table(Index.TableIndex(0u))),
-                Export(NameValue("memory"), Export.Descriptor.Memory(Index.MemoryIndex(0u))),
-                Export(NameValue("global"), Export.Descriptor.Global(Index.GlobalIndex(0u))),
-                Export(NameValue("tag"), Export.Descriptor.Tag(Index.TagIndex(0u))),
-            ),
+            exports = exports,
             startFunction = StartFunction(Index.FunctionIndex(1u)),
             elementSegments = listOf(
                 ElementSegment(
@@ -110,23 +110,13 @@ class ModuleDeclarationsFactoryTest {
             memories = listOf(memory),
             tags = listOf(tag),
             globals = listOf(GlobalDeclaration(global, constantExpression(ConstantInstruction.I32Const(7)))),
-            exports = ExportDeclarations(
-                names = arrayOf("run", "table", "memory", "global", "tag"),
-                kinds = byteArrayOf(
-                    ExportDeclarations.FUNCTION,
-                    ExportDeclarations.TABLE,
-                    ExportDeclarations.MEMORY,
-                    ExportDeclarations.GLOBAL,
-                    ExportDeclarations.TAG,
-                ),
-                indices = intArrayOf(2, 0, 0, 0, 0),
-            ),
-            startFunction = 1,
+            exports = exports,
+            startFunction = Index.FunctionIndex(1u),
             elementSegments = listOf(
                 ElementSegmentDeclaration(
                     ReferenceType.Ref(AbstractHeapType.Func),
-                    listOf(constantExpression(ConstantInstruction.RefFunc(2))),
-                    ElementSegmentDeclaration.Mode.Active(0, constantExpression(ConstantInstruction.I32Const(3))),
+                    listOf(constantExpression(ConstantInstruction.RefFunc(Index.FunctionIndex(2u)))),
+                    ElementSegmentDeclaration.Mode.Active(Index.TableIndex(0u), constantExpression(ConstantInstruction.I32Const(3))),
                 ),
                 ElementSegmentDeclaration(ReferenceType.Ref(AbstractHeapType.Func), emptyList(), ElementSegmentDeclaration.Mode.Passive),
                 ElementSegmentDeclaration(
@@ -138,7 +128,10 @@ class ModuleDeclarationsFactoryTest {
             dataSegments = listOf(
                 DataSegmentDeclaration(
                     DataPayload.Inline(byteArrayOf(1, 2, -1)),
-                    DataSegmentDeclaration.Mode.Active(1, constantExpression(ConstantInstruction.GlobalGet(0))),
+                    DataSegmentDeclaration.Mode.Active(
+                        Index.MemoryIndex(1u),
+                        constantExpression(ConstantInstruction.GlobalGet(Index.GlobalIndex(0u))),
+                    ),
                 ),
                 DataSegmentDeclaration(DataPayload.Inline(byteArrayOf()), DataSegmentDeclaration.Mode.Passive),
             ),
@@ -189,21 +182,21 @@ class ModuleDeclarationsFactoryTest {
             ConstantInstruction.I64Sub,
             ConstantInstruction.I64Mul,
             ConstantInstruction.V128Const(low = 0x0807060504030201, high = 0x100F0E0D0C0B0A09),
-            ConstantInstruction.GlobalGet(4),
+            ConstantInstruction.GlobalGet(Index.GlobalIndex(4u)),
             ConstantInstruction.RefNull(AbstractHeapType.Extern),
-            ConstantInstruction.RefFunc(5),
-            ConstantInstruction.StructNew(6),
-            ConstantInstruction.StructNewDefault(7),
-            ConstantInstruction.ArrayNew(8),
-            ConstantInstruction.ArrayNewDefault(9),
-            ConstantInstruction.ArrayNewFixed(10, 11),
+            ConstantInstruction.RefFunc(Index.FunctionIndex(5u)),
+            ConstantInstruction.StructNew(Index.TypeIndex(6u)),
+            ConstantInstruction.StructNewDefault(Index.TypeIndex(7u)),
+            ConstantInstruction.ArrayNew(Index.TypeIndex(8u)),
+            ConstantInstruction.ArrayNewDefault(Index.TypeIndex(9u)),
+            ConstantInstruction.ArrayNewFixed(Index.TypeIndex(10u), 11u),
             ConstantInstruction.RefI31,
             ConstantInstruction.AnyConvertExtern,
             ConstantInstruction.ExternConvertAny,
         )
         val module = module(globals = listOf(Global(Index.GlobalIndex(0u), globalType(), Expression(instructions))))
 
-        val actual = ModuleDeclarationsFactory(module).globals.single().initializer
+        val actual = ModuleDeclarationsFactory(module).globals.single().initExpression
 
         assertEquals(expected, actual)
     }
@@ -213,7 +206,7 @@ class ModuleDeclarationsFactoryTest {
         val expression = Expression(listOf(NumericInstruction.I32Const(1), ControlInstruction.Nop, NumericInstruction.I32Const(2)))
         val module = module(globals = listOf(Global(Index.GlobalIndex(0u), globalType(), expression)))
 
-        val actual = ModuleDeclarationsFactory(module).globals.single().initializer
+        val actual = ModuleDeclarationsFactory(module).globals.single().initExpression
 
         assertEquals(constantExpression(ConstantInstruction.I32Const(1), ConstantInstruction.I32Const(2)), actual)
     }

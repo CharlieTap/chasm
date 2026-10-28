@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.executor.instantiator.initialization
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
+import io.github.charlietap.chasm.ast.module.toInt
 import io.github.charlietap.chasm.declarations.DataSegmentDeclaration
 import io.github.charlietap.chasm.executor.instantiator.ConstantExpressionEvaluator
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
@@ -41,7 +42,7 @@ internal inline fun MemoryInitializer(
         val mode = segment.mode as? DataSegmentDeclaration.Mode.Active ?: return@forEachIndexed
         val offset = constantExpressionEvaluator(store, instance, context.types, mode.offset).bind().toInt()
 
-        val memoryAddress = instance.memoryAddress(mode.memoryIndex).bind()
+        val memoryAddress = instance.memoryAddress(mode.memoryIndex.toInt()).bind()
         val memoryInstance = store.memory(memoryAddress)
         val dataAddress = instance.dataAddress(segmentIndex).bind()
         val dataInstance = store.data(dataAddress)

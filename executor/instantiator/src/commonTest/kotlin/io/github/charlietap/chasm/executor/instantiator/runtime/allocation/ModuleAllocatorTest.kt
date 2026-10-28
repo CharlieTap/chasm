@@ -2,13 +2,15 @@ package io.github.charlietap.chasm.executor.instantiator.runtime.allocation
 
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
+import io.github.charlietap.chasm.ast.value.NameValue
 import io.github.charlietap.chasm.config.LinearMemoryConfig
 import io.github.charlietap.chasm.config.RuntimeConfig
-import io.github.charlietap.chasm.declarations.ExportDeclarations
 import io.github.charlietap.chasm.executor.instantiator.allocation.ModuleAllocator
+import io.github.charlietap.chasm.fixture.ast.module.export
+import io.github.charlietap.chasm.fixture.ast.module.functionExportDescriptor
+import io.github.charlietap.chasm.fixture.ast.module.memoryExportDescriptor
 import io.github.charlietap.chasm.fixture.executor.instantiator.constantExpression
 import io.github.charlietap.chasm.fixture.executor.instantiator.elementSegmentDeclaration
-import io.github.charlietap.chasm.fixture.executor.instantiator.exportDeclarations
 import io.github.charlietap.chasm.fixture.executor.instantiator.instantiationContext
 import io.github.charlietap.chasm.fixture.executor.instantiator.moduleDeclarations
 import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
@@ -50,7 +52,7 @@ class ModuleAllocatorTest {
             elementAllocator = { _, _, _ -> error("unexpected element allocation") },
             dataAllocator = { _, _ -> error("unexpected data allocation") },
             codeInstaller = { _, _, _, _ -> Ok(Unit) },
-            exportAllocator = { _, _, _ -> error("unexpected export allocation") },
+            exportAllocator = { _, _ -> error("unexpected export allocation") },
         )
 
         assertEquals(Ok(instance), result)
@@ -62,8 +64,8 @@ class ModuleAllocatorTest {
     fun evaluatesEachElementInitializerOnce() {
         val module = moduleDeclarations(
             elementSegments = listOf(
-                elementSegmentDeclaration(initializers = listOf(constantExpression(), constantExpression())),
-                elementSegmentDeclaration(initializers = listOf(constantExpression())),
+                elementSegmentDeclaration(initExpressions = listOf(constantExpression(), constantExpression())),
+                elementSegmentDeclaration(initExpressions = listOf(constantExpression())),
             ),
         )
         val context = instantiationContext(module = module)
@@ -86,7 +88,7 @@ class ModuleAllocatorTest {
             },
             dataAllocator = { _, _ -> error("unexpected data allocation") },
             codeInstaller = { _, _, _, _ -> Ok(Unit) },
-            exportAllocator = { _, _, _ -> error("unexpected export allocation") },
+            exportAllocator = { _, _ -> error("unexpected export allocation") },
         )
 
         assertEquals(Ok(instance), result)
@@ -97,9 +99,10 @@ class ModuleAllocatorTest {
 
     @Test
     fun installsCodeAfterAllocatingContentsAndBeforeExporting() {
+        val descriptor = memoryExportDescriptor()
         val module = moduleDeclarations(
             memories = listOf(memoryType()),
-            exports = exportDeclarations(arrayOf("memory"), byteArrayOf(ExportDeclarations.MEMORY), intArrayOf(0)),
+            exports = listOf(export(name = NameValue("memory"), descriptor = descriptor)),
         )
         val instance = moduleInstance()
         val context = instantiationContext(module = module, instance = instance)
@@ -123,14 +126,14 @@ class ModuleAllocatorTest {
                 steps.add("install")
                 Ok(Unit)
             },
-            exportAllocator = { _, kind, index ->
-                steps.add("export $kind $index")
-                Ok(ExternalValue.Memory(Address.Memory(index)))
+            exportAllocator = { _, exported ->
+                steps.add("export $exported")
+                Ok(ExternalValue.Memory(Address.Memory(0)))
             },
         )
 
         assertEquals(Ok(instance), result)
-        assertEquals(listOf("memory", "install", "export ${ExportDeclarations.MEMORY} 0"), steps)
+        assertEquals(listOf("memory", "install", "export $descriptor"), steps)
         assertEquals("memory", instance.exports.single().name.name)
     }
 
@@ -138,7 +141,7 @@ class ModuleAllocatorTest {
     fun aFailedCodeInstallationExportsNothing() {
         val failure = InstantiationError.UnsupportedThreadsModule
         val module = moduleDeclarations(
-            exports = exportDeclarations(arrayOf("run"), byteArrayOf(ExportDeclarations.FUNCTION), intArrayOf(0)),
+            exports = listOf(export(name = NameValue("run"), descriptor = functionExportDescriptor())),
         )
         val instance = moduleInstance()
         val context = instantiationContext(module = module, instance = instance)
@@ -155,7 +158,7 @@ class ModuleAllocatorTest {
             elementAllocator = { _, _, _ -> error("unexpected element allocation") },
             dataAllocator = { _, _ -> error("unexpected data allocation") },
             codeInstaller = { _, _, _, _ -> Err(failure) },
-            exportAllocator = { _, _, _ -> error("unexpected export allocation") },
+            exportAllocator = { _, _ -> error("unexpected export allocation") },
         )
 
         assertEquals(Err(failure), result)

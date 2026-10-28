@@ -5,6 +5,7 @@ import io.github.charlietap.chasm.declarations.ConstantInstruction
 import io.github.charlietap.chasm.declarations.DataSegmentDeclaration
 import io.github.charlietap.chasm.executor.instantiator.ConstantExpressionEvaluator
 import io.github.charlietap.chasm.executor.instantiator.initialization.MemoryInitializer
+import io.github.charlietap.chasm.fixture.ast.module.memoryIndex
 import io.github.charlietap.chasm.fixture.config.runtimeConfig
 import io.github.charlietap.chasm.fixture.executor.instantiator.constantExpression
 import io.github.charlietap.chasm.fixture.executor.instantiator.dataSegmentDeclaration
@@ -29,7 +30,7 @@ class MemoryInitializerTest {
         val activeOffsetExpression = constantExpression(ConstantInstruction.I32Const(offset))
         val activeSegment = dataSegmentDeclaration(
             mode = DataSegmentDeclaration.Mode.Active(
-                memoryIndex = 0,
+                memoryIndex = memoryIndex(0u),
                 offset = activeOffsetExpression,
             ),
         )

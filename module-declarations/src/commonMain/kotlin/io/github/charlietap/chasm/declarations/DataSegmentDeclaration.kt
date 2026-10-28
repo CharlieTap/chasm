@@ -1,5 +1,7 @@
 package io.github.charlietap.chasm.declarations
 
+import io.github.charlietap.chasm.ast.module.Index
+
 data class DataSegmentDeclaration(
     val payload: DataPayload,
     val mode: Mode,
@@ -10,7 +12,7 @@ data class DataSegmentDeclaration(
         data object Passive : Mode
 
         data class Active(
-            val memoryIndex: Int,
+            val memoryIndex: Index.MemoryIndex,
             val offset: ConstantExpression,
         ) : Mode
     }

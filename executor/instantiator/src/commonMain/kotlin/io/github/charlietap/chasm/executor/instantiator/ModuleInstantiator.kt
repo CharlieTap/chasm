@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.executor.instantiator
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
+import io.github.charlietap.chasm.ast.module.toInt
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.declarations.ModuleDeclarations
 import io.github.charlietap.chasm.executor.instantiator.allocation.ModuleAllocator
@@ -112,7 +113,7 @@ internal inline fun PrepareModuleInstantiation(
 
     val tableInitValues = LongArray(module.tables.size) { tableIndex ->
         val table = module.tables[tableIndex]
-        constantExpressionEvaluator(store, partialInstance, context.types, table.initializer).bind()
+        constantExpressionEvaluator(store, partialInstance, context.types, table.initExpression).bind()
     }
 
     ModuleInstantiationPreparation(context, partialInstance, tableInitValues)
@@ -129,7 +130,7 @@ internal inline fun CompleteModuleInstantiation(
     memoryInitializer(context, instance).bind()
 
     context.module.startFunction?.let { function ->
-        val address = instance.functionAddresses[function]
+        val address = instance.functionAddresses[function.toInt()]
         startInvoker(context.config, context.store, instance, address).bind()
     }
 }

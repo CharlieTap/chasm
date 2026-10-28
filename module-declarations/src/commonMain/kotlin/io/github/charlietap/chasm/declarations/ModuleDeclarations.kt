@@ -1,6 +1,8 @@
 package io.github.charlietap.chasm.declarations
 
+import io.github.charlietap.chasm.ast.module.Export
 import io.github.charlietap.chasm.ast.module.Import
+import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.type.DefinedType
 import io.github.charlietap.chasm.type.MemoryType
 import io.github.charlietap.chasm.type.TagType
@@ -13,8 +15,8 @@ class ModuleDeclarations(
     val memories: List<MemoryType>,
     val tags: List<TagType>,
     val globals: List<GlobalDeclaration>,
-    val exports: ExportDeclarations,
-    val startFunction: Int?,
+    val exports: List<Export>,
+    val startFunction: Index.FunctionIndex?,
     val elementSegments: List<ElementSegmentDeclaration>,
     val dataSegments: List<DataSegmentDeclaration>,
     val names: ModuleNames,
@@ -48,7 +50,7 @@ class ModuleDeclarations(
         result = 31 * result + tags.hashCode()
         result = 31 * result + globals.hashCode()
         result = 31 * result + exports.hashCode()
-        result = 31 * result + (startFunction ?: -1)
+        result = 31 * result + startFunction.hashCode()
         result = 31 * result + elementSegments.hashCode()
         result = 31 * result + dataSegments.hashCode()
         result = 31 * result + names.hashCode()

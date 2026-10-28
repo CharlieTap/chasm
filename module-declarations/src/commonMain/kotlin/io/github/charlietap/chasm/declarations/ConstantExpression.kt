@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.declarations
 
+import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.type.HeapType
 
 data class ConstantExpression(
@@ -42,7 +43,7 @@ sealed interface ConstantInstruction {
     data object I64Mul : ConstantInstruction
 
     data class GlobalGet(
-        val globalIndex: Int,
+        val globalIdx: Index.GlobalIndex,
     ) : ConstantInstruction
 
     data class RefNull(
@@ -50,28 +51,28 @@ sealed interface ConstantInstruction {
     ) : ConstantInstruction
 
     data class RefFunc(
-        val functionIndex: Int,
+        val funcIdx: Index.FunctionIndex,
     ) : ConstantInstruction
 
     data class StructNew(
-        val typeIndex: Int,
+        val typeIndex: Index.TypeIndex,
     ) : ConstantInstruction
 
     data class StructNewDefault(
-        val typeIndex: Int,
+        val typeIndex: Index.TypeIndex,
     ) : ConstantInstruction
 
     data class ArrayNew(
-        val typeIndex: Int,
+        val typeIndex: Index.TypeIndex,
     ) : ConstantInstruction
 
     data class ArrayNewDefault(
-        val typeIndex: Int,
+        val typeIndex: Index.TypeIndex,
     ) : ConstantInstruction
 
     data class ArrayNewFixed(
-        val typeIndex: Int,
-        val size: Int,
+        val typeIndex: Index.TypeIndex,
+        val size: UInt,
     ) : ConstantInstruction
 
     data object RefI31 : ConstantInstruction

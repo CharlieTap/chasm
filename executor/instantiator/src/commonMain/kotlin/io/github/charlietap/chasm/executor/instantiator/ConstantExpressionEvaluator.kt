@@ -4,7 +4,7 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.getOrElse
-import io.github.charlietap.chasm.ast.module.Index
+import io.github.charlietap.chasm.ast.module.toInt
 import io.github.charlietap.chasm.declarations.ConstantExpression
 import io.github.charlietap.chasm.declarations.ConstantInstruction
 import io.github.charlietap.chasm.declarations.ModuleTypeResolver
@@ -29,7 +29,6 @@ import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.type.AbstractHeapType
-import io.github.charlietap.chasm.type.DefinedType
 import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
 import io.github.charlietap.chasm.type.ext.asArrayType
 import io.github.charlietap.chasm.type.ext.asStructType
@@ -105,44 +104,49 @@ internal fun ConstantExpressionEvaluator(
                 stack.push(encoded)
             }
             is ConstantInstruction.RefFunc -> {
-                val address = instance.functionAddress(instruction.functionIndex).getOrElse { return Err(it) }
+                val address = instance.functionAddress(instruction.funcIdx.toInt()).getOrElse { return Err(it) }
                 val encoded = (address.address.toLong() shl RV_SHIFT_BITS) or RV_TYPE_FUNCTION
                 stack.push(encoded)
             }
             is ConstantInstruction.GlobalGet -> {
-                val address = instance.globalAddress(instruction.globalIndex).getOrElse { return Err(it) }
+                val address = instance.globalAddress(instruction.globalIdx.toInt()).getOrElse { return Err(it) }
                 val value = store.global(address).value
                 stack.push(value)
             }
             is ConstantInstruction.StructNew -> {
-                val rtt = instance.runtimeTypes[instruction.typeIndex]
-                val structType = DefinedTypeExpander(definedType(types, instruction.typeIndex)).asStructType()
+                val typeIndex = instruction.typeIndex.toInt()
+                val rtt = instance.runtimeTypes[typeIndex]
+                val structType = DefinedTypeExpander(types.definedType(instruction.typeIndex)).asStructType()
                 store.heap.allocateStructFromStack(rtt, structType.fields.size, stack)
             }
             is ConstantInstruction.StructNewDefault -> {
-                val rtt = instance.runtimeTypes[instruction.typeIndex]
-                val structType = DefinedTypeExpander(definedType(types, instruction.typeIndex)).asStructType()
+                val typeIndex = instruction.typeIndex.toInt()
+                val rtt = instance.runtimeTypes[typeIndex]
+                val structType = DefinedTypeExpander(types.definedType(instruction.typeIndex)).asStructType()
                 val fields = LongArray(structType.fields.size) { idx ->
                     structType.fields[idx].default()
                 }
                 stack.push(store.heap.allocateStruct(rtt, fields))
             }
             is ConstantInstruction.ArrayNew -> {
-                val rtt = instance.runtimeTypes[instruction.typeIndex]
+                val typeIndex = instruction.typeIndex.toInt()
+                val rtt = instance.runtimeTypes[typeIndex]
                 val size = stack.popI32()
                 val value = stack.pop()
                 stack.push(store.heap.allocateArrayFilled(rtt, size, value))
             }
             is ConstantInstruction.ArrayNewDefault -> {
-                val rtt = instance.runtimeTypes[instruction.typeIndex]
-                val arrayType = DefinedTypeExpander(definedType(types, instruction.typeIndex)).asArrayType()
+                val typeIndex = instruction.typeIndex.toInt()
+                val rtt = instance.runtimeTypes[typeIndex]
+                val arrayType = DefinedTypeExpander(types.definedType(instruction.typeIndex)).asArrayType()
                 val size = stack.popI32()
                 val defaultValue = arrayType.fieldType.default()
                 stack.push(store.heap.allocateArrayFilled(rtt, size, defaultValue))
             }
             is ConstantInstruction.ArrayNewFixed -> {
-                val rtt = instance.runtimeTypes[instruction.typeIndex]
-                store.heap.allocateArrayFromStack(rtt, instruction.size, stack)
+                val typeIndex = instruction.typeIndex.toInt()
+                val rtt = instance.runtimeTypes[typeIndex]
+                store.heap.allocateArrayFromStack(rtt, instruction.size.toInt(), stack)
             }
             ConstantInstruction.RefI31 -> {
                 val value = stack.popI32()
@@ -185,9 +189,3 @@ internal fun ConstantExpressionEvaluator(
         Err(InvocationError.MissingStackValue)
     }
 }
-
-private fun definedType(
-    types: ModuleTypeResolver,
-    typeIndex: Int,
-): DefinedType =
-    types.definedType(Index.TypeIndex(typeIndex.toUInt()))

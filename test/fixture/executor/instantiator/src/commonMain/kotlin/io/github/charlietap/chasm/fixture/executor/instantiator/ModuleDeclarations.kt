@@ -1,12 +1,13 @@
 package io.github.charlietap.chasm.fixture.executor.instantiator
 
+import io.github.charlietap.chasm.ast.module.Export
 import io.github.charlietap.chasm.ast.module.Import
+import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.declarations.ConstantExpression
 import io.github.charlietap.chasm.declarations.ConstantInstruction
 import io.github.charlietap.chasm.declarations.DataPayload
 import io.github.charlietap.chasm.declarations.DataSegmentDeclaration
 import io.github.charlietap.chasm.declarations.ElementSegmentDeclaration
-import io.github.charlietap.chasm.declarations.ExportDeclarations
 import io.github.charlietap.chasm.declarations.GlobalDeclaration
 import io.github.charlietap.chasm.declarations.ModuleDeclarations
 import io.github.charlietap.chasm.declarations.ModuleNames
@@ -25,8 +26,8 @@ fun moduleDeclarations(
     memories: List<MemoryType> = emptyList(),
     tags: List<TagType> = emptyList(),
     globals: List<GlobalDeclaration> = emptyList(),
-    exports: ExportDeclarations = exportDeclarations(),
-    startFunction: Int? = null,
+    exports: List<Export> = emptyList(),
+    startFunction: Index.FunctionIndex? = null,
     elementSegments: List<ElementSegmentDeclaration> = emptyList(),
     dataSegments: List<DataSegmentDeclaration> = emptyList(),
     names: ModuleNames = ModuleNames.NONE,
@@ -45,21 +46,15 @@ fun moduleDeclarations(
     names = names,
 )
 
-fun exportDeclarations(
-    names: Array<String> = emptyArray(),
-    kinds: ByteArray = ByteArray(0),
-    indices: IntArray = IntArray(0),
-) = ExportDeclarations(names, kinds, indices)
-
 fun constantExpression(
     vararg instructions: ConstantInstruction,
 ) = ConstantExpression(instructions.toList())
 
 fun elementSegmentDeclaration(
     type: ReferenceType = ReferenceType.RefNull(AbstractHeapType.Func),
-    initializers: List<ConstantExpression> = emptyList(),
+    initExpressions: List<ConstantExpression> = emptyList(),
     mode: ElementSegmentDeclaration.Mode = ElementSegmentDeclaration.Mode.Passive,
-) = ElementSegmentDeclaration(type, initializers, mode)
+) = ElementSegmentDeclaration(type, initExpressions, mode)
 
 fun dataSegmentDeclaration(
     bytes: ByteArray = ByteArray(0),

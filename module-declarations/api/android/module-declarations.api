@@ -1,3 +1,89 @@
+public final class io/github/charlietap/chasm/ast/module/Export {
+	public synthetic fun <init> (Ljava/lang/String;Lio/github/charlietap/chasm/ast/module/Export$Descriptor;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-F_ocVm4 ()Ljava/lang/String;
+	public final fun component2 ()Lio/github/charlietap/chasm/ast/module/Export$Descriptor;
+	public final fun copy-shpzjbs (Ljava/lang/String;Lio/github/charlietap/chasm/ast/module/Export$Descriptor;)Lio/github/charlietap/chasm/ast/module/Export;
+	public static synthetic fun copy-shpzjbs$default (Lio/github/charlietap/chasm/ast/module/Export;Ljava/lang/String;Lio/github/charlietap/chasm/ast/module/Export$Descriptor;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/module/Export;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getDescriptor ()Lio/github/charlietap/chasm/ast/module/Export$Descriptor;
+	public final fun getName-F_ocVm4 ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/charlietap/chasm/ast/module/Export$Descriptor {
+}
+
+public final class io/github/charlietap/chasm/ast/module/Export$Descriptor$Function : io/github/charlietap/chasm/ast/module/Export$Descriptor {
+	public static final synthetic fun box-impl (I)Lio/github/charlietap/chasm/ast/module/Export$Descriptor$Function;
+	public static fun constructor-impl (I)I
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (ILjava/lang/Object;)Z
+	public static final fun equals-impl0 (II)Z
+	public final fun getFunctionIndex-mY9JPKU ()I
+	public fun hashCode ()I
+	public static fun hashCode-impl (I)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (I)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()I
+}
+
+public final class io/github/charlietap/chasm/ast/module/Export$Descriptor$Global : io/github/charlietap/chasm/ast/module/Export$Descriptor {
+	public static final synthetic fun box-impl (I)Lio/github/charlietap/chasm/ast/module/Export$Descriptor$Global;
+	public static fun constructor-impl (I)I
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (ILjava/lang/Object;)Z
+	public static final fun equals-impl0 (II)Z
+	public final fun getGlobalIndex-pRAIPbQ ()I
+	public fun hashCode ()I
+	public static fun hashCode-impl (I)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (I)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()I
+}
+
+public final class io/github/charlietap/chasm/ast/module/Export$Descriptor$Memory : io/github/charlietap/chasm/ast/module/Export$Descriptor {
+	public static final synthetic fun box-impl (I)Lio/github/charlietap/chasm/ast/module/Export$Descriptor$Memory;
+	public static fun constructor-impl (I)I
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (ILjava/lang/Object;)Z
+	public static final fun equals-impl0 (II)Z
+	public final fun getMemoryIndex-j5_GAr0 ()I
+	public fun hashCode ()I
+	public static fun hashCode-impl (I)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (I)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()I
+}
+
+public final class io/github/charlietap/chasm/ast/module/Export$Descriptor$Table : io/github/charlietap/chasm/ast/module/Export$Descriptor {
+	public static final synthetic fun box-impl (I)Lio/github/charlietap/chasm/ast/module/Export$Descriptor$Table;
+	public static fun constructor-impl (I)I
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (ILjava/lang/Object;)Z
+	public static final fun equals-impl0 (II)Z
+	public final fun getTableIndex-30Deo2k ()I
+	public fun hashCode ()I
+	public static fun hashCode-impl (I)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (I)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()I
+}
+
+public final class io/github/charlietap/chasm/ast/module/Export$Descriptor$Tag : io/github/charlietap/chasm/ast/module/Export$Descriptor {
+	public static final synthetic fun box-impl (I)Lio/github/charlietap/chasm/ast/module/Export$Descriptor$Tag;
+	public static fun constructor-impl (I)I
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (ILjava/lang/Object;)Z
+	public static final fun equals-impl0 (II)Z
+	public final fun getTagIndex-w3r3QrU ()I
+	public fun hashCode ()I
+	public static fun hashCode-impl (I)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (I)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()I
+}
+
 public final class io/github/charlietap/chasm/ast/module/Import {
 	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Lio/github/charlietap/chasm/ast/module/Import$Descriptor;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1-F_ocVm4 ()Ljava/lang/String;
@@ -297,36 +383,36 @@ public final class io/github/charlietap/chasm/declarations/ConstantInstruction$A
 }
 
 public final class io/github/charlietap/chasm/declarations/ConstantInstruction$ArrayNew : io/github/charlietap/chasm/declarations/ConstantInstruction {
-	public fun <init> (I)V
-	public final fun component1 ()I
-	public final fun copy (I)Lio/github/charlietap/chasm/declarations/ConstantInstruction$ArrayNew;
-	public static synthetic fun copy$default (Lio/github/charlietap/chasm/declarations/ConstantInstruction$ArrayNew;IILjava/lang/Object;)Lio/github/charlietap/chasm/declarations/ConstantInstruction$ArrayNew;
+	public synthetic fun <init> (ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-Q7G2E2s ()I
+	public final fun copy-UfKnbfY (I)Lio/github/charlietap/chasm/declarations/ConstantInstruction$ArrayNew;
+	public static synthetic fun copy-UfKnbfY$default (Lio/github/charlietap/chasm/declarations/ConstantInstruction$ArrayNew;IILjava/lang/Object;)Lio/github/charlietap/chasm/declarations/ConstantInstruction$ArrayNew;
 	public fun equals (Ljava/lang/Object;)Z
-	public final fun getTypeIndex ()I
+	public final fun getTypeIndex-Q7G2E2s ()I
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
 public final class io/github/charlietap/chasm/declarations/ConstantInstruction$ArrayNewDefault : io/github/charlietap/chasm/declarations/ConstantInstruction {
-	public fun <init> (I)V
-	public final fun component1 ()I
-	public final fun copy (I)Lio/github/charlietap/chasm/declarations/ConstantInstruction$ArrayNewDefault;
-	public static synthetic fun copy$default (Lio/github/charlietap/chasm/declarations/ConstantInstruction$ArrayNewDefault;IILjava/lang/Object;)Lio/github/charlietap/chasm/declarations/ConstantInstruction$ArrayNewDefault;
+	public synthetic fun <init> (ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-Q7G2E2s ()I
+	public final fun copy-UfKnbfY (I)Lio/github/charlietap/chasm/declarations/ConstantInstruction$ArrayNewDefault;
+	public static synthetic fun copy-UfKnbfY$default (Lio/github/charlietap/chasm/declarations/ConstantInstruction$ArrayNewDefault;IILjava/lang/Object;)Lio/github/charlietap/chasm/declarations/ConstantInstruction$ArrayNewDefault;
 	public fun equals (Ljava/lang/Object;)Z
-	public final fun getTypeIndex ()I
+	public final fun getTypeIndex-Q7G2E2s ()I
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
 public final class io/github/charlietap/chasm/declarations/ConstantInstruction$ArrayNewFixed : io/github/charlietap/chasm/declarations/ConstantInstruction {
-	public fun <init> (II)V
-	public final fun component1 ()I
-	public final fun component2 ()I
-	public final fun copy (II)Lio/github/charlietap/chasm/declarations/ConstantInstruction$ArrayNewFixed;
-	public static synthetic fun copy$default (Lio/github/charlietap/chasm/declarations/ConstantInstruction$ArrayNewFixed;IIILjava/lang/Object;)Lio/github/charlietap/chasm/declarations/ConstantInstruction$ArrayNewFixed;
+	public synthetic fun <init> (IILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-Q7G2E2s ()I
+	public final fun component2-pVg5ArA ()I
+	public final fun copy-rpQ-teM (II)Lio/github/charlietap/chasm/declarations/ConstantInstruction$ArrayNewFixed;
+	public static synthetic fun copy-rpQ-teM$default (Lio/github/charlietap/chasm/declarations/ConstantInstruction$ArrayNewFixed;IIILjava/lang/Object;)Lio/github/charlietap/chasm/declarations/ConstantInstruction$ArrayNewFixed;
 	public fun equals (Ljava/lang/Object;)Z
-	public final fun getSize ()I
-	public final fun getTypeIndex ()I
+	public final fun getSize-pVg5ArA ()I
+	public final fun getTypeIndex-Q7G2E2s ()I
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
@@ -361,12 +447,12 @@ public final class io/github/charlietap/chasm/declarations/ConstantInstruction$F
 }
 
 public final class io/github/charlietap/chasm/declarations/ConstantInstruction$GlobalGet : io/github/charlietap/chasm/declarations/ConstantInstruction {
-	public fun <init> (I)V
-	public final fun component1 ()I
-	public final fun copy (I)Lio/github/charlietap/chasm/declarations/ConstantInstruction$GlobalGet;
-	public static synthetic fun copy$default (Lio/github/charlietap/chasm/declarations/ConstantInstruction$GlobalGet;IILjava/lang/Object;)Lio/github/charlietap/chasm/declarations/ConstantInstruction$GlobalGet;
+	public synthetic fun <init> (ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-pRAIPbQ ()I
+	public final fun copy-Tm1c7Yg (I)Lio/github/charlietap/chasm/declarations/ConstantInstruction$GlobalGet;
+	public static synthetic fun copy-Tm1c7Yg$default (Lio/github/charlietap/chasm/declarations/ConstantInstruction$GlobalGet;IILjava/lang/Object;)Lio/github/charlietap/chasm/declarations/ConstantInstruction$GlobalGet;
 	public fun equals (Ljava/lang/Object;)Z
-	public final fun getGlobalIndex ()I
+	public final fun getGlobalIdx-pRAIPbQ ()I
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
@@ -436,12 +522,12 @@ public final class io/github/charlietap/chasm/declarations/ConstantInstruction$I
 }
 
 public final class io/github/charlietap/chasm/declarations/ConstantInstruction$RefFunc : io/github/charlietap/chasm/declarations/ConstantInstruction {
-	public fun <init> (I)V
-	public final fun component1 ()I
-	public final fun copy (I)Lio/github/charlietap/chasm/declarations/ConstantInstruction$RefFunc;
-	public static synthetic fun copy$default (Lio/github/charlietap/chasm/declarations/ConstantInstruction$RefFunc;IILjava/lang/Object;)Lio/github/charlietap/chasm/declarations/ConstantInstruction$RefFunc;
+	public synthetic fun <init> (ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-mY9JPKU ()I
+	public final fun copy-8BqobMM (I)Lio/github/charlietap/chasm/declarations/ConstantInstruction$RefFunc;
+	public static synthetic fun copy-8BqobMM$default (Lio/github/charlietap/chasm/declarations/ConstantInstruction$RefFunc;IILjava/lang/Object;)Lio/github/charlietap/chasm/declarations/ConstantInstruction$RefFunc;
 	public fun equals (Ljava/lang/Object;)Z
-	public final fun getFunctionIndex ()I
+	public final fun getFuncIdx-mY9JPKU ()I
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
@@ -465,23 +551,23 @@ public final class io/github/charlietap/chasm/declarations/ConstantInstruction$R
 }
 
 public final class io/github/charlietap/chasm/declarations/ConstantInstruction$StructNew : io/github/charlietap/chasm/declarations/ConstantInstruction {
-	public fun <init> (I)V
-	public final fun component1 ()I
-	public final fun copy (I)Lio/github/charlietap/chasm/declarations/ConstantInstruction$StructNew;
-	public static synthetic fun copy$default (Lio/github/charlietap/chasm/declarations/ConstantInstruction$StructNew;IILjava/lang/Object;)Lio/github/charlietap/chasm/declarations/ConstantInstruction$StructNew;
+	public synthetic fun <init> (ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-Q7G2E2s ()I
+	public final fun copy-UfKnbfY (I)Lio/github/charlietap/chasm/declarations/ConstantInstruction$StructNew;
+	public static synthetic fun copy-UfKnbfY$default (Lio/github/charlietap/chasm/declarations/ConstantInstruction$StructNew;IILjava/lang/Object;)Lio/github/charlietap/chasm/declarations/ConstantInstruction$StructNew;
 	public fun equals (Ljava/lang/Object;)Z
-	public final fun getTypeIndex ()I
+	public final fun getTypeIndex-Q7G2E2s ()I
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
 public final class io/github/charlietap/chasm/declarations/ConstantInstruction$StructNewDefault : io/github/charlietap/chasm/declarations/ConstantInstruction {
-	public fun <init> (I)V
-	public final fun component1 ()I
-	public final fun copy (I)Lio/github/charlietap/chasm/declarations/ConstantInstruction$StructNewDefault;
-	public static synthetic fun copy$default (Lio/github/charlietap/chasm/declarations/ConstantInstruction$StructNewDefault;IILjava/lang/Object;)Lio/github/charlietap/chasm/declarations/ConstantInstruction$StructNewDefault;
+	public synthetic fun <init> (ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-Q7G2E2s ()I
+	public final fun copy-UfKnbfY (I)Lio/github/charlietap/chasm/declarations/ConstantInstruction$StructNewDefault;
+	public static synthetic fun copy-UfKnbfY$default (Lio/github/charlietap/chasm/declarations/ConstantInstruction$StructNewDefault;IILjava/lang/Object;)Lio/github/charlietap/chasm/declarations/ConstantInstruction$StructNewDefault;
 	public fun equals (Ljava/lang/Object;)Z
-	public final fun getTypeIndex ()I
+	public final fun getTypeIndex-Q7G2E2s ()I
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
@@ -528,13 +614,13 @@ public abstract interface class io/github/charlietap/chasm/declarations/DataSegm
 }
 
 public final class io/github/charlietap/chasm/declarations/DataSegmentDeclaration$Mode$Active : io/github/charlietap/chasm/declarations/DataSegmentDeclaration$Mode {
-	public fun <init> (ILio/github/charlietap/chasm/declarations/ConstantExpression;)V
-	public final fun component1 ()I
+	public synthetic fun <init> (ILio/github/charlietap/chasm/declarations/ConstantExpression;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-j5_GAr0 ()I
 	public final fun component2 ()Lio/github/charlietap/chasm/declarations/ConstantExpression;
-	public final fun copy (ILio/github/charlietap/chasm/declarations/ConstantExpression;)Lio/github/charlietap/chasm/declarations/DataSegmentDeclaration$Mode$Active;
-	public static synthetic fun copy$default (Lio/github/charlietap/chasm/declarations/DataSegmentDeclaration$Mode$Active;ILio/github/charlietap/chasm/declarations/ConstantExpression;ILjava/lang/Object;)Lio/github/charlietap/chasm/declarations/DataSegmentDeclaration$Mode$Active;
+	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/declarations/ConstantExpression;)Lio/github/charlietap/chasm/declarations/DataSegmentDeclaration$Mode$Active;
+	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/declarations/DataSegmentDeclaration$Mode$Active;ILio/github/charlietap/chasm/declarations/ConstantExpression;ILjava/lang/Object;)Lio/github/charlietap/chasm/declarations/DataSegmentDeclaration$Mode$Active;
 	public fun equals (Ljava/lang/Object;)Z
-	public final fun getMemoryIndex ()I
+	public final fun getMemoryIndex-j5_GAr0 ()I
 	public final fun getOffset ()Lio/github/charlietap/chasm/declarations/ConstantExpression;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
@@ -555,7 +641,7 @@ public final class io/github/charlietap/chasm/declarations/ElementSegmentDeclara
 	public final fun copy (Lio/github/charlietap/chasm/type/ReferenceType;Ljava/util/List;Lio/github/charlietap/chasm/declarations/ElementSegmentDeclaration$Mode;)Lio/github/charlietap/chasm/declarations/ElementSegmentDeclaration;
 	public static synthetic fun copy$default (Lio/github/charlietap/chasm/declarations/ElementSegmentDeclaration;Lio/github/charlietap/chasm/type/ReferenceType;Ljava/util/List;Lio/github/charlietap/chasm/declarations/ElementSegmentDeclaration$Mode;ILjava/lang/Object;)Lio/github/charlietap/chasm/declarations/ElementSegmentDeclaration;
 	public fun equals (Ljava/lang/Object;)Z
-	public final fun getInitializers ()Ljava/util/List;
+	public final fun getInitExpressions ()Ljava/util/List;
 	public final fun getMode ()Lio/github/charlietap/chasm/declarations/ElementSegmentDeclaration$Mode;
 	public final fun getType ()Lio/github/charlietap/chasm/type/ReferenceType;
 	public fun hashCode ()I
@@ -566,14 +652,14 @@ public abstract interface class io/github/charlietap/chasm/declarations/ElementS
 }
 
 public final class io/github/charlietap/chasm/declarations/ElementSegmentDeclaration$Mode$Active : io/github/charlietap/chasm/declarations/ElementSegmentDeclaration$Mode {
-	public fun <init> (ILio/github/charlietap/chasm/declarations/ConstantExpression;)V
-	public final fun component1 ()I
+	public synthetic fun <init> (ILio/github/charlietap/chasm/declarations/ConstantExpression;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-30Deo2k ()I
 	public final fun component2 ()Lio/github/charlietap/chasm/declarations/ConstantExpression;
-	public final fun copy (ILio/github/charlietap/chasm/declarations/ConstantExpression;)Lio/github/charlietap/chasm/declarations/ElementSegmentDeclaration$Mode$Active;
-	public static synthetic fun copy$default (Lio/github/charlietap/chasm/declarations/ElementSegmentDeclaration$Mode$Active;ILio/github/charlietap/chasm/declarations/ConstantExpression;ILjava/lang/Object;)Lio/github/charlietap/chasm/declarations/ElementSegmentDeclaration$Mode$Active;
+	public final fun copy-4sSdgmg (ILio/github/charlietap/chasm/declarations/ConstantExpression;)Lio/github/charlietap/chasm/declarations/ElementSegmentDeclaration$Mode$Active;
+	public static synthetic fun copy-4sSdgmg$default (Lio/github/charlietap/chasm/declarations/ElementSegmentDeclaration$Mode$Active;ILio/github/charlietap/chasm/declarations/ConstantExpression;ILjava/lang/Object;)Lio/github/charlietap/chasm/declarations/ElementSegmentDeclaration$Mode$Active;
 	public fun equals (Ljava/lang/Object;)Z
-	public final fun getOffset ()Lio/github/charlietap/chasm/declarations/ConstantExpression;
-	public final fun getTableIndex ()I
+	public final fun getOffsetExpr ()Lio/github/charlietap/chasm/declarations/ConstantExpression;
+	public final fun getTableIndex-30Deo2k ()I
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
@@ -592,25 +678,6 @@ public final class io/github/charlietap/chasm/declarations/ElementSegmentDeclara
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/declarations/ExportDeclarations {
-	public static final field Companion Lio/github/charlietap/chasm/declarations/ExportDeclarations$Companion;
-	public static final field FUNCTION B
-	public static final field GLOBAL B
-	public static final field MEMORY B
-	public static final field TABLE B
-	public static final field TAG B
-	public fun <init> ([Ljava/lang/String;[B[I)V
-	public fun equals (Ljava/lang/Object;)Z
-	public final fun getIndices ()[I
-	public final fun getKinds ()[B
-	public final fun getNames ()[Ljava/lang/String;
-	public final fun getSize ()I
-	public fun hashCode ()I
-}
-
-public final class io/github/charlietap/chasm/declarations/ExportDeclarations$Companion {
-}
-
 public final class io/github/charlietap/chasm/declarations/GlobalDeclaration {
 	public fun <init> (Lio/github/charlietap/chasm/type/GlobalType;Lio/github/charlietap/chasm/declarations/ConstantExpression;)V
 	public final fun component1 ()Lio/github/charlietap/chasm/type/GlobalType;
@@ -618,25 +685,25 @@ public final class io/github/charlietap/chasm/declarations/GlobalDeclaration {
 	public final fun copy (Lio/github/charlietap/chasm/type/GlobalType;Lio/github/charlietap/chasm/declarations/ConstantExpression;)Lio/github/charlietap/chasm/declarations/GlobalDeclaration;
 	public static synthetic fun copy$default (Lio/github/charlietap/chasm/declarations/GlobalDeclaration;Lio/github/charlietap/chasm/type/GlobalType;Lio/github/charlietap/chasm/declarations/ConstantExpression;ILjava/lang/Object;)Lio/github/charlietap/chasm/declarations/GlobalDeclaration;
 	public fun equals (Ljava/lang/Object;)Z
-	public final fun getInitializer ()Lio/github/charlietap/chasm/declarations/ConstantExpression;
+	public final fun getInitExpression ()Lio/github/charlietap/chasm/declarations/ConstantExpression;
 	public final fun getType ()Lio/github/charlietap/chasm/type/GlobalType;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
 public final class io/github/charlietap/chasm/declarations/ModuleDeclarations {
-	public fun <init> (Ljava/util/List;Ljava/util/List;[ILjava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Lio/github/charlietap/chasm/declarations/ExportDeclarations;Ljava/lang/Integer;Ljava/util/List;Ljava/util/List;Lio/github/charlietap/chasm/declarations/ModuleNames;)V
+	public synthetic fun <init> (Ljava/util/List;Ljava/util/List;[ILjava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Lio/github/charlietap/chasm/ast/module/Index$FunctionIndex;Ljava/util/List;Ljava/util/List;Lio/github/charlietap/chasm/declarations/ModuleNames;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getDataSegments ()Ljava/util/List;
 	public final fun getDefinedTypes ()Ljava/util/List;
 	public final fun getElementSegments ()Ljava/util/List;
-	public final fun getExports ()Lio/github/charlietap/chasm/declarations/ExportDeclarations;
+	public final fun getExports ()Ljava/util/List;
 	public final fun getFunctionTypeIndices ()[I
 	public final fun getGlobals ()Ljava/util/List;
 	public final fun getImports ()Ljava/util/List;
 	public final fun getMemories ()Ljava/util/List;
 	public final fun getNames ()Lio/github/charlietap/chasm/declarations/ModuleNames;
-	public final fun getStartFunction ()Ljava/lang/Integer;
+	public final fun getStartFunction-uQUp_Tg ()Lio/github/charlietap/chasm/ast/module/Index$FunctionIndex;
 	public final fun getTables ()Ljava/util/List;
 	public final fun getTags ()Ljava/util/List;
 	public fun hashCode ()I
@@ -687,7 +754,7 @@ public final class io/github/charlietap/chasm/declarations/TableDeclaration {
 	public final fun copy (Lio/github/charlietap/chasm/type/TableType;Lio/github/charlietap/chasm/declarations/ConstantExpression;)Lio/github/charlietap/chasm/declarations/TableDeclaration;
 	public static synthetic fun copy$default (Lio/github/charlietap/chasm/declarations/TableDeclaration;Lio/github/charlietap/chasm/type/TableType;Lio/github/charlietap/chasm/declarations/ConstantExpression;ILjava/lang/Object;)Lio/github/charlietap/chasm/declarations/TableDeclaration;
 	public fun equals (Ljava/lang/Object;)Z
-	public final fun getInitializer ()Lio/github/charlietap/chasm/declarations/ConstantExpression;
+	public final fun getInitExpression ()Lio/github/charlietap/chasm/declarations/ConstantExpression;
 	public final fun getType ()Lio/github/charlietap/chasm/type/TableType;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;

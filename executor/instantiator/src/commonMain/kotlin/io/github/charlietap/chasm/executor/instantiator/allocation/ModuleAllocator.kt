@@ -7,7 +7,6 @@ import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import com.github.michaelbull.result.toResultOr
-import io.github.charlietap.chasm.ast.value.NameValue
 import io.github.charlietap.chasm.declarations.DataPayload
 import io.github.charlietap.chasm.declarations.ModuleDeclarations
 import io.github.charlietap.chasm.executor.instantiator.ConstantExpressionEvaluator
@@ -133,18 +132,18 @@ internal inline fun AllocateModuleContents(
     }
 
     module.globals.forEach { global ->
-        val value = constantExpressionEvaluator(store, instance, context.types, global.initializer).bind()
+        val value = constantExpressionEvaluator(store, instance, context.types, global.initExpression).bind()
         val address = globalAllocator(store, context.types.resolve(global.type), value)
         instance.addGlobalAddress(address)
     }
 
     module.elementSegments.forEach { elementSegment ->
-        val references = LongArray(elementSegment.initializers.size) { initializerIndex ->
+        val references = LongArray(elementSegment.initExpressions.size) { initExpressionIndex ->
             constantExpressionEvaluator(
                 store,
                 instance,
                 context.types,
-                elementSegment.initializers[initializerIndex],
+                elementSegment.initExpressions[initExpressionIndex],
             ).bind()
         }
         val address = elementAllocator(
@@ -169,10 +168,9 @@ internal inline fun AllocateModuleExports(
     instance: ModuleInstance,
     crossinline exportAllocator: ExportAllocator,
 ): Result<Unit, ModuleTrapError> = binding {
-    val exports = context.module.exports
-    for (position in 0 until exports.size) {
-        val externalValue = exportAllocator(context, exports.kinds[position], exports.indices[position]).bind()
-        instance.addExport(ExportInstance(NameValue(exports.names[position]), externalValue))
+    context.module.exports.forEach { export ->
+        val externalValue = exportAllocator(context, export.descriptor).bind()
+        instance.addExport(ExportInstance(export.name, externalValue))
     }
 }
 

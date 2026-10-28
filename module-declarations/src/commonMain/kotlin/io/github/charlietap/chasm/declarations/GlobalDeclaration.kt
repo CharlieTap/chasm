@@ -4,5 +4,5 @@ import io.github.charlietap.chasm.type.GlobalType
 
 data class GlobalDeclaration(
     val type: GlobalType,
-    val initializer: ConstantExpression,
+    val initExpression: ConstantExpression,
 )
