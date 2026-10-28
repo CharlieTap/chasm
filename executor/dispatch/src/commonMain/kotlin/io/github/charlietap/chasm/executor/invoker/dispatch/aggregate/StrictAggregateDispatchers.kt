@@ -1,258 +1,574 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.aggregate
 
 import io.github.charlietap.chasm.executor.invoker.dispatch.dispatchInstruction
-import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.ArrayCopyExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.ArrayFillExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.ArrayGetExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.ArrayLenExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.ArrayNewExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.ArrayNewFixedExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.ArraySetExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.LocalSetStructGetExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.RefCastStructGetExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.StructGetExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.StructGetStructGetExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.StructNewDefaultExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.StructNewExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.StructSetExecutor
-import io.github.charlietap.chasm.runtime.instruction.AggregateInstruction
+import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.arrayAddress
+import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.executeArrayCopy
+import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.executeArrayFill
+import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.executeArrayGet
+import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.executeArrayLen
+import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.executeArrayNew
+import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.executeArrayNewFixed
+import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.executeArraySet
+import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.executeStructGet
+import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.executeStructSet
+import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.structField
+import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.structReference
+import io.github.charlietap.chasm.runtime.error.InvocationError
+import io.github.charlietap.chasm.runtime.exception.InvocationException
+import io.github.charlietap.chasm.runtime.operations.Caster
+import io.github.charlietap.chasm.runtime.type.RTT
+import io.github.charlietap.chasm.runtime.type.ReferenceTypeTest
 
-fun ArrayCopyDispatcher(
-    instruction: AggregateInstruction.ArrayCopyIii,
+fun ArrayCopyIiiDispatcher(
+    elementsToCopy: Int,
+    sourceOffset: Int,
+    destinationOffset: Int,
+    sourceAddressSlot: Int,
+    destinationAddressSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    ArrayCopyExecutor(vstack, context, instruction)
+    executeArrayCopy(
+        heap = context.heap,
+        elementsToCopy = elementsToCopy,
+        sourceOffset = sourceOffset,
+        sourceAddress = arrayAddress(vstack, sourceAddressSlot),
+        destinationOffset = destinationOffset,
+        destinationAddress = arrayAddress(vstack, destinationAddressSlot),
+    )
 }
 
-fun ArrayCopyDispatcher(
-    instruction: AggregateInstruction.ArrayCopyIis,
+fun ArrayCopyIisDispatcher(
+    elementsToCopy: Int,
+    sourceOffset: Int,
+    destinationOffsetSlot: Int,
+    sourceAddressSlot: Int,
+    destinationAddressSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    ArrayCopyExecutor(vstack, context, instruction)
+    executeArrayCopy(
+        heap = context.heap,
+        elementsToCopy = elementsToCopy,
+        sourceOffset = sourceOffset,
+        sourceAddress = arrayAddress(vstack, sourceAddressSlot),
+        destinationOffset = vstack.getFrameSlot(destinationOffsetSlot).toInt(),
+        destinationAddress = arrayAddress(vstack, destinationAddressSlot),
+    )
 }
 
-fun ArrayCopyDispatcher(
-    instruction: AggregateInstruction.ArrayCopyIsi,
+fun ArrayCopyIsiDispatcher(
+    elementsToCopy: Int,
+    sourceOffsetSlot: Int,
+    destinationOffset: Int,
+    sourceAddressSlot: Int,
+    destinationAddressSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    ArrayCopyExecutor(vstack, context, instruction)
+    executeArrayCopy(
+        heap = context.heap,
+        elementsToCopy = elementsToCopy,
+        sourceOffset = vstack.getFrameSlot(sourceOffsetSlot).toInt(),
+        sourceAddress = arrayAddress(vstack, sourceAddressSlot),
+        destinationOffset = destinationOffset,
+        destinationAddress = arrayAddress(vstack, destinationAddressSlot),
+    )
 }
 
-fun ArrayCopyDispatcher(
-    instruction: AggregateInstruction.ArrayCopyIss,
+fun ArrayCopyIssDispatcher(
+    elementsToCopy: Int,
+    sourceOffsetSlot: Int,
+    destinationOffsetSlot: Int,
+    sourceAddressSlot: Int,
+    destinationAddressSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    ArrayCopyExecutor(vstack, context, instruction)
+    executeArrayCopy(
+        heap = context.heap,
+        elementsToCopy = elementsToCopy,
+        sourceOffset = vstack.getFrameSlot(sourceOffsetSlot).toInt(),
+        sourceAddress = arrayAddress(vstack, sourceAddressSlot),
+        destinationOffset = vstack.getFrameSlot(destinationOffsetSlot).toInt(),
+        destinationAddress = arrayAddress(vstack, destinationAddressSlot),
+    )
 }
 
-fun ArrayCopyDispatcher(
-    instruction: AggregateInstruction.ArrayCopySii,
+fun ArrayCopySiiDispatcher(
+    elementsToCopySlot: Int,
+    sourceOffset: Int,
+    destinationOffset: Int,
+    sourceAddressSlot: Int,
+    destinationAddressSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    ArrayCopyExecutor(vstack, context, instruction)
+    executeArrayCopy(
+        heap = context.heap,
+        elementsToCopy = vstack.getFrameSlot(elementsToCopySlot).toInt(),
+        sourceOffset = sourceOffset,
+        sourceAddress = arrayAddress(vstack, sourceAddressSlot),
+        destinationOffset = destinationOffset,
+        destinationAddress = arrayAddress(vstack, destinationAddressSlot),
+    )
 }
 
-fun ArrayCopyDispatcher(
-    instruction: AggregateInstruction.ArrayCopySis,
+fun ArrayCopySisDispatcher(
+    elementsToCopySlot: Int,
+    sourceOffset: Int,
+    destinationOffsetSlot: Int,
+    sourceAddressSlot: Int,
+    destinationAddressSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    ArrayCopyExecutor(vstack, context, instruction)
+    executeArrayCopy(
+        heap = context.heap,
+        elementsToCopy = vstack.getFrameSlot(elementsToCopySlot).toInt(),
+        sourceOffset = sourceOffset,
+        sourceAddress = arrayAddress(vstack, sourceAddressSlot),
+        destinationOffset = vstack.getFrameSlot(destinationOffsetSlot).toInt(),
+        destinationAddress = arrayAddress(vstack, destinationAddressSlot),
+    )
 }
 
-fun ArrayCopyDispatcher(
-    instruction: AggregateInstruction.ArrayCopySsi,
+fun ArrayCopySsiDispatcher(
+    elementsToCopySlot: Int,
+    sourceOffsetSlot: Int,
+    destinationOffset: Int,
+    sourceAddressSlot: Int,
+    destinationAddressSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    ArrayCopyExecutor(vstack, context, instruction)
+    executeArrayCopy(
+        heap = context.heap,
+        elementsToCopy = vstack.getFrameSlot(elementsToCopySlot).toInt(),
+        sourceOffset = vstack.getFrameSlot(sourceOffsetSlot).toInt(),
+        sourceAddress = arrayAddress(vstack, sourceAddressSlot),
+        destinationOffset = destinationOffset,
+        destinationAddress = arrayAddress(vstack, destinationAddressSlot),
+    )
 }
 
-fun ArrayCopyDispatcher(
-    instruction: AggregateInstruction.ArrayCopySss,
+fun ArrayCopySssDispatcher(
+    elementsToCopySlot: Int,
+    sourceOffsetSlot: Int,
+    destinationOffsetSlot: Int,
+    sourceAddressSlot: Int,
+    destinationAddressSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    ArrayCopyExecutor(vstack, context, instruction)
+    executeArrayCopy(
+        heap = context.heap,
+        elementsToCopy = vstack.getFrameSlot(elementsToCopySlot).toInt(),
+        sourceOffset = vstack.getFrameSlot(sourceOffsetSlot).toInt(),
+        sourceAddress = arrayAddress(vstack, sourceAddressSlot),
+        destinationOffset = vstack.getFrameSlot(destinationOffsetSlot).toInt(),
+        destinationAddress = arrayAddress(vstack, destinationAddressSlot),
+    )
 }
 
-fun ArrayFillDispatcher(
-    instruction: AggregateInstruction.ArrayFillIii,
+fun ArrayFillIiiDispatcher(
+    elementsToFill: Int,
+    fillValue: Long,
+    arrayElementOffset: Int,
+    addressSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    ArrayFillExecutor(vstack, context, instruction)
+    executeArrayFill(
+        heap = context.heap,
+        elementsToFill = elementsToFill,
+        fillValue = fillValue,
+        arrayElementOffset = arrayElementOffset,
+        address = arrayAddress(vstack, addressSlot),
+    )
 }
 
-fun ArrayFillDispatcher(
-    instruction: AggregateInstruction.ArrayFillIis,
+fun ArrayFillIisDispatcher(
+    elementsToFill: Int,
+    fillValue: Long,
+    arrayElementOffsetSlot: Int,
+    addressSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    ArrayFillExecutor(vstack, context, instruction)
+    executeArrayFill(
+        heap = context.heap,
+        elementsToFill = elementsToFill,
+        fillValue = fillValue,
+        arrayElementOffset = vstack.getFrameSlot(arrayElementOffsetSlot).toInt(),
+        address = arrayAddress(vstack, addressSlot),
+    )
 }
 
-fun ArrayFillDispatcher(
-    instruction: AggregateInstruction.ArrayFillIsi,
+fun ArrayFillIsiDispatcher(
+    elementsToFill: Int,
+    fillValueSlot: Int,
+    arrayElementOffset: Int,
+    addressSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    ArrayFillExecutor(vstack, context, instruction)
+    executeArrayFill(
+        heap = context.heap,
+        elementsToFill = elementsToFill,
+        fillValue = vstack.getFrameSlot(fillValueSlot),
+        arrayElementOffset = arrayElementOffset,
+        address = arrayAddress(vstack, addressSlot),
+    )
 }
 
-fun ArrayFillDispatcher(
-    instruction: AggregateInstruction.ArrayFillIss,
+fun ArrayFillIssDispatcher(
+    elementsToFill: Int,
+    fillValueSlot: Int,
+    arrayElementOffsetSlot: Int,
+    addressSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    ArrayFillExecutor(vstack, context, instruction)
+    executeArrayFill(
+        heap = context.heap,
+        elementsToFill = elementsToFill,
+        fillValue = vstack.getFrameSlot(fillValueSlot),
+        arrayElementOffset = vstack.getFrameSlot(arrayElementOffsetSlot).toInt(),
+        address = arrayAddress(vstack, addressSlot),
+    )
 }
 
-fun ArrayFillDispatcher(
-    instruction: AggregateInstruction.ArrayFillSii,
+fun ArrayFillSiiDispatcher(
+    elementsToFillSlot: Int,
+    fillValue: Long,
+    arrayElementOffset: Int,
+    addressSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    ArrayFillExecutor(vstack, context, instruction)
+    executeArrayFill(
+        heap = context.heap,
+        elementsToFill = vstack.getFrameSlot(elementsToFillSlot).toInt(),
+        fillValue = fillValue,
+        arrayElementOffset = arrayElementOffset,
+        address = arrayAddress(vstack, addressSlot),
+    )
 }
 
-fun ArrayFillDispatcher(
-    instruction: AggregateInstruction.ArrayFillSis,
+fun ArrayFillSisDispatcher(
+    elementsToFillSlot: Int,
+    fillValue: Long,
+    arrayElementOffsetSlot: Int,
+    addressSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    ArrayFillExecutor(vstack, context, instruction)
+    executeArrayFill(
+        heap = context.heap,
+        elementsToFill = vstack.getFrameSlot(elementsToFillSlot).toInt(),
+        fillValue = fillValue,
+        arrayElementOffset = vstack.getFrameSlot(arrayElementOffsetSlot).toInt(),
+        address = arrayAddress(vstack, addressSlot),
+    )
 }
 
-fun ArrayFillDispatcher(
-    instruction: AggregateInstruction.ArrayFillSsi,
+fun ArrayFillSsiDispatcher(
+    elementsToFillSlot: Int,
+    fillValueSlot: Int,
+    arrayElementOffset: Int,
+    addressSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    ArrayFillExecutor(vstack, context, instruction)
+    executeArrayFill(
+        heap = context.heap,
+        elementsToFill = vstack.getFrameSlot(elementsToFillSlot).toInt(),
+        fillValue = vstack.getFrameSlot(fillValueSlot),
+        arrayElementOffset = arrayElementOffset,
+        address = arrayAddress(vstack, addressSlot),
+    )
 }
 
-fun ArrayFillDispatcher(
-    instruction: AggregateInstruction.ArrayFillSss,
+fun ArrayFillSssDispatcher(
+    elementsToFillSlot: Int,
+    fillValueSlot: Int,
+    arrayElementOffsetSlot: Int,
+    addressSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    ArrayFillExecutor(vstack, context, instruction)
+    executeArrayFill(
+        heap = context.heap,
+        elementsToFill = vstack.getFrameSlot(elementsToFillSlot).toInt(),
+        fillValue = vstack.getFrameSlot(fillValueSlot),
+        arrayElementOffset = vstack.getFrameSlot(arrayElementOffsetSlot).toInt(),
+        address = arrayAddress(vstack, addressSlot),
+    )
 }
 
-fun ArrayGetDispatcher(
-    instruction: AggregateInstruction.ArrayGetI,
+fun ArrayGetIDispatcher(
+    addressSlot: Int,
+    field: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    ArrayGetExecutor(vstack, context, instruction)
+    executeArrayGet(
+        vstack = vstack,
+        heap = context.heap,
+        fieldIndex = field,
+        address = arrayAddress(vstack, addressSlot),
+        destinationSlot = destinationSlot,
+    )
 }
 
-fun ArrayGetDispatcher(
-    instruction: AggregateInstruction.ArrayGetS,
+fun ArrayGetSDispatcher(
+    addressSlot: Int,
+    fieldSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    ArrayGetExecutor(vstack, context, instruction)
+    executeArrayGet(
+        vstack = vstack,
+        heap = context.heap,
+        fieldIndex = vstack.getFrameSlot(fieldSlot).toInt(),
+        address = arrayAddress(vstack, addressSlot),
+        destinationSlot = destinationSlot,
+    )
 }
 
-fun ArrayGetSignedDispatcher(
-    instruction: AggregateInstruction.ArrayGetSignedI,
-) = PackedArrayGetSignedDispatcher(instruction)
-
-fun ArrayGetSignedDispatcher(
-    instruction: AggregateInstruction.ArrayGetSignedS,
-) = PackedArrayGetSignedDispatcher(instruction)
-
-fun ArrayGetUnsignedDispatcher(
-    instruction: AggregateInstruction.ArrayGetUnsignedI,
-) = PackedArrayGetUnsignedDispatcher(instruction)
-
-fun ArrayGetUnsignedDispatcher(
-    instruction: AggregateInstruction.ArrayGetUnsignedS,
-) = PackedArrayGetUnsignedDispatcher(instruction)
-
-fun ArrayLenDispatcher(
-    instruction: AggregateInstruction.ArrayLenS,
+fun ArrayLenSDispatcher(
+    addressSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    ArrayLenExecutor(vstack, context, instruction)
+    executeArrayLen(
+        vstack = vstack,
+        heap = context.heap,
+        address = arrayAddress(vstack, addressSlot),
+        destinationSlot = destinationSlot,
+    )
 }
 
-fun ArrayNewDispatcher(
-    instruction: AggregateInstruction.ArrayNewIi,
+fun ArrayNewIiDispatcher(
+    size: Int,
+    value: Long,
+    destinationSlot: Int,
+    rtt: RTT,
 ) = dispatchInstruction { vstack, context ->
-    ArrayNewExecutor(vstack, context, instruction)
+    executeArrayNew(
+        vstack = vstack,
+        heap = context.heap,
+        context = context,
+        size = size,
+        value = value,
+        destinationSlot = destinationSlot,
+        rtt = rtt,
+    )
 }
 
-fun ArrayNewDispatcher(
-    instruction: AggregateInstruction.ArrayNewIs,
+fun ArrayNewIsDispatcher(
+    size: Int,
+    valueSlot: Int,
+    destinationSlot: Int,
+    rtt: RTT,
 ) = dispatchInstruction { vstack, context ->
-    ArrayNewExecutor(vstack, context, instruction)
+    executeArrayNew(
+        vstack = vstack,
+        heap = context.heap,
+        context = context,
+        size = size,
+        value = vstack.getFrameSlot(valueSlot),
+        destinationSlot = destinationSlot,
+        rtt = rtt,
+    )
 }
 
-fun ArrayNewDispatcher(
-    instruction: AggregateInstruction.ArrayNewSi,
+fun ArrayNewSiDispatcher(
+    sizeSlot: Int,
+    value: Long,
+    destinationSlot: Int,
+    rtt: RTT,
 ) = dispatchInstruction { vstack, context ->
-    ArrayNewExecutor(vstack, context, instruction)
+    executeArrayNew(
+        vstack = vstack,
+        heap = context.heap,
+        context = context,
+        size = vstack.getFrameSlot(sizeSlot).toInt(),
+        value = value,
+        destinationSlot = destinationSlot,
+        rtt = rtt,
+    )
 }
 
-fun ArrayNewDispatcher(
-    instruction: AggregateInstruction.ArrayNewSs,
+fun ArrayNewSsDispatcher(
+    sizeSlot: Int,
+    valueSlot: Int,
+    destinationSlot: Int,
+    rtt: RTT,
 ) = dispatchInstruction { vstack, context ->
-    ArrayNewExecutor(vstack, context, instruction)
+    executeArrayNew(
+        vstack = vstack,
+        heap = context.heap,
+        context = context,
+        size = vstack.getFrameSlot(sizeSlot).toInt(),
+        value = vstack.getFrameSlot(valueSlot),
+        destinationSlot = destinationSlot,
+        rtt = rtt,
+    )
 }
 
-fun ArrayNewFixedDispatcher(
-    instruction: AggregateInstruction.ArrayNewFixedS,
+fun ArrayNewFixedSDispatcher(
+    firstElementSlot: Int,
+    destinationSlot: Int,
+    rtt: RTT,
+    size: Int,
 ) = dispatchInstruction { vstack, context ->
-    ArrayNewFixedExecutor(vstack, context, instruction)
+    executeArrayNewFixed(
+        vstack = vstack,
+        heap = context.heap,
+        context = context,
+        firstElementSlot = firstElementSlot,
+        destinationSlot = destinationSlot,
+        rtt = rtt,
+        size = size,
+    )
 }
 
-fun ArraySetDispatcher(
-    instruction: AggregateInstruction.ArraySetIi,
+fun ArraySetIiDispatcher(
+    value: Long,
+    field: Int,
+    addressSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    ArraySetExecutor(vstack, context, instruction)
+    executeArraySet(
+        heap = context.heap,
+        value = value,
+        fieldIndex = field,
+        address = arrayAddress(vstack, addressSlot),
+    )
 }
 
-fun ArraySetDispatcher(
-    instruction: AggregateInstruction.ArraySetIs,
+fun ArraySetIsDispatcher(
+    value: Long,
+    fieldSlot: Int,
+    addressSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    ArraySetExecutor(vstack, context, instruction)
+    executeArraySet(
+        heap = context.heap,
+        value = value,
+        fieldIndex = vstack.getFrameSlot(fieldSlot).toInt(),
+        address = arrayAddress(vstack, addressSlot),
+    )
 }
 
-fun ArraySetDispatcher(
-    instruction: AggregateInstruction.ArraySetSi,
+fun ArraySetSiDispatcher(
+    valueSlot: Int,
+    field: Int,
+    addressSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    ArraySetExecutor(vstack, context, instruction)
+    executeArraySet(
+        heap = context.heap,
+        value = vstack.getFrameSlot(valueSlot),
+        fieldIndex = field,
+        address = arrayAddress(vstack, addressSlot),
+    )
 }
 
-fun ArraySetDispatcher(
-    instruction: AggregateInstruction.ArraySetSs,
+fun ArraySetSsDispatcher(
+    valueSlot: Int,
+    fieldSlot: Int,
+    addressSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    ArraySetExecutor(vstack, context, instruction)
+    executeArraySet(
+        heap = context.heap,
+        value = vstack.getFrameSlot(valueSlot),
+        fieldIndex = vstack.getFrameSlot(fieldSlot).toInt(),
+        address = arrayAddress(vstack, addressSlot),
+    )
 }
 
-fun StructGetDispatcher(
-    instruction: AggregateInstruction.StructGetS,
+fun StructGetSDispatcher(
+    addressSlot: Int,
+    destinationSlot: Int,
+    fieldIndex: Int,
 ) = dispatchInstruction { vstack, context ->
-    StructGetExecutor(vstack, context, instruction)
+    executeStructGet(
+        vstack = vstack,
+        heap = context.heap,
+        reference = structReference(vstack, addressSlot),
+        destinationSlot = destinationSlot,
+        fieldIndex = fieldIndex,
+    )
 }
 
-fun StructGetSignedDispatcher(
-    instruction: AggregateInstruction.StructGetSignedS,
-) = PackedStructGetSignedDispatcher(instruction)
-
-fun StructGetUnsignedDispatcher(
-    instruction: AggregateInstruction.StructGetUnsignedS,
-) = PackedStructGetUnsignedDispatcher(instruction)
-
-fun RefCastStructGetDispatcher(
-    instruction: AggregateInstruction.RefCastStructGetS,
+fun RefCastStructGetSDispatcher(
+    referenceSlot: Int,
+    destinationSlot: Int,
+    typeTest: ReferenceTypeTest,
+    fieldIndex: Int,
 ) = dispatchInstruction { vstack, context ->
-    RefCastStructGetExecutor(vstack, context, instruction)
+    run {
+        val reference = vstack.getFrameSlot(referenceSlot)
+        if (!Caster(reference, typeTest, context)) {
+            throw InvocationException(InvocationError.FailedToCastReference)
+        }
+        vstack.setFrameSlot(
+            destinationSlot,
+            context.heap.getStructFieldTrusted(reference, fieldIndex),
+        )
+    }
 }
 
-fun StructGetStructGetDispatcher(
-    instruction: AggregateInstruction.StructGetStructGetS,
+fun StructGetStructGetSDispatcher(
+    addressSlot: Int,
+    destinationSlot: Int,
+    firstFieldIndex: Int,
+    secondFieldIndex: Int,
 ) = dispatchInstruction { vstack, context ->
-    StructGetStructGetExecutor(vstack, context, instruction)
+    run {
+        val reference = structField(
+            heap = context.heap,
+            reference = vstack.getFrameSlot(addressSlot),
+            fieldIndex = firstFieldIndex,
+        )
+        vstack.setFrameSlot(
+            destinationSlot,
+            structField(context.heap, reference, secondFieldIndex),
+        )
+    }
 }
 
-fun LocalSetStructGetDispatcher(
-    instruction: AggregateInstruction.LocalSetStructGetS,
+fun LocalSetStructGetSDispatcher(
+    sourceSlot: Int,
+    localSlot: Int,
+    destinationSlot: Int,
+    fieldIndex: Int,
 ) = dispatchInstruction { vstack, context ->
-    LocalSetStructGetExecutor(vstack, context, instruction)
+    run {
+        val reference = vstack.getFrameSlot(sourceSlot)
+        vstack.setFrameSlot(localSlot, reference)
+        vstack.setFrameSlot(
+            destinationSlot,
+            structField(context.heap, reference, fieldIndex),
+        )
+    }
 }
 
-fun StructNewDispatcher(
-    instruction: AggregateInstruction.StructNewS,
+fun StructNewSDispatcher(
+    firstFieldSlot: Int,
+    destinationSlot: Int,
+    rtt: RTT,
 ) = dispatchInstruction { vstack, context ->
-    StructNewExecutor(vstack, context, instruction)
+    run {
+        context.heap.allocateStructFromFrame(
+            context = context,
+            runtimeType = rtt,
+            firstFieldSlot = firstFieldSlot,
+            destinationSlot = destinationSlot,
+        )
+    }
 }
 
-fun StructNewDefaultDispatcher(
-    instruction: AggregateInstruction.StructNewDefaultS,
+fun StructNewDefaultSDispatcher(
+    destinationSlot: Int,
+    rtt: RTT,
+    fields: LongArray,
 ) = dispatchInstruction { vstack, context ->
-    StructNewDefaultExecutor(vstack, context, instruction)
+    run {
+        vstack.setFrameSlot(
+            destinationSlot,
+            context.heap.allocateStruct(context, rtt, fields),
+        )
+    }
 }
 
-fun StructSetDispatcher(
-    instruction: AggregateInstruction.StructSetI,
+fun StructSetIDispatcher(
+    value: Long,
+    addressSlot: Int,
+    fieldIndex: Int,
 ) = dispatchInstruction { vstack, context ->
-    StructSetExecutor(vstack, context, instruction)
+    executeStructSet(
+        heap = context.heap,
+        value = value,
+        reference = structReference(vstack, addressSlot),
+        fieldIndex = fieldIndex,
+    )
 }
 
-fun StructSetDispatcher(
-    instruction: AggregateInstruction.StructSetS,
+fun StructSetSDispatcher(
+    valueSlot: Int,
+    addressSlot: Int,
+    fieldIndex: Int,
 ) = dispatchInstruction { vstack, context ->
-    StructSetExecutor(vstack, context, instruction)
+    executeStructSet(
+        heap = context.heap,
+        value = vstack.getFrameSlot(valueSlot),
+        reference = structReference(vstack, addressSlot),
+        fieldIndex = fieldIndex,
+    )
 }

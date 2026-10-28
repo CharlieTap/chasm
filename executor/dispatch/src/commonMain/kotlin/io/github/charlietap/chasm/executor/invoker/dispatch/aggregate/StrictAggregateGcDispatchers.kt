@@ -1,206 +1,566 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.aggregate
 
 import io.github.charlietap.chasm.executor.invoker.dispatch.dispatchInstruction
-import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.AnyConvertExternExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.ArrayInitDataExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.ArrayInitElementExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.ArrayNewDataExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.ArrayNewDefaultExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.ArrayNewElementExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.ExternConvertAnyExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.I31GetSignedExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.I31GetUnsignedExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.RefI31Executor
-import io.github.charlietap.chasm.runtime.instruction.AggregateInstruction
+import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.executeAnyConvertExtern
+import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.executeArrayInitData
+import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.executeArrayInitElement
+import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.executeArrayNewData
+import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.executeArrayNewDefault
+import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.executeArrayNewElement
+import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.executeExternConvertAny
+import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.executeI31Get
+import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.executeRefI31
+import io.github.charlietap.chasm.runtime.ext.extendSigned
+import io.github.charlietap.chasm.runtime.ext.extendUnsigned
+import io.github.charlietap.chasm.runtime.ext.toI31
+import io.github.charlietap.chasm.runtime.type.RTT
 
-fun ArrayNewDefaultDispatcher(
-    instruction: AggregateInstruction.ArrayNewDefaultI,
+fun ArrayNewDefaultIDispatcher(
+    size: Int,
+    destinationSlot: Int,
+    rtt: RTT,
+    field: Long,
 ) = dispatchInstruction { vstack, context ->
-    ArrayNewDefaultExecutor(vstack, context, instruction)
+    executeArrayNewDefault(
+        vstack = vstack,
+        heap = context.heap,
+        context = context,
+        size = size,
+        destinationSlot = destinationSlot,
+        rtt = rtt,
+        field = field,
+    )
 }
 
-fun ArrayNewDefaultDispatcher(
-    instruction: AggregateInstruction.ArrayNewDefaultS,
+fun ArrayNewDefaultSDispatcher(
+    sizeSlot: Int,
+    destinationSlot: Int,
+    rtt: RTT,
+    field: Long,
 ) = dispatchInstruction { vstack, context ->
-    ArrayNewDefaultExecutor(vstack, context, instruction)
+    executeArrayNewDefault(
+        vstack = vstack,
+        heap = context.heap,
+        context = context,
+        size = vstack.getFrameSlot(sizeSlot).toInt(),
+        destinationSlot = destinationSlot,
+        rtt = rtt,
+        field = field,
+    )
 }
 
-fun ArrayNewDataDispatcher(
-    instruction: AggregateInstruction.ArrayNewDataIi,
+fun ArrayNewDataIiDispatcher(
+    sourceOffset: Int,
+    arrayLength: Int,
+    destinationSlot: Int,
+    rtt: RTT,
+    dataInstance: io.github.charlietap.chasm.runtime.instance.DataInstance,
+    fieldWidthInBytes: Int,
 ) = dispatchInstruction { vstack, context ->
-    ArrayNewDataExecutor(vstack, context, instruction)
+    executeArrayNewData(
+        vstack = vstack,
+        heap = context.heap,
+        context = context,
+        sourceOffset = sourceOffset,
+        arrayLength = arrayLength,
+        destinationSlot = destinationSlot,
+        rtt = rtt,
+        dataInstance = dataInstance,
+        fieldWidthInBytes = fieldWidthInBytes,
+    )
 }
 
-fun ArrayNewDataDispatcher(
-    instruction: AggregateInstruction.ArrayNewDataIs,
+fun ArrayNewDataIsDispatcher(
+    sourceOffset: Int,
+    arrayLengthSlot: Int,
+    destinationSlot: Int,
+    rtt: RTT,
+    dataInstance: io.github.charlietap.chasm.runtime.instance.DataInstance,
+    fieldWidthInBytes: Int,
 ) = dispatchInstruction { vstack, context ->
-    ArrayNewDataExecutor(vstack, context, instruction)
+    executeArrayNewData(
+        vstack = vstack,
+        heap = context.heap,
+        context = context,
+        sourceOffset = sourceOffset,
+        arrayLength = vstack.getFrameSlot(arrayLengthSlot).toInt(),
+        destinationSlot = destinationSlot,
+        rtt = rtt,
+        dataInstance = dataInstance,
+        fieldWidthInBytes = fieldWidthInBytes,
+    )
 }
 
-fun ArrayNewDataDispatcher(
-    instruction: AggregateInstruction.ArrayNewDataSi,
+fun ArrayNewDataSiDispatcher(
+    sourceOffsetSlot: Int,
+    arrayLength: Int,
+    destinationSlot: Int,
+    rtt: RTT,
+    dataInstance: io.github.charlietap.chasm.runtime.instance.DataInstance,
+    fieldWidthInBytes: Int,
 ) = dispatchInstruction { vstack, context ->
-    ArrayNewDataExecutor(vstack, context, instruction)
+    executeArrayNewData(
+        vstack = vstack,
+        heap = context.heap,
+        context = context,
+        sourceOffset = vstack.getFrameSlot(sourceOffsetSlot).toInt(),
+        arrayLength = arrayLength,
+        destinationSlot = destinationSlot,
+        rtt = rtt,
+        dataInstance = dataInstance,
+        fieldWidthInBytes = fieldWidthInBytes,
+    )
 }
 
-fun ArrayNewDataDispatcher(
-    instruction: AggregateInstruction.ArrayNewDataSs,
+fun ArrayNewDataSsDispatcher(
+    sourceOffsetSlot: Int,
+    arrayLengthSlot: Int,
+    destinationSlot: Int,
+    rtt: RTT,
+    dataInstance: io.github.charlietap.chasm.runtime.instance.DataInstance,
+    fieldWidthInBytes: Int,
 ) = dispatchInstruction { vstack, context ->
-    ArrayNewDataExecutor(vstack, context, instruction)
+    executeArrayNewData(
+        vstack = vstack,
+        heap = context.heap,
+        context = context,
+        sourceOffset = vstack.getFrameSlot(sourceOffsetSlot).toInt(),
+        arrayLength = vstack.getFrameSlot(arrayLengthSlot).toInt(),
+        destinationSlot = destinationSlot,
+        rtt = rtt,
+        dataInstance = dataInstance,
+        fieldWidthInBytes = fieldWidthInBytes,
+    )
 }
 
-fun ArrayNewElementDispatcher(
-    instruction: AggregateInstruction.ArrayNewElementIi,
+fun ArrayNewElementIiDispatcher(
+    sourceOffset: Int,
+    arrayLength: Int,
+    destinationSlot: Int,
+    rtt: RTT,
+    elementInstance: io.github.charlietap.chasm.runtime.instance.ElementInstance,
 ) = dispatchInstruction { vstack, context ->
-    ArrayNewElementExecutor(vstack, context, instruction)
+    executeArrayNewElement(
+        vstack = vstack,
+        heap = context.heap,
+        context = context,
+        sourceOffset = sourceOffset,
+        arrayLength = arrayLength,
+        destinationSlot = destinationSlot,
+        rtt = rtt,
+        elementInstance = elementInstance,
+    )
 }
 
-fun ArrayNewElementDispatcher(
-    instruction: AggregateInstruction.ArrayNewElementIs,
+fun ArrayNewElementIsDispatcher(
+    sourceOffset: Int,
+    arrayLengthSlot: Int,
+    destinationSlot: Int,
+    rtt: RTT,
+    elementInstance: io.github.charlietap.chasm.runtime.instance.ElementInstance,
 ) = dispatchInstruction { vstack, context ->
-    ArrayNewElementExecutor(vstack, context, instruction)
+    executeArrayNewElement(
+        vstack = vstack,
+        heap = context.heap,
+        context = context,
+        sourceOffset = sourceOffset,
+        arrayLength = vstack.getFrameSlot(arrayLengthSlot).toInt(),
+        destinationSlot = destinationSlot,
+        rtt = rtt,
+        elementInstance = elementInstance,
+    )
 }
 
-fun ArrayNewElementDispatcher(
-    instruction: AggregateInstruction.ArrayNewElementSi,
+fun ArrayNewElementSiDispatcher(
+    sourceOffsetSlot: Int,
+    arrayLength: Int,
+    destinationSlot: Int,
+    rtt: RTT,
+    elementInstance: io.github.charlietap.chasm.runtime.instance.ElementInstance,
 ) = dispatchInstruction { vstack, context ->
-    ArrayNewElementExecutor(vstack, context, instruction)
+    executeArrayNewElement(
+        vstack = vstack,
+        heap = context.heap,
+        context = context,
+        sourceOffset = vstack.getFrameSlot(sourceOffsetSlot).toInt(),
+        arrayLength = arrayLength,
+        destinationSlot = destinationSlot,
+        rtt = rtt,
+        elementInstance = elementInstance,
+    )
 }
 
-fun ArrayNewElementDispatcher(
-    instruction: AggregateInstruction.ArrayNewElementSs,
+fun ArrayNewElementSsDispatcher(
+    sourceOffsetSlot: Int,
+    arrayLengthSlot: Int,
+    destinationSlot: Int,
+    rtt: RTT,
+    elementInstance: io.github.charlietap.chasm.runtime.instance.ElementInstance,
 ) = dispatchInstruction { vstack, context ->
-    ArrayNewElementExecutor(vstack, context, instruction)
+    executeArrayNewElement(
+        vstack = vstack,
+        heap = context.heap,
+        context = context,
+        sourceOffset = vstack.getFrameSlot(sourceOffsetSlot).toInt(),
+        arrayLength = vstack.getFrameSlot(arrayLengthSlot).toInt(),
+        destinationSlot = destinationSlot,
+        rtt = rtt,
+        elementInstance = elementInstance,
+    )
 }
 
-fun ArrayInitDataDispatcher(
-    instruction: AggregateInstruction.ArrayInitDataIii,
+fun ArrayInitDataIiiDispatcher(
+    elementsToCopy: Int,
+    sourceOffset: Int,
+    destinationOffset: Int,
+    addressSlot: Int,
+    dataInstance: io.github.charlietap.chasm.runtime.instance.DataInstance,
+    fieldWidthInBytes: Int,
 ) = dispatchInstruction { vstack, context ->
-    ArrayInitDataExecutor(vstack, context, instruction)
+    executeArrayInitData(
+        heap = context.heap,
+        elementsToCopy = elementsToCopy,
+        sourceOffset = sourceOffset,
+        destinationOffset = destinationOffset,
+        address = vstack.getFrameSlot(addressSlot),
+        dataInstance = dataInstance,
+        fieldWidthInBytes = fieldWidthInBytes,
+    )
 }
 
-fun ArrayInitDataDispatcher(
-    instruction: AggregateInstruction.ArrayInitDataIis,
+fun ArrayInitDataIisDispatcher(
+    elementsToCopy: Int,
+    sourceOffset: Int,
+    destinationOffsetSlot: Int,
+    addressSlot: Int,
+    dataInstance: io.github.charlietap.chasm.runtime.instance.DataInstance,
+    fieldWidthInBytes: Int,
 ) = dispatchInstruction { vstack, context ->
-    ArrayInitDataExecutor(vstack, context, instruction)
+    executeArrayInitData(
+        heap = context.heap,
+        elementsToCopy = elementsToCopy,
+        sourceOffset = sourceOffset,
+        destinationOffset = vstack.getFrameSlot(destinationOffsetSlot).toInt(),
+        address = vstack.getFrameSlot(addressSlot),
+        dataInstance = dataInstance,
+        fieldWidthInBytes = fieldWidthInBytes,
+    )
 }
 
-fun ArrayInitDataDispatcher(
-    instruction: AggregateInstruction.ArrayInitDataIsi,
+fun ArrayInitDataIsiDispatcher(
+    elementsToCopy: Int,
+    sourceOffsetSlot: Int,
+    destinationOffset: Int,
+    addressSlot: Int,
+    dataInstance: io.github.charlietap.chasm.runtime.instance.DataInstance,
+    fieldWidthInBytes: Int,
 ) = dispatchInstruction { vstack, context ->
-    ArrayInitDataExecutor(vstack, context, instruction)
+    executeArrayInitData(
+        heap = context.heap,
+        elementsToCopy = elementsToCopy,
+        sourceOffset = vstack.getFrameSlot(sourceOffsetSlot).toInt(),
+        destinationOffset = destinationOffset,
+        address = vstack.getFrameSlot(addressSlot),
+        dataInstance = dataInstance,
+        fieldWidthInBytes = fieldWidthInBytes,
+    )
 }
 
-fun ArrayInitDataDispatcher(
-    instruction: AggregateInstruction.ArrayInitDataIss,
+fun ArrayInitDataIssDispatcher(
+    elementsToCopy: Int,
+    sourceOffsetSlot: Int,
+    destinationOffsetSlot: Int,
+    addressSlot: Int,
+    dataInstance: io.github.charlietap.chasm.runtime.instance.DataInstance,
+    fieldWidthInBytes: Int,
 ) = dispatchInstruction { vstack, context ->
-    ArrayInitDataExecutor(vstack, context, instruction)
+    executeArrayInitData(
+        heap = context.heap,
+        elementsToCopy = elementsToCopy,
+        sourceOffset = vstack.getFrameSlot(sourceOffsetSlot).toInt(),
+        destinationOffset = vstack.getFrameSlot(destinationOffsetSlot).toInt(),
+        address = vstack.getFrameSlot(addressSlot),
+        dataInstance = dataInstance,
+        fieldWidthInBytes = fieldWidthInBytes,
+    )
 }
 
-fun ArrayInitDataDispatcher(
-    instruction: AggregateInstruction.ArrayInitDataSii,
+fun ArrayInitDataSiiDispatcher(
+    elementsToCopySlot: Int,
+    sourceOffset: Int,
+    destinationOffset: Int,
+    addressSlot: Int,
+    dataInstance: io.github.charlietap.chasm.runtime.instance.DataInstance,
+    fieldWidthInBytes: Int,
 ) = dispatchInstruction { vstack, context ->
-    ArrayInitDataExecutor(vstack, context, instruction)
+    executeArrayInitData(
+        heap = context.heap,
+        elementsToCopy = vstack.getFrameSlot(elementsToCopySlot).toInt(),
+        sourceOffset = sourceOffset,
+        destinationOffset = destinationOffset,
+        address = vstack.getFrameSlot(addressSlot),
+        dataInstance = dataInstance,
+        fieldWidthInBytes = fieldWidthInBytes,
+    )
 }
 
-fun ArrayInitDataDispatcher(
-    instruction: AggregateInstruction.ArrayInitDataSis,
+fun ArrayInitDataSisDispatcher(
+    elementsToCopySlot: Int,
+    sourceOffset: Int,
+    destinationOffsetSlot: Int,
+    addressSlot: Int,
+    dataInstance: io.github.charlietap.chasm.runtime.instance.DataInstance,
+    fieldWidthInBytes: Int,
 ) = dispatchInstruction { vstack, context ->
-    ArrayInitDataExecutor(vstack, context, instruction)
+    executeArrayInitData(
+        heap = context.heap,
+        elementsToCopy = vstack.getFrameSlot(elementsToCopySlot).toInt(),
+        sourceOffset = sourceOffset,
+        destinationOffset = vstack.getFrameSlot(destinationOffsetSlot).toInt(),
+        address = vstack.getFrameSlot(addressSlot),
+        dataInstance = dataInstance,
+        fieldWidthInBytes = fieldWidthInBytes,
+    )
 }
 
-fun ArrayInitDataDispatcher(
-    instruction: AggregateInstruction.ArrayInitDataSsi,
+fun ArrayInitDataSsiDispatcher(
+    elementsToCopySlot: Int,
+    sourceOffsetSlot: Int,
+    destinationOffset: Int,
+    addressSlot: Int,
+    dataInstance: io.github.charlietap.chasm.runtime.instance.DataInstance,
+    fieldWidthInBytes: Int,
 ) = dispatchInstruction { vstack, context ->
-    ArrayInitDataExecutor(vstack, context, instruction)
+    executeArrayInitData(
+        heap = context.heap,
+        elementsToCopy = vstack.getFrameSlot(elementsToCopySlot).toInt(),
+        sourceOffset = vstack.getFrameSlot(sourceOffsetSlot).toInt(),
+        destinationOffset = destinationOffset,
+        address = vstack.getFrameSlot(addressSlot),
+        dataInstance = dataInstance,
+        fieldWidthInBytes = fieldWidthInBytes,
+    )
 }
 
-fun ArrayInitDataDispatcher(
-    instruction: AggregateInstruction.ArrayInitDataSss,
+fun ArrayInitDataSssDispatcher(
+    elementsToCopySlot: Int,
+    sourceOffsetSlot: Int,
+    destinationOffsetSlot: Int,
+    addressSlot: Int,
+    dataInstance: io.github.charlietap.chasm.runtime.instance.DataInstance,
+    fieldWidthInBytes: Int,
 ) = dispatchInstruction { vstack, context ->
-    ArrayInitDataExecutor(vstack, context, instruction)
+    executeArrayInitData(
+        heap = context.heap,
+        elementsToCopy = vstack.getFrameSlot(elementsToCopySlot).toInt(),
+        sourceOffset = vstack.getFrameSlot(sourceOffsetSlot).toInt(),
+        destinationOffset = vstack.getFrameSlot(destinationOffsetSlot).toInt(),
+        address = vstack.getFrameSlot(addressSlot),
+        dataInstance = dataInstance,
+        fieldWidthInBytes = fieldWidthInBytes,
+    )
 }
 
-fun ArrayInitElementDispatcher(
-    instruction: AggregateInstruction.ArrayInitElementIii,
+fun ArrayInitElementIiiDispatcher(
+    elementsToCopy: Int,
+    sourceOffset: Int,
+    destinationOffset: Int,
+    addressSlot: Int,
+    elementInstance: io.github.charlietap.chasm.runtime.instance.ElementInstance,
 ) = dispatchInstruction { vstack, context ->
-    ArrayInitElementExecutor(vstack, context, instruction)
+    executeArrayInitElement(
+        heap = context.heap,
+        elementsToCopy = elementsToCopy,
+        sourceOffset = sourceOffset,
+        destinationOffset = destinationOffset,
+        address = vstack.getFrameSlot(addressSlot),
+        elementInstance = elementInstance,
+    )
 }
 
-fun ArrayInitElementDispatcher(
-    instruction: AggregateInstruction.ArrayInitElementIis,
+fun ArrayInitElementIisDispatcher(
+    elementsToCopy: Int,
+    sourceOffset: Int,
+    destinationOffsetSlot: Int,
+    addressSlot: Int,
+    elementInstance: io.github.charlietap.chasm.runtime.instance.ElementInstance,
 ) = dispatchInstruction { vstack, context ->
-    ArrayInitElementExecutor(vstack, context, instruction)
+    executeArrayInitElement(
+        heap = context.heap,
+        elementsToCopy = elementsToCopy,
+        sourceOffset = sourceOffset,
+        destinationOffset = vstack.getFrameSlot(destinationOffsetSlot).toInt(),
+        address = vstack.getFrameSlot(addressSlot),
+        elementInstance = elementInstance,
+    )
 }
 
-fun ArrayInitElementDispatcher(
-    instruction: AggregateInstruction.ArrayInitElementIsi,
+fun ArrayInitElementIsiDispatcher(
+    elementsToCopy: Int,
+    sourceOffsetSlot: Int,
+    destinationOffset: Int,
+    addressSlot: Int,
+    elementInstance: io.github.charlietap.chasm.runtime.instance.ElementInstance,
 ) = dispatchInstruction { vstack, context ->
-    ArrayInitElementExecutor(vstack, context, instruction)
+    executeArrayInitElement(
+        heap = context.heap,
+        elementsToCopy = elementsToCopy,
+        sourceOffset = vstack.getFrameSlot(sourceOffsetSlot).toInt(),
+        destinationOffset = destinationOffset,
+        address = vstack.getFrameSlot(addressSlot),
+        elementInstance = elementInstance,
+    )
 }
 
-fun ArrayInitElementDispatcher(
-    instruction: AggregateInstruction.ArrayInitElementIss,
+fun ArrayInitElementIssDispatcher(
+    elementsToCopy: Int,
+    sourceOffsetSlot: Int,
+    destinationOffsetSlot: Int,
+    addressSlot: Int,
+    elementInstance: io.github.charlietap.chasm.runtime.instance.ElementInstance,
 ) = dispatchInstruction { vstack, context ->
-    ArrayInitElementExecutor(vstack, context, instruction)
+    executeArrayInitElement(
+        heap = context.heap,
+        elementsToCopy = elementsToCopy,
+        sourceOffset = vstack.getFrameSlot(sourceOffsetSlot).toInt(),
+        destinationOffset = vstack.getFrameSlot(destinationOffsetSlot).toInt(),
+        address = vstack.getFrameSlot(addressSlot),
+        elementInstance = elementInstance,
+    )
 }
 
-fun ArrayInitElementDispatcher(
-    instruction: AggregateInstruction.ArrayInitElementSii,
+fun ArrayInitElementSiiDispatcher(
+    elementsToCopySlot: Int,
+    sourceOffset: Int,
+    destinationOffset: Int,
+    addressSlot: Int,
+    elementInstance: io.github.charlietap.chasm.runtime.instance.ElementInstance,
 ) = dispatchInstruction { vstack, context ->
-    ArrayInitElementExecutor(vstack, context, instruction)
+    executeArrayInitElement(
+        heap = context.heap,
+        elementsToCopy = vstack.getFrameSlot(elementsToCopySlot).toInt(),
+        sourceOffset = sourceOffset,
+        destinationOffset = destinationOffset,
+        address = vstack.getFrameSlot(addressSlot),
+        elementInstance = elementInstance,
+    )
 }
 
-fun ArrayInitElementDispatcher(
-    instruction: AggregateInstruction.ArrayInitElementSis,
+fun ArrayInitElementSisDispatcher(
+    elementsToCopySlot: Int,
+    sourceOffset: Int,
+    destinationOffsetSlot: Int,
+    addressSlot: Int,
+    elementInstance: io.github.charlietap.chasm.runtime.instance.ElementInstance,
 ) = dispatchInstruction { vstack, context ->
-    ArrayInitElementExecutor(vstack, context, instruction)
+    executeArrayInitElement(
+        heap = context.heap,
+        elementsToCopy = vstack.getFrameSlot(elementsToCopySlot).toInt(),
+        sourceOffset = sourceOffset,
+        destinationOffset = vstack.getFrameSlot(destinationOffsetSlot).toInt(),
+        address = vstack.getFrameSlot(addressSlot),
+        elementInstance = elementInstance,
+    )
 }
 
-fun ArrayInitElementDispatcher(
-    instruction: AggregateInstruction.ArrayInitElementSsi,
+fun ArrayInitElementSsiDispatcher(
+    elementsToCopySlot: Int,
+    sourceOffsetSlot: Int,
+    destinationOffset: Int,
+    addressSlot: Int,
+    elementInstance: io.github.charlietap.chasm.runtime.instance.ElementInstance,
 ) = dispatchInstruction { vstack, context ->
-    ArrayInitElementExecutor(vstack, context, instruction)
+    executeArrayInitElement(
+        heap = context.heap,
+        elementsToCopy = vstack.getFrameSlot(elementsToCopySlot).toInt(),
+        sourceOffset = vstack.getFrameSlot(sourceOffsetSlot).toInt(),
+        destinationOffset = destinationOffset,
+        address = vstack.getFrameSlot(addressSlot),
+        elementInstance = elementInstance,
+    )
 }
 
-fun ArrayInitElementDispatcher(
-    instruction: AggregateInstruction.ArrayInitElementSss,
+fun ArrayInitElementSssDispatcher(
+    elementsToCopySlot: Int,
+    sourceOffsetSlot: Int,
+    destinationOffsetSlot: Int,
+    addressSlot: Int,
+    elementInstance: io.github.charlietap.chasm.runtime.instance.ElementInstance,
 ) = dispatchInstruction { vstack, context ->
-    ArrayInitElementExecutor(vstack, context, instruction)
+    executeArrayInitElement(
+        heap = context.heap,
+        elementsToCopy = vstack.getFrameSlot(elementsToCopySlot).toInt(),
+        sourceOffset = vstack.getFrameSlot(sourceOffsetSlot).toInt(),
+        destinationOffset = vstack.getFrameSlot(destinationOffsetSlot).toInt(),
+        address = vstack.getFrameSlot(addressSlot),
+        elementInstance = elementInstance,
+    )
 }
 
-fun RefI31Dispatcher(
-    instruction: AggregateInstruction.RefI31I,
+fun RefI31IDispatcher(
+    value: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    RefI31Executor(vstack, context, instruction)
+    executeRefI31(
+        vstack = vstack,
+        value = value,
+        destinationSlot = destinationSlot,
+    )
 }
 
-fun RefI31Dispatcher(
-    instruction: AggregateInstruction.RefI31S,
+fun RefI31SDispatcher(
+    valueSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    RefI31Executor(vstack, context, instruction)
+    executeRefI31(
+        vstack = vstack,
+        value = vstack.getFrameSlot(valueSlot).toInt(),
+        destinationSlot = destinationSlot,
+    )
 }
 
-fun I31GetSignedDispatcher(
-    instruction: AggregateInstruction.I31GetSignedS,
+fun I31GetSignedSDispatcher(
+    valueSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I31GetSignedExecutor(vstack, context, instruction)
+    executeI31Get(
+        vstack = vstack,
+        value = vstack.getFrameSlot(valueSlot).toI31(),
+        destinationSlot = destinationSlot,
+        extender = UInt::extendSigned,
+    )
 }
 
-fun I31GetUnsignedDispatcher(
-    instruction: AggregateInstruction.I31GetUnsignedS,
+fun I31GetUnsignedSDispatcher(
+    valueSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I31GetUnsignedExecutor(vstack, context, instruction)
+    executeI31Get(
+        vstack = vstack,
+        value = vstack.getFrameSlot(valueSlot).toI31(),
+        destinationSlot = destinationSlot,
+        extender = UInt::extendUnsigned,
+    )
 }
 
-fun AnyConvertExternDispatcher(
-    instruction: AggregateInstruction.AnyConvertExternS,
+fun AnyConvertExternSDispatcher(
+    valueSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    AnyConvertExternExecutor(vstack, context, instruction)
+    executeAnyConvertExtern(
+        vstack = vstack,
+        referenceValue = vstack.getFrameSlot(valueSlot),
+        destinationSlot = destinationSlot,
+    )
 }
 
-fun ExternConvertAnyDispatcher(
-    instruction: AggregateInstruction.ExternConvertAnyS,
+fun ExternConvertAnySDispatcher(
+    valueSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    ExternConvertAnyExecutor(vstack, context, instruction)
+    executeExternConvertAny(
+        vstack = vstack,
+        referenceValue = vstack.getFrameSlot(valueSlot),
+        destinationSlot = destinationSlot,
+    )
 }

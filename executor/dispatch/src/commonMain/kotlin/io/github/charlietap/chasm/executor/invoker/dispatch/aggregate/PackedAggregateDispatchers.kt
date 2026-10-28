@@ -1,14 +1,15 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.aggregate
 
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
-import io.github.charlietap.chasm.runtime.instruction.AggregateInstruction
 import io.github.charlietap.chasm.type.PackedType
 
-internal fun PackedArrayGetSignedDispatcher(instruction: AggregateInstruction.ArrayGetSignedI): DispatchableInstruction {
-    val shift = instruction.packedType.signedShift()
-    val addressSlot = instruction.addressSlot
-    val destinationSlot = instruction.destinationSlot
-    val field = instruction.field
+fun ArrayGetSignedIDispatcher(
+    addressSlot: Int,
+    field: Int,
+    destinationSlot: Int,
+    packedType: PackedType,
+): DispatchableInstruction {
+    val shift = packedType.signedShift()
     return DispatchableInstruction { vstack, context, nextIp ->
         val packed = context.heap.getArrayElementTrusted(vstack.getFrameSlot(addressSlot), field)
         vstack.setFrameSlot(destinationSlot, (packed shl shift) shr shift)
@@ -16,11 +17,13 @@ internal fun PackedArrayGetSignedDispatcher(instruction: AggregateInstruction.Ar
     }
 }
 
-internal fun PackedArrayGetSignedDispatcher(instruction: AggregateInstruction.ArrayGetSignedS): DispatchableInstruction {
-    val shift = instruction.packedType.signedShift()
-    val addressSlot = instruction.addressSlot
-    val destinationSlot = instruction.destinationSlot
-    val fieldSlot = instruction.fieldSlot
+fun ArrayGetSignedSDispatcher(
+    addressSlot: Int,
+    fieldSlot: Int,
+    destinationSlot: Int,
+    packedType: PackedType,
+): DispatchableInstruction {
+    val shift = packedType.signedShift()
     return DispatchableInstruction { vstack, context, nextIp ->
         val address = vstack.getFrameSlot(addressSlot)
         val packed = context.heap.getArrayElementTrusted(address, vstack.getFrameSlot(fieldSlot).toInt())
@@ -29,11 +32,13 @@ internal fun PackedArrayGetSignedDispatcher(instruction: AggregateInstruction.Ar
     }
 }
 
-internal fun PackedArrayGetUnsignedDispatcher(instruction: AggregateInstruction.ArrayGetUnsignedI): DispatchableInstruction {
-    val mask = instruction.packedType.unsignedMask()
-    val addressSlot = instruction.addressSlot
-    val destinationSlot = instruction.destinationSlot
-    val field = instruction.field
+fun ArrayGetUnsignedIDispatcher(
+    addressSlot: Int,
+    field: Int,
+    destinationSlot: Int,
+    packedType: PackedType,
+): DispatchableInstruction {
+    val mask = packedType.unsignedMask()
     return DispatchableInstruction { vstack, context, nextIp ->
         val packed = context.heap.getArrayElementTrusted(vstack.getFrameSlot(addressSlot), field)
         vstack.setFrameSlot(destinationSlot, packed and mask)
@@ -41,11 +46,13 @@ internal fun PackedArrayGetUnsignedDispatcher(instruction: AggregateInstruction.
     }
 }
 
-internal fun PackedArrayGetUnsignedDispatcher(instruction: AggregateInstruction.ArrayGetUnsignedS): DispatchableInstruction {
-    val mask = instruction.packedType.unsignedMask()
-    val addressSlot = instruction.addressSlot
-    val destinationSlot = instruction.destinationSlot
-    val fieldSlot = instruction.fieldSlot
+fun ArrayGetUnsignedSDispatcher(
+    addressSlot: Int,
+    fieldSlot: Int,
+    destinationSlot: Int,
+    packedType: PackedType,
+): DispatchableInstruction {
+    val mask = packedType.unsignedMask()
     return DispatchableInstruction { vstack, context, nextIp ->
         val address = vstack.getFrameSlot(addressSlot)
         val packed = context.heap.getArrayElementTrusted(address, vstack.getFrameSlot(fieldSlot).toInt())
@@ -54,11 +61,13 @@ internal fun PackedArrayGetUnsignedDispatcher(instruction: AggregateInstruction.
     }
 }
 
-internal fun PackedStructGetSignedDispatcher(instruction: AggregateInstruction.StructGetSignedS): DispatchableInstruction {
-    val shift = instruction.packedType.signedShift()
-    val addressSlot = instruction.addressSlot
-    val destinationSlot = instruction.destinationSlot
-    val fieldIndex = instruction.fieldIndex
+fun StructGetSignedSDispatcher(
+    addressSlot: Int,
+    destinationSlot: Int,
+    fieldIndex: Int,
+    packedType: PackedType,
+): DispatchableInstruction {
+    val shift = packedType.signedShift()
     return DispatchableInstruction { vstack, context, nextIp ->
         val reference = vstack.getFrameSlot(addressSlot)
         val packed = context.heap.getStructFieldTrusted(reference, fieldIndex)
@@ -67,11 +76,13 @@ internal fun PackedStructGetSignedDispatcher(instruction: AggregateInstruction.S
     }
 }
 
-internal fun PackedStructGetUnsignedDispatcher(instruction: AggregateInstruction.StructGetUnsignedS): DispatchableInstruction {
-    val mask = instruction.packedType.unsignedMask()
-    val addressSlot = instruction.addressSlot
-    val destinationSlot = instruction.destinationSlot
-    val fieldIndex = instruction.fieldIndex
+fun StructGetUnsignedSDispatcher(
+    addressSlot: Int,
+    destinationSlot: Int,
+    fieldIndex: Int,
+    packedType: PackedType,
+): DispatchableInstruction {
+    val mask = packedType.unsignedMask()
     return DispatchableInstruction { vstack, context, nextIp ->
         val reference = vstack.getFrameSlot(addressSlot)
         val packed = context.heap.getStructFieldTrusted(reference, fieldIndex)
@@ -80,12 +91,12 @@ internal fun PackedStructGetUnsignedDispatcher(instruction: AggregateInstruction
     }
 }
 
-private fun PackedType.signedShift(): Int = when (this) {
+internal fun PackedType.signedShift(): Int = when (this) {
     PackedType.I8 -> Long.SIZE_BITS - Byte.SIZE_BITS
     PackedType.I16 -> Long.SIZE_BITS - Short.SIZE_BITS
 }
 
-private fun PackedType.unsignedMask(): Long = when (this) {
+internal fun PackedType.unsignedMask(): Long = when (this) {
     PackedType.I8 -> UByte.MAX_VALUE.toLong()
     PackedType.I16 -> UShort.MAX_VALUE.toLong()
 }
