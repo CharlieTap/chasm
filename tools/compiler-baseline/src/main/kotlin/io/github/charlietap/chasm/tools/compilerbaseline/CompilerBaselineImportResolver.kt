@@ -2,11 +2,11 @@ package io.github.charlietap.chasm.tools.compilerbaseline
 
 import io.github.charlietap.chasm.ast.module.Import.Descriptor
 import io.github.charlietap.chasm.ast.module.Module
-import io.github.charlietap.chasm.executor.instantiator.allocation.function.HostFunctionAllocator
 import io.github.charlietap.chasm.host.HostFunction
 import io.github.charlietap.chasm.host.writeI64
 import io.github.charlietap.chasm.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.runtime.instance.Import
+import io.github.charlietap.chasm.runtime.resource.allocation.HostFunctionAllocator
 import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.runtime.type.ModuleTypeResolver
 import io.github.charlietap.chasm.type.FunctionType

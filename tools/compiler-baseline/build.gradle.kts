@@ -20,6 +20,7 @@ kotlin {
         implementation(projects.executor.invoker)
         implementation(projects.runtime.address)
         implementation(projects.runtime.core)
+        implementation(projects.runtime.resources)
         implementation(projects.runtime.type)
         implementation(projects.runtime.value)
         implementation(libs.kotlin.reflection)

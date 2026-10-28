@@ -130,6 +130,7 @@ kotlin {
                 implementation(projects.module)
                 implementation(projects.runtime.core)
                 implementation(projects.runtime.address)
+                implementation(projects.runtime.resources)
                 implementation(projects.typeSystem)
                 implementation(projects.validator)
 

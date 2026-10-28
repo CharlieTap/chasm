@@ -1,6 +1,5 @@
-package io.github.charlietap.chasm.executor.instantiator.runtime.allocation.table
+package io.github.charlietap.chasm.runtime.resource.allocation
 
-import io.github.charlietap.chasm.executor.instantiator.allocation.table.TableAllocator
 import io.github.charlietap.chasm.fixture.runtime.instance.tableInstance
 import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.fixture.runtime.value.nullReferenceValue

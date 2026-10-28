@@ -21,6 +21,7 @@ kotlin {
 
                 implementation(projects.compiler)
                 implementation(projects.memory)
+                implementation(projects.runtime.resources)
             }
         }
 

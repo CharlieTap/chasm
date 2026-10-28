@@ -1,7 +1,6 @@
-package io.github.charlietap.chasm.executor.instantiator.runtime.allocation.memory
+package io.github.charlietap.chasm.runtime.resource.allocation
 
 import io.github.charlietap.chasm.config.LinearMemoryConfig
-import io.github.charlietap.chasm.executor.instantiator.allocation.memory.MemoryAllocator
 import io.github.charlietap.chasm.fixture.runtime.instance.memoryInstance
 import io.github.charlietap.chasm.fixture.runtime.memory.linearMemory
 import io.github.charlietap.chasm.fixture.runtime.store

@@ -1,4 +1,4 @@
-package io.github.charlietap.chasm.executor.instantiator.allocation.tag
+package io.github.charlietap.chasm.runtime.resource.allocation
 
 import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.runtime.store.Store

@@ -70,6 +70,7 @@ include(":compiler")
 include(":runtime:address")
 include(":runtime:core")
 include(":runtime:encoding")
+include(":runtime:resources")
 include(":runtime:type")
 include(":runtime:value")
 

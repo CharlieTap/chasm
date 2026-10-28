@@ -1,6 +1,5 @@
-package io.github.charlietap.chasm.executor.instantiator.runtime.allocation.global
+package io.github.charlietap.chasm.runtime.resource.allocation
 
-import io.github.charlietap.chasm.executor.instantiator.allocation.global.GlobalAllocator
 import io.github.charlietap.chasm.fixture.runtime.instance.globalInstance
 import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.fixture.runtime.value.executionValue

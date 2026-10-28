@@ -14,10 +14,6 @@ import io.github.charlietap.chasm.executor.instantiator.ConstantExpressionEvalua
 import io.github.charlietap.chasm.executor.instantiator.allocation.data.DataAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.element.ElementAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.export.ExportAllocator
-import io.github.charlietap.chasm.executor.instantiator.allocation.global.GlobalAllocator
-import io.github.charlietap.chasm.executor.instantiator.allocation.memory.MemoryAllocator
-import io.github.charlietap.chasm.executor.instantiator.allocation.table.TableAllocator
-import io.github.charlietap.chasm.executor.instantiator.allocation.tag.TagAllocator
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
 import io.github.charlietap.chasm.runtime.error.InstantiationError
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
@@ -30,6 +26,10 @@ import io.github.charlietap.chasm.runtime.ext.addTableAddress
 import io.github.charlietap.chasm.runtime.ext.addTagAddress
 import io.github.charlietap.chasm.runtime.instance.ExportInstance
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
+import io.github.charlietap.chasm.runtime.resource.allocation.GlobalAllocator
+import io.github.charlietap.chasm.runtime.resource.allocation.MemoryAllocator
+import io.github.charlietap.chasm.runtime.resource.allocation.TableAllocator
+import io.github.charlietap.chasm.runtime.resource.allocation.TagAllocator
 import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.runtime.type.ModuleTypeResolver
 import io.github.charlietap.chasm.runtime.type.RuntimeTypeMap

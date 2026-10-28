@@ -1,6 +1,5 @@
-package io.github.charlietap.chasm.executor.instantiator.runtime.allocation.function
+package io.github.charlietap.chasm.runtime.resource.allocation
 
-import io.github.charlietap.chasm.executor.instantiator.allocation.function.HostFunctionAllocator
 import io.github.charlietap.chasm.fixture.runtime.instance.functionAddress
 import io.github.charlietap.chasm.fixture.runtime.instance.functionExternalValue
 import io.github.charlietap.chasm.fixture.runtime.store

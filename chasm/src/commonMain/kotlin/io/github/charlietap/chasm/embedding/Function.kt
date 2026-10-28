@@ -2,8 +2,8 @@ package io.github.charlietap.chasm.embedding
 
 import io.github.charlietap.chasm.embedding.shapes.Function
 import io.github.charlietap.chasm.embedding.shapes.Store
-import io.github.charlietap.chasm.executor.instantiator.allocation.function.HostFunctionAllocator
 import io.github.charlietap.chasm.host.HostFunction
+import io.github.charlietap.chasm.runtime.resource.allocation.HostFunctionAllocator
 import io.github.charlietap.chasm.type.FunctionType
 
 fun function(

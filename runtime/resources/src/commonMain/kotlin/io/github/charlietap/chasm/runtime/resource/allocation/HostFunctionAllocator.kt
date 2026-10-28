@@ -1,4 +1,4 @@
-package io.github.charlietap.chasm.executor.instantiator.allocation.function
+package io.github.charlietap.chasm.runtime.resource.allocation
 
 import io.github.charlietap.chasm.host.HostFunction
 import io.github.charlietap.chasm.runtime.address.Address
