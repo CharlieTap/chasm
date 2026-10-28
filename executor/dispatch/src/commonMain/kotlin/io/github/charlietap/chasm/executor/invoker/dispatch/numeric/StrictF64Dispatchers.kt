@@ -1,485 +1,620 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.numeric
 
 import io.github.charlietap.chasm.executor.invoker.dispatch.dispatchInstruction
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.F64AddExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.F64CopysignExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.F64DivExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.F64MaxExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.F64MinExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.F64MulExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.F64SubExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.cvtop.F64ConvertI32SExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.cvtop.F64ConvertI32UExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.cvtop.F64ConvertI64SExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.cvtop.F64ConvertI64UExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.cvtop.F64PromoteF32Executor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.relop.F64EqExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.relop.F64GeExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.relop.F64GtExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.relop.F64LeExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.relop.F64LtExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.relop.F64NeExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.unop.F64AbsExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.unop.F64CeilExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.unop.F64FloorExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.unop.F64NearestExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.unop.F64NegExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.unop.F64SqrtExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.unop.F64TruncExecutor
-import io.github.charlietap.chasm.runtime.instruction.NumericInstruction
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.executeF64BinaryIi
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.executeF64BinaryIs
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.executeF64BinarySi
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.executeF64BinarySs
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.executeF64RelopIi
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.executeF64RelopIs
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.executeF64RelopSi
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.executeF64RelopSs
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.cvtop.executeF32ToF64I
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.cvtop.executeF32ToF64S
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.cvtop.executeI32ToF64I
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.cvtop.executeI32ToF64S
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.cvtop.executeI64ToF64I
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.cvtop.executeI64ToF64S
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.unop.executeF64UnaryI
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.unop.executeF64UnaryS
+import io.github.charlietap.chasm.runtime.operations.ext.ceil
+import io.github.charlietap.chasm.runtime.operations.ext.convertF64s
+import io.github.charlietap.chasm.runtime.operations.ext.convertF64u
+import io.github.charlietap.chasm.runtime.operations.ext.copySign
+import io.github.charlietap.chasm.runtime.operations.ext.eq
+import io.github.charlietap.chasm.runtime.operations.ext.floor
+import io.github.charlietap.chasm.runtime.operations.ext.ge
+import io.github.charlietap.chasm.runtime.operations.ext.gt
+import io.github.charlietap.chasm.runtime.operations.ext.le
+import io.github.charlietap.chasm.runtime.operations.ext.lt
+import io.github.charlietap.chasm.runtime.operations.ext.max
+import io.github.charlietap.chasm.runtime.operations.ext.min
+import io.github.charlietap.chasm.runtime.operations.ext.ne
+import io.github.charlietap.chasm.runtime.operations.ext.nearest
+import io.github.charlietap.chasm.runtime.operations.ext.sqrt
+import io.github.charlietap.chasm.runtime.operations.ext.trunc
+import kotlin.math.absoluteValue
 
-fun F64AddDispatcher(
-    instruction: NumericInstruction.F64AddIi,
+fun F64AddIiDispatcher(
+    left: Double,
+    right: Double,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64AddExecutor(vstack, context, instruction)
+    executeF64BinaryIi(vstack, destinationSlot, left, right) { left, right -> left + right }
 }
 
-fun F64AddDispatcher(
-    instruction: NumericInstruction.F64AddIs,
+fun F64AddIsDispatcher(
+    left: Double,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64AddExecutor(vstack, context, instruction)
+    executeF64BinaryIs(vstack, destinationSlot, left, rightSlot) { left, right -> left + right }
 }
 
-fun F64AddDispatcher(
-    instruction: NumericInstruction.F64AddSi,
+fun F64AddSiDispatcher(
+    leftSlot: Int,
+    right: Double,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64AddExecutor(vstack, context, instruction)
+    executeF64BinarySi(vstack, destinationSlot, leftSlot, right) { left, right -> left + right }
 }
 
-fun F64AddDispatcher(
-    instruction: NumericInstruction.F64AddSs,
+fun F64AddSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64AddExecutor(vstack, context, instruction)
+    executeF64BinarySs(vstack, destinationSlot, leftSlot, rightSlot) { left, right -> left + right }
 }
 
-fun F64SubDispatcher(
-    instruction: NumericInstruction.F64SubIi,
+fun F64SubIiDispatcher(
+    left: Double,
+    right: Double,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64SubExecutor(vstack, context, instruction)
+    executeF64BinaryIi(vstack, destinationSlot, left, right) { left, right -> left - right }
 }
 
-fun F64SubDispatcher(
-    instruction: NumericInstruction.F64SubIs,
+fun F64SubIsDispatcher(
+    left: Double,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64SubExecutor(vstack, context, instruction)
+    executeF64BinaryIs(vstack, destinationSlot, left, rightSlot) { left, right -> left - right }
 }
 
-fun F64SubDispatcher(
-    instruction: NumericInstruction.F64SubSi,
+fun F64SubSiDispatcher(
+    leftSlot: Int,
+    right: Double,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64SubExecutor(vstack, context, instruction)
+    executeF64BinarySi(vstack, destinationSlot, leftSlot, right) { left, right -> left - right }
 }
 
-fun F64SubDispatcher(
-    instruction: NumericInstruction.F64SubSs,
+fun F64SubSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64SubExecutor(vstack, context, instruction)
+    executeF64BinarySs(vstack, destinationSlot, leftSlot, rightSlot) { left, right -> left - right }
 }
 
-fun F64MulDispatcher(
-    instruction: NumericInstruction.F64MulIi,
+fun F64MulIiDispatcher(
+    left: Double,
+    right: Double,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64MulExecutor(vstack, context, instruction)
+    executeF64BinaryIi(vstack, destinationSlot, left, right) { left, right -> left * right }
 }
 
-fun F64MulDispatcher(
-    instruction: NumericInstruction.F64MulIs,
+fun F64MulIsDispatcher(
+    left: Double,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64MulExecutor(vstack, context, instruction)
+    executeF64BinaryIs(vstack, destinationSlot, left, rightSlot) { left, right -> left * right }
 }
 
-fun F64MulDispatcher(
-    instruction: NumericInstruction.F64MulSi,
+fun F64MulSiDispatcher(
+    leftSlot: Int,
+    right: Double,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64MulExecutor(vstack, context, instruction)
+    executeF64BinarySi(vstack, destinationSlot, leftSlot, right) { left, right -> left * right }
 }
 
-fun F64MulDispatcher(
-    instruction: NumericInstruction.F64MulSs,
+fun F64MulSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64MulExecutor(vstack, context, instruction)
+    executeF64BinarySs(vstack, destinationSlot, leftSlot, rightSlot) { left, right -> left * right }
 }
 
-fun F64DivDispatcher(
-    instruction: NumericInstruction.F64DivIi,
+fun F64DivIiDispatcher(
+    left: Double,
+    right: Double,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64DivExecutor(vstack, context, instruction)
+    executeF64BinaryIi(vstack, destinationSlot, left, right) { left, right -> left / right }
 }
 
-fun F64DivDispatcher(
-    instruction: NumericInstruction.F64DivIs,
+fun F64DivIsDispatcher(
+    left: Double,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64DivExecutor(vstack, context, instruction)
+    executeF64BinaryIs(vstack, destinationSlot, left, rightSlot) { left, right -> left / right }
 }
 
-fun F64DivDispatcher(
-    instruction: NumericInstruction.F64DivSi,
+fun F64DivSiDispatcher(
+    leftSlot: Int,
+    right: Double,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64DivExecutor(vstack, context, instruction)
+    executeF64BinarySi(vstack, destinationSlot, leftSlot, right) { left, right -> left / right }
 }
 
-fun F64DivDispatcher(
-    instruction: NumericInstruction.F64DivSs,
+fun F64DivSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64DivExecutor(vstack, context, instruction)
+    executeF64BinarySs(vstack, destinationSlot, leftSlot, rightSlot) { left, right -> left / right }
 }
 
-fun F64MinDispatcher(
-    instruction: NumericInstruction.F64MinIi,
+fun F64MinIiDispatcher(
+    left: Double,
+    right: Double,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64MinExecutor(vstack, context, instruction)
+    executeF64BinaryIi(vstack, destinationSlot, left, right, Double::min)
 }
 
-fun F64MinDispatcher(
-    instruction: NumericInstruction.F64MinIs,
+fun F64MinIsDispatcher(
+    left: Double,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64MinExecutor(vstack, context, instruction)
+    executeF64BinaryIs(vstack, destinationSlot, left, rightSlot, Double::min)
 }
 
-fun F64MinDispatcher(
-    instruction: NumericInstruction.F64MinSi,
+fun F64MinSiDispatcher(
+    leftSlot: Int,
+    right: Double,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64MinExecutor(vstack, context, instruction)
+    executeF64BinarySi(vstack, destinationSlot, leftSlot, right, Double::min)
 }
 
-fun F64MinDispatcher(
-    instruction: NumericInstruction.F64MinSs,
+fun F64MinSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64MinExecutor(vstack, context, instruction)
+    executeF64BinarySs(vstack, destinationSlot, leftSlot, rightSlot, Double::min)
 }
 
-fun F64MaxDispatcher(
-    instruction: NumericInstruction.F64MaxIi,
+fun F64MaxIiDispatcher(
+    left: Double,
+    right: Double,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64MaxExecutor(vstack, context, instruction)
+    executeF64BinaryIi(vstack, destinationSlot, left, right, Double::max)
 }
 
-fun F64MaxDispatcher(
-    instruction: NumericInstruction.F64MaxIs,
+fun F64MaxIsDispatcher(
+    left: Double,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64MaxExecutor(vstack, context, instruction)
+    executeF64BinaryIs(vstack, destinationSlot, left, rightSlot, Double::max)
 }
 
-fun F64MaxDispatcher(
-    instruction: NumericInstruction.F64MaxSi,
+fun F64MaxSiDispatcher(
+    leftSlot: Int,
+    right: Double,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64MaxExecutor(vstack, context, instruction)
+    executeF64BinarySi(vstack, destinationSlot, leftSlot, right, Double::max)
 }
 
-fun F64MaxDispatcher(
-    instruction: NumericInstruction.F64MaxSs,
+fun F64MaxSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64MaxExecutor(vstack, context, instruction)
+    executeF64BinarySs(vstack, destinationSlot, leftSlot, rightSlot, Double::max)
 }
 
-fun F64CopysignDispatcher(
-    instruction: NumericInstruction.F64CopysignIi,
+fun F64CopysignIiDispatcher(
+    left: Double,
+    right: Double,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64CopysignExecutor(vstack, context, instruction)
+    executeF64BinaryIi(vstack, destinationSlot, left, right, Double::copySign)
 }
 
-fun F64CopysignDispatcher(
-    instruction: NumericInstruction.F64CopysignIs,
+fun F64CopysignIsDispatcher(
+    left: Double,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64CopysignExecutor(vstack, context, instruction)
+    executeF64BinaryIs(vstack, destinationSlot, left, rightSlot, Double::copySign)
 }
 
-fun F64CopysignDispatcher(
-    instruction: NumericInstruction.F64CopysignSi,
+fun F64CopysignSiDispatcher(
+    leftSlot: Int,
+    right: Double,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64CopysignExecutor(vstack, context, instruction)
+    executeF64BinarySi(vstack, destinationSlot, leftSlot, right, Double::copySign)
 }
 
-fun F64CopysignDispatcher(
-    instruction: NumericInstruction.F64CopysignSs,
+fun F64CopysignSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64CopysignExecutor(vstack, context, instruction)
+    executeF64BinarySs(vstack, destinationSlot, leftSlot, rightSlot, Double::copySign)
 }
 
-fun F64AbsDispatcher(
-    instruction: NumericInstruction.F64AbsI,
+fun F64AbsIDispatcher(
+    operand: Double,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64AbsExecutor(vstack, context, instruction)
+    executeF64UnaryI(vstack, destinationSlot, operand) { operand -> operand.absoluteValue }
 }
 
-fun F64AbsDispatcher(
-    instruction: NumericInstruction.F64AbsS,
+fun F64AbsSDispatcher(
+    operandSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64AbsExecutor(vstack, context, instruction)
+    executeF64UnaryS(vstack, destinationSlot, operandSlot) { operand -> operand.absoluteValue }
 }
 
-fun F64NegDispatcher(
-    instruction: NumericInstruction.F64NegI,
+fun F64NegIDispatcher(
+    operand: Double,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64NegExecutor(vstack, context, instruction)
+    executeF64UnaryI(vstack, destinationSlot, operand) { operand -> -operand }
 }
 
-fun F64NegDispatcher(
-    instruction: NumericInstruction.F64NegS,
+fun F64NegSDispatcher(
+    operandSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64NegExecutor(vstack, context, instruction)
+    executeF64UnaryS(vstack, destinationSlot, operandSlot) { operand -> -operand }
 }
 
-fun F64CeilDispatcher(
-    instruction: NumericInstruction.F64CeilI,
+fun F64CeilIDispatcher(
+    operand: Double,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64CeilExecutor(vstack, context, instruction)
+    executeF64UnaryI(vstack, destinationSlot, operand, Double::ceil)
 }
 
-fun F64CeilDispatcher(
-    instruction: NumericInstruction.F64CeilS,
+fun F64CeilSDispatcher(
+    operandSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64CeilExecutor(vstack, context, instruction)
+    executeF64UnaryS(vstack, destinationSlot, operandSlot, Double::ceil)
 }
 
-fun F64FloorDispatcher(
-    instruction: NumericInstruction.F64FloorI,
+fun F64FloorIDispatcher(
+    operand: Double,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64FloorExecutor(vstack, context, instruction)
+    executeF64UnaryI(vstack, destinationSlot, operand, Double::floor)
 }
 
-fun F64FloorDispatcher(
-    instruction: NumericInstruction.F64FloorS,
+fun F64FloorSDispatcher(
+    operandSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64FloorExecutor(vstack, context, instruction)
+    executeF64UnaryS(vstack, destinationSlot, operandSlot, Double::floor)
 }
 
-fun F64TruncDispatcher(
-    instruction: NumericInstruction.F64TruncI,
+fun F64TruncIDispatcher(
+    operand: Double,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64TruncExecutor(vstack, context, instruction)
+    executeF64UnaryI(vstack, destinationSlot, operand, Double::trunc)
 }
 
-fun F64TruncDispatcher(
-    instruction: NumericInstruction.F64TruncS,
+fun F64TruncSDispatcher(
+    operandSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64TruncExecutor(vstack, context, instruction)
+    executeF64UnaryS(vstack, destinationSlot, operandSlot, Double::trunc)
 }
 
-fun F64NearestDispatcher(
-    instruction: NumericInstruction.F64NearestI,
+fun F64NearestIDispatcher(
+    operand: Double,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64NearestExecutor(vstack, context, instruction)
+    executeF64UnaryI(vstack, destinationSlot, operand, Double::nearest)
 }
 
-fun F64NearestDispatcher(
-    instruction: NumericInstruction.F64NearestS,
+fun F64NearestSDispatcher(
+    operandSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64NearestExecutor(vstack, context, instruction)
+    executeF64UnaryS(vstack, destinationSlot, operandSlot, Double::nearest)
 }
 
-fun F64SqrtDispatcher(
-    instruction: NumericInstruction.F64SqrtI,
+fun F64SqrtIDispatcher(
+    operand: Double,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64SqrtExecutor(vstack, context, instruction)
+    executeF64UnaryI(vstack, destinationSlot, operand, Double::sqrt)
 }
 
-fun F64SqrtDispatcher(
-    instruction: NumericInstruction.F64SqrtS,
+fun F64SqrtSDispatcher(
+    operandSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64SqrtExecutor(vstack, context, instruction)
+    executeF64UnaryS(vstack, destinationSlot, operandSlot, Double::sqrt)
 }
 
-fun F64EqDispatcher(
-    instruction: NumericInstruction.F64EqIi,
+fun F64EqIiDispatcher(
+    left: Double,
+    right: Double,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64EqExecutor(vstack, context, instruction)
+    executeF64RelopIi(vstack, destinationSlot, left, right, Double::eq)
 }
 
-fun F64EqDispatcher(
-    instruction: NumericInstruction.F64EqIs,
+fun F64EqIsDispatcher(
+    left: Double,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64EqExecutor(vstack, context, instruction)
+    executeF64RelopIs(vstack, destinationSlot, left, rightSlot, Double::eq)
 }
 
-fun F64EqDispatcher(
-    instruction: NumericInstruction.F64EqSi,
+fun F64EqSiDispatcher(
+    leftSlot: Int,
+    right: Double,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64EqExecutor(vstack, context, instruction)
+    executeF64RelopSi(vstack, destinationSlot, leftSlot, right, Double::eq)
 }
 
-fun F64EqDispatcher(
-    instruction: NumericInstruction.F64EqSs,
+fun F64EqSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64EqExecutor(vstack, context, instruction)
+    executeF64RelopSs(vstack, destinationSlot, leftSlot, rightSlot, Double::eq)
 }
 
-fun F64NeDispatcher(
-    instruction: NumericInstruction.F64NeIi,
+fun F64NeIiDispatcher(
+    left: Double,
+    right: Double,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64NeExecutor(vstack, context, instruction)
+    executeF64RelopIi(vstack, destinationSlot, left, right, Double::ne)
 }
 
-fun F64NeDispatcher(
-    instruction: NumericInstruction.F64NeIs,
+fun F64NeIsDispatcher(
+    left: Double,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64NeExecutor(vstack, context, instruction)
+    executeF64RelopIs(vstack, destinationSlot, left, rightSlot, Double::ne)
 }
 
-fun F64NeDispatcher(
-    instruction: NumericInstruction.F64NeSi,
+fun F64NeSiDispatcher(
+    leftSlot: Int,
+    right: Double,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64NeExecutor(vstack, context, instruction)
+    executeF64RelopSi(vstack, destinationSlot, leftSlot, right, Double::ne)
 }
 
-fun F64NeDispatcher(
-    instruction: NumericInstruction.F64NeSs,
+fun F64NeSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64NeExecutor(vstack, context, instruction)
+    executeF64RelopSs(vstack, destinationSlot, leftSlot, rightSlot, Double::ne)
 }
 
-fun F64LtDispatcher(
-    instruction: NumericInstruction.F64LtIi,
+fun F64LtIiDispatcher(
+    left: Double,
+    right: Double,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64LtExecutor(vstack, context, instruction)
+    executeF64RelopIi(vstack, destinationSlot, left, right, Double::lt)
 }
 
-fun F64LtDispatcher(
-    instruction: NumericInstruction.F64LtIs,
+fun F64LtIsDispatcher(
+    left: Double,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64LtExecutor(vstack, context, instruction)
+    executeF64RelopIs(vstack, destinationSlot, left, rightSlot, Double::lt)
 }
 
-fun F64LtDispatcher(
-    instruction: NumericInstruction.F64LtSi,
+fun F64LtSiDispatcher(
+    leftSlot: Int,
+    right: Double,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64LtExecutor(vstack, context, instruction)
+    executeF64RelopSi(vstack, destinationSlot, leftSlot, right, Double::lt)
 }
 
-fun F64LtDispatcher(
-    instruction: NumericInstruction.F64LtSs,
+fun F64LtSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64LtExecutor(vstack, context, instruction)
+    executeF64RelopSs(vstack, destinationSlot, leftSlot, rightSlot, Double::lt)
 }
 
-fun F64GtDispatcher(
-    instruction: NumericInstruction.F64GtIi,
+fun F64GtIiDispatcher(
+    left: Double,
+    right: Double,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64GtExecutor(vstack, context, instruction)
+    executeF64RelopIi(vstack, destinationSlot, left, right, Double::gt)
 }
 
-fun F64GtDispatcher(
-    instruction: NumericInstruction.F64GtIs,
+fun F64GtIsDispatcher(
+    left: Double,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64GtExecutor(vstack, context, instruction)
+    executeF64RelopIs(vstack, destinationSlot, left, rightSlot, Double::gt)
 }
 
-fun F64GtDispatcher(
-    instruction: NumericInstruction.F64GtSi,
+fun F64GtSiDispatcher(
+    leftSlot: Int,
+    right: Double,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64GtExecutor(vstack, context, instruction)
+    executeF64RelopSi(vstack, destinationSlot, leftSlot, right, Double::gt)
 }
 
-fun F64GtDispatcher(
-    instruction: NumericInstruction.F64GtSs,
+fun F64GtSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64GtExecutor(vstack, context, instruction)
+    executeF64RelopSs(vstack, destinationSlot, leftSlot, rightSlot, Double::gt)
 }
 
-fun F64LeDispatcher(
-    instruction: NumericInstruction.F64LeIi,
+fun F64LeIiDispatcher(
+    left: Double,
+    right: Double,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64LeExecutor(vstack, context, instruction)
+    executeF64RelopIi(vstack, destinationSlot, left, right, Double::le)
 }
 
-fun F64LeDispatcher(
-    instruction: NumericInstruction.F64LeIs,
+fun F64LeIsDispatcher(
+    left: Double,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64LeExecutor(vstack, context, instruction)
+    executeF64RelopIs(vstack, destinationSlot, left, rightSlot, Double::le)
 }
 
-fun F64LeDispatcher(
-    instruction: NumericInstruction.F64LeSi,
+fun F64LeSiDispatcher(
+    leftSlot: Int,
+    right: Double,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64LeExecutor(vstack, context, instruction)
+    executeF64RelopSi(vstack, destinationSlot, leftSlot, right, Double::le)
 }
 
-fun F64LeDispatcher(
-    instruction: NumericInstruction.F64LeSs,
+fun F64LeSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64LeExecutor(vstack, context, instruction)
+    executeF64RelopSs(vstack, destinationSlot, leftSlot, rightSlot, Double::le)
 }
 
-fun F64GeDispatcher(
-    instruction: NumericInstruction.F64GeIi,
+fun F64GeIiDispatcher(
+    left: Double,
+    right: Double,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64GeExecutor(vstack, context, instruction)
+    executeF64RelopIi(vstack, destinationSlot, left, right, Double::ge)
 }
 
-fun F64GeDispatcher(
-    instruction: NumericInstruction.F64GeIs,
+fun F64GeIsDispatcher(
+    left: Double,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64GeExecutor(vstack, context, instruction)
+    executeF64RelopIs(vstack, destinationSlot, left, rightSlot, Double::ge)
 }
 
-fun F64GeDispatcher(
-    instruction: NumericInstruction.F64GeSi,
+fun F64GeSiDispatcher(
+    leftSlot: Int,
+    right: Double,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64GeExecutor(vstack, context, instruction)
+    executeF64RelopSi(vstack, destinationSlot, leftSlot, right, Double::ge)
 }
 
-fun F64GeDispatcher(
-    instruction: NumericInstruction.F64GeSs,
+fun F64GeSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64GeExecutor(vstack, context, instruction)
+    executeF64RelopSs(vstack, destinationSlot, leftSlot, rightSlot, Double::ge)
 }
 
-fun F64ConvertI32SDispatcher(
-    instruction: NumericInstruction.F64ConvertI32SI,
+fun F64ConvertI32SIDispatcher(
+    operand: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64ConvertI32SExecutor(vstack, context, instruction)
+    executeI32ToF64I(vstack, destinationSlot, operand, Int::convertF64s)
 }
 
-fun F64ConvertI32SDispatcher(
-    instruction: NumericInstruction.F64ConvertI32SS,
+fun F64ConvertI32SSDispatcher(
+    operandSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64ConvertI32SExecutor(vstack, context, instruction)
+    executeI32ToF64S(vstack, destinationSlot, operandSlot, Int::convertF64s)
 }
 
-fun F64ConvertI32UDispatcher(
-    instruction: NumericInstruction.F64ConvertI32UI,
+fun F64ConvertI32UIDispatcher(
+    operand: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64ConvertI32UExecutor(vstack, context, instruction)
+    executeI32ToF64I(vstack, destinationSlot, operand, Int::convertF64u)
 }
 
-fun F64ConvertI32UDispatcher(
-    instruction: NumericInstruction.F64ConvertI32US,
+fun F64ConvertI32USDispatcher(
+    operandSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64ConvertI32UExecutor(vstack, context, instruction)
+    executeI32ToF64S(vstack, destinationSlot, operandSlot, Int::convertF64u)
 }
 
-fun F64ConvertI64SDispatcher(
-    instruction: NumericInstruction.F64ConvertI64SI,
+fun F64ConvertI64SIDispatcher(
+    operand: Long,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64ConvertI64SExecutor(vstack, context, instruction)
+    executeI64ToF64I(vstack, destinationSlot, operand, Long::convertF64s)
 }
 
-fun F64ConvertI64SDispatcher(
-    instruction: NumericInstruction.F64ConvertI64SS,
+fun F64ConvertI64SSDispatcher(
+    operandSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64ConvertI64SExecutor(vstack, context, instruction)
+    executeI64ToF64S(vstack, destinationSlot, operandSlot, Long::convertF64s)
 }
 
-fun F64ConvertI64UDispatcher(
-    instruction: NumericInstruction.F64ConvertI64UI,
+fun F64ConvertI64UIDispatcher(
+    operand: Long,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64ConvertI64UExecutor(vstack, context, instruction)
+    executeI64ToF64I(vstack, destinationSlot, operand, Long::convertF64u)
 }
 
-fun F64ConvertI64UDispatcher(
-    instruction: NumericInstruction.F64ConvertI64US,
+fun F64ConvertI64USDispatcher(
+    operandSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64ConvertI64UExecutor(vstack, context, instruction)
+    executeI64ToF64S(vstack, destinationSlot, operandSlot, Long::convertF64u)
 }
 
-fun F64PromoteF32Dispatcher(
-    instruction: NumericInstruction.F64PromoteF32I,
+fun F64PromoteF32IDispatcher(
+    operand: Float,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64PromoteF32Executor(vstack, context, instruction)
+    executeF32ToF64I(vstack, destinationSlot, operand) { operand -> operand.toDouble() }
 }
 
-fun F64PromoteF32Dispatcher(
-    instruction: NumericInstruction.F64PromoteF32S,
+fun F64PromoteF32SDispatcher(
+    operandSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F64PromoteF32Executor(vstack, context, instruction)
+    executeF32ToF64S(vstack, destinationSlot, operandSlot) { operand -> operand.toDouble() }
 }

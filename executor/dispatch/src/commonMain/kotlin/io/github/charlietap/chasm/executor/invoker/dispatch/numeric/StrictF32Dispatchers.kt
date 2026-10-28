@@ -1,485 +1,620 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.numeric
 
 import io.github.charlietap.chasm.executor.invoker.dispatch.dispatchInstruction
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.F32AddExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.F32CopysignExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.F32DivExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.F32MaxExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.F32MinExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.F32MulExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.F32SubExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.cvtop.F32ConvertI32SExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.cvtop.F32ConvertI32UExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.cvtop.F32ConvertI64SExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.cvtop.F32ConvertI64UExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.cvtop.F32DemoteF64Executor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.relop.F32EqExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.relop.F32GeExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.relop.F32GtExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.relop.F32LeExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.relop.F32LtExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.relop.F32NeExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.unop.F32AbsExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.unop.F32CeilExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.unop.F32FloorExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.unop.F32NearestExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.unop.F32NegExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.unop.F32SqrtExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.unop.F32TruncExecutor
-import io.github.charlietap.chasm.runtime.instruction.NumericInstruction
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.executeF32BinaryIi
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.executeF32BinaryIs
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.executeF32BinarySi
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.executeF32BinarySs
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.executeF32RelopIi
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.executeF32RelopIs
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.executeF32RelopSi
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.executeF32RelopSs
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.cvtop.executeF64ToF32I
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.cvtop.executeF64ToF32S
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.cvtop.executeI32ToF32I
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.cvtop.executeI32ToF32S
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.cvtop.executeI64ToF32I
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.cvtop.executeI64ToF32S
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.unop.executeF32UnaryI
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.unop.executeF32UnaryS
+import io.github.charlietap.chasm.runtime.operations.ext.ceil
+import io.github.charlietap.chasm.runtime.operations.ext.convertF32s
+import io.github.charlietap.chasm.runtime.operations.ext.convertF32u
+import io.github.charlietap.chasm.runtime.operations.ext.copySign
+import io.github.charlietap.chasm.runtime.operations.ext.eq
+import io.github.charlietap.chasm.runtime.operations.ext.floor
+import io.github.charlietap.chasm.runtime.operations.ext.ge
+import io.github.charlietap.chasm.runtime.operations.ext.gt
+import io.github.charlietap.chasm.runtime.operations.ext.le
+import io.github.charlietap.chasm.runtime.operations.ext.lt
+import io.github.charlietap.chasm.runtime.operations.ext.max
+import io.github.charlietap.chasm.runtime.operations.ext.min
+import io.github.charlietap.chasm.runtime.operations.ext.ne
+import io.github.charlietap.chasm.runtime.operations.ext.nearest
+import io.github.charlietap.chasm.runtime.operations.ext.sqrt
+import io.github.charlietap.chasm.runtime.operations.ext.trunc
+import kotlin.math.absoluteValue
 
-fun F32AddDispatcher(
-    instruction: NumericInstruction.F32AddIi,
+fun F32AddIiDispatcher(
+    left: Float,
+    right: Float,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32AddExecutor(vstack, context, instruction)
+    executeF32BinaryIi(vstack, destinationSlot, left, right) { left, right -> left + right }
 }
 
-fun F32AddDispatcher(
-    instruction: NumericInstruction.F32AddIs,
+fun F32AddIsDispatcher(
+    left: Float,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32AddExecutor(vstack, context, instruction)
+    executeF32BinaryIs(vstack, destinationSlot, left, rightSlot) { left, right -> left + right }
 }
 
-fun F32AddDispatcher(
-    instruction: NumericInstruction.F32AddSi,
+fun F32AddSiDispatcher(
+    leftSlot: Int,
+    right: Float,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32AddExecutor(vstack, context, instruction)
+    executeF32BinarySi(vstack, destinationSlot, leftSlot, right) { left, right -> left + right }
 }
 
-fun F32AddDispatcher(
-    instruction: NumericInstruction.F32AddSs,
+fun F32AddSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32AddExecutor(vstack, context, instruction)
+    executeF32BinarySs(vstack, destinationSlot, leftSlot, rightSlot) { left, right -> left + right }
 }
 
-fun F32SubDispatcher(
-    instruction: NumericInstruction.F32SubIi,
+fun F32SubIiDispatcher(
+    left: Float,
+    right: Float,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32SubExecutor(vstack, context, instruction)
+    executeF32BinaryIi(vstack, destinationSlot, left, right) { left, right -> left - right }
 }
 
-fun F32SubDispatcher(
-    instruction: NumericInstruction.F32SubIs,
+fun F32SubIsDispatcher(
+    left: Float,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32SubExecutor(vstack, context, instruction)
+    executeF32BinaryIs(vstack, destinationSlot, left, rightSlot) { left, right -> left - right }
 }
 
-fun F32SubDispatcher(
-    instruction: NumericInstruction.F32SubSi,
+fun F32SubSiDispatcher(
+    leftSlot: Int,
+    right: Float,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32SubExecutor(vstack, context, instruction)
+    executeF32BinarySi(vstack, destinationSlot, leftSlot, right) { left, right -> left - right }
 }
 
-fun F32SubDispatcher(
-    instruction: NumericInstruction.F32SubSs,
+fun F32SubSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32SubExecutor(vstack, context, instruction)
+    executeF32BinarySs(vstack, destinationSlot, leftSlot, rightSlot) { left, right -> left - right }
 }
 
-fun F32MulDispatcher(
-    instruction: NumericInstruction.F32MulIi,
+fun F32MulIiDispatcher(
+    left: Float,
+    right: Float,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32MulExecutor(vstack, context, instruction)
+    executeF32BinaryIi(vstack, destinationSlot, left, right) { left, right -> left * right }
 }
 
-fun F32MulDispatcher(
-    instruction: NumericInstruction.F32MulIs,
+fun F32MulIsDispatcher(
+    left: Float,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32MulExecutor(vstack, context, instruction)
+    executeF32BinaryIs(vstack, destinationSlot, left, rightSlot) { left, right -> left * right }
 }
 
-fun F32MulDispatcher(
-    instruction: NumericInstruction.F32MulSi,
+fun F32MulSiDispatcher(
+    leftSlot: Int,
+    right: Float,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32MulExecutor(vstack, context, instruction)
+    executeF32BinarySi(vstack, destinationSlot, leftSlot, right) { left, right -> left * right }
 }
 
-fun F32MulDispatcher(
-    instruction: NumericInstruction.F32MulSs,
+fun F32MulSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32MulExecutor(vstack, context, instruction)
+    executeF32BinarySs(vstack, destinationSlot, leftSlot, rightSlot) { left, right -> left * right }
 }
 
-fun F32DivDispatcher(
-    instruction: NumericInstruction.F32DivIi,
+fun F32DivIiDispatcher(
+    left: Float,
+    right: Float,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32DivExecutor(vstack, context, instruction)
+    executeF32BinaryIi(vstack, destinationSlot, left, right) { left, right -> left / right }
 }
 
-fun F32DivDispatcher(
-    instruction: NumericInstruction.F32DivIs,
+fun F32DivIsDispatcher(
+    left: Float,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32DivExecutor(vstack, context, instruction)
+    executeF32BinaryIs(vstack, destinationSlot, left, rightSlot) { left, right -> left / right }
 }
 
-fun F32DivDispatcher(
-    instruction: NumericInstruction.F32DivSi,
+fun F32DivSiDispatcher(
+    leftSlot: Int,
+    right: Float,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32DivExecutor(vstack, context, instruction)
+    executeF32BinarySi(vstack, destinationSlot, leftSlot, right) { left, right -> left / right }
 }
 
-fun F32DivDispatcher(
-    instruction: NumericInstruction.F32DivSs,
+fun F32DivSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32DivExecutor(vstack, context, instruction)
+    executeF32BinarySs(vstack, destinationSlot, leftSlot, rightSlot) { left, right -> left / right }
 }
 
-fun F32MinDispatcher(
-    instruction: NumericInstruction.F32MinIi,
+fun F32MinIiDispatcher(
+    left: Float,
+    right: Float,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32MinExecutor(vstack, context, instruction)
+    executeF32BinaryIi(vstack, destinationSlot, left, right, Float::min)
 }
 
-fun F32MinDispatcher(
-    instruction: NumericInstruction.F32MinIs,
+fun F32MinIsDispatcher(
+    left: Float,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32MinExecutor(vstack, context, instruction)
+    executeF32BinaryIs(vstack, destinationSlot, left, rightSlot, Float::min)
 }
 
-fun F32MinDispatcher(
-    instruction: NumericInstruction.F32MinSi,
+fun F32MinSiDispatcher(
+    leftSlot: Int,
+    right: Float,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32MinExecutor(vstack, context, instruction)
+    executeF32BinarySi(vstack, destinationSlot, leftSlot, right, Float::min)
 }
 
-fun F32MinDispatcher(
-    instruction: NumericInstruction.F32MinSs,
+fun F32MinSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32MinExecutor(vstack, context, instruction)
+    executeF32BinarySs(vstack, destinationSlot, leftSlot, rightSlot, Float::min)
 }
 
-fun F32MaxDispatcher(
-    instruction: NumericInstruction.F32MaxIi,
+fun F32MaxIiDispatcher(
+    left: Float,
+    right: Float,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32MaxExecutor(vstack, context, instruction)
+    executeF32BinaryIi(vstack, destinationSlot, left, right, Float::max)
 }
 
-fun F32MaxDispatcher(
-    instruction: NumericInstruction.F32MaxIs,
+fun F32MaxIsDispatcher(
+    left: Float,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32MaxExecutor(vstack, context, instruction)
+    executeF32BinaryIs(vstack, destinationSlot, left, rightSlot, Float::max)
 }
 
-fun F32MaxDispatcher(
-    instruction: NumericInstruction.F32MaxSi,
+fun F32MaxSiDispatcher(
+    leftSlot: Int,
+    right: Float,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32MaxExecutor(vstack, context, instruction)
+    executeF32BinarySi(vstack, destinationSlot, leftSlot, right, Float::max)
 }
 
-fun F32MaxDispatcher(
-    instruction: NumericInstruction.F32MaxSs,
+fun F32MaxSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32MaxExecutor(vstack, context, instruction)
+    executeF32BinarySs(vstack, destinationSlot, leftSlot, rightSlot, Float::max)
 }
 
-fun F32CopysignDispatcher(
-    instruction: NumericInstruction.F32CopysignIi,
+fun F32CopysignIiDispatcher(
+    left: Float,
+    right: Float,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32CopysignExecutor(vstack, context, instruction)
+    executeF32BinaryIi(vstack, destinationSlot, left, right, Float::copySign)
 }
 
-fun F32CopysignDispatcher(
-    instruction: NumericInstruction.F32CopysignIs,
+fun F32CopysignIsDispatcher(
+    left: Float,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32CopysignExecutor(vstack, context, instruction)
+    executeF32BinaryIs(vstack, destinationSlot, left, rightSlot, Float::copySign)
 }
 
-fun F32CopysignDispatcher(
-    instruction: NumericInstruction.F32CopysignSi,
+fun F32CopysignSiDispatcher(
+    leftSlot: Int,
+    right: Float,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32CopysignExecutor(vstack, context, instruction)
+    executeF32BinarySi(vstack, destinationSlot, leftSlot, right, Float::copySign)
 }
 
-fun F32CopysignDispatcher(
-    instruction: NumericInstruction.F32CopysignSs,
+fun F32CopysignSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32CopysignExecutor(vstack, context, instruction)
+    executeF32BinarySs(vstack, destinationSlot, leftSlot, rightSlot, Float::copySign)
 }
 
-fun F32AbsDispatcher(
-    instruction: NumericInstruction.F32AbsI,
+fun F32AbsIDispatcher(
+    operand: Float,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32AbsExecutor(vstack, context, instruction)
+    executeF32UnaryI(vstack, destinationSlot, operand) { operand -> operand.absoluteValue }
 }
 
-fun F32AbsDispatcher(
-    instruction: NumericInstruction.F32AbsS,
+fun F32AbsSDispatcher(
+    operandSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32AbsExecutor(vstack, context, instruction)
+    executeF32UnaryS(vstack, destinationSlot, operandSlot) { operand -> operand.absoluteValue }
 }
 
-fun F32NegDispatcher(
-    instruction: NumericInstruction.F32NegI,
+fun F32NegIDispatcher(
+    operand: Float,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32NegExecutor(vstack, context, instruction)
+    executeF32UnaryI(vstack, destinationSlot, operand) { operand -> -operand }
 }
 
-fun F32NegDispatcher(
-    instruction: NumericInstruction.F32NegS,
+fun F32NegSDispatcher(
+    operandSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32NegExecutor(vstack, context, instruction)
+    executeF32UnaryS(vstack, destinationSlot, operandSlot) { operand -> -operand }
 }
 
-fun F32CeilDispatcher(
-    instruction: NumericInstruction.F32CeilI,
+fun F32CeilIDispatcher(
+    operand: Float,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32CeilExecutor(vstack, context, instruction)
+    executeF32UnaryI(vstack, destinationSlot, operand, Float::ceil)
 }
 
-fun F32CeilDispatcher(
-    instruction: NumericInstruction.F32CeilS,
+fun F32CeilSDispatcher(
+    operandSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32CeilExecutor(vstack, context, instruction)
+    executeF32UnaryS(vstack, destinationSlot, operandSlot, Float::ceil)
 }
 
-fun F32FloorDispatcher(
-    instruction: NumericInstruction.F32FloorI,
+fun F32FloorIDispatcher(
+    operand: Float,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32FloorExecutor(vstack, context, instruction)
+    executeF32UnaryI(vstack, destinationSlot, operand, Float::floor)
 }
 
-fun F32FloorDispatcher(
-    instruction: NumericInstruction.F32FloorS,
+fun F32FloorSDispatcher(
+    operandSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32FloorExecutor(vstack, context, instruction)
+    executeF32UnaryS(vstack, destinationSlot, operandSlot, Float::floor)
 }
 
-fun F32TruncDispatcher(
-    instruction: NumericInstruction.F32TruncI,
+fun F32TruncIDispatcher(
+    operand: Float,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32TruncExecutor(vstack, context, instruction)
+    executeF32UnaryI(vstack, destinationSlot, operand, Float::trunc)
 }
 
-fun F32TruncDispatcher(
-    instruction: NumericInstruction.F32TruncS,
+fun F32TruncSDispatcher(
+    operandSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32TruncExecutor(vstack, context, instruction)
+    executeF32UnaryS(vstack, destinationSlot, operandSlot, Float::trunc)
 }
 
-fun F32NearestDispatcher(
-    instruction: NumericInstruction.F32NearestI,
+fun F32NearestIDispatcher(
+    operand: Float,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32NearestExecutor(vstack, context, instruction)
+    executeF32UnaryI(vstack, destinationSlot, operand, Float::nearest)
 }
 
-fun F32NearestDispatcher(
-    instruction: NumericInstruction.F32NearestS,
+fun F32NearestSDispatcher(
+    operandSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32NearestExecutor(vstack, context, instruction)
+    executeF32UnaryS(vstack, destinationSlot, operandSlot, Float::nearest)
 }
 
-fun F32SqrtDispatcher(
-    instruction: NumericInstruction.F32SqrtI,
+fun F32SqrtIDispatcher(
+    operand: Float,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32SqrtExecutor(vstack, context, instruction)
+    executeF32UnaryI(vstack, destinationSlot, operand, Float::sqrt)
 }
 
-fun F32SqrtDispatcher(
-    instruction: NumericInstruction.F32SqrtS,
+fun F32SqrtSDispatcher(
+    operandSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32SqrtExecutor(vstack, context, instruction)
+    executeF32UnaryS(vstack, destinationSlot, operandSlot, Float::sqrt)
 }
 
-fun F32EqDispatcher(
-    instruction: NumericInstruction.F32EqIi,
+fun F32EqIiDispatcher(
+    left: Float,
+    right: Float,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32EqExecutor(vstack, context, instruction)
+    executeF32RelopIi(vstack, destinationSlot, left, right, Float::eq)
 }
 
-fun F32EqDispatcher(
-    instruction: NumericInstruction.F32EqIs,
+fun F32EqIsDispatcher(
+    left: Float,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32EqExecutor(vstack, context, instruction)
+    executeF32RelopIs(vstack, destinationSlot, left, rightSlot, Float::eq)
 }
 
-fun F32EqDispatcher(
-    instruction: NumericInstruction.F32EqSi,
+fun F32EqSiDispatcher(
+    leftSlot: Int,
+    right: Float,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32EqExecutor(vstack, context, instruction)
+    executeF32RelopSi(vstack, destinationSlot, leftSlot, right, Float::eq)
 }
 
-fun F32EqDispatcher(
-    instruction: NumericInstruction.F32EqSs,
+fun F32EqSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32EqExecutor(vstack, context, instruction)
+    executeF32RelopSs(vstack, destinationSlot, leftSlot, rightSlot, Float::eq)
 }
 
-fun F32NeDispatcher(
-    instruction: NumericInstruction.F32NeIi,
+fun F32NeIiDispatcher(
+    left: Float,
+    right: Float,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32NeExecutor(vstack, context, instruction)
+    executeF32RelopIi(vstack, destinationSlot, left, right, Float::ne)
 }
 
-fun F32NeDispatcher(
-    instruction: NumericInstruction.F32NeIs,
+fun F32NeIsDispatcher(
+    left: Float,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32NeExecutor(vstack, context, instruction)
+    executeF32RelopIs(vstack, destinationSlot, left, rightSlot, Float::ne)
 }
 
-fun F32NeDispatcher(
-    instruction: NumericInstruction.F32NeSi,
+fun F32NeSiDispatcher(
+    leftSlot: Int,
+    right: Float,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32NeExecutor(vstack, context, instruction)
+    executeF32RelopSi(vstack, destinationSlot, leftSlot, right, Float::ne)
 }
 
-fun F32NeDispatcher(
-    instruction: NumericInstruction.F32NeSs,
+fun F32NeSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32NeExecutor(vstack, context, instruction)
+    executeF32RelopSs(vstack, destinationSlot, leftSlot, rightSlot, Float::ne)
 }
 
-fun F32LtDispatcher(
-    instruction: NumericInstruction.F32LtIi,
+fun F32LtIiDispatcher(
+    left: Float,
+    right: Float,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32LtExecutor(vstack, context, instruction)
+    executeF32RelopIi(vstack, destinationSlot, left, right, Float::lt)
 }
 
-fun F32LtDispatcher(
-    instruction: NumericInstruction.F32LtIs,
+fun F32LtIsDispatcher(
+    left: Float,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32LtExecutor(vstack, context, instruction)
+    executeF32RelopIs(vstack, destinationSlot, left, rightSlot, Float::lt)
 }
 
-fun F32LtDispatcher(
-    instruction: NumericInstruction.F32LtSi,
+fun F32LtSiDispatcher(
+    leftSlot: Int,
+    right: Float,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32LtExecutor(vstack, context, instruction)
+    executeF32RelopSi(vstack, destinationSlot, leftSlot, right, Float::lt)
 }
 
-fun F32LtDispatcher(
-    instruction: NumericInstruction.F32LtSs,
+fun F32LtSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32LtExecutor(vstack, context, instruction)
+    executeF32RelopSs(vstack, destinationSlot, leftSlot, rightSlot, Float::lt)
 }
 
-fun F32GtDispatcher(
-    instruction: NumericInstruction.F32GtIi,
+fun F32GtIiDispatcher(
+    left: Float,
+    right: Float,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32GtExecutor(vstack, context, instruction)
+    executeF32RelopIi(vstack, destinationSlot, left, right, Float::gt)
 }
 
-fun F32GtDispatcher(
-    instruction: NumericInstruction.F32GtIs,
+fun F32GtIsDispatcher(
+    left: Float,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32GtExecutor(vstack, context, instruction)
+    executeF32RelopIs(vstack, destinationSlot, left, rightSlot, Float::gt)
 }
 
-fun F32GtDispatcher(
-    instruction: NumericInstruction.F32GtSi,
+fun F32GtSiDispatcher(
+    leftSlot: Int,
+    right: Float,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32GtExecutor(vstack, context, instruction)
+    executeF32RelopSi(vstack, destinationSlot, leftSlot, right, Float::gt)
 }
 
-fun F32GtDispatcher(
-    instruction: NumericInstruction.F32GtSs,
+fun F32GtSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32GtExecutor(vstack, context, instruction)
+    executeF32RelopSs(vstack, destinationSlot, leftSlot, rightSlot, Float::gt)
 }
 
-fun F32LeDispatcher(
-    instruction: NumericInstruction.F32LeIi,
+fun F32LeIiDispatcher(
+    left: Float,
+    right: Float,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32LeExecutor(vstack, context, instruction)
+    executeF32RelopIi(vstack, destinationSlot, left, right, Float::le)
 }
 
-fun F32LeDispatcher(
-    instruction: NumericInstruction.F32LeIs,
+fun F32LeIsDispatcher(
+    left: Float,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32LeExecutor(vstack, context, instruction)
+    executeF32RelopIs(vstack, destinationSlot, left, rightSlot, Float::le)
 }
 
-fun F32LeDispatcher(
-    instruction: NumericInstruction.F32LeSi,
+fun F32LeSiDispatcher(
+    leftSlot: Int,
+    right: Float,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32LeExecutor(vstack, context, instruction)
+    executeF32RelopSi(vstack, destinationSlot, leftSlot, right, Float::le)
 }
 
-fun F32LeDispatcher(
-    instruction: NumericInstruction.F32LeSs,
+fun F32LeSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32LeExecutor(vstack, context, instruction)
+    executeF32RelopSs(vstack, destinationSlot, leftSlot, rightSlot, Float::le)
 }
 
-fun F32GeDispatcher(
-    instruction: NumericInstruction.F32GeIi,
+fun F32GeIiDispatcher(
+    left: Float,
+    right: Float,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32GeExecutor(vstack, context, instruction)
+    executeF32RelopIi(vstack, destinationSlot, left, right, Float::ge)
 }
 
-fun F32GeDispatcher(
-    instruction: NumericInstruction.F32GeIs,
+fun F32GeIsDispatcher(
+    left: Float,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32GeExecutor(vstack, context, instruction)
+    executeF32RelopIs(vstack, destinationSlot, left, rightSlot, Float::ge)
 }
 
-fun F32GeDispatcher(
-    instruction: NumericInstruction.F32GeSi,
+fun F32GeSiDispatcher(
+    leftSlot: Int,
+    right: Float,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32GeExecutor(vstack, context, instruction)
+    executeF32RelopSi(vstack, destinationSlot, leftSlot, right, Float::ge)
 }
 
-fun F32GeDispatcher(
-    instruction: NumericInstruction.F32GeSs,
+fun F32GeSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32GeExecutor(vstack, context, instruction)
+    executeF32RelopSs(vstack, destinationSlot, leftSlot, rightSlot, Float::ge)
 }
 
-fun F32ConvertI32SDispatcher(
-    instruction: NumericInstruction.F32ConvertI32SI,
+fun F32ConvertI32SIDispatcher(
+    operand: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32ConvertI32SExecutor(vstack, context, instruction)
+    executeI32ToF32I(vstack, destinationSlot, operand, Int::convertF32s)
 }
 
-fun F32ConvertI32SDispatcher(
-    instruction: NumericInstruction.F32ConvertI32SS,
+fun F32ConvertI32SSDispatcher(
+    operandSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32ConvertI32SExecutor(vstack, context, instruction)
+    executeI32ToF32S(vstack, destinationSlot, operandSlot, Int::convertF32s)
 }
 
-fun F32ConvertI32UDispatcher(
-    instruction: NumericInstruction.F32ConvertI32UI,
+fun F32ConvertI32UIDispatcher(
+    operand: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32ConvertI32UExecutor(vstack, context, instruction)
+    executeI32ToF32I(vstack, destinationSlot, operand, Int::convertF32u)
 }
 
-fun F32ConvertI32UDispatcher(
-    instruction: NumericInstruction.F32ConvertI32US,
+fun F32ConvertI32USDispatcher(
+    operandSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32ConvertI32UExecutor(vstack, context, instruction)
+    executeI32ToF32S(vstack, destinationSlot, operandSlot, Int::convertF32u)
 }
 
-fun F32ConvertI64SDispatcher(
-    instruction: NumericInstruction.F32ConvertI64SI,
+fun F32ConvertI64SIDispatcher(
+    operand: Long,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32ConvertI64SExecutor(vstack, context, instruction)
+    executeI64ToF32I(vstack, destinationSlot, operand, Long::convertF32s)
 }
 
-fun F32ConvertI64SDispatcher(
-    instruction: NumericInstruction.F32ConvertI64SS,
+fun F32ConvertI64SSDispatcher(
+    operandSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32ConvertI64SExecutor(vstack, context, instruction)
+    executeI64ToF32S(vstack, destinationSlot, operandSlot, Long::convertF32s)
 }
 
-fun F32ConvertI64UDispatcher(
-    instruction: NumericInstruction.F32ConvertI64UI,
+fun F32ConvertI64UIDispatcher(
+    operand: Long,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32ConvertI64UExecutor(vstack, context, instruction)
+    executeI64ToF32I(vstack, destinationSlot, operand, Long::convertF32u)
 }
 
-fun F32ConvertI64UDispatcher(
-    instruction: NumericInstruction.F32ConvertI64US,
+fun F32ConvertI64USDispatcher(
+    operandSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32ConvertI64UExecutor(vstack, context, instruction)
+    executeI64ToF32S(vstack, destinationSlot, operandSlot, Long::convertF32u)
 }
 
-fun F32DemoteF64Dispatcher(
-    instruction: NumericInstruction.F32DemoteF64I,
+fun F32DemoteF64IDispatcher(
+    operand: Double,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32DemoteF64Executor(vstack, context, instruction)
+    executeF64ToF32I(vstack, destinationSlot, operand) { operand -> operand.toFloat() }
 }
 
-fun F32DemoteF64Dispatcher(
-    instruction: NumericInstruction.F32DemoteF64S,
+fun F32DemoteF64SDispatcher(
+    operandSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    F32DemoteF64Executor(vstack, context, instruction)
+    executeF64ToF32S(vstack, destinationSlot, operandSlot) { operand -> operand.toFloat() }
 }

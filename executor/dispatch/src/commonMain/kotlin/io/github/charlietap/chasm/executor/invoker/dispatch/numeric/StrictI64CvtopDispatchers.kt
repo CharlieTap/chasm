@@ -1,108 +1,189 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.numeric
 
 import io.github.charlietap.chasm.executor.invoker.dispatch.dispatchInstruction
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.cvtop.I64TruncF32SExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.cvtop.I64TruncF32UExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.cvtop.I64TruncF64SExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.cvtop.I64TruncF64UExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.cvtop.I64TruncSatF32SExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.cvtop.I64TruncSatF32UExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.cvtop.I64TruncSatF64SExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.cvtop.I64TruncSatF64UExecutor
-import io.github.charlietap.chasm.runtime.instruction.NumericInstruction
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.cvtop.executeF32ToI64I
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.cvtop.executeF32ToI64S
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.cvtop.executeF64ToI64I
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.cvtop.executeF64ToI64S
+import io.github.charlietap.chasm.runtime.error.InvocationError
+import io.github.charlietap.chasm.runtime.exception.InvocationException
+import io.github.charlietap.chasm.runtime.operations.ext.truncI64s
+import io.github.charlietap.chasm.runtime.operations.ext.truncI64sTrapping
+import io.github.charlietap.chasm.runtime.operations.ext.truncI64u
+import io.github.charlietap.chasm.runtime.operations.ext.truncI64uTrapping
 
-fun I64TruncF32SDispatcher(
-    instruction: NumericInstruction.I64TruncF32SI,
+fun I64TruncF32SIDispatcher(
+    operand: Float,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64TruncF32SExecutor(vstack, context, instruction)
+    executeF32ToI64I(vstack, destinationSlot, operand) { operand ->
+        try {
+            operand.truncI64sTrapping()
+        } catch (_: IllegalArgumentException) {
+            throw InvocationException(InvocationError.ConvertOperationFailed)
+        }
+    }
 }
 
-fun I64TruncF32SDispatcher(
-    instruction: NumericInstruction.I64TruncF32SS,
+fun I64TruncF32SSDispatcher(
+    operandSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64TruncF32SExecutor(vstack, context, instruction)
+    executeF32ToI64S(vstack, destinationSlot, operandSlot) { operand ->
+        try {
+            operand.truncI64sTrapping()
+        } catch (_: IllegalArgumentException) {
+            throw InvocationException(InvocationError.ConvertOperationFailed)
+        }
+    }
 }
 
-fun I64TruncF32UDispatcher(
-    instruction: NumericInstruction.I64TruncF32UI,
+fun I64TruncF32UIDispatcher(
+    operand: Float,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64TruncF32UExecutor(vstack, context, instruction)
+    executeF32ToI64I(vstack, destinationSlot, operand) { operand ->
+        try {
+            operand.truncI64uTrapping()
+        } catch (_: IllegalArgumentException) {
+            throw InvocationException(InvocationError.ConvertOperationFailed)
+        }
+    }
 }
 
-fun I64TruncF32UDispatcher(
-    instruction: NumericInstruction.I64TruncF32US,
+fun I64TruncF32USDispatcher(
+    operandSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64TruncF32UExecutor(vstack, context, instruction)
+    executeF32ToI64S(vstack, destinationSlot, operandSlot) { operand ->
+        try {
+            operand.truncI64uTrapping()
+        } catch (_: IllegalArgumentException) {
+            throw InvocationException(InvocationError.ConvertOperationFailed)
+        }
+    }
 }
 
-fun I64TruncF64SDispatcher(
-    instruction: NumericInstruction.I64TruncF64SI,
+fun I64TruncF64SIDispatcher(
+    operand: Double,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64TruncF64SExecutor(vstack, context, instruction)
+    executeF64ToI64I(vstack, destinationSlot, operand) { operand ->
+        try {
+            operand.truncI64sTrapping()
+        } catch (_: IllegalArgumentException) {
+            throw InvocationException(InvocationError.ConvertOperationFailed)
+        }
+    }
 }
 
-fun I64TruncF64SDispatcher(
-    instruction: NumericInstruction.I64TruncF64SS,
+fun I64TruncF64SSDispatcher(
+    operandSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64TruncF64SExecutor(vstack, context, instruction)
+    executeF64ToI64S(vstack, destinationSlot, operandSlot) { operand ->
+        try {
+            operand.truncI64sTrapping()
+        } catch (_: IllegalArgumentException) {
+            throw InvocationException(InvocationError.ConvertOperationFailed)
+        }
+    }
 }
 
-fun I64TruncF64UDispatcher(
-    instruction: NumericInstruction.I64TruncF64UI,
+fun I64TruncF64UIDispatcher(
+    operand: Double,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64TruncF64UExecutor(vstack, context, instruction)
+    executeF64ToI64I(vstack, destinationSlot, operand) { operand ->
+        try {
+            operand.truncI64uTrapping()
+        } catch (_: IllegalArgumentException) {
+            throw InvocationException(InvocationError.ConvertOperationFailed)
+        }
+    }
 }
 
-fun I64TruncF64UDispatcher(
-    instruction: NumericInstruction.I64TruncF64US,
+fun I64TruncF64USDispatcher(
+    operandSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64TruncF64UExecutor(vstack, context, instruction)
+    executeF64ToI64S(vstack, destinationSlot, operandSlot) { operand ->
+        try {
+            operand.truncI64uTrapping()
+        } catch (_: IllegalArgumentException) {
+            throw InvocationException(InvocationError.ConvertOperationFailed)
+        }
+    }
 }
 
-fun I64TruncSatF32SDispatcher(
-    instruction: NumericInstruction.I64TruncSatF32SI,
+fun I64TruncSatF32SIDispatcher(
+    operand: Float,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64TruncSatF32SExecutor(vstack, context, instruction)
+    executeF32ToI64I(vstack, destinationSlot, operand) { operand ->
+        operand.truncI64s()
+    }
 }
 
-fun I64TruncSatF32SDispatcher(
-    instruction: NumericInstruction.I64TruncSatF32SS,
+fun I64TruncSatF32SSDispatcher(
+    operandSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64TruncSatF32SExecutor(vstack, context, instruction)
+    executeF32ToI64S(vstack, destinationSlot, operandSlot) { operand ->
+        operand.truncI64s()
+    }
 }
 
-fun I64TruncSatF32UDispatcher(
-    instruction: NumericInstruction.I64TruncSatF32UI,
+fun I64TruncSatF32UIDispatcher(
+    operand: Float,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64TruncSatF32UExecutor(vstack, context, instruction)
+    executeF32ToI64I(vstack, destinationSlot, operand) { operand ->
+        operand.truncI64u()
+    }
 }
 
-fun I64TruncSatF32UDispatcher(
-    instruction: NumericInstruction.I64TruncSatF32US,
+fun I64TruncSatF32USDispatcher(
+    operandSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64TruncSatF32UExecutor(vstack, context, instruction)
+    executeF32ToI64S(vstack, destinationSlot, operandSlot) { operand ->
+        operand.truncI64u()
+    }
 }
 
-fun I64TruncSatF64SDispatcher(
-    instruction: NumericInstruction.I64TruncSatF64SI,
+fun I64TruncSatF64SIDispatcher(
+    operand: Double,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64TruncSatF64SExecutor(vstack, context, instruction)
+    executeF64ToI64I(vstack, destinationSlot, operand) { operand ->
+        operand.truncI64s()
+    }
 }
 
-fun I64TruncSatF64SDispatcher(
-    instruction: NumericInstruction.I64TruncSatF64SS,
+fun I64TruncSatF64SSDispatcher(
+    operandSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64TruncSatF64SExecutor(vstack, context, instruction)
+    executeF64ToI64S(vstack, destinationSlot, operandSlot) { operand ->
+        operand.truncI64s()
+    }
 }
 
-fun I64TruncSatF64UDispatcher(
-    instruction: NumericInstruction.I64TruncSatF64UI,
+fun I64TruncSatF64UIDispatcher(
+    operand: Double,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64TruncSatF64UExecutor(vstack, context, instruction)
+    executeF64ToI64I(vstack, destinationSlot, operand) { operand ->
+        operand.truncI64u()
+    }
 }
 
-fun I64TruncSatF64UDispatcher(
-    instruction: NumericInstruction.I64TruncSatF64US,
+fun I64TruncSatF64USDispatcher(
+    operandSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64TruncSatF64UExecutor(vstack, context, instruction)
+    executeF64ToI64S(vstack, destinationSlot, operandSlot) { operand ->
+        operand.truncI64u()
+    }
 }
