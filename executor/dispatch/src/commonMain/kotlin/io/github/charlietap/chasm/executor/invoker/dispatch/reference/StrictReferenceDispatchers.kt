@@ -1,53 +1,94 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.reference
 
 import io.github.charlietap.chasm.executor.invoker.dispatch.dispatchInstruction
-import io.github.charlietap.chasm.executor.invoker.instruction.reference.RefAsNonNullExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.reference.RefCastExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.reference.RefEqExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.reference.RefFuncExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.reference.RefIsNullExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.reference.RefNullExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.reference.RefTestExecutor
-import io.github.charlietap.chasm.runtime.instruction.ReferenceInstruction
+import io.github.charlietap.chasm.executor.invoker.instruction.reference.executeRefEq
+import io.github.charlietap.chasm.executor.invoker.instruction.reference.executeRefIsNull
+import io.github.charlietap.chasm.runtime.error.InvocationError
+import io.github.charlietap.chasm.runtime.exception.InvocationException
+import io.github.charlietap.chasm.runtime.ext.isNullableReference
+import io.github.charlietap.chasm.runtime.type.ReferenceTypeTest
 
-fun RefCastDispatcher(
-    instruction: ReferenceInstruction.RefCastS,
+fun RefCastSDispatcher(
+    referenceSlot: Int,
+    destinationSlot: Int,
+    typeTest: ReferenceTypeTest,
 ) = dispatchInstruction { vstack, context ->
-    RefCastExecutor(vstack, context, instruction)
+    RefCastExecutor(
+        vstack = vstack,
+        context = context,
+        referenceValue = vstack.getFrameSlot(referenceSlot),
+        typeTest = typeTest,
+        destinationSlot = destinationSlot,
+    )
 }
 
-fun RefEqDispatcher(
-    instruction: ReferenceInstruction.RefEqSs,
+fun RefEqSsDispatcher(
+    reference1Slot: Int,
+    reference2Slot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    RefEqExecutor(vstack, context, instruction)
+    executeRefEq(
+        vstack = vstack,
+        reference1 = vstack.getFrameSlot(reference1Slot),
+        reference2 = vstack.getFrameSlot(reference2Slot),
+        destinationSlot = destinationSlot,
+    )
 }
 
-fun RefIsNullDispatcher(
-    instruction: ReferenceInstruction.RefIsNullS,
+fun RefIsNullSDispatcher(
+    valueSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    RefIsNullExecutor(vstack, context, instruction)
+    executeRefIsNull(
+        vstack = vstack,
+        value = vstack.getFrameSlot(valueSlot),
+        destinationSlot = destinationSlot,
+    )
 }
 
-fun RefAsNonNullDispatcher(
-    instruction: ReferenceInstruction.RefAsNonNullS,
+fun RefAsNonNullSDispatcher(
+    valueSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    RefAsNonNullExecutor(vstack, context, instruction)
+    run {
+        val value = vstack.getFrameSlot(valueSlot)
+        if (value.isNullableReference()) {
+            throw InvocationException(InvocationError.NonNullReferenceExpected)
+        }
+        vstack.setFrameSlot(destinationSlot, value)
+    }
 }
 
-fun RefNullDispatcher(
-    instruction: ReferenceInstruction.RefNullS,
+fun RefNullSDispatcher(
+    reference: Long,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    RefNullExecutor(vstack, context, instruction)
+    run {
+        vstack.setFrameSlot(destinationSlot, reference)
+    }
 }
 
-fun RefFuncDispatcher(
-    instruction: ReferenceInstruction.RefFuncS,
+fun RefFuncSDispatcher(
+    reference: Long,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    RefFuncExecutor(vstack, context, instruction)
+    run {
+        vstack.setFrameSlot(destinationSlot, reference)
+    }
 }
 
-fun RefTestDispatcher(
-    instruction: ReferenceInstruction.RefTestS,
+fun RefTestSDispatcher(
+    referenceSlot: Int,
+    destinationSlot: Int,
+    typeTest: ReferenceTypeTest,
 ) = dispatchInstruction { vstack, context ->
-    RefTestExecutor(vstack, context, instruction)
+    RefTestExecutor(
+        vstack = vstack,
+        context = context,
+        referenceValue = vstack.getFrameSlot(referenceSlot),
+        typeTest = typeTest,
+        destinationSlot = destinationSlot,
+    )
 }
