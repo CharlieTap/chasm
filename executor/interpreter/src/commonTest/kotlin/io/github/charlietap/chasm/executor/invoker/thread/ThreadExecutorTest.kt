@@ -16,7 +16,6 @@ import io.github.charlietap.chasm.fixture.runtime.function.runtimeFunction
 import io.github.charlietap.chasm.fixture.runtime.instance.hostFunctionInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.wasmFunctionInstance
-import io.github.charlietap.chasm.fixture.runtime.instruction.endFunctionAdminInstruction
 import io.github.charlietap.chasm.fixture.runtime.instruction.hostCallRuntimeInstruction
 import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.fixture.runtime.type.rtt
@@ -35,7 +34,6 @@ import io.github.charlietap.chasm.host.HostException
 import io.github.charlietap.chasm.host.HostFunction
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.error.InvocationError
-import io.github.charlietap.chasm.runtime.instruction.AdminInstruction
 import io.github.charlietap.chasm.runtime.program.Program
 import io.github.charlietap.chasm.runtime.resource.gc.GarbageCollector
 import io.github.charlietap.chasm.runtime.store.Store
@@ -71,7 +69,7 @@ class ThreadExecutorTest {
         val entryIp = program.append(
             arrayOf(
                 CallDispatcher(hostCallRuntimeInstruction(instance = hostFunction, caller = module)),
-                EndFunctionDispatcher(endFunctionAdminInstruction(resultCount = 1)),
+                EndFunctionDispatcher(resultCount = 1, activationHeaderSlot = 1),
             ),
         )
         program.registerExceptionTable(
@@ -169,7 +167,7 @@ class ThreadExecutorTest {
                     vstack.setFrameSlot(0, 0L)
                     nextIp
                 },
-                EndFunctionDispatcher(AdminInstruction.EndFunction(1, 2)),
+                EndFunctionDispatcher(resultCount = 1, activationHeaderSlot = 2),
             ),
         )
         val module = moduleInstance()
@@ -205,7 +203,7 @@ class ThreadExecutorTest {
                     vstack.setFrameSlot(1, 42L)
                     nextIp
                 },
-                EndFunctionDispatcher(AdminInstruction.EndFunction(resultCount = 2, activationHeaderSlot = 2)),
+                EndFunctionDispatcher(resultCount = 2, activationHeaderSlot = 2),
             ),
         )
         val function = wasmFunctionInstance(
@@ -239,7 +237,7 @@ class ThreadExecutorTest {
                     vstack.setFrameSlot(2, 999L)
                     nextIp
                 },
-                EndFunctionDispatcher(AdminInstruction.EndFunction(1, 1)),
+                EndFunctionDispatcher(resultCount = 1, activationHeaderSlot = 1),
             ),
         )
         val module = moduleInstance()
@@ -283,7 +281,7 @@ class ThreadExecutorTest {
         val program = Program()
         val entryIp = program.append(
             arrayOf(
-                EndFunctionDispatcher(AdminInstruction.EndFunction(0, 0)),
+                EndFunctionDispatcher(resultCount = 0, activationHeaderSlot = 0),
             ),
         )
         val module = moduleInstance()
@@ -320,7 +318,7 @@ class ThreadExecutorTest {
     fun `collector failure is returned`() {
         val program = Program()
         val entryIp = program.append(
-            arrayOf(EndFunctionDispatcher(AdminInstruction.EndFunction(0, 0))),
+            arrayOf(EndFunctionDispatcher(resultCount = 0, activationHeaderSlot = 0)),
         )
         val function = wasmFunctionInstance(
             module = moduleInstance(),

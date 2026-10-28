@@ -20,7 +20,6 @@ import io.github.charlietap.chasm.fixture.runtime.function.runtimeFunction
 import io.github.charlietap.chasm.fixture.runtime.instance.hostFunctionInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.wasmFunctionInstance
-import io.github.charlietap.chasm.fixture.runtime.instruction.endFunctionAdminInstruction
 import io.github.charlietap.chasm.fixture.runtime.instruction.hostCallRuntimeInstruction
 import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.fixture.runtime.type.rtt
@@ -88,7 +87,7 @@ class HostExceptionIntegrationTest {
                         resultSlotBase = 0,
                     )
                 },
-                EndFunctionDispatcher(endFunctionAdminInstruction(resultCount = 1)),
+                EndFunctionDispatcher(resultCount = 1, activationHeaderSlot = 1),
             ),
         )
         val outer = wasmFunctionInstance(
@@ -131,7 +130,7 @@ class HostExceptionIntegrationTest {
         val entryIp = program.append(
             arrayOf(
                 CallDispatcher(hostCallRuntimeInstruction(instance = bridge, caller = module)),
-                EndFunctionDispatcher(endFunctionAdminInstruction(resultCount = 1)),
+                EndFunctionDispatcher(resultCount = 1, activationHeaderSlot = 1),
             ),
         )
         program.registerExceptionTable(

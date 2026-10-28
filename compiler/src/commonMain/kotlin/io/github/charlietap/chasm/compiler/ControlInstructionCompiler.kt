@@ -84,18 +84,16 @@ internal fun finishFunctionControl(state: FunctionCompilationContext) {
         if (root.reachedByBranch) {
             if (transfer.isIdentity()) {
                 state.bind(root.continuationTarget)
-                state.emit(
-                    AdminInstruction.EndFunction(root.resultSlots.size, state.layout.activationHeaderSlot),
-                    ::EndFunctionDispatcher,
-                )
+                state.emit(AdminInstruction.EndFunction(root.resultSlots.size, state.layout.activationHeaderSlot)) { end ->
+                    EndFunctionDispatcher(end.resultCount, end.activationHeaderSlot)
+                }
                 return
             }
             state.emitFunctionReturn(transfer)
             state.bind(root.continuationTarget)
-            state.emit(
-                AdminInstruction.EndFunction(root.resultSlots.size, state.layout.activationHeaderSlot),
-                ::EndFunctionDispatcher,
-            )
+            state.emit(AdminInstruction.EndFunction(root.resultSlots.size, state.layout.activationHeaderSlot)) { end ->
+                EndFunctionDispatcher(end.resultCount, end.activationHeaderSlot)
+            }
             return
         }
         state.bind(root.continuationTarget)
@@ -104,10 +102,9 @@ internal fun finishFunctionControl(state: FunctionCompilationContext) {
     }
     state.bind(root.continuationTarget)
     if (root.reachedByBranch) {
-        state.emit(
-            AdminInstruction.EndFunction(root.resultSlots.size, state.layout.activationHeaderSlot),
-            ::EndFunctionDispatcher,
-        )
+        state.emit(AdminInstruction.EndFunction(root.resultSlots.size, state.layout.activationHeaderSlot)) { end ->
+            EndFunctionDispatcher(end.resultCount, end.activationHeaderSlot)
+        }
     }
 }
 

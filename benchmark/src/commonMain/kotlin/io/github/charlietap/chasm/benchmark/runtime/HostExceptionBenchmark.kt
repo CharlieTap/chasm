@@ -32,7 +32,6 @@ import io.github.charlietap.chasm.runtime.exception.ExceptionRegion
 import io.github.charlietap.chasm.runtime.exception.FunctionExceptionTable
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
-import io.github.charlietap.chasm.runtime.instruction.AdminInstruction
 import io.github.charlietap.chasm.runtime.instruction.ControlInstruction
 import io.github.charlietap.chasm.runtime.instruction.OperandTransfer
 import io.github.charlietap.chasm.runtime.instruction.TransferSource
@@ -138,7 +137,7 @@ class HostExceptionBenchmark : StabilizedBenchmark() {
         val entryIp = program.append(
             arrayOf(
                 invocation,
-                EndFunctionDispatcher(AdminInstruction.EndFunction(resultCount = 0, activationHeaderSlot = interfaceSlotCount)),
+                EndFunctionDispatcher(resultCount = 0, activationHeaderSlot = interfaceSlotCount),
             ),
         )
         program.registerExceptionTable(
@@ -241,7 +240,7 @@ class HostExceptionBenchmark : StabilizedBenchmark() {
                         callFrameOffset = 0,
                     ),
                 ),
-                EndFunctionDispatcher(AdminInstruction.EndFunction(1, 1)),
+                EndFunctionDispatcher(resultCount = 1, activationHeaderSlot = 1),
             ),
         )
         program.registerExceptionTable(

@@ -44,7 +44,7 @@ internal fun FunctionCompilationContext.emitCopies(
         sourceSlots = sourceSlots,
         destinationSlots = destinationSlots,
     )
-    emit(instruction, ::CopySlotsDispatcher)
+    emit(instruction) { copies -> CopySlotsDispatcher(copies.sourceSlots, copies.destinationSlots) }
 }
 
 internal fun FunctionCompilationContext.emitI32Constant(value: Int, destinationSlot: Int) {
@@ -72,13 +72,13 @@ internal fun FunctionCompilationContext.emitCheckpoint() {
     val interrupt = compiler.interrupt
     when {
         fuel != null && interrupt != null -> emit(AdminInstruction.FuelAndInterruptCheck) {
-            FuelAndInterruptCheckDispatcher(it, fuel, interrupt)
+            FuelAndInterruptCheckDispatcher(fuel, interrupt)
         }
         fuel != null -> emit(AdminInstruction.FuelCheck) {
-            FuelCheckDispatcher(it, fuel)
+            FuelCheckDispatcher(fuel)
         }
         interrupt != null -> emit(AdminInstruction.InterruptCheck) {
-            InterruptCheckDispatcher(it, interrupt)
+            InterruptCheckDispatcher(interrupt)
         }
     }
 }

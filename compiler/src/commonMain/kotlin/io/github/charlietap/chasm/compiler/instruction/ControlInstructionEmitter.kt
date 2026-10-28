@@ -9,7 +9,23 @@ import io.github.charlietap.chasm.compiler.operand.OperandSourceKind
 import io.github.charlietap.chasm.compiler.operand.sourceSlot
 import io.github.charlietap.chasm.compiler.program.ProgramTarget
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.JumpConditionDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.admin.JumpCopiesDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.JumpDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.admin.JumpIfCopyIDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.admin.JumpIfCopySDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.admin.JumpIfIDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.admin.JumpIfSDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.admin.JumpIfZeroIDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.admin.JumpIfZeroSDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.admin.JumpOnCastFailIDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.admin.JumpOnCastFailSDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.admin.JumpOnCastIDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.admin.JumpOnCastSDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.admin.JumpOnNonNullIDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.admin.JumpOnNonNullSDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.admin.JumpOnNullIDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.admin.JumpOnNullSDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.admin.JumpTableSDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.FunctionReturnDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.ThrowDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.ThrowRefDispatcher
@@ -48,12 +64,12 @@ internal fun FunctionCompilationContext.emitJump(
         append(
             target = target,
             instruction = { targetIp -> AdminInstruction.JumpCopies(operands, destinationSlotBase, targetIp) },
-            dispatcher = ::JumpDispatcher,
+            dispatcher = { jump -> JumpCopiesDispatcher(jump.operands, jump.destinationSlotBase, jump.targetIp) },
         )
         return
     }
 
-    append(target, AdminInstruction::Jump, ::JumpDispatcher)
+    append(target, AdminInstruction::Jump) { jump -> JumpDispatcher(jump.targetIp) }
 }
 
 private fun SlotTransfer.toOperandTransfer(
@@ -100,8 +116,7 @@ internal fun FunctionCompilationContext.emitBranchIf(
                     destinationSlot = transfer.destinationSlot(0),
                     targetIp = targetIp,
                 ),
-                ::JumpDispatcher,
-            )
+            ) { jump -> JumpIfCopyIDispatcher(jump.operand, jump.sourceSlot, jump.destinationSlot, jump.targetIp) }
             scalarTransfer -> dispatch(
                 observer,
                 AdminInstruction.JumpIfCopyS(
@@ -110,28 +125,23 @@ internal fun FunctionCompilationContext.emitBranchIf(
                     destinationSlot = transfer.destinationSlot(0),
                     targetIp = targetIp,
                 ),
-                ::JumpDispatcher,
-            )
+            ) { jump -> JumpIfCopySDispatcher(jump.operandSlot, jump.sourceSlot, jump.destinationSlot, jump.targetIp) }
             whenZero && conditionKind.isImmediate -> dispatch(
                 observer,
                 AdminInstruction.JumpIfZeroI(conditionBits, targetIp),
-                ::JumpDispatcher,
-            )
+            ) { jump -> JumpIfZeroIDispatcher(jump.operand, jump.targetIp) }
             whenZero -> dispatch(
                 observer,
                 AdminInstruction.JumpIfZeroS(conditionBits.toInt(), targetIp),
-                ::JumpDispatcher,
-            )
+            ) { jump -> JumpIfZeroSDispatcher(jump.operandSlot, jump.targetIp) }
             conditionKind.isImmediate -> dispatch(
                 observer,
                 AdminInstruction.JumpIfI(conditionBits, targetIp),
-                ::JumpDispatcher,
-            )
+            ) { jump -> JumpIfIDispatcher(jump.operand, jump.targetIp) }
             else -> dispatch(
                 observer,
                 AdminInstruction.JumpIfS(conditionBits.toInt(), targetIp),
-                ::JumpDispatcher,
-            )
+            ) { jump -> JumpIfSDispatcher(jump.operandSlot, jump.targetIp) }
         }
     }
     return BranchOutcome.Dynamic
@@ -236,7 +246,7 @@ internal fun FunctionCompilationContext.emitBranchTable(
     append(
         targetIndices = targetIndices,
         instruction = { targetIps -> AdminInstruction.JumpTableS(selectorBits.toInt(), targetIps) },
-        dispatcher = ::JumpDispatcher,
+        dispatcher = { jump -> JumpTableSDispatcher(jump.operandSlot, jump.targetIps) },
     )
 }
 
@@ -254,23 +264,19 @@ internal fun FunctionCompilationContext.emitBranchOnNull(
             onNull && immediate -> dispatch(
                 observer,
                 AdminInstruction.JumpOnNullI(operandBits, targetIp),
-                ::JumpDispatcher,
-            )
+            ) { jump -> JumpOnNullIDispatcher(jump.operand, jump.targetIp) }
             onNull -> dispatch(
                 observer,
                 AdminInstruction.JumpOnNullS(operandBits.toInt(), targetIp),
-                ::JumpDispatcher,
-            )
+            ) { jump -> JumpOnNullSDispatcher(jump.operandSlot, jump.targetIp) }
             immediate -> dispatch(
                 observer,
                 AdminInstruction.JumpOnNonNullI(operandBits, targetIp),
-                ::JumpDispatcher,
-            )
+            ) { jump -> JumpOnNonNullIDispatcher(jump.operand, jump.targetIp) }
             else -> dispatch(
                 observer,
                 AdminInstruction.JumpOnNonNullS(operandBits.toInt(), targetIp),
-                ::JumpDispatcher,
-            )
+            ) { jump -> JumpOnNonNullSDispatcher(jump.operandSlot, jump.targetIp) }
         }
     }
 }
@@ -290,23 +296,19 @@ internal fun FunctionCompilationContext.emitBranchOnCast(
             onSuccess && immediate -> dispatch(
                 observer,
                 AdminInstruction.JumpOnCastI(operandBits, targetIp, typeTest),
-                ::JumpDispatcher,
-            )
+            ) { jump -> JumpOnCastIDispatcher(jump.operand, jump.targetIp, jump.typeTest) }
             onSuccess -> dispatch(
                 observer,
                 AdminInstruction.JumpOnCastS(operandBits.toInt(), targetIp, typeTest),
-                ::JumpDispatcher,
-            )
+            ) { jump -> JumpOnCastSDispatcher(jump.operandSlot, jump.targetIp, jump.typeTest) }
             immediate -> dispatch(
                 observer,
                 AdminInstruction.JumpOnCastFailI(operandBits, targetIp, typeTest),
-                ::JumpDispatcher,
-            )
+            ) { jump -> JumpOnCastFailIDispatcher(jump.operand, jump.targetIp, jump.typeTest) }
             else -> dispatch(
                 observer,
                 AdminInstruction.JumpOnCastFailS(operandBits.toInt(), targetIp, typeTest),
-                ::JumpDispatcher,
-            )
+            ) { jump -> JumpOnCastFailSDispatcher(jump.operandSlot, jump.targetIp, jump.typeTest) }
         }
     }
 }

@@ -12,7 +12,7 @@ import kotlinx.serialization.json.JsonPrimitive
 internal class DispatchSupplements {
 
     private val sequentialCopies = CopySlotSequenceDispatcher(intArrayOf(0, 1), intArrayOf(2, 3)).javaClass
-    private val simultaneousCopies = CopySlotsDispatcher(AdminInstruction.CopySlots(intArrayOf(0, 1), intArrayOf(2, 3))).javaClass
+    private val simultaneousCopies = CopySlotsDispatcher(intArrayOf(0, 1), intArrayOf(2, 3)).javaClass
 
     fun immediates(
         instruction: LinkedInstruction,
