@@ -1,11 +1,11 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.control
 
-import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
+import io.github.charlietap.chasm.executor.invoker.dispatch.control.ThrowDispatcher
 import io.github.charlietap.chasm.fixture.runtime.dispatch.dispatchableInstruction
 import io.github.charlietap.chasm.fixture.runtime.exception.compiledCatch
 import io.github.charlietap.chasm.fixture.runtime.exception.exceptionRegion
 import io.github.charlietap.chasm.fixture.runtime.exception.functionExceptionTable
-import io.github.charlietap.chasm.fixture.runtime.instruction.throwRuntimeInstruction
+import io.github.charlietap.chasm.fixture.runtime.execution.executionContext
 import io.github.charlietap.chasm.fixture.runtime.stack.vstack
 import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.fixture.runtime.type.rtt
@@ -16,7 +16,7 @@ import io.github.charlietap.chasm.fixture.type.tagType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class StrictThrowExecutorTest {
+class StrictThrowDispatcherTest {
 
     @Test
     fun `strict throw copies a contiguous frame payload in semantic order`() {
@@ -55,12 +55,8 @@ class StrictThrowExecutorTest {
             setFrameSlot(1, 52)
         }
 
-        val continuationIp = ThrowExecutor(
-            vstack,
-            executionContext(store = store, vstack = vstack),
-            throwRuntimeInstruction(tagAddress = tagAddress, firstPayloadSlot = 0),
-            faultIp = 0,
-        )
+        val continuationIp = ThrowDispatcher(tagAddress = tagAddress, firstPayloadSlot = 0)
+            .invoke(vstack, executionContext(store = store, vstack = vstack), 1)
 
         assertEquals(64, continuationIp)
         assertEquals(51, vstack.getFrameSlot(2))

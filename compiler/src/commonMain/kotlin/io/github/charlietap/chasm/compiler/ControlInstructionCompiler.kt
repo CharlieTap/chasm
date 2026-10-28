@@ -123,10 +123,7 @@ internal fun compileControlInstruction(
     var consumesNextInstruction = false
     when (instruction) {
         ControlInstruction.Unreachable -> {
-            state.emit(
-                RuntimeControlInstruction.Unreachable,
-                ::UnreachableDispatcher,
-            )
+            state.emit(RuntimeControlInstruction.Unreachable) { UnreachableDispatcher() }
             state.reachable = false
         }
         ControlInstruction.Nop -> Unit

@@ -16,152 +16,12 @@ import io.github.charlietap.chasm.runtime.ext.toFunctionAddress
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.instance.TableInstance
-import io.github.charlietap.chasm.runtime.instruction.ControlInstruction
 import io.github.charlietap.chasm.runtime.instruction.OperandTransfer
 import io.github.charlietap.chasm.runtime.instruction.TailCallOperandTransfer
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.type.RTT
 
-internal fun CallExecutor(
-    vstack: ValueStack,
-    context: ExecutionContext,
-    instruction: ControlInstruction.CallIndirectI,
-    returnIp: Int,
-    activationHeader: Long,
-    resultDestinationSlot: Int? = null,
-): Int = strictIndirectCall(
-    vstack = vstack,
-    context = context,
-    elementIndex = instruction.elementIndex,
-    operands = instruction.operands,
-    type = instruction.type,
-    table = instruction.table,
-    caller = instruction.caller,
-    callFrameOffset = instruction.callFrameOffset,
-    returnIp = returnIp,
-    activationHeader = activationHeader,
-    resultDestinationSlot = resultDestinationSlot,
-)
-
-internal fun CallExecutor(
-    vstack: ValueStack,
-    context: ExecutionContext,
-    instruction: ControlInstruction.CallIndirectS,
-    returnIp: Int,
-    activationHeader: Long,
-    resultDestinationSlot: Int? = null,
-): Int = strictIndirectCall(
-    vstack = vstack,
-    context = context,
-    elementIndex = vstack.getFrameSlot(instruction.elementIndexSlot).toInt(),
-    operands = instruction.operands,
-    type = instruction.type,
-    table = instruction.table,
-    caller = instruction.caller,
-    callFrameOffset = instruction.callFrameOffset,
-    returnIp = returnIp,
-    activationHeader = activationHeader,
-    resultDestinationSlot = resultDestinationSlot,
-)
-
-internal fun CallExecutor(
-    vstack: ValueStack,
-    context: ExecutionContext,
-    instruction: ControlInstruction.CallRefS,
-    returnIp: Int,
-    activationHeader: Long,
-    resultDestinationSlot: Int? = null,
-): Int = strictReferenceCall(
-    vstack = vstack,
-    context = context,
-    functionSlot = instruction.functionSlot,
-    operands = instruction.operands,
-    caller = instruction.caller,
-    callFrameOffset = instruction.callFrameOffset,
-    returnIp = returnIp,
-    activationHeader = activationHeader,
-    resultDestinationSlot = resultDestinationSlot,
-)
-
-internal fun ReturnCallExecutor(
-    vstack: ValueStack,
-    context: ExecutionContext,
-    instruction: ControlInstruction.ReturnCallIndirectI,
-    nextIp: Int,
-): Int = strictIndirectReturnCall(
-    vstack = vstack,
-    context = context,
-    elementIndex = instruction.elementIndex,
-    operands = instruction.operands,
-    type = instruction.type,
-    table = instruction.table,
-    caller = instruction.caller,
-    callFrameOffset = instruction.callFrameOffset,
-    callerActivationHeaderSlot = instruction.callerActivationHeaderSlot,
-    nextIp = nextIp,
-)
-
-internal fun ReturnCallExecutor(
-    vstack: ValueStack,
-    context: ExecutionContext,
-    instruction: ControlInstruction.ReturnCallIndirectS,
-    nextIp: Int,
-): Int = strictIndirectReturnCall(
-    vstack = vstack,
-    context = context,
-    elementIndex = vstack.getFrameSlot(instruction.elementIndexSlot).toInt(),
-    operands = instruction.operands,
-    type = instruction.type,
-    table = instruction.table,
-    caller = instruction.caller,
-    callFrameOffset = instruction.callFrameOffset,
-    callerActivationHeaderSlot = instruction.callerActivationHeaderSlot,
-    nextIp = nextIp,
-)
-
-internal fun ReturnCallExecutor(
-    vstack: ValueStack,
-    context: ExecutionContext,
-    instruction: ControlInstruction.ReturnCallRefS,
-    nextIp: Int,
-): Int = strictReferenceReturnCall(
-    vstack = vstack,
-    context = context,
-    functionSlot = instruction.functionSlot,
-    operands = instruction.operands,
-    caller = instruction.caller,
-    callFrameOffset = instruction.callFrameOffset,
-    callerActivationHeaderSlot = instruction.callerActivationHeaderSlot,
-    nextIp = nextIp,
-)
-
-internal fun ThrowExecutor(
-    vstack: ValueStack,
-    context: ExecutionContext,
-    instruction: ControlInstruction.Throw,
-    faultIp: Int,
-): Int {
-    return ThrowRefValueExecutor(
-        vstack = vstack,
-        context = context,
-        ref = context.heap.allocateExceptionFromFrame(context, instruction.tagAddress, instruction.firstPayloadSlot),
-        faultIp = faultIp,
-    )
-}
-
-internal fun ThrowRefExecutor(
-    vstack: ValueStack,
-    context: ExecutionContext,
-    instruction: ControlInstruction.ThrowRefS,
-    faultIp: Int,
-) = ThrowRefValueExecutor(
-    vstack = vstack,
-    context = context,
-    ref = vstack.getFrameSlot(instruction.exceptionSlot),
-    faultIp = faultIp,
-)
-
-private fun strictIndirectCall(
+internal fun strictIndirectCall(
     vstack: ValueStack,
     context: ExecutionContext,
     elementIndex: Int,
@@ -188,7 +48,7 @@ private fun strictIndirectCall(
     )
 }
 
-private fun strictReferenceCall(
+internal fun strictReferenceCall(
     vstack: ValueStack,
     context: ExecutionContext,
     functionSlot: Int,
@@ -213,7 +73,7 @@ private fun strictReferenceCall(
     )
 }
 
-private fun strictIndirectReturnCall(
+internal fun strictIndirectReturnCall(
     vstack: ValueStack,
     context: ExecutionContext,
     elementIndex: Int,
@@ -238,7 +98,7 @@ private fun strictIndirectReturnCall(
     )
 }
 
-private fun strictReferenceReturnCall(
+internal fun strictReferenceReturnCall(
     vstack: ValueStack,
     context: ExecutionContext,
     functionSlot: Int,
@@ -261,7 +121,7 @@ private fun strictReferenceReturnCall(
     )
 }
 
-private fun strictResolveIndirectFunction(
+internal fun strictResolveIndirectFunction(
     context: ExecutionContext,
     table: TableInstance,
     type: RTT,
@@ -275,7 +135,7 @@ private fun strictResolveIndirectFunction(
     return functionInstance
 }
 
-private fun strictInvokeFunction(
+internal fun strictInvokeFunction(
     vstack: ValueStack,
     context: ExecutionContext,
     functionInstance: FunctionInstance,
@@ -314,7 +174,7 @@ private fun strictInvokeFunction(
     )
 }
 
-private fun strictInvokeReturnFunction(
+internal fun strictInvokeReturnFunction(
     vstack: ValueStack,
     context: ExecutionContext,
     functionInstance: FunctionInstance,

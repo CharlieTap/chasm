@@ -8,41 +8,57 @@ import io.github.charlietap.chasm.executor.invoker.function.HostFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.resultCallSiteIp
 import io.github.charlietap.chasm.executor.invoker.function.returnToCaller
 import io.github.charlietap.chasm.executor.invoker.function.withHostExceptionHandling
-import io.github.charlietap.chasm.executor.invoker.instruction.control.CallExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.control.ReturnCallExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.control.ReturnExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.control.ThrowExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.control.ThrowRefExecutor
+import io.github.charlietap.chasm.executor.invoker.instruction.control.ThrowRefValueExecutor
+import io.github.charlietap.chasm.executor.invoker.instruction.control.strictIndirectCall
+import io.github.charlietap.chasm.executor.invoker.instruction.control.strictIndirectReturnCall
+import io.github.charlietap.chasm.executor.invoker.instruction.control.strictReferenceCall
+import io.github.charlietap.chasm.executor.invoker.instruction.control.strictReferenceReturnCall
+import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.function.LocalInitialization
-import io.github.charlietap.chasm.runtime.instruction.ControlInstruction
-import io.github.charlietap.chasm.runtime.instruction.LinkedInstruction
+import io.github.charlietap.chasm.runtime.instance.FunctionInstance
+import io.github.charlietap.chasm.runtime.instance.ModuleInstance
+import io.github.charlietap.chasm.runtime.instance.TableInstance
 import io.github.charlietap.chasm.runtime.instruction.OperandTransfer
+import io.github.charlietap.chasm.runtime.instruction.TailCallOperandTransfer
 import io.github.charlietap.chasm.runtime.instruction.TransferSource
-import io.github.charlietap.chasm.runtime.program.Program
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.stack.activationHeader
+import io.github.charlietap.chasm.runtime.type.RTT
 
 private const val NO_RESULT_DESTINATION = -1
 private const val RESULT_CALL_SITE_IP_LIMIT = 1 shl 30
 private const val CALLER_FRAME_DELTA_LIMIT = 1 shl 25
 
-fun CallDispatcher(
-    instruction: ControlInstruction.WasmCall,
-    resultDestinationSlot: Int? = null,
-): DispatchableInstruction = UnlinkedWasmCallByStrategy(
-    instruction,
-    instruction.callFrameOffset,
-    resultDestinationSlot,
-)
-
-private fun wasmCallWithoutLocalsDispatcher(
-    instruction: ControlInstruction.WasmCall,
+fun WasmCallDispatcher(
     operands: OperandTransfer,
     callFrameOffset: Int,
+    frameSlots: Int,
+    entryIp: Int,
+    activationHeaderSlot: Int,
+    localInitialization: LocalInitialization,
+    callSiteIp: Int,
     resultDestinationSlot: Int?,
-): UnlinkedWasmCall {
+): DispatchableInstruction {
+    checkWasmCallSite(callSiteIp, callFrameOffset, resultDestinationSlot)
+    val returnAddress = if (resultDestinationSlot == null) callSiteIp + 1 else resultCallSiteIp(callSiteIp + 1)
+    val activationHeader = activationHeader(returnAddress, callFrameOffset)
+    val frameEndOffset = callFrameOffset + frameSlots
+    if (localInitialization !== LocalInitialization.None) {
+        return linkedWasmCallDispatcher(
+            operands = operands,
+            callFrameOffset = callFrameOffset,
+            frameEndOffset = frameEndOffset,
+            entryIp = entryIp,
+            activationHeaderSlot = activationHeaderSlot,
+            activationHeader = activationHeader,
+            localInitialization = localInitialization,
+            resultDestinationSlot = resultDestinationSlot,
+        )
+    }
+    val destination = resultDestinationSlot ?: NO_RESULT_DESTINATION
     val sources = operands.sources
     val operand = sources.singleOrNull()
     val firstOperand = sources.getOrNull(0)
@@ -50,192 +66,84 @@ private fun wasmCallWithoutLocalsDispatcher(
     val thirdOperand = sources.getOrNull(2)
     val fourthOperand = sources.getOrNull(3)
     return when {
-        operands.isInPlace -> {
-            UnlinkedWasmCallWithoutLocalsOrOperandTransfer(instruction, callFrameOffset, resultDestinationSlot)
-        }
-        sources.size == 2 && firstOperand is TransferSource.Slot && secondOperand is TransferSource.Slot -> {
-            UnlinkedWasmCallWithoutLocalsWithTwoSlotOperands(
-                instruction = instruction,
+        operands.isInPlace -> LinkedWasmCallWithoutLocalsOrOperandTransfer(
+            callFrameOffset = callFrameOffset,
+            frameEndOffset = frameEndOffset,
+            entryIp = entryIp,
+            activationHeaderSlot = activationHeaderSlot,
+            activationHeader = activationHeader,
+            resultDestinationSlot = destination,
+        )
+        sources.size == 2 && firstOperand is TransferSource.Slot && secondOperand is TransferSource.Slot ->
+            LinkedWasmCallWithoutLocalsWithTwoSlotOperands(
                 callFrameOffset = callFrameOffset,
+                frameEndOffset = frameEndOffset,
+                entryIp = entryIp,
                 firstSourceSlot = firstOperand.slot,
                 secondSourceSlot = secondOperand.slot,
-                resultDestinationSlot = resultDestinationSlot,
+                activationHeaderSlot = activationHeaderSlot,
+                activationHeader = activationHeader,
+                resultDestinationSlot = destination,
             )
-        }
         sources.size == 3 &&
             firstOperand is TransferSource.Slot &&
             secondOperand is TransferSource.Slot &&
-            thirdOperand is TransferSource.Slot -> {
-            UnlinkedWasmCallWithoutLocalsWithThreeSlotOperands(
-                instruction = instruction,
+            thirdOperand is TransferSource.Slot ->
+            LinkedWasmCallWithoutLocalsWithThreeSlotOperands(
                 callFrameOffset = callFrameOffset,
+                frameEndOffset = frameEndOffset,
+                entryIp = entryIp,
                 firstSourceSlot = firstOperand.slot,
                 secondSourceSlot = secondOperand.slot,
                 thirdSourceSlot = thirdOperand.slot,
-                resultDestinationSlot = resultDestinationSlot,
+                activationHeaderSlot = activationHeaderSlot,
+                activationHeader = activationHeader,
+                resultDestinationSlot = destination,
             )
-        }
         sources.size == 4 &&
             firstOperand is TransferSource.Slot &&
             secondOperand is TransferSource.Slot &&
             thirdOperand is TransferSource.Slot &&
-            fourthOperand is TransferSource.Slot -> {
-            UnlinkedWasmCallWithoutLocalsWithFourSlotOperands(
-                instruction = instruction,
+            fourthOperand is TransferSource.Slot ->
+            LinkedWasmCallWithoutLocalsWithFourSlotOperands(
                 callFrameOffset = callFrameOffset,
+                frameEndOffset = frameEndOffset,
+                entryIp = entryIp,
                 firstSourceSlot = firstOperand.slot,
                 secondSourceSlot = secondOperand.slot,
                 thirdSourceSlot = thirdOperand.slot,
                 fourthSourceSlot = fourthOperand.slot,
-                resultDestinationSlot = resultDestinationSlot,
+                activationHeaderSlot = activationHeaderSlot,
+                activationHeader = activationHeader,
+                resultDestinationSlot = destination,
             )
-        }
-        operand is TransferSource.Immediate -> {
-            val value = operand.value
-            UnlinkedWasmCallWithoutLocalsWithImmediateOperand(
-                instruction,
-                callFrameOffset,
-                value,
-                resultDestinationSlot,
-            )
-        }
-        operand is TransferSource.Slot -> {
-            val slot = operand.slot
-            UnlinkedWasmCallWithoutLocalsWithSlotOperand(
-                instruction,
-                callFrameOffset,
-                slot,
-                resultDestinationSlot,
-            )
-        }
-        else -> UnlinkedWasmCallWithOperands(instruction, callFrameOffset, resultDestinationSlot)
-    }
-}
-
-/** Resolves Wasm call metadata after final program addresses and function strategies are known. */
-fun LinkWasmCallDispatchers(
-    program: Program,
-    firstIp: Int,
-    onLinked: ((DispatchableInstruction, LinkedInstruction) -> Unit)? = null,
-): Int {
-    require(firstIp in 0..program.size) {
-        "first linkable Wasm call instruction index is out of bounds"
-    }
-    var linkedCount = 0
-    for (ip in firstIp until program.size) {
-        val instruction = program.instructions[ip]
-        if (instruction is LinkableWasmCall) {
-            val linked = instruction.link(ip)
-            onLinked?.invoke(linked, instruction.source)
-            program.replace(ip, linked)
-            linkedCount++
-        }
-    }
-    return linkedCount
-}
-
-private interface LinkableWasmCall {
-    val source: LinkedInstruction
-
-    fun link(callSiteIp: Int): DispatchableInstruction
-}
-
-private abstract class UnlinkedWasmCall(
-    final override val source: ControlInstruction.WasmCall,
-    val resultDestinationSlot: Int?,
-) : DispatchableInstruction(), LinkableWasmCall {
-
-    protected val strategy = source.strategy
-
-    protected fun linkedTarget(): Triple<Int, Int, Int> {
-        check(strategy.isInstalled) {
-            "direct Wasm call target is not installed"
-        }
-        return Triple(strategy.frameSlots, strategy.entryIp, strategy.interfaceSlotCount)
-    }
-
-    protected fun linkedActivationHeader(callSiteIp: Int): Long {
-        checkWasmCallSite(callSiteIp, source.callFrameOffset, resultDestinationSlot)
-        val returnAddress = if (resultDestinationSlot == null) {
-            callSiteIp + 1
-        } else {
-            resultCallSiteIp(callSiteIp + 1)
-        }
-        return activationHeader(returnAddress, source.callFrameOffset)
-    }
-
-    final override fun invoke(
-        vstack: ValueStack,
-        context: ExecutionContext,
-        nextIp: Int,
-    ): Int = error("unlinked Wasm call cannot be dispatched")
-}
-
-private class UnlinkedWasmCallWithOperands(
-    instruction: ControlInstruction.WasmCall,
-    private val callFrameOffset: Int,
-    resultDestinationSlot: Int?,
-) : UnlinkedWasmCall(instruction, resultDestinationSlot) {
-
-    override fun link(callSiteIp: Int): DispatchableInstruction {
-        val (frameSlots, entryIp, activationHeaderSlot) = linkedTarget()
-        return linkedWasmCallDispatcher(
-            operands = source.operands,
+        operand is TransferSource.Immediate -> LinkedWasmCallWithoutLocalsWithImmediateOperand(
             callFrameOffset = callFrameOffset,
-            frameEndOffset = callFrameOffset + frameSlots,
+            frameEndOffset = frameEndOffset,
+            entryIp = entryIp,
+            operand = operand.value,
+            activationHeaderSlot = activationHeaderSlot,
+            activationHeader = activationHeader,
+            resultDestinationSlot = destination,
+        )
+        operand is TransferSource.Slot -> LinkedWasmCallWithoutLocalsWithSlotOperand(
+            callFrameOffset = callFrameOffset,
+            frameEndOffset = frameEndOffset,
+            entryIp = entryIp,
+            sourceSlot = operand.slot,
+            activationHeaderSlot = activationHeaderSlot,
+            activationHeader = activationHeader,
+            resultDestinationSlot = destination,
+        )
+        else -> linkedWasmCallDispatcher(
+            operands = operands,
+            callFrameOffset = callFrameOffset,
+            frameEndOffset = frameEndOffset,
             entryIp = entryIp,
             activationHeaderSlot = activationHeaderSlot,
-            activationHeader = linkedActivationHeader(callSiteIp),
+            activationHeader = activationHeader,
             localInitialization = LocalInitialization.None,
             resultDestinationSlot = resultDestinationSlot,
-        )
-    }
-}
-
-private class UnlinkedWasmCallByStrategy(
-    instruction: ControlInstruction.WasmCall,
-    private val callFrameOffset: Int,
-    resultDestinationSlot: Int?,
-) : UnlinkedWasmCall(instruction, resultDestinationSlot) {
-
-    override fun link(callSiteIp: Int): DispatchableInstruction {
-        if (strategy.localInitialization == LocalInitialization.None) {
-            return wasmCallWithoutLocalsDispatcher(
-                source,
-                source.operands,
-                callFrameOffset,
-                resultDestinationSlot,
-            ).link(callSiteIp)
-        }
-        val (frameSlots, entryIp, activationHeaderSlot) = linkedTarget()
-        return linkedWasmCallDispatcher(
-            operands = source.operands,
-            callFrameOffset = callFrameOffset,
-            frameEndOffset = callFrameOffset + frameSlots,
-            entryIp = entryIp,
-            activationHeaderSlot = activationHeaderSlot,
-            activationHeader = linkedActivationHeader(callSiteIp),
-            localInitialization = strategy.localInitialization,
-            resultDestinationSlot = resultDestinationSlot,
-        )
-    }
-}
-
-private class UnlinkedWasmCallWithoutLocalsOrOperandTransfer(
-    instruction: ControlInstruction.WasmCall,
-    private val callFrameOffset: Int,
-    resultDestinationSlot: Int?,
-) : UnlinkedWasmCall(instruction, resultDestinationSlot) {
-
-    override fun link(callSiteIp: Int): DispatchableInstruction {
-        val (frameSlots, entryIp, activationHeaderSlot) = linkedTarget()
-        return LinkedWasmCallWithoutLocalsOrOperandTransfer(
-            callFrameOffset = callFrameOffset,
-            frameEndOffset = callFrameOffset + frameSlots,
-            entryIp = entryIp,
-            activationHeaderSlot = activationHeaderSlot,
-            activationHeader = linkedActivationHeader(callSiteIp),
-            resultDestinationSlot = resultDestinationSlot ?: NO_RESULT_DESTINATION,
         )
     }
 }
@@ -256,27 +164,6 @@ private class LinkedWasmCallWithoutLocalsOrOperandTransfer(
     ): Int {
         vstack.activateLinkedFrame(callFrameOffset, frameEndOffset, activationHeaderSlot, activationHeader)
         return entryIp
-    }
-}
-
-private class UnlinkedWasmCallWithoutLocalsWithImmediateOperand(
-    instruction: ControlInstruction.WasmCall,
-    private val callFrameOffset: Int,
-    private val operand: Long,
-    resultDestinationSlot: Int?,
-) : UnlinkedWasmCall(instruction, resultDestinationSlot) {
-
-    override fun link(callSiteIp: Int): DispatchableInstruction {
-        val (frameSlots, entryIp, activationHeaderSlot) = linkedTarget()
-        return LinkedWasmCallWithoutLocalsWithImmediateOperand(
-            callFrameOffset = callFrameOffset,
-            frameEndOffset = callFrameOffset + frameSlots,
-            entryIp = entryIp,
-            operand = operand,
-            activationHeaderSlot = activationHeaderSlot,
-            activationHeader = linkedActivationHeader(callSiteIp),
-            resultDestinationSlot = resultDestinationSlot ?: NO_RESULT_DESTINATION,
-        )
     }
 }
 
@@ -306,27 +193,6 @@ private class LinkedWasmCallWithoutLocalsWithImmediateOperand(
     }
 }
 
-private class UnlinkedWasmCallWithoutLocalsWithSlotOperand(
-    instruction: ControlInstruction.WasmCall,
-    private val callFrameOffset: Int,
-    private val sourceSlot: Int,
-    resultDestinationSlot: Int?,
-) : UnlinkedWasmCall(instruction, resultDestinationSlot) {
-
-    override fun link(callSiteIp: Int): DispatchableInstruction {
-        val (frameSlots, entryIp, activationHeaderSlot) = linkedTarget()
-        return LinkedWasmCallWithoutLocalsWithSlotOperand(
-            callFrameOffset = callFrameOffset,
-            frameEndOffset = callFrameOffset + frameSlots,
-            entryIp = entryIp,
-            sourceSlot = sourceSlot,
-            activationHeaderSlot = activationHeaderSlot,
-            activationHeader = linkedActivationHeader(callSiteIp),
-            resultDestinationSlot = resultDestinationSlot ?: NO_RESULT_DESTINATION,
-        )
-    }
-}
-
 private class LinkedWasmCallWithoutLocalsWithSlotOperand(
     private val callFrameOffset: Int,
     private val frameEndOffset: Int,
@@ -350,29 +216,6 @@ private class LinkedWasmCallWithoutLocalsWithSlotOperand(
             sourceSlot,
         )
         return entryIp
-    }
-}
-
-private class UnlinkedWasmCallWithoutLocalsWithTwoSlotOperands(
-    instruction: ControlInstruction.WasmCall,
-    private val callFrameOffset: Int,
-    private val firstSourceSlot: Int,
-    private val secondSourceSlot: Int,
-    resultDestinationSlot: Int?,
-) : UnlinkedWasmCall(instruction, resultDestinationSlot) {
-
-    override fun link(callSiteIp: Int): DispatchableInstruction {
-        val (frameSlots, entryIp, activationHeaderSlot) = linkedTarget()
-        return LinkedWasmCallWithoutLocalsWithTwoSlotOperands(
-            callFrameOffset = callFrameOffset,
-            frameEndOffset = callFrameOffset + frameSlots,
-            entryIp = entryIp,
-            firstSourceSlot = firstSourceSlot,
-            secondSourceSlot = secondSourceSlot,
-            activationHeaderSlot = activationHeaderSlot,
-            activationHeader = linkedActivationHeader(callSiteIp),
-            resultDestinationSlot = resultDestinationSlot ?: NO_RESULT_DESTINATION,
-        )
     }
 }
 
@@ -404,31 +247,6 @@ private class LinkedWasmCallWithoutLocalsWithTwoSlotOperands(
     }
 }
 
-private class UnlinkedWasmCallWithoutLocalsWithThreeSlotOperands(
-    instruction: ControlInstruction.WasmCall,
-    private val callFrameOffset: Int,
-    private val firstSourceSlot: Int,
-    private val secondSourceSlot: Int,
-    private val thirdSourceSlot: Int,
-    resultDestinationSlot: Int?,
-) : UnlinkedWasmCall(instruction, resultDestinationSlot) {
-
-    override fun link(callSiteIp: Int): DispatchableInstruction {
-        val (frameSlots, entryIp, activationHeaderSlot) = linkedTarget()
-        return LinkedWasmCallWithoutLocalsWithThreeSlotOperands(
-            callFrameOffset = callFrameOffset,
-            frameEndOffset = callFrameOffset + frameSlots,
-            entryIp = entryIp,
-            firstSourceSlot = firstSourceSlot,
-            secondSourceSlot = secondSourceSlot,
-            thirdSourceSlot = thirdSourceSlot,
-            activationHeaderSlot = activationHeaderSlot,
-            activationHeader = linkedActivationHeader(callSiteIp),
-            resultDestinationSlot = resultDestinationSlot ?: NO_RESULT_DESTINATION,
-        )
-    }
-}
-
 private class LinkedWasmCallWithoutLocalsWithThreeSlotOperands(
     private val callFrameOffset: Int,
     private val frameEndOffset: Int,
@@ -456,33 +274,6 @@ private class LinkedWasmCallWithoutLocalsWithThreeSlotOperands(
             thirdSourceSlot,
         )
         return entryIp
-    }
-}
-
-private class UnlinkedWasmCallWithoutLocalsWithFourSlotOperands(
-    instruction: ControlInstruction.WasmCall,
-    private val callFrameOffset: Int,
-    private val firstSourceSlot: Int,
-    private val secondSourceSlot: Int,
-    private val thirdSourceSlot: Int,
-    private val fourthSourceSlot: Int,
-    resultDestinationSlot: Int?,
-) : UnlinkedWasmCall(instruction, resultDestinationSlot) {
-
-    override fun link(callSiteIp: Int): DispatchableInstruction {
-        val (frameSlots, entryIp, activationHeaderSlot) = linkedTarget()
-        return LinkedWasmCallWithoutLocalsWithFourSlotOperands(
-            callFrameOffset = callFrameOffset,
-            frameEndOffset = callFrameOffset + frameSlots,
-            entryIp = entryIp,
-            firstSourceSlot = firstSourceSlot,
-            secondSourceSlot = secondSourceSlot,
-            thirdSourceSlot = thirdSourceSlot,
-            fourthSourceSlot = fourthSourceSlot,
-            activationHeaderSlot = activationHeaderSlot,
-            activationHeader = linkedActivationHeader(callSiteIp),
-            resultDestinationSlot = resultDestinationSlot ?: NO_RESULT_DESTINATION,
-        )
     }
 }
 
@@ -799,14 +590,13 @@ private inline fun linkedWasmFunctionCall(
     return entryIp
 }
 
-fun CallDispatcher(
-    instruction: ControlInstruction.HostCall,
-    resultDestinationSlot: Int? = null,
+fun HostCallDispatcher(
+    function: FunctionInstance.HostFunction,
+    caller: ModuleInstance,
+    operands: OperandTransfer,
+    callFrameOffset: Int,
+    resultDestinationSlot: Int?,
 ): DispatchableInstruction {
-    val function = instruction.instance
-    val caller = instruction.caller
-    val operands = instruction.operands
-    val callFrameOffset = instruction.callFrameOffset
     val resultSlotBase = resultDestinationSlot ?: callFrameOffset
     val operand = operands.sources.singleOrNull()
 
@@ -852,125 +642,79 @@ fun CallDispatcher(
     }
 }
 
-fun CallDispatcher(
-    instruction: ControlInstruction.CallIndirectI,
-    resultDestinationSlot: Int? = null,
-): DispatchableInstruction = UnlinkedCallIndirectI(instruction, resultDestinationSlot)
-
-private class UnlinkedCallIndirectI(
-    override val source: ControlInstruction.CallIndirectI,
-    private val resultDestinationSlot: Int?,
-) : DispatchableInstruction(), LinkableWasmCall {
-
-    override fun link(callSiteIp: Int): DispatchableInstruction =
-        CallDispatcher(source, callSiteIp, resultDestinationSlot)
-
-    override fun invoke(
-        vstack: ValueStack,
-        context: ExecutionContext,
-        nextIp: Int,
-    ): Int = error("unlinked indirect Wasm call cannot be dispatched")
-}
-
-fun CallDispatcher(
-    instruction: ControlInstruction.CallIndirectS,
-    resultDestinationSlot: Int? = null,
-): DispatchableInstruction = UnlinkedCallIndirectS(instruction, resultDestinationSlot)
-
-private class UnlinkedCallIndirectS(
-    override val source: ControlInstruction.CallIndirectS,
-    private val resultDestinationSlot: Int?,
-) : DispatchableInstruction(), LinkableWasmCall {
-
-    override fun link(callSiteIp: Int): DispatchableInstruction =
-        CallDispatcher(source, callSiteIp, resultDestinationSlot)
-
-    override fun invoke(
-        vstack: ValueStack,
-        context: ExecutionContext,
-        nextIp: Int,
-    ): Int = error("unlinked indirect Wasm call cannot be dispatched")
-}
-
-fun CallDispatcher(
-    instruction: ControlInstruction.CallRefS,
-    resultDestinationSlot: Int? = null,
-): DispatchableInstruction = UnlinkedCallRef(instruction, resultDestinationSlot)
-
-private class UnlinkedCallRef(
-    override val source: ControlInstruction.CallRefS,
-    private val resultDestinationSlot: Int?,
-) : DispatchableInstruction(), LinkableWasmCall {
-
-    override fun link(callSiteIp: Int): DispatchableInstruction =
-        CallDispatcher(source, callSiteIp, resultDestinationSlot)
-
-    override fun invoke(
-        vstack: ValueStack,
-        context: ExecutionContext,
-        nextIp: Int,
-    ): Int = error("unlinked reference Wasm call cannot be dispatched")
-}
-
-fun CallDispatcher(
-    instruction: ControlInstruction.CallIndirectI,
+fun CallIndirectIDispatcher(
+    elementIndex: Int,
+    operands: OperandTransfer,
+    type: RTT,
+    table: TableInstance,
+    caller: ModuleInstance,
+    callFrameOffset: Int,
     callSiteIp: Int,
-    resultDestinationSlot: Int? = null,
+    resultDestinationSlot: Int?,
 ): DispatchableInstruction {
-    checkWasmCallSite(callSiteIp, instruction.callFrameOffset, resultDestinationSlot)
+    checkWasmCallSite(callSiteIp, callFrameOffset, resultDestinationSlot)
     val returnIp = callSiteIp + 1
-    val header = activationHeader(
-        if (resultDestinationSlot == null) returnIp else resultCallSiteIp(returnIp),
-        instruction.callFrameOffset,
-    )
+    val header = callActivationHeader(returnIp, callFrameOffset, resultDestinationSlot)
     return if (resultDestinationSlot == null) {
         DispatchableInstruction { vstack, context, _ ->
-            CallExecutor(vstack, context, instruction, returnIp, header)
+            strictIndirectCall(vstack, context, elementIndex, operands, type, table, caller, callFrameOffset, returnIp, header, null)
         }
     } else {
-        ResultCallIndirectIDispatcher(instruction, returnIp, header, resultDestinationSlot)
+        ResultCallIndirectIDispatcher(elementIndex, operands, type, table, caller, callFrameOffset, returnIp, header, resultDestinationSlot)
     }
 }
 
-fun CallDispatcher(
-    instruction: ControlInstruction.CallIndirectS,
+fun CallIndirectSDispatcher(
+    elementIndexSlot: Int,
+    operands: OperandTransfer,
+    type: RTT,
+    table: TableInstance,
+    caller: ModuleInstance,
+    callFrameOffset: Int,
     callSiteIp: Int,
-    resultDestinationSlot: Int? = null,
+    resultDestinationSlot: Int?,
 ): DispatchableInstruction {
-    checkWasmCallSite(callSiteIp, instruction.callFrameOffset, resultDestinationSlot)
+    checkWasmCallSite(callSiteIp, callFrameOffset, resultDestinationSlot)
     val returnIp = callSiteIp + 1
-    val header = activationHeader(
-        if (resultDestinationSlot == null) returnIp else resultCallSiteIp(returnIp),
-        instruction.callFrameOffset,
-    )
+    val header = callActivationHeader(returnIp, callFrameOffset, resultDestinationSlot)
     return if (resultDestinationSlot == null) {
         DispatchableInstruction { vstack, context, _ ->
-            CallExecutor(vstack, context, instruction, returnIp, header)
+            val elementIndex = vstack.getFrameSlot(elementIndexSlot).toInt()
+            strictIndirectCall(vstack, context, elementIndex, operands, type, table, caller, callFrameOffset, returnIp, header, null)
         }
     } else {
-        ResultCallIndirectSDispatcher(instruction, returnIp, header, resultDestinationSlot)
+        ResultCallIndirectSDispatcher(elementIndexSlot, operands, type, table, caller, callFrameOffset, returnIp, header, resultDestinationSlot)
     }
 }
 
-fun CallDispatcher(
-    instruction: ControlInstruction.CallRefS,
+fun CallRefSDispatcher(
+    functionSlot: Int,
+    operands: OperandTransfer,
+    caller: ModuleInstance,
+    callFrameOffset: Int,
     callSiteIp: Int,
-    resultDestinationSlot: Int? = null,
+    resultDestinationSlot: Int?,
 ): DispatchableInstruction {
-    checkWasmCallSite(callSiteIp, instruction.callFrameOffset, resultDestinationSlot)
+    checkWasmCallSite(callSiteIp, callFrameOffset, resultDestinationSlot)
     val returnIp = callSiteIp + 1
-    val header = activationHeader(
-        if (resultDestinationSlot == null) returnIp else resultCallSiteIp(returnIp),
-        instruction.callFrameOffset,
-    )
+    val header = callActivationHeader(returnIp, callFrameOffset, resultDestinationSlot)
     return if (resultDestinationSlot == null) {
         DispatchableInstruction { vstack, context, _ ->
-            CallExecutor(vstack, context, instruction, returnIp, header)
+            strictReferenceCall(vstack, context, functionSlot, operands, caller, callFrameOffset, returnIp, header, null)
         }
     } else {
-        ResultCallRefDispatcher(instruction, returnIp, header, resultDestinationSlot)
+        ResultCallRefDispatcher(functionSlot, operands, caller, callFrameOffset, returnIp, header, resultDestinationSlot)
     }
 }
+
+private fun callActivationHeader(
+    returnIp: Int,
+    callFrameOffset: Int,
+    resultDestinationSlot: Int?,
+): Long = activationHeader(
+    if (resultDestinationSlot == null) returnIp else resultCallSiteIp(returnIp),
+    callFrameOffset,
+)
 
 private fun checkWasmCallSite(
     callSiteIp: Int,
@@ -987,7 +731,12 @@ private fun checkWasmCallSite(
 }
 
 private class ResultCallIndirectIDispatcher(
-    private val instruction: ControlInstruction.CallIndirectI,
+    private val elementIndex: Int,
+    private val operands: OperandTransfer,
+    private val type: RTT,
+    private val table: TableInstance,
+    private val caller: ModuleInstance,
+    private val callFrameOffset: Int,
     private val returnIp: Int,
     private val activationHeader: Long,
     override val resultDestinationSlot: Int,
@@ -997,11 +746,28 @@ private class ResultCallIndirectIDispatcher(
         vstack: ValueStack,
         context: ExecutionContext,
         nextIp: Int,
-    ): Int = CallExecutor(vstack, context, instruction, returnIp, activationHeader, resultDestinationSlot)
+    ): Int = strictIndirectCall(
+        vstack,
+        context,
+        elementIndex,
+        operands,
+        type,
+        table,
+        caller,
+        callFrameOffset,
+        returnIp,
+        activationHeader,
+        resultDestinationSlot,
+    )
 }
 
 private class ResultCallIndirectSDispatcher(
-    private val instruction: ControlInstruction.CallIndirectS,
+    private val elementIndexSlot: Int,
+    private val operands: OperandTransfer,
+    private val type: RTT,
+    private val table: TableInstance,
+    private val caller: ModuleInstance,
+    private val callFrameOffset: Int,
     private val returnIp: Int,
     private val activationHeader: Long,
     override val resultDestinationSlot: Int,
@@ -1011,11 +777,26 @@ private class ResultCallIndirectSDispatcher(
         vstack: ValueStack,
         context: ExecutionContext,
         nextIp: Int,
-    ): Int = CallExecutor(vstack, context, instruction, returnIp, activationHeader, resultDestinationSlot)
+    ): Int = strictIndirectCall(
+        vstack,
+        context,
+        vstack.getFrameSlot(elementIndexSlot).toInt(),
+        operands,
+        type,
+        table,
+        caller,
+        callFrameOffset,
+        returnIp,
+        activationHeader,
+        resultDestinationSlot,
+    )
 }
 
 private class ResultCallRefDispatcher(
-    private val instruction: ControlInstruction.CallRefS,
+    private val functionSlot: Int,
+    private val operands: OperandTransfer,
+    private val caller: ModuleInstance,
+    private val callFrameOffset: Int,
     private val returnIp: Int,
     private val activationHeader: Long,
     override val resultDestinationSlot: Int,
@@ -1025,40 +806,20 @@ private class ResultCallRefDispatcher(
         vstack: ValueStack,
         context: ExecutionContext,
         nextIp: Int,
-    ): Int = CallExecutor(vstack, context, instruction, returnIp, activationHeader, resultDestinationSlot)
+    ): Int = strictReferenceCall(
+        vstack,
+        context,
+        functionSlot,
+        operands,
+        caller,
+        callFrameOffset,
+        returnIp,
+        activationHeader,
+        resultDestinationSlot,
+    )
 }
 
-fun ReturnCallDispatcher(
-    instruction: ControlInstruction.ReturnWasmCall,
-): DispatchableInstruction = UnlinkedReturnWasmCall(instruction)
-
-private class UnlinkedReturnWasmCall(
-    override val source: ControlInstruction.ReturnWasmCall,
-) : DispatchableInstruction(), LinkableWasmCall {
-
-    override fun link(callSiteIp: Int): DispatchableInstruction {
-        val strategy = source.strategy
-        check(strategy.isInstalled) {
-            "direct Wasm tail-call target is not installed"
-        }
-        return linkedReturnWasmCallDispatcher(
-            frameSlots = strategy.frameSlots,
-            entryIp = strategy.entryIp,
-            activationHeaderSlot = strategy.interfaceSlotCount,
-            callerActivationHeaderSlot = source.callerActivationHeaderSlot,
-            operands = source.operands,
-            localInitialization = strategy.localInitialization,
-        )
-    }
-
-    override fun invoke(
-        vstack: ValueStack,
-        context: ExecutionContext,
-        nextIp: Int,
-    ): Int = error("unlinked Wasm tail call cannot be dispatched")
-}
-
-private fun linkedReturnWasmCallDispatcher(
+fun ReturnWasmCallDispatcher(
     frameSlots: Int,
     entryIp: Int,
     activationHeaderSlot: Int,
@@ -1295,11 +1056,10 @@ private inline fun linkedReturnWasmFunctionCall(
 }
 
 fun FunctionReturnDispatcher(
-    instruction: ControlInstruction.FunctionReturn,
+    results: OperandTransfer,
+    activationHeaderSlot: Int,
 ): DispatchableInstruction {
-    val results = instruction.results
     val resultCount = results.sources.size
-    val activationHeaderSlot = instruction.activationHeaderSlot
     if (results.isInPlace) {
         return when (resultCount) {
             0 -> DispatchableInstruction { vstack, _, _ ->
@@ -1341,14 +1101,13 @@ fun FunctionReturnDispatcher(
     }
 }
 
-fun ReturnCallDispatcher(
-    instruction: ControlInstruction.ReturnHostCall,
+fun ReturnHostCallDispatcher(
+    function: FunctionInstance.HostFunction,
+    caller: ModuleInstance,
+    operands: OperandTransfer,
+    callFrameOffset: Int,
+    activationHeaderSlot: Int,
 ): DispatchableInstruction {
-    val function = instruction.instance
-    val caller = instruction.caller
-    val operands = instruction.operands
-    val callFrameOffset = instruction.callFrameOffset
-    val activationHeaderSlot = instruction.activationHeaderSlot
     val operand = operands.sources.singleOrNull()
 
     return when {
@@ -1393,32 +1152,90 @@ fun ReturnCallDispatcher(
     }
 }
 
-fun ReturnCallDispatcher(
-    instruction: ControlInstruction.ReturnCallIndirectI,
+fun ReturnCallIndirectIDispatcher(
+    elementIndex: Int,
+    operands: TailCallOperandTransfer,
+    type: RTT,
+    table: TableInstance,
+    caller: ModuleInstance,
+    callFrameOffset: Int,
+    callerActivationHeaderSlot: Int,
 ): DispatchableInstruction = DispatchableInstruction { vstack, context, nextIp ->
-    ReturnCallExecutor(vstack, context, instruction, nextIp)
+    strictIndirectReturnCall(
+        vstack,
+        context,
+        elementIndex,
+        operands,
+        type,
+        table,
+        caller,
+        callFrameOffset,
+        callerActivationHeaderSlot,
+        nextIp,
+    )
 }
 
-fun ReturnCallDispatcher(
-    instruction: ControlInstruction.ReturnCallIndirectS,
+fun ReturnCallIndirectSDispatcher(
+    elementIndexSlot: Int,
+    operands: TailCallOperandTransfer,
+    type: RTT,
+    table: TableInstance,
+    caller: ModuleInstance,
+    callFrameOffset: Int,
+    callerActivationHeaderSlot: Int,
 ): DispatchableInstruction = DispatchableInstruction { vstack, context, nextIp ->
-    ReturnCallExecutor(vstack, context, instruction, nextIp)
+    strictIndirectReturnCall(
+        vstack,
+        context,
+        vstack.getFrameSlot(elementIndexSlot).toInt(),
+        operands,
+        type,
+        table,
+        caller,
+        callFrameOffset,
+        callerActivationHeaderSlot,
+        nextIp,
+    )
 }
 
-fun ReturnCallDispatcher(
-    instruction: ControlInstruction.ReturnCallRefS,
+fun ReturnCallRefSDispatcher(
+    functionSlot: Int,
+    operands: TailCallOperandTransfer,
+    caller: ModuleInstance,
+    callFrameOffset: Int,
+    callerActivationHeaderSlot: Int,
 ): DispatchableInstruction = DispatchableInstruction { vstack, context, nextIp ->
-    ReturnCallExecutor(vstack, context, instruction, nextIp)
+    strictReferenceReturnCall(
+        vstack,
+        context,
+        functionSlot,
+        operands,
+        caller,
+        callFrameOffset,
+        callerActivationHeaderSlot,
+        nextIp,
+    )
 }
 
 fun ThrowDispatcher(
-    instruction: ControlInstruction.Throw,
+    tagAddress: Address.Tag,
+    firstPayloadSlot: Int,
 ): DispatchableInstruction = DispatchableInstruction { vstack, context, nextIp ->
-    ThrowExecutor(vstack, context, instruction, nextIp - 1)
+    ThrowRefValueExecutor(
+        vstack = vstack,
+        context = context,
+        ref = context.heap.allocateExceptionFromFrame(context, tagAddress, firstPayloadSlot),
+        faultIp = nextIp - 1,
+    )
 }
 
-fun ThrowRefDispatcher(
-    instruction: ControlInstruction.ThrowRefS,
+fun ThrowRefSDispatcher(
+    exceptionSlot: Int,
 ): DispatchableInstruction = DispatchableInstruction { vstack, context, nextIp ->
-    ThrowRefExecutor(vstack, context, instruction, nextIp - 1)
+    ThrowRefValueExecutor(
+        vstack = vstack,
+        context = context,
+        ref = vstack.getFrameSlot(exceptionSlot),
+        faultIp = nextIp - 1,
+    )
 }
