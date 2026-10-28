@@ -1,13 +1,12 @@
 package io.github.charlietap.chasm.tools.compilerbaseline
 
-import io.github.charlietap.chasm.runtime.address.Address
+import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.exception.FunctionExceptionTable
 import io.github.charlietap.chasm.runtime.ext.toReferenceValue
 import io.github.charlietap.chasm.runtime.function.LocalInitialization
-import io.github.charlietap.chasm.runtime.instruction.AdminInstruction
-import io.github.charlietap.chasm.runtime.instruction.LinkedInstruction
 import io.github.charlietap.chasm.runtime.instruction.OperandTransfer
-import io.github.charlietap.chasm.runtime.instruction.ReferenceInstruction
+import io.github.charlietap.chasm.runtime.stack.decodeActivationCallerFrameDelta
+import io.github.charlietap.chasm.runtime.stack.decodeActivationReturnIp
 import io.github.charlietap.chasm.runtime.type.RTT
 import io.github.charlietap.chasm.runtime.type.ReferenceTypeTest
 import io.github.charlietap.chasm.runtime.value.ReferenceValue
@@ -18,6 +17,8 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
+import java.lang.reflect.Field
+import java.lang.reflect.Modifier
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
 import kotlin.reflect.full.allSuperclasses
@@ -26,13 +27,40 @@ import kotlin.reflect.full.memberProperties
 import kotlin.reflect.full.primaryConstructor
 import kotlin.reflect.jvm.isAccessible
 
-internal class InstructionRenderer(
+internal class DispatcherRenderer(
     private val symbols: ModuleSymbols,
 ) {
 
-    fun immediates(instruction: LinkedInstruction, entryIp: Int): JsonObject = buildJsonObject {
-        for ((name, value) in properties(instruction)) {
-            put(snakeCase(name), field(instruction, name, value, entryIp))
+    fun dispatcher(
+        dispatchable: DispatchableInstruction,
+    ): String {
+        val name = dispatchable.javaClass.name.substringAfterLast('.')
+        val parts = name.split('$')
+        val factory = if (parts.size > 1 && parts[0].endsWith("Kt")) parts[1] else parts[0]
+        return factory.substringBefore('-')
+    }
+
+    fun variant(
+        dispatchable: DispatchableInstruction,
+    ): Int? {
+        val name = dispatchable.javaClass.name
+        val ordinal = name.substringAfterLast('$').toIntOrNull() ?: return null
+        val prefix = name.substringBeforeLast('$')
+        val loader = dispatchable.javaClass.classLoader
+        val hasSiblings = (1..2).any { sibling -> sibling != ordinal && classExists("$prefix$$sibling", loader) }
+        return ordinal.takeIf { hasSiblings }
+    }
+
+    fun fields(
+        dispatchable: DispatchableInstruction,
+        entryIp: Int,
+    ): JsonObject? {
+        val fields = capturedFields(dispatchable)
+        if (fields.isEmpty()) return null
+        return buildJsonObject {
+            for ((name, field) in fields) {
+                put(snakeCase(name), field(name, field.get(dispatchable), entryIp))
+            }
         }
     }
 
@@ -73,42 +101,54 @@ internal class InstructionRenderer(
     }
 
     private fun field(
-        instruction: LinkedInstruction,
         name: String,
         value: Any?,
         entryIp: Int,
-    ): JsonElement = when {
-        instruction is AdminInstruction && name == "targetIp" -> target((value as Int) - entryIp)
-        instruction is AdminInstruction && name == "targetIps" -> JsonArray((value as IntArray).map { ip -> target(ip - entryIp) })
-        instruction is ReferenceInstruction.RefFuncS && name == "reference" -> reference((value as Long).toReferenceValue())
-        instruction is ReferenceInstruction.RefNullS && name == "reference" -> reference((value as Long).toReferenceValue())
+    ): JsonElement = when (name) {
+        "entryIp" -> JsonPrimitive(symbols.entry(value as Int))
+        "targetIp", "returnIp", "callSiteIp" -> target((value as Int) - entryIp)
+        "targetIps" -> JsonArray((value as IntArray).map { ip -> target(ip - entryIp) })
+        "activationHeader", "header" -> activationHeader(value as Long, entryIp)
+        "rtt", "type" -> JsonPrimitive(symbols.type(RTT(value as Int)))
+        "typeTest" -> referenceTypeTest(boxReferenceTypeTest(value as Int))
+        "tagAddress" -> JsonPrimitive(symbols.tag(value as Int))
+        "reference" -> reference((value as Long).toReferenceValue())
         else -> value(value, name)
+    }
+
+    private fun reference(
+        reference: ReferenceValue,
+    ): JsonElement = when (reference) {
+        is ReferenceValue.Function -> JsonPrimitive(symbols.function(reference.address))
+        else -> record(reference, "reference")
+    }
+
+    private fun activationHeader(
+        header: Long,
+        entryIp: Int,
+    ): JsonObject = buildJsonObject {
+        val returnIp = decodeActivationReturnIp(header)
+        val resultCall = returnIp and RESULT_CALL_SITE_FLAG != 0
+        put("return", target((returnIp and RESULT_CALL_SITE_IP_MASK) - entryIp))
+        if (resultCall) put("result_call", true)
+        put("caller_frame_delta", decodeActivationCallerFrameDelta(header))
     }
 
     private fun value(value: Any?, path: String): JsonElement = when (value) {
         null -> JsonNull
         is Boolean -> JsonPrimitive(value)
         is Byte, is Short, is Int, is Long -> JsonPrimitive(value as Number)
-        is UByte, is UShort, is UInt, is ULong -> JsonPrimitive(value.toString().toBigInteger())
         is Float -> JsonPrimitive("$value (0x${value.toRawBits().toUInt().toString(HEX).padStart(8, '0')})")
         is Double -> JsonPrimitive("$value (0x${value.toRawBits().toULong().toString(HEX).padStart(16, '0')})")
-        is String -> JsonPrimitive(value)
         is Enum<*> -> JsonPrimitive(snakeCase(value.name))
         is IntArray -> JsonArray(value.map(::JsonPrimitive))
         is LongArray -> JsonArray(value.map(::JsonPrimitive))
-        is ByteArray -> JsonPrimitive(value.joinToString("") { byte -> byte.toUByte().toString(HEX).padStart(2, '0') })
         is Array<*> -> JsonArray(value.mapIndexed { index, element -> value(element, "$path[$index]") })
-        is List<*> -> JsonArray(value.mapIndexed { index, element -> value(element, "$path[$index]") })
-        is RTT -> JsonPrimitive(symbols.type(value))
-        is ReferenceTypeTest -> referenceTypeTest(value)
-        is Address.Function -> JsonPrimitive(symbols.function(value))
-        is Address.Tag -> JsonPrimitive(symbols.tag(value))
         is OperandTransfer -> transfer(value, path)
         is LocalInitialization.ConstantStores -> buildJsonObject {
             put("kind", "constant_stores")
             put("values", value(value.values, "$path.values"))
         }
-        is ReferenceValue -> reference(value)
         else -> symbols.nameOf(value)?.let(::JsonPrimitive) ?: record(value, path)
     }
 
@@ -119,7 +159,7 @@ internal class InstructionRenderer(
             return JsonPrimitive(snakeCase(checkNotNull(kind ?: type.simpleName) { "unnamed object at $path" }))
         }
         check(type.isData || type.isValue) {
-            "no rendering for ${type.qualifiedName} at $path; extend InstructionRenderer"
+            "no rendering for ${type.qualifiedName} at $path; extend DispatcherRenderer"
         }
         val properties = properties(value)
         if (type.isValue && kind == null) return value(properties.single().second, path)
@@ -136,11 +176,6 @@ internal class InstructionRenderer(
         } else {
             put("accepted_reference_tags", test.acceptedReferenceTags)
         }
-    }
-
-    private fun reference(reference: ReferenceValue): JsonElement = when (reference) {
-        is ReferenceValue.Function -> JsonPrimitive(symbols.function(reference.address))
-        else -> record(reference, "reference")
     }
 
     private fun transfer(transfer: OperandTransfer, path: String): JsonObject {
@@ -179,7 +214,7 @@ internal class InstructionRenderer(
         } else {
             name.replace(Regex("(?<=[a-z0-9])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])"), "_").lowercase()
         }
-        return NAME_REPLACEMENTS[snake] ?: snake.split('_').joinToString("_", transform = ::wholeWord)
+        return snake.split('_').joinToString("_", transform = ::wholeWord)
     }
 
     private fun wholeWord(word: String): String {
@@ -198,7 +233,9 @@ internal class InstructionRenderer(
         const val TRANSFER_OPERATION_SHIFT = 30
         const val TRANSFER_INDEX_MASK = (1 shl TRANSFER_OPERATION_SHIFT) - 1
 
-        val NAME_REPLACEMENTS = mapOf("mem_arg" to "memory_offset")
+        const val RESULT_CALL_SITE_FLAG = 1 shl 30
+        const val RESULT_CALL_SITE_IP_MASK = RESULT_CALL_SITE_FLAG - 1
+
         val WORD_REPLACEMENTS = mapOf("val" to "value", "src" to "source", "dst" to "destination", "dest" to "destination")
         val NUMBERED_WORD = Regex("(zero|val)([0-9]+)")
 
@@ -207,11 +244,47 @@ internal class InstructionRenderer(
             .single { property -> property.name == "schedule" }
             .apply { isAccessible = true } as KProperty1<OperandTransfer, Any?>
 
+        val boxReferenceTypeTest = ReferenceTypeTest::class.java
+            .getDeclaredMethod("box-impl", Int::class.javaPrimitiveType)
+            .apply { isAccessible = true }
+
+        fun boxReferenceTypeTest(
+            encoding: Int,
+        ): ReferenceTypeTest = boxReferenceTypeTest.invoke(null, encoding) as ReferenceTypeTest
+
+        fun classExists(
+            name: String,
+            loader: ClassLoader?,
+        ): Boolean = try {
+            Class.forName(name, false, loader)
+            true
+        } catch (_: ClassNotFoundException) {
+            false
+        }
+
         fun scheduleField(schedule: Any, name: String): Any? = schedule::class.memberProperties
             .single { property -> property.name == name }
             .apply { isAccessible = true }
             .getter
             .call(schedule)
+
+        fun capturedFields(
+            dispatchable: DispatchableInstruction,
+        ): List<Pair<String, Field>> {
+            val fields = sortedMapOf<String, Field>()
+            var type: Class<*>? = dispatchable.javaClass
+            while (type != null && type.name.startsWith(CHASM_PACKAGE)) {
+                for (field in type.declaredFields) {
+                    if (Modifier.isStatic(field.modifiers)) continue
+                    val name = field.name.removePrefix("$").substringBefore("\$inlined")
+                    field.isAccessible = true
+                    val previous = fields.put(name, field)
+                    check(previous == null) { "${dispatchable.javaClass.name} captures $name twice" }
+                }
+                type = type.superclass
+            }
+            return fields.toList()
+        }
 
         fun properties(value: Any): List<Pair<String, Any?>> {
             val type = value::class
@@ -227,5 +300,7 @@ internal class InstructionRenderer(
                 name to property.getter.call(value)
             }
         }
+
+        const val CHASM_PACKAGE = "io.github.charlietap.chasm."
     }
 }

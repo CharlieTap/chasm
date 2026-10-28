@@ -1192,4 +1192,10 @@
 
   (func $locals.reference_default (result externref) (local externref)
     local.get 0)
+
+  (func $reference.ref_func (result funcref)
+    ref.func $callee.unary)
+
+  (func $reference.ref_null (result externref)
+    ref.null extern)
 )

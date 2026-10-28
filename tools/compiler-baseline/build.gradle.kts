@@ -13,7 +13,9 @@ plugins {
 kotlin {
     dependencies {
         implementation(projects.ast)
-        implementation(projects.compiler)
+        implementation(projects.cir)
+        implementation(projects.compiler.backendChasm)
+        implementation(projects.compiler.frontend)
         implementation(projects.config)
         implementation(projects.decoder)
         implementation(projects.executor.instantiator)
@@ -28,6 +30,7 @@ kotlin {
         implementation(libs.kotlinx.serialization)
         implementation(libs.result)
 
+        testImplementation(projects.test.fixture.cir)
         testImplementation(libs.kotlin.test)
     }
 }
@@ -56,8 +59,8 @@ fun registerCompilerBaseline(
     generatorMainClass: String,
 ) {
     val taskName = name.replaceFirstChar(Char::uppercase)
-    val generated = layout.buildDirectory.file("baselines/compiler/$name-baseline.json")
-    val baseline = compilerBaselineDirectory.file("$name-baseline.json")
+    val generated = layout.buildDirectory.file("baselines/compiler/$name.json")
+    val baseline = compilerBaselineDirectory.file("$name.json")
     val generate = tasks.register<GenerateCompilerBaselineTask>("generate${taskName}CompilerBaseline") {
         group = "verification"
         description = "Generate the $displayName compiler baseline"
@@ -87,12 +90,22 @@ fun registerCompilerBaseline(
 }
 
 registerCompilerBaseline(
-    name = "coremark",
-    displayName = "CoreMark",
-    generatorMainClass = "io.github.charlietap.chasm.tools.compilerbaseline.GenerateCompilerBaselineKt",
+    name = "coremark-frontend",
+    displayName = "CoreMark frontend",
+    generatorMainClass = "io.github.charlietap.chasm.tools.compilerbaseline.GenerateCoremarkFrontendBaselineKt",
 )
 registerCompilerBaseline(
-    name = "contrived",
-    displayName = "contrived",
-    generatorMainClass = "io.github.charlietap.chasm.tools.compilerbaseline.GenerateContrivedCompilerBaselineKt",
+    name = "coremark-backend",
+    displayName = "CoreMark backend",
+    generatorMainClass = "io.github.charlietap.chasm.tools.compilerbaseline.GenerateCoremarkBackendBaselineKt",
+)
+registerCompilerBaseline(
+    name = "contrived-frontend",
+    displayName = "contrived frontend",
+    generatorMainClass = "io.github.charlietap.chasm.tools.compilerbaseline.GenerateContrivedFrontendBaselineKt",
+)
+registerCompilerBaseline(
+    name = "contrived-backend",
+    displayName = "contrived backend",
+    generatorMainClass = "io.github.charlietap.chasm.tools.compilerbaseline.GenerateContrivedBackendBaselineKt",
 )

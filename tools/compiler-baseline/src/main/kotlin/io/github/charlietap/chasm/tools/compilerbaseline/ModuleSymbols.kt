@@ -19,13 +19,19 @@ internal class ModuleSymbols(
 ) {
 
     private val names = IdentityHashMap<Any, String>()
+    private val entries = HashMap<Int, String>()
 
     init {
         names[instance] = "module"
+        names[store.fuel] = "fuel"
+        names[store.interrupt] = "interrupt"
         instance.functionAddresses.forEachIndexed { index, address ->
             val function = store.function(address)
             names.putIfAbsent(function, "func[$index]")
-            if (function is FunctionInstance.WasmFunction) names.putIfAbsent(function.callStrategy, "func[$index]")
+            if (function is FunctionInstance.WasmFunction) {
+                names.putIfAbsent(function.callStrategy, "func[$index]")
+                entries.putIfAbsent(function.callStrategy.entryIp, "func[$index]")
+            }
         }
         instance.tableAddresses.forEachIndexed { index, address -> names.putIfAbsent(store.table(address), "table[$index]") }
         instance.memAddresses.forEachIndexed { index, address -> names.putIfAbsent(store.memory(address), "memory[$index]") }
@@ -35,6 +41,10 @@ internal class ModuleSymbols(
     }
 
     fun nameOf(value: Any): String? = names[value]
+
+    fun entry(
+        entryIp: Int,
+    ): String = checkNotNull(entries[entryIp]) { "no function of the module starts at ip $entryIp" }
 
     fun type(rtt: RTT): String {
         val types = instance.runtimeTypes

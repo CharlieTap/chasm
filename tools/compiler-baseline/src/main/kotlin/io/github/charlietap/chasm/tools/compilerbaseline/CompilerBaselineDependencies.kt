@@ -8,14 +8,14 @@ import kotlinx.serialization.json.JsonNamingStrategy
 internal fun compilerBaselineWriter(
     importResolver: CompilerBaselineImportResolver,
     runtimeConfig: RuntimeConfig = RuntimeConfig(),
+    stores: List<CompilerBaselineStore> = listOf(CompilerBaselineStore.DEFAULT),
 ): CompilerBaselineWriter = CompilerBaselineWriter(
     generator = ModuleCompilerBaselineGenerator(
         importResolver = importResolver,
         moduleDecoder = ChasmModuleDecoder(),
         moduleInstantiator = ChasmModuleInstantiator(),
-        instructionCollectorFactory = ::IdentityProgramInstructionCollector,
-        tagTranslator = CompilerInstructionTagTranslator(),
         runtimeConfig = runtimeConfig,
+        stores = stores,
     ),
     json = compilerBaselineJson,
 )
@@ -26,4 +26,10 @@ internal val compilerBaselineJson = Json {
     prettyPrintIndent = "    "
     explicitNulls = false
     namingStrategy = JsonNamingStrategy.SnakeCase
+}
+
+@OptIn(ExperimentalSerializationApi::class)
+internal val cirBaselineJson = Json {
+    prettyPrint = true
+    prettyPrintIndent = "  "
 }

@@ -10,6 +10,7 @@ fun main() {
     val writer = compilerBaselineWriter(
         importResolver = EmptyCompilerBaselineImportResolver(),
         runtimeConfig = RuntimeConfig(gcStrategy = GCStrategy.TRADITIONAL),
+        stores = listOf(CompilerBaselineStore.CHECKPOINTS),
     )
     System.out.writer().use { output ->
         writer.write(

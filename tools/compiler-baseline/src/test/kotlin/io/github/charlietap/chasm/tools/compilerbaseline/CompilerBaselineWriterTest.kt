@@ -11,7 +11,7 @@ class CompilerBaselineWriterTest {
     @Test
     fun `writes generated baseline to supplied output`() {
         val baseline = CompilerBaseline(
-            schemaVersion = 2,
+            schemaVersion = 3,
             modules = listOf(
                 CompilerBaselineModule(
                     name = "fixture",
@@ -22,13 +22,15 @@ class CompilerBaselineWriterTest {
                             frameSlots = 4,
                             activationHeaderSlot = 2,
                             localInitialization = JsonPrimitive("none"),
+                            unlinkedCheckpoints = listOf(0),
                             instructions = listOf(
                                 CompilerBaselineInstruction(
                                     offset = 0,
-                                    tag = "numeric.i32.add.ss",
-                                    immediates = JsonObject(mapOf("left_slot" to JsonPrimitive(0))),
+                                    position = 1,
+                                    dispatcher = "I32AddSsDispatcher",
+                                    fields = JsonObject(mapOf("left_slot" to JsonPrimitive(0))),
                                 ),
-                                CompilerBaselineInstruction(offset = 1, tag = "admin.fuel_check"),
+                                CompilerBaselineInstruction(offset = 1, position = 2, dispatcher = "UnreachableDispatcher"),
                             ),
                         ),
                     ),
@@ -44,8 +46,9 @@ class CompilerBaselineWriterTest {
         writer.write(CompilerBaselineFixture("fixture", byteArrayOf()), output)
 
         assertEquals(baseline, compilerBaselineJson.decodeFromString(output.toString()))
-        assertTrue("\"schema_version\": 2" in output)
-        assertTrue("immediates" !in output.toString().substringAfter("admin.fuel_check"))
+        assertTrue("\"schema_version\": 3" in output)
+        assertTrue("\"unlinked_checkpoints\"" in output)
+        assertTrue("fields" !in output.toString().substringAfter("UnreachableDispatcher"))
         assertEquals('\n', output.last())
     }
 }

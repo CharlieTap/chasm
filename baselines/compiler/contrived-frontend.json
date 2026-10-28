@@ -1,0 +1,5564 @@
+{
+  "schema_version": 2,
+  "functions": [
+    {
+      "index": 0,
+      "type": 0,
+      "frame": {
+        "frame_slots": 3,
+        "activation_header_slot": 1
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [
+              {
+                "kind": "immediate",
+                "value": 1
+              }
+            ],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 1
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 1,
+      "type": 0,
+      "frame": {
+        "frame_slots": 4,
+        "activation_header_slot": 1,
+        "locals": [
+          "i32"
+        ],
+        "initialised_local_count": 1
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [
+              {
+                "kind": "slot",
+                "slot": 2
+              }
+            ],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 1
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 2,
+      "type": 1,
+      "frame": {
+        "frame_slots": 3,
+        "activation_header_slot": 1
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [
+              {
+                "kind": "slot",
+                "slot": 0
+              }
+            ],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 1
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 3,
+      "type": 5,
+      "frame": {
+        "frame_slots": 5,
+        "activation_header_slot": 2
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [
+              {
+                "kind": "immediate",
+                "value": 2
+              }
+            ],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 2
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 4,
+      "type": 5,
+      "frame": {
+        "frame_slots": 5,
+        "activation_header_slot": 2
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "numeric.i32.add.is",
+          "left": 1,
+          "right_slot": 1,
+          "destination_slot": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [
+              {
+                "kind": "slot",
+                "slot": 0
+              }
+            ],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 2
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 5,
+      "type": 5,
+      "frame": {
+        "frame_slots": 5,
+        "activation_header_slot": 2
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "numeric.i32.add.si",
+          "left_slot": 0,
+          "right": 1,
+          "destination_slot": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [
+              {
+                "kind": "slot",
+                "slot": 0
+              }
+            ],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 2
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 6,
+      "type": 5,
+      "frame": {
+        "frame_slots": 5,
+        "activation_header_slot": 2
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "numeric.i32.add.ss",
+          "left_slot": 0,
+          "right_slot": 1,
+          "destination_slot": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [
+              {
+                "kind": "slot",
+                "slot": 0
+              }
+            ],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 2
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 7,
+      "type": 6,
+      "frame": {
+        "frame_slots": 7,
+        "activation_header_slot": 3
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [
+              {
+                "kind": "immediate",
+                "value": 1
+              }
+            ],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 3
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 8,
+      "type": 6,
+      "frame": {
+        "frame_slots": 7,
+        "activation_header_slot": 3
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "parametric.select.sii",
+          "condition_slot": 2,
+          "val1": 1,
+          "val2": 1,
+          "destination_slot": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [
+              {
+                "kind": "slot",
+                "slot": 0
+              }
+            ],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 3
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 9,
+      "type": 6,
+      "frame": {
+        "frame_slots": 7,
+        "activation_header_slot": 3
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [
+              {
+                "kind": "immediate",
+                "value": 1
+              }
+            ],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 3
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 10,
+      "type": 6,
+      "frame": {
+        "frame_slots": 7,
+        "activation_header_slot": 3
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "parametric.select.sis",
+          "condition_slot": 2,
+          "val1": 1,
+          "val2_slot": 1,
+          "destination_slot": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [
+              {
+                "kind": "slot",
+                "slot": 0
+              }
+            ],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 3
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 11,
+      "type": 6,
+      "frame": {
+        "frame_slots": 7,
+        "activation_header_slot": 3
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [
+              {
+                "kind": "slot",
+                "slot": 0
+              }
+            ],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 3
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 12,
+      "type": 6,
+      "frame": {
+        "frame_slots": 7,
+        "activation_header_slot": 3
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "parametric.select.ssi",
+          "condition_slot": 2,
+          "val1_slot": 0,
+          "val2": 1,
+          "destination_slot": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [
+              {
+                "kind": "slot",
+                "slot": 0
+              }
+            ],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 3
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 13,
+      "type": 6,
+      "frame": {
+        "frame_slots": 7,
+        "activation_header_slot": 3
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [
+              {
+                "kind": "slot",
+                "slot": 0
+              }
+            ],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 3
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 14,
+      "type": 6,
+      "frame": {
+        "frame_slots": 7,
+        "activation_header_slot": 3
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "parametric.select.sss",
+          "condition_slot": 2,
+          "val1_slot": 0,
+          "val2_slot": 1,
+          "destination_slot": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [
+              {
+                "kind": "slot",
+                "slot": 0
+              }
+            ],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 3
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 15,
+      "type": 1,
+      "frame": {
+        "frame_slots": 3,
+        "activation_header_slot": 1
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "memory.i32.load.i",
+          "address": 1,
+          "destination_slot": 0,
+          "memory": 0,
+          "mem_arg": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [
+              {
+                "kind": "slot",
+                "slot": 0
+              }
+            ],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 1
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 16,
+      "type": 1,
+      "frame": {
+        "frame_slots": 3,
+        "activation_header_slot": 1
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "memory.i32.load.s",
+          "address_slot": 0,
+          "destination_slot": 0,
+          "memory": 0,
+          "mem_arg": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [
+              {
+                "kind": "slot",
+                "slot": 0
+              }
+            ],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 1
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 17,
+      "type": 7,
+      "frame": {
+        "frame_slots": 5,
+        "activation_header_slot": 2
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "memory.i32.store.ii",
+          "value": 1,
+          "address": 1,
+          "memory": 0,
+          "mem_arg": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 2
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 18,
+      "type": 7,
+      "frame": {
+        "frame_slots": 5,
+        "activation_header_slot": 2
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "memory.i32.store.is",
+          "value": 1,
+          "address_slot": 0,
+          "memory": 0,
+          "mem_arg": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 2
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 19,
+      "type": 7,
+      "frame": {
+        "frame_slots": 5,
+        "activation_header_slot": 2
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "memory.i32.store.si",
+          "value_slot": 1,
+          "address": 1,
+          "memory": 0,
+          "mem_arg": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 2
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 20,
+      "type": 7,
+      "frame": {
+        "frame_slots": 5,
+        "activation_header_slot": 2
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "memory.i32.store.ss",
+          "value_slot": 1,
+          "address_slot": 0,
+          "memory": 0,
+          "mem_arg": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 2
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 21,
+      "type": 8,
+      "frame": {
+        "frame_slots": 3,
+        "activation_header_slot": 1
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "table.get.i",
+          "element_index": 1,
+          "destination_slot": 0,
+          "table": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [
+              {
+                "kind": "slot",
+                "slot": 0
+              }
+            ],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 1
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 22,
+      "type": 8,
+      "frame": {
+        "frame_slots": 3,
+        "activation_header_slot": 1
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "table.get.s",
+          "element_index_slot": 0,
+          "destination_slot": 0,
+          "table": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [
+              {
+                "kind": "slot",
+                "slot": 0
+              }
+            ],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 1
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 23,
+      "type": 9,
+      "frame": {
+        "frame_slots": 5,
+        "activation_header_slot": 2
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "table.set.si",
+          "value_slot": 1,
+          "element_index": 0,
+          "table": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 2
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 24,
+      "type": 9,
+      "frame": {
+        "frame_slots": 5,
+        "activation_header_slot": 2
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "table.set.ss",
+          "value_slot": 1,
+          "element_index_slot": 0,
+          "table": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 2
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 25,
+      "type": 10,
+      "frame": {
+        "frame_slots": 7,
+        "activation_header_slot": 3
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "memory.copy.iii",
+          "bytes_to_copy": 1,
+          "source_offset": 1,
+          "destination_offset": 1,
+          "src_memory": 0,
+          "dst_memory": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 3
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 26,
+      "type": 10,
+      "frame": {
+        "frame_slots": 7,
+        "activation_header_slot": 3
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "memory.copy.iis",
+          "bytes_to_copy": 1,
+          "source_offset": 1,
+          "destination_offset_slot": 0,
+          "src_memory": 0,
+          "dst_memory": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 3
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 27,
+      "type": 10,
+      "frame": {
+        "frame_slots": 7,
+        "activation_header_slot": 3
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "memory.copy.isi",
+          "bytes_to_copy": 1,
+          "source_offset_slot": 1,
+          "destination_offset": 1,
+          "src_memory": 0,
+          "dst_memory": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 3
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 28,
+      "type": 10,
+      "frame": {
+        "frame_slots": 7,
+        "activation_header_slot": 3
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "memory.copy.iss",
+          "bytes_to_copy": 1,
+          "source_offset_slot": 1,
+          "destination_offset_slot": 0,
+          "src_memory": 0,
+          "dst_memory": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 3
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 29,
+      "type": 10,
+      "frame": {
+        "frame_slots": 7,
+        "activation_header_slot": 3
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "memory.copy.sii",
+          "bytes_to_copy_slot": 2,
+          "source_offset": 1,
+          "destination_offset": 1,
+          "src_memory": 0,
+          "dst_memory": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 3
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 30,
+      "type": 10,
+      "frame": {
+        "frame_slots": 7,
+        "activation_header_slot": 3
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "memory.copy.sis",
+          "bytes_to_copy_slot": 2,
+          "source_offset": 1,
+          "destination_offset_slot": 0,
+          "src_memory": 0,
+          "dst_memory": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 3
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 31,
+      "type": 10,
+      "frame": {
+        "frame_slots": 7,
+        "activation_header_slot": 3
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "memory.copy.ssi",
+          "bytes_to_copy_slot": 2,
+          "source_offset_slot": 1,
+          "destination_offset": 1,
+          "src_memory": 0,
+          "dst_memory": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 3
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 32,
+      "type": 10,
+      "frame": {
+        "frame_slots": 7,
+        "activation_header_slot": 3
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "memory.copy.sss",
+          "bytes_to_copy_slot": 2,
+          "source_offset_slot": 1,
+          "destination_offset_slot": 0,
+          "src_memory": 0,
+          "dst_memory": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 3
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 33,
+      "type": 10,
+      "frame": {
+        "frame_slots": 7,
+        "activation_header_slot": 3
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "table.copy.iii",
+          "elements_to_copy": 1,
+          "src_offset": 1,
+          "dst_offset": 1,
+          "src_table": 0,
+          "dest_table": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 3
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 34,
+      "type": 10,
+      "frame": {
+        "frame_slots": 7,
+        "activation_header_slot": 3
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "table.copy.iis",
+          "elements_to_copy": 1,
+          "src_offset": 1,
+          "dst_offset_slot": 0,
+          "src_table": 0,
+          "dest_table": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 3
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 35,
+      "type": 10,
+      "frame": {
+        "frame_slots": 7,
+        "activation_header_slot": 3
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "table.copy.isi",
+          "elements_to_copy": 1,
+          "src_offset_slot": 1,
+          "dst_offset": 1,
+          "src_table": 0,
+          "dest_table": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 3
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 36,
+      "type": 10,
+      "frame": {
+        "frame_slots": 7,
+        "activation_header_slot": 3
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "table.copy.iss",
+          "elements_to_copy": 1,
+          "src_offset_slot": 1,
+          "dst_offset_slot": 0,
+          "src_table": 0,
+          "dest_table": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 3
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 37,
+      "type": 10,
+      "frame": {
+        "frame_slots": 7,
+        "activation_header_slot": 3
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "table.copy.sii",
+          "elements_to_copy_slot": 2,
+          "src_offset": 1,
+          "dst_offset": 1,
+          "src_table": 0,
+          "dest_table": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 3
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 38,
+      "type": 10,
+      "frame": {
+        "frame_slots": 7,
+        "activation_header_slot": 3
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "table.copy.sis",
+          "elements_to_copy_slot": 2,
+          "src_offset": 1,
+          "dst_offset_slot": 0,
+          "src_table": 0,
+          "dest_table": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 3
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 39,
+      "type": 10,
+      "frame": {
+        "frame_slots": 7,
+        "activation_header_slot": 3
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "table.copy.ssi",
+          "elements_to_copy_slot": 2,
+          "src_offset_slot": 1,
+          "dst_offset": 1,
+          "src_table": 0,
+          "dest_table": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 3
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 40,
+      "type": 10,
+      "frame": {
+        "frame_slots": 7,
+        "activation_header_slot": 3
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "table.copy.sss",
+          "elements_to_copy_slot": 2,
+          "src_offset_slot": 1,
+          "dst_offset_slot": 0,
+          "src_table": 0,
+          "dest_table": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 3
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 41,
+      "type": 0,
+      "frame": {
+        "frame_slots": 2,
+        "activation_header_slot": 1
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "variable.global_get",
+          "global": 0,
+          "destination_slot": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [
+              {
+                "kind": "slot",
+                "slot": 0
+              }
+            ],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 1
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 42,
+      "type": 11,
+      "frame": {
+        "frame_slots": 2,
+        "activation_header_slot": 0
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "variable.global_set.i",
+          "value": 1,
+          "global": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 0
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 43,
+      "type": 12,
+      "frame": {
+        "frame_slots": 3,
+        "activation_header_slot": 1
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "variable.global_set.s",
+          "source_slot": 0,
+          "global": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 1
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 44,
+      "type": 7,
+      "frame": {
+        "frame_slots": 6,
+        "activation_header_slot": 2,
+        "locals": [
+          "i32"
+        ]
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "numeric.i32.add.ss",
+          "left_slot": 0,
+          "right_slot": 1,
+          "destination_slot": 3
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 2
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 45,
+      "type": 5,
+      "frame": {
+        "frame_slots": 6,
+        "activation_header_slot": 2,
+        "locals": [
+          "i32"
+        ]
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "numeric.i32.add.ss",
+          "left_slot": 0,
+          "right_slot": 1,
+          "destination_slot": 3
+        },
+        {
+          "tag": "numeric.i32.add.si",
+          "left_slot": 3,
+          "right": 1,
+          "destination_slot": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [
+              {
+                "kind": "slot",
+                "slot": 0
+              }
+            ],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 2
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 46,
+      "type": 1,
+      "frame": {
+        "frame_slots": 3,
+        "activation_header_slot": 1
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [
+              {
+                "kind": "slot",
+                "slot": 0
+              }
+            ],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 1
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 47,
+      "type": 12,
+      "frame": {
+        "frame_slots": 3,
+        "activation_header_slot": 1
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 1
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 48,
+      "type": 1,
+      "frame": {
+        "frame_slots": 5,
+        "activation_header_slot": 1,
+        "locals": [
+          "i32"
+        ]
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.copy_slot",
+          "source_slot": 0,
+          "destination_slot": 2
+        },
+        {
+          "tag": "admin.copy_slot",
+          "source_slot": 2,
+          "destination_slot": 3
+        },
+        {
+          "tag": "numeric.i32.const",
+          "value": 2,
+          "destination_slot": 2
+        },
+        {
+          "tag": "numeric.i32.add.si",
+          "left_slot": 3,
+          "right": 1,
+          "destination_slot": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [
+              {
+                "kind": "slot",
+                "slot": 0
+              }
+            ],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 1
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 49,
+      "type": 0,
+      "frame": {
+        "frame_slots": 3,
+        "activation_header_slot": 1
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "numeric.f32.neg.i",
+          "operand": "0x3f800000",
+          "destination_slot": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [
+              {
+                "kind": "slot",
+                "slot": 2
+              }
+            ],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 1
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 50,
+      "type": 11,
+      "frame": {
+        "frame_slots": 2,
+        "activation_header_slot": 0
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump",
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 0
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 51,
+      "type": 12,
+      "frame": {
+        "frame_slots": 3,
+        "activation_header_slot": 1
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump_if.s",
+          "operand_slot": 0,
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 1
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 52,
+      "type": 11,
+      "frame": {
+        "frame_slots": 2,
+        "activation_header_slot": 0
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump",
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 0
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 53,
+      "type": 12,
+      "frame": {
+        "frame_slots": 3,
+        "activation_header_slot": 1
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump_if_zero.s",
+          "operand_slot": 0,
+          "target": 3
+        },
+        {
+          "tag": "admin.jump",
+          "target": 3
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 1
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 54,
+      "type": 0,
+      "frame": {
+        "frame_slots": 4,
+        "activation_header_slot": 1
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump_copies",
+          "operands": {
+            "sources": [
+              {
+                "kind": "immediate",
+                "value": 42
+              }
+            ],
+            "destination_slot_base": 0
+          },
+          "target": 2
+        },
+        {
+          "tag": "admin.end_function",
+          "result_count": 1,
+          "activation_header_slot": 1
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 55,
+      "type": 1,
+      "frame": {
+        "frame_slots": 4,
+        "activation_header_slot": 1
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump_if.s",
+          "operand_slot": 0,
+          "target": 4
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [
+              {
+                "kind": "immediate",
+                "value": 0
+              }
+            ],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 1
+        },
+        {
+          "tag": "admin.end_function",
+          "result_count": 1,
+          "activation_header_slot": 1
+        },
+        {
+          "tag": "admin.jump_copies",
+          "operands": {
+            "sources": [
+              {
+                "kind": "immediate",
+                "value": 42
+              }
+            ],
+            "destination_slot_base": 0
+          },
+          "target": 3
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 56,
+      "type": 1,
+      "frame": {
+        "frame_slots": 4,
+        "activation_header_slot": 1
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump_if.s",
+          "operand_slot": 0,
+          "target": 4
+        },
+        {
+          "tag": "numeric.i32.const",
+          "value": 7,
+          "destination_slot": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [
+              {
+                "kind": "slot",
+                "slot": 2
+              }
+            ],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 1
+        },
+        {
+          "tag": "admin.jump_copies",
+          "operands": {
+            "sources": [
+              {
+                "kind": "immediate",
+                "value": 42
+              }
+            ],
+            "destination_slot_base": 2
+          },
+          "target": 3
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 57,
+      "type": 11,
+      "frame": {
+        "frame_slots": 1,
+        "activation_header_slot": 0
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "control.unreachable"
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 58,
+      "type": 0,
+      "frame": {
+        "frame_slots": 4,
+        "activation_header_slot": 1
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "control.call",
+          "function": 0,
+          "operands": {
+            "sources": [],
+            "destination_slot_base": 2
+          },
+          "call_frame_offset": 2,
+          "result_destination_slot": null
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [
+              {
+                "kind": "slot",
+                "slot": 2
+              }
+            ],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 1
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 59,
+      "type": 0,
+      "frame": {
+        "frame_slots": 4,
+        "activation_header_slot": 1
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "control.call",
+          "function": 1,
+          "operands": {
+            "sources": [],
+            "destination_slot_base": 2
+          },
+          "call_frame_offset": 2,
+          "result_destination_slot": null
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [
+              {
+                "kind": "slot",
+                "slot": 2
+              }
+            ],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 1
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 60,
+      "type": 0,
+      "frame": {
+        "frame_slots": 2,
+        "activation_header_slot": 1
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "control.return_call",
+          "function": 0,
+          "operands": {
+            "wasm": {
+              "sources": [],
+              "destination_slot_base": 0
+            },
+            "host": {
+              "sources": [],
+              "destination_slot_base": 2
+            }
+          },
+          "call_frame_offset": 2,
+          "caller_activation_header_slot": 1
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 61,
+      "type": 0,
+      "frame": {
+        "frame_slots": 4,
+        "activation_header_slot": 1
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "control.call_indirect.i",
+          "element_index": 0,
+          "operands": {
+            "sources": [],
+            "destination_slot_base": 2
+          },
+          "type": 0,
+          "table": 0,
+          "call_frame_offset": 2,
+          "result_destination_slot": null
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [
+              {
+                "kind": "slot",
+                "slot": 2
+              }
+            ],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 1
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 62,
+      "type": 1,
+      "frame": {
+        "frame_slots": 4,
+        "activation_header_slot": 1
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "control.call_indirect.s",
+          "element_index_slot": 0,
+          "operands": {
+            "sources": [],
+            "destination_slot_base": 2
+          },
+          "type": 0,
+          "table": 0,
+          "call_frame_offset": 2,
+          "result_destination_slot": null
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [
+              {
+                "kind": "slot",
+                "slot": 2
+              }
+            ],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 1
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 63,
+      "type": 0,
+      "frame": {
+        "frame_slots": 4,
+        "activation_header_slot": 1
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "control.call",
+          "function": 0,
+          "operands": {
+            "sources": [],
+            "destination_slot_base": 2
+          },
+          "call_frame_offset": 2,
+          "result_destination_slot": null
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [
+              {
+                "kind": "slot",
+                "slot": 2
+              }
+            ],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 1
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 64,
+      "type": 0,
+      "frame": {
+        "frame_slots": 3,
+        "activation_header_slot": 1
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "control.return_call_indirect.i",
+          "element_index": 0,
+          "operands": {
+            "wasm": {
+              "sources": [],
+              "destination_slot_base": 0
+            },
+            "host": {
+              "sources": [],
+              "destination_slot_base": 2
+            }
+          },
+          "type": 0,
+          "table": 0,
+          "call_frame_offset": 2,
+          "caller_activation_header_slot": 1
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 65,
+      "type": 1,
+      "frame": {
+        "frame_slots": 3,
+        "activation_header_slot": 1
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "control.return_call_indirect.s",
+          "element_index_slot": 0,
+          "operands": {
+            "wasm": {
+              "sources": [],
+              "destination_slot_base": 0
+            },
+            "host": {
+              "sources": [],
+              "destination_slot_base": 2
+            }
+          },
+          "type": 0,
+          "table": 0,
+          "call_frame_offset": 2,
+          "caller_activation_header_slot": 1
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 66,
+      "type": 0,
+      "frame": {
+        "frame_slots": 2,
+        "activation_header_slot": 1
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "control.return_call",
+          "function": 0,
+          "operands": {
+            "wasm": {
+              "sources": [],
+              "destination_slot_base": 0
+            },
+            "host": {
+              "sources": [],
+              "destination_slot_base": 2
+            }
+          },
+          "call_frame_offset": 2,
+          "caller_activation_header_slot": 1
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 67,
+      "type": 5,
+      "frame": {
+        "frame_slots": 5,
+        "activation_header_slot": 2
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "control.call_indirect.s",
+          "element_index_slot": 0,
+          "operands": {
+            "sources": [
+              {
+                "kind": "slot",
+                "slot": 1
+              }
+            ],
+            "destination_slot_base": 3
+          },
+          "type": 1,
+          "table": 0,
+          "call_frame_offset": 3,
+          "result_destination_slot": null
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [
+              {
+                "kind": "slot",
+                "slot": 3
+              }
+            ],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 2
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 68,
+      "type": 1,
+      "frame": {
+        "frame_slots": 3,
+        "activation_header_slot": 1
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "control.return_call",
+          "function": 2,
+          "operands": {
+            "wasm": {
+              "sources": [
+                {
+                  "kind": "slot",
+                  "slot": 0
+                }
+              ],
+              "destination_slot_base": 0
+            },
+            "host": {
+              "sources": [
+                {
+                  "kind": "slot",
+                  "slot": 0
+                }
+              ],
+              "destination_slot_base": 2
+            }
+          },
+          "call_frame_offset": 2,
+          "caller_activation_header_slot": 1
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 69,
+      "type": 13,
+      "frame": {
+        "frame_slots": 3,
+        "activation_header_slot": 1
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "aggregate.ref_cast_struct_get",
+          "reference_slot": 0,
+          "destination_slot": 0,
+          "type_test": "ref 2",
+          "type": 2,
+          "field_index": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [
+              {
+                "kind": "slot",
+                "slot": 0
+              }
+            ],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 1
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 70,
+      "type": 14,
+      "frame": {
+        "frame_slots": 3,
+        "activation_header_slot": 1
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "aggregate.struct_get_struct_get",
+          "address_slot": 0,
+          "destination_slot": 0,
+          "first_type": 3,
+          "first_field_index": 0,
+          "second_type": 2,
+          "second_field_index": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [
+              {
+                "kind": "slot",
+                "slot": 0
+              }
+            ],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 1
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 71,
+      "type": 15,
+      "frame": {
+        "frame_slots": 4,
+        "activation_header_slot": 2
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "aggregate.local_set_struct_get",
+          "source_slot": 1,
+          "local_slot": 0,
+          "destination_slot": 0,
+          "type": 2,
+          "field_index": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [
+              {
+                "kind": "slot",
+                "slot": 0
+              }
+            ],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 2
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 72,
+      "type": 16,
+      "frame": {
+        "frame_slots": 4,
+        "activation_header_slot": 1
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "aggregate.array.new.ii",
+          "size": 2,
+          "value": 1,
+          "destination_slot": 0,
+          "type": 4
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [
+              {
+                "kind": "slot",
+                "slot": 0
+              }
+            ],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 1
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 73,
+      "type": 17,
+      "frame": {
+        "frame_slots": 4,
+        "activation_header_slot": 1
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "aggregate.array.new.is",
+          "size": 2,
+          "value_slot": 0,
+          "destination_slot": 0,
+          "type": 4
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [
+              {
+                "kind": "slot",
+                "slot": 0
+              }
+            ],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 1
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 74,
+      "type": 17,
+      "frame": {
+        "frame_slots": 4,
+        "activation_header_slot": 1
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "aggregate.array.new.si",
+          "size_slot": 0,
+          "value": 1,
+          "destination_slot": 0,
+          "type": 4
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [
+              {
+                "kind": "slot",
+                "slot": 0
+              }
+            ],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 1
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 75,
+      "type": 18,
+      "frame": {
+        "frame_slots": 5,
+        "activation_header_slot": 2
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "aggregate.array.new.ss",
+          "size_slot": 1,
+          "value_slot": 0,
+          "destination_slot": 0,
+          "type": 4
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [
+              {
+                "kind": "slot",
+                "slot": 0
+              }
+            ],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 2
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 76,
+      "type": 19,
+      "frame": {
+        "frame_slots": 5,
+        "activation_header_slot": 1
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "aggregate.array.set.ii",
+          "value": 1,
+          "field": 0,
+          "address_slot": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 1
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 77,
+      "type": 20,
+      "frame": {
+        "frame_slots": 6,
+        "activation_header_slot": 2
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "aggregate.array.set.is",
+          "value": 1,
+          "field_slot": 1,
+          "address_slot": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 2
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 78,
+      "type": 20,
+      "frame": {
+        "frame_slots": 6,
+        "activation_header_slot": 2
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "aggregate.array.set.si",
+          "value_slot": 1,
+          "field": 0,
+          "address_slot": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 2
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 79,
+      "type": 21,
+      "frame": {
+        "frame_slots": 7,
+        "activation_header_slot": 3
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "aggregate.array.set.ss",
+          "value_slot": 2,
+          "field_slot": 1,
+          "address_slot": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 3
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 80,
+      "type": 22,
+      "frame": {
+        "frame_slots": 11,
+        "activation_header_slot": 5
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "aggregate.array.copy.iii",
+          "elements_to_copy": 1,
+          "source_offset": 1,
+          "destination_offset": 1,
+          "source_address_slot": 1,
+          "destination_address_slot": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 5
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 81,
+      "type": 22,
+      "frame": {
+        "frame_slots": 11,
+        "activation_header_slot": 5
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "aggregate.array.copy.iis",
+          "elements_to_copy": 1,
+          "source_offset": 1,
+          "destination_offset_slot": 2,
+          "source_address_slot": 1,
+          "destination_address_slot": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 5
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 82,
+      "type": 22,
+      "frame": {
+        "frame_slots": 11,
+        "activation_header_slot": 5
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "aggregate.array.copy.isi",
+          "elements_to_copy": 1,
+          "source_offset_slot": 3,
+          "destination_offset": 1,
+          "source_address_slot": 1,
+          "destination_address_slot": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 5
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 83,
+      "type": 22,
+      "frame": {
+        "frame_slots": 11,
+        "activation_header_slot": 5
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "aggregate.array.copy.iss",
+          "elements_to_copy": 1,
+          "source_offset_slot": 3,
+          "destination_offset_slot": 2,
+          "source_address_slot": 1,
+          "destination_address_slot": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 5
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 84,
+      "type": 22,
+      "frame": {
+        "frame_slots": 11,
+        "activation_header_slot": 5
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "aggregate.array.copy.sii",
+          "elements_to_copy_slot": 4,
+          "source_offset": 1,
+          "destination_offset": 1,
+          "source_address_slot": 1,
+          "destination_address_slot": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 5
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 85,
+      "type": 22,
+      "frame": {
+        "frame_slots": 11,
+        "activation_header_slot": 5
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "aggregate.array.copy.sis",
+          "elements_to_copy_slot": 4,
+          "source_offset": 1,
+          "destination_offset_slot": 2,
+          "source_address_slot": 1,
+          "destination_address_slot": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 5
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 86,
+      "type": 22,
+      "frame": {
+        "frame_slots": 11,
+        "activation_header_slot": 5
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "aggregate.array.copy.ssi",
+          "elements_to_copy_slot": 4,
+          "source_offset_slot": 3,
+          "destination_offset": 1,
+          "source_address_slot": 1,
+          "destination_address_slot": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 5
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 87,
+      "type": 22,
+      "frame": {
+        "frame_slots": 11,
+        "activation_header_slot": 5
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "aggregate.array.copy.sss",
+          "elements_to_copy_slot": 4,
+          "source_offset_slot": 3,
+          "destination_offset_slot": 2,
+          "source_address_slot": 1,
+          "destination_address_slot": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 5
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 88,
+      "type": 12,
+      "frame": {
+        "frame_slots": 3,
+        "activation_header_slot": 1
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump_if_condition",
+          "condition": {
+            "kind": "i32.eqz",
+            "operand": {
+              "kind": "frame_slot",
+              "offset": 0
+            }
+          },
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 1
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 89,
+      "type": 11,
+      "frame": {
+        "frame_slots": 2,
+        "activation_header_slot": 0
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump",
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 0
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 90,
+      "type": 23,
+      "frame": {
+        "frame_slots": 3,
+        "activation_header_slot": 1
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump_if_condition",
+          "condition": {
+            "kind": "i64.eqz",
+            "operand": {
+              "kind": "frame_slot",
+              "offset": 0
+            }
+          },
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 1
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 91,
+      "type": 11,
+      "frame": {
+        "frame_slots": 2,
+        "activation_header_slot": 0
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump",
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 0
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 92,
+      "type": 7,
+      "frame": {
+        "frame_slots": 5,
+        "activation_header_slot": 2
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump_if_condition",
+          "condition": {
+            "kind": "i32.eq",
+            "left": {
+              "kind": "frame_slot",
+              "offset": 0
+            },
+            "right": {
+              "kind": "frame_slot",
+              "offset": 1
+            }
+          },
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 2
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 93,
+      "type": 11,
+      "frame": {
+        "frame_slots": 3,
+        "activation_header_slot": 0
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump",
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 0
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 94,
+      "type": 24,
+      "frame": {
+        "frame_slots": 5,
+        "activation_header_slot": 2
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump_if_condition",
+          "condition": {
+            "kind": "i64.eq",
+            "left": {
+              "kind": "frame_slot",
+              "offset": 0
+            },
+            "right": {
+              "kind": "frame_slot",
+              "offset": 1
+            }
+          },
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 2
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 95,
+      "type": 11,
+      "frame": {
+        "frame_slots": 3,
+        "activation_header_slot": 0
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump",
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 0
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 96,
+      "type": 7,
+      "frame": {
+        "frame_slots": 5,
+        "activation_header_slot": 2
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump_if_condition",
+          "condition": {
+            "kind": "i32.ne",
+            "left": {
+              "kind": "frame_slot",
+              "offset": 0
+            },
+            "right": {
+              "kind": "frame_slot",
+              "offset": 1
+            }
+          },
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 2
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 97,
+      "type": 11,
+      "frame": {
+        "frame_slots": 3,
+        "activation_header_slot": 0
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump",
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 0
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 98,
+      "type": 24,
+      "frame": {
+        "frame_slots": 5,
+        "activation_header_slot": 2
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump_if_condition",
+          "condition": {
+            "kind": "i64.ne",
+            "left": {
+              "kind": "frame_slot",
+              "offset": 0
+            },
+            "right": {
+              "kind": "frame_slot",
+              "offset": 1
+            }
+          },
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 2
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 99,
+      "type": 11,
+      "frame": {
+        "frame_slots": 3,
+        "activation_header_slot": 0
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump",
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 0
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 100,
+      "type": 7,
+      "frame": {
+        "frame_slots": 5,
+        "activation_header_slot": 2
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump_if_condition",
+          "condition": {
+            "kind": "i32.lt_s",
+            "left": {
+              "kind": "frame_slot",
+              "offset": 0
+            },
+            "right": {
+              "kind": "frame_slot",
+              "offset": 1
+            }
+          },
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 2
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 101,
+      "type": 11,
+      "frame": {
+        "frame_slots": 3,
+        "activation_header_slot": 0
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump",
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 0
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 102,
+      "type": 24,
+      "frame": {
+        "frame_slots": 5,
+        "activation_header_slot": 2
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump_if_condition",
+          "condition": {
+            "kind": "i64.lt_s",
+            "left": {
+              "kind": "frame_slot",
+              "offset": 0
+            },
+            "right": {
+              "kind": "frame_slot",
+              "offset": 1
+            }
+          },
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 2
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 103,
+      "type": 11,
+      "frame": {
+        "frame_slots": 3,
+        "activation_header_slot": 0
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump",
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 0
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 104,
+      "type": 7,
+      "frame": {
+        "frame_slots": 5,
+        "activation_header_slot": 2
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump_if_condition",
+          "condition": {
+            "kind": "i32.lt_u",
+            "left": {
+              "kind": "frame_slot",
+              "offset": 0
+            },
+            "right": {
+              "kind": "frame_slot",
+              "offset": 1
+            }
+          },
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 2
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 105,
+      "type": 11,
+      "frame": {
+        "frame_slots": 3,
+        "activation_header_slot": 0
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump",
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 0
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 106,
+      "type": 24,
+      "frame": {
+        "frame_slots": 5,
+        "activation_header_slot": 2
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump_if_condition",
+          "condition": {
+            "kind": "i64.lt_u",
+            "left": {
+              "kind": "frame_slot",
+              "offset": 0
+            },
+            "right": {
+              "kind": "frame_slot",
+              "offset": 1
+            }
+          },
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 2
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 107,
+      "type": 11,
+      "frame": {
+        "frame_slots": 3,
+        "activation_header_slot": 0
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump",
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 0
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 108,
+      "type": 7,
+      "frame": {
+        "frame_slots": 5,
+        "activation_header_slot": 2
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump_if_condition",
+          "condition": {
+            "kind": "i32.gt_s",
+            "left": {
+              "kind": "frame_slot",
+              "offset": 0
+            },
+            "right": {
+              "kind": "frame_slot",
+              "offset": 1
+            }
+          },
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 2
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 109,
+      "type": 11,
+      "frame": {
+        "frame_slots": 3,
+        "activation_header_slot": 0
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump",
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 0
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 110,
+      "type": 24,
+      "frame": {
+        "frame_slots": 5,
+        "activation_header_slot": 2
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump_if_condition",
+          "condition": {
+            "kind": "i64.gt_s",
+            "left": {
+              "kind": "frame_slot",
+              "offset": 0
+            },
+            "right": {
+              "kind": "frame_slot",
+              "offset": 1
+            }
+          },
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 2
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 111,
+      "type": 11,
+      "frame": {
+        "frame_slots": 3,
+        "activation_header_slot": 0
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump",
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 0
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 112,
+      "type": 7,
+      "frame": {
+        "frame_slots": 5,
+        "activation_header_slot": 2
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump_if_condition",
+          "condition": {
+            "kind": "i32.gt_u",
+            "left": {
+              "kind": "frame_slot",
+              "offset": 0
+            },
+            "right": {
+              "kind": "frame_slot",
+              "offset": 1
+            }
+          },
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 2
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 113,
+      "type": 11,
+      "frame": {
+        "frame_slots": 3,
+        "activation_header_slot": 0
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump",
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 0
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 114,
+      "type": 24,
+      "frame": {
+        "frame_slots": 5,
+        "activation_header_slot": 2
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump_if_condition",
+          "condition": {
+            "kind": "i64.gt_u",
+            "left": {
+              "kind": "frame_slot",
+              "offset": 0
+            },
+            "right": {
+              "kind": "frame_slot",
+              "offset": 1
+            }
+          },
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 2
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 115,
+      "type": 11,
+      "frame": {
+        "frame_slots": 3,
+        "activation_header_slot": 0
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump",
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 0
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 116,
+      "type": 7,
+      "frame": {
+        "frame_slots": 5,
+        "activation_header_slot": 2
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump_if_condition",
+          "condition": {
+            "kind": "i32.le_s",
+            "left": {
+              "kind": "frame_slot",
+              "offset": 0
+            },
+            "right": {
+              "kind": "frame_slot",
+              "offset": 1
+            }
+          },
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 2
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 117,
+      "type": 11,
+      "frame": {
+        "frame_slots": 3,
+        "activation_header_slot": 0
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump",
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 0
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 118,
+      "type": 24,
+      "frame": {
+        "frame_slots": 5,
+        "activation_header_slot": 2
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump_if_condition",
+          "condition": {
+            "kind": "i64.le_s",
+            "left": {
+              "kind": "frame_slot",
+              "offset": 0
+            },
+            "right": {
+              "kind": "frame_slot",
+              "offset": 1
+            }
+          },
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 2
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 119,
+      "type": 11,
+      "frame": {
+        "frame_slots": 3,
+        "activation_header_slot": 0
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump",
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 0
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 120,
+      "type": 7,
+      "frame": {
+        "frame_slots": 5,
+        "activation_header_slot": 2
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump_if_condition",
+          "condition": {
+            "kind": "i32.le_u",
+            "left": {
+              "kind": "frame_slot",
+              "offset": 0
+            },
+            "right": {
+              "kind": "frame_slot",
+              "offset": 1
+            }
+          },
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 2
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 121,
+      "type": 11,
+      "frame": {
+        "frame_slots": 3,
+        "activation_header_slot": 0
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump",
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 0
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 122,
+      "type": 24,
+      "frame": {
+        "frame_slots": 5,
+        "activation_header_slot": 2
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump_if_condition",
+          "condition": {
+            "kind": "i64.le_u",
+            "left": {
+              "kind": "frame_slot",
+              "offset": 0
+            },
+            "right": {
+              "kind": "frame_slot",
+              "offset": 1
+            }
+          },
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 2
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 123,
+      "type": 11,
+      "frame": {
+        "frame_slots": 3,
+        "activation_header_slot": 0
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump",
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 0
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 124,
+      "type": 7,
+      "frame": {
+        "frame_slots": 5,
+        "activation_header_slot": 2
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump_if_condition",
+          "condition": {
+            "kind": "i32.ge_s",
+            "left": {
+              "kind": "frame_slot",
+              "offset": 0
+            },
+            "right": {
+              "kind": "frame_slot",
+              "offset": 1
+            }
+          },
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 2
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 125,
+      "type": 11,
+      "frame": {
+        "frame_slots": 3,
+        "activation_header_slot": 0
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump",
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 0
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 126,
+      "type": 24,
+      "frame": {
+        "frame_slots": 5,
+        "activation_header_slot": 2
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump_if_condition",
+          "condition": {
+            "kind": "i64.ge_s",
+            "left": {
+              "kind": "frame_slot",
+              "offset": 0
+            },
+            "right": {
+              "kind": "frame_slot",
+              "offset": 1
+            }
+          },
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 2
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 127,
+      "type": 11,
+      "frame": {
+        "frame_slots": 3,
+        "activation_header_slot": 0
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump",
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 0
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 128,
+      "type": 7,
+      "frame": {
+        "frame_slots": 5,
+        "activation_header_slot": 2
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump_if_condition",
+          "condition": {
+            "kind": "i32.ge_u",
+            "left": {
+              "kind": "frame_slot",
+              "offset": 0
+            },
+            "right": {
+              "kind": "frame_slot",
+              "offset": 1
+            }
+          },
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 2
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 129,
+      "type": 11,
+      "frame": {
+        "frame_slots": 3,
+        "activation_header_slot": 0
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump",
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 0
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 130,
+      "type": 24,
+      "frame": {
+        "frame_slots": 5,
+        "activation_header_slot": 2
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump_if_condition",
+          "condition": {
+            "kind": "i64.ge_u",
+            "left": {
+              "kind": "frame_slot",
+              "offset": 0
+            },
+            "right": {
+              "kind": "frame_slot",
+              "offset": 1
+            }
+          },
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 2
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 131,
+      "type": 11,
+      "frame": {
+        "frame_slots": 3,
+        "activation_header_slot": 0
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump",
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 0
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 132,
+      "type": 25,
+      "frame": {
+        "frame_slots": 5,
+        "activation_header_slot": 2
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump_if_condition",
+          "condition": {
+            "kind": "f32.eq",
+            "left": {
+              "kind": "frame_slot",
+              "offset": 0
+            },
+            "right": {
+              "kind": "frame_slot",
+              "offset": 1
+            }
+          },
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 2
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 133,
+      "type": 11,
+      "frame": {
+        "frame_slots": 3,
+        "activation_header_slot": 0
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump",
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 0
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 134,
+      "type": 26,
+      "frame": {
+        "frame_slots": 5,
+        "activation_header_slot": 2
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump_if_condition",
+          "condition": {
+            "kind": "f64.eq",
+            "left": {
+              "kind": "frame_slot",
+              "offset": 0
+            },
+            "right": {
+              "kind": "frame_slot",
+              "offset": 1
+            }
+          },
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 2
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 135,
+      "type": 11,
+      "frame": {
+        "frame_slots": 3,
+        "activation_header_slot": 0
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump",
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 0
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 136,
+      "type": 25,
+      "frame": {
+        "frame_slots": 5,
+        "activation_header_slot": 2
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump_if_condition",
+          "condition": {
+            "kind": "f32.ne",
+            "left": {
+              "kind": "frame_slot",
+              "offset": 0
+            },
+            "right": {
+              "kind": "frame_slot",
+              "offset": 1
+            }
+          },
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 2
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 137,
+      "type": 11,
+      "frame": {
+        "frame_slots": 3,
+        "activation_header_slot": 0
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump",
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 0
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 138,
+      "type": 26,
+      "frame": {
+        "frame_slots": 5,
+        "activation_header_slot": 2
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump_if_condition",
+          "condition": {
+            "kind": "f64.ne",
+            "left": {
+              "kind": "frame_slot",
+              "offset": 0
+            },
+            "right": {
+              "kind": "frame_slot",
+              "offset": 1
+            }
+          },
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 2
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 139,
+      "type": 11,
+      "frame": {
+        "frame_slots": 3,
+        "activation_header_slot": 0
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump",
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 0
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 140,
+      "type": 25,
+      "frame": {
+        "frame_slots": 5,
+        "activation_header_slot": 2
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump_if_condition",
+          "condition": {
+            "kind": "f32.lt",
+            "left": {
+              "kind": "frame_slot",
+              "offset": 0
+            },
+            "right": {
+              "kind": "frame_slot",
+              "offset": 1
+            }
+          },
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 2
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 141,
+      "type": 11,
+      "frame": {
+        "frame_slots": 3,
+        "activation_header_slot": 0
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump",
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 0
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 142,
+      "type": 26,
+      "frame": {
+        "frame_slots": 5,
+        "activation_header_slot": 2
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump_if_condition",
+          "condition": {
+            "kind": "f64.lt",
+            "left": {
+              "kind": "frame_slot",
+              "offset": 0
+            },
+            "right": {
+              "kind": "frame_slot",
+              "offset": 1
+            }
+          },
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 2
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 143,
+      "type": 11,
+      "frame": {
+        "frame_slots": 3,
+        "activation_header_slot": 0
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump",
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 0
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 144,
+      "type": 25,
+      "frame": {
+        "frame_slots": 5,
+        "activation_header_slot": 2
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump_if_condition",
+          "condition": {
+            "kind": "f32.gt",
+            "left": {
+              "kind": "frame_slot",
+              "offset": 0
+            },
+            "right": {
+              "kind": "frame_slot",
+              "offset": 1
+            }
+          },
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 2
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 145,
+      "type": 11,
+      "frame": {
+        "frame_slots": 3,
+        "activation_header_slot": 0
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump",
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 0
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 146,
+      "type": 26,
+      "frame": {
+        "frame_slots": 5,
+        "activation_header_slot": 2
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump_if_condition",
+          "condition": {
+            "kind": "f64.gt",
+            "left": {
+              "kind": "frame_slot",
+              "offset": 0
+            },
+            "right": {
+              "kind": "frame_slot",
+              "offset": 1
+            }
+          },
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 2
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 147,
+      "type": 11,
+      "frame": {
+        "frame_slots": 3,
+        "activation_header_slot": 0
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump",
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 0
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 148,
+      "type": 25,
+      "frame": {
+        "frame_slots": 5,
+        "activation_header_slot": 2
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump_if_condition",
+          "condition": {
+            "kind": "f32.le",
+            "left": {
+              "kind": "frame_slot",
+              "offset": 0
+            },
+            "right": {
+              "kind": "frame_slot",
+              "offset": 1
+            }
+          },
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 2
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 149,
+      "type": 11,
+      "frame": {
+        "frame_slots": 3,
+        "activation_header_slot": 0
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump",
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 0
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 150,
+      "type": 26,
+      "frame": {
+        "frame_slots": 5,
+        "activation_header_slot": 2
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump_if_condition",
+          "condition": {
+            "kind": "f64.le",
+            "left": {
+              "kind": "frame_slot",
+              "offset": 0
+            },
+            "right": {
+              "kind": "frame_slot",
+              "offset": 1
+            }
+          },
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 2
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 151,
+      "type": 11,
+      "frame": {
+        "frame_slots": 3,
+        "activation_header_slot": 0
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump",
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 0
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 152,
+      "type": 25,
+      "frame": {
+        "frame_slots": 5,
+        "activation_header_slot": 2
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump_if_condition",
+          "condition": {
+            "kind": "f32.ge",
+            "left": {
+              "kind": "frame_slot",
+              "offset": 0
+            },
+            "right": {
+              "kind": "frame_slot",
+              "offset": 1
+            }
+          },
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 2
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 153,
+      "type": 11,
+      "frame": {
+        "frame_slots": 3,
+        "activation_header_slot": 0
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump",
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 0
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 154,
+      "type": 26,
+      "frame": {
+        "frame_slots": 5,
+        "activation_header_slot": 2
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump_if_condition",
+          "condition": {
+            "kind": "f64.ge",
+            "left": {
+              "kind": "frame_slot",
+              "offset": 0
+            },
+            "right": {
+              "kind": "frame_slot",
+              "offset": 1
+            }
+          },
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 2
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 155,
+      "type": 11,
+      "frame": {
+        "frame_slots": 3,
+        "activation_header_slot": 0
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump",
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 0
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 156,
+      "type": 7,
+      "frame": {
+        "frame_slots": 5,
+        "activation_header_slot": 2
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump_if_condition",
+          "condition": {
+            "kind": "i32.eq",
+            "left": {
+              "kind": "i32_const",
+              "const": 1
+            },
+            "right": {
+              "kind": "frame_slot",
+              "offset": 1
+            }
+          },
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 2
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 157,
+      "type": 7,
+      "frame": {
+        "frame_slots": 5,
+        "activation_header_slot": 2
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.jump_if_condition",
+          "condition": {
+            "kind": "i32.eq",
+            "left": {
+              "kind": "frame_slot",
+              "offset": 0
+            },
+            "right": {
+              "kind": "i32_const",
+              "const": 1
+            }
+          },
+          "target": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 2
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 158,
+      "type": 11,
+      "frame": {
+        "frame_slots": 2,
+        "activation_header_slot": 0
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 0
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 159,
+      "type": 1,
+      "frame": {
+        "frame_slots": 3,
+        "activation_header_slot": 1
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "admin.copy_slot",
+          "source_slot": 0,
+          "destination_slot": 2
+        },
+        {
+          "tag": "control.throw",
+          "exception_tag": 0,
+          "first_payload_slot": 2
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [
+              {
+                "kind": "slot",
+                "slot": 2
+              }
+            ],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 1
+        }
+      ],
+      "checkpoints": [
+        0
+      ],
+      "exceptions": {
+        "regions": [
+          {
+            "start": 1,
+            "end": 3,
+            "parent": null,
+            "catches": [
+              {
+                "tag": 0,
+                "target": 3,
+                "payload_slots": [
+                  2
+                ],
+                "exception_reference": false,
+                "stack_slots": 3
+              }
+            ]
+          }
+        ],
+        "tail_calls": []
+      }
+    },
+    {
+      "index": 160,
+      "type": 0,
+      "frame": {
+        "frame_slots": 3,
+        "activation_header_slot": 1
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "control.return_call",
+          "function": 0,
+          "operands": {
+            "wasm": {
+              "sources": [],
+              "destination_slot_base": 0
+            },
+            "host": {
+              "sources": [],
+              "destination_slot_base": 2
+            }
+          },
+          "call_frame_offset": 2,
+          "caller_activation_header_slot": 1
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [
+              {
+                "kind": "immediate",
+                "value": 1
+              }
+            ],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 1
+        }
+      ],
+      "checkpoints": [
+        0
+      ],
+      "exceptions": {
+        "regions": [
+          {
+            "start": 1,
+            "end": 2,
+            "parent": null,
+            "catches": [
+              {
+                "tag": null,
+                "target": 2,
+                "payload_slots": [
+                  2
+                ],
+                "exception_reference": true,
+                "stack_slots": 3
+              }
+            ]
+          }
+        ],
+        "tail_calls": [
+          1
+        ]
+      }
+    },
+    {
+      "index": 161,
+      "type": 27,
+      "frame": {
+        "frame_slots": 4,
+        "activation_header_slot": 1,
+        "locals": [
+          "ref null extern"
+        ],
+        "initialised_local_count": 1
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [
+              {
+                "kind": "slot",
+                "slot": 2
+              }
+            ],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 1
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 162,
+      "type": 28,
+      "frame": {
+        "frame_slots": 2,
+        "activation_header_slot": 1
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "reference.ref_func",
+          "function": 2,
+          "destination_slot": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [
+              {
+                "kind": "slot",
+                "slot": 0
+              }
+            ],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 1
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    },
+    {
+      "index": 163,
+      "type": 27,
+      "frame": {
+        "frame_slots": 2,
+        "activation_header_slot": 1
+      },
+      "instructions": [
+        {
+          "tag": "admin.checkpoint"
+        },
+        {
+          "tag": "reference.ref_null",
+          "heap_type": "extern",
+          "destination_slot": 0
+        },
+        {
+          "tag": "control.return",
+          "results": {
+            "sources": [
+              {
+                "kind": "slot",
+                "slot": 0
+              }
+            ],
+            "destination_slot_base": 0
+          },
+          "activation_header_slot": 1
+        }
+      ],
+      "checkpoints": [
+        0
+      ]
+    }
+  ]
+}

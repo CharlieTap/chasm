@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.tools.compilerbaseline
 
+import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.map
 import com.github.michaelbull.result.unwrap
@@ -7,8 +8,10 @@ import io.github.charlietap.chasm.ast.module.FunctionNameSubsection
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.NameData
 import io.github.charlietap.chasm.ast.module.toInt
-import io.github.charlietap.chasm.compiler.ModuleCompiler
-import io.github.charlietap.chasm.compiler.diagnostic.CompilerDiagnostics
+import io.github.charlietap.chasm.cir.CirModule
+import io.github.charlietap.chasm.compiler.backend.chasm.FunctionLayout
+import io.github.charlietap.chasm.compiler.backend.chasm.ModuleLinker
+import io.github.charlietap.chasm.compiler.frontend.ModuleCompiler
 import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
@@ -22,7 +25,6 @@ import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.Import
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.store.Store
-import kotlinx.serialization.json.JsonObject
 
 fun interface CompilerModuleDecoder {
     fun decode(config: ModuleConfig, bytes: ByteArray): Result<Module, ModuleDecoderError>
@@ -38,8 +40,8 @@ fun interface CompilerModuleInstantiator {
         config: RuntimeConfig,
         store: Store,
         module: Module,
+        code: CirModule,
         imports: List<Import>,
-        diagnostics: CompilerDiagnostics,
     ): Result<ModuleInstance, ModuleTrapError>
 }
 
@@ -48,25 +50,19 @@ class ChasmModuleInstantiator : CompilerModuleInstantiator {
         config: RuntimeConfig,
         store: Store,
         module: Module,
+        code: CirModule,
         imports: List<Import>,
-        diagnostics: CompilerDiagnostics,
     ): Result<ModuleInstance, ModuleTrapError> =
         ModuleInstantiator(
             config = config,
             store = store,
             module = ModuleDeclarationsFactory(module),
             imports = imports,
-            codeInstaller = { compileStore, instance, runtimeTypes, types ->
-                ModuleCompiler(compileStore, module, instance, runtimeTypes, types, diagnostics)
-            },
+            codeInstaller = { linkStore, instance, _, _ -> Ok(ModuleLinker(linkStore, instance, module, code)) },
             startInvoker = { invokeConfig, invokeStore, instance, address ->
                 FunctionInvoker(invokeConfig, invokeStore, instance, address, emptyList()).map { }
             },
         )
-}
-
-fun interface ProgramInstructionCollectorFactory {
-    fun create(): ProgramInstructionCollector
 }
 
 fun interface CompilerBaselineGenerator {
@@ -77,78 +73,63 @@ class ModuleCompilerBaselineGenerator(
     private val importResolver: CompilerBaselineImportResolver,
     private val moduleDecoder: CompilerModuleDecoder,
     private val moduleInstantiator: CompilerModuleInstantiator,
-    private val instructionCollectorFactory: ProgramInstructionCollectorFactory,
-    private val tagTranslator: CompilerInstructionTagTranslator,
     private val runtimeConfig: RuntimeConfig = RuntimeConfig(),
+    private val stores: List<CompilerBaselineStore> = listOf(CompilerBaselineStore.DEFAULT),
 ) : CompilerBaselineGenerator {
 
     override fun generate(fixture: CompilerBaselineFixture): CompilerBaseline {
         val module = moduleDecoder.decode(ModuleConfig(decodeNameSection = true), fixture.bytes).unwrap()
-        val instructionCollector = instructionCollectorFactory.create()
-        val store = Store()
-        val imports = importResolver.resolve(module, store)
-        val instance = moduleInstantiator.instantiate(
-            config = runtimeConfig,
-            store = store,
-            module = module,
-            imports = imports,
-            diagnostics = CompilerDiagnostics(instructionObserver = instructionCollector),
-        ).unwrap()
-
+        val cir = ModuleCompiler(module).unwrap()
         return CompilerBaseline(
             schemaVersion = SCHEMA_VERSION,
-            modules = listOf(
+            modules = stores.map { configuration ->
+                val store = Store(config = configuration.config)
+                store.fuel.remaining = Long.MAX_VALUE
+                val imports = importResolver.resolve(module, store)
+                val instance = moduleInstantiator.instantiate(runtimeConfig, store, module, cir, imports).unwrap()
                 CompilerBaselineModule(
-                    name = fixture.name,
-                    functions = functions(module, instance, store, instructionCollector),
-                ),
-            ),
+                    name = configuration.suffix?.let { suffix -> "${fixture.name}.$suffix" } ?: fixture.name,
+                    functions = functions(module, cir, instance, store),
+                )
+            },
         )
     }
 
     private fun functions(
         module: Module,
+        cir: CirModule,
         instance: ModuleInstance,
         store: Store,
-        instructionCollector: ProgramInstructionCollector,
     ): List<CompilerBaselineFunction> {
-        val functionNames = module.customs
-            .filterIsInstance<NameData>()
-            .firstOrNull()
-            ?.subsections
-            ?.filterIsInstance<FunctionNameSubsection>()
-            ?.firstOrNull()
-            ?.nameMap
-            ?.associate { association -> association.idx.toInt() to association.name.name }
-            .orEmpty()
+        val functionNames = functionNames(module)
+        val renderer = DispatcherRenderer(ModuleSymbols(instance, store))
+        val program = store.program
 
-        val renderer = InstructionRenderer(ModuleSymbols(instance, store))
-        val supplements = DispatchSupplements()
-        val functions = module.functions.map { function ->
-            val functionIndex = function.idx.toInt()
-            val address = instance.functionAddresses[functionIndex]
-            functionIndex to (store.function(address) as FunctionInstance.WasmFunction).callStrategy
-        }
-
-        return functions.mapIndexed { index, (functionIndex, strategy) ->
+        return cir.functions.map { function ->
+            val functionIndex = function.index.index
+            val strategy = (store.function(instance.functionAddresses[functionIndex]) as FunctionInstance.WasmFunction).callStrategy
             val entryIp = strategy.entryIp
-            val endIp = functions.getOrNull(index + 1)?.second?.entryIp ?: store.program.size
-            val instructions = instructionCollector.instructions(store.program, entryIp, endIp)
-            val exceptions = store.program.exceptionTable(entryIp)?.takeIf { table -> table.entryIp == entryIp }
+            val layout = FunctionLayout(function, store)
+            check(entryIp + layout.size <= program.size) { "function $functionIndex runs past the end of the program" }
+            val positions = (0 until layout.size).map(layout::position)
+            val unlinkedCheckpoints = function.instructions.indices - positions.toSet()
+            val exceptions = program.exceptionTable(entryIp)?.takeIf { table -> table.entryIp == entryIp }
             CompilerBaselineFunction(
                 index = functionIndex,
                 name = functionNames[functionIndex] ?: "\$func$functionIndex",
                 frameSlots = strategy.frameSlots,
                 activationHeaderSlot = strategy.interfaceSlotCount,
                 localInitialization = renderer.localInitialization(strategy.localInitialization),
+                unlinkedCheckpoints = unlinkedCheckpoints.takeIf { it.isNotEmpty() },
                 exceptions = exceptions?.let(renderer::exceptions),
-                instructions = instructions.mapIndexed { offset, observed ->
-                    val immediates = renderer.immediates(observed.instruction, entryIp) +
-                        supplements.immediates(observed.instruction, observed.dispatchable)
+                instructions = positions.mapIndexed { offset, position ->
+                    val dispatchable = program.instructions[entryIp + offset]
                     CompilerBaselineInstruction(
                         offset = offset,
-                        tag = tagTranslator.translate(observed.instruction),
-                        immediates = immediates.takeIf { it.isNotEmpty() }?.let(::JsonObject),
+                        position = position,
+                        dispatcher = renderer.dispatcher(dispatchable),
+                        variant = renderer.variant(dispatchable),
+                        fields = renderer.fields(dispatchable, entryIp),
                     )
                 },
             )
@@ -156,6 +137,18 @@ class ModuleCompilerBaselineGenerator(
     }
 
     private companion object {
-        const val SCHEMA_VERSION = 2
+        const val SCHEMA_VERSION = 3
     }
 }
+
+internal fun functionNames(
+    module: Module,
+): Map<Int, String> = module.customs
+    .filterIsInstance<NameData>()
+    .firstOrNull()
+    ?.subsections
+    ?.filterIsInstance<FunctionNameSubsection>()
+    ?.firstOrNull()
+    ?.nameMap
+    ?.associate { association -> association.idx.toInt() to association.name.name }
+    .orEmpty()
