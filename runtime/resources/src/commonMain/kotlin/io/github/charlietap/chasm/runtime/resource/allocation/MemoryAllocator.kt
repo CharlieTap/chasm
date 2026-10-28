@@ -45,7 +45,7 @@ internal inline fun MemoryAllocator(
         LinearMemory.Pages(effectiveMaximum.toUInt())
     }
     val memory = memoryFactory(pages, maximumPages, config)
-    val instance = MemoryInstance(type, memory, effectiveMaximum)
+    val instance = MemoryInstance(type.copy(limits = type.limits.copy()), memory, effectiveMaximum)
 
     store.memories.add(instance)
 

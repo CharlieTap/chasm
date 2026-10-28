@@ -19,7 +19,7 @@ fun TableAllocator(
         elements.size,
         minOf(TableInstance.declaredMaximumElements(type), limit ?: Int.MAX_VALUE),
     )
-    val instance = TableInstance(type, elements, effectiveMaximum)
+    val instance = TableInstance(type.copy(limits = type.limits.copy()), elements, effectiveMaximum)
 
     store.tables.add(instance)
 
