@@ -11,7 +11,7 @@ data class DataSegmentDeclaration(
 
         data class Active(
             val memoryIndex: Int,
-            val offset: InitializerExpression,
+            val offset: ConstantExpression,
         ) : Mode
     }
 }

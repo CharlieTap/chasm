@@ -4,6 +4,7 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.module.ElementSegment
+import io.github.charlietap.chasm.ast.module.toInt
 import io.github.charlietap.chasm.executor.instantiator.ConstantExpressionEvaluator
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
 import io.github.charlietap.chasm.executor.instantiator.ext.elementAddress
@@ -41,9 +42,9 @@ internal inline fun TableInitializer(
             val mode = segment.mode as ElementSegment.Mode.Active
             val offset = constantExpressionEvaluator(store, instance, context.types, mode.offsetExpr).bind().toInt()
 
-            val tableAddress = instance.tableAddress(mode.tableIndex).bind()
+            val tableAddress = instance.tableAddress(mode.tableIndex.toInt()).bind()
             val tableInstance = store.table(tableAddress)
-            val elementAddress = instance.elementAddress(segment.idx).bind()
+            val elementAddress = instance.elementAddress(segment.idx.toInt()).bind()
             val elementInstance = store.element(elementAddress)
 
             val elementsToInit = segment.initExpressions.size
@@ -63,7 +64,7 @@ internal inline fun TableInitializer(
         .filter { segment ->
             segment.mode is ElementSegment.Mode.Declarative
         }.forEach { segment ->
-            val elementAddress = instance.elementAddress(segment.idx).bind()
+            val elementAddress = instance.elementAddress(segment.idx.toInt()).bind()
             val elementInstance = store.element(elementAddress)
             elementInstance.elements = longArrayOf()
         }

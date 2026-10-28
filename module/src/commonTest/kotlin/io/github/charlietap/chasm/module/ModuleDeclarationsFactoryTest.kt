@@ -26,13 +26,13 @@ import io.github.charlietap.chasm.ast.module.Tag
 import io.github.charlietap.chasm.ast.name.IndirectNameAssociation
 import io.github.charlietap.chasm.ast.name.NameAssociation
 import io.github.charlietap.chasm.ast.value.NameValue
+import io.github.charlietap.chasm.declarations.ConstantExpression
+import io.github.charlietap.chasm.declarations.ConstantInstruction
 import io.github.charlietap.chasm.declarations.DataPayload
 import io.github.charlietap.chasm.declarations.DataSegmentDeclaration
 import io.github.charlietap.chasm.declarations.ElementSegmentDeclaration
 import io.github.charlietap.chasm.declarations.ExportDeclarations
 import io.github.charlietap.chasm.declarations.GlobalDeclaration
-import io.github.charlietap.chasm.declarations.InitializerExpression
-import io.github.charlietap.chasm.declarations.InitializerInstruction
 import io.github.charlietap.chasm.declarations.ModuleDeclarations
 import io.github.charlietap.chasm.declarations.ModuleNames
 import io.github.charlietap.chasm.declarations.TableDeclaration
@@ -106,10 +106,10 @@ class ModuleDeclarationsFactoryTest {
             definedTypes = types,
             imports = listOf(functionImport, memoryImport),
             functionTypeIndices = intArrayOf(0, 1),
-            tables = listOf(TableDeclaration(table, initializer(InitializerInstruction.RefNull(AbstractHeapType.Func)))),
+            tables = listOf(TableDeclaration(table, constantExpression(ConstantInstruction.RefNull(AbstractHeapType.Func)))),
             memories = listOf(memory),
             tags = listOf(tag),
-            globals = listOf(GlobalDeclaration(global, initializer(InitializerInstruction.I32Const(7)))),
+            globals = listOf(GlobalDeclaration(global, constantExpression(ConstantInstruction.I32Const(7)))),
             exports = ExportDeclarations(
                 names = arrayOf("run", "table", "memory", "global", "tag"),
                 kinds = byteArrayOf(
@@ -125,8 +125,8 @@ class ModuleDeclarationsFactoryTest {
             elementSegments = listOf(
                 ElementSegmentDeclaration(
                     ReferenceType.Ref(AbstractHeapType.Func),
-                    listOf(initializer(InitializerInstruction.RefFunc(2))),
-                    ElementSegmentDeclaration.Mode.Active(0, initializer(InitializerInstruction.I32Const(3))),
+                    listOf(constantExpression(ConstantInstruction.RefFunc(2))),
+                    ElementSegmentDeclaration.Mode.Active(0, constantExpression(ConstantInstruction.I32Const(3))),
                 ),
                 ElementSegmentDeclaration(ReferenceType.Ref(AbstractHeapType.Func), emptyList(), ElementSegmentDeclaration.Mode.Passive),
                 ElementSegmentDeclaration(
@@ -138,7 +138,7 @@ class ModuleDeclarationsFactoryTest {
             dataSegments = listOf(
                 DataSegmentDeclaration(
                     DataPayload.Inline(byteArrayOf(1, 2, -1)),
-                    DataSegmentDeclaration.Mode.Active(1, initializer(InitializerInstruction.GlobalGet(0))),
+                    DataSegmentDeclaration.Mode.Active(1, constantExpression(ConstantInstruction.GlobalGet(0))),
                 ),
                 DataSegmentDeclaration(DataPayload.Inline(byteArrayOf()), DataSegmentDeclaration.Mode.Passive),
             ),
@@ -152,7 +152,7 @@ class ModuleDeclarationsFactoryTest {
     }
 
     @Test
-    fun `every constant instruction becomes its initializer instruction`() {
+    fun `every constant instruction is carried over`() {
         val instructions = listOf(
             NumericInstruction.I32Const(-1),
             NumericInstruction.I64Const(Long.MIN_VALUE),
@@ -177,29 +177,29 @@ class ModuleDeclarationsFactoryTest {
             AggregateInstruction.AnyConvertExtern,
             AggregateInstruction.ExternConvertAny,
         )
-        val expected = initializer(
-            InitializerInstruction.I32Const(-1),
-            InitializerInstruction.I64Const(Long.MIN_VALUE),
-            InitializerInstruction.F32Const((-0.0f).toRawBits()),
-            InitializerInstruction.F64Const(0x7FF4000000000001),
-            InitializerInstruction.I32Add,
-            InitializerInstruction.I32Sub,
-            InitializerInstruction.I32Mul,
-            InitializerInstruction.I64Add,
-            InitializerInstruction.I64Sub,
-            InitializerInstruction.I64Mul,
-            InitializerInstruction.V128Const(low = 0x0807060504030201, high = 0x100F0E0D0C0B0A09),
-            InitializerInstruction.GlobalGet(4),
-            InitializerInstruction.RefNull(AbstractHeapType.Extern),
-            InitializerInstruction.RefFunc(5),
-            InitializerInstruction.StructNew(6),
-            InitializerInstruction.StructNewDefault(7),
-            InitializerInstruction.ArrayNew(8),
-            InitializerInstruction.ArrayNewDefault(9),
-            InitializerInstruction.ArrayNewFixed(10, 11),
-            InitializerInstruction.RefI31,
-            InitializerInstruction.AnyConvertExtern,
-            InitializerInstruction.ExternConvertAny,
+        val expected = constantExpression(
+            ConstantInstruction.I32Const(-1),
+            ConstantInstruction.I64Const(Long.MIN_VALUE),
+            ConstantInstruction.F32Const((-0.0f).toRawBits()),
+            ConstantInstruction.F64Const(0x7FF4000000000001),
+            ConstantInstruction.I32Add,
+            ConstantInstruction.I32Sub,
+            ConstantInstruction.I32Mul,
+            ConstantInstruction.I64Add,
+            ConstantInstruction.I64Sub,
+            ConstantInstruction.I64Mul,
+            ConstantInstruction.V128Const(low = 0x0807060504030201, high = 0x100F0E0D0C0B0A09),
+            ConstantInstruction.GlobalGet(4),
+            ConstantInstruction.RefNull(AbstractHeapType.Extern),
+            ConstantInstruction.RefFunc(5),
+            ConstantInstruction.StructNew(6),
+            ConstantInstruction.StructNewDefault(7),
+            ConstantInstruction.ArrayNew(8),
+            ConstantInstruction.ArrayNewDefault(9),
+            ConstantInstruction.ArrayNewFixed(10, 11),
+            ConstantInstruction.RefI31,
+            ConstantInstruction.AnyConvertExtern,
+            ConstantInstruction.ExternConvertAny,
         )
         val module = module(globals = listOf(Global(Index.GlobalIndex(0u), globalType(), Expression(instructions))))
 
@@ -215,7 +215,7 @@ class ModuleDeclarationsFactoryTest {
 
         val actual = ModuleDeclarationsFactory(module).globals.single().initializer
 
-        assertEquals(initializer(InitializerInstruction.I32Const(1), InitializerInstruction.I32Const(2)), actual)
+        assertEquals(constantExpression(ConstantInstruction.I32Const(1), ConstantInstruction.I32Const(2)), actual)
     }
 
     @Test
@@ -278,7 +278,7 @@ class ModuleDeclarationsFactoryTest {
         vararg instructions: Instruction,
     ) = Expression(instructions.toList())
 
-    private fun initializer(
-        vararg instructions: InitializerInstruction,
-    ) = InitializerExpression(instructions.toList())
+    private fun constantExpression(
+        vararg instructions: ConstantInstruction,
+    ) = ConstantExpression(instructions.toList())
 }

@@ -4,7 +4,7 @@ import io.github.charlietap.chasm.type.ReferenceType
 
 data class ElementSegmentDeclaration(
     val type: ReferenceType,
-    val initializers: List<InitializerExpression>,
+    val initializers: List<ConstantExpression>,
     val mode: Mode,
 ) {
 
@@ -14,7 +14,7 @@ data class ElementSegmentDeclaration(
 
         data class Active(
             val tableIndex: Int,
-            val offset: InitializerExpression,
+            val offset: ConstantExpression,
         ) : Mode
 
         data object Declarative : Mode
