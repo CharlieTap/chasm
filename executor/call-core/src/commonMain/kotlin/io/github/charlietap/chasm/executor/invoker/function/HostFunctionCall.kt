@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.executor.invoker.function
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.executor.invoker.instruction.control.ThrowRefValueExecutor
 import io.github.charlietap.chasm.host.HostFunction
 import io.github.charlietap.chasm.host.HostFunctionException
@@ -12,8 +13,9 @@ import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 
+@InternalChasmApi
 @OptIn(UnsafeHostApi::class)
-internal fun HostFunctionCall(
+fun HostFunctionCall(
     vstack: ValueStack,
     context: ExecutionContext,
     caller: ModuleInstance,
@@ -50,7 +52,8 @@ internal inline fun HostFunction.invokeHost(
 }
 
 // Catch here so the dispatch loop does not need to preserve the current IP.
-internal inline fun withHostExceptionHandling(
+@InternalChasmApi
+inline fun withHostExceptionHandling(
     vstack: ValueStack,
     context: ExecutionContext,
     nextIp: Int,

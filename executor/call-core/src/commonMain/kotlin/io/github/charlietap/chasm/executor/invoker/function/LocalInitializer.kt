@@ -1,10 +1,12 @@
 package io.github.charlietap.chasm.executor.invoker.function
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.runtime.function.LocalInitialization
 import io.github.charlietap.chasm.runtime.function.WasmFunctionCallStrategy
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 
-internal fun initializeLocals(
+@InternalChasmApi
+fun initializeLocals(
     vstack: ValueStack,
     strategy: WasmFunctionCallStrategy,
     fp: Int,

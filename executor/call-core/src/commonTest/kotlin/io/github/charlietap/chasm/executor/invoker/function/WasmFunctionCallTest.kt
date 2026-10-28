@@ -1,5 +1,8 @@
+@file:OptIn(InternalChasmApi::class)
+
 package io.github.charlietap.chasm.executor.invoker.function
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.fixture.runtime.function.runtimeExpression
 import io.github.charlietap.chasm.fixture.runtime.function.runtimeFunction
 import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance

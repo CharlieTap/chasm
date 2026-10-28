@@ -49,6 +49,7 @@ include(":decoder")
 
 include(":embedding-api")
 
+include(":executor:call-core")
 include(":executor:instantiator")
 include(":executor:invoker")
 

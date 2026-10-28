@@ -1,7 +1,10 @@
+@file:OptIn(InternalChasmApi::class)
+
 package io.github.charlietap.chasm.executor.invoker
 
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.EndFunctionDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.CallDispatcher
 import io.github.charlietap.chasm.executor.invoker.function.HostFunctionCall

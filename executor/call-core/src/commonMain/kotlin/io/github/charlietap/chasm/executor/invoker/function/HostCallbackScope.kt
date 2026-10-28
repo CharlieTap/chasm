@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.executor.invoker.function
 
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 
+@PublishedApi
 internal inline fun <T> ExecutionContext.withHostCallbackScope(block: () -> T): T {
     val marker = heap.beginScope(0)
     try {

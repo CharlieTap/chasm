@@ -1,16 +1,19 @@
 package io.github.charlietap.chasm.executor.invoker.function
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.runtime.program.EXIT_IP
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
 
 /** Call-site metadata used only when a single result has a compiled destination. */
-internal interface CallSiteResultDestination {
+@InternalChasmApi
+interface CallSiteResultDestination {
     val resultDestinationSlot: Int
 }
 
 /** Encodes the calling instruction, rather than its successor, in the saved return field. */
-internal fun resultCallSiteIp(nextIp: Int): Int = (nextIp - 1) or RESULT_CALL_SITE_FLAG
+@InternalChasmApi
+fun resultCallSiteIp(nextIp: Int): Int = (nextIp - 1) or RESULT_CALL_SITE_FLAG
 
 /** The caller is protected at its call instruction, not at the normal continuation. */
 internal fun exceptionalCallSiteIp(returnIp: Int, resultCount: Int): Int =
@@ -28,7 +31,8 @@ internal fun exceptionalCallSiteIp(returnIp: Int, resultCount: Int): Int =
  * holds the compiler-selected caller-frame destination. Compiled code is
  * trusted: a missing destination dispatcher is a publication failure.
  */
-internal fun returnToCaller(
+@InternalChasmApi
+fun returnToCaller(
     vstack: ValueStack,
     store: Store,
     resultCount: Int,

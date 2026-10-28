@@ -1,8 +1,11 @@
+@file:OptIn(InternalChasmApi::class)
+
 package io.github.charlietap.chasm.executor.invoker.thread
 
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.config.GCStrategy
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.executor.invoker.diagnostic.TrapSnapshot

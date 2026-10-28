@@ -1,5 +1,8 @@
+@file:OptIn(InternalChasmApi::class)
+
 package io.github.charlietap.chasm.executor.invoker.function
 
+import io.github.charlietap.chasm.InternalChasmApi
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

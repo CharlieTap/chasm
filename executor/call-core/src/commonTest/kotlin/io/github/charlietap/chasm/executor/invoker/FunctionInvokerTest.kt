@@ -1,8 +1,10 @@
+@file:OptIn(InternalChasmApi::class)
+
 package io.github.charlietap.chasm.executor.invoker
 
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.executor.invoker.thread.ThreadExecutor
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.fixture.config.runtimeConfig
 import io.github.charlietap.chasm.fixture.runtime.instance.functionAddress
 import io.github.charlietap.chasm.fixture.runtime.instance.hostFunctionInstance
@@ -57,7 +59,7 @@ class FunctionInvokerTest {
             functions = mutableListOf(functionInstance),
         )
 
-        val threadExecutor: ThreadExecutor = { actualConfig, actualStore, actualFunction, actualParams ->
+        val wasmFunctionExecutor: WasmFunctionExecutor = { actualConfig, actualStore, actualFunction, actualParams ->
             assertEquals(config, actualConfig)
             assertEquals(store, actualStore)
             assertEquals(functionInstance, actualFunction)
@@ -71,7 +73,7 @@ class FunctionInvokerTest {
             instance = moduleInstance,
             function = functionInstance,
             values = params,
-            threadExecutor = threadExecutor,
+            wasmFunctionExecutor = wasmFunctionExecutor,
         )
 
         assertEquals(Ok(listOf(i32(117))), actual)
@@ -84,7 +86,7 @@ class FunctionInvokerTest {
         val functionInstance = wasmFunctionInstance(module = moduleInstance)
         val runtimeStore = store()
         runtimeStore.heap.setPendingException(117L)
-        val threadExecutor: ThreadExecutor = { _, _, _, _ -> Ok(emptyList()) }
+        val wasmFunctionExecutor: WasmFunctionExecutor = { _, _, _, _ -> Ok(emptyList()) }
 
         FunctionInvoker(
             config = config,
@@ -92,7 +94,7 @@ class FunctionInvokerTest {
             instance = moduleInstance,
             function = functionInstance,
             values = emptyList(),
-            threadExecutor = threadExecutor,
+            wasmFunctionExecutor = wasmFunctionExecutor,
         )
 
         assertFalse(runtimeStore.heap.hasPending)
@@ -127,7 +129,7 @@ class FunctionInvokerTest {
         )
         runtimeStore.functions += functionInstance
 
-        val threadExecutor: ThreadExecutor = { _, _, _, _ ->
+        val wasmFunctionExecutor: WasmFunctionExecutor = { _, _, _, _ ->
             error("thread executor should not be called for host functions")
         }
 
@@ -137,7 +139,7 @@ class FunctionInvokerTest {
             instance = moduleInstance,
             address = address,
             values = params,
-            threadExecutor = threadExecutor,
+            wasmFunctionExecutor = wasmFunctionExecutor,
         )
 
         assertEquals(Ok(listOf(i32(118))), actual)
@@ -164,7 +166,7 @@ class FunctionInvokerTest {
             assertEquals(117, parameters.readI32(0))
             results.writeI32(0, 118)
         }
-        val threadExecutor: ThreadExecutor = { _, _, _, _ ->
+        val wasmFunctionExecutor: WasmFunctionExecutor = { _, _, _, _ ->
             error("thread executor should not be called for host functions")
         }
 
@@ -174,7 +176,7 @@ class FunctionInvokerTest {
             instance = moduleInstance,
             function = functionInstance,
             values = params,
-            threadExecutor = threadExecutor,
+            wasmFunctionExecutor = wasmFunctionExecutor,
         )
 
         assertEquals(Ok(listOf(i32(118))), actual)
@@ -196,7 +198,7 @@ class FunctionInvokerTest {
                 }
             },
         )
-        val threadExecutor: ThreadExecutor = { _, _, _, _ ->
+        val wasmFunctionExecutor: WasmFunctionExecutor = { _, _, _, _ ->
             error("thread executor should not be called for host functions")
         }
 
@@ -206,7 +208,7 @@ class FunctionInvokerTest {
             instance = moduleInstance,
             function = functionInstance,
             values = emptyList(),
-            threadExecutor = threadExecutor,
+            wasmFunctionExecutor = wasmFunctionExecutor,
         )
 
         assertEquals(Err(InvocationError.ThrownException), actual)

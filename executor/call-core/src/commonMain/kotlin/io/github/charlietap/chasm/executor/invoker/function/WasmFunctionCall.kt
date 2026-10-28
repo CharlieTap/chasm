@@ -1,10 +1,12 @@
 package io.github.charlietap.chasm.executor.invoker.function
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.runtime.function.WasmFunctionCallStrategy
 import io.github.charlietap.chasm.runtime.instruction.OperandTransfer
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 
-internal fun WasmFunctionCall(
+@InternalChasmApi
+fun WasmFunctionCall(
     vstack: ValueStack,
     strategy: WasmFunctionCallStrategy,
     operands: OperandTransfer,

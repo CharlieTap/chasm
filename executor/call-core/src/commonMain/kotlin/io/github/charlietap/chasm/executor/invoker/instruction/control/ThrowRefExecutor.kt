@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.control
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.executor.invoker.function.exceptionalCallSiteIp
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.CompiledCatch
@@ -12,7 +13,8 @@ import io.github.charlietap.chasm.runtime.program.EXIT_IP
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
 
-internal fun ThrowRefValueExecutor(
+@InternalChasmApi
+fun ThrowRefValueExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     ref: Long,
@@ -71,7 +73,10 @@ internal fun ThrowRefValueExecutor(
     }
 }
 
-private fun findOwningFunction(store: Store, ip: Int): FunctionInstance.WasmFunction {
+private fun findOwningFunction(
+    store: Store,
+    ip: Int,
+): FunctionInstance.WasmFunction {
     var owner: FunctionInstance.WasmFunction? = null
     var closestEntry = -1
     var index = 0
@@ -89,7 +94,10 @@ private fun findOwningFunction(store: Store, ip: Int): FunctionInstance.WasmFunc
     return owner ?: throw InvocationException(InvocationError.ProgramFinishedInconsistentState)
 }
 
-private fun escapeException(heap: WasmHeap, ref: Long): Nothing {
+private fun escapeException(
+    heap: WasmHeap,
+    ref: Long,
+): Nothing {
     heap.setPendingException(ref)
     throw InvocationException(InvocationError.ThrownException)
 }
