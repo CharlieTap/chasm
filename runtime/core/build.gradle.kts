@@ -17,6 +17,7 @@ kotlin {
                 api(projects.ast)
                 api(projects.gc)
                 api(projects.host)
+                api(projects.runtime.encoding)
                 api(projects.runtime.type)
                 api(projects.runtime.value)
             }
