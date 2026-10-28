@@ -3,162 +3,403 @@ package io.github.charlietap.chasm.executor.invoker.dispatch.memory
 import io.github.charlietap.chasm.executor.invoker.dispatch.dispatchInstruction
 import io.github.charlietap.chasm.executor.invoker.instruction.memory.bulk.MemoryCopyExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.memory.bulk.MemoryFillExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.memory.bulk.MemoryGrowExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.memory.bulk.MemoryInitExecutor
-import io.github.charlietap.chasm.runtime.instruction.MemoryInstruction
+import io.github.charlietap.chasm.executor.invoker.instruction.memory.bulk.executeMemoryGrow
+import io.github.charlietap.chasm.runtime.instance.DataInstance
+import io.github.charlietap.chasm.runtime.instance.MemoryInstance
 
-fun MemoryGrowDispatcher(
-    instruction: MemoryInstruction.MemoryGrowI,
+fun MemoryGrowIDispatcher(
+    pagesToAdd: Int,
+    destinationSlot: Int,
+    memory: MemoryInstance,
 ) = dispatchInstruction { vstack, context ->
-    MemoryGrowExecutor(vstack, context, instruction)
+    executeMemoryGrow(
+        vstack = vstack,
+        context = context,
+        pagesToAdd = pagesToAdd,
+        destinationSlot = destinationSlot,
+        memory = memory,
+    )
 }
 
-fun MemoryGrowDispatcher(
-    instruction: MemoryInstruction.MemoryGrowS,
+fun MemoryGrowSDispatcher(
+    pagesToAddSlot: Int,
+    destinationSlot: Int,
+    memory: MemoryInstance,
 ) = dispatchInstruction { vstack, context ->
-    MemoryGrowExecutor(vstack, context, instruction)
+    executeMemoryGrow(
+        vstack = vstack,
+        context = context,
+        pagesToAdd = vstack.getFrameSlot(pagesToAddSlot).toInt(),
+        destinationSlot = destinationSlot,
+        memory = memory,
+    )
 }
 
-fun MemoryInitDispatcher(
-    instruction: MemoryInstruction.MemoryInitIii,
+fun MemoryInitIiiDispatcher(
+    bytesToCopy: Int,
+    sourceOffset: Int,
+    destinationOffset: Int,
+    memory: MemoryInstance,
+    data: io.github.charlietap.chasm.runtime.instance.DataInstance,
 ) = dispatchInstruction { vstack, context ->
-    MemoryInitExecutor(vstack, context, instruction)
+    MemoryInitExecutor(
+        bytesToCopy = bytesToCopy,
+        sourceOffset = sourceOffset,
+        destinationOffset = destinationOffset,
+        memory = memory,
+        data = data,
+    )
 }
 
-fun MemoryInitDispatcher(
-    instruction: MemoryInstruction.MemoryInitIis,
+fun MemoryInitIisDispatcher(
+    bytesToCopy: Int,
+    sourceOffset: Int,
+    destinationOffsetSlot: Int,
+    memory: MemoryInstance,
+    data: io.github.charlietap.chasm.runtime.instance.DataInstance,
 ) = dispatchInstruction { vstack, context ->
-    MemoryInitExecutor(vstack, context, instruction)
+    MemoryInitExecutor(
+        bytesToCopy = bytesToCopy,
+        sourceOffset = sourceOffset,
+        destinationOffset = vstack.getFrameSlot(destinationOffsetSlot).toInt(),
+        memory = memory,
+        data = data,
+    )
 }
 
-fun MemoryInitDispatcher(
-    instruction: MemoryInstruction.MemoryInitIsi,
+fun MemoryInitIsiDispatcher(
+    bytesToCopy: Int,
+    sourceOffsetSlot: Int,
+    destinationOffset: Int,
+    memory: MemoryInstance,
+    data: io.github.charlietap.chasm.runtime.instance.DataInstance,
 ) = dispatchInstruction { vstack, context ->
-    MemoryInitExecutor(vstack, context, instruction)
+    MemoryInitExecutor(
+        bytesToCopy = bytesToCopy,
+        sourceOffset = vstack.getFrameSlot(sourceOffsetSlot).toInt(),
+        destinationOffset = destinationOffset,
+        memory = memory,
+        data = data,
+    )
 }
 
-fun MemoryInitDispatcher(
-    instruction: MemoryInstruction.MemoryInitIss,
+fun MemoryInitIssDispatcher(
+    bytesToCopy: Int,
+    sourceOffsetSlot: Int,
+    destinationOffsetSlot: Int,
+    memory: MemoryInstance,
+    data: io.github.charlietap.chasm.runtime.instance.DataInstance,
 ) = dispatchInstruction { vstack, context ->
-    MemoryInitExecutor(vstack, context, instruction)
+    MemoryInitExecutor(
+        bytesToCopy = bytesToCopy,
+        sourceOffset = vstack.getFrameSlot(sourceOffsetSlot).toInt(),
+        destinationOffset = vstack.getFrameSlot(destinationOffsetSlot).toInt(),
+        memory = memory,
+        data = data,
+    )
 }
 
-fun MemoryInitDispatcher(
-    instruction: MemoryInstruction.MemoryInitSii,
+fun MemoryInitSiiDispatcher(
+    bytesToCopySlot: Int,
+    sourceOffset: Int,
+    destinationOffset: Int,
+    memory: MemoryInstance,
+    data: io.github.charlietap.chasm.runtime.instance.DataInstance,
 ) = dispatchInstruction { vstack, context ->
-    MemoryInitExecutor(vstack, context, instruction)
+    MemoryInitExecutor(
+        bytesToCopy = vstack.getFrameSlot(bytesToCopySlot).toInt(),
+        sourceOffset = sourceOffset,
+        destinationOffset = destinationOffset,
+        memory = memory,
+        data = data,
+    )
 }
 
-fun MemoryInitDispatcher(
-    instruction: MemoryInstruction.MemoryInitSis,
+fun MemoryInitSisDispatcher(
+    bytesToCopySlot: Int,
+    sourceOffset: Int,
+    destinationOffsetSlot: Int,
+    memory: MemoryInstance,
+    data: io.github.charlietap.chasm.runtime.instance.DataInstance,
 ) = dispatchInstruction { vstack, context ->
-    MemoryInitExecutor(vstack, context, instruction)
+    MemoryInitExecutor(
+        bytesToCopy = vstack.getFrameSlot(bytesToCopySlot).toInt(),
+        sourceOffset = sourceOffset,
+        destinationOffset = vstack.getFrameSlot(destinationOffsetSlot).toInt(),
+        memory = memory,
+        data = data,
+    )
 }
 
-fun MemoryInitDispatcher(
-    instruction: MemoryInstruction.MemoryInitSsi,
+fun MemoryInitSsiDispatcher(
+    bytesToCopySlot: Int,
+    sourceOffsetSlot: Int,
+    destinationOffset: Int,
+    memory: MemoryInstance,
+    data: io.github.charlietap.chasm.runtime.instance.DataInstance,
 ) = dispatchInstruction { vstack, context ->
-    MemoryInitExecutor(vstack, context, instruction)
+    MemoryInitExecutor(
+        bytesToCopy = vstack.getFrameSlot(bytesToCopySlot).toInt(),
+        sourceOffset = vstack.getFrameSlot(sourceOffsetSlot).toInt(),
+        destinationOffset = destinationOffset,
+        memory = memory,
+        data = data,
+    )
 }
 
-fun MemoryInitDispatcher(
-    instruction: MemoryInstruction.MemoryInitSss,
+fun MemoryInitSssDispatcher(
+    bytesToCopySlot: Int,
+    sourceOffsetSlot: Int,
+    destinationOffsetSlot: Int,
+    memory: MemoryInstance,
+    data: io.github.charlietap.chasm.runtime.instance.DataInstance,
 ) = dispatchInstruction { vstack, context ->
-    MemoryInitExecutor(vstack, context, instruction)
+    MemoryInitExecutor(
+        bytesToCopy = vstack.getFrameSlot(bytesToCopySlot).toInt(),
+        sourceOffset = vstack.getFrameSlot(sourceOffsetSlot).toInt(),
+        destinationOffset = vstack.getFrameSlot(destinationOffsetSlot).toInt(),
+        memory = memory,
+        data = data,
+    )
 }
 
-fun MemoryCopyDispatcher(
-    instruction: MemoryInstruction.MemoryCopyIii,
+fun MemoryCopyIiiDispatcher(
+    bytesToCopy: Int,
+    sourceOffset: Int,
+    destinationOffset: Int,
+    srcMemory: MemoryInstance,
+    dstMemory: MemoryInstance,
 ) = dispatchInstruction { vstack, context ->
-    MemoryCopyExecutor(vstack, context, instruction)
+    MemoryCopyExecutor(
+        bytesToCopy = bytesToCopy,
+        sourceOffset = sourceOffset,
+        destinationOffset = destinationOffset,
+        srcMemory = srcMemory,
+        dstMemory = dstMemory,
+    )
 }
 
-fun MemoryCopyDispatcher(
-    instruction: MemoryInstruction.MemoryCopyIis,
+fun MemoryCopyIisDispatcher(
+    bytesToCopy: Int,
+    sourceOffset: Int,
+    destinationOffsetSlot: Int,
+    srcMemory: MemoryInstance,
+    dstMemory: MemoryInstance,
 ) = dispatchInstruction { vstack, context ->
-    MemoryCopyExecutor(vstack, context, instruction)
+    MemoryCopyExecutor(
+        bytesToCopy = bytesToCopy,
+        sourceOffset = sourceOffset,
+        destinationOffset = vstack.getFrameSlot(destinationOffsetSlot).toInt(),
+        srcMemory = srcMemory,
+        dstMemory = dstMemory,
+    )
 }
 
-fun MemoryCopyDispatcher(
-    instruction: MemoryInstruction.MemoryCopyIsi,
+fun MemoryCopyIsiDispatcher(
+    bytesToCopy: Int,
+    sourceOffsetSlot: Int,
+    destinationOffset: Int,
+    srcMemory: MemoryInstance,
+    dstMemory: MemoryInstance,
 ) = dispatchInstruction { vstack, context ->
-    MemoryCopyExecutor(vstack, context, instruction)
+    MemoryCopyExecutor(
+        bytesToCopy = bytesToCopy,
+        sourceOffset = vstack.getFrameSlot(sourceOffsetSlot).toInt(),
+        destinationOffset = destinationOffset,
+        srcMemory = srcMemory,
+        dstMemory = dstMemory,
+    )
 }
 
-fun MemoryCopyDispatcher(
-    instruction: MemoryInstruction.MemoryCopyIss,
+fun MemoryCopyIssDispatcher(
+    bytesToCopy: Int,
+    sourceOffsetSlot: Int,
+    destinationOffsetSlot: Int,
+    srcMemory: MemoryInstance,
+    dstMemory: MemoryInstance,
 ) = dispatchInstruction { vstack, context ->
-    MemoryCopyExecutor(vstack, context, instruction)
+    MemoryCopyExecutor(
+        bytesToCopy = bytesToCopy,
+        sourceOffset = vstack.getFrameSlot(sourceOffsetSlot).toInt(),
+        destinationOffset = vstack.getFrameSlot(destinationOffsetSlot).toInt(),
+        srcMemory = srcMemory,
+        dstMemory = dstMemory,
+    )
 }
 
-fun MemoryCopyDispatcher(
-    instruction: MemoryInstruction.MemoryCopySii,
+fun MemoryCopySiiDispatcher(
+    bytesToCopySlot: Int,
+    sourceOffset: Int,
+    destinationOffset: Int,
+    srcMemory: MemoryInstance,
+    dstMemory: MemoryInstance,
 ) = dispatchInstruction { vstack, context ->
-    MemoryCopyExecutor(vstack, context, instruction)
+    MemoryCopyExecutor(
+        bytesToCopy = vstack.getFrameSlot(bytesToCopySlot).toInt(),
+        sourceOffset = sourceOffset,
+        destinationOffset = destinationOffset,
+        srcMemory = srcMemory,
+        dstMemory = dstMemory,
+    )
 }
 
-fun MemoryCopyDispatcher(
-    instruction: MemoryInstruction.MemoryCopySis,
+fun MemoryCopySisDispatcher(
+    bytesToCopySlot: Int,
+    sourceOffset: Int,
+    destinationOffsetSlot: Int,
+    srcMemory: MemoryInstance,
+    dstMemory: MemoryInstance,
 ) = dispatchInstruction { vstack, context ->
-    MemoryCopyExecutor(vstack, context, instruction)
+    MemoryCopyExecutor(
+        bytesToCopy = vstack.getFrameSlot(bytesToCopySlot).toInt(),
+        sourceOffset = sourceOffset,
+        destinationOffset = vstack.getFrameSlot(destinationOffsetSlot).toInt(),
+        srcMemory = srcMemory,
+        dstMemory = dstMemory,
+    )
 }
 
-fun MemoryCopyDispatcher(
-    instruction: MemoryInstruction.MemoryCopySsi,
+fun MemoryCopySsiDispatcher(
+    bytesToCopySlot: Int,
+    sourceOffsetSlot: Int,
+    destinationOffset: Int,
+    srcMemory: MemoryInstance,
+    dstMemory: MemoryInstance,
 ) = dispatchInstruction { vstack, context ->
-    MemoryCopyExecutor(vstack, context, instruction)
+    MemoryCopyExecutor(
+        bytesToCopy = vstack.getFrameSlot(bytesToCopySlot).toInt(),
+        sourceOffset = vstack.getFrameSlot(sourceOffsetSlot).toInt(),
+        destinationOffset = destinationOffset,
+        srcMemory = srcMemory,
+        dstMemory = dstMemory,
+    )
 }
 
-fun MemoryCopyDispatcher(
-    instruction: MemoryInstruction.MemoryCopySss,
+fun MemoryCopySssDispatcher(
+    bytesToCopySlot: Int,
+    sourceOffsetSlot: Int,
+    destinationOffsetSlot: Int,
+    srcMemory: MemoryInstance,
+    dstMemory: MemoryInstance,
 ) = dispatchInstruction { vstack, context ->
-    MemoryCopyExecutor(vstack, context, instruction)
+    MemoryCopyExecutor(
+        bytesToCopy = vstack.getFrameSlot(bytesToCopySlot).toInt(),
+        sourceOffset = vstack.getFrameSlot(sourceOffsetSlot).toInt(),
+        destinationOffset = vstack.getFrameSlot(destinationOffsetSlot).toInt(),
+        srcMemory = srcMemory,
+        dstMemory = dstMemory,
+    )
 }
 
-fun MemoryFillDispatcher(
-    instruction: MemoryInstruction.MemoryFillIii,
+fun MemoryFillIiiDispatcher(
+    bytesToFill: Int,
+    fillValue: Int,
+    offset: Int,
+    memory: MemoryInstance,
 ) = dispatchInstruction { vstack, context ->
-    MemoryFillExecutor(vstack, context, instruction)
+    MemoryFillExecutor(
+        bytesToFill = bytesToFill,
+        fillValue = fillValue,
+        offset = offset,
+        memory = memory,
+    )
 }
 
-fun MemoryFillDispatcher(
-    instruction: MemoryInstruction.MemoryFillIis,
+fun MemoryFillIisDispatcher(
+    bytesToFill: Int,
+    fillValue: Int,
+    offsetSlot: Int,
+    memory: MemoryInstance,
 ) = dispatchInstruction { vstack, context ->
-    MemoryFillExecutor(vstack, context, instruction)
+    MemoryFillExecutor(
+        bytesToFill = bytesToFill,
+        fillValue = fillValue,
+        offset = vstack.getFrameSlot(offsetSlot).toInt(),
+        memory = memory,
+    )
 }
 
-fun MemoryFillDispatcher(
-    instruction: MemoryInstruction.MemoryFillIsi,
+fun MemoryFillIsiDispatcher(
+    bytesToFill: Int,
+    fillValueSlot: Int,
+    offset: Int,
+    memory: MemoryInstance,
 ) = dispatchInstruction { vstack, context ->
-    MemoryFillExecutor(vstack, context, instruction)
+    MemoryFillExecutor(
+        bytesToFill = bytesToFill,
+        fillValue = vstack.getFrameSlot(fillValueSlot).toInt(),
+        offset = offset,
+        memory = memory,
+    )
 }
 
-fun MemoryFillDispatcher(
-    instruction: MemoryInstruction.MemoryFillIss,
+fun MemoryFillIssDispatcher(
+    bytesToFill: Int,
+    fillValueSlot: Int,
+    offsetSlot: Int,
+    memory: MemoryInstance,
 ) = dispatchInstruction { vstack, context ->
-    MemoryFillExecutor(vstack, context, instruction)
+    MemoryFillExecutor(
+        bytesToFill = bytesToFill,
+        fillValue = vstack.getFrameSlot(fillValueSlot).toInt(),
+        offset = vstack.getFrameSlot(offsetSlot).toInt(),
+        memory = memory,
+    )
 }
 
-fun MemoryFillDispatcher(
-    instruction: MemoryInstruction.MemoryFillSii,
+fun MemoryFillSiiDispatcher(
+    bytesToFillSlot: Int,
+    fillValue: Int,
+    offset: Int,
+    memory: MemoryInstance,
 ) = dispatchInstruction { vstack, context ->
-    MemoryFillExecutor(vstack, context, instruction)
+    MemoryFillExecutor(
+        bytesToFill = vstack.getFrameSlot(bytesToFillSlot).toInt(),
+        fillValue = fillValue,
+        offset = offset,
+        memory = memory,
+    )
 }
 
-fun MemoryFillDispatcher(
-    instruction: MemoryInstruction.MemoryFillSis,
+fun MemoryFillSisDispatcher(
+    bytesToFillSlot: Int,
+    fillValue: Int,
+    offsetSlot: Int,
+    memory: MemoryInstance,
 ) = dispatchInstruction { vstack, context ->
-    MemoryFillExecutor(vstack, context, instruction)
+    MemoryFillExecutor(
+        bytesToFill = vstack.getFrameSlot(bytesToFillSlot).toInt(),
+        fillValue = fillValue,
+        offset = vstack.getFrameSlot(offsetSlot).toInt(),
+        memory = memory,
+    )
 }
 
-fun MemoryFillDispatcher(
-    instruction: MemoryInstruction.MemoryFillSsi,
+fun MemoryFillSsiDispatcher(
+    bytesToFillSlot: Int,
+    fillValueSlot: Int,
+    offset: Int,
+    memory: MemoryInstance,
 ) = dispatchInstruction { vstack, context ->
-    MemoryFillExecutor(vstack, context, instruction)
+    MemoryFillExecutor(
+        bytesToFill = vstack.getFrameSlot(bytesToFillSlot).toInt(),
+        fillValue = vstack.getFrameSlot(fillValueSlot).toInt(),
+        offset = offset,
+        memory = memory,
+    )
 }
 
-fun MemoryFillDispatcher(
-    instruction: MemoryInstruction.MemoryFillSss,
+fun MemoryFillSssDispatcher(
+    bytesToFillSlot: Int,
+    fillValueSlot: Int,
+    offsetSlot: Int,
+    memory: MemoryInstance,
 ) = dispatchInstruction { vstack, context ->
-    MemoryFillExecutor(vstack, context, instruction)
+    MemoryFillExecutor(
+        bytesToFill = vstack.getFrameSlot(bytesToFillSlot).toInt(),
+        fillValue = vstack.getFrameSlot(fillValueSlot).toInt(),
+        offset = vstack.getFrameSlot(offsetSlot).toInt(),
+        memory = memory,
+    )
 }

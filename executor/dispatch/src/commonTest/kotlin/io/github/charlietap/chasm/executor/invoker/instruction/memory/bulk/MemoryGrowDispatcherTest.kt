@@ -1,12 +1,13 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.memory.bulk
 
-import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
+import io.github.charlietap.chasm.executor.invoker.dispatch.memory.MemoryGrowIDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.memory.MemoryGrowSDispatcher
+import io.github.charlietap.chasm.fixture.runtime.execution.executionContext
 import io.github.charlietap.chasm.fixture.runtime.instance.memoryInstance
 import io.github.charlietap.chasm.fixture.runtime.memory.NoOpLinearMemory
 import io.github.charlietap.chasm.fixture.runtime.stack.vstack
 import io.github.charlietap.chasm.fixture.type.limits
 import io.github.charlietap.chasm.fixture.type.memoryType
-import io.github.charlietap.chasm.runtime.instruction.MemoryInstruction
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
 import io.github.charlietap.chasm.runtime.memory.LinearMemory.Companion.PAGE_SIZE
 import io.github.charlietap.chasm.runtime.memory.OutOfMemoryError
@@ -14,7 +15,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertSame
 
-class MemoryGrowExecutorTest {
+class MemoryGrowDispatcherTest {
 
     @Test
     fun `returns minus one for negative and overflowing growth`() {
@@ -30,11 +31,8 @@ class MemoryGrowExecutorTest {
                 setFrameSlot(0, pagesToAdd.toLong())
             }
 
-            MemoryGrowExecutor(
-                vstack = vstack,
-                context = executionContext(vstack = vstack),
-                instruction = MemoryInstruction.MemoryGrowS(0, 1, memory),
-            )
+            MemoryGrowSDispatcher(pagesToAddSlot = 0, destinationSlot = 1, memory = memory)
+                .invoke(vstack, executionContext(vstack = vstack), 1)
 
             assertEquals(-1L, vstack.getFrameSlot(1))
         }
@@ -54,11 +52,8 @@ class MemoryGrowExecutorTest {
             )
             val vstack = vstack().apply { reserveDepth(1) }
 
-            MemoryGrowExecutor(
-                vstack = vstack,
-                context = executionContext(vstack = vstack),
-                instruction = MemoryInstruction.MemoryGrowI(1, 0, memory),
-            )
+            MemoryGrowIDispatcher(pagesToAdd = 1, destinationSlot = 0, memory = memory)
+                .invoke(vstack, executionContext(vstack = vstack), 1)
 
             assertEquals(-1L, vstack.getFrameSlot(0))
             assertEquals(1u, memory.type.limits.min)

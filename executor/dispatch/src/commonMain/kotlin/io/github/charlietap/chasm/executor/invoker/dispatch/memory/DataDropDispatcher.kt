@@ -1,12 +1,13 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.memory
 
-import io.github.charlietap.chasm.executor.invoker.instruction.memory.DataDropExecutor
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
-import io.github.charlietap.chasm.runtime.instruction.MemoryInstruction
+import io.github.charlietap.chasm.runtime.instance.DataInstance
 
 fun DataDropDispatcher(
-    instruction: MemoryInstruction.DataDrop,
+    data: DataInstance,
 ): DispatchableInstruction = DispatchableInstruction { vstack, context, nextIp ->
-    DataDropExecutor(vstack, context, instruction)
+    run {
+        data.bytes = DataInstance.EMPTY
+    }
     nextIp
 }

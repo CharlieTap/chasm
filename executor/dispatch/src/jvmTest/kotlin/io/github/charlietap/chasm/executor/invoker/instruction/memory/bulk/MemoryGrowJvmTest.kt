@@ -1,13 +1,13 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.memory.bulk
 
-import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
+import io.github.charlietap.chasm.executor.invoker.dispatch.memory.MemoryGrowIDispatcher
+import io.github.charlietap.chasm.fixture.runtime.execution.executionContext
 import io.github.charlietap.chasm.fixture.runtime.instance.memoryInstance
 import io.github.charlietap.chasm.fixture.runtime.stack.vstack
 import io.github.charlietap.chasm.fixture.type.limits
 import io.github.charlietap.chasm.fixture.type.memoryType
 import io.github.charlietap.chasm.memory.ByteBufferLinearMemory
 import io.github.charlietap.chasm.memory.destruct.LinearMemoryDestructor
-import io.github.charlietap.chasm.runtime.instruction.MemoryInstruction
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
 import io.github.charlietap.chasm.runtime.memory.LinearMemory.Companion.MAX_PAGES
 import io.github.charlietap.chasm.runtime.memory.LinearMemory.Companion.PAGE_SIZE
@@ -31,11 +31,8 @@ class MemoryGrowJvmTest {
         val vstack = vstack().apply { reserveDepth(1) }
 
         try {
-            MemoryGrowExecutor(
-                vstack = vstack,
-                context = executionContext(vstack = vstack),
-                instruction = MemoryInstruction.MemoryGrowI(1, 0, memory),
-            )
+            MemoryGrowIDispatcher(pagesToAdd = 1, destinationSlot = 0, memory = memory)
+                .invoke(vstack, executionContext(vstack = vstack), 1)
 
             assertEquals(-1L, vstack.getFrameSlot(0))
             assertEquals(maximumJvmPages.toULong(), memory.type.limits.min)
