@@ -71,6 +71,7 @@ include(":memory")
 include(":module")
 
 include(":compiler")
+include(":compiler:backend-chasm")
 
 include(":runtime:address")
 include(":runtime:core")

@@ -49,13 +49,23 @@ class Program
             return index
         }
 
-        fun append(values: Array<DispatchableInstruction>): Int {
-            val entryIp = size
-            if (values.isEmpty()) return entryIp
+        fun append(
+            values: Array<DispatchableInstruction>,
+        ): Int = append(values, values.size)
 
-            ensureCapacity(size + values.size)
-            values.copyInto(instructions, destinationOffset = size)
-            size += values.size
+        fun append(
+            values: Array<DispatchableInstruction>,
+            count: Int,
+        ): Int {
+            require(count in 0..values.size) {
+                "program instruction count is out of bounds"
+            }
+            val entryIp = size
+            if (count == 0) return entryIp
+
+            ensureCapacity(size + count)
+            values.copyInto(instructions, destinationOffset = size, endIndex = count)
+            size += count
             return entryIp
         }
 
