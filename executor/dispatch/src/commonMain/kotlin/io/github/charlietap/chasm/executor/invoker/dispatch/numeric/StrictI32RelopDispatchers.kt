@@ -1,174 +1,407 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.numeric
 
 import io.github.charlietap.chasm.executor.invoker.dispatch.dispatchInstruction
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.relop.I32EqExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.relop.I32GeSExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.relop.I32GeUExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.relop.I32GtSExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.relop.I32GtUExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.relop.I32LeSExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.relop.I32LeUExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.relop.I32LtSExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.relop.I32LtUExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.relop.I32NeExecutor
-import io.github.charlietap.chasm.runtime.instruction.NumericInstruction
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.executeI32BinaryIi
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.executeI32BinaryIs
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.executeI32BinarySi
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.executeI32BinarySs
 
-fun I32EqDispatcher(
-    instruction: NumericInstruction.I32EqIi,
-) = dispatchInstruction { vstack, context -> I32EqExecutor(vstack, context, instruction) }
+fun I32EqIiDispatcher(
+    left: Int,
+    right: Int,
+    destinationSlot: Int,
+) = dispatchInstruction { vstack, context ->
+    executeI32BinaryIi(vstack, destinationSlot, left, right) { left, right ->
+        if (left == right) 1 else 0
+    }
+}
 
-fun I32EqDispatcher(
-    instruction: NumericInstruction.I32EqIs,
-) = dispatchInstruction { vstack, context -> I32EqExecutor(vstack, context, instruction) }
+fun I32EqIsDispatcher(
+    left: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
+) = dispatchInstruction { vstack, context ->
+    executeI32BinaryIs(vstack, destinationSlot, left, rightSlot) { left, right ->
+        if (left == right) 1 else 0
+    }
+}
 
-fun I32EqDispatcher(
-    instruction: NumericInstruction.I32EqSi,
-) = dispatchInstruction { vstack, context -> I32EqExecutor(vstack, context, instruction) }
+fun I32EqSiDispatcher(
+    leftSlot: Int,
+    right: Int,
+    destinationSlot: Int,
+) = dispatchInstruction { vstack, context ->
+    executeI32BinarySi(vstack, destinationSlot, leftSlot, right) { left, right ->
+        if (left == right) 1 else 0
+    }
+}
 
-fun I32EqDispatcher(
-    instruction: NumericInstruction.I32EqSs,
-) = dispatchInstruction { vstack, context -> I32EqExecutor(vstack, context, instruction) }
+fun I32EqSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
+) = dispatchInstruction { vstack, context ->
+    executeI32BinarySs(vstack, destinationSlot, leftSlot, rightSlot) { left, right ->
+        if (left == right) 1 else 0
+    }
+}
 
-fun I32NeDispatcher(
-    instruction: NumericInstruction.I32NeIi,
-) = dispatchInstruction { vstack, context -> I32NeExecutor(vstack, context, instruction) }
+fun I32NeIiDispatcher(
+    left: Int,
+    right: Int,
+    destinationSlot: Int,
+) = dispatchInstruction { vstack, context ->
+    executeI32BinaryIi(vstack, destinationSlot, left, right) { left, right ->
+        if (left != right) 1 else 0
+    }
+}
 
-fun I32NeDispatcher(
-    instruction: NumericInstruction.I32NeIs,
-) = dispatchInstruction { vstack, context -> I32NeExecutor(vstack, context, instruction) }
+fun I32NeIsDispatcher(
+    left: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
+) = dispatchInstruction { vstack, context ->
+    executeI32BinaryIs(vstack, destinationSlot, left, rightSlot) { left, right ->
+        if (left != right) 1 else 0
+    }
+}
 
-fun I32NeDispatcher(
-    instruction: NumericInstruction.I32NeSi,
-) = dispatchInstruction { vstack, context -> I32NeExecutor(vstack, context, instruction) }
+fun I32NeSiDispatcher(
+    leftSlot: Int,
+    right: Int,
+    destinationSlot: Int,
+) = dispatchInstruction { vstack, context ->
+    executeI32BinarySi(vstack, destinationSlot, leftSlot, right) { left, right ->
+        if (left != right) 1 else 0
+    }
+}
 
-fun I32NeDispatcher(
-    instruction: NumericInstruction.I32NeSs,
-) = dispatchInstruction { vstack, context -> I32NeExecutor(vstack, context, instruction) }
+fun I32NeSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
+) = dispatchInstruction { vstack, context ->
+    executeI32BinarySs(vstack, destinationSlot, leftSlot, rightSlot) { left, right ->
+        if (left != right) 1 else 0
+    }
+}
 
-fun I32LtSDispatcher(
-    instruction: NumericInstruction.I32LtSIi,
-) = dispatchInstruction { vstack, context -> I32LtSExecutor(vstack, context, instruction) }
+fun I32LtSIiDispatcher(
+    left: Int,
+    right: Int,
+    destinationSlot: Int,
+) = dispatchInstruction { vstack, context ->
+    executeI32BinaryIi(vstack, destinationSlot, left, right) { left, right ->
+        if (left < right) 1 else 0
+    }
+}
 
-fun I32LtSDispatcher(
-    instruction: NumericInstruction.I32LtSIs,
-) = dispatchInstruction { vstack, context -> I32LtSExecutor(vstack, context, instruction) }
+fun I32LtSIsDispatcher(
+    left: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
+) = dispatchInstruction { vstack, context ->
+    executeI32BinaryIs(vstack, destinationSlot, left, rightSlot) { left, right ->
+        if (left < right) 1 else 0
+    }
+}
 
-fun I32LtSDispatcher(
-    instruction: NumericInstruction.I32LtSSi,
-) = dispatchInstruction { vstack, context -> I32LtSExecutor(vstack, context, instruction) }
+fun I32LtSSiDispatcher(
+    leftSlot: Int,
+    right: Int,
+    destinationSlot: Int,
+) = dispatchInstruction { vstack, context ->
+    executeI32BinarySi(vstack, destinationSlot, leftSlot, right) { left, right ->
+        if (left < right) 1 else 0
+    }
+}
 
-fun I32LtSDispatcher(
-    instruction: NumericInstruction.I32LtSSs,
-) = dispatchInstruction { vstack, context -> I32LtSExecutor(vstack, context, instruction) }
+fun I32LtSSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
+) = dispatchInstruction { vstack, context ->
+    executeI32BinarySs(vstack, destinationSlot, leftSlot, rightSlot) { left, right ->
+        if (left < right) 1 else 0
+    }
+}
 
-fun I32LtUDispatcher(
-    instruction: NumericInstruction.I32LtUIi,
-) = dispatchInstruction { vstack, context -> I32LtUExecutor(vstack, context, instruction) }
+fun I32LtUIiDispatcher(
+    left: Int,
+    right: Int,
+    destinationSlot: Int,
+) = dispatchInstruction { vstack, context ->
+    executeI32BinaryIi(vstack, destinationSlot, left, right) { left, right ->
+        if (left.toUInt() < right.toUInt()) 1 else 0
+    }
+}
 
-fun I32LtUDispatcher(
-    instruction: NumericInstruction.I32LtUIs,
-) = dispatchInstruction { vstack, context -> I32LtUExecutor(vstack, context, instruction) }
+fun I32LtUIsDispatcher(
+    left: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
+) = dispatchInstruction { vstack, context ->
+    executeI32BinaryIs(vstack, destinationSlot, left, rightSlot) { left, right ->
+        if (left.toUInt() < right.toUInt()) 1 else 0
+    }
+}
 
-fun I32LtUDispatcher(
-    instruction: NumericInstruction.I32LtUSi,
-) = dispatchInstruction { vstack, context -> I32LtUExecutor(vstack, context, instruction) }
+fun I32LtUSiDispatcher(
+    leftSlot: Int,
+    right: Int,
+    destinationSlot: Int,
+) = dispatchInstruction { vstack, context ->
+    executeI32BinarySi(vstack, destinationSlot, leftSlot, right) { left, right ->
+        if (left.toUInt() < right.toUInt()) 1 else 0
+    }
+}
 
-fun I32LtUDispatcher(
-    instruction: NumericInstruction.I32LtUSs,
-) = dispatchInstruction { vstack, context -> I32LtUExecutor(vstack, context, instruction) }
+fun I32LtUSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
+) = dispatchInstruction { vstack, context ->
+    executeI32BinarySs(vstack, destinationSlot, leftSlot, rightSlot) { left, right ->
+        if (left.toUInt() < right.toUInt()) 1 else 0
+    }
+}
 
-fun I32GtSDispatcher(
-    instruction: NumericInstruction.I32GtSIi,
-) = dispatchInstruction { vstack, context -> I32GtSExecutor(vstack, context, instruction) }
+fun I32GtSIiDispatcher(
+    left: Int,
+    right: Int,
+    destinationSlot: Int,
+) = dispatchInstruction { vstack, context ->
+    executeI32BinaryIi(vstack, destinationSlot, left, right) { left, right ->
+        if (left > right) 1 else 0
+    }
+}
 
-fun I32GtSDispatcher(
-    instruction: NumericInstruction.I32GtSIs,
-) = dispatchInstruction { vstack, context -> I32GtSExecutor(vstack, context, instruction) }
+fun I32GtSIsDispatcher(
+    left: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
+) = dispatchInstruction { vstack, context ->
+    executeI32BinaryIs(vstack, destinationSlot, left, rightSlot) { left, right ->
+        if (left > right) 1 else 0
+    }
+}
 
-fun I32GtSDispatcher(
-    instruction: NumericInstruction.I32GtSSi,
-) = dispatchInstruction { vstack, context -> I32GtSExecutor(vstack, context, instruction) }
+fun I32GtSSiDispatcher(
+    leftSlot: Int,
+    right: Int,
+    destinationSlot: Int,
+) = dispatchInstruction { vstack, context ->
+    executeI32BinarySi(vstack, destinationSlot, leftSlot, right) { left, right ->
+        if (left > right) 1 else 0
+    }
+}
 
-fun I32GtSDispatcher(
-    instruction: NumericInstruction.I32GtSSs,
-) = dispatchInstruction { vstack, context -> I32GtSExecutor(vstack, context, instruction) }
+fun I32GtSSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
+) = dispatchInstruction { vstack, context ->
+    executeI32BinarySs(vstack, destinationSlot, leftSlot, rightSlot) { left, right ->
+        if (left > right) 1 else 0
+    }
+}
 
-fun I32GtUDispatcher(
-    instruction: NumericInstruction.I32GtUIi,
-) = dispatchInstruction { vstack, context -> I32GtUExecutor(vstack, context, instruction) }
+fun I32GtUIiDispatcher(
+    left: Int,
+    right: Int,
+    destinationSlot: Int,
+) = dispatchInstruction { vstack, context ->
+    executeI32BinaryIi(vstack, destinationSlot, left, right) { left, right ->
+        if (left.toUInt() > right.toUInt()) 1 else 0
+    }
+}
 
-fun I32GtUDispatcher(
-    instruction: NumericInstruction.I32GtUIs,
-) = dispatchInstruction { vstack, context -> I32GtUExecutor(vstack, context, instruction) }
+fun I32GtUIsDispatcher(
+    left: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
+) = dispatchInstruction { vstack, context ->
+    executeI32BinaryIs(vstack, destinationSlot, left, rightSlot) { left, right ->
+        if (left.toUInt() > right.toUInt()) 1 else 0
+    }
+}
 
-fun I32GtUDispatcher(
-    instruction: NumericInstruction.I32GtUSi,
-) = dispatchInstruction { vstack, context -> I32GtUExecutor(vstack, context, instruction) }
+fun I32GtUSiDispatcher(
+    leftSlot: Int,
+    right: Int,
+    destinationSlot: Int,
+) = dispatchInstruction { vstack, context ->
+    executeI32BinarySi(vstack, destinationSlot, leftSlot, right) { left, right ->
+        if (left.toUInt() > right.toUInt()) 1 else 0
+    }
+}
 
-fun I32GtUDispatcher(
-    instruction: NumericInstruction.I32GtUSs,
-) = dispatchInstruction { vstack, context -> I32GtUExecutor(vstack, context, instruction) }
+fun I32GtUSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
+) = dispatchInstruction { vstack, context ->
+    executeI32BinarySs(vstack, destinationSlot, leftSlot, rightSlot) { left, right ->
+        if (left.toUInt() > right.toUInt()) 1 else 0
+    }
+}
 
-fun I32LeSDispatcher(
-    instruction: NumericInstruction.I32LeSIi,
-) = dispatchInstruction { vstack, context -> I32LeSExecutor(vstack, context, instruction) }
+fun I32LeSIiDispatcher(
+    left: Int,
+    right: Int,
+    destinationSlot: Int,
+) = dispatchInstruction { vstack, context ->
+    executeI32BinaryIi(vstack, destinationSlot, left, right) { left, right ->
+        if (left <= right) 1 else 0
+    }
+}
 
-fun I32LeSDispatcher(
-    instruction: NumericInstruction.I32LeSIs,
-) = dispatchInstruction { vstack, context -> I32LeSExecutor(vstack, context, instruction) }
+fun I32LeSIsDispatcher(
+    left: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
+) = dispatchInstruction { vstack, context ->
+    executeI32BinaryIs(vstack, destinationSlot, left, rightSlot) { left, right ->
+        if (left <= right) 1 else 0
+    }
+}
 
-fun I32LeSDispatcher(
-    instruction: NumericInstruction.I32LeSSi,
-) = dispatchInstruction { vstack, context -> I32LeSExecutor(vstack, context, instruction) }
+fun I32LeSSiDispatcher(
+    leftSlot: Int,
+    right: Int,
+    destinationSlot: Int,
+) = dispatchInstruction { vstack, context ->
+    executeI32BinarySi(vstack, destinationSlot, leftSlot, right) { left, right ->
+        if (left <= right) 1 else 0
+    }
+}
 
-fun I32LeSDispatcher(
-    instruction: NumericInstruction.I32LeSSs,
-) = dispatchInstruction { vstack, context -> I32LeSExecutor(vstack, context, instruction) }
+fun I32LeSSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
+) = dispatchInstruction { vstack, context ->
+    executeI32BinarySs(vstack, destinationSlot, leftSlot, rightSlot) { left, right ->
+        if (left <= right) 1 else 0
+    }
+}
 
-fun I32LeUDispatcher(
-    instruction: NumericInstruction.I32LeUIi,
-) = dispatchInstruction { vstack, context -> I32LeUExecutor(vstack, context, instruction) }
+fun I32LeUIiDispatcher(
+    left: Int,
+    right: Int,
+    destinationSlot: Int,
+) = dispatchInstruction { vstack, context ->
+    executeI32BinaryIi(vstack, destinationSlot, left, right) { left, right ->
+        if (left.toUInt() <= right.toUInt()) 1 else 0
+    }
+}
 
-fun I32LeUDispatcher(
-    instruction: NumericInstruction.I32LeUIs,
-) = dispatchInstruction { vstack, context -> I32LeUExecutor(vstack, context, instruction) }
+fun I32LeUIsDispatcher(
+    left: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
+) = dispatchInstruction { vstack, context ->
+    executeI32BinaryIs(vstack, destinationSlot, left, rightSlot) { left, right ->
+        if (left.toUInt() <= right.toUInt()) 1 else 0
+    }
+}
 
-fun I32LeUDispatcher(
-    instruction: NumericInstruction.I32LeUSi,
-) = dispatchInstruction { vstack, context -> I32LeUExecutor(vstack, context, instruction) }
+fun I32LeUSiDispatcher(
+    leftSlot: Int,
+    right: Int,
+    destinationSlot: Int,
+) = dispatchInstruction { vstack, context ->
+    executeI32BinarySi(vstack, destinationSlot, leftSlot, right) { left, right ->
+        if (left.toUInt() <= right.toUInt()) 1 else 0
+    }
+}
 
-fun I32LeUDispatcher(
-    instruction: NumericInstruction.I32LeUSs,
-) = dispatchInstruction { vstack, context -> I32LeUExecutor(vstack, context, instruction) }
+fun I32LeUSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
+) = dispatchInstruction { vstack, context ->
+    executeI32BinarySs(vstack, destinationSlot, leftSlot, rightSlot) { left, right ->
+        if (left.toUInt() <= right.toUInt()) 1 else 0
+    }
+}
 
-fun I32GeSDispatcher(
-    instruction: NumericInstruction.I32GeSIi,
-) = dispatchInstruction { vstack, context -> I32GeSExecutor(vstack, context, instruction) }
+fun I32GeSIiDispatcher(
+    left: Int,
+    right: Int,
+    destinationSlot: Int,
+) = dispatchInstruction { vstack, context ->
+    executeI32BinaryIi(vstack, destinationSlot, left, right) { left, right ->
+        if (left >= right) 1 else 0
+    }
+}
 
-fun I32GeSDispatcher(
-    instruction: NumericInstruction.I32GeSIs,
-) = dispatchInstruction { vstack, context -> I32GeSExecutor(vstack, context, instruction) }
+fun I32GeSIsDispatcher(
+    left: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
+) = dispatchInstruction { vstack, context ->
+    executeI32BinaryIs(vstack, destinationSlot, left, rightSlot) { left, right ->
+        if (left >= right) 1 else 0
+    }
+}
 
-fun I32GeSDispatcher(
-    instruction: NumericInstruction.I32GeSSi,
-) = dispatchInstruction { vstack, context -> I32GeSExecutor(vstack, context, instruction) }
+fun I32GeSSiDispatcher(
+    leftSlot: Int,
+    right: Int,
+    destinationSlot: Int,
+) = dispatchInstruction { vstack, context ->
+    executeI32BinarySi(vstack, destinationSlot, leftSlot, right) { left, right ->
+        if (left >= right) 1 else 0
+    }
+}
 
-fun I32GeSDispatcher(
-    instruction: NumericInstruction.I32GeSSs,
-) = dispatchInstruction { vstack, context -> I32GeSExecutor(vstack, context, instruction) }
+fun I32GeSSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
+) = dispatchInstruction { vstack, context ->
+    executeI32BinarySs(vstack, destinationSlot, leftSlot, rightSlot) { left, right ->
+        if (left >= right) 1 else 0
+    }
+}
 
-fun I32GeUDispatcher(
-    instruction: NumericInstruction.I32GeUIi,
-) = dispatchInstruction { vstack, context -> I32GeUExecutor(vstack, context, instruction) }
+fun I32GeUIiDispatcher(
+    left: Int,
+    right: Int,
+    destinationSlot: Int,
+) = dispatchInstruction { vstack, context ->
+    executeI32BinaryIi(vstack, destinationSlot, left, right) { left, right ->
+        if (left.toUInt() >= right.toUInt()) 1 else 0
+    }
+}
 
-fun I32GeUDispatcher(
-    instruction: NumericInstruction.I32GeUIs,
-) = dispatchInstruction { vstack, context -> I32GeUExecutor(vstack, context, instruction) }
+fun I32GeUIsDispatcher(
+    left: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
+) = dispatchInstruction { vstack, context ->
+    executeI32BinaryIs(vstack, destinationSlot, left, rightSlot) { left, right ->
+        if (left.toUInt() >= right.toUInt()) 1 else 0
+    }
+}
 
-fun I32GeUDispatcher(
-    instruction: NumericInstruction.I32GeUSi,
-) = dispatchInstruction { vstack, context -> I32GeUExecutor(vstack, context, instruction) }
+fun I32GeUSiDispatcher(
+    leftSlot: Int,
+    right: Int,
+    destinationSlot: Int,
+) = dispatchInstruction { vstack, context ->
+    executeI32BinarySi(vstack, destinationSlot, leftSlot, right) { left, right ->
+        if (left.toUInt() >= right.toUInt()) 1 else 0
+    }
+}
 
-fun I32GeUDispatcher(
-    instruction: NumericInstruction.I32GeUSs,
-) = dispatchInstruction { vstack, context -> I32GeUExecutor(vstack, context, instruction) }
+fun I32GeUSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
+) = dispatchInstruction { vstack, context ->
+    executeI32BinarySs(vstack, destinationSlot, leftSlot, rightSlot) { left, right ->
+        if (left.toUInt() >= right.toUInt()) 1 else 0
+    }
+}

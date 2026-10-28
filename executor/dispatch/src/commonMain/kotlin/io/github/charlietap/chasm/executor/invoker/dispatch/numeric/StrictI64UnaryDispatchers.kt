@@ -1,82 +1,113 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.numeric
 
 import io.github.charlietap.chasm.executor.invoker.dispatch.dispatchInstruction
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.unop.I64ClzExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.unop.I64CtzExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.unop.I64Extend16SExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.unop.I64Extend32SExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.unop.I64Extend8SExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.unop.I64PopcntExecutor
-import io.github.charlietap.chasm.runtime.instruction.NumericInstruction
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.unop.executeI64UnaryI
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.unop.executeI64UnaryS
 
-fun I64ClzDispatcher(
-    instruction: NumericInstruction.I64ClzI,
+fun I64ClzIDispatcher(
+    operand: Long,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64ClzExecutor(vstack, context, instruction)
+    executeI64UnaryI(vstack, destinationSlot, operand) { operand ->
+        operand.countLeadingZeroBits().toLong()
+    }
 }
 
-fun I64ClzDispatcher(
-    instruction: NumericInstruction.I64ClzS,
+fun I64ClzSDispatcher(
+    operandSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64ClzExecutor(vstack, context, instruction)
+    executeI64UnaryS(vstack, destinationSlot, operandSlot) { operand ->
+        operand.countLeadingZeroBits().toLong()
+    }
 }
 
-fun I64CtzDispatcher(
-    instruction: NumericInstruction.I64CtzI,
+fun I64CtzIDispatcher(
+    operand: Long,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64CtzExecutor(vstack, context, instruction)
+    executeI64UnaryI(vstack, destinationSlot, operand) { operand ->
+        operand.countTrailingZeroBits().toLong()
+    }
 }
 
-fun I64CtzDispatcher(
-    instruction: NumericInstruction.I64CtzS,
+fun I64CtzSDispatcher(
+    operandSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64CtzExecutor(vstack, context, instruction)
+    executeI64UnaryS(vstack, destinationSlot, operandSlot) { operand ->
+        operand.countTrailingZeroBits().toLong()
+    }
 }
 
-fun I64PopcntDispatcher(
-    instruction: NumericInstruction.I64PopcntI,
+fun I64PopcntIDispatcher(
+    operand: Long,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64PopcntExecutor(vstack, context, instruction)
+    executeI64UnaryI(vstack, destinationSlot, operand) { operand ->
+        operand.countOneBits().toLong()
+    }
 }
 
-fun I64PopcntDispatcher(
-    instruction: NumericInstruction.I64PopcntS,
+fun I64PopcntSDispatcher(
+    operandSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64PopcntExecutor(vstack, context, instruction)
+    executeI64UnaryS(vstack, destinationSlot, operandSlot) { operand ->
+        operand.countOneBits().toLong()
+    }
 }
 
-fun I64Extend8SDispatcher(
-    instruction: NumericInstruction.I64Extend8SI,
+fun I64Extend8SIDispatcher(
+    operand: Long,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64Extend8SExecutor(vstack, context, instruction)
+    executeI64UnaryI(vstack, destinationSlot, operand) { operand ->
+        (operand and 0xFF).toByte().toLong()
+    }
 }
 
-fun I64Extend8SDispatcher(
-    instruction: NumericInstruction.I64Extend8SS,
+fun I64Extend8SSDispatcher(
+    operandSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64Extend8SExecutor(vstack, context, instruction)
+    executeI64UnaryS(vstack, destinationSlot, operandSlot) { operand ->
+        (operand and 0xFF).toByte().toLong()
+    }
 }
 
-fun I64Extend16SDispatcher(
-    instruction: NumericInstruction.I64Extend16SI,
+fun I64Extend16SIDispatcher(
+    operand: Long,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64Extend16SExecutor(vstack, context, instruction)
+    executeI64UnaryI(vstack, destinationSlot, operand) { operand ->
+        (operand and 0xFFFF).toShort().toLong()
+    }
 }
 
-fun I64Extend16SDispatcher(
-    instruction: NumericInstruction.I64Extend16SS,
+fun I64Extend16SSDispatcher(
+    operandSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64Extend16SExecutor(vstack, context, instruction)
+    executeI64UnaryS(vstack, destinationSlot, operandSlot) { operand ->
+        (operand and 0xFFFF).toShort().toLong()
+    }
 }
 
-fun I64Extend32SDispatcher(
-    instruction: NumericInstruction.I64Extend32SI,
+fun I64Extend32SIDispatcher(
+    operand: Long,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64Extend32SExecutor(vstack, context, instruction)
+    executeI64UnaryI(vstack, destinationSlot, operand) { operand ->
+        ((operand and 0xFFFFFFFFL) shl 32) shr 32
+    }
 }
 
-fun I64Extend32SDispatcher(
-    instruction: NumericInstruction.I64Extend32SS,
+fun I64Extend32SSDispatcher(
+    operandSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64Extend32SExecutor(vstack, context, instruction)
+    executeI64UnaryS(vstack, destinationSlot, operandSlot) { operand ->
+        ((operand and 0xFFFFFFFFL) shl 32) shr 32
+    }
 }

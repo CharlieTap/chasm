@@ -1,270 +1,395 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.numeric
 
 import io.github.charlietap.chasm.executor.invoker.dispatch.dispatchInstruction
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.I32DivSExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.I32DivUExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.I32RemSExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.I32RemUExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.I32RotlExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.I32RotrExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.I32ShlExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.I32ShrSExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.I32ShrUExecutor
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.executeI32BinaryIi
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.executeI32BinaryIs
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.executeI32BinarySi
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.executeI32BinarySs
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
-import io.github.charlietap.chasm.runtime.instruction.NumericInstruction
+import io.github.charlietap.chasm.runtime.operations.strictI32DivS
+import io.github.charlietap.chasm.runtime.operations.strictI32DivU
+import io.github.charlietap.chasm.runtime.operations.strictI32RemS
+import io.github.charlietap.chasm.runtime.operations.strictI32RemU
 
-fun I32AddDispatcher(instruction: NumericInstruction.I32AddIs) = I32BinaryIsDispatcher(
-    instruction.left,
-    instruction.rightSlot,
-    instruction.destinationSlot,
+fun I32AddIsDispatcher(
+    left: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
+) = I32BinaryIsDispatcher(
+    left,
+    rightSlot,
+    destinationSlot,
 ) { left, right -> left + right }
 
-fun I32AddDispatcher(instruction: NumericInstruction.I32AddSi) = I32BinarySiDispatcher(
-    instruction.leftSlot,
-    instruction.right,
-    instruction.destinationSlot,
+fun I32AddSiDispatcher(
+    leftSlot: Int,
+    right: Int,
+    destinationSlot: Int,
+) = I32BinarySiDispatcher(
+    leftSlot,
+    right,
+    destinationSlot,
 ) { left, right -> left + right }
 
-fun I32AddDispatcher(instruction: NumericInstruction.I32AddSs) = I32BinarySsDispatcher(
-    instruction.leftSlot,
-    instruction.rightSlot,
-    instruction.destinationSlot,
+fun I32AddSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
+) = I32BinarySsDispatcher(
+    leftSlot,
+    rightSlot,
+    destinationSlot,
 ) { left, right -> left + right }
 
-fun I32SubDispatcher(instruction: NumericInstruction.I32SubIi) = I32BinaryIiDispatcher(
-    instruction.left,
-    instruction.right,
-    instruction.destinationSlot,
+fun I32SubIiDispatcher(
+    left: Int,
+    right: Int,
+    destinationSlot: Int,
+) = I32BinaryIiDispatcher(
+    left,
+    right,
+    destinationSlot,
 ) { left, right -> left - right }
 
-fun I32SubDispatcher(instruction: NumericInstruction.I32SubIs) = I32BinaryIsDispatcher(
-    instruction.left,
-    instruction.rightSlot,
-    instruction.destinationSlot,
+fun I32SubIsDispatcher(
+    left: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
+) = I32BinaryIsDispatcher(
+    left,
+    rightSlot,
+    destinationSlot,
 ) { left, right -> left - right }
 
-fun I32SubDispatcher(instruction: NumericInstruction.I32SubSi) = I32BinarySiDispatcher(
-    instruction.leftSlot,
-    instruction.right,
-    instruction.destinationSlot,
+fun I32SubSiDispatcher(
+    leftSlot: Int,
+    right: Int,
+    destinationSlot: Int,
+) = I32BinarySiDispatcher(
+    leftSlot,
+    right,
+    destinationSlot,
 ) { left, right -> left - right }
 
-fun I32SubDispatcher(instruction: NumericInstruction.I32SubSs) = I32BinarySsDispatcher(
-    instruction.leftSlot,
-    instruction.rightSlot,
-    instruction.destinationSlot,
+fun I32SubSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
+) = I32BinarySsDispatcher(
+    leftSlot,
+    rightSlot,
+    destinationSlot,
 ) { left, right -> left - right }
 
-fun I32MulDispatcher(instruction: NumericInstruction.I32MulIi) = I32BinaryIiDispatcher(
-    instruction.left,
-    instruction.right,
-    instruction.destinationSlot,
+fun I32MulIiDispatcher(
+    left: Int,
+    right: Int,
+    destinationSlot: Int,
+) = I32BinaryIiDispatcher(
+    left,
+    right,
+    destinationSlot,
 ) { left, right -> left * right }
 
-fun I32MulDispatcher(instruction: NumericInstruction.I32MulIs) = I32BinaryIsDispatcher(
-    instruction.left,
-    instruction.rightSlot,
-    instruction.destinationSlot,
+fun I32MulIsDispatcher(
+    left: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
+) = I32BinaryIsDispatcher(
+    left,
+    rightSlot,
+    destinationSlot,
 ) { left, right -> left * right }
 
-fun I32MulDispatcher(instruction: NumericInstruction.I32MulSi) = I32BinarySiDispatcher(
-    instruction.leftSlot,
-    instruction.right,
-    instruction.destinationSlot,
+fun I32MulSiDispatcher(
+    leftSlot: Int,
+    right: Int,
+    destinationSlot: Int,
+) = I32BinarySiDispatcher(
+    leftSlot,
+    right,
+    destinationSlot,
 ) { left, right -> left * right }
 
-fun I32MulDispatcher(instruction: NumericInstruction.I32MulSs) = I32BinarySsDispatcher(
-    instruction.leftSlot,
-    instruction.rightSlot,
-    instruction.destinationSlot,
+fun I32MulSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
+) = I32BinarySsDispatcher(
+    leftSlot,
+    rightSlot,
+    destinationSlot,
 ) { left, right -> left * right }
 
-fun I32DivSDispatcher(
-    instruction: NumericInstruction.I32DivSIi,
+fun I32DivSIiDispatcher(
+    left: Int,
+    right: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I32DivSExecutor(vstack, context, instruction)
+    executeI32BinaryIi(vstack, destinationSlot, left, right, ::strictI32DivS)
 }
 
-fun I32DivSDispatcher(
-    instruction: NumericInstruction.I32DivSIs,
+fun I32DivSIsDispatcher(
+    left: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I32DivSExecutor(vstack, context, instruction)
+    executeI32BinaryIs(vstack, destinationSlot, left, rightSlot, ::strictI32DivS)
 }
 
-fun I32DivSDispatcher(
-    instruction: NumericInstruction.I32DivSSi,
+fun I32DivSSiDispatcher(
+    leftSlot: Int,
+    right: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I32DivSExecutor(vstack, context, instruction)
+    executeI32BinarySi(vstack, destinationSlot, leftSlot, right, ::strictI32DivS)
 }
 
-fun I32DivSDispatcher(
-    instruction: NumericInstruction.I32DivSSs,
+fun I32DivSSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I32DivSExecutor(vstack, context, instruction)
+    executeI32BinarySs(vstack, destinationSlot, leftSlot, rightSlot, ::strictI32DivS)
 }
 
-fun I32DivUDispatcher(
-    instruction: NumericInstruction.I32DivUIi,
+fun I32DivUIiDispatcher(
+    left: Int,
+    right: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I32DivUExecutor(vstack, context, instruction)
+    executeI32BinaryIi(vstack, destinationSlot, left, right, ::strictI32DivU)
 }
 
-fun I32DivUDispatcher(
-    instruction: NumericInstruction.I32DivUIs,
+fun I32DivUIsDispatcher(
+    left: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I32DivUExecutor(vstack, context, instruction)
+    executeI32BinaryIs(vstack, destinationSlot, left, rightSlot, ::strictI32DivU)
 }
 
-fun I32DivUDispatcher(
-    instruction: NumericInstruction.I32DivUSi,
+fun I32DivUSiDispatcher(
+    leftSlot: Int,
+    right: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I32DivUExecutor(vstack, context, instruction)
+    executeI32BinarySi(vstack, destinationSlot, leftSlot, right, ::strictI32DivU)
 }
 
-fun I32DivUDispatcher(
-    instruction: NumericInstruction.I32DivUSs,
+fun I32DivUSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I32DivUExecutor(vstack, context, instruction)
+    executeI32BinarySs(vstack, destinationSlot, leftSlot, rightSlot, ::strictI32DivU)
 }
 
-fun I32RemSDispatcher(
-    instruction: NumericInstruction.I32RemSIi,
+fun I32RemSIiDispatcher(
+    left: Int,
+    right: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I32RemSExecutor(vstack, context, instruction)
+    executeI32BinaryIi(vstack, destinationSlot, left, right, ::strictI32RemS)
 }
 
-fun I32RemSDispatcher(
-    instruction: NumericInstruction.I32RemSIs,
+fun I32RemSIsDispatcher(
+    left: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I32RemSExecutor(vstack, context, instruction)
+    executeI32BinaryIs(vstack, destinationSlot, left, rightSlot, ::strictI32RemS)
 }
 
-fun I32RemSDispatcher(
-    instruction: NumericInstruction.I32RemSSi,
+fun I32RemSSiDispatcher(
+    leftSlot: Int,
+    right: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I32RemSExecutor(vstack, context, instruction)
+    executeI32BinarySi(vstack, destinationSlot, leftSlot, right, ::strictI32RemS)
 }
 
-fun I32RemSDispatcher(
-    instruction: NumericInstruction.I32RemSSs,
+fun I32RemSSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I32RemSExecutor(vstack, context, instruction)
+    executeI32BinarySs(vstack, destinationSlot, leftSlot, rightSlot, ::strictI32RemS)
 }
 
-fun I32RemUDispatcher(
-    instruction: NumericInstruction.I32RemUIi,
+fun I32RemUIiDispatcher(
+    left: Int,
+    right: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I32RemUExecutor(vstack, context, instruction)
+    executeI32BinaryIi(vstack, destinationSlot, left, right, ::strictI32RemU)
 }
 
-fun I32RemUDispatcher(
-    instruction: NumericInstruction.I32RemUIs,
+fun I32RemUIsDispatcher(
+    left: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I32RemUExecutor(vstack, context, instruction)
+    executeI32BinaryIs(vstack, destinationSlot, left, rightSlot, ::strictI32RemU)
 }
 
-fun I32RemUDispatcher(
-    instruction: NumericInstruction.I32RemUSi,
+fun I32RemUSiDispatcher(
+    leftSlot: Int,
+    right: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I32RemUExecutor(vstack, context, instruction)
+    executeI32BinarySi(vstack, destinationSlot, leftSlot, right, ::strictI32RemU)
 }
 
-fun I32RemUDispatcher(
-    instruction: NumericInstruction.I32RemUSs,
+fun I32RemUSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I32RemUExecutor(vstack, context, instruction)
+    executeI32BinarySs(vstack, destinationSlot, leftSlot, rightSlot, ::strictI32RemU)
 }
 
-fun I32AndDispatcher(instruction: NumericInstruction.I32AndIi) = I32BinaryIiDispatcher(
-    instruction.left,
-    instruction.right,
-    instruction.destinationSlot,
+fun I32AndIiDispatcher(
+    left: Int,
+    right: Int,
+    destinationSlot: Int,
+) = I32BinaryIiDispatcher(
+    left,
+    right,
+    destinationSlot,
 ) { left, right -> left and right }
 
-fun I32AndDispatcher(instruction: NumericInstruction.I32AndIs) = I32BinaryIsDispatcher(
-    instruction.left,
-    instruction.rightSlot,
-    instruction.destinationSlot,
+fun I32AndIsDispatcher(
+    left: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
+) = I32BinaryIsDispatcher(
+    left,
+    rightSlot,
+    destinationSlot,
 ) { left, right -> left and right }
 
-fun I32AndDispatcher(instruction: NumericInstruction.I32AndSi) = I32BinarySiDispatcher(
-    instruction.leftSlot,
-    instruction.right,
-    instruction.destinationSlot,
+fun I32AndSiDispatcher(
+    leftSlot: Int,
+    right: Int,
+    destinationSlot: Int,
+) = I32BinarySiDispatcher(
+    leftSlot,
+    right,
+    destinationSlot,
 ) { left, right -> left and right }
 
-fun I32AndDispatcher(instruction: NumericInstruction.I32AndSs) = I32BinarySsDispatcher(
-    instruction.leftSlot,
-    instruction.rightSlot,
-    instruction.destinationSlot,
+fun I32AndSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
+) = I32BinarySsDispatcher(
+    leftSlot,
+    rightSlot,
+    destinationSlot,
 ) { left, right -> left and right }
 
-fun I32OrDispatcher(instruction: NumericInstruction.I32OrIi) = I32BinaryIiDispatcher(
-    instruction.left,
-    instruction.right,
-    instruction.destinationSlot,
+fun I32OrIiDispatcher(
+    left: Int,
+    right: Int,
+    destinationSlot: Int,
+) = I32BinaryIiDispatcher(
+    left,
+    right,
+    destinationSlot,
 ) { left, right -> left or right }
 
-fun I32OrDispatcher(instruction: NumericInstruction.I32OrIs) = I32BinaryIsDispatcher(
-    instruction.left,
-    instruction.rightSlot,
-    instruction.destinationSlot,
+fun I32OrIsDispatcher(
+    left: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
+) = I32BinaryIsDispatcher(
+    left,
+    rightSlot,
+    destinationSlot,
 ) { left, right -> left or right }
 
-fun I32OrDispatcher(instruction: NumericInstruction.I32OrSi) = I32BinarySiDispatcher(
-    instruction.leftSlot,
-    instruction.right,
-    instruction.destinationSlot,
+fun I32OrSiDispatcher(
+    leftSlot: Int,
+    right: Int,
+    destinationSlot: Int,
+) = I32BinarySiDispatcher(
+    leftSlot,
+    right,
+    destinationSlot,
 ) { left, right -> left or right }
 
-fun I32OrDispatcher(instruction: NumericInstruction.I32OrSs) = I32BinarySsDispatcher(
-    instruction.leftSlot,
-    instruction.rightSlot,
-    instruction.destinationSlot,
+fun I32OrSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
+) = I32BinarySsDispatcher(
+    leftSlot,
+    rightSlot,
+    destinationSlot,
 ) { left, right -> left or right }
 
-fun I32XorDispatcher(instruction: NumericInstruction.I32XorIi) = I32BinaryIiDispatcher(
-    instruction.left,
-    instruction.right,
-    instruction.destinationSlot,
+fun I32XorIiDispatcher(
+    left: Int,
+    right: Int,
+    destinationSlot: Int,
+) = I32BinaryIiDispatcher(
+    left,
+    right,
+    destinationSlot,
 ) { left, right -> left xor right }
 
-fun I32XorDispatcher(instruction: NumericInstruction.I32XorIs) = I32BinaryIsDispatcher(
-    instruction.left,
-    instruction.rightSlot,
-    instruction.destinationSlot,
+fun I32XorIsDispatcher(
+    left: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
+) = I32BinaryIsDispatcher(
+    left,
+    rightSlot,
+    destinationSlot,
 ) { left, right -> left xor right }
 
-fun I32XorDispatcher(instruction: NumericInstruction.I32XorSi) = I32BinarySiDispatcher(
-    instruction.leftSlot,
-    instruction.right,
-    instruction.destinationSlot,
+fun I32XorSiDispatcher(
+    leftSlot: Int,
+    right: Int,
+    destinationSlot: Int,
+) = I32BinarySiDispatcher(
+    leftSlot,
+    right,
+    destinationSlot,
 ) { left, right -> left xor right }
 
-fun I32XorDispatcher(instruction: NumericInstruction.I32XorSs) = I32BinarySsDispatcher(
-    instruction.leftSlot,
-    instruction.rightSlot,
-    instruction.destinationSlot,
+fun I32XorSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
+) = I32BinarySsDispatcher(
+    leftSlot,
+    rightSlot,
+    destinationSlot,
 ) { left, right -> left xor right }
 
-fun I32ShlDispatcher(
-    instruction: NumericInstruction.I32ShlIi,
+fun I32ShlIiDispatcher(
+    left: Int,
+    right: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I32ShlExecutor(vstack, context, instruction)
+    executeI32BinaryIi(vstack, destinationSlot, left, right) { left, right -> left shl right }
 }
 
-fun I32ShlDispatcher(
-    instruction: NumericInstruction.I32ShlIs,
+fun I32ShlIsDispatcher(
+    left: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I32ShlExecutor(vstack, context, instruction)
+    executeI32BinaryIs(vstack, destinationSlot, left, rightSlot) { left, right -> left shl right }
 }
 
-fun I32ShlDispatcher(
-    instruction: NumericInstruction.I32ShlSi,
+fun I32ShlSiDispatcher(
+    leftSlot: Int,
+    right: Int,
+    destinationSlot: Int,
 ): DispatchableInstruction {
-    val leftSlot = instruction.leftSlot
-    val right = instruction.right
-    val destinationSlot = instruction.destinationSlot
     return DispatchableInstruction { vstack, _, nextIp ->
         val value = vstack.getFrameSlot(leftSlot).toInt() shl right
         vstack.setFrameSlot(destinationSlot, value.toLong())
@@ -272,30 +397,35 @@ fun I32ShlDispatcher(
     }
 }
 
-fun I32ShlDispatcher(
-    instruction: NumericInstruction.I32ShlSs,
+fun I32ShlSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I32ShlExecutor(vstack, context, instruction)
+    executeI32BinarySs(vstack, destinationSlot, leftSlot, rightSlot) { left, right -> left shl right }
 }
 
-fun I32ShrSDispatcher(
-    instruction: NumericInstruction.I32ShrSIi,
+fun I32ShrSIiDispatcher(
+    left: Int,
+    right: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I32ShrSExecutor(vstack, context, instruction)
+    executeI32BinaryIi(vstack, destinationSlot, left, right) { left, right -> left shr right }
 }
 
-fun I32ShrSDispatcher(
-    instruction: NumericInstruction.I32ShrSIs,
+fun I32ShrSIsDispatcher(
+    left: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I32ShrSExecutor(vstack, context, instruction)
+    executeI32BinaryIs(vstack, destinationSlot, left, rightSlot) { left, right -> left shr right }
 }
 
-fun I32ShrSDispatcher(
-    instruction: NumericInstruction.I32ShrSSi,
+fun I32ShrSSiDispatcher(
+    leftSlot: Int,
+    right: Int,
+    destinationSlot: Int,
 ): DispatchableInstruction {
-    val leftSlot = instruction.leftSlot
-    val right = instruction.right
-    val destinationSlot = instruction.destinationSlot
     return DispatchableInstruction { vstack, _, nextIp ->
         val value = vstack.getFrameSlot(leftSlot).toInt() shr right
         vstack.setFrameSlot(destinationSlot, value.toLong())
@@ -303,30 +433,35 @@ fun I32ShrSDispatcher(
     }
 }
 
-fun I32ShrSDispatcher(
-    instruction: NumericInstruction.I32ShrSSs,
+fun I32ShrSSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I32ShrSExecutor(vstack, context, instruction)
+    executeI32BinarySs(vstack, destinationSlot, leftSlot, rightSlot) { left, right -> left shr right }
 }
 
-fun I32ShrUDispatcher(
-    instruction: NumericInstruction.I32ShrUIi,
+fun I32ShrUIiDispatcher(
+    left: Int,
+    right: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I32ShrUExecutor(vstack, context, instruction)
+    executeI32BinaryIi(vstack, destinationSlot, left, right) { left, right -> left.toUInt().shr(right).toInt() }
 }
 
-fun I32ShrUDispatcher(
-    instruction: NumericInstruction.I32ShrUIs,
+fun I32ShrUIsDispatcher(
+    left: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I32ShrUExecutor(vstack, context, instruction)
+    executeI32BinaryIs(vstack, destinationSlot, left, rightSlot) { left, right -> left.toUInt().shr(right).toInt() }
 }
 
-fun I32ShrUDispatcher(
-    instruction: NumericInstruction.I32ShrUSi,
+fun I32ShrUSiDispatcher(
+    leftSlot: Int,
+    right: Int,
+    destinationSlot: Int,
 ): DispatchableInstruction {
-    val leftSlot = instruction.leftSlot
-    val right = instruction.right
-    val destinationSlot = instruction.destinationSlot
     return DispatchableInstruction { vstack, _, nextIp ->
         val value = vstack.getFrameSlot(leftSlot).toInt() ushr right
         vstack.setFrameSlot(destinationSlot, value.toLong())
@@ -334,58 +469,76 @@ fun I32ShrUDispatcher(
     }
 }
 
-fun I32ShrUDispatcher(
-    instruction: NumericInstruction.I32ShrUSs,
+fun I32ShrUSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I32ShrUExecutor(vstack, context, instruction)
+    executeI32BinarySs(vstack, destinationSlot, leftSlot, rightSlot) { left, right -> left.toUInt().shr(right).toInt() }
 }
 
-fun I32RotlDispatcher(
-    instruction: NumericInstruction.I32RotlIi,
+fun I32RotlIiDispatcher(
+    left: Int,
+    right: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I32RotlExecutor(vstack, context, instruction)
+    executeI32BinaryIi(vstack, destinationSlot, left, right) { left, right -> left.rotateLeft(right) }
 }
 
-fun I32RotlDispatcher(
-    instruction: NumericInstruction.I32RotlIs,
+fun I32RotlIsDispatcher(
+    left: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I32RotlExecutor(vstack, context, instruction)
+    executeI32BinaryIs(vstack, destinationSlot, left, rightSlot) { left, right -> left.rotateLeft(right) }
 }
 
-fun I32RotlDispatcher(
-    instruction: NumericInstruction.I32RotlSi,
+fun I32RotlSiDispatcher(
+    leftSlot: Int,
+    right: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I32RotlExecutor(vstack, context, instruction)
+    executeI32BinarySi(vstack, destinationSlot, leftSlot, right) { left, right -> left.rotateLeft(right) }
 }
 
-fun I32RotlDispatcher(
-    instruction: NumericInstruction.I32RotlSs,
+fun I32RotlSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I32RotlExecutor(vstack, context, instruction)
+    executeI32BinarySs(vstack, destinationSlot, leftSlot, rightSlot) { left, right -> left.rotateLeft(right) }
 }
 
-fun I32RotrDispatcher(
-    instruction: NumericInstruction.I32RotrIi,
+fun I32RotrIiDispatcher(
+    left: Int,
+    right: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I32RotrExecutor(vstack, context, instruction)
+    executeI32BinaryIi(vstack, destinationSlot, left, right) { left, right -> left.rotateRight(right) }
 }
 
-fun I32RotrDispatcher(
-    instruction: NumericInstruction.I32RotrIs,
+fun I32RotrIsDispatcher(
+    left: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I32RotrExecutor(vstack, context, instruction)
+    executeI32BinaryIs(vstack, destinationSlot, left, rightSlot) { left, right -> left.rotateRight(right) }
 }
 
-fun I32RotrDispatcher(
-    instruction: NumericInstruction.I32RotrSi,
+fun I32RotrSiDispatcher(
+    leftSlot: Int,
+    right: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I32RotrExecutor(vstack, context, instruction)
+    executeI32BinarySi(vstack, destinationSlot, leftSlot, right) { left, right -> left.rotateRight(right) }
 }
 
-fun I32RotrDispatcher(
-    instruction: NumericInstruction.I32RotrSs,
+fun I32RotrSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I32RotrExecutor(vstack, context, instruction)
+    executeI32BinarySs(vstack, destinationSlot, leftSlot, rightSlot) { left, right -> left.rotateRight(right) }
 }
 
 private inline fun I32BinaryIiDispatcher(

@@ -1,69 +1,75 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.numeric
 
 import io.github.charlietap.chasm.executor.invoker.dispatch.dispatchInstruction
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.unop.I32ClzExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.unop.I32CtzExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.unop.I32Extend16SExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.unop.I32Extend8SExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.unop.I32PopcntExecutor
-import io.github.charlietap.chasm.runtime.instruction.NumericInstruction
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.unop.executeI32UnaryI
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.unop.executeI32UnaryS
 
-fun I32ClzDispatcher(
-    instruction: NumericInstruction.I32ClzI,
+fun I32ClzIDispatcher(
+    operand: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I32ClzExecutor(vstack, context, instruction)
+    executeI32UnaryI(vstack, destinationSlot, operand) { operand -> operand.countLeadingZeroBits() }
 }
 
-fun I32ClzDispatcher(
-    instruction: NumericInstruction.I32ClzS,
+fun I32ClzSDispatcher(
+    operandSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I32ClzExecutor(vstack, context, instruction)
+    executeI32UnaryS(vstack, destinationSlot, operandSlot) { operand -> operand.countLeadingZeroBits() }
 }
 
-fun I32CtzDispatcher(
-    instruction: NumericInstruction.I32CtzI,
+fun I32CtzIDispatcher(
+    operand: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I32CtzExecutor(vstack, context, instruction)
+    executeI32UnaryI(vstack, destinationSlot, operand) { operand -> operand.countTrailingZeroBits() }
 }
 
-fun I32CtzDispatcher(
-    instruction: NumericInstruction.I32CtzS,
+fun I32CtzSDispatcher(
+    operandSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I32CtzExecutor(vstack, context, instruction)
+    executeI32UnaryS(vstack, destinationSlot, operandSlot) { operand -> operand.countTrailingZeroBits() }
 }
 
-fun I32PopcntDispatcher(
-    instruction: NumericInstruction.I32PopcntI,
+fun I32PopcntIDispatcher(
+    operand: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I32PopcntExecutor(vstack, context, instruction)
+    executeI32UnaryI(vstack, destinationSlot, operand) { operand -> operand.countOneBits() }
 }
 
-fun I32PopcntDispatcher(
-    instruction: NumericInstruction.I32PopcntS,
+fun I32PopcntSDispatcher(
+    operandSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I32PopcntExecutor(vstack, context, instruction)
+    executeI32UnaryS(vstack, destinationSlot, operandSlot) { operand -> operand.countOneBits() }
 }
 
-fun I32Extend8SDispatcher(
-    instruction: NumericInstruction.I32Extend8SI,
+fun I32Extend8SIDispatcher(
+    operand: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I32Extend8SExecutor(vstack, context, instruction)
+    executeI32UnaryI(vstack, destinationSlot, operand) { operand -> (operand and 0xFF).toByte().toInt() }
 }
 
-fun I32Extend8SDispatcher(
-    instruction: NumericInstruction.I32Extend8SS,
+fun I32Extend8SSDispatcher(
+    operandSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I32Extend8SExecutor(vstack, context, instruction)
+    executeI32UnaryS(vstack, destinationSlot, operandSlot) { operand -> (operand and 0xFF).toByte().toInt() }
 }
 
-fun I32Extend16SDispatcher(
-    instruction: NumericInstruction.I32Extend16SI,
+fun I32Extend16SIDispatcher(
+    operand: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I32Extend16SExecutor(vstack, context, instruction)
+    executeI32UnaryI(vstack, destinationSlot, operand) { operand -> (operand and 0xFFFF).toShort().toInt() }
 }
 
-fun I32Extend16SDispatcher(
-    instruction: NumericInstruction.I32Extend16SS,
+fun I32Extend16SSDispatcher(
+    operandSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I32Extend16SExecutor(vstack, context, instruction)
+    executeI32UnaryS(vstack, destinationSlot, operandSlot) { operand -> (operand and 0xFFFF).toShort().toInt() }
 }

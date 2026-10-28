@@ -1,379 +1,497 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.numeric
 
 import io.github.charlietap.chasm.executor.invoker.dispatch.dispatchInstruction
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.I64AddExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.I64AndExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.I64DivSExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.I64DivUExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.I64MulExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.I64OrExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.I64RemSExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.I64RemUExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.I64RotlExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.I64RotrExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.I64ShlExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.I64ShrSExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.I64ShrUExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.I64SubExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.I64XorExecutor
-import io.github.charlietap.chasm.runtime.instruction.NumericInstruction
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.executeI64BinaryIi
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.executeI64BinaryIs
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.executeI64BinarySi
+import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.executeI64BinarySs
+import io.github.charlietap.chasm.runtime.operations.strictI64DivS
+import io.github.charlietap.chasm.runtime.operations.strictI64DivU
+import io.github.charlietap.chasm.runtime.operations.strictI64RemS
+import io.github.charlietap.chasm.runtime.operations.strictI64RemU
 
-fun I64AddDispatcher(
-    instruction: NumericInstruction.I64AddIi,
+fun I64AddIiDispatcher(
+    left: Long,
+    right: Long,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64AddExecutor(vstack, context, instruction)
+    executeI64BinaryIi(vstack, destinationSlot, left, right) { left, right -> left + right }
 }
 
-fun I64AddDispatcher(
-    instruction: NumericInstruction.I64AddIs,
+fun I64AddIsDispatcher(
+    left: Long,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64AddExecutor(vstack, context, instruction)
+    executeI64BinaryIs(vstack, destinationSlot, left, rightSlot) { left, right -> left + right }
 }
 
-fun I64AddDispatcher(
-    instruction: NumericInstruction.I64AddSi,
+fun I64AddSiDispatcher(
+    leftSlot: Int,
+    right: Long,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64AddExecutor(vstack, context, instruction)
+    executeI64BinarySi(vstack, destinationSlot, leftSlot, right) { left, right -> left + right }
 }
 
-fun I64AddDispatcher(
-    instruction: NumericInstruction.I64AddSs,
+fun I64AddSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64AddExecutor(vstack, context, instruction)
+    executeI64BinarySs(vstack, destinationSlot, leftSlot, rightSlot) { left, right -> left + right }
 }
 
-fun I64SubDispatcher(
-    instruction: NumericInstruction.I64SubIi,
+fun I64SubIiDispatcher(
+    left: Long,
+    right: Long,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64SubExecutor(vstack, context, instruction)
+    executeI64BinaryIi(vstack, destinationSlot, left, right) { left, right -> left - right }
 }
 
-fun I64SubDispatcher(
-    instruction: NumericInstruction.I64SubIs,
+fun I64SubIsDispatcher(
+    left: Long,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64SubExecutor(vstack, context, instruction)
+    executeI64BinaryIs(vstack, destinationSlot, left, rightSlot) { left, right -> left - right }
 }
 
-fun I64SubDispatcher(
-    instruction: NumericInstruction.I64SubSi,
+fun I64SubSiDispatcher(
+    leftSlot: Int,
+    right: Long,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64SubExecutor(vstack, context, instruction)
+    executeI64BinarySi(vstack, destinationSlot, leftSlot, right) { left, right -> left - right }
 }
 
-fun I64SubDispatcher(
-    instruction: NumericInstruction.I64SubSs,
+fun I64SubSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64SubExecutor(vstack, context, instruction)
+    executeI64BinarySs(vstack, destinationSlot, leftSlot, rightSlot) { left, right -> left - right }
 }
 
-fun I64MulDispatcher(
-    instruction: NumericInstruction.I64MulIi,
+fun I64MulIiDispatcher(
+    left: Long,
+    right: Long,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64MulExecutor(vstack, context, instruction)
+    executeI64BinaryIi(vstack, destinationSlot, left, right) { left, right -> left * right }
 }
 
-fun I64MulDispatcher(
-    instruction: NumericInstruction.I64MulIs,
+fun I64MulIsDispatcher(
+    left: Long,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64MulExecutor(vstack, context, instruction)
+    executeI64BinaryIs(vstack, destinationSlot, left, rightSlot) { left, right -> left * right }
 }
 
-fun I64MulDispatcher(
-    instruction: NumericInstruction.I64MulSi,
+fun I64MulSiDispatcher(
+    leftSlot: Int,
+    right: Long,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64MulExecutor(vstack, context, instruction)
+    executeI64BinarySi(vstack, destinationSlot, leftSlot, right) { left, right -> left * right }
 }
 
-fun I64MulDispatcher(
-    instruction: NumericInstruction.I64MulSs,
+fun I64MulSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64MulExecutor(vstack, context, instruction)
+    executeI64BinarySs(vstack, destinationSlot, leftSlot, rightSlot) { left, right -> left * right }
 }
 
-fun I64DivSDispatcher(
-    instruction: NumericInstruction.I64DivSIi,
+fun I64DivSIiDispatcher(
+    left: Long,
+    right: Long,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64DivSExecutor(vstack, context, instruction)
+    executeI64BinaryIi(vstack, destinationSlot, left, right, ::strictI64DivS)
 }
 
-fun I64DivSDispatcher(
-    instruction: NumericInstruction.I64DivSIs,
+fun I64DivSIsDispatcher(
+    left: Long,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64DivSExecutor(vstack, context, instruction)
+    executeI64BinaryIs(vstack, destinationSlot, left, rightSlot, ::strictI64DivS)
 }
 
-fun I64DivSDispatcher(
-    instruction: NumericInstruction.I64DivSSi,
+fun I64DivSSiDispatcher(
+    leftSlot: Int,
+    right: Long,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64DivSExecutor(vstack, context, instruction)
+    executeI64BinarySi(vstack, destinationSlot, leftSlot, right, ::strictI64DivS)
 }
 
-fun I64DivSDispatcher(
-    instruction: NumericInstruction.I64DivSSs,
+fun I64DivSSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64DivSExecutor(vstack, context, instruction)
+    executeI64BinarySs(vstack, destinationSlot, leftSlot, rightSlot, ::strictI64DivS)
 }
 
-fun I64DivUDispatcher(
-    instruction: NumericInstruction.I64DivUIi,
+fun I64DivUIiDispatcher(
+    left: Long,
+    right: Long,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64DivUExecutor(vstack, context, instruction)
+    executeI64BinaryIi(vstack, destinationSlot, left, right, ::strictI64DivU)
 }
 
-fun I64DivUDispatcher(
-    instruction: NumericInstruction.I64DivUIs,
+fun I64DivUIsDispatcher(
+    left: Long,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64DivUExecutor(vstack, context, instruction)
+    executeI64BinaryIs(vstack, destinationSlot, left, rightSlot, ::strictI64DivU)
 }
 
-fun I64DivUDispatcher(
-    instruction: NumericInstruction.I64DivUSi,
+fun I64DivUSiDispatcher(
+    leftSlot: Int,
+    right: Long,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64DivUExecutor(vstack, context, instruction)
+    executeI64BinarySi(vstack, destinationSlot, leftSlot, right, ::strictI64DivU)
 }
 
-fun I64DivUDispatcher(
-    instruction: NumericInstruction.I64DivUSs,
+fun I64DivUSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64DivUExecutor(vstack, context, instruction)
+    executeI64BinarySs(vstack, destinationSlot, leftSlot, rightSlot, ::strictI64DivU)
 }
 
-fun I64RemSDispatcher(
-    instruction: NumericInstruction.I64RemSIi,
+fun I64RemSIiDispatcher(
+    left: Long,
+    right: Long,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64RemSExecutor(vstack, context, instruction)
+    executeI64BinaryIi(vstack, destinationSlot, left, right, ::strictI64RemS)
 }
 
-fun I64RemSDispatcher(
-    instruction: NumericInstruction.I64RemSIs,
+fun I64RemSIsDispatcher(
+    left: Long,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64RemSExecutor(vstack, context, instruction)
+    executeI64BinaryIs(vstack, destinationSlot, left, rightSlot, ::strictI64RemS)
 }
 
-fun I64RemSDispatcher(
-    instruction: NumericInstruction.I64RemSSi,
+fun I64RemSSiDispatcher(
+    leftSlot: Int,
+    right: Long,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64RemSExecutor(vstack, context, instruction)
+    executeI64BinarySi(vstack, destinationSlot, leftSlot, right, ::strictI64RemS)
 }
 
-fun I64RemSDispatcher(
-    instruction: NumericInstruction.I64RemSSs,
+fun I64RemSSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64RemSExecutor(vstack, context, instruction)
+    executeI64BinarySs(vstack, destinationSlot, leftSlot, rightSlot, ::strictI64RemS)
 }
 
-fun I64RemUDispatcher(
-    instruction: NumericInstruction.I64RemUIi,
+fun I64RemUIiDispatcher(
+    left: Long,
+    right: Long,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64RemUExecutor(vstack, context, instruction)
+    executeI64BinaryIi(vstack, destinationSlot, left, right, ::strictI64RemU)
 }
 
-fun I64RemUDispatcher(
-    instruction: NumericInstruction.I64RemUIs,
+fun I64RemUIsDispatcher(
+    left: Long,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64RemUExecutor(vstack, context, instruction)
+    executeI64BinaryIs(vstack, destinationSlot, left, rightSlot, ::strictI64RemU)
 }
 
-fun I64RemUDispatcher(
-    instruction: NumericInstruction.I64RemUSi,
+fun I64RemUSiDispatcher(
+    leftSlot: Int,
+    right: Long,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64RemUExecutor(vstack, context, instruction)
+    executeI64BinarySi(vstack, destinationSlot, leftSlot, right, ::strictI64RemU)
 }
 
-fun I64RemUDispatcher(
-    instruction: NumericInstruction.I64RemUSs,
+fun I64RemUSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64RemUExecutor(vstack, context, instruction)
+    executeI64BinarySs(vstack, destinationSlot, leftSlot, rightSlot, ::strictI64RemU)
 }
 
-fun I64AndDispatcher(
-    instruction: NumericInstruction.I64AndIi,
+fun I64AndIiDispatcher(
+    left: Long,
+    right: Long,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64AndExecutor(vstack, context, instruction)
+    executeI64BinaryIi(vstack, destinationSlot, left, right) { left, right -> left and right }
 }
 
-fun I64AndDispatcher(
-    instruction: NumericInstruction.I64AndIs,
+fun I64AndIsDispatcher(
+    left: Long,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64AndExecutor(vstack, context, instruction)
+    executeI64BinaryIs(vstack, destinationSlot, left, rightSlot) { left, right -> left and right }
 }
 
-fun I64AndDispatcher(
-    instruction: NumericInstruction.I64AndSi,
+fun I64AndSiDispatcher(
+    leftSlot: Int,
+    right: Long,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64AndExecutor(vstack, context, instruction)
+    executeI64BinarySi(vstack, destinationSlot, leftSlot, right) { left, right -> left and right }
 }
 
-fun I64AndDispatcher(
-    instruction: NumericInstruction.I64AndSs,
+fun I64AndSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64AndExecutor(vstack, context, instruction)
+    executeI64BinarySs(vstack, destinationSlot, leftSlot, rightSlot) { left, right -> left and right }
 }
 
-fun I64OrDispatcher(
-    instruction: NumericInstruction.I64OrIi,
+fun I64OrIiDispatcher(
+    left: Long,
+    right: Long,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64OrExecutor(vstack, context, instruction)
+    executeI64BinaryIi(vstack, destinationSlot, left, right) { left, right -> left or right }
 }
 
-fun I64OrDispatcher(
-    instruction: NumericInstruction.I64OrIs,
+fun I64OrIsDispatcher(
+    left: Long,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64OrExecutor(vstack, context, instruction)
+    executeI64BinaryIs(vstack, destinationSlot, left, rightSlot) { left, right -> left or right }
 }
 
-fun I64OrDispatcher(
-    instruction: NumericInstruction.I64OrSi,
+fun I64OrSiDispatcher(
+    leftSlot: Int,
+    right: Long,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64OrExecutor(vstack, context, instruction)
+    executeI64BinarySi(vstack, destinationSlot, leftSlot, right) { left, right -> left or right }
 }
 
-fun I64OrDispatcher(
-    instruction: NumericInstruction.I64OrSs,
+fun I64OrSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64OrExecutor(vstack, context, instruction)
+    executeI64BinarySs(vstack, destinationSlot, leftSlot, rightSlot) { left, right -> left or right }
 }
 
-fun I64XorDispatcher(
-    instruction: NumericInstruction.I64XorIi,
+fun I64XorIiDispatcher(
+    left: Long,
+    right: Long,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64XorExecutor(vstack, context, instruction)
+    executeI64BinaryIi(vstack, destinationSlot, left, right) { left, right -> left xor right }
 }
 
-fun I64XorDispatcher(
-    instruction: NumericInstruction.I64XorIs,
+fun I64XorIsDispatcher(
+    left: Long,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64XorExecutor(vstack, context, instruction)
+    executeI64BinaryIs(vstack, destinationSlot, left, rightSlot) { left, right -> left xor right }
 }
 
-fun I64XorDispatcher(
-    instruction: NumericInstruction.I64XorSi,
+fun I64XorSiDispatcher(
+    leftSlot: Int,
+    right: Long,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64XorExecutor(vstack, context, instruction)
+    executeI64BinarySi(vstack, destinationSlot, leftSlot, right) { left, right -> left xor right }
 }
 
-fun I64XorDispatcher(
-    instruction: NumericInstruction.I64XorSs,
+fun I64XorSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64XorExecutor(vstack, context, instruction)
+    executeI64BinarySs(vstack, destinationSlot, leftSlot, rightSlot) { left, right -> left xor right }
 }
 
-fun I64ShlDispatcher(
-    instruction: NumericInstruction.I64ShlIi,
+fun I64ShlIiDispatcher(
+    left: Long,
+    right: Long,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64ShlExecutor(vstack, context, instruction)
+    executeI64BinaryIi(vstack, destinationSlot, left, right) { left, right -> left shl right.toInt() }
 }
 
-fun I64ShlDispatcher(
-    instruction: NumericInstruction.I64ShlIs,
+fun I64ShlIsDispatcher(
+    left: Long,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64ShlExecutor(vstack, context, instruction)
+    executeI64BinaryIs(vstack, destinationSlot, left, rightSlot) { left, right -> left shl right.toInt() }
 }
 
-fun I64ShlDispatcher(
-    instruction: NumericInstruction.I64ShlSi,
+fun I64ShlSiDispatcher(
+    leftSlot: Int,
+    right: Long,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64ShlExecutor(vstack, context, instruction)
+    executeI64BinarySi(vstack, destinationSlot, leftSlot, right) { left, right -> left shl right.toInt() }
 }
 
-fun I64ShlDispatcher(
-    instruction: NumericInstruction.I64ShlSs,
+fun I64ShlSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64ShlExecutor(vstack, context, instruction)
+    executeI64BinarySs(vstack, destinationSlot, leftSlot, rightSlot) { left, right -> left shl right.toInt() }
 }
 
-fun I64ShrSDispatcher(
-    instruction: NumericInstruction.I64ShrSIi,
+fun I64ShrSIiDispatcher(
+    left: Long,
+    right: Long,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64ShrSExecutor(vstack, context, instruction)
+    executeI64BinaryIi(vstack, destinationSlot, left, right) { left, right -> left shr right.toInt() }
 }
 
-fun I64ShrSDispatcher(
-    instruction: NumericInstruction.I64ShrSIs,
+fun I64ShrSIsDispatcher(
+    left: Long,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64ShrSExecutor(vstack, context, instruction)
+    executeI64BinaryIs(vstack, destinationSlot, left, rightSlot) { left, right -> left shr right.toInt() }
 }
 
-fun I64ShrSDispatcher(
-    instruction: NumericInstruction.I64ShrSSi,
+fun I64ShrSSiDispatcher(
+    leftSlot: Int,
+    right: Long,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64ShrSExecutor(vstack, context, instruction)
+    executeI64BinarySi(vstack, destinationSlot, leftSlot, right) { left, right -> left shr right.toInt() }
 }
 
-fun I64ShrSDispatcher(
-    instruction: NumericInstruction.I64ShrSSs,
+fun I64ShrSSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64ShrSExecutor(vstack, context, instruction)
+    executeI64BinarySs(vstack, destinationSlot, leftSlot, rightSlot) { left, right -> left shr right.toInt() }
 }
 
-fun I64ShrUDispatcher(
-    instruction: NumericInstruction.I64ShrUIi,
+fun I64ShrUIiDispatcher(
+    left: Long,
+    right: Long,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64ShrUExecutor(vstack, context, instruction)
+    executeI64BinaryIi(vstack, destinationSlot, left, right) { left, right -> left.toULong().shr(right.toInt()).toLong() }
 }
 
-fun I64ShrUDispatcher(
-    instruction: NumericInstruction.I64ShrUIs,
+fun I64ShrUIsDispatcher(
+    left: Long,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64ShrUExecutor(vstack, context, instruction)
+    executeI64BinaryIs(vstack, destinationSlot, left, rightSlot) { left, right ->
+        left.toULong().shr(right.toInt()).toLong()
+    }
 }
 
-fun I64ShrUDispatcher(
-    instruction: NumericInstruction.I64ShrUSi,
+fun I64ShrUSiDispatcher(
+    leftSlot: Int,
+    right: Long,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64ShrUExecutor(vstack, context, instruction)
+    executeI64BinarySi(vstack, destinationSlot, leftSlot, right) { left, right ->
+        left.toULong().shr(right.toInt()).toLong()
+    }
 }
 
-fun I64ShrUDispatcher(
-    instruction: NumericInstruction.I64ShrUSs,
+fun I64ShrUSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64ShrUExecutor(vstack, context, instruction)
+    executeI64BinarySs(vstack, destinationSlot, leftSlot, rightSlot) { left, right ->
+        left.toULong().shr(right.toInt()).toLong()
+    }
 }
 
-fun I64RotlDispatcher(
-    instruction: NumericInstruction.I64RotlIi,
+fun I64RotlIiDispatcher(
+    left: Long,
+    right: Long,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64RotlExecutor(vstack, context, instruction)
+    executeI64BinaryIi(vstack, destinationSlot, left, right) { left, right -> left.rotateLeft(right.toInt()) }
 }
 
-fun I64RotlDispatcher(
-    instruction: NumericInstruction.I64RotlIs,
+fun I64RotlIsDispatcher(
+    left: Long,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64RotlExecutor(vstack, context, instruction)
+    executeI64BinaryIs(vstack, destinationSlot, left, rightSlot) { left, right -> left.rotateLeft(right.toInt()) }
 }
 
-fun I64RotlDispatcher(
-    instruction: NumericInstruction.I64RotlSi,
+fun I64RotlSiDispatcher(
+    leftSlot: Int,
+    right: Long,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64RotlExecutor(vstack, context, instruction)
+    executeI64BinarySi(vstack, destinationSlot, leftSlot, right) { left, right -> left.rotateLeft(right.toInt()) }
 }
 
-fun I64RotlDispatcher(
-    instruction: NumericInstruction.I64RotlSs,
+fun I64RotlSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64RotlExecutor(vstack, context, instruction)
+    executeI64BinarySs(vstack, destinationSlot, leftSlot, rightSlot) { left, right -> left.rotateLeft(right.toInt()) }
 }
 
-fun I64RotrDispatcher(
-    instruction: NumericInstruction.I64RotrIi,
+fun I64RotrIiDispatcher(
+    left: Long,
+    right: Long,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64RotrExecutor(vstack, context, instruction)
+    executeI64BinaryIi(vstack, destinationSlot, left, right) { left, right -> left.rotateRight(right.toInt()) }
 }
 
-fun I64RotrDispatcher(
-    instruction: NumericInstruction.I64RotrIs,
+fun I64RotrIsDispatcher(
+    left: Long,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64RotrExecutor(vstack, context, instruction)
+    executeI64BinaryIs(vstack, destinationSlot, left, rightSlot) { left, right -> left.rotateRight(right.toInt()) }
 }
 
-fun I64RotrDispatcher(
-    instruction: NumericInstruction.I64RotrSi,
+fun I64RotrSiDispatcher(
+    leftSlot: Int,
+    right: Long,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64RotrExecutor(vstack, context, instruction)
+    executeI64BinarySi(vstack, destinationSlot, leftSlot, right) { left, right -> left.rotateRight(right.toInt()) }
 }
 
-fun I64RotrDispatcher(
-    instruction: NumericInstruction.I64RotrSs,
+fun I64RotrSsDispatcher(
+    leftSlot: Int,
+    rightSlot: Int,
+    destinationSlot: Int,
 ) = dispatchInstruction { vstack, context ->
-    I64RotrExecutor(vstack, context, instruction)
+    executeI64BinarySs(vstack, destinationSlot, leftSlot, rightSlot) { left, right -> left.rotateRight(right.toInt()) }
 }
