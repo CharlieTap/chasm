@@ -212,7 +212,7 @@ class ModuleDeclarationsFactoryTest {
     }
 
     @Test
-    fun `names come from the first subsection of each kind, the first name of an index winning`() {
+    fun `names come from the first subsection of each kind and the first name of an index wins`() {
         val module = module(
             functions = listOf(function(index = 0, typeIndex = 0), function(index = 1, typeIndex = 0)),
             exports = listOf(Export(NameValue("run"), Export.Descriptor.Function(Index.FunctionIndex(1u)))),
