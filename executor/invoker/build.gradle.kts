@@ -13,16 +13,13 @@ kotlin {
     sourceSets {
        commonMain {
             dependencies {
-                api(projects.ast)
                 api(projects.executor.callCore)
+                api(projects.executor.dispatch)
                 api(projects.runtime.core)
                 api(libs.result)
 
-                implementation(projects.memory)
                 implementation(projects.host)
-                implementation(projects.runtime.operations)
                 implementation(projects.runtime.resources)
-                implementation(projects.libs.sse2)
             }
         }
 

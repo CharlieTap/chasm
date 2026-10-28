@@ -50,6 +50,7 @@ include(":decoder")
 include(":embedding-api")
 
 include(":executor:call-core")
+include(":executor:dispatch")
 include(":executor:instantiator")
 include(":executor:invoker")
 
