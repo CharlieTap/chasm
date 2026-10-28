@@ -11,20 +11,20 @@ kotlin {
     }
 
     sourceSets {
-       commonMain {
+        commonMain {
             dependencies {
                 api(projects.executor.callCore)
+                api(projects.executor.interpreter)
                 api(projects.executor.dispatch)
                 api(projects.runtime.core)
+                api(projects.runtime.operations)
                 api(libs.result)
-
-                implementation(projects.host)
-                implementation(projects.runtime.resources)
             }
         }
 
         commonTest {
             dependencies {
+                implementation(projects.host)
                 implementation(projects.test.fixture.runtime)
                 implementation(projects.test.fixture.ast)
                 implementation(libs.kotlin.test)

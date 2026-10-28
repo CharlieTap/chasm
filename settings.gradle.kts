@@ -52,6 +52,7 @@ include(":embedding-api")
 include(":executor:call-core")
 include(":executor:dispatch")
 include(":executor:instantiator")
+include(":executor:interpreter")
 include(":executor:invoker")
 
 include(":host")

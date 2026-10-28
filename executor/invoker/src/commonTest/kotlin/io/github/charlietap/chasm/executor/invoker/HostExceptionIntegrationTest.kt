@@ -4,12 +4,12 @@ package io.github.charlietap.chasm.executor.invoker
 
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
+import com.github.michaelbull.result.map
 import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.EndFunctionDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.CallDispatcher
 import io.github.charlietap.chasm.executor.invoker.function.HostFunctionCall
 import io.github.charlietap.chasm.executor.invoker.instruction.control.ThrowRefValueExecutor
-import io.github.charlietap.chasm.executor.invoker.thread.ThreadExecutor
 import io.github.charlietap.chasm.fixture.config.runtimeConfig
 import io.github.charlietap.chasm.fixture.runtime.dispatch.dispatchableInstruction
 import io.github.charlietap.chasm.fixture.runtime.exception.compiledCatch
@@ -34,6 +34,7 @@ import io.github.charlietap.chasm.host.writeI64
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.CompiledCatch
+import io.github.charlietap.chasm.runtime.ext.toLongFromBoxed
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.program.Program
 import kotlin.test.Test
@@ -99,7 +100,9 @@ class HostExceptionIntegrationTest {
             ),
         )
 
-        val actual = ThreadExecutor(config, runtimeStore, outer, emptyList())
+        val actual = FunctionInvoker(config, runtimeStore, module, outer, emptyList()).map { results ->
+            results.map { result -> result.toLongFromBoxed() }
+        }
 
         assertEquals(Ok(listOf(42L)), actual)
         assertFalse(runtimeStore.heap.hasPending)
@@ -159,7 +162,9 @@ class HostExceptionIntegrationTest {
             ),
         )
 
-        val actual = ThreadExecutor(config, runtimeStore, outer, emptyList())
+        val actual = FunctionInvoker(config, runtimeStore, module, outer, emptyList()).map { results ->
+            results.map { result -> result.toLongFromBoxed() }
+        }
 
         assertEquals(Ok(listOf(exceptionReference)), actual)
         assertFalse(runtimeStore.heap.hasPending)
