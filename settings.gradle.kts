@@ -70,7 +70,6 @@ include(":memory")
 
 include(":module")
 
-include(":compiler")
 include(":compiler:backend-chasm")
 include(":compiler:frontend")
 
