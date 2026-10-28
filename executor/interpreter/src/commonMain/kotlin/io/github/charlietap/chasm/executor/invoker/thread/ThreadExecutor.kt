@@ -2,22 +2,16 @@
 
 package io.github.charlietap.chasm.executor.invoker.thread
 
-import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.InternalChasmApi
-import io.github.charlietap.chasm.config.GCStrategy
 import io.github.charlietap.chasm.config.RuntimeConfig
-import io.github.charlietap.chasm.executor.invoker.diagnostic.TrapSnapshot
-import io.github.charlietap.chasm.executor.invoker.function.initializeLocals
 import io.github.charlietap.chasm.gc.GuestHeapOutOfMemoryException
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.runtime.ext.toLongFromBoxed
+import io.github.charlietap.chasm.runtime.execution.NestedInterpreter
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.resource.gc.GarbageCollector
-import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
 
@@ -43,13 +37,14 @@ internal inline fun ThreadExecutor(
     instance: FunctionInstance.WasmFunction,
     values: List<ExecutionValue>,
     crossinline garbageCollector: GarbageCollector,
-): Result<List<Long>, InvocationError> = executeThread(
+): Result<List<Long>, InvocationError> = ThreadInvocation(
     config = config,
     store = store,
     instance = instance,
     values = values,
+    nested = NESTED_INTERPRETER,
     garbageCollector = garbageCollector,
-    interpret = { entryIp, context -> interpret(entryIp, context) },
+    run = { entryIp, context -> interpret(entryIp, context) },
     trap = { exception, _ -> exception.error },
 )
 
@@ -58,83 +53,23 @@ internal fun TraceableThreadExecutor(
     store: Store,
     instance: FunctionInstance.WasmFunction,
     values: List<ExecutionValue>,
-): Result<List<Long>, InvocationError> = executeThread(
+): Result<List<Long>, InvocationError> = ThreadInvocation(
     config = config,
     store = store,
     instance = instance,
     values = values,
+    nested = NESTED_INTERPRETER,
     garbageCollector = ::GarbageCollector,
-    interpret = { entryIp, context -> interpretTraceable(entryIp, context) },
+    run = { entryIp, context -> interpretTraceable(entryIp, context) },
     trap = { exception, vstack -> traceableTrap(store, vstack, exception) },
 )
 
-@Suppress("DEPRECATION")
-internal inline fun executeThread(
-    config: RuntimeConfig,
-    store: Store,
-    instance: FunctionInstance.WasmFunction,
-    values: List<ExecutionValue>,
-    crossinline garbageCollector: GarbageCollector,
-    crossinline interpret: (Int, ExecutionContext) -> Unit,
-    crossinline trap: (InvocationException, ValueStack) -> InvocationError,
-): Result<List<Long>, InvocationError> = binding {
-    val callStrategy = instance.callStrategy
-    val vstack = try {
-        ValueStack(callStrategy.frameSlots, store.maxStackSlots)
-    } catch (exception: InvocationException) {
-        Err(exception.error).bind()
-    }
-    val context = ExecutionContext(
-        vstack = vstack,
-        store = store,
-        instance = instance.module,
-        config = config,
-    )
+internal fun interpretNested(
+    entryIp: Int,
+    context: ExecutionContext,
+) = if (context.config.debugInfo) interpretTraceable(entryIp, context) else interpret(entryIp, context)
 
-    val results = instance.functionType.results.types.size
-    vstack.writeRootActivationHeader(callStrategy.interfaceSlotCount)
-    vstack.activateFrame(ROOT_FP, callStrategy.frameSlots)
-    values.forEachIndexed { index, value ->
-        vstack.setFrameSlot(index, value.toLongFromBoxed())
-    }
-    initializeLocals(vstack, callStrategy, ROOT_FP)
-    try {
-        interpret(callStrategy.entryIp, context)
-    } catch (exception: InvocationException) {
-        Err(trap(exception, vstack)).bind()
-    } catch (_: GuestHeapOutOfMemoryException) {
-        Err(InvocationError.GuestHeapOutOfMemory).bind()
-    }
-
-    if (vstack.fp != ROOT_FP || vstack.sp != results) {
-        Err(InvocationError.ProgramFinishedInconsistentState).bind<List<Long>>()
-    }
-
-    if (
-        config.gcStrategy == GCStrategy.ARENA &&
-        context.heap.shouldCollectGarbage(config.gcThreshold.bytes)
-    ) {
-        garbageCollector(store, vstack).bind()
-    }
-
-    List(results) {
-        vstack.pop()
-    }
-        .asReversed()
-}
-
-private fun traceableTrap(
-    store: Store,
-    vstack: ValueStack,
-    exception: InvocationException,
-): InvocationError {
-    val error = exception.error
-    // A guest exception escaping this way has already unwound its frames.
-    if (error == InvocationError.ThrownException || exception.faultIp == InvocationException.UNKNOWN_FAULT_IP) {
-        return error
-    }
-    return InvocationError.Trapped(error, TrapSnapshot(store, vstack, exception.faultIp))
-}
+private val NESTED_INTERPRETER = NestedInterpreter(::interpretNested)
 
 // Keep dispatch separate so HotSpot OSR need not preserve invocation setup
 // and result processing state across every handler call
@@ -162,8 +97,6 @@ private fun interpret(
         }
     }
 }
-
-private const val ROOT_FP = 0
 
 // Keeping the IP live for the handler costs a store per dispatch on HotSpot,
 // so this copy of interpret only runs when trap diagnostics are enabled.

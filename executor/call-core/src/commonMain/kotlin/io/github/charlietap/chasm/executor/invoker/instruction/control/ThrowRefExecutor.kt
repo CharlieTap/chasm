@@ -67,7 +67,7 @@ fun ThrowRefValueExecutor(
             }
             previousIp = ip
         }
-        val returnIp = vstack.unwindCallerFrame(interfaceSlotCount)
+        val returnIp = vstack.unwindCallerFrame(interfaceSlotCount, allowNestedExit = context.compiledCallDepth > 0)
         if (returnIp == EXIT_IP) escapeException(heap, ref)
         ip = exceptionalCallSiteIp(returnIp, resultCount)
     }

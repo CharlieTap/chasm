@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.invoker.diagnostic
 
-import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.executor.invoker.function.exceptionalCallSiteIp
 import io.github.charlietap.chasm.runtime.diagnostic.TrapSnapshot
 import io.github.charlietap.chasm.runtime.program.EXIT_IP
@@ -13,8 +12,7 @@ import io.github.charlietap.chasm.runtime.store.Store
  * Walks the activation headers without changing [vstack]. An inconsistent
  * header ends the walk incomplete rather than reporting a guessed frame.
  */
-@InternalChasmApi
-fun TrapSnapshot(
+internal fun TrapSnapshot(
     store: Store,
     vstack: ValueStack,
     faultIp: Int,
