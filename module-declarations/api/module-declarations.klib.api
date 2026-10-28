@@ -210,6 +210,23 @@ final class io.github.charlietap.chasm.ast.module/Import { // io.github.charliet
     }
 }
 
+final class io.github.charlietap.chasm.declarations/ModuleTypeResolver { // io.github.charlietap.chasm.declarations/ModuleTypeResolver|null[0]
+    constructor <init>(kotlin.collections/List<io.github.charlietap.chasm.type/DefinedType>, kotlin/IntArray) // io.github.charlietap.chasm.declarations/ModuleTypeResolver.<init>|<init>(kotlin.collections.List<io.github.charlietap.chasm.type.DefinedType>;kotlin.IntArray){}[0]
+
+    final fun blockType(io.github.charlietap.chasm.type/BlockType): io.github.charlietap.chasm.type/FunctionType // io.github.charlietap.chasm.declarations/ModuleTypeResolver.blockType|blockType(io.github.charlietap.chasm.type.BlockType){}[0]
+    final fun definedType(io.github.charlietap.chasm.ast.module/Index.TypeIndex): io.github.charlietap.chasm.type/DefinedType // io.github.charlietap.chasm.declarations/ModuleTypeResolver.definedType|definedType(io.github.charlietap.chasm.ast.module.Index.TypeIndex){}[0]
+    final fun functionType(io.github.charlietap.chasm.ast.module/Index.FunctionIndex): io.github.charlietap.chasm.type/DefinedType // io.github.charlietap.chasm.declarations/ModuleTypeResolver.functionType|functionType(io.github.charlietap.chasm.ast.module.Index.FunctionIndex){}[0]
+    final fun functionType(io.github.charlietap.chasm.ast.module/Index.TypeIndex): io.github.charlietap.chasm.type/FunctionType // io.github.charlietap.chasm.declarations/ModuleTypeResolver.functionType|functionType(io.github.charlietap.chasm.ast.module.Index.TypeIndex){}[0]
+    final fun resolve(io.github.charlietap.chasm.type/GlobalType): io.github.charlietap.chasm.type/GlobalType // io.github.charlietap.chasm.declarations/ModuleTypeResolver.resolve|resolve(io.github.charlietap.chasm.type.GlobalType){}[0]
+    final fun resolve(io.github.charlietap.chasm.type/ReferenceType): io.github.charlietap.chasm.type/ReferenceType // io.github.charlietap.chasm.declarations/ModuleTypeResolver.resolve|resolve(io.github.charlietap.chasm.type.ReferenceType){}[0]
+    final fun resolve(io.github.charlietap.chasm.type/TableType): io.github.charlietap.chasm.type/TableType // io.github.charlietap.chasm.declarations/ModuleTypeResolver.resolve|resolve(io.github.charlietap.chasm.type.TableType){}[0]
+    final fun resolve(io.github.charlietap.chasm.type/TagType): io.github.charlietap.chasm.type/TagType // io.github.charlietap.chasm.declarations/ModuleTypeResolver.resolve|resolve(io.github.charlietap.chasm.type.TagType){}[0]
+
+    final object Companion { // io.github.charlietap.chasm.declarations/ModuleTypeResolver.Companion|null[0]
+        final fun functionTypeIndices(kotlin.collections/List<io.github.charlietap.chasm.ast.module/Import>, kotlin/IntArray): kotlin/IntArray // io.github.charlietap.chasm.declarations/ModuleTypeResolver.Companion.functionTypeIndices|functionTypeIndices(kotlin.collections.List<io.github.charlietap.chasm.ast.module.Import>;kotlin.IntArray){}[0]
+    }
+}
+
 final value class io.github.charlietap.chasm.ast.value/NameValue : io.github.charlietap.chasm.ast.value/Value { // io.github.charlietap.chasm.ast.value/NameValue|null[0]
     constructor <init>(kotlin/String) // io.github.charlietap.chasm.ast.value/NameValue.<init>|<init>(kotlin.String){}[0]
 

@@ -2,13 +2,13 @@ package io.github.charlietap.chasm.tools.compilerbaseline
 
 import io.github.charlietap.chasm.ast.module.Import.Descriptor
 import io.github.charlietap.chasm.ast.module.Module
+import io.github.charlietap.chasm.ast.module.typeResolver
 import io.github.charlietap.chasm.host.HostFunction
 import io.github.charlietap.chasm.host.writeI64
 import io.github.charlietap.chasm.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.runtime.instance.Import
 import io.github.charlietap.chasm.runtime.resource.allocation.HostFunctionAllocator
 import io.github.charlietap.chasm.runtime.store.Store
-import io.github.charlietap.chasm.runtime.type.ModuleTypeResolver
 import io.github.charlietap.chasm.type.FunctionType
 
 fun interface CompilerBaselineImportResolver {
@@ -43,7 +43,7 @@ class CoremarkImportResolver(
 ) : CompilerBaselineImportResolver {
 
     override fun resolve(module: Module, store: Store): List<Import> {
-        val types = ModuleTypeResolver(module)
+        val types = module.typeResolver()
         return module.imports.map { import ->
             check(import.moduleName.name == MODULE_NAME && import.entityName.name == CLOCK_NAME) {
                 "unsupported CoreMark import: ${import.moduleName.name}.${import.entityName.name}"

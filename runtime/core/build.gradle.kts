@@ -14,7 +14,7 @@ kotlin {
        commonMain {
             dependencies {
                 api(projects.config)
-                api(projects.ast)
+                api(projects.moduleDeclarations)
                 api(projects.gc)
                 api(projects.host)
                 api(projects.runtime.encoding)

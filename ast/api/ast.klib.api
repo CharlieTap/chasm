@@ -9305,3 +9305,5 @@ final value class io.github.charlietap.chasm.ast.module/StartFunction { // io.gi
     final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.module/StartFunction.hashCode|hashCode(){}[0]
     final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.module/StartFunction.toString|toString(){}[0]
 }
+
+final fun (io.github.charlietap.chasm.ast.module/Module).io.github.charlietap.chasm.ast.module/typeResolver(): io.github.charlietap.chasm.declarations/ModuleTypeResolver // io.github.charlietap.chasm.ast.module/typeResolver|typeResolver@io.github.charlietap.chasm.ast.module.Module(){}[0]

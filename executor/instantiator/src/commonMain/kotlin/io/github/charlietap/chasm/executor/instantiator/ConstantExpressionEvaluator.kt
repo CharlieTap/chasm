@@ -11,6 +11,7 @@ import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.ast.instruction.VariableInstruction
 import io.github.charlietap.chasm.ast.instruction.VectorInstruction
 import io.github.charlietap.chasm.ast.module.toInt
+import io.github.charlietap.chasm.declarations.ModuleTypeResolver
 import io.github.charlietap.chasm.executor.instantiator.ext.functionAddress
 import io.github.charlietap.chasm.executor.instantiator.ext.globalAddress
 import io.github.charlietap.chasm.gc.GuestHeapOutOfMemoryException
@@ -31,7 +32,6 @@ import io.github.charlietap.chasm.runtime.ext.toReferenceValue
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
-import io.github.charlietap.chasm.runtime.type.ModuleTypeResolver
 import io.github.charlietap.chasm.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.type.AbstractHeapType
 import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander

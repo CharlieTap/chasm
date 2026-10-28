@@ -4,10 +4,12 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.toInt
+import io.github.charlietap.chasm.ast.module.typeResolver
 import io.github.charlietap.chasm.compiler.context.CompilerContext
 import io.github.charlietap.chasm.compiler.context.FunctionCompilerWorkspace
 import io.github.charlietap.chasm.compiler.context.createCompilerContext
 import io.github.charlietap.chasm.compiler.diagnostic.CompilerDiagnostics
+import io.github.charlietap.chasm.declarations.ModuleTypeResolver
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.LinkWasmCallDispatchers
 import io.github.charlietap.chasm.parallel.ParallelTaskExecutor
 import io.github.charlietap.chasm.parallel.ParallelTaskScope
@@ -16,7 +18,6 @@ import io.github.charlietap.chasm.runtime.function.classifyLocalInitialization
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.store.Store
-import io.github.charlietap.chasm.runtime.type.ModuleTypeResolver
 import io.github.charlietap.chasm.runtime.type.RuntimeTypeMap
 
 suspend fun ParallelModuleCompiler(
@@ -24,7 +25,7 @@ suspend fun ParallelModuleCompiler(
     module: Module,
     instance: ModuleInstance,
     runtimeTypes: RuntimeTypeMap,
-    types: ModuleTypeResolver = ModuleTypeResolver(module),
+    types: ModuleTypeResolver = module.typeResolver(),
     diagnostics: CompilerDiagnostics? = null,
     taskExecutor: ParallelTaskExecutor,
 ): Result<Unit, ModuleTrapError> {

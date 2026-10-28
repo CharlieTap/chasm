@@ -4,6 +4,7 @@ import com.github.michaelbull.result.unwrap
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
 import io.github.charlietap.chasm.ast.instruction.Expression
 import io.github.charlietap.chasm.ast.module.Index
+import io.github.charlietap.chasm.ast.module.typeResolver
 import io.github.charlietap.chasm.compiler.context.CompilerContext
 import io.github.charlietap.chasm.compiler.diagnostic.CompilerDiagnostics
 import io.github.charlietap.chasm.compiler.diagnostic.CompilerInstructionObserver
@@ -29,7 +30,6 @@ import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.exception.CompiledCatch
 import io.github.charlietap.chasm.runtime.instruction.LinkedInstruction
 import io.github.charlietap.chasm.runtime.program.Program
-import io.github.charlietap.chasm.runtime.type.ModuleTypeResolver
 import io.github.charlietap.chasm.type.BlockType
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
@@ -142,7 +142,7 @@ class ExceptionTableCompilerTest {
         val dispatchables = mutableListOf<DispatchableInstruction>()
         val context = CompilerContext(
             module = module,
-            types = ModuleTypeResolver(module),
+            types = module.typeResolver(),
             runtimeTypes = store.heap.registerRuntimeTypes(module.definedTypes),
             instance = moduleInstance(tagAddresses = mutableListOf(tagAddress(17), tagAddress(42))),
             tags = arrayOf(tagInstance(), tagInstance()),

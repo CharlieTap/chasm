@@ -10,6 +10,7 @@ import com.github.michaelbull.result.toResultOr
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.compiler.ModuleCompiler
 import io.github.charlietap.chasm.compiler.diagnostic.CompilerDiagnostics
+import io.github.charlietap.chasm.declarations.ModuleTypeResolver
 import io.github.charlietap.chasm.executor.instantiator.ConstantExpressionEvaluator
 import io.github.charlietap.chasm.executor.instantiator.allocation.data.DataAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.element.ElementAllocator
@@ -31,7 +32,6 @@ import io.github.charlietap.chasm.runtime.resource.allocation.MemoryAllocator
 import io.github.charlietap.chasm.runtime.resource.allocation.TableAllocator
 import io.github.charlietap.chasm.runtime.resource.allocation.TagAllocator
 import io.github.charlietap.chasm.runtime.store.Store
-import io.github.charlietap.chasm.runtime.type.ModuleTypeResolver
 import io.github.charlietap.chasm.runtime.type.RuntimeTypeMap
 import kotlin.jvm.JvmName
 

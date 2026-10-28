@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.compiler.context
 
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.compiler.diagnostic.CompilerDiagnostics
+import io.github.charlietap.chasm.declarations.ModuleTypeResolver
 import io.github.charlietap.chasm.runtime.ext.data
 import io.github.charlietap.chasm.runtime.ext.element
 import io.github.charlietap.chasm.runtime.ext.function
@@ -19,7 +20,6 @@ import io.github.charlietap.chasm.runtime.instance.TagInstance
 import io.github.charlietap.chasm.runtime.store.Fuel
 import io.github.charlietap.chasm.runtime.store.Interrupt
 import io.github.charlietap.chasm.runtime.store.Store
-import io.github.charlietap.chasm.runtime.type.ModuleTypeResolver
 import io.github.charlietap.chasm.runtime.type.RuntimeTypeMap
 import io.github.charlietap.chasm.type.BlockType
 import io.github.charlietap.chasm.type.FunctionType

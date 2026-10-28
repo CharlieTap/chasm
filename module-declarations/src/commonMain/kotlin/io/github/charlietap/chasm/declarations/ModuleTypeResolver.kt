@@ -1,8 +1,7 @@
-package io.github.charlietap.chasm.runtime.type
+package io.github.charlietap.chasm.declarations
 
 import io.github.charlietap.chasm.ast.module.Import
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.toInt
 import io.github.charlietap.chasm.type.BlockType
 import io.github.charlietap.chasm.type.DefinedType
@@ -20,23 +19,20 @@ import io.github.charlietap.chasm.type.rolling.substitution.TableTypeSubstitutor
 import io.github.charlietap.chasm.type.rolling.substitution.TagTypeSubstitutor
 
 class ModuleTypeResolver(
-    private val module: Module,
+    private val definedTypes: List<DefinedType>,
+    private val functionTypeIndices: IntArray,
 ) {
 
-    private val substitution = Substitution.TypeIndexToDefinedType(module.definedTypes)
-    private val functionTypeIndices = module.imports.mapNotNull { import ->
-        (import.descriptor as? Import.Descriptor.Function)?.typeIndex
-    } + module.functions.map { it.typeIndex }
+    private val substitution = Substitution.TypeIndexToDefinedType(definedTypes)
 
-    fun definedType(index: Index.TypeIndex): DefinedType = module.definedTypes[index.toInt()]
+    fun definedType(index: Index.TypeIndex): DefinedType = definedTypes[index.toInt()]
 
     fun functionType(index: Index.TypeIndex): FunctionType = definedType(index).functionType()
         ?: error("type ${index.idx} is not a function type")
 
-    fun functionType(index: Index.FunctionIndex): DefinedType =
-        definedType(functionTypeIndices[index.toInt()])
+    fun functionType(index: Index.FunctionIndex): DefinedType = definedTypes[functionTypeIndices[index.toInt()]]
 
-    fun blockType(type: BlockType): FunctionType = BlockTypeExpander(module.definedTypes, type)
+    fun blockType(type: BlockType): FunctionType = BlockTypeExpander(definedTypes, type)
         ?: error("block type is not a function type: $type")
 
     fun resolve(type: TableType): TableType = TableTypeSubstitutor(type, substitution)
@@ -46,4 +42,22 @@ class ModuleTypeResolver(
     fun resolve(type: TagType): TagType = TagTypeSubstitutor(type, substitution)
 
     fun resolve(type: ReferenceType): ReferenceType = ReferenceTypeSubstitutor(type, substitution)
+
+    companion object {
+
+        fun functionTypeIndices(
+            imports: List<Import>,
+            definedFunctionTypeIndices: IntArray,
+        ): IntArray {
+            val imported = imports.count { import -> import.descriptor is Import.Descriptor.Function }
+            val indices = IntArray(imported + definedFunctionTypeIndices.size)
+            var position = 0
+            imports.forEach { import ->
+                val descriptor = import.descriptor
+                if (descriptor is Import.Descriptor.Function) indices[position++] = descriptor.typeIndex.idx.toInt()
+            }
+            definedFunctionTypeIndices.copyInto(indices, position)
+            return indices
+        }
+    }
 }

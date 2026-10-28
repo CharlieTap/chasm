@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.compiler.diagnostic
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.module.Module
+import io.github.charlietap.chasm.ast.module.typeResolver
 import io.github.charlietap.chasm.compiler.FunctionCompiler
 import io.github.charlietap.chasm.compiler.context.FunctionCompilerWorkspace
 import io.github.charlietap.chasm.compiler.context.createCompilerContext
@@ -15,7 +16,6 @@ import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.instruction.LinkedInstruction
 import io.github.charlietap.chasm.runtime.program.Program
 import io.github.charlietap.chasm.runtime.store.Store
-import io.github.charlietap.chasm.runtime.type.ModuleTypeResolver
 
 /**
  * Offsets are relative to the function's entry. [sourceStarts] and
@@ -73,7 +73,7 @@ class FunctionProvenanceCompiler(
     private val workspace = FunctionCompilerWorkspace()
     private val context = createCompilerContext(
         module = module,
-        types = ModuleTypeResolver(module),
+        types = module.typeResolver(),
         store = store,
         instance = instance,
         runtimeTypes = instance.runtimeTypes,

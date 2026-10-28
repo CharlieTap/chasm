@@ -8895,6 +8895,10 @@ public final class io/github/charlietap/chasm/ast/module/ModuleNameSubsection : 
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class io/github/charlietap/chasm/ast/module/ModuleTypesKt {
+	public static final fun typeResolver (Lio/github/charlietap/chasm/ast/module/Module;)Lio/github/charlietap/chasm/declarations/ModuleTypeResolver;
+}
+
 public final class io/github/charlietap/chasm/ast/module/NameData : io/github/charlietap/chasm/ast/module/Custom {
 	public fun <init> (Ljava/util/List;)V
 	public final fun component1 ()Ljava/util/List;

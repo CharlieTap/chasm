@@ -275,3 +275,20 @@ public final class io/github/charlietap/chasm/ast/value/NameValue : io/github/ch
 public abstract interface class io/github/charlietap/chasm/ast/value/Value {
 }
 
+public final class io/github/charlietap/chasm/declarations/ModuleTypeResolver {
+	public static final field Companion Lio/github/charlietap/chasm/declarations/ModuleTypeResolver$Companion;
+	public fun <init> (Ljava/util/List;[I)V
+	public final fun blockType (Lio/github/charlietap/chasm/type/BlockType;)Lio/github/charlietap/chasm/type/FunctionType;
+	public final fun definedType-UfKnbfY (I)Lio/github/charlietap/chasm/type/DefinedType;
+	public final fun functionType-8BqobMM (I)Lio/github/charlietap/chasm/type/DefinedType;
+	public final fun functionType-UfKnbfY (I)Lio/github/charlietap/chasm/type/FunctionType;
+	public final fun resolve (Lio/github/charlietap/chasm/type/GlobalType;)Lio/github/charlietap/chasm/type/GlobalType;
+	public final fun resolve (Lio/github/charlietap/chasm/type/ReferenceType;)Lio/github/charlietap/chasm/type/ReferenceType;
+	public final fun resolve (Lio/github/charlietap/chasm/type/TableType;)Lio/github/charlietap/chasm/type/TableType;
+	public final fun resolve (Lio/github/charlietap/chasm/type/TagType;)Lio/github/charlietap/chasm/type/TagType;
+}
+
+public final class io/github/charlietap/chasm/declarations/ModuleTypeResolver$Companion {
+	public final fun functionTypeIndices (Ljava/util/List;[I)[I
+}
+

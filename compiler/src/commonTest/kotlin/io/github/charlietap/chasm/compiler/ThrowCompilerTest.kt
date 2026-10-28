@@ -8,6 +8,7 @@ import io.github.charlietap.chasm.ast.instruction.VariableInstruction
 import io.github.charlietap.chasm.ast.module.Function
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.Module
+import io.github.charlietap.chasm.ast.module.typeResolver
 import io.github.charlietap.chasm.compiler.context.CompilerContext
 import io.github.charlietap.chasm.compiler.context.FunctionCompilerWorkspace
 import io.github.charlietap.chasm.compiler.diagnostic.CompilerDiagnostics
@@ -25,7 +26,6 @@ import io.github.charlietap.chasm.fixture.type.tagType
 import io.github.charlietap.chasm.runtime.instruction.LinkedInstruction
 import io.github.charlietap.chasm.runtime.program.Program
 import io.github.charlietap.chasm.runtime.store.Store
-import io.github.charlietap.chasm.runtime.type.ModuleTypeResolver
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
@@ -105,7 +105,7 @@ class ThrowCompilerTest {
         )
         val function = module.functions.single()
         val store = Store()
-        val types = ModuleTypeResolver(module)
+        val types = module.typeResolver()
         val runtimeTypes = store.heap.registerRuntimeTypes(module.definedTypes)
         val stableTagType = types.resolve(module.tags.single().type)
         val tagAddress = store.heap.registerTag(runtimeTypes[stableTagType.typeIndex], stableTagType)

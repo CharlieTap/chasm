@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.compiler.context
 
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.toInt
+import io.github.charlietap.chasm.ast.module.typeResolver
 import io.github.charlietap.chasm.fixture.ast.module.elementSegment
 import io.github.charlietap.chasm.fixture.ast.module.global
 import io.github.charlietap.chasm.fixture.ast.module.globalImportDescriptor
@@ -21,7 +22,6 @@ import io.github.charlietap.chasm.fixture.type.referenceValueType
 import io.github.charlietap.chasm.fixture.type.resultType
 import io.github.charlietap.chasm.fixture.type.tableType
 import io.github.charlietap.chasm.fixture.type.tagType
-import io.github.charlietap.chasm.runtime.type.ModuleTypeResolver
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -31,9 +31,7 @@ class ModuleTypeResolverTest {
     @Test
     fun resolvesDefinedTypesByModuleIndex() {
         val definedType = definedType()
-        val resolver = ModuleTypeResolver(
-            module = module(definedTypes = listOf(definedType)),
-        )
+        val resolver = module(definedTypes = listOf(definedType)).typeResolver()
 
         assertEquals(definedType, resolver.definedType(Index.TypeIndex(0u)))
     }
@@ -41,9 +39,7 @@ class ModuleTypeResolverTest {
     @Test
     fun substitutesTypeIndicesInReferenceTypes() {
         val definedType = definedType()
-        val resolver = ModuleTypeResolver(
-            module = module(definedTypes = listOf(definedType)),
-        )
+        val resolver = module(definedTypes = listOf(definedType)).typeResolver()
 
         val resolved = resolver.resolve(
             refNullReferenceType(
@@ -91,7 +87,7 @@ class ModuleTypeResolverTest {
             globals = listOf(global(type = globalType)),
             elementSegments = listOf(elementSegment(type = indexedReference)),
         )
-        val resolver = ModuleTypeResolver(module)
+        val resolver = module.typeResolver()
         val resolvedReference = refNullReferenceType(
             heapType = concreteDefinedTypeHeapType(definedType),
         )

@@ -6,6 +6,7 @@ import io.github.charlietap.chasm.ast.instruction.AtomicMemoryInstruction
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
 import io.github.charlietap.chasm.ast.instruction.Expression
 import io.github.charlietap.chasm.ast.module.Index
+import io.github.charlietap.chasm.ast.module.typeResolver
 import io.github.charlietap.chasm.compiler.context.CompilerContext
 import io.github.charlietap.chasm.compiler.context.FunctionCompilerWorkspace
 import io.github.charlietap.chasm.fixture.ast.module.function
@@ -19,7 +20,6 @@ import io.github.charlietap.chasm.fixture.type.functionRecursiveType
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.error.InstantiationError
 import io.github.charlietap.chasm.runtime.program.Program
-import io.github.charlietap.chasm.runtime.type.ModuleTypeResolver
 import io.github.charlietap.chasm.type.BlockType
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -41,7 +41,7 @@ class ExceptionPublicationTest {
     fun `worker fragment relocation matches direct compilation at a nonzero address`() {
         val module = module(definedTypes = listOf(definedType(recursiveType = functionRecursiveType())))
         val store = store()
-        val context = CompilerContext(module, ModuleTypeResolver(module), store.heap.registerRuntimeTypes(module.definedTypes))
+        val context = CompilerContext(module, module.typeResolver(), store.heap.registerRuntimeTypes(module.definedTypes))
         val direct = Program().apply { repeat(7) { append(DispatchableInstruction { _, _, next -> next }) } }
         FunctionCompiler(context, protectedFunction, direct).unwrap()
         val fragment = FunctionCompiler(context, protectedFunction, FunctionCompilerWorkspace()).unwrap()

@@ -13,6 +13,7 @@ import io.github.charlietap.chasm.ast.instruction.VectorInstruction
 import io.github.charlietap.chasm.ast.module.Function
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.Local
+import io.github.charlietap.chasm.ast.module.typeResolver
 import io.github.charlietap.chasm.compiler.context.CompilerContext
 import io.github.charlietap.chasm.compiler.diagnostic.CompilerDiagnostics
 import io.github.charlietap.chasm.compiler.diagnostic.CompilerInstructionObserver
@@ -55,7 +56,6 @@ import io.github.charlietap.chasm.runtime.instruction.AdminInstruction
 import io.github.charlietap.chasm.runtime.instruction.LinkedInstruction
 import io.github.charlietap.chasm.runtime.program.EXIT_IP
 import io.github.charlietap.chasm.runtime.program.Program
-import io.github.charlietap.chasm.runtime.type.ModuleTypeResolver
 import io.github.charlietap.chasm.type.AbstractHeapType
 import io.github.charlietap.chasm.type.BlockType
 import io.github.charlietap.chasm.type.ValueType
@@ -83,7 +83,7 @@ class FunctionCompilerTest {
         val lowered = mutableListOf<LinkedInstruction>()
         val context = CompilerContext(
             module = module,
-            types = ModuleTypeResolver(module),
+            types = module.typeResolver(),
             runtimeTypes = runtimeTypes,
             functions = arrayOf(
                 wasmFunctionInstance(
@@ -128,7 +128,7 @@ class FunctionCompilerTest {
             ),
         )
         val store = store()
-        val types = ModuleTypeResolver(module)
+        val types = module.typeResolver()
         val runtimeTypes = store.heap.registerRuntimeTypes(module.definedTypes)
         val lowered = mutableListOf<LinkedInstruction>()
         val context = CompilerContext(
@@ -1513,7 +1513,7 @@ private fun compilerContext(
 ): CompilerContext {
     return CompilerContext(
         module = module,
-        types = ModuleTypeResolver(module),
+        types = module.typeResolver(),
         runtimeTypes = store.heap.registerRuntimeTypes(module.definedTypes),
     )
 }
