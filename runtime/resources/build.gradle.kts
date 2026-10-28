@@ -31,5 +31,5 @@ kotlin {
 
 configure<PublishingConventionsExtension> {
     name = "runtime-resources"
-    description = "Allocates a Chasm store's resources"
+    description = "Allocates, collects and disposes of a Chasm store's resources"
 }

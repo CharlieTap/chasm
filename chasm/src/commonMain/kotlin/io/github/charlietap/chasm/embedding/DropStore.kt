@@ -4,7 +4,7 @@ import io.github.charlietap.chasm.embedding.error.ChasmError
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Success
 import io.github.charlietap.chasm.embedding.shapes.Store
-import io.github.charlietap.chasm.executor.invoker.drop.MemoryInstanceDropper
+import io.github.charlietap.chasm.runtime.resource.drop.MemoryInstanceDropper
 
 fun dropStore(
     store: Store,

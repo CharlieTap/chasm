@@ -1,4 +1,4 @@
-package io.github.charlietap.chasm.executor.invoker.drop
+package io.github.charlietap.chasm.runtime.resource.drop
 
 import io.github.charlietap.chasm.memory.destruct.LinearMemoryDestructor
 import io.github.charlietap.chasm.runtime.instance.MemoryInstance

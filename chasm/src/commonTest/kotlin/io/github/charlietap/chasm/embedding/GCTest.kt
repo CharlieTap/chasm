@@ -5,9 +5,9 @@ import io.github.charlietap.chasm.embedding.error.ChasmError
 import io.github.charlietap.chasm.embedding.fixture.publicStore
 import io.github.charlietap.chasm.embedding.reference.arrayFieldTestFixture
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
-import io.github.charlietap.chasm.executor.invoker.GarbageCollector
 import io.github.charlietap.chasm.fixture.type.arrayType
 import io.github.charlietap.chasm.runtime.error.InvocationError
+import io.github.charlietap.chasm.runtime.resource.gc.GarbageCollector
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

@@ -1,4 +1,4 @@
-package io.github.charlietap.chasm.executor.invoker
+package io.github.charlietap.chasm.runtime.resource.gc
 
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
