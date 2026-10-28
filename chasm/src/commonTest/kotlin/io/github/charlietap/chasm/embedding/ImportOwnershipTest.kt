@@ -40,12 +40,13 @@ class ImportOwnershipTest {
         importables.forEach { importable ->
             val actual = instance(
                 store = targetStore,
-                module = publicModule(),
+                declarations = publicModule().declarations,
                 imports = listOf(publicImport(value = importable)),
                 config = RuntimeConfig(),
                 instantiator = { _, _, _, _, _, _ -> error("instantiation must not start") },
                 codeInstaller = { _, _, _, _ -> error("code installation must not start") },
                 importableMapper = mapper,
+                trapSource = { null },
             )
 
             assertEquals(expected, actual)

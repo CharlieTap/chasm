@@ -5,7 +5,10 @@ import com.github.michaelbull.result.fold
 import com.github.michaelbull.result.map
 import com.github.michaelbull.result.mapError
 import io.github.charlietap.chasm.config.RuntimeConfig
+import io.github.charlietap.chasm.declarations.ModuleDeclarations
 import io.github.charlietap.chasm.embedding.diagnostic.Instantiation
+import io.github.charlietap.chasm.embedding.diagnostic.InterpreterTrapSource
+import io.github.charlietap.chasm.embedding.diagnostic.TrapSource
 import io.github.charlietap.chasm.embedding.diagnostic.executionError
 import io.github.charlietap.chasm.embedding.error.ChasmError
 import io.github.charlietap.chasm.embedding.ext.withStoreSettings
@@ -33,26 +36,26 @@ fun instance(
     module: Module,
     imports: List<Import>,
     config: RuntimeConfig = RuntimeConfig(),
-): ChasmResult<Instance, ChasmError.ExecutionError> {
-    return instance(
-        store = store,
-        module = module,
-        imports = imports,
-        config = config,
-        instantiator = ::ModuleInstantiator,
-        codeInstaller = ModuleCodeInstaller(module.module),
-        importableMapper = ImportableMapper(store.store),
-    )
-}
+): ChasmResult<Instance, ChasmError.ExecutionError> = instance(
+    store = store,
+    declarations = module.declarations,
+    imports = imports,
+    config = config,
+    instantiator = ::ModuleInstantiator,
+    codeInstaller = ModuleCodeInstaller(module.module),
+    importableMapper = ImportableMapper(store.store),
+    trapSource = { instance -> InterpreterTrapSource(instance, module) },
+)
 
 internal fun instance(
     store: Store,
-    module: Module,
+    declarations: ModuleDeclarations,
     imports: List<Import>,
     config: RuntimeConfig,
     instantiator: ModuleInstantiator,
     codeInstaller: ModuleCodeInstaller,
     importableMapper: Mapper<Importable, ExternalValue>,
+    trapSource: (RuntimeModuleInstance) -> TrapSource?,
 ): ChasmResult<Instance, ChasmError.ExecutionError> {
 
     if (imports.any { it.value.store !== store.store }) {
@@ -63,8 +66,8 @@ internal fun instance(
     val firstFunctionAddress = store.store.functions.size
     val effectiveConfig = config.withStoreSettings(store.store.config)
 
-    return instantiator(effectiveConfig, store.store, module.declarations, mappedImports, codeInstaller, ::StartFunctionInvoker)
-        .toChasmResult(effectiveConfig, store, module, firstFunctionAddress)
+    return instantiator(effectiveConfig, store.store, declarations, mappedImports, codeInstaller, ::StartFunctionInvoker)
+        .toChasmResult(effectiveConfig, store, firstFunctionAddress, trapSource)
 }
 
 internal fun List<Import>.mapImports(
@@ -80,13 +83,13 @@ internal fun List<Import>.mapImports(
 internal fun Result<RuntimeModuleInstance, ModuleTrapError>.toChasmResult(
     config: RuntimeConfig,
     store: Store,
-    module: Module,
     firstFunctionAddress: Int,
+    trapSource: (RuntimeModuleInstance) -> TrapSource?,
 ): ChasmResult<Instance, ChasmError.ExecutionError> =
     this
-        .mapError { error -> executionError(store, error, Instantiation(module, firstFunctionAddress)) }
+        .mapError { error -> executionError(store, error, Instantiation(firstFunctionAddress, trapSource)) }
         .map { internal ->
-            if (config.debugInfo) store.diagnostics.register(internal, module)
+            if (config.debugInfo) store.diagnostics.register(trapSource(internal))
             Instance(
                 config = config,
                 instance = internal,

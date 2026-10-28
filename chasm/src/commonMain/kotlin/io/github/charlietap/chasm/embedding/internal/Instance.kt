@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.embedding.internal
 
 import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.config.RuntimeConfig
+import io.github.charlietap.chasm.embedding.diagnostic.InterpreterTrapSource
 import io.github.charlietap.chasm.embedding.error.ChasmError
 import io.github.charlietap.chasm.embedding.ext.withStoreSettings
 import io.github.charlietap.chasm.embedding.mapImports
@@ -39,5 +40,5 @@ suspend fun _instance(
         taskExecutor = taskExecutor,
         codeInstaller = ParallelModuleCodeInstaller(module.module),
         startInvoker = ::StartFunctionInvoker,
-    ).toChasmResult(effectiveConfig, store, module, firstFunctionAddress)
+    ).toChasmResult(effectiveConfig, store, firstFunctionAddress) { instance -> InterpreterTrapSource(instance, module) }
 }
