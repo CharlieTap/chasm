@@ -2,8 +2,8 @@ package io.github.charlietap.chasm.executor.instantiator
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.module.toInt
 import io.github.charlietap.chasm.config.RuntimeConfig
+import io.github.charlietap.chasm.declarations.ModuleDeclarations
 import io.github.charlietap.chasm.executor.instantiator.allocation.ModuleAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.PartialModuleAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.checkStoreLimits
@@ -16,12 +16,11 @@ import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.instance.Import
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.store.Store
-import io.github.charlietap.chasm.ast.module.Module as ASTModule
 
 typealias ModuleInstantiator = (
     RuntimeConfig,
     Store,
-    ASTModule,
+    ModuleDeclarations,
     List<Import>,
     ModuleCodeInstaller,
     StartFunctionInvoker,
@@ -30,7 +29,7 @@ typealias ModuleInstantiator = (
 fun ModuleInstantiator(
     config: RuntimeConfig,
     store: Store,
-    module: ASTModule,
+    module: ModuleDeclarations,
     imports: List<Import>,
     codeInstaller: ModuleCodeInstaller,
     startInvoker: StartFunctionInvoker,
@@ -54,7 +53,7 @@ fun ModuleInstantiator(
 internal inline fun ModuleInstantiator(
     config: RuntimeConfig,
     store: Store,
-    module: ASTModule,
+    module: ModuleDeclarations,
     imports: List<Import>,
     noinline codeInstaller: ModuleCodeInstaller,
     crossinline startInvoker: StartFunctionInvoker,
@@ -95,7 +94,7 @@ internal inline fun ModuleInstantiator(
 internal inline fun PrepareModuleInstantiation(
     config: RuntimeConfig,
     store: Store,
-    module: ASTModule,
+    module: ModuleDeclarations,
     imports: List<Import>,
     crossinline compatibilityChecker: CompatibilityChecker,
     crossinline partialAllocator: PartialModuleAllocator,
@@ -113,7 +112,7 @@ internal inline fun PrepareModuleInstantiation(
 
     val tableInitValues = LongArray(module.tables.size) { tableIndex ->
         val table = module.tables[tableIndex]
-        constantExpressionEvaluator(store, partialInstance, context.types, table.initExpression).bind()
+        constantExpressionEvaluator(store, partialInstance, context.types, table.initializer).bind()
     }
 
     ModuleInstantiationPreparation(context, partialInstance, tableInitValues)
@@ -130,7 +129,7 @@ internal inline fun CompleteModuleInstantiation(
     memoryInitializer(context, instance).bind()
 
     context.module.startFunction?.let { function ->
-        val address = instance.functionAddresses[function.idx.toInt()]
+        val address = instance.functionAddresses[function]
         startInvoker(context.config, context.store, instance, address).bind()
     }
 }

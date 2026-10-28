@@ -5,6 +5,7 @@ import com.github.michaelbull.result.asErr
 import com.github.michaelbull.result.get
 import com.github.michaelbull.result.map
 import io.github.charlietap.chasm.config.RuntimeConfig
+import io.github.charlietap.chasm.declarations.ModuleDeclarations
 import io.github.charlietap.chasm.executor.instantiator.allocation.ParallelModuleAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.PartialModuleAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.type.TypeAllocator
@@ -16,12 +17,11 @@ import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.instance.Import
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.store.Store
-import io.github.charlietap.chasm.ast.module.Module as ASTModule
 
 suspend fun ParallelModuleInstantiator(
     config: RuntimeConfig,
     store: Store,
-    module: ASTModule,
+    module: ModuleDeclarations,
     imports: List<Import>,
     taskExecutor: ParallelTaskExecutor,
     codeInstaller: ParallelModuleCodeInstaller,

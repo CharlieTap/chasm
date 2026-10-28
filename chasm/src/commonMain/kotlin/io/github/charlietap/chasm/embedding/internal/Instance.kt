@@ -34,7 +34,7 @@ suspend fun _instance(
     return ParallelModuleInstantiator(
         config = effectiveConfig,
         store = store.store,
-        module = module.module,
+        module = module.declarations,
         imports = imports.mapImports(ImportableMapper(store.store)),
         taskExecutor = taskExecutor,
         codeInstaller = ParallelModuleCodeInstaller(module.module),

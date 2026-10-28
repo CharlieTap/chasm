@@ -7,7 +7,9 @@ import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import com.github.michaelbull.result.toResultOr
-import io.github.charlietap.chasm.ast.module.Module
+import io.github.charlietap.chasm.ast.value.NameValue
+import io.github.charlietap.chasm.declarations.DataPayload
+import io.github.charlietap.chasm.declarations.ModuleDeclarations
 import io.github.charlietap.chasm.executor.instantiator.ConstantExpressionEvaluator
 import io.github.charlietap.chasm.executor.instantiator.ModuleCodeInstaller
 import io.github.charlietap.chasm.executor.instantiator.allocation.data.DataAllocator
@@ -96,6 +98,7 @@ internal inline fun ModuleAllocator(
     instance
 }
 
+@OptIn(ExperimentalUnsignedTypes::class)
 internal inline fun AllocateModuleContents(
     context: InstantiationContext,
     instance: ModuleInstance,
@@ -118,30 +121,30 @@ internal inline fun AllocateModuleContents(
     }
 
     module.memories.forEach { memory ->
-        val address = memoryAllocator(store, memory.type, context.config.linearMemory)
+        val address = memoryAllocator(store, memory, context.config.linearMemory)
         instance.addMemoryAddress(address)
     }
 
     module.tags.forEach { tag ->
-        val type = context.types.resolve(tag.type)
+        val type = context.types.resolve(tag)
         val rtt = context.runtimeTypes[type.typeIndex]
         val address = tagAllocator(store, rtt, type)
         instance.addTagAddress(address)
     }
 
     module.globals.forEach { global ->
-        val value = constantExpressionEvaluator(store, instance, context.types, global.initExpression).bind()
+        val value = constantExpressionEvaluator(store, instance, context.types, global.initializer).bind()
         val address = globalAllocator(store, context.types.resolve(global.type), value)
         instance.addGlobalAddress(address)
     }
 
     module.elementSegments.forEach { elementSegment ->
-        val references = LongArray(elementSegment.initExpressions.size) { initExpressionIndex ->
+        val references = LongArray(elementSegment.initializers.size) { initializerIndex ->
             constantExpressionEvaluator(
                 store,
                 instance,
                 context.types,
-                elementSegment.initExpressions[initExpressionIndex],
+                elementSegment.initializers[initializerIndex],
             ).bind()
         }
         val address = elementAllocator(
@@ -153,7 +156,10 @@ internal inline fun AllocateModuleContents(
     }
 
     module.dataSegments.forEach { dataSegment ->
-        val address = dataAllocator(store, dataSegment.initData)
+        val bytes = when (val payload = dataSegment.payload) {
+            is DataPayload.Inline -> payload.bytes.asUByteArray()
+        }
+        val address = dataAllocator(store, bytes)
         instance.addDataAddress(address)
     }
 }
@@ -163,9 +169,10 @@ internal inline fun AllocateModuleExports(
     instance: ModuleInstance,
     crossinline exportAllocator: ExportAllocator,
 ): Result<Unit, ModuleTrapError> = binding {
-    context.module.exports.forEach { export ->
-        val externalValue = exportAllocator(context, export.descriptor).bind()
-        instance.addExport(ExportInstance(export.name, externalValue))
+    val exports = context.module.exports
+    for (position in 0 until exports.size) {
+        val externalValue = exportAllocator(context, exports.kinds[position], exports.indices[position]).bind()
+        instance.addExport(ExportInstance(NameValue(exports.names[position]), externalValue))
     }
 }
 
@@ -173,12 +180,12 @@ internal inline fun AllocateModuleExports(
 // hold leaves no functions, types or initial memory and table storage behind.
 internal fun checkStoreLimits(
     store: Store,
-    module: Module,
+    module: ModuleDeclarations,
 ): Result<Unit, ModuleTrapError> {
     val limits = store.config.limits
     val memoryPages = limits.memoryPages
     if (memoryPages != null) {
-        val exceeded = module.memories.any { memory -> memory.type.limits.min > memoryPages.toULong() }
+        val exceeded = module.memories.any { memory -> memory.limits.min > memoryPages.toULong() }
         if (exceeded) return Err(InstantiationError.MemoryLimitExceeded(memoryPages))
     }
     val tableElements = limits.tableElements

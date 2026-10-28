@@ -1,17 +1,15 @@
 package io.github.charlietap.chasm.executor.instantiator.runtime.initialization
 
 import com.github.michaelbull.result.Ok
+import io.github.charlietap.chasm.declarations.ConstantInstruction
+import io.github.charlietap.chasm.declarations.DataSegmentDeclaration
 import io.github.charlietap.chasm.executor.instantiator.ConstantExpressionEvaluator
 import io.github.charlietap.chasm.executor.instantiator.initialization.MemoryInitializer
-import io.github.charlietap.chasm.fixture.ast.instruction.expression
-import io.github.charlietap.chasm.fixture.ast.instruction.i32ConstInstruction
-import io.github.charlietap.chasm.fixture.ast.module.activeDataSegmentMode
-import io.github.charlietap.chasm.fixture.ast.module.dataIndex
-import io.github.charlietap.chasm.fixture.ast.module.dataSegment
-import io.github.charlietap.chasm.fixture.ast.module.memoryIndex
-import io.github.charlietap.chasm.fixture.ast.module.module
 import io.github.charlietap.chasm.fixture.config.runtimeConfig
+import io.github.charlietap.chasm.fixture.executor.instantiator.constantExpression
+import io.github.charlietap.chasm.fixture.executor.instantiator.dataSegmentDeclaration
 import io.github.charlietap.chasm.fixture.executor.instantiator.instantiationContext
+import io.github.charlietap.chasm.fixture.executor.instantiator.moduleDeclarations
 import io.github.charlietap.chasm.fixture.runtime.instance.dataAddress
 import io.github.charlietap.chasm.fixture.runtime.instance.dataInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.memoryAddress
@@ -27,18 +25,11 @@ class MemoryInitializerTest {
     @Test
     fun `can initialize a memory on a module instance`() {
 
-        val activeDataIndex = dataIndex(0u)
         val offset = 117
-        val activeOffsetExpression = expression(
-            listOf(
-                i32ConstInstruction(offset),
-            ),
-        )
-        val memoryIndex = memoryIndex(0u)
-        val activeSegment = dataSegment(
-            idx = activeDataIndex,
-            mode = activeDataSegmentMode(
-                memoryIndex = memoryIndex,
+        val activeOffsetExpression = constantExpression(ConstantInstruction.I32Const(offset))
+        val activeSegment = dataSegmentDeclaration(
+            mode = DataSegmentDeclaration.Mode.Active(
+                memoryIndex = 0,
                 offset = activeOffsetExpression,
             ),
         )
@@ -50,7 +41,7 @@ class MemoryInitializerTest {
             memories = mutableListOf(memInstance),
             data = mutableListOf(dataInst),
         )
-        val module = module(
+        val module = moduleDeclarations(
             dataSegments = listOf(activeSegment),
         )
 
@@ -76,7 +67,7 @@ class MemoryInitializerTest {
         val linearMemoryInitialiser: LinearMemoryInitialiser = { _src, _dst, _srcOffset, _dstOffset, _bytesToInit, _srcUpperBound, _dstUpperBound ->
             assertEquals(0, _srcOffset)
             assertEquals(offset, _dstOffset)
-            assertEquals(activeSegment.initData.size, _bytesToInit)
+            assertEquals(activeSegment.payload.size, _bytesToInit)
         }
 
         val actual = MemoryInitializer(

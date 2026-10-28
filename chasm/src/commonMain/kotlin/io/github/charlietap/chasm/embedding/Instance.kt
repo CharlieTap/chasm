@@ -63,7 +63,7 @@ internal fun instance(
     val firstFunctionAddress = store.store.functions.size
     val effectiveConfig = config.withStoreSettings(store.store.config)
 
-    return instantiator(effectiveConfig, store.store, module.module, mappedImports, codeInstaller, ::StartFunctionInvoker)
+    return instantiator(effectiveConfig, store.store, module.declarations, mappedImports, codeInstaller, ::StartFunctionInvoker)
         .toChasmResult(effectiveConfig, store, module, firstFunctionAddress)
 }
 

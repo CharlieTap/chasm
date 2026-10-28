@@ -1,9 +1,8 @@
 package io.github.charlietap.chasm.fixture.executor.instantiator
 
-import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.config.RuntimeConfig
+import io.github.charlietap.chasm.declarations.ModuleDeclarations
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
-import io.github.charlietap.chasm.fixture.ast.module.module
 import io.github.charlietap.chasm.fixture.config.runtimeConfig
 import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
@@ -12,7 +11,7 @@ import io.github.charlietap.chasm.runtime.type.RuntimeTypeMap
 
 fun instantiationContext(
     store: Store = store(),
-    module: Module = module(),
+    module: ModuleDeclarations = moduleDeclarations(),
     config: RuntimeConfig = runtimeConfig(),
     runtimeTypes: RuntimeTypeMap = store.heap.registerRuntimeTypes(module.definedTypes),
     instance: ModuleInstance? = null,

@@ -3,8 +3,7 @@ package io.github.charlietap.chasm.executor.instantiator.initialization
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.module.ElementSegment
-import io.github.charlietap.chasm.ast.module.toInt
+import io.github.charlietap.chasm.declarations.ElementSegmentDeclaration
 import io.github.charlietap.chasm.executor.instantiator.ConstantExpressionEvaluator
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
 import io.github.charlietap.chasm.executor.instantiator.ext.elementAddress
@@ -34,38 +33,32 @@ internal inline fun TableInitializer(
 ): Result<Unit, ModuleTrapError> = binding {
 
     val store = context.store
-    val module = context.module
-    module.elementSegments
-        .filter { segment ->
-            segment.mode is ElementSegment.Mode.Active
-        }.forEach { segment ->
-            val mode = segment.mode as ElementSegment.Mode.Active
-            val offset = constantExpressionEvaluator(store, instance, context.types, mode.offsetExpr).bind().toInt()
+    val segments = context.module.elementSegments
 
-            val tableAddress = instance.tableAddress(mode.tableIndex.toInt()).bind()
-            val tableInstance = store.table(tableAddress)
-            val elementAddress = instance.elementAddress(segment.idx.toInt()).bind()
-            val elementInstance = store.element(elementAddress)
+    segments.forEachIndexed { segmentIndex, segment ->
+        val mode = segment.mode as? ElementSegmentDeclaration.Mode.Active ?: return@forEachIndexed
+        val offset = constantExpressionEvaluator(store, instance, context.types, mode.offset).bind().toInt()
+        val tableAddress = instance.tableAddress(mode.tableIndex).bind()
+        val tableInstance = store.table(tableAddress)
+        val elementAddress = instance.elementAddress(segmentIndex).bind()
+        val elementInstance = store.element(elementAddress)
+        val elementsToInit = segment.initializers.size
 
-            val elementsToInit = segment.initExpressions.size
-
-            try {
-                elementInstance.elements.copyInto(tableInstance.elements, offset, 0, elementsToInit)
-            } catch (_: IndexOutOfBoundsException) {
-                Err(InvocationError.TableOperationOutOfBounds).bind<Unit>()
-            } catch (_: IllegalArgumentException) {
-                Err(InvocationError.TableOperationOutOfBounds).bind<Unit>()
-            }
-
-            elementInstance.elements = longArrayOf()
+        try {
+            elementInstance.elements.copyInto(tableInstance.elements, offset, 0, elementsToInit)
+        } catch (_: IndexOutOfBoundsException) {
+            Err(InvocationError.TableOperationOutOfBounds).bind<Unit>()
+        } catch (_: IllegalArgumentException) {
+            Err(InvocationError.TableOperationOutOfBounds).bind<Unit>()
         }
 
-    module.elementSegments
-        .filter { segment ->
-            segment.mode is ElementSegment.Mode.Declarative
-        }.forEach { segment ->
-            val elementAddress = instance.elementAddress(segment.idx.toInt()).bind()
-            val elementInstance = store.element(elementAddress)
-            elementInstance.elements = longArrayOf()
-        }
+        elementInstance.elements = longArrayOf()
+    }
+
+    segments.forEachIndexed { segmentIndex, segment ->
+        if (segment.mode != ElementSegmentDeclaration.Mode.Declarative) return@forEachIndexed
+        val elementAddress = instance.elementAddress(segmentIndex).bind()
+        val elementInstance = store.element(elementAddress)
+        elementInstance.elements = longArrayOf()
+    }
 }

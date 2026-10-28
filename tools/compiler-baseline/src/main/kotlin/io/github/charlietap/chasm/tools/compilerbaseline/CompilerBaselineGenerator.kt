@@ -15,6 +15,7 @@ import io.github.charlietap.chasm.decoder.WasmModuleDecoder
 import io.github.charlietap.chasm.decoder.error.ModuleDecoderError
 import io.github.charlietap.chasm.executor.instantiator.ModuleInstantiator
 import io.github.charlietap.chasm.executor.invoker.FunctionInvoker
+import io.github.charlietap.chasm.module.ModuleDeclarationsFactory
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.ext.function
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
@@ -53,7 +54,7 @@ class ChasmModuleInstantiator : CompilerModuleInstantiator {
         ModuleInstantiator(
             config = config,
             store = store,
-            module = module,
+            module = ModuleDeclarationsFactory(module),
             imports = imports,
             codeInstaller = { compileStore, instance, runtimeTypes, types ->
                 ModuleCompiler(compileStore, module, instance, runtimeTypes, types, diagnostics)

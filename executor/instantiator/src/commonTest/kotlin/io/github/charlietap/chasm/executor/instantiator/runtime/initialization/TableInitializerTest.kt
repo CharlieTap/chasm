@@ -1,18 +1,15 @@
 package io.github.charlietap.chasm.executor.instantiator.runtime.initialization
 
 import com.github.michaelbull.result.Ok
+import io.github.charlietap.chasm.declarations.ConstantInstruction
+import io.github.charlietap.chasm.declarations.ElementSegmentDeclaration
 import io.github.charlietap.chasm.executor.instantiator.ConstantExpressionEvaluator
 import io.github.charlietap.chasm.executor.instantiator.initialization.TableInitializer
-import io.github.charlietap.chasm.fixture.ast.instruction.expression
-import io.github.charlietap.chasm.fixture.ast.instruction.i32ConstInstruction
-import io.github.charlietap.chasm.fixture.ast.module.activeElementSegmentMode
-import io.github.charlietap.chasm.fixture.ast.module.declarativeElementSegmentMode
-import io.github.charlietap.chasm.fixture.ast.module.elementIndex
-import io.github.charlietap.chasm.fixture.ast.module.elementSegment
-import io.github.charlietap.chasm.fixture.ast.module.module
-import io.github.charlietap.chasm.fixture.ast.module.tableIndex
 import io.github.charlietap.chasm.fixture.config.runtimeConfig
+import io.github.charlietap.chasm.fixture.executor.instantiator.constantExpression
+import io.github.charlietap.chasm.fixture.executor.instantiator.elementSegmentDeclaration
 import io.github.charlietap.chasm.fixture.executor.instantiator.instantiationContext
+import io.github.charlietap.chasm.fixture.executor.instantiator.moduleDeclarations
 import io.github.charlietap.chasm.fixture.runtime.instance.elementAddress
 import io.github.charlietap.chasm.fixture.runtime.instance.elementInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
@@ -27,22 +24,15 @@ class TableInitializerTest {
     @Test
     fun `can initialize a table on a module instance`() {
 
-        val activeTableIndex = tableIndex(0u)
-        val activeOffsetExpression = expression(
-            listOf(
-                i32ConstInstruction(117),
+        val activeOffsetExpression = constantExpression(ConstantInstruction.I32Const(117))
+        val activeSegment = elementSegmentDeclaration(
+            mode = ElementSegmentDeclaration.Mode.Active(
+                tableIndex = 0,
+                offset = activeOffsetExpression,
             ),
         )
-        val activeSegment = elementSegment(
-            idx = elementIndex(0u),
-            mode = activeElementSegmentMode(
-                tableIndex = activeTableIndex,
-                offsetExpr = activeOffsetExpression,
-            ),
-        )
-        val declarativeSegment = elementSegment(
-            idx = elementIndex(1u),
-            mode = declarativeElementSegmentMode(),
+        val declarativeSegment = elementSegmentDeclaration(
+            mode = ElementSegmentDeclaration.Mode.Declarative,
         )
 
         val config = runtimeConfig()
@@ -53,7 +43,7 @@ class TableInitializerTest {
             tables = mutableListOf(tableInst),
             elements = mutableListOf(activeElemInst, declarativeElemInst),
         )
-        val module = module(
+        val module = moduleDeclarations(
             elementSegments = listOf(activeSegment, declarativeSegment),
         )
         val instance = moduleInstance(

@@ -4,12 +4,6 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.getOrElse
-import io.github.charlietap.chasm.ast.instruction.AggregateInstruction
-import io.github.charlietap.chasm.ast.instruction.Expression
-import io.github.charlietap.chasm.ast.instruction.NumericInstruction
-import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
-import io.github.charlietap.chasm.ast.instruction.VariableInstruction
-import io.github.charlietap.chasm.ast.instruction.VectorInstruction
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.declarations.ConstantExpression
 import io.github.charlietap.chasm.declarations.ConstantInstruction
@@ -40,14 +34,7 @@ import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
 import io.github.charlietap.chasm.type.ext.asArrayType
 import io.github.charlietap.chasm.type.ext.asStructType
 
-typealias ConstantExpressionEvaluator = (Store, ModuleInstance, ModuleTypeResolver, Expression) -> Result<Long, InvocationError>
-
-fun ConstantExpressionEvaluator(
-    store: Store,
-    instance: ModuleInstance,
-    types: ModuleTypeResolver,
-    expression: Expression,
-): Result<Long, InvocationError> = ConstantExpressionEvaluator(store, instance, types, constantExpression(expression))
+typealias ConstantExpressionEvaluator = (Store, ModuleInstance, ModuleTypeResolver, ConstantExpression) -> Result<Long, InvocationError>
 
 fun ConstantExpressionEvaluator(
     store: Store,
@@ -204,40 +191,3 @@ private fun definedType(
     typeIndex: Int,
 ): DefinedType =
     types.definedType(Index.TypeIndex(typeIndex.toUInt()))
-
-private fun constantExpression(
-    expression: Expression,
-): ConstantExpression = ConstantExpression(
-    expression.instructions.mapNotNull { instruction ->
-        when (instruction) {
-            is NumericInstruction.I32Const -> ConstantInstruction.I32Const(instruction.value)
-            is NumericInstruction.I64Const -> ConstantInstruction.I64Const(instruction.value)
-            is NumericInstruction.F32Const -> ConstantInstruction.F32Const(instruction.bits)
-            is NumericInstruction.F64Const -> ConstantInstruction.F64Const(instruction.bits)
-            is NumericInstruction.I32Add -> ConstantInstruction.I32Add
-            is NumericInstruction.I32Sub -> ConstantInstruction.I32Sub
-            is NumericInstruction.I32Mul -> ConstantInstruction.I32Mul
-            is NumericInstruction.I64Add -> ConstantInstruction.I64Add
-            is NumericInstruction.I64Sub -> ConstantInstruction.I64Sub
-            is NumericInstruction.I64Mul -> ConstantInstruction.I64Mul
-            is VectorInstruction.V128Const -> ConstantInstruction.V128Const(low = 0, high = 0)
-            is VariableInstruction.GlobalGet -> ConstantInstruction.GlobalGet(instruction.globalIdx.position())
-            is ReferenceInstruction.RefNull -> ConstantInstruction.RefNull(instruction.type)
-            is ReferenceInstruction.RefFunc -> ConstantInstruction.RefFunc(instruction.funcIdx.position())
-            is AggregateInstruction.StructNew -> ConstantInstruction.StructNew(instruction.typeIndex.position())
-            is AggregateInstruction.StructNewDefault -> ConstantInstruction.StructNewDefault(instruction.typeIndex.position())
-            is AggregateInstruction.ArrayNew -> ConstantInstruction.ArrayNew(instruction.typeIndex.position())
-            is AggregateInstruction.ArrayNewDefault -> ConstantInstruction.ArrayNewDefault(instruction.typeIndex.position())
-            is AggregateInstruction.ArrayNewFixed -> ConstantInstruction.ArrayNewFixed(
-                typeIndex = instruction.typeIndex.position(),
-                size = instruction.size.toInt(),
-            )
-            is AggregateInstruction.RefI31 -> ConstantInstruction.RefI31
-            is AggregateInstruction.AnyConvertExtern -> ConstantInstruction.AnyConvertExtern
-            is AggregateInstruction.ExternConvertAny -> ConstantInstruction.ExternConvertAny
-            else -> null
-        }
-    },
-)
-
-private fun Index.position(): Int = idx.toInt()

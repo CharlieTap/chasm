@@ -3,7 +3,6 @@ package io.github.charlietap.chasm.executor.instantiator.allocation
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.executor.instantiator.allocation.function.WasmFunctionAllocator
-import io.github.charlietap.chasm.executor.instantiator.allocation.type.TypeAllocator
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
 import io.github.charlietap.chasm.executor.instantiator.matching.ImportMatcher
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
@@ -55,8 +54,8 @@ internal inline fun PartialModuleAllocator(
         }
     }
 
-    module.functions.forEach { function ->
-        wasmFunctionAllocator(module, instance, function, store).bind()
+    module.functionTypeIndices.forEach { typeIndex ->
+        wasmFunctionAllocator(module, instance, typeIndex, store).bind()
     }
 
     instance

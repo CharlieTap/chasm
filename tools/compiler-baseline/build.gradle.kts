@@ -18,6 +18,7 @@ kotlin {
         implementation(projects.decoder)
         implementation(projects.executor.instantiator)
         implementation(projects.executor.invoker)
+        implementation(projects.module)
         implementation(projects.runtime.address)
         implementation(projects.runtime.core)
         implementation(projects.runtime.resources)

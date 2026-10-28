@@ -13,7 +13,7 @@ kotlin {
     sourceSets {
        commonMain {
             dependencies {
-                api(projects.ast)
+                api(projects.moduleDeclarations)
                 api(projects.runtime.core)
                 api(projects.libs.parallel)
                 api(libs.result)
