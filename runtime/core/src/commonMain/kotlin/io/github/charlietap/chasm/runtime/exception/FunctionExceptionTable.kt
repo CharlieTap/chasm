@@ -36,6 +36,14 @@ class FunctionExceptionTable(
     val endIp: Int
         get() = entryIp + instructionCount
 
+    val firstCatchOrdinals: IntArray = IntArray(regions.size).also { ordinals ->
+        var ordinal = 0
+        for (index in regions.indices) {
+            ordinals[index] = ordinal
+            ordinal += regions[index].catches.size
+        }
+    }
+
     fun relocated(entryIp: Int): FunctionExceptionTable = FunctionExceptionTable(
         entryIp,
         instructionCount,

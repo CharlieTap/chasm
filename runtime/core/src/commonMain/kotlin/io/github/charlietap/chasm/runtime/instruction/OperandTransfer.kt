@@ -65,6 +65,13 @@ internal class OperandTransferSchedule(
         "OperandTransferSchedule(operationCount=$operationCount, scratchSaveCount=$scratchSaveCount)"
 }
 
+private val inPlaceSchedule = OperandTransferSchedule(IntArray(0), LongArray(0), scratchSaveCount = 0)
+
+private fun encodeOperation(
+    operation: Int,
+    index: Int,
+): Int = (operation shl OPERAND_TRANSFER_OPERATION_SHIFT) or index
+
 internal const val OPERAND_TRANSFER_COPY_SLOT = 0
 internal const val OPERAND_TRANSFER_COPY_IMMEDIATE = 1
 internal const val OPERAND_TRANSFER_SAVE_SLOT = 2
@@ -85,25 +92,13 @@ private fun compileOperandTransferSchedule(
             remainingCount++
         }
     }
-    if (remainingCount == 0) {
-        return OperandTransferSchedule(IntArray(0), LongArray(0), scratchSaveCount = 0)
-    }
+    if (remainingCount == 0) return inPlaceSchedule
 
     val operations = IntArray(sources.size * 2)
     val values = LongArray(sources.size * 2)
     var operationCount = 0
     var scratchSaveCount = 0
     var pendingRestore = -1
-
-    fun emit(
-        operation: Int,
-        index: Int,
-        value: Long,
-    ) {
-        operations[operationCount] = (operation shl OPERAND_TRANSFER_OPERATION_SHIFT) or index
-        values[operationCount] = value
-        operationCount++
-    }
 
     while (remainingCount > 0) {
         var safeMove = -1
@@ -127,8 +122,14 @@ private fun compileOperandTransferSchedule(
 
         if (safeMove >= 0) {
             when (val source = sources[safeMove]) {
-                is TransferSource.Immediate -> emit(OPERAND_TRANSFER_COPY_IMMEDIATE, safeMove, source.value)
-                is TransferSource.Slot -> emit(OPERAND_TRANSFER_COPY_SLOT, safeMove, source.slot.toLong())
+                is TransferSource.Immediate -> {
+                    operations[operationCount] = encodeOperation(OPERAND_TRANSFER_COPY_IMMEDIATE, safeMove)
+                    values[operationCount++] = source.value
+                }
+                is TransferSource.Slot -> {
+                    operations[operationCount] = encodeOperation(OPERAND_TRANSFER_COPY_SLOT, safeMove)
+                    values[operationCount++] = source.slot.toLong()
+                }
             }
             remaining[safeMove] = false
             remainingCount--
@@ -136,14 +137,16 @@ private fun compileOperandTransferSchedule(
         }
 
         if (pendingRestore >= 0) {
-            emit(OPERAND_TRANSFER_RESTORE, pendingRestore, 0L)
+            operations[operationCount] = encodeOperation(OPERAND_TRANSFER_RESTORE, pendingRestore)
+            values[operationCount++] = 0L
             pendingRestore = -1
             continue
         }
 
         val cycleMove = remaining.indexOfFirst { it }
         val source = sources[cycleMove] as TransferSource.Slot
-        emit(OPERAND_TRANSFER_SAVE_SLOT, 0, source.slot.toLong())
+        operations[operationCount] = encodeOperation(OPERAND_TRANSFER_SAVE_SLOT, 0)
+        values[operationCount++] = source.slot.toLong()
         scratchSaveCount++
         pendingRestore = cycleMove
         remaining[cycleMove] = false
@@ -151,7 +154,8 @@ private fun compileOperandTransferSchedule(
     }
 
     if (pendingRestore >= 0) {
-        emit(OPERAND_TRANSFER_RESTORE, pendingRestore, 0L)
+        operations[operationCount] = encodeOperation(OPERAND_TRANSFER_RESTORE, pendingRestore)
+        values[operationCount++] = 0L
     }
 
     return OperandTransferSchedule(

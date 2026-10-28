@@ -9,4 +9,6 @@ class WasmFunctionCallStrategy(
 ) {
     val isInstalled: Boolean
         get() = entryIp >= 0
+
+    var compiledEntry: CompiledFunction? = null
 }

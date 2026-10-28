@@ -69,6 +69,12 @@ class Program
             return entryIp
         }
 
+        fun reserve(
+            count: Int,
+        ) {
+            ensureCapacity(size + count)
+        }
+
         fun replace(index: Int, value: DispatchableInstruction) {
             require(index in 0 until size) {
                 "program instruction index is out of bounds"

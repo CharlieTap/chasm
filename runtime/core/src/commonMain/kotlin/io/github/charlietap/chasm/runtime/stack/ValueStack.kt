@@ -452,7 +452,10 @@ class ValueStack(
     }
 
     /** Walks an exceptional return without copying results or running the ordinary return path. */
-    fun unwindCallerFrame(activationHeaderSlot: Int): Int {
+    fun unwindCallerFrame(
+        activationHeaderSlot: Int,
+        allowNestedExit: Boolean = false,
+    ): Int {
         val calleeFp = fp
         val slot = calleeFp + activationHeaderSlot
         if (slot !in elements.indices) {
@@ -461,7 +464,8 @@ class ValueStack(
         val header = elements[slot]
         val returnIp = activationReturnIp(header)
         val delta = activationCallerFrameDelta(header)
-        if (if (returnIp == Int.MAX_VALUE) delta != 0 || calleeFp != 0 else delta <= 0 || delta > calleeFp) {
+        val invalidExit = if (allowNestedExit) delta < 0 || delta > calleeFp else delta != 0 || calleeFp != 0
+        if (if (returnIp == Int.MAX_VALUE) invalidExit else delta <= 0 || delta > calleeFp) {
             throw InvocationException(InvocationError.ProgramFinishedInconsistentState)
         }
         fp = calleeFp - delta

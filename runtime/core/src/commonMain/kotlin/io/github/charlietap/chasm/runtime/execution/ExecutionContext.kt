@@ -14,9 +14,11 @@ import io.github.charlietap.chasm.host.HostTable
 import io.github.charlietap.chasm.host.HostTag
 import io.github.charlietap.chasm.host.ModuleIndex
 import io.github.charlietap.chasm.runtime.heap.WasmHeap
+import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
+import kotlin.jvm.JvmField
 
 data class ExecutionContext(
     val vstack: ValueStack,
@@ -25,6 +27,30 @@ data class ExecutionContext(
     val config: RuntimeConfig,
 ) : HostResources {
     val heap: WasmHeap = store.heap
+
+    @JvmField
+    var compiledCallDepth: Int = store.compiledCallDepth
+
+    @JvmField
+    var compiledStackLimit: Int = minOf(
+        CompiledStack.budget.toLong(),
+        store.config.limits.stackBytes?.div(CompiledStack.UNIT_BYTES) ?: Long.MAX_VALUE,
+    ).toInt()
+
+    @JvmField
+    var pendingTailFunction: FunctionInstance? = null
+
+    @JvmField
+    var pendingTailCaller: ModuleInstance? = null
+
+    @JvmField
+    var pendingTailArguments: LongArray? = null
+
+    @JvmField
+    var compiledUnwinding: Boolean = false
+
+    @JvmField
+    var nestedInterpreter: NestedInterpreter? = null
 
     override val references: HostReferences
         get() = heap

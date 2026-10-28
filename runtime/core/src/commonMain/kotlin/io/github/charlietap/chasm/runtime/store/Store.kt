@@ -26,4 +26,6 @@ class Store(
 ) {
     // The most slots any one invocation's ValueStack may hold.
     val maxStackSlots: Int = ValueStack.maxCapacityFor(config.limits.stackBytes)
+
+    var compiledCallDepth: Int = 0
 }

@@ -628,6 +628,16 @@ class WasmHeap internal constructor(
         return allocateStruct(runtimeType, initialFields)
     }
 
+    fun allocateStruct(
+        context: ExecutionContext,
+        runtimeType: RTT,
+        source: LongArray,
+        sourceOffset: Int,
+    ): Long {
+        prepareStructAllocation(context, runtimeType)
+        return garbageCollectedHeap.allocateStruct(structDescriptorKey(runtimeType), source, sourceOffset)
+    }
+
     fun allocateStructFromStack(
         runtimeType: RTT,
         fieldCount: Int,

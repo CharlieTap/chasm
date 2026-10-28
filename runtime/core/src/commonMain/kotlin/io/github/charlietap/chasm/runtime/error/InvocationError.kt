@@ -190,6 +190,8 @@ sealed interface InvocationError : ModuleTrapError {
 
     data object ProgramFinishedInconsistentState : InvocationError
 
+    data object InterpreterUnavailable : InvocationError
+
     @JvmInline
     value class GarbageCollectionFailed(val message: String) : InvocationError
 
