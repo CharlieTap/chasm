@@ -36,10 +36,7 @@ fun invoke(
     args: List<ExecutionValue> = [],
 ): ChasmResult<List<ExecutionValue>, ChasmError.ExecutionError> {
 
-    val extern = instance.instance.exports
-        .firstOrNull { export ->
-            export.name.name == name
-        }?.value
+    val extern = instance.exportsByName[name]
 
     val address = (extern as? ExternalValue.Function)?.address ?: return Error(
         ChasmError.ExecutionError(InvocationError.FunctionNotFound(name).toString()),
@@ -80,9 +77,7 @@ internal fun invoke(
     invoker: FunctionInvoker,
 ): ChasmResult<List<ExecutionValue>, ChasmError.ExecutionError> {
 
-    val extern = instance.instance.exports.firstOrNull { export ->
-        export.name.name == name
-    }?.value
+    val extern = instance.exportsByName[name]
 
     val address = (extern as? ExternalValue.Function)?.address ?: return Error(
         ChasmError.ExecutionError(InvocationError.FunctionNotFound(name).toString()),
