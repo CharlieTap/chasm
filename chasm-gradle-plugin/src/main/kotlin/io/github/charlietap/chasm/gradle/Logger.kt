@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.gradle
 
+import io.github.charlietap.chasm.bindgen.BindgenLogger
 import org.gradle.api.logging.Logger as GradleLogger
 
 internal class PluginLogger(

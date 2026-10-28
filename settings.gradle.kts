@@ -86,6 +86,8 @@ include(":test:fixture:type-system")
 
 include(":tools:compiler-baseline")
 
+include(":tooling:bindgen")
+
 include(":type-system")
 include(":validator")
 include(":vm")

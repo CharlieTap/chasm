@@ -121,6 +121,7 @@ chasm-coroutines-jvm = { module = "io.github.charlietap.chasm:chasm-coroutines-j
 chasm-coroutines-kmp = { module = "io.github.charlietap.chasm:chasm-coroutines", version.ref = "version-name"}
 vm-jvm = { module = "io.github.charlietap.chasm:vm-jvm", version.ref = "version-name"}
 vm-kmp = { module = "io.github.charlietap.chasm:vm", version.ref = "version-name"}
+tooling-bindgen = { module = "io.github.charlietap.chasm:tooling-bindgen", version.ref = "version-name"}
 
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "dagger"}
 hilt-core = { module = "com.google.dagger:hilt-core", version.ref = "dagger"}

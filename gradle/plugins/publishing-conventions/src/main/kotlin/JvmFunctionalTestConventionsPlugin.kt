@@ -7,10 +7,12 @@ import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.publish.maven.tasks.AbstractPublishToMaven
 import org.gradle.api.publish.maven.tasks.GenerateMavenPom
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Sync
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.configureEach
 import org.gradle.kotlin.dsl.create
+import org.gradle.kotlin.dsl.findByType
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.register
@@ -25,6 +27,9 @@ class JvmFunctionalTestConventionsPlugin @Inject constructor(
     private val softwareComponentFactory: SoftwareComponentFactory,
 ) : Plugin<Project> {
     override fun apply(project: Project) {
+        project.pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
+            configureJvmProjectRepository(project)
+        }
         project.pluginManager.withPlugin("org.jetbrains.kotlin.multiplatform") {
             project.extensions
                 .getByType<KotlinMultiplatformExtension>()
@@ -149,7 +154,62 @@ class JvmFunctionalTestConventionsPlugin @Inject constructor(
         }
     }
 
+    private fun configureJvmProjectRepository(project: Project) {
+        val publicationGroup = project.group.toString()
+        val publicationVersion = project.version.toString()
+        val artifactId = publishedArtifactId(project, MAVEN_PUBLICATION_NAME, project.name)
+        val functionalTestRepository = project.layout.buildDirectory.dir(FUNCTIONAL_TEST_REPOSITORY_PATH)
+        val staging = project.tasks.register<Sync>(STAGE_JVM_RUNTIME_TASK_NAME) {
+            description = "Stages the JVM runtime for functional tests"
+            dependsOn(GENERATE_MAVEN_POM_TASK_NAME)
+            from(project.tasks.named<Jar>("jar").flatMap { it.archiveFile }) {
+                rename { "${artifactId.get()}-$publicationVersion.jar" }
+            }
+            from(project.layout.buildDirectory.file("publications/maven/pom-default.xml")) {
+                rename { "${artifactId.get()}-$publicationVersion.pom" }
+            }
+            into(
+                functionalTestRepository.map { repository ->
+                    repository.dir("${publicationGroup.replace('.', '/')}/${artifactId.get()}/$publicationVersion")
+                },
+            )
+        }
+
+        val repositoryDependencies = project.configurations.dependencyScope(
+            FUNCTIONAL_TEST_REPOSITORY_DEPENDENCIES_CONFIGURATION_NAME,
+        )
+        project.configurations.named(RUNTIME_CLASSPATH_CONFIGURATION).configure {
+            allDependencies.withType(ProjectDependency::class.java).configureEach {
+                repositoryDependencies.get().dependencies.add(copy())
+            }
+        }
+        project.configurations.consumable(FUNCTIONAL_TEST_REPOSITORY_ELEMENTS_CONFIGURATION_NAME) {
+            extendsFrom(repositoryDependencies.get())
+            attributes {
+                attribute(
+                    Category.CATEGORY_ATTRIBUTE,
+                    project.objects.named(Category::class.java, FUNCTIONAL_TEST_REPOSITORY_CATEGORY),
+                )
+            }
+            outgoing.artifact(functionalTestRepository) {
+                builtBy(staging)
+            }
+        }
+    }
+
+    private fun publishedArtifactId(
+        project: Project,
+        publicationName: String,
+        default: String,
+    ): Provider<String> = project.provider {
+        val publications = project.extensions.findByType<PublishingExtension>()?.publications
+        (publications?.findByName(publicationName) as? MavenPublication)?.artifactId ?: default
+    }
+
     private companion object {
+        private const val MAVEN_PUBLICATION_NAME = "maven"
+        private const val GENERATE_MAVEN_POM_TASK_NAME = "generatePomFileForMavenPublication"
+        private const val RUNTIME_CLASSPATH_CONFIGURATION = "runtimeClasspath"
         private const val JVM_TARGET_NAME = "jvm"
         private const val FUNCTIONAL_TEST_REPOSITORY_PATH = "functional-test-repository"
         private const val FUNCTIONAL_TEST_JVM_PUBLICATION_NAME = "functionalTestJvm"

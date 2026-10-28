@@ -111,6 +111,7 @@ class ChasmPlugin : Plugin<Project> {
             configuration.description = "Dependencies for the Chasm codegen worker"
         }
         project.dependencies.add(dependencies.name, BuildConfig.CHASM_JVM_DEPENDENCY)
+        project.dependencies.add(dependencies.name, BuildConfig.TOOLING_BINDGEN_DEPENDENCY)
         project.dependencies.add(dependencies.name, resolveKotlinPoetNotation())
 
         return project.configurations.resolvable(WORKER_CLASSPATH_CONFIGURATION_NAME) { configuration ->

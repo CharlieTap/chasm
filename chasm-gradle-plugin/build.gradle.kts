@@ -8,7 +8,6 @@ import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
 
 plugins {
     alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.kotlinx.test.resources)
     alias(libs.plugins.build.config)
     `java-gradle-plugin`
 
@@ -27,6 +26,7 @@ fun MinimalExternalModuleDependency.notation(): String {
 val wasiPreview1Dependency = libs.wasi.emscripten.host.chasm.wasip1.kmp.get().notation()
 
 buildConfig {
+    buildConfigField("TOOLING_BINDGEN_DEPENDENCY", libs.tooling.bindgen.get().notation())
     buildConfigField("CHASM_DEPENDENCY", libs.chasm.kmp.get().notation())
     buildConfigField("CHASM_JVM_DEPENDENCY", libs.chasm.jvm.get().notation())
     buildConfigField("CHASM_COROUTINES_DEPENDENCY", libs.chasm.coroutines.kmp.get().notation())
@@ -85,14 +85,8 @@ kotlin {
         compileOnly(projects.chasm) {
             because("We use the module and moduleInfo calls during codegen")
         }
+        compileOnly(projects.tooling.bindgen)
         compileOnly(libs.kotlin.poet)
-
-        testImplementation(libs.kotlin.test)
-        testImplementation(libs.kotlinx.test.resources)
-        testImplementation(projects.chasm)
-        testImplementation(projects.vm)
-        testImplementation(libs.kotlin.poet)
-        testImplementation(projects.test.fixture.chasm)
     }
 }
 
@@ -139,6 +133,7 @@ val functionalTestRepositories = configurations.resolvable("functionalTestReposi
 
 dependencies {
     add(functionalTestRepositoryDependencies.name, projects.chasm)
+    add(functionalTestRepositoryDependencies.name, projects.tooling.bindgen)
     add(functionalTestRepositoryDependencies.name, projects.chasmCoroutines)
     add(functionalTestRepositoryDependencies.name, projects.vm)
 }
