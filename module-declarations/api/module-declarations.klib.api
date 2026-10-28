@@ -1,0 +1,234 @@
+// Klib ABI Dump
+// Targets: [iosArm64, iosSimulatorArm64, linuxArm64, linuxX64, macosArm64, mingwX64]
+// Rendering settings:
+// - Signature version: 2
+// - Show manifest properties: true
+// - Show declarations: true
+
+// Library unique name: <io.github.charlietap.chasm:module-declarations>
+sealed interface io.github.charlietap.chasm.ast.module/Index { // io.github.charlietap.chasm.ast.module/Index|null[0]
+    abstract val idx // io.github.charlietap.chasm.ast.module/Index.idx|{}idx[0]
+        abstract fun <get-idx>(): kotlin/UInt // io.github.charlietap.chasm.ast.module/Index.idx.<get-idx>|<get-idx>(){}[0]
+
+    final value class DataIndex : io.github.charlietap.chasm.ast.module/Index { // io.github.charlietap.chasm.ast.module/Index.DataIndex|null[0]
+        constructor <init>(kotlin/UInt) // io.github.charlietap.chasm.ast.module/Index.DataIndex.<init>|<init>(kotlin.UInt){}[0]
+
+        final val idx // io.github.charlietap.chasm.ast.module/Index.DataIndex.idx|{}idx[0]
+            final fun <get-idx>(): kotlin/UInt // io.github.charlietap.chasm.ast.module/Index.DataIndex.idx.<get-idx>|<get-idx>(){}[0]
+
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.module/Index.DataIndex.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.module/Index.DataIndex.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.module/Index.DataIndex.toString|toString(){}[0]
+    }
+
+    final value class ElementIndex : io.github.charlietap.chasm.ast.module/Index { // io.github.charlietap.chasm.ast.module/Index.ElementIndex|null[0]
+        constructor <init>(kotlin/UInt) // io.github.charlietap.chasm.ast.module/Index.ElementIndex.<init>|<init>(kotlin.UInt){}[0]
+
+        final val idx // io.github.charlietap.chasm.ast.module/Index.ElementIndex.idx|{}idx[0]
+            final fun <get-idx>(): kotlin/UInt // io.github.charlietap.chasm.ast.module/Index.ElementIndex.idx.<get-idx>|<get-idx>(){}[0]
+
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.module/Index.ElementIndex.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.module/Index.ElementIndex.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.module/Index.ElementIndex.toString|toString(){}[0]
+    }
+
+    final value class FieldIndex : io.github.charlietap.chasm.ast.module/Index { // io.github.charlietap.chasm.ast.module/Index.FieldIndex|null[0]
+        constructor <init>(kotlin/UInt) // io.github.charlietap.chasm.ast.module/Index.FieldIndex.<init>|<init>(kotlin.UInt){}[0]
+
+        final val idx // io.github.charlietap.chasm.ast.module/Index.FieldIndex.idx|{}idx[0]
+            final fun <get-idx>(): kotlin/UInt // io.github.charlietap.chasm.ast.module/Index.FieldIndex.idx.<get-idx>|<get-idx>(){}[0]
+
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.module/Index.FieldIndex.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.module/Index.FieldIndex.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.module/Index.FieldIndex.toString|toString(){}[0]
+    }
+
+    final value class FunctionIndex : io.github.charlietap.chasm.ast.module/Index { // io.github.charlietap.chasm.ast.module/Index.FunctionIndex|null[0]
+        constructor <init>(kotlin/UInt) // io.github.charlietap.chasm.ast.module/Index.FunctionIndex.<init>|<init>(kotlin.UInt){}[0]
+
+        final val idx // io.github.charlietap.chasm.ast.module/Index.FunctionIndex.idx|{}idx[0]
+            final fun <get-idx>(): kotlin/UInt // io.github.charlietap.chasm.ast.module/Index.FunctionIndex.idx.<get-idx>|<get-idx>(){}[0]
+
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.module/Index.FunctionIndex.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.module/Index.FunctionIndex.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.module/Index.FunctionIndex.toString|toString(){}[0]
+    }
+
+    final value class GlobalIndex : io.github.charlietap.chasm.ast.module/Index { // io.github.charlietap.chasm.ast.module/Index.GlobalIndex|null[0]
+        constructor <init>(kotlin/UInt) // io.github.charlietap.chasm.ast.module/Index.GlobalIndex.<init>|<init>(kotlin.UInt){}[0]
+
+        final val idx // io.github.charlietap.chasm.ast.module/Index.GlobalIndex.idx|{}idx[0]
+            final fun <get-idx>(): kotlin/UInt // io.github.charlietap.chasm.ast.module/Index.GlobalIndex.idx.<get-idx>|<get-idx>(){}[0]
+
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.module/Index.GlobalIndex.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.module/Index.GlobalIndex.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.module/Index.GlobalIndex.toString|toString(){}[0]
+    }
+
+    final value class LabelIndex : io.github.charlietap.chasm.ast.module/Index { // io.github.charlietap.chasm.ast.module/Index.LabelIndex|null[0]
+        constructor <init>(kotlin/UInt) // io.github.charlietap.chasm.ast.module/Index.LabelIndex.<init>|<init>(kotlin.UInt){}[0]
+
+        final val idx // io.github.charlietap.chasm.ast.module/Index.LabelIndex.idx|{}idx[0]
+            final fun <get-idx>(): kotlin/UInt // io.github.charlietap.chasm.ast.module/Index.LabelIndex.idx.<get-idx>|<get-idx>(){}[0]
+
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.module/Index.LabelIndex.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.module/Index.LabelIndex.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.module/Index.LabelIndex.toString|toString(){}[0]
+    }
+
+    final value class LocalIndex : io.github.charlietap.chasm.ast.module/Index { // io.github.charlietap.chasm.ast.module/Index.LocalIndex|null[0]
+        constructor <init>(kotlin/UInt) // io.github.charlietap.chasm.ast.module/Index.LocalIndex.<init>|<init>(kotlin.UInt){}[0]
+
+        final val idx // io.github.charlietap.chasm.ast.module/Index.LocalIndex.idx|{}idx[0]
+            final fun <get-idx>(): kotlin/UInt // io.github.charlietap.chasm.ast.module/Index.LocalIndex.idx.<get-idx>|<get-idx>(){}[0]
+
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.module/Index.LocalIndex.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.module/Index.LocalIndex.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.module/Index.LocalIndex.toString|toString(){}[0]
+    }
+
+    final value class MemoryIndex : io.github.charlietap.chasm.ast.module/Index { // io.github.charlietap.chasm.ast.module/Index.MemoryIndex|null[0]
+        constructor <init>(kotlin/UInt) // io.github.charlietap.chasm.ast.module/Index.MemoryIndex.<init>|<init>(kotlin.UInt){}[0]
+
+        final val idx // io.github.charlietap.chasm.ast.module/Index.MemoryIndex.idx|{}idx[0]
+            final fun <get-idx>(): kotlin/UInt // io.github.charlietap.chasm.ast.module/Index.MemoryIndex.idx.<get-idx>|<get-idx>(){}[0]
+
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.module/Index.MemoryIndex.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.module/Index.MemoryIndex.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.module/Index.MemoryIndex.toString|toString(){}[0]
+    }
+
+    final value class TableIndex : io.github.charlietap.chasm.ast.module/Index { // io.github.charlietap.chasm.ast.module/Index.TableIndex|null[0]
+        constructor <init>(kotlin/UInt) // io.github.charlietap.chasm.ast.module/Index.TableIndex.<init>|<init>(kotlin.UInt){}[0]
+
+        final val idx // io.github.charlietap.chasm.ast.module/Index.TableIndex.idx|{}idx[0]
+            final fun <get-idx>(): kotlin/UInt // io.github.charlietap.chasm.ast.module/Index.TableIndex.idx.<get-idx>|<get-idx>(){}[0]
+
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.module/Index.TableIndex.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.module/Index.TableIndex.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.module/Index.TableIndex.toString|toString(){}[0]
+    }
+
+    final value class TagIndex : io.github.charlietap.chasm.ast.module/Index { // io.github.charlietap.chasm.ast.module/Index.TagIndex|null[0]
+        constructor <init>(kotlin/UInt) // io.github.charlietap.chasm.ast.module/Index.TagIndex.<init>|<init>(kotlin.UInt){}[0]
+
+        final val idx // io.github.charlietap.chasm.ast.module/Index.TagIndex.idx|{}idx[0]
+            final fun <get-idx>(): kotlin/UInt // io.github.charlietap.chasm.ast.module/Index.TagIndex.idx.<get-idx>|<get-idx>(){}[0]
+
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.module/Index.TagIndex.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.module/Index.TagIndex.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.module/Index.TagIndex.toString|toString(){}[0]
+    }
+
+    final value class TypeIndex : io.github.charlietap.chasm.ast.module/Index { // io.github.charlietap.chasm.ast.module/Index.TypeIndex|null[0]
+        constructor <init>(kotlin/UInt) // io.github.charlietap.chasm.ast.module/Index.TypeIndex.<init>|<init>(kotlin.UInt){}[0]
+
+        final val idx // io.github.charlietap.chasm.ast.module/Index.TypeIndex.idx|{}idx[0]
+            final fun <get-idx>(): kotlin/UInt // io.github.charlietap.chasm.ast.module/Index.TypeIndex.idx.<get-idx>|<get-idx>(){}[0]
+
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.module/Index.TypeIndex.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.module/Index.TypeIndex.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.module/Index.TypeIndex.toString|toString(){}[0]
+    }
+}
+
+sealed interface io.github.charlietap.chasm.ast.value/Value // io.github.charlietap.chasm.ast.value/Value|null[0]
+
+final class io.github.charlietap.chasm.ast.module/Import { // io.github.charlietap.chasm.ast.module/Import|null[0]
+    constructor <init>(io.github.charlietap.chasm.ast.value/NameValue, io.github.charlietap.chasm.ast.value/NameValue, io.github.charlietap.chasm.ast.module/Import.Descriptor) // io.github.charlietap.chasm.ast.module/Import.<init>|<init>(io.github.charlietap.chasm.ast.value.NameValue;io.github.charlietap.chasm.ast.value.NameValue;io.github.charlietap.chasm.ast.module.Import.Descriptor){}[0]
+
+    final val descriptor // io.github.charlietap.chasm.ast.module/Import.descriptor|{}descriptor[0]
+        final fun <get-descriptor>(): io.github.charlietap.chasm.ast.module/Import.Descriptor // io.github.charlietap.chasm.ast.module/Import.descriptor.<get-descriptor>|<get-descriptor>(){}[0]
+    final val entityName // io.github.charlietap.chasm.ast.module/Import.entityName|{}entityName[0]
+        final fun <get-entityName>(): io.github.charlietap.chasm.ast.value/NameValue // io.github.charlietap.chasm.ast.module/Import.entityName.<get-entityName>|<get-entityName>(){}[0]
+    final val moduleName // io.github.charlietap.chasm.ast.module/Import.moduleName|{}moduleName[0]
+        final fun <get-moduleName>(): io.github.charlietap.chasm.ast.value/NameValue // io.github.charlietap.chasm.ast.module/Import.moduleName.<get-moduleName>|<get-moduleName>(){}[0]
+
+    final fun component1(): io.github.charlietap.chasm.ast.value/NameValue // io.github.charlietap.chasm.ast.module/Import.component1|component1(){}[0]
+    final fun component2(): io.github.charlietap.chasm.ast.value/NameValue // io.github.charlietap.chasm.ast.module/Import.component2|component2(){}[0]
+    final fun component3(): io.github.charlietap.chasm.ast.module/Import.Descriptor // io.github.charlietap.chasm.ast.module/Import.component3|component3(){}[0]
+    final fun copy(io.github.charlietap.chasm.ast.value/NameValue = ..., io.github.charlietap.chasm.ast.value/NameValue = ..., io.github.charlietap.chasm.ast.module/Import.Descriptor = ...): io.github.charlietap.chasm.ast.module/Import // io.github.charlietap.chasm.ast.module/Import.copy|copy(io.github.charlietap.chasm.ast.value.NameValue;io.github.charlietap.chasm.ast.value.NameValue;io.github.charlietap.chasm.ast.module.Import.Descriptor){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.module/Import.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.module/Import.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.module/Import.toString|toString(){}[0]
+
+    sealed interface Descriptor { // io.github.charlietap.chasm.ast.module/Import.Descriptor|null[0]
+        final value class Function : io.github.charlietap.chasm.ast.module/Import.Descriptor { // io.github.charlietap.chasm.ast.module/Import.Descriptor.Function|null[0]
+            constructor <init>(io.github.charlietap.chasm.ast.module/Index.TypeIndex) // io.github.charlietap.chasm.ast.module/Import.Descriptor.Function.<init>|<init>(io.github.charlietap.chasm.ast.module.Index.TypeIndex){}[0]
+
+            final val typeIndex // io.github.charlietap.chasm.ast.module/Import.Descriptor.Function.typeIndex|{}typeIndex[0]
+                final fun <get-typeIndex>(): io.github.charlietap.chasm.ast.module/Index.TypeIndex // io.github.charlietap.chasm.ast.module/Import.Descriptor.Function.typeIndex.<get-typeIndex>|<get-typeIndex>(){}[0]
+
+            final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.module/Import.Descriptor.Function.equals|equals(kotlin.Any?){}[0]
+            final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.module/Import.Descriptor.Function.hashCode|hashCode(){}[0]
+            final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.module/Import.Descriptor.Function.toString|toString(){}[0]
+        }
+
+        final value class Global : io.github.charlietap.chasm.ast.module/Import.Descriptor { // io.github.charlietap.chasm.ast.module/Import.Descriptor.Global|null[0]
+            constructor <init>(io.github.charlietap.chasm.type/GlobalType) // io.github.charlietap.chasm.ast.module/Import.Descriptor.Global.<init>|<init>(io.github.charlietap.chasm.type.GlobalType){}[0]
+
+            final val type // io.github.charlietap.chasm.ast.module/Import.Descriptor.Global.type|{}type[0]
+                final fun <get-type>(): io.github.charlietap.chasm.type/GlobalType // io.github.charlietap.chasm.ast.module/Import.Descriptor.Global.type.<get-type>|<get-type>(){}[0]
+
+            final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.module/Import.Descriptor.Global.equals|equals(kotlin.Any?){}[0]
+            final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.module/Import.Descriptor.Global.hashCode|hashCode(){}[0]
+            final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.module/Import.Descriptor.Global.toString|toString(){}[0]
+        }
+
+        final value class Memory : io.github.charlietap.chasm.ast.module/Import.Descriptor { // io.github.charlietap.chasm.ast.module/Import.Descriptor.Memory|null[0]
+            constructor <init>(io.github.charlietap.chasm.type/MemoryType) // io.github.charlietap.chasm.ast.module/Import.Descriptor.Memory.<init>|<init>(io.github.charlietap.chasm.type.MemoryType){}[0]
+
+            final val type // io.github.charlietap.chasm.ast.module/Import.Descriptor.Memory.type|{}type[0]
+                final fun <get-type>(): io.github.charlietap.chasm.type/MemoryType // io.github.charlietap.chasm.ast.module/Import.Descriptor.Memory.type.<get-type>|<get-type>(){}[0]
+
+            final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.module/Import.Descriptor.Memory.equals|equals(kotlin.Any?){}[0]
+            final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.module/Import.Descriptor.Memory.hashCode|hashCode(){}[0]
+            final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.module/Import.Descriptor.Memory.toString|toString(){}[0]
+        }
+
+        final value class Table : io.github.charlietap.chasm.ast.module/Import.Descriptor { // io.github.charlietap.chasm.ast.module/Import.Descriptor.Table|null[0]
+            constructor <init>(io.github.charlietap.chasm.type/TableType) // io.github.charlietap.chasm.ast.module/Import.Descriptor.Table.<init>|<init>(io.github.charlietap.chasm.type.TableType){}[0]
+
+            final val type // io.github.charlietap.chasm.ast.module/Import.Descriptor.Table.type|{}type[0]
+                final fun <get-type>(): io.github.charlietap.chasm.type/TableType // io.github.charlietap.chasm.ast.module/Import.Descriptor.Table.type.<get-type>|<get-type>(){}[0]
+
+            final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.module/Import.Descriptor.Table.equals|equals(kotlin.Any?){}[0]
+            final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.module/Import.Descriptor.Table.hashCode|hashCode(){}[0]
+            final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.module/Import.Descriptor.Table.toString|toString(){}[0]
+        }
+
+        final value class Tag : io.github.charlietap.chasm.ast.module/Import.Descriptor { // io.github.charlietap.chasm.ast.module/Import.Descriptor.Tag|null[0]
+            constructor <init>(io.github.charlietap.chasm.type/TagType) // io.github.charlietap.chasm.ast.module/Import.Descriptor.Tag.<init>|<init>(io.github.charlietap.chasm.type.TagType){}[0]
+
+            final val type // io.github.charlietap.chasm.ast.module/Import.Descriptor.Tag.type|{}type[0]
+                final fun <get-type>(): io.github.charlietap.chasm.type/TagType // io.github.charlietap.chasm.ast.module/Import.Descriptor.Tag.type.<get-type>|<get-type>(){}[0]
+
+            final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.module/Import.Descriptor.Tag.equals|equals(kotlin.Any?){}[0]
+            final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.module/Import.Descriptor.Tag.hashCode|hashCode(){}[0]
+            final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.module/Import.Descriptor.Tag.toString|toString(){}[0]
+        }
+    }
+}
+
+final value class io.github.charlietap.chasm.ast.value/NameValue : io.github.charlietap.chasm.ast.value/Value { // io.github.charlietap.chasm.ast.value/NameValue|null[0]
+    constructor <init>(kotlin/String) // io.github.charlietap.chasm.ast.value/NameValue.<init>|<init>(kotlin.String){}[0]
+
+    final val name // io.github.charlietap.chasm.ast.value/NameValue.name|{}name[0]
+        final fun <get-name>(): kotlin/String // io.github.charlietap.chasm.ast.value/NameValue.name.<get-name>|<get-name>(){}[0]
+
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.value/NameValue.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.value/NameValue.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.value/NameValue.toString|toString(){}[0]
+}
+
+final fun (io.github.charlietap.chasm.ast.module/Index.DataIndex).io.github.charlietap.chasm.ast.module/toInt(): kotlin/Int // io.github.charlietap.chasm.ast.module/toInt|toInt@io.github.charlietap.chasm.ast.module.Index.DataIndex(){}[0]
+final fun (io.github.charlietap.chasm.ast.module/Index.ElementIndex).io.github.charlietap.chasm.ast.module/toInt(): kotlin/Int // io.github.charlietap.chasm.ast.module/toInt|toInt@io.github.charlietap.chasm.ast.module.Index.ElementIndex(){}[0]
+final fun (io.github.charlietap.chasm.ast.module/Index.FieldIndex).io.github.charlietap.chasm.ast.module/toInt(): kotlin/Int // io.github.charlietap.chasm.ast.module/toInt|toInt@io.github.charlietap.chasm.ast.module.Index.FieldIndex(){}[0]
+final fun (io.github.charlietap.chasm.ast.module/Index.FunctionIndex).io.github.charlietap.chasm.ast.module/toInt(): kotlin/Int // io.github.charlietap.chasm.ast.module/toInt|toInt@io.github.charlietap.chasm.ast.module.Index.FunctionIndex(){}[0]
+final fun (io.github.charlietap.chasm.ast.module/Index.GlobalIndex).io.github.charlietap.chasm.ast.module/toInt(): kotlin/Int // io.github.charlietap.chasm.ast.module/toInt|toInt@io.github.charlietap.chasm.ast.module.Index.GlobalIndex(){}[0]
+final fun (io.github.charlietap.chasm.ast.module/Index.LabelIndex).io.github.charlietap.chasm.ast.module/toInt(): kotlin/Int // io.github.charlietap.chasm.ast.module/toInt|toInt@io.github.charlietap.chasm.ast.module.Index.LabelIndex(){}[0]
+final fun (io.github.charlietap.chasm.ast.module/Index.LocalIndex).io.github.charlietap.chasm.ast.module/toInt(): kotlin/Int // io.github.charlietap.chasm.ast.module/toInt|toInt@io.github.charlietap.chasm.ast.module.Index.LocalIndex(){}[0]
+final fun (io.github.charlietap.chasm.ast.module/Index.MemoryIndex).io.github.charlietap.chasm.ast.module/toInt(): kotlin/Int // io.github.charlietap.chasm.ast.module/toInt|toInt@io.github.charlietap.chasm.ast.module.Index.MemoryIndex(){}[0]
+final fun (io.github.charlietap.chasm.ast.module/Index.TableIndex).io.github.charlietap.chasm.ast.module/toInt(): kotlin/Int // io.github.charlietap.chasm.ast.module/toInt|toInt@io.github.charlietap.chasm.ast.module.Index.TableIndex(){}[0]
+final fun (io.github.charlietap.chasm.ast.module/Index.TagIndex).io.github.charlietap.chasm.ast.module/toInt(): kotlin/Int // io.github.charlietap.chasm.ast.module/toInt|toInt@io.github.charlietap.chasm.ast.module.Index.TagIndex(){}[0]
+final fun (io.github.charlietap.chasm.ast.module/Index.TypeIndex).io.github.charlietap.chasm.ast.module/toInt(): kotlin/Int // io.github.charlietap.chasm.ast.module/toInt|toInt@io.github.charlietap.chasm.ast.module.Index.TypeIndex(){}[0]

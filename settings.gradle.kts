@@ -38,6 +38,7 @@ dependencyResolutionManagement {
 }
 
 include(":ast")
+include(":module-declarations")
 include(":benchmark")
 include(":chasm")
 include(":chasm-coroutines")

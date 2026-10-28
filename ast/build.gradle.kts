@@ -18,6 +18,7 @@ kotlin {
     sourceSets {
        commonMain {
             dependencies {
+                api(projects.moduleDeclarations)
                 api(projects.typeSystem)
             }
         }
