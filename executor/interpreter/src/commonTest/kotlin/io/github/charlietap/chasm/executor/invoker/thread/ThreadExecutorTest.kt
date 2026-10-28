@@ -6,7 +6,7 @@ import io.github.charlietap.chasm.config.GCStrategy
 import io.github.charlietap.chasm.config.GCThreshold
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.EndFunctionDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.control.CallDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.control.HostCallDispatcher
 import io.github.charlietap.chasm.fixture.config.runtimeConfig
 import io.github.charlietap.chasm.fixture.runtime.exception.compiledCatch
 import io.github.charlietap.chasm.fixture.runtime.exception.exceptionRegion
@@ -16,7 +16,7 @@ import io.github.charlietap.chasm.fixture.runtime.function.runtimeFunction
 import io.github.charlietap.chasm.fixture.runtime.instance.hostFunctionInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.wasmFunctionInstance
-import io.github.charlietap.chasm.fixture.runtime.instruction.hostCallRuntimeInstruction
+import io.github.charlietap.chasm.fixture.runtime.instruction.operandTransfer
 import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.fixture.runtime.type.rtt
 import io.github.charlietap.chasm.fixture.runtime.value.i32
@@ -68,7 +68,7 @@ class ThreadExecutorTest {
         )
         val entryIp = program.append(
             arrayOf(
-                CallDispatcher(hostCallRuntimeInstruction(instance = hostFunction, caller = module)),
+                HostCallDispatcher(hostFunction, module, operandTransfer(), callFrameOffset = 0, resultDestinationSlot = null),
                 EndFunctionDispatcher(resultCount = 1, activationHeaderSlot = 1),
             ),
         )
@@ -124,7 +124,7 @@ class ThreadExecutorTest {
             },
         )
         val entryIp = program.append(
-            CallDispatcher(hostCallRuntimeInstruction(instance = hostFunction, caller = module)),
+            HostCallDispatcher(hostFunction, module, operandTransfer(), callFrameOffset = 0, resultDestinationSlot = null),
         )
         val function = wasmFunctionInstance(
             module = module,

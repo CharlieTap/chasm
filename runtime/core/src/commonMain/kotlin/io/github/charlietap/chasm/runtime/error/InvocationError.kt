@@ -2,7 +2,6 @@ package io.github.charlietap.chasm.runtime.error
 
 import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.runtime.diagnostic.TrapSnapshot
-import io.github.charlietap.chasm.runtime.instruction.LinkedInstruction
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.type.ValueType
 import kotlin.jvm.JvmInline
@@ -176,9 +175,6 @@ sealed interface InvocationError : ModuleTrapError {
     data object FuelExhausted : InvocationError
 
     data object Interrupted : InvocationError
-
-    @JvmInline
-    value class UnimplementedInstruction(val instruction: LinkedInstruction) : InvocationError
 
     data object Unreachable : InvocationError
 

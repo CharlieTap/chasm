@@ -8,11 +8,7 @@ import io.github.charlietap.chasm.fixture.runtime.instance.hostFunctionInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.tableInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.wasmFunctionInstance
-import io.github.charlietap.chasm.fixture.runtime.instruction.callIndirectIRuntimeInstruction
-import io.github.charlietap.chasm.fixture.runtime.instruction.callRefSRuntimeInstruction
-import io.github.charlietap.chasm.fixture.runtime.instruction.functionReturnRuntimeInstruction
 import io.github.charlietap.chasm.fixture.runtime.instruction.operandTransfer
-import io.github.charlietap.chasm.fixture.runtime.instruction.wasmCallRuntimeInstruction
 import io.github.charlietap.chasm.fixture.runtime.stack.vstack
 import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.fixture.runtime.value.functionReferenceValue
@@ -26,8 +22,7 @@ import io.github.charlietap.chasm.host.readI32
 import io.github.charlietap.chasm.host.writeI32
 import io.github.charlietap.chasm.runtime.ext.toLong
 import io.github.charlietap.chasm.runtime.function.LocalInitialization
-import io.github.charlietap.chasm.runtime.instruction.ControlInstruction
-import io.github.charlietap.chasm.runtime.instruction.OperandTransfer
+import io.github.charlietap.chasm.runtime.function.classifyLocalInitialization
 import io.github.charlietap.chasm.runtime.instruction.TransferSource
 import io.github.charlietap.chasm.runtime.program.Program
 import kotlin.contextOf
@@ -38,32 +33,22 @@ class StrictControlDispatchersTest {
 
     @Test
     fun `returns a direct Wasm result to its compiled caller slot`() {
-        val type = functionType(results = resultType(listOf(i32ValueType())))
-        val function = wasmFunctionInstance(
-            functionType = type,
-            function = runtimeFunction(
-                body = runtimeExpression(entryIp = 2),
-                frameSlots = 2,
-            ),
-        )
-        val call = wasmCallRuntimeInstruction(
-            strategy = function.callStrategy,
-            operands = operandTransfer(emptyArray(), destinationSlotBase = 2),
-            callFrameOffset = 2,
-        )
-        val returnInstruction = functionReturnRuntimeInstruction(
-            results = operandTransfer(
-                sources = arrayOf(TransferSource.Slot(0)),
-                destinationSlotBase = 0,
-            ),
-            activationHeaderSlot = 1,
-        )
         val program = Program().apply {
-            append(CallDispatcher(call, resultDestinationSlot = 0))
+            append(
+                WasmCallDispatcher(
+                    operands = operandTransfer(emptyArray(), destinationSlotBase = 2),
+                    callFrameOffset = 2,
+                    frameSlots = 2,
+                    entryIp = 2,
+                    activationHeaderSlot = 1,
+                    localInitialization = LocalInitialization.None,
+                    callSiteIp = 0,
+                    resultDestinationSlot = 0,
+                ),
+            )
             append(dispatchableInstruction())
-            append(FunctionReturnDispatcher(returnInstruction))
+            append(FunctionReturnDispatcher(operandTransfer(arrayOf(TransferSource.Slot(0)), destinationSlotBase = 0), activationHeaderSlot = 1))
         }
-        LinkWasmCallDispatchers(program, firstIp = 0)
         val store = store(program = program)
         val vstack = vstack().apply { reserveDepth(4) }
         val context = executionContext(vstack, store)
@@ -78,7 +63,7 @@ class StrictControlDispatchersTest {
     }
 
     @Test
-    fun `links normal and tail direct calls for every local initialization shape`() {
+    fun `initialises the callee's locals for every local initialization shape`() {
         val localInitialValues = listOf(
             longArrayOf(),
             longArrayOf(0),
@@ -88,66 +73,40 @@ class StrictControlDispatchersTest {
             longArrayOf(0, 0, 0, 0, 0),
             longArrayOf(0, 1),
         )
-        val program = Program()
-        val linkedSources = mutableListOf<ControlInstruction>()
 
-        for ((index, locals) in localInitialValues.withIndex()) {
-            val function = wasmFunctionInstance(
-                function = runtimeFunction(
-                    locals = locals,
-                    body = runtimeExpression(entryIp = 100 + index),
-                    frameSlots = locals.size + 1,
-                ),
+        for (locals in localInitialValues) {
+            val localInitialization = classifyLocalInitialization(locals)
+            val frameSlots = locals.size + 1
+            val call = WasmCallDispatcher(
+                operands = operandTransfer(emptyArray(), destinationSlotBase = 0),
+                callFrameOffset = 2,
+                frameSlots = frameSlots,
+                entryIp = 100,
+                activationHeaderSlot = 0,
+                localInitialization = localInitialization,
+                callSiteIp = 0,
+                resultDestinationSlot = null,
             )
-            val operands = OperandTransfer(emptyArray(), destinationSlotBase = 0)
-            val call = ControlInstruction.WasmCall(function.callStrategy, operands, callFrameOffset = 2)
-            val tailCall = ControlInstruction.ReturnWasmCall(
-                function.callStrategy,
-                operands,
+            val tailCall = ReturnWasmCallDispatcher(
+                frameSlots = frameSlots,
+                entryIp = 100,
+                activationHeaderSlot = 0,
                 callerActivationHeaderSlot = 0,
+                operands = operandTransfer(emptyArray(), destinationSlotBase = 0),
+                localInitialization = localInitialization,
             )
-            program.append(CallDispatcher(call))
-            program.append(ReturnCallDispatcher(tailCall))
+
+            for (dispatcher in listOf(call, tailCall)) {
+                val vstack = vstack().apply {
+                    reserveDepth(2 + frameSlots)
+                    for (slot in 0 until 2 + frameSlots) setFrameSlot(slot, -1)
+                }
+                val context = executionContext(vstack, store())
+
+                assertEquals(100, dispatcher(vstack, context, 1))
+                for (index in locals.indices) assertEquals(locals[index], vstack.getFrameSlot(1 + index))
+            }
         }
-
-        assertEquals(
-            localInitialValues.size * 2,
-            LinkWasmCallDispatchers(program, firstIp = 0) { _, source ->
-                linkedSources += source as ControlInstruction
-            },
-        )
-        assertEquals(localInitialValues.size * 2, linkedSources.size)
-        assertEquals(0, LinkWasmCallDispatchers(program, firstIp = 0))
-    }
-
-    @Test
-    fun `selects local initialization after the callee strategy is installed`() {
-        val strategy = wasmFunctionInstance(function = runtimeFunction(body = runtimeExpression(entryIp = -1))).callStrategy
-        val call = wasmCallRuntimeInstruction(
-            strategy = strategy,
-            operands = operandTransfer(emptyArray(), destinationSlotBase = 2),
-            callFrameOffset = 2,
-        )
-        val program = Program().apply {
-            append(CallDispatcher(call))
-            append(dispatchableInstruction())
-        }
-
-        strategy.entryIp = 1
-        strategy.frameSlots = 2
-        strategy.localInitialization = LocalInitialization.Zero1
-        LinkWasmCallDispatchers(program, firstIp = 0)
-
-        val store = store(program = program)
-        val vstack = vstack().apply {
-            reserveDepth(4)
-            setFrameSlot(3, 42)
-        }
-        val context = executionContext(vstack, store)
-
-        assertEquals(1, program.instructions[0](vstack, context, 1))
-        assertEquals(2, vstack.fp)
-        assertEquals(0, vstack.getFrameSlot(1))
     }
 
     @Test
@@ -169,21 +128,15 @@ class StrictControlDispatchersTest {
             setFrameSlot(0, 41)
             setFrameSlot(1, functionReferenceValue().toLong())
         }
-        val instruction = callRefSRuntimeInstruction(
-            functionSlot = 1,
-            operands = operandTransfer(
-                sources = arrayOf(TransferSource.Slot(0)),
-                destinationSlotBase = 2,
-            ),
-            callFrameOffset = 2,
-            caller = module,
-        )
 
-        val nextIp = CallDispatcher(instruction, callSiteIp = 10)(
-            vstack,
-            executionContext(vstack, store, module),
-            11,
-        )
+        val nextIp = CallRefSDispatcher(
+            functionSlot = 1,
+            operands = operandTransfer(arrayOf(TransferSource.Slot(0)), destinationSlotBase = 2),
+            caller = module,
+            callFrameOffset = 2,
+            callSiteIp = 10,
+            resultDestinationSlot = null,
+        )(vstack, executionContext(vstack, store, module), 11)
 
         assertEquals(11, nextIp)
         assertEquals(42L, vstack.getFrameSlot(2))
@@ -214,23 +167,17 @@ class StrictControlDispatchersTest {
             reserveDepth(2)
             setFrameSlot(0, 41)
         }
-        val instruction = callIndirectIRuntimeInstruction(
+
+        val nextIp = CallIndirectIDispatcher(
             elementIndex = 0,
-            operands = operandTransfer(
-                sources = arrayOf(TransferSource.Slot(0)),
-                destinationSlotBase = 1,
-            ),
+            operands = operandTransfer(arrayOf(TransferSource.Slot(0)), destinationSlotBase = 1),
             type = runtimeType,
             table = table,
-            callFrameOffset = 1,
             caller = module,
-        )
-
-        val nextIp = CallDispatcher(instruction, callSiteIp = 10)(
-            vstack,
-            executionContext(vstack, store, module),
-            11,
-        )
+            callFrameOffset = 1,
+            callSiteIp = 10,
+            resultDestinationSlot = null,
+        )(vstack, executionContext(vstack, store, module), 11)
 
         assertEquals(11, nextIp)
         assertEquals(42L, vstack.getFrameSlot(1))
@@ -259,23 +206,17 @@ class StrictControlDispatchersTest {
             reserveDepth(2)
             setFrameSlot(0, 41)
         }
-        val instruction = callIndirectIRuntimeInstruction(
+
+        val nextIp = CallIndirectIDispatcher(
             elementIndex = 0,
-            operands = operandTransfer(
-                sources = arrayOf(TransferSource.Slot(0)),
-                destinationSlotBase = 1,
-            ),
+            operands = operandTransfer(arrayOf(TransferSource.Slot(0)), destinationSlotBase = 1),
             type = runtimeType,
             table = table,
-            callFrameOffset = 1,
             caller = module,
-        )
-
-        val nextIp = CallDispatcher(instruction, callSiteIp = 10, resultDestinationSlot = 0)(
-            vstack,
-            executionContext(vstack, store, module),
-            11,
-        )
+            callFrameOffset = 1,
+            callSiteIp = 10,
+            resultDestinationSlot = 0,
+        )(vstack, executionContext(vstack, store, module), 11)
 
         assertEquals(11, nextIp)
         assertEquals(42L, vstack.getFrameSlot(0))
@@ -301,27 +242,22 @@ class StrictControlDispatchersTest {
         val table = tableInstance(
             elements = longArrayOf(functionReferenceValue().toLong()),
         )
-        val call = callIndirectIRuntimeInstruction(
-            elementIndex = 0,
-            operands = operandTransfer(emptyArray(), destinationSlotBase = 2),
-            type = runtimeType,
-            table = table,
-            callFrameOffset = 2,
-            caller = module,
-        )
-        val returnInstruction = functionReturnRuntimeInstruction(
-            results = operandTransfer(
-                sources = arrayOf(TransferSource.Slot(0)),
-                destinationSlotBase = 0,
+        program.append(dispatchableInstruction())
+        program.append(dispatchableInstruction())
+        program.append(
+            CallIndirectIDispatcher(
+                elementIndex = 0,
+                operands = operandTransfer(emptyArray(), destinationSlotBase = 2),
+                type = runtimeType,
+                table = table,
+                caller = module,
+                callFrameOffset = 2,
+                callSiteIp = 2,
+                resultDestinationSlot = 0,
             ),
-            activationHeaderSlot = 1,
         )
         program.append(dispatchableInstruction())
-        program.append(dispatchableInstruction())
-        program.append(CallDispatcher(call, resultDestinationSlot = 0))
-        program.append(dispatchableInstruction())
-        program.append(FunctionReturnDispatcher(returnInstruction))
-        LinkWasmCallDispatchers(program, firstIp = 2)
+        program.append(FunctionReturnDispatcher(operandTransfer(arrayOf(TransferSource.Slot(0)), destinationSlotBase = 0), activationHeaderSlot = 1))
         val vstack = vstack().apply { reserveDepth(4) }
         val context = executionContext(vstack, store, module)
 
@@ -351,21 +287,15 @@ class StrictControlDispatchersTest {
             setFrameSlot(0, 42)
             setFrameSlot(1, functionReferenceValue().toLong())
         }
-        val instruction = callRefSRuntimeInstruction(
-            functionSlot = 1,
-            operands = operandTransfer(
-                sources = arrayOf(TransferSource.Slot(0)),
-                destinationSlotBase = 2,
-            ),
-            callFrameOffset = 2,
-            caller = module,
-        )
 
-        val nextIp = CallDispatcher(instruction, callSiteIp = 10)(
-            vstack,
-            executionContext(vstack, store, module),
-            11,
-        )
+        val nextIp = CallRefSDispatcher(
+            functionSlot = 1,
+            operands = operandTransfer(arrayOf(TransferSource.Slot(0)), destinationSlotBase = 2),
+            caller = module,
+            callFrameOffset = 2,
+            callSiteIp = 10,
+            resultDestinationSlot = null,
+        )(vstack, executionContext(vstack, store, module), 11)
 
         assertEquals(37, nextIp)
         assertEquals(2, vstack.fp)

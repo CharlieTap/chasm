@@ -7,7 +7,7 @@ import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.map
 import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.EndFunctionDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.control.CallDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.control.HostCallDispatcher
 import io.github.charlietap.chasm.executor.invoker.function.HostFunctionCall
 import io.github.charlietap.chasm.executor.invoker.instruction.control.ThrowRefValueExecutor
 import io.github.charlietap.chasm.fixture.config.runtimeConfig
@@ -20,7 +20,7 @@ import io.github.charlietap.chasm.fixture.runtime.function.runtimeFunction
 import io.github.charlietap.chasm.fixture.runtime.instance.hostFunctionInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.wasmFunctionInstance
-import io.github.charlietap.chasm.fixture.runtime.instruction.hostCallRuntimeInstruction
+import io.github.charlietap.chasm.fixture.runtime.instruction.operandTransfer
 import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.fixture.runtime.type.rtt
 import io.github.charlietap.chasm.fixture.type.functionType
@@ -129,7 +129,7 @@ class HostExceptionIntegrationTest {
         )
         val entryIp = program.append(
             arrayOf(
-                CallDispatcher(hostCallRuntimeInstruction(instance = bridge, caller = module)),
+                HostCallDispatcher(bridge, module, operandTransfer(), callFrameOffset = 0, resultDestinationSlot = null),
                 EndFunctionDispatcher(resultCount = 1, activationHeaderSlot = 1),
             ),
         )

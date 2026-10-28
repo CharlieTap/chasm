@@ -6,8 +6,8 @@ import io.github.charlietap.chasm.benchmark.StabilizedBenchmark
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.executor.invoker.FunctionInvoker
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.EndFunctionDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.control.CallDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.control.ThrowRefDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.control.HostCallDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.control.ThrowRefSDispatcher
 import io.github.charlietap.chasm.fixture.runtime.function.runtimeExpression
 import io.github.charlietap.chasm.fixture.runtime.function.runtimeFunction
 import io.github.charlietap.chasm.fixture.runtime.instance.hostFunctionInstance
@@ -32,7 +32,6 @@ import io.github.charlietap.chasm.runtime.exception.ExceptionRegion
 import io.github.charlietap.chasm.runtime.exception.FunctionExceptionTable
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
-import io.github.charlietap.chasm.runtime.instruction.ControlInstruction
 import io.github.charlietap.chasm.runtime.instruction.OperandTransfer
 import io.github.charlietap.chasm.runtime.instruction.TransferSource
 import io.github.charlietap.chasm.runtime.program.Program
@@ -115,19 +114,18 @@ class HostExceptionBenchmark : StabilizedBenchmark() {
             },
         )
         val invocation = if (hostRaised) {
-            CallDispatcher(
-                ControlInstruction.HostCall(
-                    instance = hostFunction,
-                    caller = module,
-                    operands = OperandTransfer(
-                        sources = Array(payloadSize) { TransferSource.Slot(it) },
-                        destinationSlotBase = 0,
-                    ),
-                    callFrameOffset = 0,
+            HostCallDispatcher(
+                function = hostFunction,
+                caller = module,
+                operands = OperandTransfer(
+                    sources = Array(payloadSize) { TransferSource.Slot(it) },
+                    destinationSlotBase = 0,
                 ),
+                callFrameOffset = 0,
+                resultDestinationSlot = null,
             )
         } else {
-            val throwInstruction = ThrowRefDispatcher(ControlInstruction.ThrowRefS(exceptionSlot = 1))
+            val throwInstruction = ThrowRefSDispatcher(exceptionSlot = 1)
             DispatchableInstruction { vstack, context, nextIp ->
                 vstack.setFrameSlot(1, exception.rawReference)
                 throwInstruction(vstack, context, nextIp)
@@ -232,13 +230,12 @@ class HostExceptionBenchmark : StabilizedBenchmark() {
         )
         val entryIp = program.append(
             arrayOf(
-                CallDispatcher(
-                    ControlInstruction.HostCall(
-                        instance = bridge,
-                        caller = module,
-                        operands = OperandTransfer(emptyArray(), destinationSlotBase = 0),
-                        callFrameOffset = 0,
-                    ),
+                HostCallDispatcher(
+                    function = bridge,
+                    caller = module,
+                    operands = OperandTransfer(emptyArray(), destinationSlotBase = 0),
+                    callFrameOffset = 0,
+                    resultDestinationSlot = null,
                 ),
                 EndFunctionDispatcher(resultCount = 1, activationHeaderSlot = 1),
             ),
@@ -280,7 +277,7 @@ class HostExceptionBenchmark : StabilizedBenchmark() {
         module: ModuleInstance,
         exceptionReference: Long,
     ): FunctionInstance.WasmFunction {
-        val throwInstruction = ThrowRefDispatcher(ControlInstruction.ThrowRefS(exceptionSlot = 1))
+        val throwInstruction = ThrowRefSDispatcher(exceptionSlot = 1)
         return wasmFunctionInstance(
             module = module,
             function = runtimeFunction(

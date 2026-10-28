@@ -96,15 +96,6 @@ class ValueStack(
         elements = LongArray(minOf(powerOfTwoAtLeast(minimumCapacity), this.maxCapacity))
     }
 
-    fun getLocal(localIndex: Int): Long = getFrameSlot(localIndex)
-
-    fun setLocal(
-        localIndex: Int,
-        value: Long,
-    ) {
-        setFrameSlot(localIndex, value)
-    }
-
     fun getFrameSlot(slot: Int): Long = elements[fp + slot]
 
     fun getFrameSlot(
@@ -148,12 +139,6 @@ class ValueStack(
         throw InvocationException(InvocationError.MissingStackValue)
     }
 
-    fun peekI32(): Int = try {
-        elements[sp - 1].toInt()
-    } catch (_: IndexOutOfBoundsException) {
-        throw InvocationException(InvocationError.MissingStackValue)
-    }
-
     fun peekNthI32(n: Int): Int = try {
         elements[sp - 1 - n].toInt()
     } catch (_: IndexOutOfBoundsException) {
@@ -171,12 +156,6 @@ class ValueStack(
     fun popI32(): Int = try {
         sp--
         elements[sp].toInt()
-    } catch (_: IndexOutOfBoundsException) {
-        throw InvocationException(InvocationError.MissingStackValue)
-    }
-
-    fun peekNthI64(n: Int): Long = try {
-        elements[sp - 1 - n]
     } catch (_: IndexOutOfBoundsException) {
         throw InvocationException(InvocationError.MissingStackValue)
     }
@@ -200,20 +179,8 @@ class ValueStack(
         pushI32(value.toRawBits())
     }
 
-    fun popF32(): Float = try {
-        Float.fromBits(popI32())
-    } catch (_: IndexOutOfBoundsException) {
-        throw InvocationException(InvocationError.MissingStackValue)
-    }
-
     fun pushF64(value: Double) {
         pushI64(value.toRawBits())
-    }
-
-    fun popF64(): Double = try {
-        Double.fromBits(popI64())
-    } catch (_: IndexOutOfBoundsException) {
-        throw InvocationException(InvocationError.MissingStackValue)
     }
 
     fun push(

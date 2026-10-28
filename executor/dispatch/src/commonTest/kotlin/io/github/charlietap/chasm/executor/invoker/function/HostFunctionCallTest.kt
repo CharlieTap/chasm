@@ -3,8 +3,8 @@
 package io.github.charlietap.chasm.executor.invoker.function
 
 import io.github.charlietap.chasm.InternalChasmApi
-import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.invoker.instruction.control.ReturnExecutor
+import io.github.charlietap.chasm.fixture.runtime.execution.executionContext
 import io.github.charlietap.chasm.fixture.runtime.instance.hostFunctionInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.runtime.stack.vstack
