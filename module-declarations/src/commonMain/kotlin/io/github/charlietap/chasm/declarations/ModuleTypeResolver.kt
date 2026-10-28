@@ -23,6 +23,13 @@ class ModuleTypeResolver(
     private val functionTypeIndices: IntArray,
 ) {
 
+    constructor(
+        declarations: ModuleDeclarations,
+    ) : this(
+        definedTypes = declarations.definedTypes,
+        functionTypeIndices = functionTypeIndices(declarations.imports, declarations.functionTypeIndices),
+    )
+
     private val substitution = Substitution.TypeIndexToDefinedType(definedTypes)
 
     fun definedType(index: Index.TypeIndex): DefinedType = definedTypes[index.toInt()]
@@ -35,11 +42,11 @@ class ModuleTypeResolver(
     fun blockType(type: BlockType): FunctionType = BlockTypeExpander(definedTypes, type)
         ?: error("block type is not a function type: $type")
 
-    fun resolve(type: TableType): TableType = TableTypeSubstitutor(type, substitution)
+    fun resolve(type: TableType): TableType = TableTypeSubstitutor(type.copy(), substitution)
 
-    fun resolve(type: GlobalType): GlobalType = GlobalTypeSubstitutor(type, substitution)
+    fun resolve(type: GlobalType): GlobalType = GlobalTypeSubstitutor(type.copy(), substitution)
 
-    fun resolve(type: TagType): TagType = TagTypeSubstitutor(type, substitution)
+    fun resolve(type: TagType): TagType = TagTypeSubstitutor(type.copy(functionType = type.functionType.copy()), substitution)
 
     fun resolve(type: ReferenceType): ReferenceType = ReferenceTypeSubstitutor(type, substitution)
 

@@ -107,4 +107,39 @@ class ModuleTypeResolverTest {
         )
         assertEquals(resolvedReference, resolver.resolve(indexedReference))
     }
+
+    @Test
+    fun leavesTheModulesTypesUnchanged() {
+        val definedType = definedType()
+        val indexedReference = refNullReferenceType(
+            heapType = concreteTypeIndexHeapType(0),
+        )
+        val tableType = tableType(referenceType = indexedReference)
+        val globalType = globalType(valueType = referenceValueType(indexedReference))
+        val tagType = tagType(
+            functionType = functionType(
+                params = resultType(listOf(referenceValueType(indexedReference))),
+                results = resultType(listOf(referenceValueType(indexedReference))),
+            ),
+        )
+        val resolver = module(definedTypes = listOf(definedType)).typeResolver()
+
+        repeat(2) {
+            resolver.resolve(tableType)
+            resolver.resolve(globalType)
+            resolver.resolve(tagType)
+        }
+
+        assertEquals(tableType(referenceType = indexedReference), tableType)
+        assertEquals(globalType(valueType = referenceValueType(indexedReference)), globalType)
+        assertEquals(
+            tagType(
+                functionType = functionType(
+                    params = resultType(listOf(referenceValueType(indexedReference))),
+                    results = resultType(listOf(referenceValueType(indexedReference))),
+                ),
+            ),
+            tagType,
+        )
+    }
 }

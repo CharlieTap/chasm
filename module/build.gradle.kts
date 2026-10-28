@@ -14,6 +14,7 @@ kotlin {
         commonMain {
             dependencies {
                 api(projects.ast)
+                api(projects.moduleDeclarations)
                 api(projects.config)
                 api(projects.decoder)
                 api(projects.validator)
@@ -26,6 +27,7 @@ kotlin {
             dependencies {
                 implementation(libs.kotlin.test)
                 implementation(libs.kotlinx.coroutines.test)
+                implementation(projects.test.fixture.ast)
             }
         }
     }
