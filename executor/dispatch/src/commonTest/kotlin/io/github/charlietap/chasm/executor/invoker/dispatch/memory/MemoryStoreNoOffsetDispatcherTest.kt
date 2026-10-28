@@ -13,8 +13,6 @@ import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.instance.MemoryInstance
-import io.github.charlietap.chasm.runtime.instruction.MemArg
-import io.github.charlietap.chasm.runtime.instruction.MemoryInstruction
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
 import io.github.charlietap.chasm.runtime.memory.LinearMemory.Companion.PAGE_SIZE
 import kotlin.test.Test
@@ -25,10 +23,9 @@ class MemoryStoreNoOffsetDispatcherTest {
 
     @Test
     fun `stores at an unsigned address above the signed range trap without an offset`() {
-        val memArg = MemArg(0)
         val dispatchers: List<(MemoryInstance) -> DispatchableInstruction> = listOf(
-            { memory -> I32StoreDispatcher(MemoryInstruction.I32StoreSs(1, 0, memory, memArg)) },
-            { memory -> I32Store8Dispatcher(MemoryInstruction.I32Store8Is(-1, 0, memory, memArg)) },
+            { memory -> I32StoreSsDispatcher(1, 0, memory, offset = 0) },
+            { memory -> I32Store8IsDispatcher(-1, 0, memory, offset = 0) },
         )
 
         // 0xFFFFFFFC and 0xFFFFFFFF are both far beyond a one page memory.

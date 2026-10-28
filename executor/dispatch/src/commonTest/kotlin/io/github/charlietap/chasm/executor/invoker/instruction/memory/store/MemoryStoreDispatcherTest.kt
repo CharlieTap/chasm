@@ -1,6 +1,10 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.memory.store
 
-import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
+import io.github.charlietap.chasm.executor.invoker.dispatch.memory.I32Store8SsDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.memory.I32StoreIiDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.memory.I32StoreSsDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.memory.I64Store16IiDispatcher
+import io.github.charlietap.chasm.fixture.runtime.execution.executionContext
 import io.github.charlietap.chasm.fixture.runtime.instance.memoryInstance
 import io.github.charlietap.chasm.fixture.runtime.stack.vstack
 import io.github.charlietap.chasm.fixture.type.limits
@@ -11,8 +15,6 @@ import io.github.charlietap.chasm.memory.read.I64Reader
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.instance.MemoryInstance
-import io.github.charlietap.chasm.runtime.instruction.MemArg
-import io.github.charlietap.chasm.runtime.instruction.MemoryInstruction
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
 import io.github.charlietap.chasm.runtime.memory.LinearMemory.Companion.PAGE_SIZE
 import io.github.charlietap.chasm.runtime.stack.ValueStack
@@ -20,7 +22,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
-class MemoryStoreExecutorTest {
+class MemoryStoreDispatcherTest {
 
     @Test
     fun `stores at an unsigned address above the signed range trap instead of wrapping`() {
@@ -46,20 +48,19 @@ class MemoryStoreExecutorTest {
     }
 
     private fun assertStoresTrap(address: Int, offset: Int, includeByteStores: Boolean = true) {
-        val memArg = MemArg(offset)
         val byteStore: (ValueStack, MemoryInstance) -> Unit = { vstack, memory ->
-            I32Store8Executor(vstack, executionContext(vstack = vstack), MemoryInstruction.I32Store8Ss(1, 0, memory, memArg))
+            I32Store8SsDispatcher(1, 0, memory, offset).invoke(vstack, executionContext(vstack = vstack), 1)
         }
         val stores: List<(ValueStack, MemoryInstance) -> Unit> = listOfNotNull(
             { vstack, memory ->
-                I32StoreExecutor(vstack, executionContext(vstack = vstack), MemoryInstruction.I32StoreIi(-1, address, memory, memArg))
+                I32StoreIiDispatcher(-1, address, memory, offset).invoke(vstack, executionContext(vstack = vstack), 1)
             },
             { vstack, memory ->
-                I32StoreExecutor(vstack, executionContext(vstack = vstack), MemoryInstruction.I32StoreSs(1, 0, memory, memArg))
+                I32StoreSsDispatcher(1, 0, memory, offset).invoke(vstack, executionContext(vstack = vstack), 1)
             },
             byteStore.takeIf { includeByteStores },
             { vstack, memory ->
-                I64Store16Executor(vstack, executionContext(vstack = vstack), MemoryInstruction.I64Store16Ii(-1L, address, memory, memArg))
+                I64Store16IiDispatcher(-1L, address, memory, offset).invoke(vstack, executionContext(vstack = vstack), 1)
             },
         )
 

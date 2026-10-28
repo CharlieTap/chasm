@@ -6,6 +6,7 @@ import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.instance.MemoryInstance
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
+import io.github.charlietap.chasm.runtime.operations.effectiveAddress
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 
 internal inline fun memoryLoadNoOffsetDispatcher(
