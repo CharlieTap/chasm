@@ -10,17 +10,19 @@ import io.github.charlietap.chasm.ast.module.FunctionNameSubsection
 import io.github.charlietap.chasm.ast.module.ModuleNameSubsection
 import io.github.charlietap.chasm.ast.module.NameData
 import io.github.charlietap.chasm.ast.module.toInt
-import io.github.charlietap.chasm.compiler.diagnostic.FunctionProvenance
-import io.github.charlietap.chasm.compiler.diagnostic.FunctionProvenanceCompiler
+import io.github.charlietap.chasm.compiler.backend.chasm.diagnostic.FunctionProvenance
+import io.github.charlietap.chasm.compiler.backend.chasm.diagnostic.FunctionProvenanceLinker
+import io.github.charlietap.chasm.compiler.frontend.DefinedFunctionCompiler
 import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.decoder.WasmFunctionBodyOffsets
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
 import io.github.charlietap.chasm.embedding.error.MemoryAccess
 import io.github.charlietap.chasm.embedding.shapes.Module
 import io.github.charlietap.chasm.runtime.diagnostic.TrapSnapshot
+import io.github.charlietap.chasm.runtime.ext.data
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
-import io.github.charlietap.chasm.runtime.instruction.LinkedInstruction
 import io.github.charlietap.chasm.ast.module.Module as AstModule
+import io.github.charlietap.chasm.cir.Instruction as CirInstruction
 import io.github.charlietap.chasm.runtime.store.Store as RuntimeStore
 
 internal class InterpreterTrapSource private constructor(
@@ -62,7 +64,7 @@ private class InterpreterFrames(
         .flatMap { subsection -> subsection.nameMap }
         .associate { association -> association.idx.toInt() to association.name.name }
 
-    private val compiler by lazy { FunctionProvenanceCompiler(runtime, module, instance) }
+    private val reconstruction by lazy { Reconstruction(module, instance, runtime) }
     private val functions = HashMap<Int, FunctionResolution?>()
 
     override val moduleName: String? = names.filterIsInstance<ModuleNameSubsection>().firstOrNull()?.name?.name
@@ -90,9 +92,9 @@ private class InterpreterFrames(
     ): FunctionResolution? {
         val definedIndex = module.functions.indexOfFirst { function -> function.idx.toInt() == functionIndex }
         if (definedIndex < 0) return null
-        val provenance = compiler.compile(definedIndex).get()
-            ?.takeIf { compiled ->
-                compiled.matchesInstalled(runtime.program, snapshot.entryIps[frameIndex], snapshot.endIps[frameIndex])
+        val provenance = reconstruction.compiler.compile(definedIndex, recordProvenance = true).get()
+            ?.let { compiled ->
+                reconstruction.linker.link(compiled, runtime.program, snapshot.entryIps[frameIndex], snapshot.endIps[frameIndex])
             } ?: return null
         val body = module.functions[definedIndex].body.instructions
         val offsets = WasmFunctionBodyOffsets(config, binary, definedIndex)
@@ -105,8 +107,10 @@ private class InterpreterFrames(
         source: SourceSite,
     ): MemoryAccess? {
         val instruction = source.instruction as? MemoryInstruction ?: return null
-        val linked = source.linked ?: return null
-        val operands = MemoryOperands(linked, snapshot.innermostFrameSlots) ?: return null
+        val compiled = source.compiled ?: return null
+        val operands = MemoryOperands(compiled, snapshot.innermostFrameSlots) { data ->
+            instance.dataAddresses.getOrNull(data.index)?.let { address -> runtime.data(address).bytes.size.toLong() }
+        } ?: return null
         val base = operands.address ?: return null
         val access = when (instruction) {
             is MemoryInstruction.Load -> access(
@@ -163,10 +167,19 @@ private class InterpreterFrames(
     ): Boolean = access.address + access.width > access.memorySize
 }
 
+private class Reconstruction(
+    ast: AstModule,
+    instance: ModuleInstance,
+    store: RuntimeStore,
+) {
+    val compiler by lazy { DefinedFunctionCompiler(ast) }
+    val linker by lazy { FunctionProvenanceLinker(store, ast, instance) }
+}
+
 private class SourceSite(
     override val offset: Int,
     val instruction: Instruction,
-    val linked: LinkedInstruction?,
+    val compiled: CirInstruction?,
     private val frames: InterpreterFrames,
 ) : TrapSite {
     override fun memoryAccess(): MemoryAccess? = frames.memoryAccess(this)
@@ -183,14 +196,14 @@ private class FunctionResolution(
         frames: InterpreterFrames,
     ): SourceSite? {
         if (compiledOffset !in 0 until provenance.size) return null
-        val start = provenance.sourceStarts[compiledOffset]
-        val end = provenance.sourceEnds[compiledOffset]
+        val start = provenance.sourceStart(compiledOffset)
+        val end = provenance.sourceEnd(compiledOffset)
         if (start == FunctionProvenance.NO_SOURCE || start !in body.indices || end <= start) return null
         val chosen = (start until minOf(end, body.size)).firstOrNull { index -> body[index].canTrap() } ?: start
         return SourceSite(
             offset = offsets[chosen],
             instruction = body[chosen],
-            linked = provenance.linkedInstruction(compiledOffset),
+            compiled = provenance.instruction(compiledOffset),
             frames = frames,
         )
     }

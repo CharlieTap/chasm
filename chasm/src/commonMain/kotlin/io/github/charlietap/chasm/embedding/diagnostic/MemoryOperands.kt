@@ -1,7 +1,8 @@
 package io.github.charlietap.chasm.embedding.diagnostic
 
-import io.github.charlietap.chasm.runtime.instruction.LinkedInstruction
-import io.github.charlietap.chasm.runtime.instruction.MemoryInstruction
+import io.github.charlietap.chasm.cir.DataIndex
+import io.github.charlietap.chasm.cir.Instruction
+import io.github.charlietap.chasm.cir.MemoryInstruction
 
 /**
  * Slot operands are read from the faulting frame, which the trap left
@@ -17,8 +18,9 @@ internal class MemoryOperands(
 )
 
 internal fun MemoryOperands(
-    instruction: LinkedInstruction,
+    instruction: Instruction,
     slots: LongArray,
+    segmentLength: (DataIndex) -> Long?,
 ): MemoryOperands? = when (instruction) {
     is MemoryInstruction.I32LoadI -> MemoryOperands(
         address = unsigned(instruction.address),
@@ -136,49 +138,49 @@ internal fun MemoryOperands(
         address = unsigned(instruction.destinationOffset),
         length = unsigned(instruction.bytesToCopy),
         sourceAddress = unsigned(instruction.sourceOffset),
-        segmentLength = instruction.data.bytes.size.toLong(),
+        segmentLength = segmentLength(instruction.data),
     )
     is MemoryInstruction.MemoryInitIis -> MemoryOperands(
         address = slot(slots, instruction.destinationOffsetSlot),
         length = unsigned(instruction.bytesToCopy),
         sourceAddress = unsigned(instruction.sourceOffset),
-        segmentLength = instruction.data.bytes.size.toLong(),
+        segmentLength = segmentLength(instruction.data),
     )
     is MemoryInstruction.MemoryInitIsi -> MemoryOperands(
         address = unsigned(instruction.destinationOffset),
         length = unsigned(instruction.bytesToCopy),
         sourceAddress = slot(slots, instruction.sourceOffsetSlot),
-        segmentLength = instruction.data.bytes.size.toLong(),
+        segmentLength = segmentLength(instruction.data),
     )
     is MemoryInstruction.MemoryInitIss -> MemoryOperands(
         address = slot(slots, instruction.destinationOffsetSlot),
         length = unsigned(instruction.bytesToCopy),
         sourceAddress = slot(slots, instruction.sourceOffsetSlot),
-        segmentLength = instruction.data.bytes.size.toLong(),
+        segmentLength = segmentLength(instruction.data),
     )
     is MemoryInstruction.MemoryInitSii -> MemoryOperands(
         address = unsigned(instruction.destinationOffset),
         length = slot(slots, instruction.bytesToCopySlot),
         sourceAddress = unsigned(instruction.sourceOffset),
-        segmentLength = instruction.data.bytes.size.toLong(),
+        segmentLength = segmentLength(instruction.data),
     )
     is MemoryInstruction.MemoryInitSis -> MemoryOperands(
         address = slot(slots, instruction.destinationOffsetSlot),
         length = slot(slots, instruction.bytesToCopySlot),
         sourceAddress = unsigned(instruction.sourceOffset),
-        segmentLength = instruction.data.bytes.size.toLong(),
+        segmentLength = segmentLength(instruction.data),
     )
     is MemoryInstruction.MemoryInitSsi -> MemoryOperands(
         address = unsigned(instruction.destinationOffset),
         length = slot(slots, instruction.bytesToCopySlot),
         sourceAddress = slot(slots, instruction.sourceOffsetSlot),
-        segmentLength = instruction.data.bytes.size.toLong(),
+        segmentLength = segmentLength(instruction.data),
     )
     is MemoryInstruction.MemoryInitSss -> MemoryOperands(
         address = slot(slots, instruction.destinationOffsetSlot),
         length = slot(slots, instruction.bytesToCopySlot),
         sourceAddress = slot(slots, instruction.sourceOffsetSlot),
-        segmentLength = instruction.data.bytes.size.toLong(),
+        segmentLength = segmentLength(instruction.data),
     )
     is MemoryInstruction.MemoryCopyIii -> MemoryOperands(
         address = unsigned(instruction.destinationOffset),

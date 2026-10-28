@@ -122,7 +122,9 @@ kotlin {
                 api(projects.stream)
 
                 implementation(projects.ast)
-                implementation(projects.compiler)
+                implementation(projects.cir)
+                implementation(projects.compiler.backendChasm)
+                implementation(projects.compiler.frontend)
                 implementation(projects.decoder)
                 implementation(projects.executor.instantiator)
                 implementation(projects.executor.invoker)

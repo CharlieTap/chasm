@@ -269,6 +269,17 @@ class TrapDiagnosticsTest {
     }
 
     @Test
+    fun `memory init reads the segment length at the time of the trap`() {
+        val bytes = Resource(DROPPED_SEGMENT_FIXTURE).readBytes()
+
+        val beforeDrop = Fixture(DIAGNOSTICS, bytes = bytes, imports = false).trap("init_before_drop")
+        val afterDrop = Fixture(DIAGNOSTICS, bytes = bytes, imports = false).trap("init_after_drop")
+
+        assertEquals(MemoryAccessOf(MemoryAccess.Kind.INIT, address = 65536, width = 1), beforeDrop.memoryAccess.describe())
+        assertNull(afterDrop.memoryAccess)
+    }
+
+    @Test
     fun `an imported start function is not attributed to the module being instantiated`() {
         val store = store()
         val owner = module(Resource(START_OWNER_FIXTURE).readBytes()).expect("decode owner")
@@ -358,6 +369,7 @@ class TrapDiagnosticsTest {
     private companion object {
         const val FIXTURE = "integration/trap_diagnostics.wasm"
         const val MEMORY_FIXTURE = "integration/trap_diagnostics_memory.wasm"
+        const val DROPPED_SEGMENT_FIXTURE = "integration/trap_diagnostics_dropped_segment.wasm"
         const val START_FIXTURE = "integration/trap_diagnostics_start.wasm"
         const val START_OWNER_FIXTURE = "integration/trap_diagnostics_start_owner.wasm"
         const val START_IMPORT_FIXTURE = "integration/trap_diagnostics_start_import.wasm"

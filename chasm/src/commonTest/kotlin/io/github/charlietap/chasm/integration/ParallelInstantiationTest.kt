@@ -220,7 +220,7 @@ class ParallelInstantiationTest {
         const val FIXTURE = "integration/gc.wasm"
         const val CONCURRENT_COMPILATIONS = 8
         const val PARALLEL_FUNCTION_COUNT = 32
-        const val PARALLEL_INSTRUCTION_COUNT = 256
+        const val PARALLEL_INSTRUCTION_COUNT = 2_304
     }
 
     private class TestParallelTaskExecutor : ParallelTaskExecutor {
