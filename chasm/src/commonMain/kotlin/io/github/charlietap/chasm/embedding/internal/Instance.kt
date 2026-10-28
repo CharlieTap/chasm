@@ -37,5 +37,7 @@ suspend fun _instance(
         module = module.module,
         imports = imports.mapImports(ImportableMapper(store.store)),
         taskExecutor = taskExecutor,
+        codeInstaller = ParallelModuleCodeInstaller(module.module),
+        startInvoker = ::StartFunctionInvoker,
     ).toChasmResult(effectiveConfig, store, module, firstFunctionAddress)
 }

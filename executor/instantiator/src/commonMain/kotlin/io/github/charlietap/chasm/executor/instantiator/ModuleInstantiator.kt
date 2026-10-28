@@ -3,7 +3,6 @@ package io.github.charlietap.chasm.executor.instantiator
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.module.toInt
-import io.github.charlietap.chasm.compiler.diagnostic.CompilerDiagnostics
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.executor.instantiator.allocation.ModuleAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.PartialModuleAllocator
@@ -13,55 +12,40 @@ import io.github.charlietap.chasm.executor.instantiator.compat.CompatibilityChec
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
 import io.github.charlietap.chasm.executor.instantiator.initialization.MemoryInitializer
 import io.github.charlietap.chasm.executor.instantiator.initialization.TableInitializer
-import io.github.charlietap.chasm.executor.invoker.FunctionInvoker
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.instance.Import
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.ast.module.Module as ASTModule
 
-typealias ModuleInstantiator = (RuntimeConfig, Store, ASTModule, List<Import>) -> Result<ModuleInstance, ModuleTrapError>
+typealias ModuleInstantiator = (
+    RuntimeConfig,
+    Store,
+    ASTModule,
+    List<Import>,
+    ModuleCodeInstaller,
+    StartFunctionInvoker,
+) -> Result<ModuleInstance, ModuleTrapError>
 
 fun ModuleInstantiator(
     config: RuntimeConfig,
     store: Store,
     module: ASTModule,
     imports: List<Import>,
+    codeInstaller: ModuleCodeInstaller,
+    startInvoker: StartFunctionInvoker,
 ): Result<ModuleInstance, ModuleTrapError> =
     ModuleInstantiator(
         config = config,
         store = store,
         module = module,
         imports = imports,
-        compilerDiagnostics = null,
+        codeInstaller = codeInstaller,
+        startInvoker = startInvoker,
         compatibilityChecker = ::CompatibilityChecker,
         partialAllocator = ::PartialModuleAllocator,
         allocator = ::ModuleAllocator,
         typeAllocator = ::TypeAllocator,
-        invoker = ::FunctionInvoker,
-        constantExpressionEvaluator = ::ConstantExpressionEvaluator,
-        tableInitializer = ::TableInitializer,
-        memoryInitializer = ::MemoryInitializer,
-    )
-
-fun ModuleInstantiator(
-    config: RuntimeConfig,
-    store: Store,
-    module: ASTModule,
-    imports: List<Import>,
-    compilerDiagnostics: CompilerDiagnostics,
-): Result<ModuleInstance, ModuleTrapError> =
-    ModuleInstantiator(
-        config = config,
-        store = store,
-        module = module,
-        imports = imports,
-        compilerDiagnostics = compilerDiagnostics,
-        compatibilityChecker = ::CompatibilityChecker,
-        partialAllocator = ::PartialModuleAllocator,
-        allocator = ::ModuleAllocator,
-        typeAllocator = ::TypeAllocator,
-        invoker = ::FunctionInvoker,
         constantExpressionEvaluator = ::ConstantExpressionEvaluator,
         tableInitializer = ::TableInitializer,
         memoryInitializer = ::MemoryInitializer,
@@ -72,12 +56,12 @@ internal inline fun ModuleInstantiator(
     store: Store,
     module: ASTModule,
     imports: List<Import>,
-    compilerDiagnostics: CompilerDiagnostics?,
+    noinline codeInstaller: ModuleCodeInstaller,
+    crossinline startInvoker: StartFunctionInvoker,
     crossinline compatibilityChecker: CompatibilityChecker,
     crossinline partialAllocator: PartialModuleAllocator,
     crossinline allocator: ModuleAllocator,
     crossinline typeAllocator: TypeAllocator,
-    crossinline invoker: FunctionInvoker,
     crossinline constantExpressionEvaluator: ConstantExpressionEvaluator,
     crossinline tableInitializer: TableInitializer,
     crossinline memoryInitializer: MemoryInitializer,
@@ -96,12 +80,12 @@ internal inline fun ModuleInstantiator(
         preparation.context,
         preparation.partialInstance,
         preparation.tableInitValues,
-        compilerDiagnostics,
+        codeInstaller,
     ).bind()
     CompleteModuleInstantiation(
         preparation.context,
         instance,
-        invoker,
+        startInvoker,
         tableInitializer,
         memoryInitializer,
     ).bind()
@@ -138,7 +122,7 @@ internal inline fun PrepareModuleInstantiation(
 internal inline fun CompleteModuleInstantiation(
     context: InstantiationContext,
     instance: ModuleInstance,
-    crossinline invoker: FunctionInvoker,
+    crossinline startInvoker: StartFunctionInvoker,
     crossinline tableInitializer: TableInitializer,
     crossinline memoryInitializer: MemoryInitializer,
 ): Result<Unit, ModuleTrapError> = binding {
@@ -147,7 +131,7 @@ internal inline fun CompleteModuleInstantiation(
 
     context.module.startFunction?.let { function ->
         val address = instance.functionAddresses[function.idx.toInt()]
-        invoker(context.config, context.store, instance, address, emptyList()).bind()
+        startInvoker(context.config, context.store, instance, address).bind()
     }
 }
 

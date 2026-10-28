@@ -3,8 +3,8 @@ package io.github.charlietap.chasm.executor.instantiator.allocation
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.asErr
 import com.github.michaelbull.result.map
-import io.github.charlietap.chasm.compiler.ParallelModuleCompiler
 import io.github.charlietap.chasm.executor.instantiator.ConstantExpressionEvaluator
+import io.github.charlietap.chasm.executor.instantiator.ParallelModuleCodeInstaller
 import io.github.charlietap.chasm.executor.instantiator.allocation.data.DataAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.element.ElementAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.export.ExportAllocator
@@ -22,6 +22,7 @@ internal suspend fun ParallelModuleAllocator(
     instance: ModuleInstance,
     tableInitValues: LongArray,
     taskExecutor: ParallelTaskExecutor,
+    codeInstaller: ParallelModuleCodeInstaller,
 ): Result<ModuleInstance, ModuleTrapError> {
     val allocation = AllocateModuleContents(
         context = context,
@@ -37,15 +38,14 @@ internal suspend fun ParallelModuleAllocator(
     )
     if (allocation.isErr) return allocation.asErr()
 
-    val compilation = ParallelModuleCompiler(
-        store = context.store,
-        module = context.module,
-        instance = instance,
-        runtimeTypes = context.runtimeTypes,
-        types = context.types,
-        taskExecutor = taskExecutor,
+    val installation = codeInstaller(
+        context.store,
+        instance,
+        context.runtimeTypes,
+        context.types,
+        taskExecutor,
     )
-    if (compilation.isErr) return compilation.asErr()
+    if (installation.isErr) return installation.asErr()
 
     return AllocateModuleExports(context, instance, ::ExportAllocator).map { instance }
 }

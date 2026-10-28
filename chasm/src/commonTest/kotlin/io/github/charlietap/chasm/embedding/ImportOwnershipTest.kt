@@ -43,7 +43,8 @@ class ImportOwnershipTest {
                 module = publicModule(),
                 imports = listOf(publicImport(value = importable)),
                 config = RuntimeConfig(),
-                instantiator = { _, _, _, _ -> error("instantiation must not start") },
+                instantiator = { _, _, _, _, _, _ -> error("instantiation must not start") },
+                codeInstaller = { _, _, _, _ -> error("code installation must not start") },
                 importableMapper = mapper,
             )
 

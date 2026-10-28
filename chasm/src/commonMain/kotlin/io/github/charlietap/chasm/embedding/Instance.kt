@@ -9,6 +9,8 @@ import io.github.charlietap.chasm.embedding.diagnostic.Instantiation
 import io.github.charlietap.chasm.embedding.diagnostic.executionError
 import io.github.charlietap.chasm.embedding.error.ChasmError
 import io.github.charlietap.chasm.embedding.ext.withStoreSettings
+import io.github.charlietap.chasm.embedding.internal.ModuleCodeInstaller
+import io.github.charlietap.chasm.embedding.internal.StartFunctionInvoker
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Error
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Success
@@ -19,6 +21,7 @@ import io.github.charlietap.chasm.embedding.shapes.Module
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.transform.ImportableMapper
 import io.github.charlietap.chasm.embedding.transform.Mapper
+import io.github.charlietap.chasm.executor.instantiator.ModuleCodeInstaller
 import io.github.charlietap.chasm.executor.instantiator.ModuleInstantiator
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.instance.ExternalValue
@@ -37,6 +40,7 @@ fun instance(
         imports = imports,
         config = config,
         instantiator = ::ModuleInstantiator,
+        codeInstaller = ModuleCodeInstaller(module.module),
         importableMapper = ImportableMapper(store.store),
     )
 }
@@ -47,6 +51,7 @@ internal fun instance(
     imports: List<Import>,
     config: RuntimeConfig,
     instantiator: ModuleInstantiator,
+    codeInstaller: ModuleCodeInstaller,
     importableMapper: Mapper<Importable, ExternalValue>,
 ): ChasmResult<Instance, ChasmError.ExecutionError> {
 
@@ -58,7 +63,7 @@ internal fun instance(
     val firstFunctionAddress = store.store.functions.size
     val effectiveConfig = config.withStoreSettings(store.store.config)
 
-    return instantiator(effectiveConfig, store.store, module.module, mappedImports)
+    return instantiator(effectiveConfig, store.store, module.module, mappedImports, codeInstaller, ::StartFunctionInvoker)
         .toChasmResult(effectiveConfig, store, module, firstFunctionAddress)
 }
 

@@ -15,11 +15,9 @@ kotlin {
             dependencies {
                 api(projects.ast)
                 api(projects.runtime.core)
-                api(projects.executor.invoker)
                 api(projects.libs.parallel)
                 api(libs.result)
 
-                implementation(projects.compiler)
                 implementation(projects.memory)
                 implementation(projects.runtime.resources)
             }

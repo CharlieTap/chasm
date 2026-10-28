@@ -8,10 +8,8 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import com.github.michaelbull.result.toResultOr
 import io.github.charlietap.chasm.ast.module.Module
-import io.github.charlietap.chasm.compiler.ModuleCompiler
-import io.github.charlietap.chasm.compiler.diagnostic.CompilerDiagnostics
-import io.github.charlietap.chasm.declarations.ModuleTypeResolver
 import io.github.charlietap.chasm.executor.instantiator.ConstantExpressionEvaluator
+import io.github.charlietap.chasm.executor.instantiator.ModuleCodeInstaller
 import io.github.charlietap.chasm.executor.instantiator.allocation.data.DataAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.element.ElementAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.export.ExportAllocator
@@ -32,36 +30,25 @@ import io.github.charlietap.chasm.runtime.resource.allocation.MemoryAllocator
 import io.github.charlietap.chasm.runtime.resource.allocation.TableAllocator
 import io.github.charlietap.chasm.runtime.resource.allocation.TagAllocator
 import io.github.charlietap.chasm.runtime.store.Store
-import io.github.charlietap.chasm.runtime.type.RuntimeTypeMap
 import kotlin.jvm.JvmName
 
 internal typealias ModuleAllocator = (
     InstantiationContext,
     ModuleInstance,
     LongArray,
-    CompilerDiagnostics?,
+    ModuleCodeInstaller,
 ) -> Result<ModuleInstance, ModuleTrapError>
-
-internal typealias ModuleCompiler = (
-    Store,
-    Module,
-    ModuleInstance,
-    RuntimeTypeMap,
-    ModuleTypeResolver,
-    CompilerDiagnostics?,
-) -> Result<Unit, ModuleTrapError>
 
 internal fun ModuleAllocator(
     context: InstantiationContext,
     instance: ModuleInstance,
     tableInitValues: LongArray,
-    compilerDiagnostics: CompilerDiagnostics?,
+    codeInstaller: ModuleCodeInstaller,
 ): Result<ModuleInstance, ModuleTrapError> =
     ModuleAllocator(
         context = context,
         instance = instance,
         tableInitValues = tableInitValues,
-        compilerDiagnostics = compilerDiagnostics,
         constantExpressionEvaluator = ::ConstantExpressionEvaluator,
         tableAllocator = ::TableAllocator,
         memoryAllocator = ::MemoryAllocator,
@@ -69,7 +56,7 @@ internal fun ModuleAllocator(
         globalAllocator = ::GlobalAllocator,
         elementAllocator = ::ElementAllocator,
         dataAllocator = ::DataAllocator,
-        moduleCompiler = ::ModuleCompiler,
+        codeInstaller = codeInstaller,
         exportAllocator = ::ExportAllocator,
     )
 
@@ -77,7 +64,6 @@ internal inline fun ModuleAllocator(
     context: InstantiationContext,
     instance: ModuleInstance,
     tableInitValues: LongArray,
-    compilerDiagnostics: CompilerDiagnostics? = null,
     crossinline constantExpressionEvaluator: ConstantExpressionEvaluator,
     crossinline tableAllocator: TableAllocator,
     crossinline memoryAllocator: MemoryAllocator,
@@ -85,7 +71,7 @@ internal inline fun ModuleAllocator(
     crossinline globalAllocator: GlobalAllocator,
     crossinline elementAllocator: ElementAllocator,
     crossinline dataAllocator: DataAllocator,
-    crossinline moduleCompiler: ModuleCompiler,
+    crossinline codeInstaller: ModuleCodeInstaller,
     crossinline exportAllocator: ExportAllocator,
 ): Result<ModuleInstance, ModuleTrapError> = binding {
     AllocateModuleContents(
@@ -100,13 +86,11 @@ internal inline fun ModuleAllocator(
         elementAllocator = elementAllocator,
         dataAllocator = dataAllocator,
     ).bind()
-    moduleCompiler(
+    codeInstaller(
         context.store,
-        context.module,
         instance,
         context.runtimeTypes,
         context.types,
-        compilerDiagnostics,
     ).bind()
     AllocateModuleExports(context, instance, exportAllocator).bind()
     instance

@@ -1,17 +1,20 @@
 package io.github.charlietap.chasm.tools.compilerbaseline
 
 import com.github.michaelbull.result.Result
+import com.github.michaelbull.result.map
 import com.github.michaelbull.result.unwrap
 import io.github.charlietap.chasm.ast.module.FunctionNameSubsection
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.NameData
 import io.github.charlietap.chasm.ast.module.toInt
+import io.github.charlietap.chasm.compiler.ModuleCompiler
 import io.github.charlietap.chasm.compiler.diagnostic.CompilerDiagnostics
 import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
 import io.github.charlietap.chasm.decoder.error.ModuleDecoderError
 import io.github.charlietap.chasm.executor.instantiator.ModuleInstantiator
+import io.github.charlietap.chasm.executor.invoker.FunctionInvoker
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.ext.function
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
@@ -46,7 +49,19 @@ class ChasmModuleInstantiator : CompilerModuleInstantiator {
         module: Module,
         imports: List<Import>,
         diagnostics: CompilerDiagnostics,
-    ): Result<ModuleInstance, ModuleTrapError> = ModuleInstantiator(config, store, module, imports, diagnostics)
+    ): Result<ModuleInstance, ModuleTrapError> =
+        ModuleInstantiator(
+            config = config,
+            store = store,
+            module = module,
+            imports = imports,
+            codeInstaller = { compileStore, instance, runtimeTypes, types ->
+                ModuleCompiler(compileStore, module, instance, runtimeTypes, types, diagnostics)
+            },
+            startInvoker = { invokeConfig, invokeStore, instance, address ->
+                FunctionInvoker(invokeConfig, invokeStore, instance, address, emptyList()).map { }
+            },
+        )
 }
 
 fun interface ProgramInstructionCollectorFactory {
