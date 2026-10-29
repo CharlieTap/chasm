@@ -20,6 +20,7 @@ class ModuleDeclarations(
     val elementSegments: List<ElementSegmentDeclaration>,
     val dataSegments: List<DataSegmentDeclaration>,
     val names: ModuleNames,
+    val dataSource: DataSource? = null,
 ) {
 
     override fun equals(

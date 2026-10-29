@@ -8,6 +8,7 @@ import io.github.charlietap.chasm.declarations.ModuleDeclarations
 import io.github.charlietap.chasm.executor.instantiator.allocation.ModuleAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.PartialModuleAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.checkStoreLimits
+import io.github.charlietap.chasm.executor.instantiator.allocation.data.DataPayloadPreparer
 import io.github.charlietap.chasm.executor.instantiator.allocation.type.TypeAllocator
 import io.github.charlietap.chasm.executor.instantiator.compat.CompatibilityChecker
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
@@ -46,6 +47,7 @@ fun ModuleInstantiator(
         partialAllocator = ::PartialModuleAllocator,
         allocator = ::ModuleAllocator,
         typeAllocator = ::TypeAllocator,
+        dataPayloadPreparer = ::DataPayloadPreparer,
         constantExpressionEvaluator = ::ConstantExpressionEvaluator,
         tableInitializer = ::TableInitializer,
         memoryInitializer = ::MemoryInitializer,
@@ -62,6 +64,7 @@ internal inline fun ModuleInstantiator(
     crossinline partialAllocator: PartialModuleAllocator,
     crossinline allocator: ModuleAllocator,
     crossinline typeAllocator: TypeAllocator,
+    crossinline dataPayloadPreparer: DataPayloadPreparer,
     crossinline constantExpressionEvaluator: ConstantExpressionEvaluator,
     crossinline tableInitializer: TableInitializer,
     crossinline memoryInitializer: MemoryInitializer,
@@ -74,22 +77,27 @@ internal inline fun ModuleInstantiator(
         compatibilityChecker = compatibilityChecker,
         partialAllocator = partialAllocator,
         typeAllocator = typeAllocator,
+        dataPayloadPreparer = dataPayloadPreparer,
         constantExpressionEvaluator = constantExpressionEvaluator,
     ).bind()
-    val instance = allocator(
-        preparation.context,
-        preparation.partialInstance,
-        preparation.tableInitValues,
-        codeInstaller,
-    ).bind()
-    CompleteModuleInstantiation(
-        preparation.context,
-        instance,
-        startInvoker,
-        tableInitializer,
-        memoryInitializer,
-    ).bind()
-    instance
+    try {
+        val instance = allocator(
+            preparation.context,
+            preparation.partialInstance,
+            preparation.tableInitValues,
+            codeInstaller,
+        ).bind()
+        CompleteModuleInstantiation(
+            preparation.context,
+            instance,
+            startInvoker,
+            tableInitializer,
+            memoryInitializer,
+        ).bind()
+        instance
+    } finally {
+        preparation.context.data.close()
+    }
 }
 
 internal inline fun PrepareModuleInstantiation(
@@ -100,23 +108,30 @@ internal inline fun PrepareModuleInstantiation(
     crossinline compatibilityChecker: CompatibilityChecker,
     crossinline partialAllocator: PartialModuleAllocator,
     crossinline typeAllocator: TypeAllocator,
+    crossinline dataPayloadPreparer: DataPayloadPreparer,
     crossinline constantExpressionEvaluator: ConstantExpressionEvaluator,
 ): Result<ModuleInstantiationPreparation, ModuleTrapError> = binding {
 
     compatibilityChecker(module).bind()
     checkStoreLimits(store, module).bind()
+    val data = dataPayloadPreparer(module).bind()
 
-    val runtimeTypes = typeAllocator(module, store)
+    try {
+        val runtimeTypes = typeAllocator(module, store)
 
-    val context = InstantiationContext(config, store, module, runtimeTypes)
-    val partialInstance = partialAllocator(context, imports).bind()
+        val context = InstantiationContext(config, store, module, runtimeTypes, data)
+        val partialInstance = partialAllocator(context, imports).bind()
 
-    val tableInitValues = LongArray(module.tables.size) { tableIndex ->
-        val table = module.tables[tableIndex]
-        constantExpressionEvaluator(store, partialInstance, context.types, table.initExpression).bind()
+        val tableInitValues = LongArray(module.tables.size) { tableIndex ->
+            val table = module.tables[tableIndex]
+            constantExpressionEvaluator(store, partialInstance, context.types, table.initExpression).bind()
+        }
+
+        ModuleInstantiationPreparation(context, partialInstance, tableInitValues)
+    } catch (failure: Throwable) {
+        data.close()
+        throw failure
     }
-
-    ModuleInstantiationPreparation(context, partialInstance, tableInitValues)
 }
 
 internal inline fun CompleteModuleInstantiation(
@@ -128,6 +143,7 @@ internal inline fun CompleteModuleInstantiation(
 ): Result<Unit, ModuleTrapError> = binding {
     tableInitializer(context, instance).bind()
     memoryInitializer(context, instance).bind()
+    context.data.close()
 
     context.module.startFunction?.let { function ->
         val address = instance.functionAddresses[function.toInt()]

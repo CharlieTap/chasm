@@ -4,12 +4,15 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.module.toInt
+import io.github.charlietap.chasm.declarations.DataPayload
 import io.github.charlietap.chasm.declarations.DataSegmentDeclaration
 import io.github.charlietap.chasm.executor.instantiator.ConstantExpressionEvaluator
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
 import io.github.charlietap.chasm.executor.instantiator.ext.dataAddress
 import io.github.charlietap.chasm.executor.instantiator.ext.memoryAddress
 import io.github.charlietap.chasm.memory.init.LinearMemoryInitialiser
+import io.github.charlietap.chasm.memory.init.LinearMemoryLoader
+import io.github.charlietap.chasm.runtime.error.InstantiationError
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.ext.data
@@ -28,6 +31,7 @@ internal fun MemoryInitializer(
         instance = instance,
         constantExpressionEvaluator = ::ConstantExpressionEvaluator,
         linearMemoryInitialiser = ::LinearMemoryInitialiser,
+        linearMemoryLoader = ::LinearMemoryLoader,
     )
 
 internal inline fun MemoryInitializer(
@@ -35,6 +39,7 @@ internal inline fun MemoryInitializer(
     instance: ModuleInstance,
     crossinline constantExpressionEvaluator: ConstantExpressionEvaluator,
     crossinline linearMemoryInitialiser: LinearMemoryInitialiser,
+    crossinline linearMemoryLoader: LinearMemoryLoader,
 ): Result<Unit, ModuleTrapError> = binding {
 
     val store = context.store
@@ -48,10 +53,26 @@ internal inline fun MemoryInitializer(
         val dataInstance = store.data(dataAddress)
 
         val size = segment.payload.size
-        try {
-            linearMemoryInitialiser(dataInstance.bytes, memoryInstance.data, 0, offset, size, dataInstance.bytes.size, memoryInstance.size)
-        } catch (e: InvocationException) {
-            Err(e.error).bind<Unit>()
+        val external = segment.payload as? DataPayload.External
+        val reader = context.data.reader
+        if (context.data.payloads[segmentIndex] == null && external != null && reader != null) {
+            try {
+                linearMemoryLoader(memoryInstance.data, offset, size, memoryInstance.size) { destination, destinationOffset ->
+                    reader.read(external.offset, size, destination, destinationOffset)
+                }
+            } catch (e: InvocationException) {
+                Err(e.error).bind<Unit>()
+            } catch (
+                @Suppress("TooGenericExceptionCaught") e: Exception,
+            ) {
+                Err(InstantiationError.DataUnavailable(e.message ?: e.toString())).bind<Unit>()
+            }
+        } else {
+            try {
+                linearMemoryInitialiser(dataInstance.bytes, memoryInstance.data, 0, offset, size, dataInstance.bytes.size, memoryInstance.size)
+            } catch (e: InvocationException) {
+                Err(e.error).bind<Unit>()
+            }
         }
 
         dataInstance.bytes = DataInstance.EMPTY

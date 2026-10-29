@@ -7,7 +7,6 @@ import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import com.github.michaelbull.result.toResultOr
-import io.github.charlietap.chasm.declarations.DataPayload
 import io.github.charlietap.chasm.declarations.ModuleDeclarations
 import io.github.charlietap.chasm.executor.instantiator.ConstantExpressionEvaluator
 import io.github.charlietap.chasm.executor.instantiator.ModuleCodeInstaller
@@ -24,6 +23,7 @@ import io.github.charlietap.chasm.runtime.ext.addGlobalAddress
 import io.github.charlietap.chasm.runtime.ext.addMemoryAddress
 import io.github.charlietap.chasm.runtime.ext.addTableAddress
 import io.github.charlietap.chasm.runtime.ext.addTagAddress
+import io.github.charlietap.chasm.runtime.instance.DataInstance
 import io.github.charlietap.chasm.runtime.instance.ExportInstance
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.resource.allocation.GlobalAllocator
@@ -154,11 +154,8 @@ internal inline fun AllocateModuleContents(
         instance.addElementAddress(address)
     }
 
-    module.dataSegments.forEach { dataSegment ->
-        val bytes = when (val payload = dataSegment.payload) {
-            is DataPayload.Inline -> payload.bytes.asUByteArray()
-        }
-        val address = dataAllocator(store, bytes)
+    context.data.payloads.forEach { bytes ->
+        val address = dataAllocator(store, bytes?.asUByteArray() ?: DataInstance.EMPTY)
         instance.addDataAddress(address)
     }
 }

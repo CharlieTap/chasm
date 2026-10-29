@@ -589,12 +589,36 @@ public abstract interface class io/github/charlietap/chasm/declarations/DataPayl
 	public abstract fun getSize ()I
 }
 
+public final class io/github/charlietap/chasm/declarations/DataPayload$External : io/github/charlietap/chasm/declarations/DataPayload {
+	public fun <init> (JI)V
+	public final fun component1 ()J
+	public final fun component2 ()I
+	public final fun copy (JI)Lio/github/charlietap/chasm/declarations/DataPayload$External;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/declarations/DataPayload$External;JIILjava/lang/Object;)Lio/github/charlietap/chasm/declarations/DataPayload$External;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getOffset ()J
+	public fun getSize ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
 public final class io/github/charlietap/chasm/declarations/DataPayload$Inline : io/github/charlietap/chasm/declarations/DataPayload {
 	public fun <init> ([B)V
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getBytes ()[B
 	public fun getSize ()I
 	public fun hashCode ()I
+}
+
+public abstract interface class io/github/charlietap/chasm/declarations/DataReader : java/lang/AutoCloseable {
+	public fun getLength ()Ljava/lang/Long;
+	public abstract fun read (JI)[B
+	public fun read (JI[BI)V
+}
+
+public final class io/github/charlietap/chasm/declarations/DataReader$DefaultImpls {
+	public static fun getLength (Lio/github/charlietap/chasm/declarations/DataReader;)Ljava/lang/Long;
+	public static fun read (Lio/github/charlietap/chasm/declarations/DataReader;JI[BI)V
 }
 
 public final class io/github/charlietap/chasm/declarations/DataSegmentDeclaration {
@@ -631,6 +655,10 @@ public final class io/github/charlietap/chasm/declarations/DataSegmentDeclaratio
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/charlietap/chasm/declarations/DataSource {
+	public abstract fun open ()Lio/github/charlietap/chasm/declarations/DataReader;
 }
 
 public final class io/github/charlietap/chasm/declarations/ElementSegmentDeclaration {
@@ -692,9 +720,11 @@ public final class io/github/charlietap/chasm/declarations/GlobalDeclaration {
 }
 
 public final class io/github/charlietap/chasm/declarations/ModuleDeclarations {
-	public synthetic fun <init> (Ljava/util/List;Ljava/util/List;[ILjava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Lio/github/charlietap/chasm/ast/module/Index$FunctionIndex;Ljava/util/List;Ljava/util/List;Lio/github/charlietap/chasm/declarations/ModuleNames;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (Ljava/util/List;Ljava/util/List;[ILjava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Lio/github/charlietap/chasm/ast/module/Index$FunctionIndex;Ljava/util/List;Ljava/util/List;Lio/github/charlietap/chasm/declarations/ModuleNames;Lio/github/charlietap/chasm/declarations/DataSource;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (Ljava/util/List;Ljava/util/List;[ILjava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Lio/github/charlietap/chasm/ast/module/Index$FunctionIndex;Ljava/util/List;Ljava/util/List;Lio/github/charlietap/chasm/declarations/ModuleNames;Lio/github/charlietap/chasm/declarations/DataSource;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getDataSegments ()Ljava/util/List;
+	public final fun getDataSource ()Lio/github/charlietap/chasm/declarations/DataSource;
 	public final fun getDefinedTypes ()Ljava/util/List;
 	public final fun getElementSegments ()Ljava/util/List;
 	public final fun getExports ()Ljava/util/List;

@@ -6,6 +6,18 @@
 // - Show declarations: true
 
 // Library unique name: <io.github.charlietap.chasm:module-declarations>
+abstract fun interface io.github.charlietap.chasm.declarations/DataSource { // io.github.charlietap.chasm.declarations/DataSource|null[0]
+    abstract fun open(): io.github.charlietap.chasm.declarations/DataReader // io.github.charlietap.chasm.declarations/DataSource.open|open(){}[0]
+}
+
+abstract interface io.github.charlietap.chasm.declarations/DataReader : kotlin/AutoCloseable { // io.github.charlietap.chasm.declarations/DataReader|null[0]
+    open val length // io.github.charlietap.chasm.declarations/DataReader.length|{}length[0]
+        open fun <get-length>(): kotlin/Long? // io.github.charlietap.chasm.declarations/DataReader.length.<get-length>|<get-length>(){}[0]
+
+    abstract fun read(kotlin/Long, kotlin/Int): kotlin/ByteArray // io.github.charlietap.chasm.declarations/DataReader.read|read(kotlin.Long;kotlin.Int){}[0]
+    open fun read(kotlin/Long, kotlin/Int, kotlin/ByteArray, kotlin/Int) // io.github.charlietap.chasm.declarations/DataReader.read|read(kotlin.Long;kotlin.Int;kotlin.ByteArray;kotlin.Int){}[0]
+}
+
 sealed interface io.github.charlietap.chasm.ast.module/Index { // io.github.charlietap.chasm.ast.module/Index|null[0]
     abstract val idx // io.github.charlietap.chasm.ast.module/Index.idx|{}idx[0]
         abstract fun <get-idx>(): kotlin/UInt // io.github.charlietap.chasm.ast.module/Index.idx.<get-idx>|<get-idx>(){}[0]
@@ -369,6 +381,22 @@ sealed interface io.github.charlietap.chasm.declarations/DataPayload { // io.git
     abstract val size // io.github.charlietap.chasm.declarations/DataPayload.size|{}size[0]
         abstract fun <get-size>(): kotlin/Int // io.github.charlietap.chasm.declarations/DataPayload.size.<get-size>|<get-size>(){}[0]
 
+    final class External : io.github.charlietap.chasm.declarations/DataPayload { // io.github.charlietap.chasm.declarations/DataPayload.External|null[0]
+        constructor <init>(kotlin/Long, kotlin/Int) // io.github.charlietap.chasm.declarations/DataPayload.External.<init>|<init>(kotlin.Long;kotlin.Int){}[0]
+
+        final val offset // io.github.charlietap.chasm.declarations/DataPayload.External.offset|{}offset[0]
+            final fun <get-offset>(): kotlin/Long // io.github.charlietap.chasm.declarations/DataPayload.External.offset.<get-offset>|<get-offset>(){}[0]
+        final val size // io.github.charlietap.chasm.declarations/DataPayload.External.size|{}size[0]
+            final fun <get-size>(): kotlin/Int // io.github.charlietap.chasm.declarations/DataPayload.External.size.<get-size>|<get-size>(){}[0]
+
+        final fun component1(): kotlin/Long // io.github.charlietap.chasm.declarations/DataPayload.External.component1|component1(){}[0]
+        final fun component2(): kotlin/Int // io.github.charlietap.chasm.declarations/DataPayload.External.component2|component2(){}[0]
+        final fun copy(kotlin/Long = ..., kotlin/Int = ...): io.github.charlietap.chasm.declarations/DataPayload.External // io.github.charlietap.chasm.declarations/DataPayload.External.copy|copy(kotlin.Long;kotlin.Int){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.declarations/DataPayload.External.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.declarations/DataPayload.External.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.declarations/DataPayload.External.toString|toString(){}[0]
+    }
+
     final class Inline : io.github.charlietap.chasm.declarations/DataPayload { // io.github.charlietap.chasm.declarations/DataPayload.Inline|null[0]
         constructor <init>(kotlin/ByteArray) // io.github.charlietap.chasm.declarations/DataPayload.Inline.<init>|<init>(kotlin.ByteArray){}[0]
 
@@ -650,10 +678,12 @@ final class io.github.charlietap.chasm.declarations/GlobalDeclaration { // io.gi
 }
 
 final class io.github.charlietap.chasm.declarations/ModuleDeclarations { // io.github.charlietap.chasm.declarations/ModuleDeclarations|null[0]
-    constructor <init>(kotlin.collections/List<io.github.charlietap.chasm.type/DefinedType>, kotlin.collections/List<io.github.charlietap.chasm.ast.module/Import>, kotlin/IntArray, kotlin.collections/List<io.github.charlietap.chasm.declarations/TableDeclaration>, kotlin.collections/List<io.github.charlietap.chasm.type/MemoryType>, kotlin.collections/List<io.github.charlietap.chasm.type/TagType>, kotlin.collections/List<io.github.charlietap.chasm.declarations/GlobalDeclaration>, kotlin.collections/List<io.github.charlietap.chasm.ast.module/Export>, io.github.charlietap.chasm.ast.module/Index.FunctionIndex?, kotlin.collections/List<io.github.charlietap.chasm.declarations/ElementSegmentDeclaration>, kotlin.collections/List<io.github.charlietap.chasm.declarations/DataSegmentDeclaration>, io.github.charlietap.chasm.declarations/ModuleNames) // io.github.charlietap.chasm.declarations/ModuleDeclarations.<init>|<init>(kotlin.collections.List<io.github.charlietap.chasm.type.DefinedType>;kotlin.collections.List<io.github.charlietap.chasm.ast.module.Import>;kotlin.IntArray;kotlin.collections.List<io.github.charlietap.chasm.declarations.TableDeclaration>;kotlin.collections.List<io.github.charlietap.chasm.type.MemoryType>;kotlin.collections.List<io.github.charlietap.chasm.type.TagType>;kotlin.collections.List<io.github.charlietap.chasm.declarations.GlobalDeclaration>;kotlin.collections.List<io.github.charlietap.chasm.ast.module.Export>;io.github.charlietap.chasm.ast.module.Index.FunctionIndex?;kotlin.collections.List<io.github.charlietap.chasm.declarations.ElementSegmentDeclaration>;kotlin.collections.List<io.github.charlietap.chasm.declarations.DataSegmentDeclaration>;io.github.charlietap.chasm.declarations.ModuleNames){}[0]
+    constructor <init>(kotlin.collections/List<io.github.charlietap.chasm.type/DefinedType>, kotlin.collections/List<io.github.charlietap.chasm.ast.module/Import>, kotlin/IntArray, kotlin.collections/List<io.github.charlietap.chasm.declarations/TableDeclaration>, kotlin.collections/List<io.github.charlietap.chasm.type/MemoryType>, kotlin.collections/List<io.github.charlietap.chasm.type/TagType>, kotlin.collections/List<io.github.charlietap.chasm.declarations/GlobalDeclaration>, kotlin.collections/List<io.github.charlietap.chasm.ast.module/Export>, io.github.charlietap.chasm.ast.module/Index.FunctionIndex?, kotlin.collections/List<io.github.charlietap.chasm.declarations/ElementSegmentDeclaration>, kotlin.collections/List<io.github.charlietap.chasm.declarations/DataSegmentDeclaration>, io.github.charlietap.chasm.declarations/ModuleNames, io.github.charlietap.chasm.declarations/DataSource? = ...) // io.github.charlietap.chasm.declarations/ModuleDeclarations.<init>|<init>(kotlin.collections.List<io.github.charlietap.chasm.type.DefinedType>;kotlin.collections.List<io.github.charlietap.chasm.ast.module.Import>;kotlin.IntArray;kotlin.collections.List<io.github.charlietap.chasm.declarations.TableDeclaration>;kotlin.collections.List<io.github.charlietap.chasm.type.MemoryType>;kotlin.collections.List<io.github.charlietap.chasm.type.TagType>;kotlin.collections.List<io.github.charlietap.chasm.declarations.GlobalDeclaration>;kotlin.collections.List<io.github.charlietap.chasm.ast.module.Export>;io.github.charlietap.chasm.ast.module.Index.FunctionIndex?;kotlin.collections.List<io.github.charlietap.chasm.declarations.ElementSegmentDeclaration>;kotlin.collections.List<io.github.charlietap.chasm.declarations.DataSegmentDeclaration>;io.github.charlietap.chasm.declarations.ModuleNames;io.github.charlietap.chasm.declarations.DataSource?){}[0]
 
     final val dataSegments // io.github.charlietap.chasm.declarations/ModuleDeclarations.dataSegments|{}dataSegments[0]
         final fun <get-dataSegments>(): kotlin.collections/List<io.github.charlietap.chasm.declarations/DataSegmentDeclaration> // io.github.charlietap.chasm.declarations/ModuleDeclarations.dataSegments.<get-dataSegments>|<get-dataSegments>(){}[0]
+    final val dataSource // io.github.charlietap.chasm.declarations/ModuleDeclarations.dataSource|{}dataSource[0]
+        final fun <get-dataSource>(): io.github.charlietap.chasm.declarations/DataSource? // io.github.charlietap.chasm.declarations/ModuleDeclarations.dataSource.<get-dataSource>|<get-dataSource>(){}[0]
     final val definedTypes // io.github.charlietap.chasm.declarations/ModuleDeclarations.definedTypes|{}definedTypes[0]
         final fun <get-definedTypes>(): kotlin.collections/List<io.github.charlietap.chasm.type/DefinedType> // io.github.charlietap.chasm.declarations/ModuleDeclarations.definedTypes.<get-definedTypes>|<get-definedTypes>(){}[0]
     final val elementSegments // io.github.charlietap.chasm.declarations/ModuleDeclarations.elementSegments|{}elementSegments[0]

@@ -7,6 +7,7 @@ import io.github.charlietap.chasm.declarations.ConstantExpression
 import io.github.charlietap.chasm.declarations.ConstantInstruction
 import io.github.charlietap.chasm.declarations.DataPayload
 import io.github.charlietap.chasm.declarations.DataSegmentDeclaration
+import io.github.charlietap.chasm.declarations.DataSource
 import io.github.charlietap.chasm.declarations.ElementSegmentDeclaration
 import io.github.charlietap.chasm.declarations.GlobalDeclaration
 import io.github.charlietap.chasm.declarations.ModuleDeclarations
@@ -31,6 +32,7 @@ fun moduleDeclarations(
     elementSegments: List<ElementSegmentDeclaration> = emptyList(),
     dataSegments: List<DataSegmentDeclaration> = emptyList(),
     names: ModuleNames = ModuleNames.NONE,
+    dataSource: DataSource? = null,
 ) = ModuleDeclarations(
     definedTypes = definedTypes,
     imports = imports,
@@ -44,6 +46,7 @@ fun moduleDeclarations(
     elementSegments = elementSegments,
     dataSegments = dataSegments,
     names = names,
+    dataSource = dataSource,
 )
 
 fun constantExpression(

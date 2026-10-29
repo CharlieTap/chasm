@@ -35,4 +35,34 @@ sealed interface DataPayload {
 
         override fun hashCode(): Int = bytes.contentHashCode()
     }
+
+    data class External(
+        val offset: Long,
+        override val size: Int,
+    ) : DataPayload
+}
+
+fun interface DataSource {
+
+    fun open(): DataReader
+}
+
+interface DataReader : AutoCloseable {
+
+    val length: Long?
+        get() = null
+
+    fun read(
+        offset: Long,
+        size: Int,
+    ): ByteArray
+
+    fun read(
+        offset: Long,
+        size: Int,
+        destination: ByteArray,
+        destinationOffset: Int,
+    ) {
+        read(offset, size).copyInto(destination, destinationOffset)
+    }
 }

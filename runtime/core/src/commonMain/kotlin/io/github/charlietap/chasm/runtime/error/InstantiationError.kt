@@ -35,4 +35,8 @@ sealed interface InstantiationError : ModuleTrapError {
 
     @JvmInline
     value class TableLimitExceeded(val maximumElements: Int) : InstantiationError
+
+    data class DataUnavailable(
+        val reason: String,
+    ) : InstantiationError
 }
