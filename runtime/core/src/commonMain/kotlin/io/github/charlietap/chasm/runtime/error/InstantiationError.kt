@@ -39,4 +39,8 @@ sealed interface InstantiationError : ModuleTrapError {
     data class DataUnavailable(
         val reason: String,
     ) : InstantiationError
+
+    data class CompiledCodeRejected(
+        val reason: String,
+    ) : InstantiationError
 }

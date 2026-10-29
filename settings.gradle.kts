@@ -74,6 +74,7 @@ include(":compiler:backend-chasm")
 include(":compiler:frontend")
 
 include(":runtime:address")
+include(":runtime:compiled")
 include(":runtime:core")
 include(":runtime:encoding")
 include(":runtime:operations")
