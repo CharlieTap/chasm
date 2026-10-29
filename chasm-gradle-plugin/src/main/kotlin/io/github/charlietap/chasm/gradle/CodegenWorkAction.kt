@@ -1,12 +1,10 @@
 package io.github.charlietap.chasm.gradle
 
+import io.github.charlietap.chasm.aot.inspectModule
 import io.github.charlietap.chasm.bindgen.BindingGenerator
 import io.github.charlietap.chasm.bindgen.BindingOptions
 import io.github.charlietap.chasm.config.ModuleConfig
-import io.github.charlietap.chasm.embedding.module
-import io.github.charlietap.chasm.embedding.moduleInfo
 import io.github.charlietap.chasm.embedding.shapes.expect
-import io.github.charlietap.chasm.embedding.shapes.map
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.logging.Logging
@@ -52,12 +50,10 @@ internal abstract class CodegenWorkAction : WorkAction<CodegenWorkParameters> {
     override fun execute() {
         val params = parameters
         val binaryFile = params.binary.get().asFile
-        val info = module(
+        val info = inspectModule(
             binaryFile.readBytes(),
             ModuleConfig(decodeNameSection = true),
-        ).map { wasmModule ->
-            moduleInfo(wasmModule)
-        }.expect("Failed to find module at path: ${binaryFile.absolutePath}")
+        ).expect("Failed to find module at path: ${binaryFile.absolutePath}")
 
         val options = BindingOptions(
             interfaceName = params.interfaceName.get(),
@@ -76,6 +72,9 @@ internal abstract class CodegenWorkAction : WorkAction<CodegenWorkParameters> {
         val specs = BindingGenerator(PluginLogger(logger)).generate(info, options)
 
         val outputDirectory = params.outputDirectory.get().asFile
+        outputDirectory.listFiles()?.forEach { stale ->
+            check(stale.deleteRecursively()) { "Failed to delete stale generated source: ${stale.absolutePath}" }
+        }
         specs.forEach { spec ->
             spec.writeTo(outputDirectory)
         }
@@ -88,6 +87,7 @@ private fun CodegenConfig.toBindgen() = BindgenCodegenConfig(
     generateSuspendingFactories = generateSuspendingFactories,
     runtime = BindgenCodegenRuntime.valueOf(runtime.name),
     wasi = BindgenWasiLinking.valueOf(wasi.name),
+    compiledCode = compiledCode,
 )
 
 private fun WasmFunction.toBindgen() = BindgenWasmFunction(

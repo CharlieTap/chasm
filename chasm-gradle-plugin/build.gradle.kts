@@ -27,10 +27,13 @@ val wasiPreview1Dependency = libs.wasi.emscripten.host.chasm.wasip1.kmp.get().no
 
 buildConfig {
     buildConfigField("TOOLING_BINDGEN_DEPENDENCY", libs.tooling.bindgen.get().notation())
+    buildConfigField("TOOLING_COMPILER_DEPENDENCY", libs.tooling.compiler.get().notation())
     buildConfigField("CHASM_DEPENDENCY", libs.chasm.kmp.get().notation())
     buildConfigField("CHASM_JVM_DEPENDENCY", libs.chasm.jvm.get().notation())
     buildConfigField("CHASM_COROUTINES_DEPENDENCY", libs.chasm.coroutines.kmp.get().notation())
     buildConfigField("CHASM_COROUTINES_JVM_DEPENDENCY", libs.chasm.coroutines.jvm.get().notation())
+    buildConfigField("CHASM_AOT_DEPENDENCY", libs.chasm.aot.kmp.get().notation())
+    buildConfigField("CHASM_AOT_JVM_DEPENDENCY", libs.chasm.aot.jvm.get().notation())
     buildConfigField("VM_DEPENDENCY", libs.vm.kmp.get().notation())
     buildConfigField("VM_JVM_DEPENDENCY", libs.vm.jvm.get().notation())
     buildConfigField("WASI_PREVIEW1_DEPENDENCY", wasiPreview1Dependency)
@@ -82,9 +85,7 @@ kotlin {
         compileOnly(libs.android.gradle.plugin)
         compileOnly(libs.kotlin.stdlib)
 
-        compileOnly(projects.chasm) {
-            because("We use the module and moduleInfo calls during codegen")
-        }
+        compileOnly(projects.tooling.compiler)
         compileOnly(projects.tooling.bindgen)
         compileOnly(libs.kotlin.poet)
     }
@@ -134,7 +135,9 @@ val functionalTestRepositories = configurations.resolvable("functionalTestReposi
 dependencies {
     add(functionalTestRepositoryDependencies.name, projects.chasm)
     add(functionalTestRepositoryDependencies.name, projects.tooling.bindgen)
+    add(functionalTestRepositoryDependencies.name, projects.tooling.compiler)
     add(functionalTestRepositoryDependencies.name, projects.chasmCoroutines)
+    add(functionalTestRepositoryDependencies.name, projects.chasmAot)
     add(functionalTestRepositoryDependencies.name, projects.vm)
 }
 

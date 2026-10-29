@@ -121,9 +121,12 @@ chasm-jvm = { module = "io.github.charlietap.chasm:chasm-jvm", version.ref = "ve
 chasm-kmp = { module = "io.github.charlietap.chasm:chasm", version.ref = "version-name"}
 chasm-coroutines-jvm = { module = "io.github.charlietap.chasm:chasm-coroutines-jvm", version.ref = "version-name"}
 chasm-coroutines-kmp = { module = "io.github.charlietap.chasm:chasm-coroutines", version.ref = "version-name"}
+chasm-aot-jvm = { module = "io.github.charlietap.chasm:chasm-aot-jvm", version.ref = "version-name"}
+chasm-aot-kmp = { module = "io.github.charlietap.chasm:chasm-aot", version.ref = "version-name"}
 vm-jvm = { module = "io.github.charlietap.chasm:vm-jvm", version.ref = "version-name"}
 vm-kmp = { module = "io.github.charlietap.chasm:vm", version.ref = "version-name"}
 tooling-bindgen = { module = "io.github.charlietap.chasm:tooling-bindgen", version.ref = "version-name"}
+tooling-compiler = { module = "io.github.charlietap.chasm:tooling-compiler", version.ref = "version-name"}
 
 asm = { module = "org.ow2.asm:asm", version.ref = "asm" }
 asm-tree = { module = "org.ow2.asm:asm-tree", version.ref = "asm" }

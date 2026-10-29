@@ -58,4 +58,6 @@ data class CodegenConfig(
     val runtime: CodegenRuntime = CodegenRuntime.PORTABLE_VM,
     @IntroducedAt("3.1.0")
     val wasi: WasiLinking = WasiLinking.DISABLED,
+    @IntroducedAt("3.2.0")
+    val compiledCode: String? = null,
 ) : Serializable

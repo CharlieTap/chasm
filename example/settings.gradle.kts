@@ -45,6 +45,7 @@ includeBuild("..") {
         substitute(module("io.github.charlietap.chasm:vm")).using(project(":vm"))
         substitute(module("io.github.charlietap.chasm:vm-jvm")).using(project(":vm"))
         substitute(module("io.github.charlietap.chasm:tooling-bindgen")).using(project(":tooling:bindgen"))
+        substitute(module("io.github.charlietap.chasm:tooling-compiler")).using(project(":tooling:compiler"))
         substitute(module("io.github.charlietap.chasm:chasm")).using(project(":chasm"))
         substitute(module("io.github.charlietap.chasm:chasm-jvm")).using(project(":chasm"))
     }

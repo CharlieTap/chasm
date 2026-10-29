@@ -304,6 +304,103 @@ class ChasmPluginFunctionalTest {
     }
 
     @Test
+    fun `compiled code rejects configurations it cannot serve`() {
+        val provider = "\"test.chasm.aot.WasmModule\""
+        listOf(
+            "compiledCode = $provider" to "compiledCode requires CodegenRuntime.CHASM",
+            "runtime = CodegenRuntime.CHASM, compiledCode = \"test.chasm.Outer\\${'$'}Inner\"" to
+                "compiledCode must name a class as Kotlin source does",
+        ).forEach { (config, message) ->
+            val project = project(
+                build = """
+                    import io.github.charlietap.chasm.gradle.CodegenConfig
+                    import io.github.charlietap.chasm.gradle.CodegenRuntime
+
+                    plugins {
+                        id("$pluginId")
+                        id("org.jetbrains.kotlin.jvm")
+                    }
+
+                    chasm {
+                        modules.create("CompiledService") {
+                            packageName.set("test.chasm")
+                            codegenConfig.set(CodegenConfig($config))
+                        }
+                    }
+                """,
+            )
+
+            val result = project.buildAndFail("codegenModuleMainCompiledService")
+
+            assertContains(result.output, message)
+        }
+    }
+
+    @Test
+    fun `compiled code is rejected in a multiplatform project with targets other than JVM and Android`() {
+        val project = project(
+            gradleProperties = "kotlin.native.ignoreDisabledTargets=true",
+            build = """
+                import io.github.charlietap.chasm.gradle.CodegenConfig
+                import io.github.charlietap.chasm.gradle.CodegenRuntime
+
+                plugins {
+                    id("$pluginId")
+                    id("org.jetbrains.kotlin.multiplatform")
+                }
+
+                chasm {
+                    modules.create("CompiledService") {
+                        packageName.set("test.chasm")
+                        codegenConfig.set(CodegenConfig(runtime = CodegenRuntime.CHASM, compiledCode = "test.chasm.aot.WasmModule"))
+                    }
+                }
+
+                kotlin {
+                    jvm()
+                    linuxX64()
+                }
+            """,
+        )
+
+        val result = project.buildAndFail("codegenModuleCommonMainCompiledService", gradleVersion = "9.7.1")
+
+        assertContains(result.output, "compiledCode only runs on JVM and Android targets, but this project also targets: linuxX64.")
+    }
+
+    @Test
+    fun `compiled code generates in a multiplatform project that only targets the JVM`() {
+        val project = project(
+            build = """
+                import io.github.charlietap.chasm.gradle.CodegenConfig
+                import io.github.charlietap.chasm.gradle.CodegenRuntime
+
+                plugins {
+                    id("$pluginId")
+                    id("org.jetbrains.kotlin.multiplatform")
+                }
+
+                chasm {
+                    modules.create("CompiledService") {
+                        packageName.set("test.chasm")
+                        codegenConfig.set(CodegenConfig(runtime = CodegenRuntime.CHASM, compiledCode = "test.chasm.aot.WasmModule"))
+                    }
+                }
+
+                kotlin {
+                    jvm()
+                }
+            """,
+        )
+
+        project.build("codegenModuleCommonMainCompiledService", gradleVersion = "9.7.1")
+
+        val generated = project.file("build/generated/kotlin/commonMain/CompiledService/test/chasm")
+        assertEquals(setOf("CompiledService.kt", "CompiledServiceCompiled.kt"), generated.list()?.toSet())
+        assertContains(project.build("dependencies", "--configuration=jvmCompileClasspath", gradleVersion = "9.7.1").output, ":chasm-aot:")
+    }
+
+    @Test
     fun `WASI Preview 1 linking accepts every published multiplatform target`() {
         val project = project(
             gradleProperties = "kotlin.native.ignoreDisabledTargets=true",
@@ -837,6 +934,203 @@ class ChasmPluginFunctionalTest {
         val result = project.build("run")
 
         assertContains(result.output, "SUSPENDING_DIRECT_CHASM_OK")
+    }
+
+    @Test
+    fun `a compiled module runs with only the dependencies the plugin adds`() {
+        val project = project(
+            build = """
+                import io.github.charlietap.chasm.gradle.CodegenConfig
+                import io.github.charlietap.chasm.gradle.CodegenRuntime
+
+                plugins {
+                    id("$pluginId")
+                    id("org.jetbrains.kotlin.jvm")
+                    application
+                }
+
+                val aotTool = sourceSets.create("aotTool")
+                dependencies {
+                    "aotToolImplementation"("io.github.charlietap.chasm:tooling-compiler:${pluginVersion.substringAfter('-')}")
+                }
+                val compiledModule = layout.buildDirectory.dir("compiled-module")
+                val compileModule = tasks.register<JavaExec>("compileModule") {
+                    classpath = aotTool.runtimeClasspath
+                    mainClass.set("tool.CompileKt")
+                    inputs.file("src/main/wasm/module.wasm")
+                    outputs.dir(compiledModule)
+                    args(file("src/main/wasm/module.wasm").absolutePath, compiledModule.get().asFile.absolutePath)
+                }
+                dependencies {
+                    implementation(files(compiledModule).builtBy(compileModule))
+                }
+
+                application {
+                    mainClass.set("test.consumer.Main")
+                }
+
+                chasm {
+                    modules.create("CompiledService") {
+                        packageName.set("test.generated")
+                        codegenConfig.set(CodegenConfig(runtime = CodegenRuntime.CHASM, compiledCode = "test.compiled.WasmModule"))
+                    }
+                }
+            """,
+            binary = ANSWER_WASM_MODULE,
+        )
+        project.write(
+            "src/aotTool/kotlin/tool/Compile.kt",
+            """
+                package tool
+
+                import io.github.charlietap.chasm.aot.CompileConfig
+                import io.github.charlietap.chasm.aot.CompileOutput
+                import io.github.charlietap.chasm.aot.compile
+                import io.github.charlietap.chasm.aot.expect
+                import java.io.File
+                import java.io.OutputStream
+                import java.nio.file.Path
+
+                fun main(
+                    args: Array<String>,
+                ) {
+                    val directory = File(args[1]).apply { deleteRecursively(); mkdirs() }
+                    val output = object : CompileOutput {
+                        override fun classFile(
+                            internalName: String,
+                            bytes: ByteArray,
+                        ) =
+                            File(directory, "${'$'}internalName.class").apply { parentFile.mkdirs() }.writeBytes(bytes)
+
+                        override fun resource(
+                            path: String,
+                            write: (OutputStream) -> Unit,
+                        ) =
+                            File(directory, path).apply { parentFile.mkdirs() }.outputStream().use(write)
+                    }
+                    compile(Path.of(args[0]), output, CompileConfig("test.compiled")).expect("compiles")
+                }
+            """,
+        )
+        project.write(
+            "src/main/kotlin/test/consumer/Main.kt",
+            """
+                package test.consumer
+
+                import test.generated.compiledService
+
+                object Main {
+                    @JvmStatic
+                    fun main(
+                        args: Array<String>,
+                    ) {
+                        check(compiledService().answer() == 42)
+                        check(compiledService().answer() == 42)
+                        println("COMPILED_MODULE_RAN")
+                    }
+                }
+            """,
+        )
+
+        val result = project.build("run")
+
+        assertContains(result.output, "COMPILED_MODULE_RAN")
+        val runtime = project.build("dependencies", "--configuration=runtimeClasspath").output
+        assertContains(runtime, ":chasm-aot-jvm:")
+        listOf(
+            ":chasm-jvm:",
+            ":decoder-jvm:",
+            ":validator-jvm:",
+            ":ast-jvm:",
+            ":frontend-jvm:",
+            ":tooling-compiler:",
+            ":tooling-bindgen:",
+        ).forEach { artifact ->
+            assertFalse(runtime.contains(artifact), "$artifact reaches the app")
+        }
+    }
+
+    @Test
+    fun `compiled code factories instantiate with the configured code`() {
+        val project = project(
+            build = """
+                import io.github.charlietap.chasm.gradle.CodegenConfig
+                import io.github.charlietap.chasm.gradle.CodegenRuntime
+
+                plugins {
+                    id("$pluginId")
+                    id("org.jetbrains.kotlin.jvm")
+                    application
+                }
+
+                application {
+                    mainClass.set("test.consumer.Main")
+                }
+
+                dependencies {
+                    implementation("io.github.charlietap.chasm:compiled-jvm:${pluginVersion.substringAfter('-')}")
+                    implementation("io.github.charlietap.chasm:module-declarations-jvm:${pluginVersion.substringAfter('-')}")
+                }
+
+                chasm {
+                    modules.create("CompiledService") {
+                        packageName.set("test.generated")
+                        codegenConfig.set(
+                            CodegenConfig(
+                                runtime = CodegenRuntime.CHASM,
+                                compiledCode = "test.consumer.StaleCode",
+                            ),
+                        )
+                    }
+                }
+            """,
+            binary = ANSWER_WASM_MODULE,
+        )
+        project.write(
+            "src/main/kotlin/test/consumer/Main.kt",
+            """
+                @file:OptIn(InternalChasmApi::class)
+
+                package test.consumer
+
+                import io.github.charlietap.chasm.InternalChasmApi
+                import io.github.charlietap.chasm.aot.CodeIdentity
+                import io.github.charlietap.chasm.aot.CompiledModule
+                import io.github.charlietap.chasm.declarations.ModuleDeclarations
+                import io.github.charlietap.chasm.runtime.compiled.CodeInstallation
+                import test.generated.compiledService
+
+                class StaleCode private constructor() : CompiledModule() {
+                    override val identity = CodeIdentity(abi = 0, meterFuel = false, interruptible = false)
+
+                    override fun install(
+                        installation: CodeInstallation,
+                    ) = error("stale code was installed")
+
+                    override fun buildDeclarations(): ModuleDeclarations = error("stale declarations were built")
+
+                    companion object {
+                        @JvmField
+                        val INSTANCE = StaleCode()
+                    }
+                }
+
+                object Main {
+                    @JvmStatic
+                    fun main(
+                        args: Array<String>,
+                    ) {
+                        val failure = runCatching { compiledService() }.exceptionOrNull()
+                        check(failure != null && "Failed to instantiate module" in failure.message.orEmpty()) { failure.toString() }
+                        println("COMPILED_CODE_REJECTED")
+                    }
+                }
+            """,
+        )
+
+        val result = project.build("run")
+
+        assertContains(result.output, "COMPILED_CODE_REJECTED")
     }
 
     @Test
@@ -1480,7 +1774,11 @@ class ChasmPluginFunctionalTest {
         val implementationChanged = project.build("compileKotlin", "--configuration-cache")
 
         assertTrue(implementationChanged.task(":codegenModuleMainStableService")?.outcome == TaskOutcome.UP_TO_DATE)
-        assertTrue(implementationChanged.task(":codegenModuleMainChangingService")?.outcome == TaskOutcome.SUCCESS)
+        assertEquals(
+            TaskOutcome.SUCCESS,
+            implementationChanged.task(":codegenModuleMainChangingService")?.outcome,
+            "configuration cache reused: ${"Configuration cache entry reused." in implementationChanged.output}",
+        )
         assertContains(
             project.readGenerated("main", "ChangingService", "ChangingServiceImpl.kt"),
             "internal fun changingService(",
@@ -1494,7 +1792,11 @@ class ChasmPluginFunctionalTest {
         val factoryChanged = project.build("compileKotlin", "--configuration-cache")
 
         assertTrue(factoryChanged.task(":codegenModuleMainStableService")?.outcome == TaskOutcome.UP_TO_DATE)
-        assertTrue(factoryChanged.task(":codegenModuleMainChangingService")?.outcome == TaskOutcome.SUCCESS)
+        assertEquals(
+            TaskOutcome.SUCCESS,
+            factoryChanged.task(":codegenModuleMainChangingService")?.outcome,
+            "configuration cache reused: ${"Configuration cache entry reused." in factoryChanged.output}",
+        )
         assertContains(
             project.readGenerated("main", "ChangingService", "ChangingServiceImpl.kt"),
             "public fun changingService(",
@@ -2005,6 +2307,10 @@ class ChasmPluginFunctionalTest {
             gradleVersion?.let(runner::withGradleVersion)
             return runner.buildAndFail()
         }
+
+        fun file(
+            relativePath: String,
+        ): java.io.File = directory.resolve(relativePath).toFile()
 
         fun write(relativePath: String, content: String) {
             val path = directory.resolve(relativePath)

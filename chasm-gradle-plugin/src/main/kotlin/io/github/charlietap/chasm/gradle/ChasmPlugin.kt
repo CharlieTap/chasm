@@ -28,8 +28,10 @@ class ChasmPlugin : Plugin<Project> {
             val commonMain = multiplatform.sourceSets.getByName(COMMON_MAIN_SOURCE_SET_NAME)
             val hasWebTarget = project.objects.property(Boolean::class.java).convention(false)
             val unsupportedWasiTargets = project.objects.setProperty(String::class.java).convention(emptySet())
+            val targetsWithoutCompiledCode = project.objects.setProperty(String::class.java).convention(emptySet())
             hasWebTarget.disallowUnsafeRead()
             unsupportedWasiTargets.disallowUnsafeRead()
+            targetsWithoutCompiledCode.disallowUnsafeRead()
 
             multiplatform.targets.configureEach { target ->
                 if (target.platformType == KotlinPlatformType.js || target.platformType == KotlinPlatformType.wasm) {
@@ -38,6 +40,9 @@ class ChasmPlugin : Plugin<Project> {
                 if (!target.supportsWasiPreview1()) {
                     unsupportedWasiTargets.add(target.name)
                 }
+                if (!target.runsCompiledCode()) {
+                    targetsWithoutCompiledCode.add(target.name)
+                }
             }
 
             extension.modules.configureEach { module ->
@@ -45,6 +50,7 @@ class ChasmPlugin : Plugin<Project> {
                     module.codegenConfig,
                     hasWebTarget,
                     unsupportedWasiTargets,
+                    targetsWithoutCompiledCode,
                 )
                 addRuntime(
                     project = project,
@@ -110,7 +116,7 @@ class ChasmPlugin : Plugin<Project> {
         val dependencies = project.configurations.dependencyScope(WORKER_DEPENDENCIES_CONFIGURATION_NAME) { configuration ->
             configuration.description = "Dependencies for the Chasm codegen worker"
         }
-        project.dependencies.add(dependencies.name, BuildConfig.CHASM_JVM_DEPENDENCY)
+        project.dependencies.add(dependencies.name, BuildConfig.TOOLING_COMPILER_DEPENDENCY)
         project.dependencies.add(dependencies.name, BuildConfig.TOOLING_BINDGEN_DEPENDENCY)
         project.dependencies.add(dependencies.name, resolveKotlinPoetNotation())
 
@@ -139,59 +145,64 @@ class ChasmPlugin : Plugin<Project> {
         jvmArtifact: Boolean = false,
     ) {
         val runtimeNotation = config.map { value ->
-            when (value.runtime) {
-                CodegenRuntime.PORTABLE_VM -> resolveVMRuntimeNotation(jvmArtifact)
-                CodegenRuntime.CHASM -> resolveChasmRuntimeNotation(jvmArtifact)
+            when {
+                value.runtime == CodegenRuntime.PORTABLE_VM -> resolveVMRuntimeNotation(jvmArtifact)
+                value.compiledCode != null -> resolveChasmAotRuntimeNotation(jvmArtifact)
+                else -> resolveChasmRuntimeNotation(jvmArtifact)
             }
         }
-        project.dependencies.addProvider(
-            apiConfigurationName,
-            selection.filter { it == RuntimeDependencyConfiguration.API }.flatMap { runtimeNotation },
-        )
-        project.dependencies.addProvider(
-            implementationConfigurationName,
-            selection.filter { it == RuntimeDependencyConfiguration.IMPLEMENTATION }.flatMap { runtimeNotation },
-        )
+        addDependency(project, selection, apiConfigurationName, implementationConfigurationName, runtimeNotation)
 
         val coroutineNotation = config.filter { value ->
-            value.runtime == CodegenRuntime.CHASM && value.generateSuspendingFactories
-        }
-            .map { resolveChasmCoroutinesRuntimeNotation(jvmArtifact) }
-        project.dependencies.addProvider(
-            apiConfigurationName,
-            selection.filter { it == RuntimeDependencyConfiguration.API }.flatMap { coroutineNotation },
-        )
-        project.dependencies.addProvider(
-            implementationConfigurationName,
-            selection.filter { it == RuntimeDependencyConfiguration.IMPLEMENTATION }.flatMap { coroutineNotation },
-        )
+            value.runtime == CodegenRuntime.CHASM && value.compiledCode == null && value.generateSuspendingFactories
+        }.map { resolveChasmCoroutinesRuntimeNotation(jvmArtifact) }
+        addDependency(project, selection, apiConfigurationName, implementationConfigurationName, coroutineNotation)
 
-        val wasiPreview1Notation = config.filter { value -> value.wasi == WasiLinking.AUTOMATIC }
+        val wasiPreview1Notation = config.filter { value -> value.compiledCode == null && value.wasi == WasiLinking.AUTOMATIC }
             .map { resolveWasiPreview1RuntimeNotation() }
+        addDependency(project, selection, apiConfigurationName, implementationConfigurationName, wasiPreview1Notation)
+    }
+
+    private fun addDependency(
+        project: Project,
+        selection: Provider<RuntimeDependencyConfiguration>,
+        apiConfigurationName: String,
+        implementationConfigurationName: String,
+        notation: Provider<String>,
+    ) {
         project.dependencies.addProvider(
             apiConfigurationName,
-            selection.filter { it == RuntimeDependencyConfiguration.API }.flatMap { wasiPreview1Notation },
+            selection.filter { it == RuntimeDependencyConfiguration.API }.flatMap { notation },
         )
         project.dependencies.addProvider(
             implementationConfigurationName,
-            selection.filter { it == RuntimeDependencyConfiguration.IMPLEMENTATION }.flatMap { wasiPreview1Notation },
+            selection.filter { it == RuntimeDependencyConfiguration.IMPLEMENTATION }.flatMap { notation },
         )
     }
 
     private fun validatedCodegenConfig(config: Provider<CodegenConfig>): Provider<CodegenConfig> = config.map { value ->
-        validateWasiRuntime(value)
+        validateRuntime(value)
     }
 
     private fun validatedCodegenConfig(
         config: Provider<CodegenConfig>,
         hasWebTarget: Provider<Boolean>,
         unsupportedWasiTargets: Provider<Set<String>>,
+        targetsWithoutCompiledCode: Provider<Set<String>>,
     ): Provider<CodegenConfig> = config.zip(
-        hasWebTarget.zip(unsupportedWasiTargets) { webTarget, unsupportedTargets ->
-            TargetCompatibility(webTarget, unsupportedTargets)
-        },
+        hasWebTarget.zip(unsupportedWasiTargets) { webTarget, wasi -> webTarget to wasi }
+            .zip(targetsWithoutCompiledCode) { (webTarget, wasi), withoutCompiledCode ->
+                TargetCompatibility(webTarget, wasi, withoutCompiledCode)
+            },
     ) { configuredValue, compatibility ->
-        val value = validateWasiRuntime(configuredValue)
+        val value = validateRuntime(configuredValue)
+        if (value.compiledCode != null && compatibility.targetsWithoutCompiledCode.isNotEmpty()) {
+            throw InvalidUserCodeException(
+                "compiledCode only runs on JVM and Android targets, but this project also targets: " +
+                    compatibility.targetsWithoutCompiledCode.sorted().joinToString(", ") + ". " +
+                    "Remove compiledCode, or generate this module in a project that targets only JVM and Android.",
+            )
+        }
         if (value.wasi == WasiLinking.AUTOMATIC && compatibility.unsupportedWasiTargets.isNotEmpty()) {
             throw InvalidUserCodeException(
                 "The current Preview 1 provider for WasiLinking.AUTOMATIC does not support targets: " +
@@ -208,11 +219,24 @@ class ChasmPlugin : Plugin<Project> {
         value
     }
 
-    private fun validateWasiRuntime(config: CodegenConfig): CodegenConfig {
+    private fun validateRuntime(
+        config: CodegenConfig,
+    ): CodegenConfig {
         if (config.wasi == WasiLinking.AUTOMATIC && config.runtime != CodegenRuntime.CHASM) {
             throw InvalidUserCodeException(
                 "WasiLinking.AUTOMATIC requires CodegenRuntime.CHASM because the WASI binding uses " +
                     "Chasm's direct host-function API.",
+            )
+        }
+        if (config.compiledCode != null && config.runtime != CodegenRuntime.CHASM) {
+            throw InvalidUserCodeException(
+                "compiledCode requires CodegenRuntime.CHASM because compiled code runs on Chasm's own runtime.",
+            )
+        }
+        if (config.compiledCode != null && !QUALIFIED_CLASS_NAME.matches(config.compiledCode)) {
+            throw InvalidUserCodeException(
+                "compiledCode must name a class as Kotlin source does, such as com.example.aot.WasmModule:" +
+                    "\"${config.compiledCode}\" is not one.",
             )
         }
         return config
@@ -224,6 +248,12 @@ class ChasmPlugin : Plugin<Project> {
 
     private fun resolveChasmRuntimeNotation(jvmArtifact: Boolean = false): String {
         return if (jvmArtifact) BuildConfig.CHASM_JVM_DEPENDENCY else BuildConfig.CHASM_DEPENDENCY
+    }
+
+    private fun resolveChasmAotRuntimeNotation(
+        jvmArtifact: Boolean = false,
+    ): String {
+        return if (jvmArtifact) BuildConfig.CHASM_AOT_JVM_DEPENDENCY else BuildConfig.CHASM_AOT_DEPENDENCY
     }
 
     private fun resolveChasmCoroutinesRuntimeNotation(jvmArtifact: Boolean = false): String {
@@ -243,6 +273,7 @@ class ChasmPlugin : Plugin<Project> {
     private data class TargetCompatibility(
         val hasWebTarget: Boolean,
         val unsupportedWasiTargets: Set<String>,
+        val targetsWithoutCompiledCode: Set<String>,
     )
 
     private companion object {
@@ -255,6 +286,19 @@ class ChasmPlugin : Plugin<Project> {
         private const val WORKER_DEPENDENCIES_CONFIGURATION_NAME = "chasmCodegenWorkerDependencies"
         private const val WORKER_CLASSPATH_CONFIGURATION_NAME = "chasmCodegenWorkerClasspath"
     }
+}
+
+private val QUALIFIED_CLASS_NAME = Regex("[A-Za-z_][A-Za-z0-9_]*(\\.[A-Za-z_][A-Za-z0-9_]*)*")
+
+private fun KotlinTarget.runsCompiledCode(): Boolean = when (platformType) {
+    KotlinPlatformType.jvm,
+    KotlinPlatformType.androidJvm,
+    KotlinPlatformType.common,
+    -> true
+    KotlinPlatformType.native,
+    KotlinPlatformType.js,
+    KotlinPlatformType.wasm,
+    -> false
 }
 
 private fun KotlinTarget.supportsWasiPreview1(): Boolean = when (platformType) {

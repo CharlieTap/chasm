@@ -269,3 +269,19 @@ will become
   var mutableGlobal: Int
   val immutableGlobal: Int
 ```
+
+## Generating bindings without the plugin
+
+The plugin's code generation is published on its own as `io.github.charlietap.chasm:tooling-bindgen`, for build tools
+that drive it themselves. It takes the module's exports as Chasm describes them, which
+`io.github.charlietap.chasm:tooling-compiler` reads from the binary, and the same options the plugin's DSL sets, and
+returns the generated files:
+
+```kotlin
+val info = inspectModule(binary, ModuleConfig(decodeNameSection = true)).expect("Failed to decode")
+val files = BindingGenerator().generate(
+    info,
+    BindingOptions(interfaceName = "ExampleService", packageName = "com.example"),
+)
+files.forEach { file -> file.writeTo(outputDirectory) }
+```
