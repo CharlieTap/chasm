@@ -18,7 +18,14 @@ import io.github.charlietap.chasm.runtime.value.NumberValue
 import kotlin.time.Clock
 
 /** Takes an optional store configuration: `plain` (the default), `fuel`, `interrupt`, or `fuel+interrupt`. */
-fun main(args: Array<String>) {
+fun main(
+    args: Array<String>,
+) = runCoremark(args) { config -> CoremarkBenchmark(config).run() }
+
+internal fun runCoremark(
+    args: Array<String>,
+    benchmark: (StoreConfig) -> Unit,
+) {
     val config = when (val name = args.firstOrNull() ?: "plain") {
         "plain" -> StoreConfig()
         "fuel" -> StoreConfig(meterFuel = true)
@@ -37,8 +44,7 @@ fun main(args: Array<String>) {
         "CoreMark started on logical CPU ${start.cpuId}, outside the fastest class"
     }
 
-    val benchmark = CoremarkBenchmark(config)
-    benchmark.run()
+    benchmark(config)
 
     val placement = BenchmarkStabilizer.finishTrial(start, effectiveTopology)
     check(placement.isValid) {

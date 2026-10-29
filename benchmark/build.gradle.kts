@@ -86,6 +86,13 @@ kotlin {
             }
         }
 
+        jvmMain {
+            dependencies {
+                implementation(projects.chasmAot)
+                implementation(projects.tooling.compiler)
+            }
+        }
+
         commonTest {
             dependencies {
                 implementation(libs.kotlin.test)
@@ -101,10 +108,19 @@ tasks.register<JavaExec>("coremark") {
     mainClass.set("io.github.charlietap.chasm.benchmark.coremark.CoremarkBenchmarkKt")
 }
 
+tasks.register<JavaExec>("coremarkCompiled") {
+    group = "benchmark"
+    description = "Run the Coremark benchmark compiled ahead of time to JVM classes"
+    classpath = kotlin.jvm().compilations["main"].run { runtimeDependencyFiles + output.allOutputs }
+    mainClass.set("io.github.charlietap.chasm.benchmark.coremark.CompiledCoremarkBenchmarkKt")
+    jvmArgs("-Xss32m")
+}
+
 tasks.withType<JavaExec>().configureEach {
     if (JavaVersion.current() >= JavaVersion.VERSION_24) {
         jvmArgs("--enable-native-access=ALL-UNNAMED")
     }
+    providers.gradleProperty("benchmark.jvmArgs").orNull?.let { options -> jvmArgs(options.split(' ').filter(String::isNotBlank)) }
 }
 
 tasks.withType<ConfigurableKtLintTask>().configureEach {
