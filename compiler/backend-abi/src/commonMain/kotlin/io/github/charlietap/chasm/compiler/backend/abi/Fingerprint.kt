@@ -2,7 +2,7 @@ package io.github.charlietap.chasm.compiler.backend.abi
 
 data class Fingerprint(
     val module: String,
-    val shape: String = "",
+    val layout: String = "",
     val runtimeAbi: Int,
     val meterFuel: Boolean,
     val interruptible: Boolean,

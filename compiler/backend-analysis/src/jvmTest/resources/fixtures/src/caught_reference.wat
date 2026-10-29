@@ -1,0 +1,11 @@
+(module
+  (type (func))
+  (import "env" "throws" (func $throws (type 0)))
+  (import "env" "churn" (func $churn (type 0)))
+  (func (export "run") (type 0)
+    (block $caught (result exnref)
+      (try_table (catch_all_ref $caught)
+        (call $throws))
+      (return))
+    (call $churn)
+    (throw_ref)))
