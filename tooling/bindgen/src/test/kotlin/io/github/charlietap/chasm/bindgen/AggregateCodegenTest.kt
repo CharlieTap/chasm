@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.bindgen
 
 import io.github.charlietap.chasm.bindgen.fixture.aggregateType
+import io.github.charlietap.chasm.bindgen.fixture.codegenConfig
 import io.github.charlietap.chasm.bindgen.fixture.doubleScalarType
 import io.github.charlietap.chasm.bindgen.fixture.field
 import io.github.charlietap.chasm.bindgen.fixture.floatScalarType
@@ -26,7 +27,22 @@ import kotlin.test.Test
 class AggregateCodegenTest {
 
     @Test
-    fun `generates complete test service`() {
+    fun `generates complete test service`() = assertGenerates(
+        category = "aggregate",
+        wasmInterface = testService("TestService"),
+    )
+
+    @Test
+    fun `generates complete test service run as compiled code`() = assertGenerates(
+        category = "aggregate",
+        wasmInterface = testService("CompiledTestService"),
+        config = codegenConfig(compiledCode = "com.test.chasm.aot.WasmModule"),
+        runtimes = listOf(CodegenRuntime.CHASM),
+    )
+
+    private fun testService(
+        interfaceName: String,
+    ): WasmInterface {
         val multipleReturnResult = generatedType(
             name = "MultipleReturnFunctionResult",
             fields = listOf(
@@ -34,75 +50,72 @@ class AggregateCodegenTest {
                 field("r1", longScalarType()),
             ),
         )
-        assertGenerates(
-            category = "aggregate",
-            wasmInterface = wasmInterface(
-                interfaceName = "TestService",
-                packageName = "com.test.chasm",
-                types = listOf(multipleReturnResult),
-                functions = listOf(
-                    numericReturnFunction("intFunction", "int_function", integerScalarType(), i32ValueType()),
-                    numericReturnFunction("longFunction", "long_function", longScalarType(), i64ValueType()),
-                    numericReturnFunction("floatFunction", "float_function", floatScalarType(), f32ValueType()),
-                    numericReturnFunction("doubleFunction", "double_function", doubleScalarType(), f64ValueType()),
-                    stringReturnFunction(
-                        "palStringFunction",
-                        "pal_string_function",
-                        StringEncodingStrategy.POINTER_AND_LENGTH,
-                        listOf(i32ValueType(), i32ValueType()),
-                    ),
-                    stringReturnFunction(
-                        "lengthPrefixedStringFunction",
-                        "length_prefixed_string_function",
-                        StringEncodingStrategy.LENGTH_PREFIXED,
-                        listOf(i32ValueType()),
-                    ),
-                    stringReturnFunction(
-                        "nullTerminatedStringFunction",
-                        "null_terminated_string_function",
-                        StringEncodingStrategy.NULL_TERMINATED,
-                        listOf(i32ValueType()),
-                    ),
-                    stringReturnFunction(
-                        "packedI64StringFunction",
-                        "packed_i64_string_function",
-                        StringEncodingStrategy.PACKED_POINTER_AND_LENGTH,
-                        listOf(i64ValueType()),
-                    ),
-                    function(name = "unitFunction", implementation = functionProxy("unit_function")),
-                    function(
-                        name = "multipleParamFunction",
-                        params = listOf(
-                            functionParameter("p0", integerScalarType()),
-                            functionParameter("p1", doubleScalarType()),
-                        ),
-                        returns = functionReturn(doubleScalarType()),
-                        resultTypes = listOf(f64ValueType()),
-                        implementation = functionProxy("multiple_param_function"),
-                    ),
-                    function(
-                        name = "multipleReturnFunction",
-                        returns = functionReturn(aggregateType(multipleReturnResult)),
-                        resultTypes = listOf(i32ValueType(), i64ValueType()),
-                        implementation = functionProxy("multiple_return_function"),
-                    ),
+        return wasmInterface(
+            interfaceName = interfaceName,
+            packageName = "com.test.chasm",
+            types = listOf(multipleReturnResult),
+            functions = listOf(
+                numericReturnFunction("intFunction", "int_function", integerScalarType(), i32ValueType()),
+                numericReturnFunction("longFunction", "long_function", longScalarType(), i64ValueType()),
+                numericReturnFunction("floatFunction", "float_function", floatScalarType(), f32ValueType()),
+                numericReturnFunction("doubleFunction", "double_function", doubleScalarType(), f64ValueType()),
+                stringReturnFunction(
+                    "palStringFunction",
+                    "pal_string_function",
+                    StringEncodingStrategy.POINTER_AND_LENGTH,
+                    listOf(i32ValueType(), i32ValueType()),
                 ),
-                properties = listOf(
-                    property(
-                        "mutableGlobal",
-                        integerScalarType(),
-                        false,
-                        globalProxy("mutable_global", VALUE_I32_CLASS_NAME),
-                    ),
-                    property(
-                        "immutableGlobal",
-                        integerScalarType(),
-                        true,
-                        globalProxy("immutable_global", VALUE_I32_CLASS_NAME),
-                    ),
+                stringReturnFunction(
+                    "lengthPrefixedStringFunction",
+                    "length_prefixed_string_function",
+                    StringEncodingStrategy.LENGTH_PREFIXED,
+                    listOf(i32ValueType()),
                 ),
-                memories = listOf(memoryBinding("memory", "memory")),
+                stringReturnFunction(
+                    "nullTerminatedStringFunction",
+                    "null_terminated_string_function",
+                    StringEncodingStrategy.NULL_TERMINATED,
+                    listOf(i32ValueType()),
+                ),
+                stringReturnFunction(
+                    "packedI64StringFunction",
+                    "packed_i64_string_function",
+                    StringEncodingStrategy.PACKED_POINTER_AND_LENGTH,
+                    listOf(i64ValueType()),
+                ),
+                function(name = "unitFunction", implementation = functionProxy("unit_function")),
+                function(
+                    name = "multipleParamFunction",
+                    params = listOf(
+                        functionParameter("p0", integerScalarType()),
+                        functionParameter("p1", doubleScalarType()),
+                    ),
+                    returns = functionReturn(doubleScalarType()),
+                    resultTypes = listOf(f64ValueType()),
+                    implementation = functionProxy("multiple_param_function"),
+                ),
+                function(
+                    name = "multipleReturnFunction",
+                    returns = functionReturn(aggregateType(multipleReturnResult)),
+                    resultTypes = listOf(i32ValueType(), i64ValueType()),
+                    implementation = functionProxy("multiple_return_function"),
+                ),
             ),
+            properties = listOf(
+                property(
+                    "mutableGlobal",
+                    integerScalarType(),
+                    false,
+                    globalProxy("mutable_global", VALUE_I32_CLASS_NAME),
+                ),
+                property(
+                    "immutableGlobal",
+                    integerScalarType(),
+                    true,
+                    globalProxy("immutable_global", VALUE_I32_CLASS_NAME),
+                ),
+            ),
+            memories = listOf(memoryBinding("memory", "memory")),
         )
     }
 

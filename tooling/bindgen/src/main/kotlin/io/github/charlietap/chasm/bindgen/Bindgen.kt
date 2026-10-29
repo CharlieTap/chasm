@@ -58,6 +58,10 @@ private class KotlinPoetBindingGenerator(
             ignoredExports = options.ignoredExports,
             logger = logger,
         )
+        require(!options.config.runsCompiledCode || !wasmInterface.linksWasiPreview1) {
+            "WasiLinking.AUTOMATIC is not supported for compiled code yet. Use WasiLinking.DISABLED and " +
+                "pass the module's WASI imports."
+        }
         return WasmInterfaceGenerator()(
             interfaceVisibility = options.interfaceVisibility,
             implementationVisibility = options.implementationVisibility,

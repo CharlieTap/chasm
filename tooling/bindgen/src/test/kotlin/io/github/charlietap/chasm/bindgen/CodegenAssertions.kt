@@ -12,11 +12,15 @@ internal fun assertGenerates(
     config: CodegenConfig = CodegenConfig(),
     runtimes: Iterable<CodegenRuntime> = CodegenRuntime.entries,
 ) {
-    val expectedFileNames = listOf(
-        wasmInterface.interfaceName,
-        wasmInterface.interfaceName + "Impl",
-    )
+    val implementationFileName = wasmInterface.interfaceName + "Impl"
+    val compiledFileName = wasmInterface.interfaceName + "Compiled"
     val generatedByRuntime = runtimes.associateWith { runtime ->
+        val compiled = runtime == CodegenRuntime.CHASM && config.compiledCode != null
+        val expectedFileNames = listOfNotNull(
+            wasmInterface.interfaceName,
+            implementationFileName.takeIf { !compiled },
+            compiledFileName.takeIf { compiled },
+        )
         WasmInterfaceGenerator()(
             interfaceVisibility = interfaceVisibility,
             factoryVisibility = factoryVisibility,
@@ -42,10 +46,14 @@ internal fun assertGenerates(
     )
 
     generatedByRuntime.forEach { (runtime, files) ->
-        assertGolden(
-            path = "codegen/implementation/${runtime.goldenDirectory}/$category/${wasmInterface.interfaceName}Impl.kt.txt",
-            actual = files.getValue(wasmInterface.interfaceName + "Impl").toString(),
-        )
+        listOf(implementationFileName, compiledFileName).forEach { name ->
+            files[name]?.let { file ->
+                assertGolden(
+                    path = "codegen/implementation/${runtime.goldenDirectory}/$category/$name.kt.txt",
+                    actual = file.toString(),
+                )
+            }
+        }
     }
 }
 

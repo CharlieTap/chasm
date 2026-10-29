@@ -50,16 +50,18 @@ public final class io/github/charlietap/chasm/bindgen/BindingOptions : java/io/S
 
 public final class io/github/charlietap/chasm/bindgen/CodegenConfig : java/io/Serializable {
 	public fun <init> ()V
-	public fun <init> (ZZZLio/github/charlietap/chasm/bindgen/CodegenRuntime;Lio/github/charlietap/chasm/bindgen/WasiLinking;)V
-	public synthetic fun <init> (ZZZLio/github/charlietap/chasm/bindgen/CodegenRuntime;Lio/github/charlietap/chasm/bindgen/WasiLinking;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (ZZZLio/github/charlietap/chasm/bindgen/CodegenRuntime;Lio/github/charlietap/chasm/bindgen/WasiLinking;Ljava/lang/String;)V
+	public synthetic fun <init> (ZZZLio/github/charlietap/chasm/bindgen/CodegenRuntime;Lio/github/charlietap/chasm/bindgen/WasiLinking;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1 ()Z
 	public final fun component2 ()Z
 	public final fun component3 ()Z
 	public final fun component4 ()Lio/github/charlietap/chasm/bindgen/CodegenRuntime;
 	public final fun component5 ()Lio/github/charlietap/chasm/bindgen/WasiLinking;
-	public final fun copy (ZZZLio/github/charlietap/chasm/bindgen/CodegenRuntime;Lio/github/charlietap/chasm/bindgen/WasiLinking;)Lio/github/charlietap/chasm/bindgen/CodegenConfig;
-	public static synthetic fun copy$default (Lio/github/charlietap/chasm/bindgen/CodegenConfig;ZZZLio/github/charlietap/chasm/bindgen/CodegenRuntime;Lio/github/charlietap/chasm/bindgen/WasiLinking;ILjava/lang/Object;)Lio/github/charlietap/chasm/bindgen/CodegenConfig;
+	public final fun component6 ()Ljava/lang/String;
+	public final fun copy (ZZZLio/github/charlietap/chasm/bindgen/CodegenRuntime;Lio/github/charlietap/chasm/bindgen/WasiLinking;Ljava/lang/String;)Lio/github/charlietap/chasm/bindgen/CodegenConfig;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/bindgen/CodegenConfig;ZZZLio/github/charlietap/chasm/bindgen/CodegenRuntime;Lio/github/charlietap/chasm/bindgen/WasiLinking;Ljava/lang/String;ILjava/lang/Object;)Lio/github/charlietap/chasm/bindgen/CodegenConfig;
 	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCompiledCode ()Ljava/lang/String;
 	public final fun getGenerateSuspendingFactories ()Z
 	public final fun getGenerateTypesafeGlobalProperties ()Z
 	public final fun getGenerateTypesafeMemoryProperties ()Z

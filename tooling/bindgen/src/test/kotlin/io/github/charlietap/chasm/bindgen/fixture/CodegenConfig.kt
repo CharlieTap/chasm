@@ -10,10 +10,12 @@ internal fun codegenConfig(
     generateSuspendingFactories: Boolean = false,
     runtime: CodegenRuntime = CodegenRuntime.PORTABLE_VM,
     wasi: WasiLinking = WasiLinking.DISABLED,
+    compiledCode: String? = null,
 ) = CodegenConfig(
     generateTypesafeGlobalProperties = generateTypesafeGlobalProperties,
     generateTypesafeMemoryProperties = generateTypesafeMemoryProperties,
     generateSuspendingFactories = generateSuspendingFactories,
     runtime = runtime,
     wasi = wasi,
+    compiledCode = compiledCode,
 )

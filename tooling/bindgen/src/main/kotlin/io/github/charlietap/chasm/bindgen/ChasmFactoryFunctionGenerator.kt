@@ -88,6 +88,50 @@ internal class ChasmFactoryFunctionGenerator {
             )
         }.build()
     }
+
+    fun compiledFactory(
+        packageName: String,
+        interfaceName: String,
+        visibility: FactoryVisibility,
+        compiledCode: String,
+    ): FunSpec {
+        val compiled = ClassName(compiledCode.substringBeforeLast('.', ""), compiledCode.substringAfterLast('.'))
+        val visibilityModifier = when (visibility) {
+            FactoryVisibility.INTERNAL -> KModifier.INTERNAL
+            FactoryVisibility.PUBLIC -> KModifier.PUBLIC
+        }
+
+        return FunSpec.builder(interfaceName.replaceFirstChar { character -> character.lowercaseChar() }).apply {
+            addModifiers(visibilityModifier)
+            addParameter(
+                ParameterSpec.builder("imports", CHASM_CODEGEN_IMPORT_LIST_CLASS_NAME)
+                    .defaultValue("emptyList()")
+                    .build(),
+            )
+            addParameter(
+                ParameterSpec.builder("instanceFactory", CHASM_COMPILED_INSTANCE_FACTORY_CLASS_NAME.copy(nullable = true))
+                    .defaultValue("null")
+                    .build(),
+            )
+            returns(ClassName(packageName, interfaceName))
+
+            addStatement("val store = %M()", CHASM_STORE)
+            addStatement("val allocatedImports = %M(store, imports)", CHASM_ALLOCATE_IMPORTS)
+            addStatement(
+                "val instance = instanceFactory?.invoke(store, %T.INSTANCE, allocatedImports) ?: " +
+                    "%M(store, %T.INSTANCE, allocatedImports).%M(%S)",
+                compiled,
+                CHASM_COMPILED_INSTANCE,
+                compiled,
+                CHASM_EXPECT,
+                "Failed to instantiate module",
+            )
+            addStatement(
+                "return %T(store = store, instance = instance)",
+                ClassName(packageName, interfaceName + "CompiledImpl"),
+            )
+        }.build()
+    }
 }
 
 internal val CHASM_STORE_CLASS_NAME = ClassName("io.github.charlietap.chasm.embedding.shapes", "Store")
@@ -112,6 +156,8 @@ internal val CHASM_INSTANCE_FACTORY_CLASS_NAME =
     ClassName("io.github.charlietap.chasm.embedding.codegen", "InstanceFactory")
 internal val CHASM_SUSPEND_INSTANCE_FACTORY_CLASS_NAME =
     ClassName("io.github.charlietap.chasm.embedding.codegen", "SuspendInstanceFactory")
+internal val CHASM_COMPILED_INSTANCE_FACTORY_CLASS_NAME =
+    ClassName("io.github.charlietap.chasm.embedding.codegen", "CompiledInstanceFactory")
 internal val WASI_EMBEDDER_HOST_CLASS_NAME = ClassName("at.released.weh.host", "EmbedderHost")
 internal val WASI_PREVIEW1_BUILDER_CLASS_NAME =
     ClassName("at.released.weh.bindings.chasm.wasip1", "ChasmWasiPreview1Builder")
@@ -119,6 +165,7 @@ internal val WASI_PREVIEW1_BUILDER_CLASS_NAME =
 internal val CHASM_STORE = MemberName("io.github.charlietap.chasm.embedding", "store")
 internal val CHASM_MODULE = MemberName("io.github.charlietap.chasm.embedding", "module")
 internal val CHASM_INSTANCE = MemberName("io.github.charlietap.chasm.embedding", "instance")
+internal val CHASM_COMPILED_INSTANCE = MemberName("io.github.charlietap.chasm.aot", "instance")
 internal val CHASM_SUSPENDING_MODULE = MemberName("io.github.charlietap.chasm.coroutines", "module")
 internal val CHASM_SUSPENDING_INSTANCE = MemberName("io.github.charlietap.chasm.coroutines", "instance")
 internal val CHASM_ALLOCATE_IMPORTS = MemberName("io.github.charlietap.chasm.embedding.codegen", "allocateImports")

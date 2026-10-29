@@ -51,4 +51,8 @@ data class CodegenConfig(
     val generateSuspendingFactories: Boolean = false,
     val runtime: CodegenRuntime = CodegenRuntime.PORTABLE_VM,
     val wasi: WasiLinking = WasiLinking.DISABLED,
+    val compiledCode: String? = null,
 ) : Serializable
+
+internal val CodegenConfig.runsCompiledCode: Boolean
+    get() = runtime == CodegenRuntime.CHASM && compiledCode != null

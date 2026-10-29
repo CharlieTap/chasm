@@ -1,0 +1,24 @@
+package com.test
+
+import com.test.aot.WasmModule
+import io.github.charlietap.chasm.aot.instance
+import io.github.charlietap.chasm.embedding.codegen.CodegenImport
+import io.github.charlietap.chasm.embedding.codegen.CompiledInstanceFactory
+import io.github.charlietap.chasm.embedding.codegen.allocateImports
+import io.github.charlietap.chasm.embedding.shapes.Instance
+import io.github.charlietap.chasm.embedding.shapes.Store
+import io.github.charlietap.chasm.embedding.shapes.`expect`
+import io.github.charlietap.chasm.embedding.store
+import kotlin.collections.List
+
+public fun compiledConstruction(imports: List<CodegenImport> = emptyList(), instanceFactory: CompiledInstanceFactory? = null): CompiledConstruction {
+  val store = store()
+  val allocatedImports = allocateImports(store, imports)
+  val instance = instanceFactory?.invoke(store, WasmModule.INSTANCE, allocatedImports) ?: instance(store, WasmModule.INSTANCE, allocatedImports).`expect`("Failed to instantiate module")
+  return CompiledConstructionCompiledImpl(store = store, instance = instance)
+}
+
+private class CompiledConstructionCompiledImpl(
+  private val store: Store,
+  private val instance: Instance,
+) : CompiledConstruction

@@ -42,6 +42,13 @@ class ConstructionCodegenTest {
     )
 
     @Test
+    fun `generates construction with compiled code`() = assertConstruction(
+        scenario = "CompiledConstruction",
+        config = codegenConfig(compiledCode = "com.test.aot.WasmModule"),
+        runtimes = listOf(CodegenRuntime.CHASM),
+    )
+
+    @Test
     fun `generates initializers`() = assertGenerates(
         category = "construction",
         wasmInterface = wasmInterface(

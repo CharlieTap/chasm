@@ -18,13 +18,15 @@ import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.UNIT
 import io.github.charlietap.chasm.bindgen.ext.asTypeName
 
-internal class ChasmClassImplementationGenerator {
+internal class ChasmClassImplementationGenerator(
+    private val implementationSuffix: String = "Impl",
+) {
     operator fun invoke(
         packageName: String,
         interfaceName: String,
         visibility: ImplementationVisibility,
         wasmInterface: WasmInterface,
-    ): TypeSpec = TypeSpec.classBuilder(interfaceName + "Impl").apply {
+    ): TypeSpec = TypeSpec.classBuilder(interfaceName + implementationSuffix).apply {
         addModifiers(visibility.modifier())
         addSuperinterface(ClassName(packageName, interfaceName))
         addConstructor()
@@ -138,7 +140,7 @@ internal class ChasmClassImplementationGenerator {
             addProperty(
                 PropertySpec.builder(memory.name, ClassName(packageName, interfaceName, "Memory"))
                     .addModifiers(KModifier.OVERRIDE)
-                    .initializer("%T(store, %N)", ClassName(packageName, interfaceName + "Impl", "MemoryImpl"), memory.backingName)
+                    .initializer("%T(store, %N)", ClassName(packageName, interfaceName + implementationSuffix, "MemoryImpl"), memory.backingName)
                     .build(),
             )
         }

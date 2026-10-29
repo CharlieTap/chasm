@@ -39,6 +39,7 @@ internal class WasmInterfaceGenerator(
     private val portableVmClassImplementationGenerator: PortableVmClassImplementationGenerator = PortableVmClassImplementationGenerator(),
     private val chasmFactoryFunctionGenerator: ChasmFactoryFunctionGenerator = ChasmFactoryFunctionGenerator(),
     private val chasmClassImplementationGenerator: ChasmClassImplementationGenerator = ChasmClassImplementationGenerator(),
+    private val compiledClassImplementationGenerator: ChasmClassImplementationGenerator = ChasmClassImplementationGenerator("CompiledImpl"),
     private val visibilityValidator: VisibilityValidator = VisibilityValidator(),
 ) {
     operator fun invoke(
@@ -55,51 +56,89 @@ internal class WasmInterfaceGenerator(
             implementationVisibility = implementationVisibility,
         )
 
-        val interfaceFile = FileSpec.builder(wasmInterface.packageName, wasmInterface.interfaceName).apply {
-            wasmInterface.types.forEach { type ->
-                addType(dataClassGenerator(wasmInterface.packageName, type))
-            }
-            addType(classInterfaceGenerator(wasmInterface.packageName, wasmInterface.interfaceName, interfaceVisibility, wasmInterface))
-        }.build()
+        val interfaceFile = interfaceFile(interfaceVisibility, wasmInterface)
+        val compiledCode = config.compiledCode?.takeIf { config.runsCompiledCode }
+        if (compiledCode == null) {
+            return listOf(interfaceFile, implementationFile(factoryVisibility, wasmInterface, implementationVisibility, config))
+        }
 
-        val implementationFile = FileSpec.builder(wasmInterface.packageName, wasmInterface.interfaceName + "Impl").apply {
-            addFunction(
-                when (config.runtime) {
-                    CodegenRuntime.PORTABLE_VM -> portableVmFactoryFunctionGenerator(
-                        packageName = wasmInterface.packageName,
-                        interfaceName = wasmInterface.interfaceName,
-                        visibility = factoryVisibility,
-                        generateSuspendingFactory = config.generateSuspendingFactories,
-                    )
-                    CodegenRuntime.CHASM -> chasmFactoryFunctionGenerator(
-                        packageName = wasmInterface.packageName,
-                        interfaceName = wasmInterface.interfaceName,
-                        visibility = factoryVisibility,
-                        generateSuspendingFactory = config.generateSuspendingFactories,
-                        linksWasiPreview1 = wasmInterface.linksWasiPreview1,
-                    )
-                },
-            )
-            addType(
-                when (config.runtime) {
-                    CodegenRuntime.PORTABLE_VM -> portableVmClassImplementationGenerator(
-                        packageName = wasmInterface.packageName,
-                        interfaceName = wasmInterface.interfaceName,
-                        visibility = implementationVisibility,
-                        wasmInterface = wasmInterface,
-                    )
-                    CodegenRuntime.CHASM -> chasmClassImplementationGenerator(
-                        packageName = wasmInterface.packageName,
-                        interfaceName = wasmInterface.interfaceName,
-                        visibility = implementationVisibility,
-                        wasmInterface = wasmInterface,
-                    )
-                },
-            )
-        }.build()
-
-        return listOf(interfaceFile, implementationFile)
+        return listOf(interfaceFile, compiledFile(factoryVisibility, wasmInterface, implementationVisibility, compiledCode))
     }
+
+    private fun interfaceFile(
+        interfaceVisibility: InterfaceVisibility,
+        wasmInterface: WasmInterface,
+    ): FileSpec = FileSpec.builder(wasmInterface.packageName, wasmInterface.interfaceName).apply {
+        wasmInterface.types.forEach { type ->
+            addType(dataClassGenerator(wasmInterface.packageName, type))
+        }
+        addType(classInterfaceGenerator(wasmInterface.packageName, wasmInterface.interfaceName, interfaceVisibility, wasmInterface))
+    }.build()
+
+    private fun implementationFile(
+        factoryVisibility: FactoryVisibility,
+        wasmInterface: WasmInterface,
+        implementationVisibility: ImplementationVisibility,
+        config: CodegenConfig,
+    ): FileSpec = FileSpec.builder(wasmInterface.packageName, wasmInterface.interfaceName + "Impl").apply {
+        addFunction(
+            when (config.runtime) {
+                CodegenRuntime.PORTABLE_VM -> portableVmFactoryFunctionGenerator(
+                    packageName = wasmInterface.packageName,
+                    interfaceName = wasmInterface.interfaceName,
+                    visibility = factoryVisibility,
+                    generateSuspendingFactory = config.generateSuspendingFactories,
+                )
+                CodegenRuntime.CHASM -> chasmFactoryFunctionGenerator(
+                    packageName = wasmInterface.packageName,
+                    interfaceName = wasmInterface.interfaceName,
+                    visibility = factoryVisibility,
+                    generateSuspendingFactory = config.generateSuspendingFactories,
+                    linksWasiPreview1 = wasmInterface.linksWasiPreview1,
+                )
+            },
+        )
+        addType(
+            when (config.runtime) {
+                CodegenRuntime.PORTABLE_VM -> portableVmClassImplementationGenerator(
+                    packageName = wasmInterface.packageName,
+                    interfaceName = wasmInterface.interfaceName,
+                    visibility = implementationVisibility,
+                    wasmInterface = wasmInterface,
+                )
+                CodegenRuntime.CHASM -> chasmClassImplementationGenerator(
+                    packageName = wasmInterface.packageName,
+                    interfaceName = wasmInterface.interfaceName,
+                    visibility = implementationVisibility,
+                    wasmInterface = wasmInterface,
+                )
+            },
+        )
+    }.build()
+
+    private fun compiledFile(
+        factoryVisibility: FactoryVisibility,
+        wasmInterface: WasmInterface,
+        implementationVisibility: ImplementationVisibility,
+        compiledCode: String,
+    ): FileSpec = FileSpec.builder(wasmInterface.packageName, wasmInterface.interfaceName + "Compiled").apply {
+        addFunction(
+            chasmFactoryFunctionGenerator.compiledFactory(
+                packageName = wasmInterface.packageName,
+                interfaceName = wasmInterface.interfaceName,
+                visibility = factoryVisibility,
+                compiledCode = compiledCode,
+            ),
+        )
+        addType(
+            compiledClassImplementationGenerator(
+                packageName = wasmInterface.packageName,
+                interfaceName = wasmInterface.interfaceName,
+                visibility = implementationVisibility,
+                wasmInterface = wasmInterface,
+            ),
+        )
+    }.build()
 }
 
 internal class VisibilityValidator {
