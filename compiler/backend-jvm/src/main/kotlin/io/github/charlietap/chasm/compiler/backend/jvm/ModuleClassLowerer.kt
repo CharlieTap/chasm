@@ -2,17 +2,25 @@ package io.github.charlietap.chasm.compiler.backend.jvm
 
 import io.github.charlietap.chasm.compiler.backend.abi.Fingerprint
 import io.github.charlietap.chasm.compiler.backend.abi.internalName
+import io.github.charlietap.chasm.compiler.backend.jvm.abi.BUILD_DECLARATIONS
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.CLASS_FILE_VERSION
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.CODE_IDENTITY
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.CODE_INSTALLATION
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.COMPILED_MODULE
+import io.github.charlietap.chasm.compiler.backend.jvm.abi.DATA_SOURCE
+import io.github.charlietap.chasm.compiler.backend.jvm.abi.DATA_SOURCE_TYPE
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.INSTALL
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.INSTALLS_PER_METHOD
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.MAX_FANOUT
+import io.github.charlietap.chasm.compiler.backend.jvm.abi.MODULE_DECLARATIONS
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.installClassDescriptor
+import io.github.charlietap.chasm.compiler.backend.jvm.declarations.DECLARATIONS_BUILDER
+import io.github.charlietap.chasm.compiler.backend.jvm.declarations.DECLARE
+import io.github.charlietap.chasm.compiler.backend.jvm.declarations.DECLARE_DESCRIPTOR
 import org.objectweb.asm.Opcodes
+import org.objectweb.asm.Type
 
-internal typealias ModuleClassLowerer = (ModuleLowering, String, List<InstalledEntry>, JvmOutput) -> Unit
+internal typealias ModuleClassLowerer = (ModuleLowering, String, List<String>, String?, List<InstalledEntry>, JvmOutput) -> Unit
 
 internal class InstalledEntry(
     val function: Int,
@@ -23,6 +31,8 @@ internal class InstalledEntry(
 internal fun ModuleClassLowerer(
     module: ModuleLowering,
     moduleDescriptor: String,
+    declarationClasses: List<String>,
+    dataResourcePath: String?,
     entries: List<InstalledEntry>,
     output: JvmOutput,
 ) {
@@ -62,6 +72,30 @@ internal fun ModuleClassLowerer(
         visitInsn(if (options.meterFuel) Opcodes.ICONST_1 else Opcodes.ICONST_0)
         visitInsn(if (options.interruptible) Opcodes.ICONST_1 else Opcodes.ICONST_0)
         visitMethodInsn(Opcodes.INVOKESPECIAL, internalName(CODE_IDENTITY), "<init>", "(IZZ)V", false)
+        visitInsn(Opcodes.ARETURN)
+        visitMaxs(0, 0)
+        visitEnd()
+    }
+
+    writer.visitMethod(Opcodes.ACC_PUBLIC, BUILD_DECLARATIONS, "()$MODULE_DECLARATIONS", null, null).apply {
+        visitCode()
+        visitTypeInsn(Opcodes.NEW, DECLARATIONS_BUILDER)
+        visitInsn(Opcodes.DUP)
+        visitMethodInsn(Opcodes.INVOKESPECIAL, DECLARATIONS_BUILDER, "<init>", "()V", false)
+        visitVarInsn(Opcodes.ASTORE, 1)
+        declarationClasses.forEach { declaring ->
+            visitVarInsn(Opcodes.ALOAD, 1)
+            visitMethodInsn(Opcodes.INVOKESTATIC, declaring, DECLARE, DECLARE_DESCRIPTOR, false)
+        }
+        visitVarInsn(Opcodes.ALOAD, 1)
+        if (dataResourcePath != null) {
+            visitLdcInsn(Type.getObjectType(owner))
+            visitLdcInsn(dataResourcePath)
+            visitMethodInsn(Opcodes.INVOKESTATIC, internalName(DATA_SOURCE.owner), DATA_SOURCE.name, DATA_SOURCE.descriptor, false)
+        } else {
+            visitInsn(Opcodes.ACONST_NULL)
+        }
+        visitMethodInsn(Opcodes.INVOKEVIRTUAL, DECLARATIONS_BUILDER, "build", "($DATA_SOURCE_TYPE)$MODULE_DECLARATIONS", false)
         visitInsn(Opcodes.ARETURN)
         visitMaxs(0, 0)
         visitEnd()

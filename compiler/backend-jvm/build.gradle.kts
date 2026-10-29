@@ -11,6 +11,7 @@ kotlin {
         api(projects.ast)
         api(projects.cir)
         api(projects.compiler.backendAbi)
+        api(projects.moduleDeclarations)
 
         implementation(projects.compiler.backendAnalysis)
         implementation(libs.asm)
@@ -18,6 +19,7 @@ kotlin {
 
         testImplementation(projects.compiler.frontend)
         testImplementation(projects.decoder)
+        testImplementation(projects.module)
         testImplementation(projects.validator)
         testImplementation(libs.kotlin.test)
         testImplementation(libs.result)

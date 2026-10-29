@@ -1,7 +1,10 @@
 package io.github.charlietap.chasm.compiler.backend.jvm
 
 import com.github.michaelbull.result.getOrThrow
+import io.github.charlietap.chasm.compiler.backend.jvm.declarations.DeclarationCallGenerator
+import io.github.charlietap.chasm.compiler.backend.jvm.declarations.DeclarationsLowerer
 import io.github.charlietap.chasm.compiler.frontend.ModuleCompiler
+import io.github.charlietap.chasm.module.ModuleDeclarationsFactory
 import org.objectweb.asm.ClassTooLargeException
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -52,11 +55,14 @@ class ModuleLowererTest {
                     code = code,
                     options = JvmOptions(splitInstructions = 64),
                     output = output,
+                    declarations = ModuleDeclarationsFactory(module),
                     parallelism = parallelism,
                     functionLowerer = ::FunctionLowerer,
                     signatureLowerer = ::SignatureLowerer,
                     entryLowerer = ::EntryLowerer,
                     bindingLowerer = ::BindingLowerer,
+                    declarationCallGenerator = ::DeclarationCallGenerator,
+                    declarationsLowerer = ::DeclarationsLowerer,
                     moduleClassLowerer = ::ModuleClassLowerer,
                 )
             }.classes.mapValues { (_, bytes) -> bytes.toList() }
@@ -73,11 +79,14 @@ class ModuleLowererTest {
             code = code,
             options = JvmOptions(),
             output = Generated(),
+            declarations = ModuleDeclarationsFactory(module),
             parallelism = 4,
             functionLowerer = functionLowerer,
             signatureLowerer = { _, _ -> fail("signatures are lowered after every function") },
             entryLowerer = { _, _, _, _, _ -> fail("entries are lowered after every function") },
             bindingLowerer = { _, _ -> fail("the binding is lowered after every function") },
-            moduleClassLowerer = { _, _, _, _ -> fail("the module class is lowered after every function") },
+            declarationCallGenerator = { _, _ -> fail("declarations are lowered after every function") },
+            declarationsLowerer = { _, _, _ -> fail("declarations are lowered after every function") },
+            moduleClassLowerer = { _, _, _, _, _, _ -> fail("the module class is lowered after every function") },
         )
 }

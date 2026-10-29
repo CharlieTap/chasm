@@ -4,10 +4,15 @@ import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.cir.CirModule
 import io.github.charlietap.chasm.compiler.backend.abi.internalName
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.codeClassDescriptor
+import io.github.charlietap.chasm.compiler.backend.jvm.abi.dataResource
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.entriesClassDescriptor
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.moduleClassDescriptor
+import io.github.charlietap.chasm.compiler.backend.jvm.declarations.DeclarationCallGenerator
+import io.github.charlietap.chasm.compiler.backend.jvm.declarations.DeclarationsLowerer
+import io.github.charlietap.chasm.declarations.ModuleDeclarations
 import org.objectweb.asm.ClassTooLargeException
 import org.objectweb.asm.tree.MethodNode
+import java.io.OutputStream
 import java.util.concurrent.Callable
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutionException
@@ -28,24 +33,28 @@ internal fun <T> completed(
     throw failure.cause ?: failure
 }
 
-typealias ModuleLowerer = (Module, CirModule, JvmOptions, JvmOutput) -> JvmModule
+typealias ModuleLowerer = (Module, CirModule, JvmOptions, JvmOutput, ModuleDeclarations) -> JvmModule
 
 fun ModuleLowerer(
     module: Module,
     code: CirModule,
     options: JvmOptions,
     output: JvmOutput,
+    declarations: ModuleDeclarations,
 ): JvmModule =
     ModuleLowerer(
         module = module,
         code = code,
         options = options,
         output = output,
+        declarations = declarations,
         parallelism = Runtime.getRuntime().availableProcessors(),
         functionLowerer = ::FunctionLowerer,
         signatureLowerer = ::SignatureLowerer,
         entryLowerer = ::EntryLowerer,
         bindingLowerer = ::BindingLowerer,
+        declarationCallGenerator = ::DeclarationCallGenerator,
+        declarationsLowerer = ::DeclarationsLowerer,
         moduleClassLowerer = ::ModuleClassLowerer,
     )
 
@@ -54,11 +63,14 @@ internal inline fun ModuleLowerer(
     code: CirModule,
     options: JvmOptions,
     output: JvmOutput,
+    declarations: ModuleDeclarations,
     parallelism: Int,
     crossinline functionLowerer: FunctionLowerer,
     crossinline signatureLowerer: SignatureLowerer,
     crossinline entryLowerer: EntryLowerer,
     crossinline bindingLowerer: BindingLowerer,
+    crossinline declarationCallGenerator: DeclarationCallGenerator,
+    crossinline declarationsLowerer: DeclarationsLowerer,
     crossinline moduleClassLowerer: ModuleClassLowerer,
 ): JvmModule = try {
     val lowering = ModuleLowering(module, code, options)
@@ -142,9 +154,16 @@ internal inline fun ModuleLowerer(
         pool?.shutdownNow()
     }
     bindingLowerer(lowering, output)
+    val dataResourcePath = dataResource(packagePath).takeIf { declarations.dataSegments.isNotEmpty() }
+    val calls = if (dataResourcePath != null) {
+        output.resource(dataResourcePath) { stream -> declarationCallGenerator(declarations, stream) }
+    } else {
+        declarationCallGenerator(declarations, OutputStream.nullOutputStream())
+    }
+    val declarationClasses = declarationsLowerer(calls, packagePath, output)
     val moduleDescriptor = moduleClassDescriptor(packagePath)
-    moduleClassLowerer(lowering, moduleDescriptor, entries, output)
-    JvmModule(internalName(moduleDescriptor).replace('/', '.'))
+    moduleClassLowerer(lowering, moduleDescriptor, declarationClasses, dataResourcePath, entries, output)
+    JvmModule(internalName(moduleDescriptor).replace('/', '.'), dataResourcePath)
 } catch (tooLarge: ClassTooLargeException) {
     throw ClassTooLarge(
         "generated class ${tooLarge.className} needs ${tooLarge.constantPoolCount} constants, more than the JVM's 65535",

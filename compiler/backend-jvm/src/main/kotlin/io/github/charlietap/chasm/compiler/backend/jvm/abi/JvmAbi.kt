@@ -53,6 +53,17 @@ internal val UNSAFE_GET_LONG = MethodRef(UNSAFE_TYPE, "getLong", listOf(OBJECT_T
 internal val UNSAFE_PUT_INT = MethodRef(UNSAFE_TYPE, "putInt", listOf(OBJECT_TYPE, "J", "I"), "V")
 internal val UNSAFE_PUT_LONG = MethodRef(UNSAFE_TYPE, "putLong", listOf(OBJECT_TYPE, "J", "J"), "V")
 
+internal const val BUILD_DECLARATIONS = "buildDeclarations"
+internal const val MODULE_DECLARATIONS = "Lio/github/charlietap/chasm/declarations/ModuleDeclarations;"
+internal const val DATA_SOURCE_TYPE = "Lio/github/charlietap/chasm/declarations/DataSource;"
+
+internal val DATA_SOURCE = MethodRef(
+    "Lio/github/charlietap/chasm/runtime/compiled/CompiledResources;",
+    "dataSource",
+    listOf("Ljava/lang/Class;", "Ljava/lang/String;"),
+    DATA_SOURCE_TYPE,
+)
+
 internal val MEMORY_COPY = MethodRef(MEMORY, "memoryCopy", listOf(MEMORY_INSTANCE, MEMORY_INSTANCE, "I", "I", "I"), "V")
 internal val MEMORY_FILL = MethodRef(MEMORY, "memoryFill", listOf(MEMORY_INSTANCE, "I", "I", "I"), "V")
 

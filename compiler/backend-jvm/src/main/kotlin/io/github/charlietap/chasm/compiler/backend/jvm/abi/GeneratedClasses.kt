@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.compiler.backend.jvm.abi
 import io.github.charlietap.chasm.compiler.backend.abi.MethodRef
 import io.github.charlietap.chasm.compiler.backend.abi.returnDescriptor
 import io.github.charlietap.chasm.compiler.backend.abi.staticParameters
+import io.github.charlietap.chasm.compiler.backend.jvm.DATA_EXTENSION
 import io.github.charlietap.chasm.type.FunctionType
 
 internal fun bindingClassDescriptor(
@@ -33,6 +34,10 @@ internal fun signatureClassDescriptor(
 internal fun moduleClassDescriptor(
     packagePath: String,
 ) = "L$packagePath/WasmModule;"
+
+internal fun dataResource(
+    packagePath: String,
+) = "$packagePath/data.$DATA_EXTENSION"
 
 internal fun installClassDescriptor(
     packagePath: String,
