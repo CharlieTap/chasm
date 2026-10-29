@@ -11,7 +11,6 @@ import io.github.charlietap.chasm.embedding.error.TrapReason
 import io.github.charlietap.chasm.embedding.error.WasmFrame
 import io.github.charlietap.chasm.embedding.error.WasmTrap
 import io.github.charlietap.chasm.embedding.error.WasmTrapException
-import io.github.charlietap.chasm.embedding.fixture.publicImport
 import io.github.charlietap.chasm.embedding.function
 import io.github.charlietap.chasm.embedding.instance
 import io.github.charlietap.chasm.embedding.invoke
@@ -332,7 +331,7 @@ class TrapDiagnosticsTest {
 
         init {
             val hostFunction = HostFunction { _, _ -> throw HostFunctionException("host failed") }
-            val import = publicImport("env", "host_fail", function(store, functionType(), hostFunction))
+            val import = Import("env", "host_fail", function(store, functionType(), hostFunction))
             val module = if (streamed) {
                 module(FakeSourceReader(bytes)).expect("decode")
             } else {

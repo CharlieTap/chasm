@@ -4,13 +4,13 @@ import com.github.michaelbull.result.fold
 import com.github.michaelbull.result.mapError
 import io.github.charlietap.chasm.embedding.diagnostic.executionError
 import io.github.charlietap.chasm.embedding.error.ChasmError
+import io.github.charlietap.chasm.embedding.internal.InstanceInvoker
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Error
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Success
 import io.github.charlietap.chasm.embedding.shapes.Function
 import io.github.charlietap.chasm.embedding.shapes.Instance
 import io.github.charlietap.chasm.embedding.shapes.Store
-import io.github.charlietap.chasm.executor.invoker.FunctionInvoker
 import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.instance.ExternalValue
@@ -26,7 +26,7 @@ fun invoke(
     instance = instance,
     function = function,
     args = args,
-    invoker = ::FunctionInvoker,
+    invoker = instance.invoker,
 )
 
 fun invoke(
@@ -51,7 +51,7 @@ fun invoke(
         instance = instance,
         address = address,
         args = args,
-        invoker = ::FunctionInvoker,
+        invoker = instance.invoker,
     )
 }
 
@@ -60,7 +60,7 @@ internal fun invoke(
     instance: Instance,
     function: Function,
     args: List<ExecutionValue> = [],
-    invoker: FunctionInvoker,
+    invoker: InstanceInvoker,
 ): ChasmResult<List<ExecutionValue>, ChasmError.ExecutionError> = invoke(
     store = store,
     instance = instance,
@@ -74,7 +74,7 @@ internal fun invoke(
     instance: Instance,
     name: String,
     args: List<ExecutionValue> = [],
-    invoker: FunctionInvoker,
+    invoker: InstanceInvoker,
 ): ChasmResult<List<ExecutionValue>, ChasmError.ExecutionError> {
 
     val extern = instance.exportsByName[name]
@@ -101,7 +101,7 @@ internal inline fun invoke(
     instance: Instance,
     address: Address.Function,
     args: List<ExecutionValue>,
-    invoker: FunctionInvoker,
+    invoker: InstanceInvoker,
 ): ChasmResult<List<ExecutionValue>, ChasmError.ExecutionError> {
 
     if (instance.instance.deallocated) {
@@ -125,9 +125,9 @@ private inline fun invokeExported(
     instance: Instance,
     address: Address.Function,
     args: List<ExecutionValue>,
-    invoker: FunctionInvoker,
+    invoker: InstanceInvoker,
 ): ChasmResult<List<ExecutionValue>, ChasmError.ExecutionError> {
-    return invoker(instance.config, store.store, instance.instance, address, args)
+    return invoker.invoke(instance.config, store.store, instance.instance, address, args)
         .mapError { error -> executionError(store, error) }
         .fold(::Success, ::Error)
 }

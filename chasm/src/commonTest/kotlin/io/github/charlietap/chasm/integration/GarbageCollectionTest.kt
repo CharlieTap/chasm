@@ -1,6 +1,9 @@
+@file:OptIn(InternalChasmApi::class)
+
 package io.github.charlietap.chasm.integration
 
 import com.goncalossilva.resources.Resource
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.config.GCStrategy
 import io.github.charlietap.chasm.config.GCThreshold
 import io.github.charlietap.chasm.config.RuntimeConfig
@@ -11,6 +14,7 @@ import io.github.charlietap.chasm.embedding.module
 import io.github.charlietap.chasm.embedding.shapes.Instance
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.shapes.expect
+import io.github.charlietap.chasm.embedding.store
 import io.github.charlietap.chasm.embedding.validate
 import io.github.charlietap.chasm.runtime.value.NumberValue
 import kotlin.test.Test
@@ -80,7 +84,7 @@ class GarbageCollectionTest {
             .expect("expected garbage collection fixture to decode")
             .let(::validate)
             .expect("expected garbage collection fixture to validate")
-        val store = Store()
+        val store = store()
         val config = RuntimeConfig(
             gcStrategy = strategy,
             gcThreshold = threshold,

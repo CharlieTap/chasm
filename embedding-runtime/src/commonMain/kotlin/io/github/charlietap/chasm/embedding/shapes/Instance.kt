@@ -1,15 +1,18 @@
 package io.github.charlietap.chasm.embedding.shapes
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.embedding.exports
+import io.github.charlietap.chasm.embedding.internal.InstanceInvoker
 import io.github.charlietap.chasm.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.store.Store
 
 class Instance internal constructor(
     internal val config: RuntimeConfig,
-    internal val instance: ModuleInstance,
+    @property:InternalChasmApi val instance: ModuleInstance,
     internal val store: Store,
+    internal val invoker: InstanceInvoker,
 ) {
     val exports by lazy {
         exports(this)

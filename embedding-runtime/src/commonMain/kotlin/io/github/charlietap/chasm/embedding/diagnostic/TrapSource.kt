@@ -1,11 +1,13 @@
 package io.github.charlietap.chasm.embedding.diagnostic
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.embedding.error.MemoryAccess
 import io.github.charlietap.chasm.runtime.diagnostic.TrapSnapshot
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.store.Store as RuntimeStore
 
-internal interface TrapSource {
+@InternalChasmApi
+interface TrapSource {
 
     val instance: ModuleInstance
 
@@ -15,7 +17,8 @@ internal interface TrapSource {
     ): ModuleFrames?
 }
 
-internal interface ModuleFrames {
+@InternalChasmApi
+interface ModuleFrames {
 
     val moduleName: String?
 
@@ -30,7 +33,8 @@ internal interface ModuleFrames {
     ): TrapSite? = null
 }
 
-internal interface TrapSite {
+@InternalChasmApi
+interface TrapSite {
 
     val offset: Int
 

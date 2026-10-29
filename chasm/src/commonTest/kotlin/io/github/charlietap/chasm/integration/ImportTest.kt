@@ -1,14 +1,17 @@
+@file:OptIn(InternalChasmApi::class)
+
 package io.github.charlietap.chasm.integration
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.embedding.function
 import io.github.charlietap.chasm.embedding.global
 import io.github.charlietap.chasm.embedding.memory
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.Store
+import io.github.charlietap.chasm.embedding.store
 import io.github.charlietap.chasm.embedding.table
 import io.github.charlietap.chasm.embedding.tag
-import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.fixture.type.constMutability
 import io.github.charlietap.chasm.fixture.type.definedType
 import io.github.charlietap.chasm.fixture.type.exceptionAttribute
@@ -37,7 +40,7 @@ class ImportTest {
     @Test
     fun `can run a wasm file with all types of import and return a correct result`() {
 
-        val store = Store(store())
+        val store = store()
 
         val functionType = functionType(
             params = resultType(

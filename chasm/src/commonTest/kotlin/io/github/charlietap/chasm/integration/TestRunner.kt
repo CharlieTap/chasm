@@ -1,6 +1,9 @@
+@file:OptIn(InternalChasmApi::class)
+
 package io.github.charlietap.chasm.integration
 
 import com.goncalossilva.resources.Resource
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.config.GCStrategy
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.embedding.error.ChasmError
@@ -11,6 +14,7 @@ import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.shapes.flatMap
+import io.github.charlietap.chasm.embedding.store
 import io.github.charlietap.chasm.embedding.validate
 import io.github.charlietap.chasm.fake.decoder.FakeSourceReader
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
@@ -19,7 +23,7 @@ fun testRunner(
     fileName: String,
     fileDirectory: String,
     arguments: List<ExecutionValue> = [],
-    store: Store = Store(),
+    store: Store = store(),
     imports: List<Import> = [],
     functionName: String = fileName.replace(".wasm", ""),
     setupFunctions: List<Pair<String, List<ExecutionValue>>> = [],

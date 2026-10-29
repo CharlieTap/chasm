@@ -4,16 +4,11 @@ import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.embedding.diagnostic.InterpreterTrapSource
 import io.github.charlietap.chasm.embedding.error.ChasmError
-import io.github.charlietap.chasm.embedding.ext.withStoreSettings
-import io.github.charlietap.chasm.embedding.mapImports
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
-import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Error
 import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.Instance
 import io.github.charlietap.chasm.embedding.shapes.Module
 import io.github.charlietap.chasm.embedding.shapes.Store
-import io.github.charlietap.chasm.embedding.toChasmResult
-import io.github.charlietap.chasm.embedding.transform.ImportableMapper
 import io.github.charlietap.chasm.executor.instantiator.ParallelModuleInstantiator
 import io.github.charlietap.chasm.parallel.ParallelTaskExecutor
 
@@ -24,21 +19,21 @@ suspend fun _instance(
     imports: List<Import>,
     config: RuntimeConfig,
     taskExecutor: ParallelTaskExecutor,
-): ChasmResult<Instance, ChasmError.ExecutionError> {
-    if (imports.any { it.value.store !== store.store }) {
-        return Error(ChasmError.ExecutionError("Importable belongs to a different Store"))
+): ChasmResult<Instance, ChasmError.ExecutionError> =
+    instantiate(
+        store = store,
+        imports = imports,
+        config = config,
+        invoker = InterpreterInvoker,
+        trapSource = { instance -> InterpreterTrapSource(instance, module) },
+    ) { effectiveConfig, runtime, runtimeImports ->
+        ParallelModuleInstantiator(
+            config = effectiveConfig,
+            store = runtime,
+            module = module.declarations,
+            imports = runtimeImports,
+            taskExecutor = taskExecutor,
+            codeInstaller = ParallelModuleCodeInstaller(module.module),
+            startInvoker = ::StartFunctionInvoker,
+        )
     }
-
-    val firstFunctionAddress = store.store.functions.size
-    val effectiveConfig = config.withStoreSettings(store.store.config)
-
-    return ParallelModuleInstantiator(
-        config = effectiveConfig,
-        store = store.store,
-        module = module.declarations,
-        imports = imports.mapImports(ImportableMapper(store.store)),
-        taskExecutor = taskExecutor,
-        codeInstaller = ParallelModuleCodeInstaller(module.module),
-        startInvoker = ::StartFunctionInvoker,
-    ).toChasmResult(effectiveConfig, store, firstFunctionAddress) { instance -> InterpreterTrapSource(instance, module) }
-}

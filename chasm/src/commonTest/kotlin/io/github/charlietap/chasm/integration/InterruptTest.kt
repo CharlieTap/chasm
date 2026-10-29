@@ -1,16 +1,19 @@
+@file:OptIn(InternalChasmApi::class)
+
 package io.github.charlietap.chasm.integration
 
 import com.goncalossilva.resources.Resource
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.config.StoreConfig
 import io.github.charlietap.chasm.embedding.addFuel
 import io.github.charlietap.chasm.embedding.error.ChasmError
-import io.github.charlietap.chasm.embedding.fixture.publicImport
 import io.github.charlietap.chasm.embedding.function
 import io.github.charlietap.chasm.embedding.instance
 import io.github.charlietap.chasm.embedding.interrupt
 import io.github.charlietap.chasm.embedding.invoke
 import io.github.charlietap.chasm.embedding.module
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
+import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.Instance
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.shapes.expect
@@ -162,9 +165,9 @@ class InterruptTest {
             )
             val module = module(Resource(FIXTURE).readBytes()).expect("module decodes")
             val imports = listOf(
-                publicImport("env", "interrupt", hostInterrupt),
-                publicImport("env", "callback", hostCallback),
-                publicImport("env", "keep_running", hostKeepRunning),
+                Import("env", "interrupt", hostInterrupt),
+                Import("env", "callback", hostCallback),
+                Import("env", "keep_running", hostKeepRunning),
             )
             instance = instance(store, module, imports).expect("module instantiates")
             return store to instance

@@ -1,11 +1,15 @@
+@file:OptIn(InternalChasmApi::class)
+
 package io.github.charlietap.chasm.script
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.config.Config
 import io.github.charlietap.chasm.config.GCStrategy
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.embedding.shapes.Instance
 import io.github.charlietap.chasm.embedding.shapes.Module
 import io.github.charlietap.chasm.embedding.shapes.Store
+import io.github.charlietap.chasm.embedding.store
 import io.github.charlietap.chasm.script.command.CommandResult
 import io.github.charlietap.chasm.script.command.CommandRunner
 import io.github.charlietap.chasm.script.ext.readTextFromPath
@@ -26,7 +30,7 @@ class ChasmScriptRunner(
     private val scriptFilename: String,
     private val phaseSupport: SemanticPhase,
     private val excludedLines: Set<Int> = emptySet(),
-    private val store: Store = Store(),
+    private val store: Store = store(),
     private val instances: MutableMap<String?, Instance> = mutableMapOf(),
     private val modules: MutableMap<String?, Module> = mutableMapOf(),
     private val commandRunner: CommandRunner = ::CommandRunner,

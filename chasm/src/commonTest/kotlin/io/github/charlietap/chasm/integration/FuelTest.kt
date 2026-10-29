@@ -1,6 +1,9 @@
+@file:OptIn(InternalChasmApi::class)
+
 package io.github.charlietap.chasm.integration
 
 import com.goncalossilva.resources.Resource
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.config.StoreConfig
 import io.github.charlietap.chasm.embedding.addFuel
 import io.github.charlietap.chasm.embedding.error.ChasmError

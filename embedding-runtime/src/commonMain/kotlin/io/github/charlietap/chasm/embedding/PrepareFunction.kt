@@ -10,7 +10,6 @@ import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Success
 import io.github.charlietap.chasm.embedding.shapes.Instance
 import io.github.charlietap.chasm.embedding.shapes.PreparedFunction
 import io.github.charlietap.chasm.embedding.shapes.Store
-import io.github.charlietap.chasm.executor.invoker.FunctionInvoker
 import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
@@ -66,7 +65,7 @@ private fun invokePrepared(
         return Error(ChasmError.ExecutionError(InvocationError.FunctionLookupFailed(address).toString()))
     }
 
-    return FunctionInvoker(instance.config, store.store, instance.instance, function, args)
+    return instance.invoker.invoke(instance.config, store.store, instance.instance, function, args)
         .mapError { error -> executionError(store, error) }
         .fold(::Success, ::Error)
 }

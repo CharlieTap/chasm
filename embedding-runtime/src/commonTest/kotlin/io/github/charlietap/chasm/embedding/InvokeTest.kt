@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.embedding
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.embedding.error.ChasmError
+import io.github.charlietap.chasm.embedding.fixture.instanceInvoker
 import io.github.charlietap.chasm.embedding.fixture.publicFunction
 import io.github.charlietap.chasm.embedding.fixture.publicInstance
 import io.github.charlietap.chasm.embedding.fixture.publicStore
@@ -138,7 +139,7 @@ class InvokeTest {
 
         val expected = ChasmResult.Success(listOf(i32(117)))
 
-        val actual = invoke(store, instance, name, args, functionInvoker)
+        val actual = invoke(store, instance, name, args, instanceInvoker(byAddress = functionInvoker))
 
         assertEquals(expected, actual)
     }
@@ -177,7 +178,7 @@ class InvokeTest {
 
         val expected = ChasmError.ExecutionError(error.toString())
 
-        val actual = invoke(store, instance, name, args, functionInvoker)
+        val actual = invoke(store, instance, name, args, instanceInvoker(byAddress = functionInvoker))
 
         assertEquals(ChasmResult.Error(expected), actual)
     }
@@ -218,7 +219,7 @@ class InvokeTest {
 
         val expected = ChasmResult.Success(listOf(i32(117)))
 
-        val actual = invoke(store, instance, function, args, functionInvoker)
+        val actual = invoke(store, instance, function, args, instanceInvoker(byAddress = functionInvoker))
 
         assertEquals(expected, actual)
     }
@@ -258,7 +259,7 @@ class InvokeTest {
 
         val expected = ChasmError.ExecutionError(error.toString())
 
-        val actual = invoke(store, instance, function, args, functionInvoker)
+        val actual = invoke(store, instance, function, args, instanceInvoker(byAddress = functionInvoker))
 
         assertEquals(ChasmResult.Error(expected), actual)
     }
@@ -297,7 +298,7 @@ class InvokeTest {
 
         val expected = ChasmResult.Success(listOf(i32(117)))
 
-        val actual = invoke(store, instance, address, args, functionInvoker)
+        val actual = invoke(store, instance, address, args, instanceInvoker(byAddress = functionInvoker))
 
         assertEquals(expected, actual)
     }
@@ -335,7 +336,7 @@ class InvokeTest {
 
         val expected = ChasmError.ExecutionError(error.toString())
 
-        val actual = invoke(store, instance, address, args, functionInvoker)
+        val actual = invoke(store, instance, address, args, instanceInvoker(byAddress = functionInvoker))
 
         assertEquals(ChasmResult.Error(expected), actual)
     }

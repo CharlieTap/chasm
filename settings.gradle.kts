@@ -49,6 +49,7 @@ include(":config")
 include(":decoder")
 
 include(":embedding-api")
+include(":embedding-runtime")
 
 include(":executor:call-core")
 include(":executor:dispatch")

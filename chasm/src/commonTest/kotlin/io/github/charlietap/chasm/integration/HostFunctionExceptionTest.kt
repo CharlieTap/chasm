@@ -1,11 +1,10 @@
 package io.github.charlietap.chasm.integration
 
 import io.github.charlietap.chasm.embedding.error.ChasmError
-import io.github.charlietap.chasm.embedding.fixture.publicImport
-import io.github.charlietap.chasm.embedding.fixture.publicStore
 import io.github.charlietap.chasm.embedding.function
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
-import io.github.charlietap.chasm.fixture.runtime.store
+import io.github.charlietap.chasm.embedding.shapes.Import
+import io.github.charlietap.chasm.embedding.store
 import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.fixture.type.i32ValueType
 import io.github.charlietap.chasm.fixture.type.resultType
@@ -20,7 +19,7 @@ class HostFunctionExceptionTest {
     @Test
     fun `can run a host function that throws an exception and return a chasm error`() {
 
-        val store = publicStore(store())
+        val store = store()
 
         val functionType = functionType(
             results = resultType(
@@ -35,7 +34,7 @@ class HostFunctionExceptionTest {
             throw exception
         }
         val functionExternal = function(store, functionType, hostFunction)
-        val functionImport = publicImport(
+        val functionImport = Import(
             "env",
             "host_function",
             functionExternal,

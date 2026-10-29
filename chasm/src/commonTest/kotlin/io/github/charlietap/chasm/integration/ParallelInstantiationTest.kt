@@ -1,3 +1,5 @@
+@file:OptIn(InternalChasmApi::class)
+
 package io.github.charlietap.chasm.integration
 
 import com.goncalossilva.resources.Resource
@@ -16,6 +18,7 @@ import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Module
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.shapes.expect
+import io.github.charlietap.chasm.embedding.store
 import io.github.charlietap.chasm.embedding.validate
 import io.github.charlietap.chasm.fixture.ast.module.function
 import io.github.charlietap.chasm.fixture.type.definedType
@@ -50,8 +53,8 @@ class ParallelInstantiationTest {
             .let(::validate)
             .expect("expected fixture to validate")
             .withParallelCompilationWork()
-        val serialStore = Store()
-        val parallelStore = Store()
+        val serialStore = store()
+        val parallelStore = store()
         val taskExecutor = TestParallelTaskExecutor()
 
         val serialInstance = synchronousInstance(
@@ -96,7 +99,7 @@ class ParallelInstantiationTest {
         val compilations = coroutineScope {
             List(CONCURRENT_COMPILATIONS) {
                 async(Dispatchers.Default) {
-                    val store = Store()
+                    val store = store()
                     val taskExecutor = TestParallelTaskExecutor()
                     val instance = parallelInstance(
                         store,
@@ -124,7 +127,7 @@ class ParallelInstantiationTest {
     @Test
     fun `parallel compilation reports the first error without linking functions`() = runTest {
         val module = unsupportedInstructionModule()
-        val store = Store()
+        val store = store()
         val taskExecutor = TestParallelTaskExecutor()
 
         val result = parallelInstance(

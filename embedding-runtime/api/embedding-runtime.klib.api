@@ -1,0 +1,340 @@
+// Klib ABI Dump
+// Targets: [iosArm64, iosSimulatorArm64, linuxArm64, linuxX64, macosArm64, mingwX64]
+// Rendering settings:
+// - Signature version: 2
+// - Show manifest properties: true
+// - Show declarations: true
+
+// Library unique name: <io.github.charlietap.chasm:embedding-runtime>
+abstract interface <#A: kotlin/Any?> io.github.charlietap.chasm.embedding.shapes/Allocator { // io.github.charlietap.chasm.embedding.shapes/Allocator|null[0]
+    abstract fun alloc(#A): #A // io.github.charlietap.chasm.embedding.shapes/Allocator.alloc|alloc(1:0){}[0]
+    abstract fun free(#A) // io.github.charlietap.chasm.embedding.shapes/Allocator.free|free(1:0){}[0]
+}
+
+abstract interface io.github.charlietap.chasm.embedding.diagnostic/ModuleFrames { // io.github.charlietap.chasm.embedding.diagnostic/ModuleFrames|null[0]
+    abstract val moduleName // io.github.charlietap.chasm.embedding.diagnostic/ModuleFrames.moduleName|{}moduleName[0]
+        abstract fun <get-moduleName>(): kotlin/String? // io.github.charlietap.chasm.embedding.diagnostic/ModuleFrames.moduleName.<get-moduleName>|<get-moduleName>(){}[0]
+
+    abstract fun functionName(kotlin/Int): kotlin/String? // io.github.charlietap.chasm.embedding.diagnostic/ModuleFrames.functionName|functionName(kotlin.Int){}[0]
+    open fun site(kotlin/Int, kotlin/Int, kotlin/Int): io.github.charlietap.chasm.embedding.diagnostic/TrapSite? // io.github.charlietap.chasm.embedding.diagnostic/ModuleFrames.site|site(kotlin.Int;kotlin.Int;kotlin.Int){}[0]
+}
+
+abstract interface io.github.charlietap.chasm.embedding.diagnostic/TrapSite { // io.github.charlietap.chasm.embedding.diagnostic/TrapSite|null[0]
+    abstract val offset // io.github.charlietap.chasm.embedding.diagnostic/TrapSite.offset|{}offset[0]
+        abstract fun <get-offset>(): kotlin/Int // io.github.charlietap.chasm.embedding.diagnostic/TrapSite.offset.<get-offset>|<get-offset>(){}[0]
+
+    open fun memoryAccess(): io.github.charlietap.chasm.embedding.error/MemoryAccess? // io.github.charlietap.chasm.embedding.diagnostic/TrapSite.memoryAccess|memoryAccess(){}[0]
+}
+
+abstract interface io.github.charlietap.chasm.embedding.diagnostic/TrapSource { // io.github.charlietap.chasm.embedding.diagnostic/TrapSource|null[0]
+    abstract val instance // io.github.charlietap.chasm.embedding.diagnostic/TrapSource.instance|{}instance[0]
+        abstract fun <get-instance>(): io.github.charlietap.chasm.runtime.instance/ModuleInstance // io.github.charlietap.chasm.embedding.diagnostic/TrapSource.instance.<get-instance>|<get-instance>(){}[0]
+
+    abstract fun frames(io.github.charlietap.chasm.runtime.store/Store, io.github.charlietap.chasm.runtime.diagnostic/TrapSnapshot): io.github.charlietap.chasm.embedding.diagnostic/ModuleFrames? // io.github.charlietap.chasm.embedding.diagnostic/TrapSource.frames|frames(io.github.charlietap.chasm.runtime.store.Store;io.github.charlietap.chasm.runtime.diagnostic.TrapSnapshot){}[0]
+}
+
+abstract interface io.github.charlietap.chasm.embedding.internal/InstanceInvoker { // io.github.charlietap.chasm.embedding.internal/InstanceInvoker|null[0]
+    abstract fun invoke(io.github.charlietap.chasm.config/RuntimeConfig, io.github.charlietap.chasm.runtime.store/Store, io.github.charlietap.chasm.runtime.instance/ModuleInstance, io.github.charlietap.chasm.runtime.address/Address.Function, kotlin.collections/List<io.github.charlietap.chasm.runtime.value/ExecutionValue>): com.github.michaelbull.result/Result<kotlin.collections/List<io.github.charlietap.chasm.runtime.value/ExecutionValue>, io.github.charlietap.chasm.runtime.error/InvocationError> // io.github.charlietap.chasm.embedding.internal/InstanceInvoker.invoke|invoke(io.github.charlietap.chasm.config.RuntimeConfig;io.github.charlietap.chasm.runtime.store.Store;io.github.charlietap.chasm.runtime.instance.ModuleInstance;io.github.charlietap.chasm.runtime.address.Address.Function;kotlin.collections.List<io.github.charlietap.chasm.runtime.value.ExecutionValue>){}[0]
+    abstract fun invoke(io.github.charlietap.chasm.config/RuntimeConfig, io.github.charlietap.chasm.runtime.store/Store, io.github.charlietap.chasm.runtime.instance/ModuleInstance, io.github.charlietap.chasm.runtime.instance/FunctionInstance, kotlin.collections/List<io.github.charlietap.chasm.runtime.value/ExecutionValue>): com.github.michaelbull.result/Result<kotlin.collections/List<io.github.charlietap.chasm.runtime.value/ExecutionValue>, io.github.charlietap.chasm.runtime.error/InvocationError> // io.github.charlietap.chasm.embedding.internal/InstanceInvoker.invoke|invoke(io.github.charlietap.chasm.config.RuntimeConfig;io.github.charlietap.chasm.runtime.store.Store;io.github.charlietap.chasm.runtime.instance.ModuleInstance;io.github.charlietap.chasm.runtime.instance.FunctionInstance;kotlin.collections.List<io.github.charlietap.chasm.runtime.value.ExecutionValue>){}[0]
+}
+
+final class io.github.charlietap.chasm.embedding.dsl/FunctionImportBuilder { // io.github.charlietap.chasm.embedding.dsl/FunctionImportBuilder|null[0]
+    constructor <init>(io.github.charlietap.chasm.embedding.shapes/Store) // io.github.charlietap.chasm.embedding.dsl/FunctionImportBuilder.<init>|<init>(io.github.charlietap.chasm.embedding.shapes.Store){}[0]
+
+    final var entityName // io.github.charlietap.chasm.embedding.dsl/FunctionImportBuilder.entityName|{}entityName[0]
+        final fun <get-entityName>(): kotlin/String // io.github.charlietap.chasm.embedding.dsl/FunctionImportBuilder.entityName.<get-entityName>|<get-entityName>(){}[0]
+        final fun <set-entityName>(kotlin/String) // io.github.charlietap.chasm.embedding.dsl/FunctionImportBuilder.entityName.<set-entityName>|<set-entityName>(kotlin.String){}[0]
+    final var moduleName // io.github.charlietap.chasm.embedding.dsl/FunctionImportBuilder.moduleName|{}moduleName[0]
+        final fun <get-moduleName>(): kotlin/String // io.github.charlietap.chasm.embedding.dsl/FunctionImportBuilder.moduleName.<get-moduleName>|<get-moduleName>(){}[0]
+        final fun <set-moduleName>(kotlin/String) // io.github.charlietap.chasm.embedding.dsl/FunctionImportBuilder.moduleName.<set-moduleName>|<set-moduleName>(kotlin.String){}[0]
+
+    final fun build(): io.github.charlietap.chasm.embedding.shapes/Import // io.github.charlietap.chasm.embedding.dsl/FunctionImportBuilder.build|build(){}[0]
+    final fun reference(io.github.charlietap.chasm.host/HostFunction) // io.github.charlietap.chasm.embedding.dsl/FunctionImportBuilder.reference|reference(io.github.charlietap.chasm.host.HostFunction){}[0]
+    final fun type(io.github.charlietap.chasm.type/FunctionType) // io.github.charlietap.chasm.embedding.dsl/FunctionImportBuilder.type|type(io.github.charlietap.chasm.type.FunctionType){}[0]
+    final fun type(kotlin/Function1<io.github.charlietap.chasm.embedding.dsl/FunctionTypeBuilder, kotlin/Unit>) // io.github.charlietap.chasm.embedding.dsl/FunctionImportBuilder.type|type(kotlin.Function1<io.github.charlietap.chasm.embedding.dsl.FunctionTypeBuilder,kotlin.Unit>){}[0]
+}
+
+final class io.github.charlietap.chasm.embedding.dsl/GlobalImportBuilder { // io.github.charlietap.chasm.embedding.dsl/GlobalImportBuilder|null[0]
+    constructor <init>(io.github.charlietap.chasm.embedding.shapes/Store) // io.github.charlietap.chasm.embedding.dsl/GlobalImportBuilder.<init>|<init>(io.github.charlietap.chasm.embedding.shapes.Store){}[0]
+
+    final var entityName // io.github.charlietap.chasm.embedding.dsl/GlobalImportBuilder.entityName|{}entityName[0]
+        final fun <get-entityName>(): kotlin/String // io.github.charlietap.chasm.embedding.dsl/GlobalImportBuilder.entityName.<get-entityName>|<get-entityName>(){}[0]
+        final fun <set-entityName>(kotlin/String) // io.github.charlietap.chasm.embedding.dsl/GlobalImportBuilder.entityName.<set-entityName>|<set-entityName>(kotlin.String){}[0]
+    final var moduleName // io.github.charlietap.chasm.embedding.dsl/GlobalImportBuilder.moduleName|{}moduleName[0]
+        final fun <get-moduleName>(): kotlin/String // io.github.charlietap.chasm.embedding.dsl/GlobalImportBuilder.moduleName.<get-moduleName>|<get-moduleName>(){}[0]
+        final fun <set-moduleName>(kotlin/String) // io.github.charlietap.chasm.embedding.dsl/GlobalImportBuilder.moduleName.<set-moduleName>|<set-moduleName>(kotlin.String){}[0]
+    final var value // io.github.charlietap.chasm.embedding.dsl/GlobalImportBuilder.value|{}value[0]
+        final fun <get-value>(): io.github.charlietap.chasm.runtime.value/ExecutionValue // io.github.charlietap.chasm.embedding.dsl/GlobalImportBuilder.value.<get-value>|<get-value>(){}[0]
+        final fun <set-value>(io.github.charlietap.chasm.runtime.value/ExecutionValue) // io.github.charlietap.chasm.embedding.dsl/GlobalImportBuilder.value.<set-value>|<set-value>(io.github.charlietap.chasm.runtime.value.ExecutionValue){}[0]
+
+    final fun build(): io.github.charlietap.chasm.embedding.shapes/Import // io.github.charlietap.chasm.embedding.dsl/GlobalImportBuilder.build|build(){}[0]
+    final fun type(kotlin/Function1<io.github.charlietap.chasm.embedding.dsl/GlobalTypeBuilder, kotlin/Unit>) // io.github.charlietap.chasm.embedding.dsl/GlobalImportBuilder.type|type(kotlin.Function1<io.github.charlietap.chasm.embedding.dsl.GlobalTypeBuilder,kotlin.Unit>){}[0]
+}
+
+final class io.github.charlietap.chasm.embedding.dsl/GlobalTypeBuilder { // io.github.charlietap.chasm.embedding.dsl/GlobalTypeBuilder|null[0]
+    constructor <init>() // io.github.charlietap.chasm.embedding.dsl/GlobalTypeBuilder.<init>|<init>(){}[0]
+
+    final var mutability // io.github.charlietap.chasm.embedding.dsl/GlobalTypeBuilder.mutability|{}mutability[0]
+        final fun <get-mutability>(): io.github.charlietap.chasm.type/Mutability // io.github.charlietap.chasm.embedding.dsl/GlobalTypeBuilder.mutability.<get-mutability>|<get-mutability>(){}[0]
+        final fun <set-mutability>(io.github.charlietap.chasm.type/Mutability) // io.github.charlietap.chasm.embedding.dsl/GlobalTypeBuilder.mutability.<set-mutability>|<set-mutability>(io.github.charlietap.chasm.type.Mutability){}[0]
+    final var valueType // io.github.charlietap.chasm.embedding.dsl/GlobalTypeBuilder.valueType|{}valueType[0]
+        final fun <get-valueType>(): io.github.charlietap.chasm.type/ValueType // io.github.charlietap.chasm.embedding.dsl/GlobalTypeBuilder.valueType.<get-valueType>|<get-valueType>(){}[0]
+        final fun <set-valueType>(io.github.charlietap.chasm.type/ValueType) // io.github.charlietap.chasm.embedding.dsl/GlobalTypeBuilder.valueType.<set-valueType>|<set-valueType>(io.github.charlietap.chasm.type.ValueType){}[0]
+
+    final fun build(): io.github.charlietap.chasm.type/GlobalType // io.github.charlietap.chasm.embedding.dsl/GlobalTypeBuilder.build|build(){}[0]
+}
+
+final class io.github.charlietap.chasm.embedding.dsl/ImportsBuilder { // io.github.charlietap.chasm.embedding.dsl/ImportsBuilder|null[0]
+    constructor <init>(io.github.charlietap.chasm.embedding.shapes/Store) // io.github.charlietap.chasm.embedding.dsl/ImportsBuilder.<init>|<init>(io.github.charlietap.chasm.embedding.shapes.Store){}[0]
+
+    final fun build(): kotlin.collections/List<io.github.charlietap.chasm.embedding.shapes/Import> // io.github.charlietap.chasm.embedding.dsl/ImportsBuilder.build|build(){}[0]
+    final fun function(kotlin/Function1<io.github.charlietap.chasm.embedding.dsl/FunctionImportBuilder, kotlin/Unit>) // io.github.charlietap.chasm.embedding.dsl/ImportsBuilder.function|function(kotlin.Function1<io.github.charlietap.chasm.embedding.dsl.FunctionImportBuilder,kotlin.Unit>){}[0]
+    final fun global(kotlin/Function1<io.github.charlietap.chasm.embedding.dsl/GlobalImportBuilder, kotlin/Unit>) // io.github.charlietap.chasm.embedding.dsl/ImportsBuilder.global|global(kotlin.Function1<io.github.charlietap.chasm.embedding.dsl.GlobalImportBuilder,kotlin.Unit>){}[0]
+    final fun memory(kotlin/Function1<io.github.charlietap.chasm.embedding.dsl/MemoryImportBuilder, kotlin/Unit>) // io.github.charlietap.chasm.embedding.dsl/ImportsBuilder.memory|memory(kotlin.Function1<io.github.charlietap.chasm.embedding.dsl.MemoryImportBuilder,kotlin.Unit>){}[0]
+    final fun table(kotlin/Function1<io.github.charlietap.chasm.embedding.dsl/TableImportBuilder, kotlin/Unit>) // io.github.charlietap.chasm.embedding.dsl/ImportsBuilder.table|table(kotlin.Function1<io.github.charlietap.chasm.embedding.dsl.TableImportBuilder,kotlin.Unit>){}[0]
+    final fun tag(kotlin/Function1<io.github.charlietap.chasm.embedding.dsl/TagImportBuilder, kotlin/Unit>) // io.github.charlietap.chasm.embedding.dsl/ImportsBuilder.tag|tag(kotlin.Function1<io.github.charlietap.chasm.embedding.dsl.TagImportBuilder,kotlin.Unit>){}[0]
+}
+
+final class io.github.charlietap.chasm.embedding.dsl/LimitsBuilder { // io.github.charlietap.chasm.embedding.dsl/LimitsBuilder|null[0]
+    constructor <init>() // io.github.charlietap.chasm.embedding.dsl/LimitsBuilder.<init>|<init>(){}[0]
+
+    final var max // io.github.charlietap.chasm.embedding.dsl/LimitsBuilder.max|{}max[0]
+        final fun <get-max>(): kotlin/ULong? // io.github.charlietap.chasm.embedding.dsl/LimitsBuilder.max.<get-max>|<get-max>(){}[0]
+        final fun <set-max>(kotlin/ULong?) // io.github.charlietap.chasm.embedding.dsl/LimitsBuilder.max.<set-max>|<set-max>(kotlin.ULong?){}[0]
+    final var min // io.github.charlietap.chasm.embedding.dsl/LimitsBuilder.min|{}min[0]
+        final fun <get-min>(): kotlin/ULong // io.github.charlietap.chasm.embedding.dsl/LimitsBuilder.min.<get-min>|<get-min>(){}[0]
+        final fun <set-min>(kotlin/ULong) // io.github.charlietap.chasm.embedding.dsl/LimitsBuilder.min.<set-min>|<set-min>(kotlin.ULong){}[0]
+
+    final fun build(): io.github.charlietap.chasm.type/Limits // io.github.charlietap.chasm.embedding.dsl/LimitsBuilder.build|build(){}[0]
+}
+
+final class io.github.charlietap.chasm.embedding.dsl/MemoryImportBuilder { // io.github.charlietap.chasm.embedding.dsl/MemoryImportBuilder|null[0]
+    constructor <init>(io.github.charlietap.chasm.embedding.shapes/Store) // io.github.charlietap.chasm.embedding.dsl/MemoryImportBuilder.<init>|<init>(io.github.charlietap.chasm.embedding.shapes.Store){}[0]
+
+    final var entityName // io.github.charlietap.chasm.embedding.dsl/MemoryImportBuilder.entityName|{}entityName[0]
+        final fun <get-entityName>(): kotlin/String // io.github.charlietap.chasm.embedding.dsl/MemoryImportBuilder.entityName.<get-entityName>|<get-entityName>(){}[0]
+        final fun <set-entityName>(kotlin/String) // io.github.charlietap.chasm.embedding.dsl/MemoryImportBuilder.entityName.<set-entityName>|<set-entityName>(kotlin.String){}[0]
+    final var moduleName // io.github.charlietap.chasm.embedding.dsl/MemoryImportBuilder.moduleName|{}moduleName[0]
+        final fun <get-moduleName>(): kotlin/String // io.github.charlietap.chasm.embedding.dsl/MemoryImportBuilder.moduleName.<get-moduleName>|<get-moduleName>(){}[0]
+        final fun <set-moduleName>(kotlin/String) // io.github.charlietap.chasm.embedding.dsl/MemoryImportBuilder.moduleName.<set-moduleName>|<set-moduleName>(kotlin.String){}[0]
+
+    final fun build(): io.github.charlietap.chasm.embedding.shapes/Import // io.github.charlietap.chasm.embedding.dsl/MemoryImportBuilder.build|build(){}[0]
+    final fun type(kotlin/Function1<io.github.charlietap.chasm.embedding.dsl/MemoryTypeBuilder, kotlin/Unit>) // io.github.charlietap.chasm.embedding.dsl/MemoryImportBuilder.type|type(kotlin.Function1<io.github.charlietap.chasm.embedding.dsl.MemoryTypeBuilder,kotlin.Unit>){}[0]
+}
+
+final class io.github.charlietap.chasm.embedding.dsl/MemoryTypeBuilder { // io.github.charlietap.chasm.embedding.dsl/MemoryTypeBuilder|null[0]
+    constructor <init>() // io.github.charlietap.chasm.embedding.dsl/MemoryTypeBuilder.<init>|<init>(){}[0]
+
+    final var shared // io.github.charlietap.chasm.embedding.dsl/MemoryTypeBuilder.shared|{}shared[0]
+        final fun <get-shared>(): kotlin/Boolean // io.github.charlietap.chasm.embedding.dsl/MemoryTypeBuilder.shared.<get-shared>|<get-shared>(){}[0]
+        final fun <set-shared>(kotlin/Boolean) // io.github.charlietap.chasm.embedding.dsl/MemoryTypeBuilder.shared.<set-shared>|<set-shared>(kotlin.Boolean){}[0]
+
+    final fun build(): io.github.charlietap.chasm.type/MemoryType // io.github.charlietap.chasm.embedding.dsl/MemoryTypeBuilder.build|build(){}[0]
+    final fun limits(kotlin/Function1<io.github.charlietap.chasm.embedding.dsl/LimitsBuilder, kotlin/Unit>) // io.github.charlietap.chasm.embedding.dsl/MemoryTypeBuilder.limits|limits(kotlin.Function1<io.github.charlietap.chasm.embedding.dsl.LimitsBuilder,kotlin.Unit>){}[0]
+}
+
+final class io.github.charlietap.chasm.embedding.dsl/TableImportBuilder { // io.github.charlietap.chasm.embedding.dsl/TableImportBuilder|null[0]
+    constructor <init>(io.github.charlietap.chasm.embedding.shapes/Store) // io.github.charlietap.chasm.embedding.dsl/TableImportBuilder.<init>|<init>(io.github.charlietap.chasm.embedding.shapes.Store){}[0]
+
+    final var entityName // io.github.charlietap.chasm.embedding.dsl/TableImportBuilder.entityName|{}entityName[0]
+        final fun <get-entityName>(): kotlin/String // io.github.charlietap.chasm.embedding.dsl/TableImportBuilder.entityName.<get-entityName>|<get-entityName>(){}[0]
+        final fun <set-entityName>(kotlin/String) // io.github.charlietap.chasm.embedding.dsl/TableImportBuilder.entityName.<set-entityName>|<set-entityName>(kotlin.String){}[0]
+    final var moduleName // io.github.charlietap.chasm.embedding.dsl/TableImportBuilder.moduleName|{}moduleName[0]
+        final fun <get-moduleName>(): kotlin/String // io.github.charlietap.chasm.embedding.dsl/TableImportBuilder.moduleName.<get-moduleName>|<get-moduleName>(){}[0]
+        final fun <set-moduleName>(kotlin/String) // io.github.charlietap.chasm.embedding.dsl/TableImportBuilder.moduleName.<set-moduleName>|<set-moduleName>(kotlin.String){}[0]
+    final var value // io.github.charlietap.chasm.embedding.dsl/TableImportBuilder.value|{}value[0]
+        final fun <get-value>(): io.github.charlietap.chasm.runtime.value/ReferenceValue // io.github.charlietap.chasm.embedding.dsl/TableImportBuilder.value.<get-value>|<get-value>(){}[0]
+        final fun <set-value>(io.github.charlietap.chasm.runtime.value/ReferenceValue) // io.github.charlietap.chasm.embedding.dsl/TableImportBuilder.value.<set-value>|<set-value>(io.github.charlietap.chasm.runtime.value.ReferenceValue){}[0]
+
+    final fun build(): io.github.charlietap.chasm.embedding.shapes/Import // io.github.charlietap.chasm.embedding.dsl/TableImportBuilder.build|build(){}[0]
+    final fun type(kotlin/Function1<io.github.charlietap.chasm.embedding.dsl/TableTypeBuilder, kotlin/Unit>) // io.github.charlietap.chasm.embedding.dsl/TableImportBuilder.type|type(kotlin.Function1<io.github.charlietap.chasm.embedding.dsl.TableTypeBuilder,kotlin.Unit>){}[0]
+}
+
+final class io.github.charlietap.chasm.embedding.dsl/TableTypeBuilder { // io.github.charlietap.chasm.embedding.dsl/TableTypeBuilder|null[0]
+    constructor <init>() // io.github.charlietap.chasm.embedding.dsl/TableTypeBuilder.<init>|<init>(){}[0]
+
+    final var referenceType // io.github.charlietap.chasm.embedding.dsl/TableTypeBuilder.referenceType|{}referenceType[0]
+        final fun <get-referenceType>(): io.github.charlietap.chasm.type/ReferenceType? // io.github.charlietap.chasm.embedding.dsl/TableTypeBuilder.referenceType.<get-referenceType>|<get-referenceType>(){}[0]
+        final fun <set-referenceType>(io.github.charlietap.chasm.type/ReferenceType?) // io.github.charlietap.chasm.embedding.dsl/TableTypeBuilder.referenceType.<set-referenceType>|<set-referenceType>(io.github.charlietap.chasm.type.ReferenceType?){}[0]
+
+    final fun build(): io.github.charlietap.chasm.type/TableType // io.github.charlietap.chasm.embedding.dsl/TableTypeBuilder.build|build(){}[0]
+    final fun limits(kotlin/Function1<io.github.charlietap.chasm.embedding.dsl/LimitsBuilder, kotlin/Unit>) // io.github.charlietap.chasm.embedding.dsl/TableTypeBuilder.limits|limits(kotlin.Function1<io.github.charlietap.chasm.embedding.dsl.LimitsBuilder,kotlin.Unit>){}[0]
+}
+
+final class io.github.charlietap.chasm.embedding.dsl/TagImportBuilder { // io.github.charlietap.chasm.embedding.dsl/TagImportBuilder|null[0]
+    constructor <init>(io.github.charlietap.chasm.embedding.shapes/Store) // io.github.charlietap.chasm.embedding.dsl/TagImportBuilder.<init>|<init>(io.github.charlietap.chasm.embedding.shapes.Store){}[0]
+
+    final var entityName // io.github.charlietap.chasm.embedding.dsl/TagImportBuilder.entityName|{}entityName[0]
+        final fun <get-entityName>(): kotlin/String // io.github.charlietap.chasm.embedding.dsl/TagImportBuilder.entityName.<get-entityName>|<get-entityName>(){}[0]
+        final fun <set-entityName>(kotlin/String) // io.github.charlietap.chasm.embedding.dsl/TagImportBuilder.entityName.<set-entityName>|<set-entityName>(kotlin.String){}[0]
+    final var moduleName // io.github.charlietap.chasm.embedding.dsl/TagImportBuilder.moduleName|{}moduleName[0]
+        final fun <get-moduleName>(): kotlin/String // io.github.charlietap.chasm.embedding.dsl/TagImportBuilder.moduleName.<get-moduleName>|<get-moduleName>(){}[0]
+        final fun <set-moduleName>(kotlin/String) // io.github.charlietap.chasm.embedding.dsl/TagImportBuilder.moduleName.<set-moduleName>|<set-moduleName>(kotlin.String){}[0]
+
+    final fun build(): io.github.charlietap.chasm.embedding.shapes/Import // io.github.charlietap.chasm.embedding.dsl/TagImportBuilder.build|build(){}[0]
+    final fun type(kotlin/Function1<io.github.charlietap.chasm.embedding.dsl/TagTypeBuilder, kotlin/Unit>) // io.github.charlietap.chasm.embedding.dsl/TagImportBuilder.type|type(kotlin.Function1<io.github.charlietap.chasm.embedding.dsl.TagTypeBuilder,kotlin.Unit>){}[0]
+}
+
+final class io.github.charlietap.chasm.embedding.dsl/TagTypeBuilder { // io.github.charlietap.chasm.embedding.dsl/TagTypeBuilder|null[0]
+    constructor <init>() // io.github.charlietap.chasm.embedding.dsl/TagTypeBuilder.<init>|<init>(){}[0]
+
+    final var attribute // io.github.charlietap.chasm.embedding.dsl/TagTypeBuilder.attribute|{}attribute[0]
+        final fun <get-attribute>(): io.github.charlietap.chasm.type/TagType.Attribute // io.github.charlietap.chasm.embedding.dsl/TagTypeBuilder.attribute.<get-attribute>|<get-attribute>(){}[0]
+        final fun <set-attribute>(io.github.charlietap.chasm.type/TagType.Attribute) // io.github.charlietap.chasm.embedding.dsl/TagTypeBuilder.attribute.<set-attribute>|<set-attribute>(io.github.charlietap.chasm.type.TagType.Attribute){}[0]
+
+    final fun build(): io.github.charlietap.chasm.type/TagType // io.github.charlietap.chasm.embedding.dsl/TagTypeBuilder.build|build(){}[0]
+    final fun functionType(kotlin/Function1<io.github.charlietap.chasm.embedding.dsl/FunctionTypeBuilder, kotlin/Unit>) // io.github.charlietap.chasm.embedding.dsl/TagTypeBuilder.functionType|functionType(kotlin.Function1<io.github.charlietap.chasm.embedding.dsl.FunctionTypeBuilder,kotlin.Unit>){}[0]
+}
+
+final class io.github.charlietap.chasm.embedding.shapes/Export { // io.github.charlietap.chasm.embedding.shapes/Export|null[0]
+    constructor <init>(kotlin/String, io.github.charlietap.chasm.embedding.shapes/Importable) // io.github.charlietap.chasm.embedding.shapes/Export.<init>|<init>(kotlin.String;io.github.charlietap.chasm.embedding.shapes.Importable){}[0]
+
+    final val name // io.github.charlietap.chasm.embedding.shapes/Export.name|{}name[0]
+        final fun <get-name>(): kotlin/String // io.github.charlietap.chasm.embedding.shapes/Export.name.<get-name>|<get-name>(){}[0]
+    final val value // io.github.charlietap.chasm.embedding.shapes/Export.value|{}value[0]
+        final fun <get-value>(): io.github.charlietap.chasm.embedding.shapes/Importable // io.github.charlietap.chasm.embedding.shapes/Export.value.<get-value>|<get-value>(){}[0]
+
+    final fun component1(): kotlin/String // io.github.charlietap.chasm.embedding.shapes/Export.component1|component1(){}[0]
+    final fun component2(): io.github.charlietap.chasm.embedding.shapes/Importable // io.github.charlietap.chasm.embedding.shapes/Export.component2|component2(){}[0]
+    final fun copy(kotlin/String = ..., io.github.charlietap.chasm.embedding.shapes/Importable = ...): io.github.charlietap.chasm.embedding.shapes/Export // io.github.charlietap.chasm.embedding.shapes/Export.copy|copy(kotlin.String;io.github.charlietap.chasm.embedding.shapes.Importable){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.embedding.shapes/Export.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.embedding.shapes/Export.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.charlietap.chasm.embedding.shapes/Export.toString|toString(){}[0]
+}
+
+final class io.github.charlietap.chasm.embedding.shapes/ExternRef : kotlin/AutoCloseable { // io.github.charlietap.chasm.embedding.shapes/ExternRef|null[0]
+    final fun asValue(): io.github.charlietap.chasm.embedding.shapes/ChasmResult<io.github.charlietap.chasm.runtime.value/ReferenceValue, io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError> // io.github.charlietap.chasm.embedding.shapes/ExternRef.asValue|asValue(){}[0]
+    final fun close() // io.github.charlietap.chasm.embedding.shapes/ExternRef.close|close(){}[0]
+    final fun hostValue(): io.github.charlietap.chasm.embedding.shapes/ChasmResult<kotlin/Any?, io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError> // io.github.charlietap.chasm.embedding.shapes/ExternRef.hostValue|hostValue(){}[0]
+}
+
+final class io.github.charlietap.chasm.embedding.shapes/Function : io.github.charlietap.chasm.embedding.shapes/Importable { // io.github.charlietap.chasm.embedding.shapes/Function|null[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.embedding.shapes/Function.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.embedding.shapes/Function.hashCode|hashCode(){}[0]
+}
+
+final class io.github.charlietap.chasm.embedding.shapes/Global : io.github.charlietap.chasm.embedding.shapes/Importable { // io.github.charlietap.chasm.embedding.shapes/Global|null[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.embedding.shapes/Global.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.embedding.shapes/Global.hashCode|hashCode(){}[0]
+}
+
+final class io.github.charlietap.chasm.embedding.shapes/Import { // io.github.charlietap.chasm.embedding.shapes/Import|null[0]
+    constructor <init>(kotlin/String, kotlin/String, io.github.charlietap.chasm.embedding.shapes/Importable) // io.github.charlietap.chasm.embedding.shapes/Import.<init>|<init>(kotlin.String;kotlin.String;io.github.charlietap.chasm.embedding.shapes.Importable){}[0]
+
+    final val entityName // io.github.charlietap.chasm.embedding.shapes/Import.entityName|{}entityName[0]
+        final fun <get-entityName>(): kotlin/String // io.github.charlietap.chasm.embedding.shapes/Import.entityName.<get-entityName>|<get-entityName>(){}[0]
+    final val moduleName // io.github.charlietap.chasm.embedding.shapes/Import.moduleName|{}moduleName[0]
+        final fun <get-moduleName>(): kotlin/String // io.github.charlietap.chasm.embedding.shapes/Import.moduleName.<get-moduleName>|<get-moduleName>(){}[0]
+    final val value // io.github.charlietap.chasm.embedding.shapes/Import.value|{}value[0]
+        final fun <get-value>(): io.github.charlietap.chasm.embedding.shapes/Importable // io.github.charlietap.chasm.embedding.shapes/Import.value.<get-value>|<get-value>(){}[0]
+
+    final fun component1(): kotlin/String // io.github.charlietap.chasm.embedding.shapes/Import.component1|component1(){}[0]
+    final fun component2(): kotlin/String // io.github.charlietap.chasm.embedding.shapes/Import.component2|component2(){}[0]
+    final fun component3(): io.github.charlietap.chasm.embedding.shapes/Importable // io.github.charlietap.chasm.embedding.shapes/Import.component3|component3(){}[0]
+    final fun copy(kotlin/String = ..., kotlin/String = ..., io.github.charlietap.chasm.embedding.shapes/Importable = ...): io.github.charlietap.chasm.embedding.shapes/Import // io.github.charlietap.chasm.embedding.shapes/Import.copy|copy(kotlin.String;kotlin.String;io.github.charlietap.chasm.embedding.shapes.Importable){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.embedding.shapes/Import.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.embedding.shapes/Import.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.charlietap.chasm.embedding.shapes/Import.toString|toString(){}[0]
+}
+
+final class io.github.charlietap.chasm.embedding.shapes/Instance { // io.github.charlietap.chasm.embedding.shapes/Instance|null[0]
+    final val exports // io.github.charlietap.chasm.embedding.shapes/Instance.exports|{}exports[0]
+        final fun <get-exports>(): kotlin.collections/List<io.github.charlietap.chasm.embedding.shapes/Export> // io.github.charlietap.chasm.embedding.shapes/Instance.exports.<get-exports>|<get-exports>(){}[0]
+    final val instance // io.github.charlietap.chasm.embedding.shapes/Instance.instance|{}instance[0]
+        final fun <get-instance>(): io.github.charlietap.chasm.runtime.instance/ModuleInstance // io.github.charlietap.chasm.embedding.shapes/Instance.instance.<get-instance>|<get-instance>(){}[0]
+}
+
+final class io.github.charlietap.chasm.embedding.shapes/Memory : io.github.charlietap.chasm.embedding.shapes/Importable { // io.github.charlietap.chasm.embedding.shapes/Memory|null[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.embedding.shapes/Memory.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.embedding.shapes/Memory.hashCode|hashCode(){}[0]
+}
+
+final class io.github.charlietap.chasm.embedding.shapes/PreparedFunction { // io.github.charlietap.chasm.embedding.shapes/PreparedFunction|null[0]
+    final fun invoke(kotlin.collections/List<io.github.charlietap.chasm.runtime.value/ExecutionValue> = ...): io.github.charlietap.chasm.embedding.shapes/ChasmResult<kotlin.collections/List<io.github.charlietap.chasm.runtime.value/ExecutionValue>, io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError> // io.github.charlietap.chasm.embedding.shapes/PreparedFunction.invoke|invoke(kotlin.collections.List<io.github.charlietap.chasm.runtime.value.ExecutionValue>){}[0]
+}
+
+final class io.github.charlietap.chasm.embedding.shapes/Store { // io.github.charlietap.chasm.embedding.shapes/Store|null[0]
+    final val store // io.github.charlietap.chasm.embedding.shapes/Store.store|{}store[0]
+        final fun <get-store>(): io.github.charlietap.chasm.runtime.store/Store // io.github.charlietap.chasm.embedding.shapes/Store.store.<get-store>|<get-store>(){}[0]
+}
+
+final class io.github.charlietap.chasm.embedding.shapes/Table : io.github.charlietap.chasm.embedding.shapes/Importable { // io.github.charlietap.chasm.embedding.shapes/Table|null[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.embedding.shapes/Table.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.embedding.shapes/Table.hashCode|hashCode(){}[0]
+}
+
+final class io.github.charlietap.chasm.embedding.shapes/Tag : io.github.charlietap.chasm.embedding.shapes/Importable { // io.github.charlietap.chasm.embedding.shapes/Tag|null[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.embedding.shapes/Tag.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.embedding.shapes/Tag.hashCode|hashCode(){}[0]
+}
+
+final class io.github.charlietap.chasm.embedding.shapes/Wasm32Allocator : io.github.charlietap.chasm.embedding.shapes/Allocator<kotlin/Int> { // io.github.charlietap.chasm.embedding.shapes/Wasm32Allocator|null[0]
+    constructor <init>(io.github.charlietap.chasm.embedding.shapes/Instance, io.github.charlietap.chasm.embedding.shapes/Store, kotlin/String, kotlin/String) // io.github.charlietap.chasm.embedding.shapes/Wasm32Allocator.<init>|<init>(io.github.charlietap.chasm.embedding.shapes.Instance;io.github.charlietap.chasm.embedding.shapes.Store;kotlin.String;kotlin.String){}[0]
+
+    final fun alloc(kotlin/Int): kotlin/Int // io.github.charlietap.chasm.embedding.shapes/Wasm32Allocator.alloc|alloc(kotlin.Int){}[0]
+    final fun free(kotlin/Int) // io.github.charlietap.chasm.embedding.shapes/Wasm32Allocator.free|free(kotlin.Int){}[0]
+}
+
+sealed class io.github.charlietap.chasm.embedding.shapes/Importable // io.github.charlietap.chasm.embedding.shapes/Importable|null[0]
+
+final fun (io.github.charlietap.chasm.config/RuntimeConfig).io.github.charlietap.chasm.embedding.ext/withStoreSettings(io.github.charlietap.chasm.config/StoreConfig): io.github.charlietap.chasm.config/RuntimeConfig // io.github.charlietap.chasm.embedding.ext/withStoreSettings|withStoreSettings@io.github.charlietap.chasm.config.RuntimeConfig(io.github.charlietap.chasm.config.StoreConfig){}[0]
+final fun io.github.charlietap.chasm.embedding.codegen/allocateImports(io.github.charlietap.chasm.embedding.shapes/Store, kotlin.collections/List<io.github.charlietap.chasm.embedding.codegen/CodegenImport>): kotlin.collections/List<io.github.charlietap.chasm.embedding.shapes/Import> // io.github.charlietap.chasm.embedding.codegen/allocateImports|allocateImports(io.github.charlietap.chasm.embedding.shapes.Store;kotlin.collections.List<io.github.charlietap.chasm.embedding.codegen.CodegenImport>){}[0]
+final fun io.github.charlietap.chasm.embedding.dsl/functionImport(io.github.charlietap.chasm.embedding.shapes/Store, kotlin/Function1<io.github.charlietap.chasm.embedding.dsl/FunctionImportBuilder, kotlin/Unit>): io.github.charlietap.chasm.embedding.shapes/Import // io.github.charlietap.chasm.embedding.dsl/functionImport|functionImport(io.github.charlietap.chasm.embedding.shapes.Store;kotlin.Function1<io.github.charlietap.chasm.embedding.dsl.FunctionImportBuilder,kotlin.Unit>){}[0]
+final fun io.github.charlietap.chasm.embedding.dsl/globalImport(io.github.charlietap.chasm.embedding.shapes/Store, kotlin/Function1<io.github.charlietap.chasm.embedding.dsl/GlobalImportBuilder, kotlin/Unit>): io.github.charlietap.chasm.embedding.shapes/Import // io.github.charlietap.chasm.embedding.dsl/globalImport|globalImport(io.github.charlietap.chasm.embedding.shapes.Store;kotlin.Function1<io.github.charlietap.chasm.embedding.dsl.GlobalImportBuilder,kotlin.Unit>){}[0]
+final fun io.github.charlietap.chasm.embedding.dsl/hostFunction(io.github.charlietap.chasm.host/HostFunction): io.github.charlietap.chasm.host/HostFunction // io.github.charlietap.chasm.embedding.dsl/hostFunction|hostFunction(io.github.charlietap.chasm.host.HostFunction){}[0]
+final fun io.github.charlietap.chasm.embedding.dsl/imports(io.github.charlietap.chasm.embedding.shapes/Store, kotlin/Function1<io.github.charlietap.chasm.embedding.dsl/ImportsBuilder, kotlin/Unit>): kotlin.collections/List<io.github.charlietap.chasm.embedding.shapes/Import> // io.github.charlietap.chasm.embedding.dsl/imports|imports(io.github.charlietap.chasm.embedding.shapes.Store;kotlin.Function1<io.github.charlietap.chasm.embedding.dsl.ImportsBuilder,kotlin.Unit>){}[0]
+final fun io.github.charlietap.chasm.embedding.dsl/limits(kotlin/Function1<io.github.charlietap.chasm.embedding.dsl/LimitsBuilder, kotlin/Unit>): io.github.charlietap.chasm.type/Limits // io.github.charlietap.chasm.embedding.dsl/limits|limits(kotlin.Function1<io.github.charlietap.chasm.embedding.dsl.LimitsBuilder,kotlin.Unit>){}[0]
+final fun io.github.charlietap.chasm.embedding.dsl/memoryImport(io.github.charlietap.chasm.embedding.shapes/Store, kotlin/Function1<io.github.charlietap.chasm.embedding.dsl/MemoryImportBuilder, kotlin/Unit>): io.github.charlietap.chasm.embedding.shapes/Import // io.github.charlietap.chasm.embedding.dsl/memoryImport|memoryImport(io.github.charlietap.chasm.embedding.shapes.Store;kotlin.Function1<io.github.charlietap.chasm.embedding.dsl.MemoryImportBuilder,kotlin.Unit>){}[0]
+final fun io.github.charlietap.chasm.embedding.dsl/tableImport(io.github.charlietap.chasm.embedding.shapes/Store, kotlin/Function1<io.github.charlietap.chasm.embedding.dsl/TableImportBuilder, kotlin/Unit>): io.github.charlietap.chasm.embedding.shapes/Import // io.github.charlietap.chasm.embedding.dsl/tableImport|tableImport(io.github.charlietap.chasm.embedding.shapes.Store;kotlin.Function1<io.github.charlietap.chasm.embedding.dsl.TableImportBuilder,kotlin.Unit>){}[0]
+final fun io.github.charlietap.chasm.embedding.dsl/tagImport(io.github.charlietap.chasm.embedding.shapes/Store, kotlin/Function1<io.github.charlietap.chasm.embedding.dsl/TagImportBuilder, kotlin/Unit>): io.github.charlietap.chasm.embedding.shapes/Import // io.github.charlietap.chasm.embedding.dsl/tagImport|tagImport(io.github.charlietap.chasm.embedding.shapes.Store;kotlin.Function1<io.github.charlietap.chasm.embedding.dsl.TagImportBuilder,kotlin.Unit>){}[0]
+final fun io.github.charlietap.chasm.embedding.extern/createExternRef(io.github.charlietap.chasm.embedding.shapes/Store, kotlin/Any?): io.github.charlietap.chasm.embedding.shapes/ChasmResult<io.github.charlietap.chasm.embedding.shapes/ExternRef, io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError> // io.github.charlietap.chasm.embedding.extern/createExternRef|createExternRef(io.github.charlietap.chasm.embedding.shapes.Store;kotlin.Any?){}[0]
+final fun io.github.charlietap.chasm.embedding.global/readGlobal(io.github.charlietap.chasm.embedding.shapes/Store, io.github.charlietap.chasm.embedding.shapes/Global): io.github.charlietap.chasm.embedding.shapes/ChasmResult<io.github.charlietap.chasm.runtime.value/ExecutionValue, io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError> // io.github.charlietap.chasm.embedding.global/readGlobal|readGlobal(io.github.charlietap.chasm.embedding.shapes.Store;io.github.charlietap.chasm.embedding.shapes.Global){}[0]
+final fun io.github.charlietap.chasm.embedding.global/writeGlobal(io.github.charlietap.chasm.embedding.shapes/Store, io.github.charlietap.chasm.embedding.shapes/Global, io.github.charlietap.chasm.runtime.value/ExecutionValue): io.github.charlietap.chasm.embedding.shapes/ChasmResult<kotlin/Unit, io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError> // io.github.charlietap.chasm.embedding.global/writeGlobal|writeGlobal(io.github.charlietap.chasm.embedding.shapes.Store;io.github.charlietap.chasm.embedding.shapes.Global;io.github.charlietap.chasm.runtime.value.ExecutionValue){}[0]
+final fun io.github.charlietap.chasm.embedding.internal/importsFromAnotherStore(io.github.charlietap.chasm.embedding.shapes/Store, kotlin.collections/List<io.github.charlietap.chasm.embedding.shapes/Import>): kotlin/Boolean // io.github.charlietap.chasm.embedding.internal/importsFromAnotherStore|importsFromAnotherStore(io.github.charlietap.chasm.embedding.shapes.Store;kotlin.collections.List<io.github.charlietap.chasm.embedding.shapes.Import>){}[0]
+final fun io.github.charlietap.chasm.embedding.internal/runtimeImports(io.github.charlietap.chasm.embedding.shapes/Store, kotlin.collections/List<io.github.charlietap.chasm.embedding.shapes/Import>): kotlin.collections/List<io.github.charlietap.chasm.runtime.instance/Import> // io.github.charlietap.chasm.embedding.internal/runtimeImports|runtimeImports(io.github.charlietap.chasm.embedding.shapes.Store;kotlin.collections.List<io.github.charlietap.chasm.embedding.shapes.Import>){}[0]
+final fun io.github.charlietap.chasm.embedding.internal/wrapInstantiationResult(com.github.michaelbull.result/Result<io.github.charlietap.chasm.runtime.instance/ModuleInstance, io.github.charlietap.chasm.runtime.error/ModuleTrapError>, io.github.charlietap.chasm.config/RuntimeConfig, io.github.charlietap.chasm.embedding.shapes/Store, kotlin/Int, io.github.charlietap.chasm.embedding.internal/InstanceInvoker, kotlin/Function1<io.github.charlietap.chasm.runtime.instance/ModuleInstance, io.github.charlietap.chasm.embedding.diagnostic/TrapSource?>): io.github.charlietap.chasm.embedding.shapes/ChasmResult<io.github.charlietap.chasm.embedding.shapes/Instance, io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError> // io.github.charlietap.chasm.embedding.internal/wrapInstantiationResult|wrapInstantiationResult(com.github.michaelbull.result.Result<io.github.charlietap.chasm.runtime.instance.ModuleInstance,io.github.charlietap.chasm.runtime.error.ModuleTrapError>;io.github.charlietap.chasm.config.RuntimeConfig;io.github.charlietap.chasm.embedding.shapes.Store;kotlin.Int;io.github.charlietap.chasm.embedding.internal.InstanceInvoker;kotlin.Function1<io.github.charlietap.chasm.runtime.instance.ModuleInstance,io.github.charlietap.chasm.embedding.diagnostic.TrapSource?>){}[0]
+final fun io.github.charlietap.chasm.embedding.memory/growMemory(io.github.charlietap.chasm.embedding.shapes/Store, io.github.charlietap.chasm.embedding.shapes/Memory, kotlin/Int): io.github.charlietap.chasm.embedding.shapes/ChasmResult<kotlin/Int, io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError> // io.github.charlietap.chasm.embedding.memory/growMemory|growMemory(io.github.charlietap.chasm.embedding.shapes.Store;io.github.charlietap.chasm.embedding.shapes.Memory;kotlin.Int){}[0]
+final fun io.github.charlietap.chasm.embedding.memory/readByte(io.github.charlietap.chasm.embedding.shapes/Store, io.github.charlietap.chasm.embedding.shapes/Memory, kotlin/Int): io.github.charlietap.chasm.embedding.shapes/ChasmResult<kotlin/Byte, io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError> // io.github.charlietap.chasm.embedding.memory/readByte|readByte(io.github.charlietap.chasm.embedding.shapes.Store;io.github.charlietap.chasm.embedding.shapes.Memory;kotlin.Int){}[0]
+final fun io.github.charlietap.chasm.embedding.memory/readBytes(io.github.charlietap.chasm.embedding.shapes/Store, io.github.charlietap.chasm.embedding.shapes/Memory, kotlin/ByteArray, kotlin/Int, kotlin/Int, kotlin/Int = ...): io.github.charlietap.chasm.embedding.shapes/ChasmResult<kotlin/ByteArray, io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError> // io.github.charlietap.chasm.embedding.memory/readBytes|readBytes(io.github.charlietap.chasm.embedding.shapes.Store;io.github.charlietap.chasm.embedding.shapes.Memory;kotlin.ByteArray;kotlin.Int;kotlin.Int;kotlin.Int){}[0]
+final fun io.github.charlietap.chasm.embedding.memory/readDouble(io.github.charlietap.chasm.embedding.shapes/Store, io.github.charlietap.chasm.embedding.shapes/Memory, kotlin/Int): io.github.charlietap.chasm.embedding.shapes/ChasmResult<kotlin/Double, io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError> // io.github.charlietap.chasm.embedding.memory/readDouble|readDouble(io.github.charlietap.chasm.embedding.shapes.Store;io.github.charlietap.chasm.embedding.shapes.Memory;kotlin.Int){}[0]
+final fun io.github.charlietap.chasm.embedding.memory/readFloat(io.github.charlietap.chasm.embedding.shapes/Store, io.github.charlietap.chasm.embedding.shapes/Memory, kotlin/Int): io.github.charlietap.chasm.embedding.shapes/ChasmResult<kotlin/Float, io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError> // io.github.charlietap.chasm.embedding.memory/readFloat|readFloat(io.github.charlietap.chasm.embedding.shapes.Store;io.github.charlietap.chasm.embedding.shapes.Memory;kotlin.Int){}[0]
+final fun io.github.charlietap.chasm.embedding.memory/readInt(io.github.charlietap.chasm.embedding.shapes/Store, io.github.charlietap.chasm.embedding.shapes/Memory, kotlin/Int): io.github.charlietap.chasm.embedding.shapes/ChasmResult<kotlin/Int, io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError> // io.github.charlietap.chasm.embedding.memory/readInt|readInt(io.github.charlietap.chasm.embedding.shapes.Store;io.github.charlietap.chasm.embedding.shapes.Memory;kotlin.Int){}[0]
+final fun io.github.charlietap.chasm.embedding.memory/readLong(io.github.charlietap.chasm.embedding.shapes/Store, io.github.charlietap.chasm.embedding.shapes/Memory, kotlin/Int): io.github.charlietap.chasm.embedding.shapes/ChasmResult<kotlin/Long, io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError> // io.github.charlietap.chasm.embedding.memory/readLong|readLong(io.github.charlietap.chasm.embedding.shapes.Store;io.github.charlietap.chasm.embedding.shapes.Memory;kotlin.Int){}[0]
+final fun io.github.charlietap.chasm.embedding.memory/readNullTerminatedUtf8String(io.github.charlietap.chasm.embedding.shapes/Store, io.github.charlietap.chasm.embedding.shapes/Memory, kotlin/Int): io.github.charlietap.chasm.embedding.shapes/ChasmResult<kotlin/String, io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError> // io.github.charlietap.chasm.embedding.memory/readNullTerminatedUtf8String|readNullTerminatedUtf8String(io.github.charlietap.chasm.embedding.shapes.Store;io.github.charlietap.chasm.embedding.shapes.Memory;kotlin.Int){}[0]
+final fun io.github.charlietap.chasm.embedding.memory/readUtf8String(io.github.charlietap.chasm.embedding.shapes/Store, io.github.charlietap.chasm.embedding.shapes/Memory, kotlin/Int, kotlin/Int): io.github.charlietap.chasm.embedding.shapes/ChasmResult<kotlin/String, io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError> // io.github.charlietap.chasm.embedding.memory/readUtf8String|readUtf8String(io.github.charlietap.chasm.embedding.shapes.Store;io.github.charlietap.chasm.embedding.shapes.Memory;kotlin.Int;kotlin.Int){}[0]
+final fun io.github.charlietap.chasm.embedding.memory/sizeMemory(io.github.charlietap.chasm.embedding.shapes/Store, io.github.charlietap.chasm.embedding.shapes/Memory): io.github.charlietap.chasm.embedding.shapes/ChasmResult<kotlin/Int, io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError> // io.github.charlietap.chasm.embedding.memory/sizeMemory|sizeMemory(io.github.charlietap.chasm.embedding.shapes.Store;io.github.charlietap.chasm.embedding.shapes.Memory){}[0]
+final fun io.github.charlietap.chasm.embedding.memory/writeByte(io.github.charlietap.chasm.embedding.shapes/Store, io.github.charlietap.chasm.embedding.shapes/Memory, kotlin/Int, kotlin/Byte): io.github.charlietap.chasm.embedding.shapes/ChasmResult<kotlin/Unit, io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError> // io.github.charlietap.chasm.embedding.memory/writeByte|writeByte(io.github.charlietap.chasm.embedding.shapes.Store;io.github.charlietap.chasm.embedding.shapes.Memory;kotlin.Int;kotlin.Byte){}[0]
+final fun io.github.charlietap.chasm.embedding.memory/writeBytes(io.github.charlietap.chasm.embedding.shapes/Store, io.github.charlietap.chasm.embedding.shapes/Memory, kotlin/Int, kotlin/ByteArray, kotlin/Int = ..., kotlin/Int = ...): io.github.charlietap.chasm.embedding.shapes/ChasmResult<kotlin/Unit, io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError> // io.github.charlietap.chasm.embedding.memory/writeBytes|writeBytes(io.github.charlietap.chasm.embedding.shapes.Store;io.github.charlietap.chasm.embedding.shapes.Memory;kotlin.Int;kotlin.ByteArray;kotlin.Int;kotlin.Int){}[0]
+final fun io.github.charlietap.chasm.embedding.memory/writeDouble(io.github.charlietap.chasm.embedding.shapes/Store, io.github.charlietap.chasm.embedding.shapes/Memory, kotlin/Int, kotlin/Double): io.github.charlietap.chasm.embedding.shapes/ChasmResult<kotlin/Unit, io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError> // io.github.charlietap.chasm.embedding.memory/writeDouble|writeDouble(io.github.charlietap.chasm.embedding.shapes.Store;io.github.charlietap.chasm.embedding.shapes.Memory;kotlin.Int;kotlin.Double){}[0]
+final fun io.github.charlietap.chasm.embedding.memory/writeFloat(io.github.charlietap.chasm.embedding.shapes/Store, io.github.charlietap.chasm.embedding.shapes/Memory, kotlin/Int, kotlin/Float): io.github.charlietap.chasm.embedding.shapes/ChasmResult<kotlin/Unit, io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError> // io.github.charlietap.chasm.embedding.memory/writeFloat|writeFloat(io.github.charlietap.chasm.embedding.shapes.Store;io.github.charlietap.chasm.embedding.shapes.Memory;kotlin.Int;kotlin.Float){}[0]
+final fun io.github.charlietap.chasm.embedding.memory/writeInt(io.github.charlietap.chasm.embedding.shapes/Store, io.github.charlietap.chasm.embedding.shapes/Memory, kotlin/Int, kotlin/Int): io.github.charlietap.chasm.embedding.shapes/ChasmResult<kotlin/Unit, io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError> // io.github.charlietap.chasm.embedding.memory/writeInt|writeInt(io.github.charlietap.chasm.embedding.shapes.Store;io.github.charlietap.chasm.embedding.shapes.Memory;kotlin.Int;kotlin.Int){}[0]
+final fun io.github.charlietap.chasm.embedding.memory/writeLong(io.github.charlietap.chasm.embedding.shapes/Store, io.github.charlietap.chasm.embedding.shapes/Memory, kotlin/Int, kotlin/Long): io.github.charlietap.chasm.embedding.shapes/ChasmResult<kotlin/Unit, io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError> // io.github.charlietap.chasm.embedding.memory/writeLong|writeLong(io.github.charlietap.chasm.embedding.shapes.Store;io.github.charlietap.chasm.embedding.shapes.Memory;kotlin.Int;kotlin.Long){}[0]
+final fun io.github.charlietap.chasm.embedding.memory/writeUtf8String(io.github.charlietap.chasm.embedding.shapes/Store, io.github.charlietap.chasm.embedding.shapes/Memory, kotlin/Int, kotlin/String): io.github.charlietap.chasm.embedding.shapes/ChasmResult<kotlin/Unit, io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError> // io.github.charlietap.chasm.embedding.memory/writeUtf8String|writeUtf8String(io.github.charlietap.chasm.embedding.shapes.Store;io.github.charlietap.chasm.embedding.shapes.Memory;kotlin.Int;kotlin.String){}[0]
+final fun io.github.charlietap.chasm.embedding.reference/readArrayElement(io.github.charlietap.chasm.embedding.shapes/Store, io.github.charlietap.chasm.runtime.value/ReferenceValue.Array, kotlin/Int): io.github.charlietap.chasm.embedding.shapes/ChasmResult<io.github.charlietap.chasm.runtime.value/FieldValue, io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError> // io.github.charlietap.chasm.embedding.reference/readArrayElement|readArrayElement(io.github.charlietap.chasm.embedding.shapes.Store;io.github.charlietap.chasm.runtime.value.ReferenceValue.Array;kotlin.Int){}[0]
+final fun io.github.charlietap.chasm.embedding.reference/readArrayLength(io.github.charlietap.chasm.embedding.shapes/Store, io.github.charlietap.chasm.runtime.value/ReferenceValue.Array): io.github.charlietap.chasm.embedding.shapes/ChasmResult<kotlin/Int, io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError> // io.github.charlietap.chasm.embedding.reference/readArrayLength|readArrayLength(io.github.charlietap.chasm.embedding.shapes.Store;io.github.charlietap.chasm.runtime.value.ReferenceValue.Array){}[0]
+final fun io.github.charlietap.chasm.embedding.reference/readStructField(io.github.charlietap.chasm.embedding.shapes/Store, io.github.charlietap.chasm.runtime.value/ReferenceValue.Struct, kotlin/Int): io.github.charlietap.chasm.embedding.shapes/ChasmResult<io.github.charlietap.chasm.runtime.value/FieldValue, io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError> // io.github.charlietap.chasm.embedding.reference/readStructField|readStructField(io.github.charlietap.chasm.embedding.shapes.Store;io.github.charlietap.chasm.runtime.value.ReferenceValue.Struct;kotlin.Int){}[0]
+final fun io.github.charlietap.chasm.embedding.reference/writeArrayElement(io.github.charlietap.chasm.embedding.shapes/Store, io.github.charlietap.chasm.runtime.value/ReferenceValue.Array, kotlin/Int, io.github.charlietap.chasm.runtime.value/FieldValue): io.github.charlietap.chasm.embedding.shapes/ChasmResult<kotlin/Unit, io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError> // io.github.charlietap.chasm.embedding.reference/writeArrayElement|writeArrayElement(io.github.charlietap.chasm.embedding.shapes.Store;io.github.charlietap.chasm.runtime.value.ReferenceValue.Array;kotlin.Int;io.github.charlietap.chasm.runtime.value.FieldValue){}[0]
+final fun io.github.charlietap.chasm.embedding.reference/writeStructField(io.github.charlietap.chasm.embedding.shapes/Store, io.github.charlietap.chasm.runtime.value/ReferenceValue.Struct, kotlin/Int, io.github.charlietap.chasm.runtime.value/FieldValue): io.github.charlietap.chasm.embedding.shapes/ChasmResult<kotlin/Unit, io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError> // io.github.charlietap.chasm.embedding.reference/writeStructField|writeStructField(io.github.charlietap.chasm.embedding.shapes.Store;io.github.charlietap.chasm.runtime.value.ReferenceValue.Struct;kotlin.Int;io.github.charlietap.chasm.runtime.value.FieldValue){}[0]
+final fun io.github.charlietap.chasm.embedding.table/readTable(io.github.charlietap.chasm.embedding.shapes/Store, io.github.charlietap.chasm.embedding.shapes/Table, kotlin/Int): io.github.charlietap.chasm.embedding.shapes/ChasmResult<io.github.charlietap.chasm.runtime.value/ReferenceValue, io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError> // io.github.charlietap.chasm.embedding.table/readTable|readTable(io.github.charlietap.chasm.embedding.shapes.Store;io.github.charlietap.chasm.embedding.shapes.Table;kotlin.Int){}[0]
+final fun io.github.charlietap.chasm.embedding.table/writeTable(io.github.charlietap.chasm.embedding.shapes/Store, io.github.charlietap.chasm.embedding.shapes/Table, kotlin/Int, io.github.charlietap.chasm.runtime.value/ReferenceValue): io.github.charlietap.chasm.embedding.shapes/ChasmResult<kotlin/Unit, io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError> // io.github.charlietap.chasm.embedding.table/writeTable|writeTable(io.github.charlietap.chasm.embedding.shapes.Store;io.github.charlietap.chasm.embedding.shapes.Table;kotlin.Int;io.github.charlietap.chasm.runtime.value.ReferenceValue){}[0]
+final fun io.github.charlietap.chasm.embedding/addFuel(io.github.charlietap.chasm.embedding.shapes/Store, kotlin/Long): io.github.charlietap.chasm.embedding.shapes/ChasmResult<kotlin/Unit, io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError> // io.github.charlietap.chasm.embedding/addFuel|addFuel(io.github.charlietap.chasm.embedding.shapes.Store;kotlin.Long){}[0]
+final fun io.github.charlietap.chasm.embedding/dropInstance(io.github.charlietap.chasm.embedding.shapes/Store, io.github.charlietap.chasm.embedding.shapes/Instance): io.github.charlietap.chasm.embedding.shapes/ChasmResult<kotlin/Unit, io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError> // io.github.charlietap.chasm.embedding/dropInstance|dropInstance(io.github.charlietap.chasm.embedding.shapes.Store;io.github.charlietap.chasm.embedding.shapes.Instance){}[0]
+final fun io.github.charlietap.chasm.embedding/dropStore(io.github.charlietap.chasm.embedding.shapes/Store): io.github.charlietap.chasm.embedding.shapes/ChasmResult<kotlin/Unit, io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError> // io.github.charlietap.chasm.embedding/dropStore|dropStore(io.github.charlietap.chasm.embedding.shapes.Store){}[0]
+final fun io.github.charlietap.chasm.embedding/exports(io.github.charlietap.chasm.embedding.shapes/Instance): kotlin.collections/List<io.github.charlietap.chasm.embedding.shapes/Export> // io.github.charlietap.chasm.embedding/exports|exports(io.github.charlietap.chasm.embedding.shapes.Instance){}[0]
+final fun io.github.charlietap.chasm.embedding/function(io.github.charlietap.chasm.embedding.shapes/Store, io.github.charlietap.chasm.type/FunctionType, io.github.charlietap.chasm.host/HostFunction): io.github.charlietap.chasm.embedding.shapes/Function // io.github.charlietap.chasm.embedding/function|function(io.github.charlietap.chasm.embedding.shapes.Store;io.github.charlietap.chasm.type.FunctionType;io.github.charlietap.chasm.host.HostFunction){}[0]
+final fun io.github.charlietap.chasm.embedding/gc(io.github.charlietap.chasm.embedding.shapes/Store): io.github.charlietap.chasm.embedding.shapes/ChasmResult<kotlin/Unit, io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError> // io.github.charlietap.chasm.embedding/gc|gc(io.github.charlietap.chasm.embedding.shapes.Store){}[0]
+final fun io.github.charlietap.chasm.embedding/global(io.github.charlietap.chasm.embedding.shapes/Store, io.github.charlietap.chasm.type/GlobalType, io.github.charlietap.chasm.runtime.value/ExecutionValue): io.github.charlietap.chasm.embedding.shapes/Global // io.github.charlietap.chasm.embedding/global|global(io.github.charlietap.chasm.embedding.shapes.Store;io.github.charlietap.chasm.type.GlobalType;io.github.charlietap.chasm.runtime.value.ExecutionValue){}[0]
+final fun io.github.charlietap.chasm.embedding/interrupt(io.github.charlietap.chasm.embedding.shapes/Store): io.github.charlietap.chasm.embedding.shapes/ChasmResult<kotlin/Boolean, io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError> // io.github.charlietap.chasm.embedding/interrupt|interrupt(io.github.charlietap.chasm.embedding.shapes.Store){}[0]
+final fun io.github.charlietap.chasm.embedding/invoke(io.github.charlietap.chasm.embedding.shapes/Store, io.github.charlietap.chasm.embedding.shapes/Instance, io.github.charlietap.chasm.embedding.shapes/Function, kotlin.collections/List<io.github.charlietap.chasm.runtime.value/ExecutionValue> = ...): io.github.charlietap.chasm.embedding.shapes/ChasmResult<kotlin.collections/List<io.github.charlietap.chasm.runtime.value/ExecutionValue>, io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError> // io.github.charlietap.chasm.embedding/invoke|invoke(io.github.charlietap.chasm.embedding.shapes.Store;io.github.charlietap.chasm.embedding.shapes.Instance;io.github.charlietap.chasm.embedding.shapes.Function;kotlin.collections.List<io.github.charlietap.chasm.runtime.value.ExecutionValue>){}[0]
+final fun io.github.charlietap.chasm.embedding/invoke(io.github.charlietap.chasm.embedding.shapes/Store, io.github.charlietap.chasm.embedding.shapes/Instance, kotlin/String, kotlin.collections/List<io.github.charlietap.chasm.runtime.value/ExecutionValue> = ...): io.github.charlietap.chasm.embedding.shapes/ChasmResult<kotlin.collections/List<io.github.charlietap.chasm.runtime.value/ExecutionValue>, io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError> // io.github.charlietap.chasm.embedding/invoke|invoke(io.github.charlietap.chasm.embedding.shapes.Store;io.github.charlietap.chasm.embedding.shapes.Instance;kotlin.String;kotlin.collections.List<io.github.charlietap.chasm.runtime.value.ExecutionValue>){}[0]
+final fun io.github.charlietap.chasm.embedding/memory(io.github.charlietap.chasm.embedding.shapes/Store, io.github.charlietap.chasm.type/MemoryType): io.github.charlietap.chasm.embedding.shapes/Memory // io.github.charlietap.chasm.embedding/memory|memory(io.github.charlietap.chasm.embedding.shapes.Store;io.github.charlietap.chasm.type.MemoryType){}[0]
+final fun io.github.charlietap.chasm.embedding/memory(io.github.charlietap.chasm.embedding.shapes/Store, io.github.charlietap.chasm.type/MemoryType, io.github.charlietap.chasm.config/LinearMemoryConfig): io.github.charlietap.chasm.embedding.shapes/Memory // io.github.charlietap.chasm.embedding/memory|memory(io.github.charlietap.chasm.embedding.shapes.Store;io.github.charlietap.chasm.type.MemoryType;io.github.charlietap.chasm.config.LinearMemoryConfig){}[0]
+final fun io.github.charlietap.chasm.embedding/prepareFunction(io.github.charlietap.chasm.embedding.shapes/Store, io.github.charlietap.chasm.embedding.shapes/Instance, kotlin/String): io.github.charlietap.chasm.embedding.shapes/ChasmResult<io.github.charlietap.chasm.embedding.shapes/PreparedFunction, io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError> // io.github.charlietap.chasm.embedding/prepareFunction|prepareFunction(io.github.charlietap.chasm.embedding.shapes.Store;io.github.charlietap.chasm.embedding.shapes.Instance;kotlin.String){}[0]
+final fun io.github.charlietap.chasm.embedding/remainingFuel(io.github.charlietap.chasm.embedding.shapes/Store): io.github.charlietap.chasm.embedding.shapes/ChasmResult<kotlin/Long, io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError> // io.github.charlietap.chasm.embedding/remainingFuel|remainingFuel(io.github.charlietap.chasm.embedding.shapes.Store){}[0]
+final fun io.github.charlietap.chasm.embedding/resetFuel(io.github.charlietap.chasm.embedding.shapes/Store): io.github.charlietap.chasm.embedding.shapes/ChasmResult<kotlin/Unit, io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError> // io.github.charlietap.chasm.embedding/resetFuel|resetFuel(io.github.charlietap.chasm.embedding.shapes.Store){}[0]
+final fun io.github.charlietap.chasm.embedding/store(): io.github.charlietap.chasm.embedding.shapes/Store // io.github.charlietap.chasm.embedding/store|store(){}[0]
+final fun io.github.charlietap.chasm.embedding/store(io.github.charlietap.chasm.config/StoreConfig): io.github.charlietap.chasm.embedding.shapes/Store // io.github.charlietap.chasm.embedding/store|store(io.github.charlietap.chasm.config.StoreConfig){}[0]
+final fun io.github.charlietap.chasm.embedding/table(io.github.charlietap.chasm.embedding.shapes/Store, io.github.charlietap.chasm.type/TableType, io.github.charlietap.chasm.runtime.value/ReferenceValue): io.github.charlietap.chasm.embedding.shapes/Table // io.github.charlietap.chasm.embedding/table|table(io.github.charlietap.chasm.embedding.shapes.Store;io.github.charlietap.chasm.type.TableType;io.github.charlietap.chasm.runtime.value.ReferenceValue){}[0]
+final fun io.github.charlietap.chasm.embedding/tag(io.github.charlietap.chasm.embedding.shapes/Store, io.github.charlietap.chasm.type/TagType): io.github.charlietap.chasm.embedding.shapes/Tag // io.github.charlietap.chasm.embedding/tag|tag(io.github.charlietap.chasm.embedding.shapes.Store;io.github.charlietap.chasm.type.TagType){}[0]
+final inline fun <#A: reified kotlin/Any> (io.github.charlietap.chasm.embedding.shapes/ExternRef).io.github.charlietap.chasm.embedding.shapes/hostValueAs(): io.github.charlietap.chasm.embedding.shapes/ChasmResult<#A?, io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError> // io.github.charlietap.chasm.embedding.shapes/hostValueAs|hostValueAs@io.github.charlietap.chasm.embedding.shapes.ExternRef(){0§<kotlin.Any>}[0]
+final inline fun io.github.charlietap.chasm.embedding.internal/instantiate(io.github.charlietap.chasm.embedding.shapes/Store, kotlin.collections/List<io.github.charlietap.chasm.embedding.shapes/Import>, io.github.charlietap.chasm.config/RuntimeConfig, io.github.charlietap.chasm.embedding.internal/InstanceInvoker, noinline kotlin/Function1<io.github.charlietap.chasm.runtime.instance/ModuleInstance, io.github.charlietap.chasm.embedding.diagnostic/TrapSource?>, kotlin/Function3<io.github.charlietap.chasm.config/RuntimeConfig, io.github.charlietap.chasm.runtime.store/Store, kotlin.collections/List<io.github.charlietap.chasm.runtime.instance/Import>, com.github.michaelbull.result/Result<io.github.charlietap.chasm.runtime.instance/ModuleInstance, io.github.charlietap.chasm.runtime.error/ModuleTrapError>>): io.github.charlietap.chasm.embedding.shapes/ChasmResult<io.github.charlietap.chasm.embedding.shapes/Instance, io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError> // io.github.charlietap.chasm.embedding.internal/instantiate|instantiate(io.github.charlietap.chasm.embedding.shapes.Store;kotlin.collections.List<io.github.charlietap.chasm.embedding.shapes.Import>;io.github.charlietap.chasm.config.RuntimeConfig;io.github.charlietap.chasm.embedding.internal.InstanceInvoker;kotlin.Function1<io.github.charlietap.chasm.runtime.instance.ModuleInstance,io.github.charlietap.chasm.embedding.diagnostic.TrapSource?>;kotlin.Function3<io.github.charlietap.chasm.config.RuntimeConfig,io.github.charlietap.chasm.runtime.store.Store,kotlin.collections.List<io.github.charlietap.chasm.runtime.instance.Import>,com.github.michaelbull.result.Result<io.github.charlietap.chasm.runtime.instance.ModuleInstance,io.github.charlietap.chasm.runtime.error.ModuleTrapError>>){}[0]

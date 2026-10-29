@@ -1,3 +1,5 @@
+@file:OptIn(InternalChasmApi::class)
+
 package io.github.charlietap.chasm.corpus
 
 import at.released.weh.bindings.chasm.wasip1.ChasmWasiPreview1Builder
@@ -9,6 +11,7 @@ import at.released.weh.host.EntropySource
 import at.released.weh.host.SystemEnvProvider
 import at.released.weh.host.clock.Clock
 import at.released.weh.host.clock.MonotonicClock
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.config.Config
 import io.github.charlietap.chasm.config.GCStrategy
 import io.github.charlietap.chasm.config.RuntimeConfig

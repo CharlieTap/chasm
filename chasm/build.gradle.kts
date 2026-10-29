@@ -115,6 +115,7 @@ kotlin {
             dependencies {
                 api(projects.config)
                 api(projects.embeddingApi)
+                api(projects.embeddingRuntime)
                 api(projects.host)
                 api(projects.libs.parallel)
                 api(projects.runtime.type)
