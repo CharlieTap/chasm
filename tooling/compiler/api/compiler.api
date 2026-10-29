@@ -1,0 +1,116 @@
+public final class io/github/charlietap/chasm/aot/CompileConfig {
+	public final fun getFunctionMaxMethodBytes ()Ljava/util/Map;
+	public final fun getInterruptible ()Z
+	public final fun getMaxMethodBytes ()I
+	public final fun getMeterFuel ()Z
+	public final fun getModuleConfig ()Lio/github/charlietap/chasm/config/ModuleConfig;
+	public final fun getPackageName ()Ljava/lang/String;
+	public final fun getTarget ()Lio/github/charlietap/chasm/aot/CompileTarget;
+}
+
+public final class io/github/charlietap/chasm/aot/CompileConfig$Builder {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun build ()Lio/github/charlietap/chasm/aot/CompileConfig;
+	public final fun interruptible (Z)Lio/github/charlietap/chasm/aot/CompileConfig$Builder;
+	public final fun maxMethodBytes (I)Lio/github/charlietap/chasm/aot/CompileConfig$Builder;
+	public final fun maxMethodBytes (II)Lio/github/charlietap/chasm/aot/CompileConfig$Builder;
+	public final fun meterFuel (Z)Lio/github/charlietap/chasm/aot/CompileConfig$Builder;
+	public final fun moduleConfig (Lio/github/charlietap/chasm/config/ModuleConfig;)Lio/github/charlietap/chasm/aot/CompileConfig$Builder;
+	public final fun target (Lio/github/charlietap/chasm/aot/CompileTarget;)Lio/github/charlietap/chasm/aot/CompileConfig$Builder;
+}
+
+public final class io/github/charlietap/chasm/aot/CompileConfigKt {
+	public static final fun CompileConfig (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lio/github/charlietap/chasm/aot/CompileConfig;
+	public static synthetic fun CompileConfig$default (Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/charlietap/chasm/aot/CompileConfig;
+}
+
+public final class io/github/charlietap/chasm/aot/CompileError {
+	public fun <init> (Ljava/lang/String;Lio/github/charlietap/chasm/aot/CompileError$Stage;Ljava/util/List;)V
+	public synthetic fun <init> (Ljava/lang/String;Lio/github/charlietap/chasm/aot/CompileError$Stage;Ljava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Lio/github/charlietap/chasm/aot/CompileError$Stage;
+	public final fun component3 ()Ljava/util/List;
+	public final fun copy (Ljava/lang/String;Lio/github/charlietap/chasm/aot/CompileError$Stage;Ljava/util/List;)Lio/github/charlietap/chasm/aot/CompileError;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/aot/CompileError;Ljava/lang/String;Lio/github/charlietap/chasm/aot/CompileError$Stage;Ljava/util/List;ILjava/lang/Object;)Lio/github/charlietap/chasm/aot/CompileError;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getError ()Ljava/lang/String;
+	public final fun getFunctions ()Ljava/util/List;
+	public final fun getStage ()Lio/github/charlietap/chasm/aot/CompileError$Stage;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/aot/CompileError$Stage : java/lang/Enum {
+	public static final field CONFIGURATION Lio/github/charlietap/chasm/aot/CompileError$Stage;
+	public static final field DECODE Lio/github/charlietap/chasm/aot/CompileError$Stage;
+	public static final field GENERATION Lio/github/charlietap/chasm/aot/CompileError$Stage;
+	public static final field INPUT Lio/github/charlietap/chasm/aot/CompileError$Stage;
+	public static final field OUTPUT Lio/github/charlietap/chasm/aot/CompileError$Stage;
+	public static final field VALIDATION Lio/github/charlietap/chasm/aot/CompileError$Stage;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/charlietap/chasm/aot/CompileError$Stage;
+	public static fun values ()[Lio/github/charlietap/chasm/aot/CompileError$Stage;
+}
+
+public final class io/github/charlietap/chasm/aot/CompileKt {
+	public static final fun compile (Ljava/nio/file/Path;Lio/github/charlietap/chasm/aot/CompileOutput;Lio/github/charlietap/chasm/aot/CompileConfig;)Lio/github/charlietap/chasm/aot/CompileResult;
+	public static final fun compile ([BLio/github/charlietap/chasm/aot/CompileOutput;Lio/github/charlietap/chasm/aot/CompileConfig;)Lio/github/charlietap/chasm/aot/CompileResult;
+}
+
+public abstract interface class io/github/charlietap/chasm/aot/CompileOutput {
+	public abstract fun classFile (Ljava/lang/String;[B)V
+	public abstract fun resource (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+}
+
+public abstract interface class io/github/charlietap/chasm/aot/CompileResult {
+}
+
+public final class io/github/charlietap/chasm/aot/CompileResult$Error : io/github/charlietap/chasm/aot/CompileResult {
+	public fun <init> (Lio/github/charlietap/chasm/aot/CompileError;)V
+	public final fun component1 ()Lio/github/charlietap/chasm/aot/CompileError;
+	public final fun copy (Lio/github/charlietap/chasm/aot/CompileError;)Lio/github/charlietap/chasm/aot/CompileResult$Error;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/aot/CompileResult$Error;Lio/github/charlietap/chasm/aot/CompileError;ILjava/lang/Object;)Lio/github/charlietap/chasm/aot/CompileResult$Error;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getError ()Lio/github/charlietap/chasm/aot/CompileError;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/aot/CompileResult$Success : io/github/charlietap/chasm/aot/CompileResult {
+	public fun <init> (Lio/github/charlietap/chasm/aot/CompiledModuleArtifact;)V
+	public final fun component1 ()Lio/github/charlietap/chasm/aot/CompiledModuleArtifact;
+	public final fun copy (Lio/github/charlietap/chasm/aot/CompiledModuleArtifact;)Lio/github/charlietap/chasm/aot/CompileResult$Success;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/aot/CompileResult$Success;Lio/github/charlietap/chasm/aot/CompiledModuleArtifact;ILjava/lang/Object;)Lio/github/charlietap/chasm/aot/CompileResult$Success;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getArtifact ()Lio/github/charlietap/chasm/aot/CompiledModuleArtifact;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/aot/CompileResultKt {
+	public static final fun expect (Lio/github/charlietap/chasm/aot/CompileResult;Ljava/lang/String;)Lio/github/charlietap/chasm/aot/CompiledModuleArtifact;
+}
+
+public final class io/github/charlietap/chasm/aot/CompileTarget : java/lang/Enum {
+	public static final field ANDROID Lio/github/charlietap/chasm/aot/CompileTarget;
+	public static final field JVM Lio/github/charlietap/chasm/aot/CompileTarget;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/charlietap/chasm/aot/CompileTarget;
+	public static fun values ()[Lio/github/charlietap/chasm/aot/CompileTarget;
+}
+
+public final class io/github/charlietap/chasm/aot/CompiledModuleArtifact {
+	public static final field Companion Lio/github/charlietap/chasm/aot/CompiledModuleArtifact$Companion;
+	public static final field DATA_RESOURCE_EXTENSION Ljava/lang/String;
+	public final fun getDataResourcePath ()Ljava/lang/String;
+	public final fun getModuleClassName ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/aot/CompiledModuleArtifact$Companion {
+}
+
+public final class io/github/charlietap/chasm/aot/InspectModuleKt {
+	public static final fun inspectModule ([BLio/github/charlietap/chasm/config/ModuleConfig;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+	public static synthetic fun inspectModule$default ([BLio/github/charlietap/chasm/config/ModuleConfig;ILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+}
+

@@ -103,6 +103,7 @@ include(":test:fixture:type-system")
 include(":tools:compiler-baseline")
 
 include(":tooling:bindgen")
+include(":tooling:compiler")
 
 include(":type-system")
 include(":validator")
