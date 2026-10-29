@@ -32,6 +32,7 @@ compose-icons = "1.7.8"
 compose-activity = "1.13.0"
 compose-viewmodel = "2.11.0"
 
+asm = "9.11.1"
 dokka="2.2.0"
 
 gradle-maven-publish-plugin = "0.37.0"
@@ -123,6 +124,9 @@ chasm-coroutines-kmp = { module = "io.github.charlietap.chasm:chasm-coroutines",
 vm-jvm = { module = "io.github.charlietap.chasm:vm-jvm", version.ref = "version-name"}
 vm-kmp = { module = "io.github.charlietap.chasm:vm", version.ref = "version-name"}
 tooling-bindgen = { module = "io.github.charlietap.chasm:tooling-bindgen", version.ref = "version-name"}
+
+asm = { module = "org.ow2.asm:asm", version.ref = "asm" }
+asm-tree = { module = "org.ow2.asm:asm-tree", version.ref = "asm" }
 
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "dagger"}
 hilt-core = { module = "com.google.dagger:hilt-core", version.ref = "dagger"}

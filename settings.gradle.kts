@@ -73,6 +73,7 @@ include(":module")
 include(":compiler:backend-abi")
 include(":compiler:backend-analysis")
 include(":compiler:backend-chasm")
+include(":compiler:backend-jvm")
 include(":compiler:frontend")
 
 include(":runtime:address")
