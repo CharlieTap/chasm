@@ -5,6 +5,7 @@ import com.github.michaelbull.result.fold
 import com.github.michaelbull.result.mapError
 import com.github.michaelbull.result.runCatching
 import io.github.charlietap.chasm.embedding.error.ChasmError
+import io.github.charlietap.chasm.embedding.ext.runtime
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Error
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Success
@@ -41,14 +42,15 @@ internal fun internalWriteStructField(
     value: FieldValue,
     fieldValueEncoder: FieldValueEncoder,
 ): Result<Unit, ModuleTrapError> = runCatching {
+    val heap = store.runtime().heap
     val rawReference = struct.toLong()
-    val fieldType = store.store.heap.structFieldType(rawReference, index)
+    val fieldType = heap.structFieldType(rawReference, index)
 
     if (fieldType.mutability != Mutability.Var) {
         throw InvocationException(InvocationError.ArrayCopyOnAConstArray)
     }
 
-    store.store.heap.setStructField(rawReference, index, fieldValueEncoder(value, fieldType))
+    heap.setStructField(rawReference, index, fieldValueEncoder(value, fieldType))
 }.mapError { e ->
     when (e) {
         is InvocationException -> e.error

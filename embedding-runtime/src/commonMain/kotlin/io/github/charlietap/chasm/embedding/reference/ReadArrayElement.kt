@@ -5,6 +5,7 @@ import com.github.michaelbull.result.fold
 import com.github.michaelbull.result.mapError
 import com.github.michaelbull.result.runCatching
 import io.github.charlietap.chasm.embedding.error.ChasmError
+import io.github.charlietap.chasm.embedding.ext.runtime
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Error
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Success
@@ -37,9 +38,10 @@ internal fun internalReadArrayElement(
     index: Int,
     fieldValueDecoder: FieldValueDecoder,
 ): Result<FieldValue, ModuleTrapError> = runCatching {
+    val heap = store.runtime().heap
     val rawReference = array.toLong()
-    val fieldType = store.store.heap.arrayFieldType(rawReference)
-    fieldValueDecoder(store.store.heap.getArrayElement(rawReference, index), fieldType)
+    val fieldType = heap.arrayFieldType(rawReference)
+    fieldValueDecoder(heap.getArrayElement(rawReference, index), fieldType)
 }.mapError { e ->
     when (e) {
         is InvocationException -> e.error

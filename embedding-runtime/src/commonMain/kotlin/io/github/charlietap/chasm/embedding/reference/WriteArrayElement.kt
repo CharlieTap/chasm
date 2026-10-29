@@ -5,6 +5,7 @@ import com.github.michaelbull.result.fold
 import com.github.michaelbull.result.mapError
 import com.github.michaelbull.result.runCatching
 import io.github.charlietap.chasm.embedding.error.ChasmError
+import io.github.charlietap.chasm.embedding.ext.runtime
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Error
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Success
@@ -41,17 +42,18 @@ internal fun internalWriteArrayElement(
     value: FieldValue,
     fieldValueEncoder: FieldValueEncoder,
 ): Result<Unit, ModuleTrapError> = runCatching {
+    val heap = store.runtime().heap
     val rawReference = array.toLong()
-    val fieldType = store.store.heap.arrayFieldType(rawReference)
+    val fieldType = heap.arrayFieldType(rawReference)
 
     if (fieldType.mutability != Mutability.Var) {
         throw InvocationException(InvocationError.ArrayCopyOnAConstArray)
     }
-    if (index !in 0 until store.store.heap.arrayLengthChecked(rawReference)) {
+    if (index !in 0 until heap.arrayLengthChecked(rawReference)) {
         throw InvocationException(InvocationError.ArrayFieldLookupFailed(index))
     }
 
-    store.store.heap.setArrayElement(rawReference, index, fieldValueEncoder(value, fieldType))
+    heap.setArrayElement(rawReference, index, fieldValueEncoder(value, fieldType))
 }.mapError { e ->
     when (e) {
         is InvocationException -> e.error

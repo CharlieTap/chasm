@@ -25,7 +25,7 @@ class WriteUtf8StringTest {
             store(memories = mutableListOf(instance)),
         )
         val address = memoryAddress()
-        val memory = publicMemory(memoryExternalValue(address))
+        val memory = publicMemory(memoryExternalValue(address), store.store)
         val pointer = 1
 
         val string = "Hello world"
@@ -52,7 +52,7 @@ class WriteUtf8StringTest {
     @Test
     fun `maps a string writer bounds failure to a memory trap`() {
         val store = publicStore(store(memories = mutableListOf(memoryInstance())))
-        val memory = publicMemory(memoryExternalValue(memoryAddress()))
+        val memory = publicMemory(memoryExternalValue(memoryAddress()), store.store)
         val stringWriter: StringWriter = { _, _, _ -> throw IndexOutOfBoundsException() }
 
         val actual = writeUtf8String(

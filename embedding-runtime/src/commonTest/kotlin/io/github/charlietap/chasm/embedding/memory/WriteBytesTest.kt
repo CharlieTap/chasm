@@ -19,7 +19,7 @@ class WriteBytesTest {
     fun `can write a range from a buffer to a memory instance`() {
         val instance = memoryInstance()
         val store = publicStore(store(memories = mutableListOf(instance)))
-        val memory = publicMemory(memoryExternalValue(memoryAddress()))
+        val memory = publicMemory(memoryExternalValue(memoryAddress()), store.store)
         val pointer = 118
         val buffer = byteArrayOf(116, 117, 118, 119)
 
@@ -54,7 +54,7 @@ class WriteBytesTest {
         val instance = memoryInstance()
         val store = publicStore(store(memories = mutableListOf(instance)))
         val address = memoryAddress()
-        val memory = publicMemory(memoryExternalValue(address))
+        val memory = publicMemory(memoryExternalValue(address), store.store)
         val pointer = 118
         val buffer: ByteArray = byteArrayOf(117, 118)
 

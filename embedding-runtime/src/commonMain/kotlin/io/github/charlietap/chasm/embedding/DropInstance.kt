@@ -6,6 +6,7 @@ import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Error
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Success
 import io.github.charlietap.chasm.embedding.shapes.Instance
 import io.github.charlietap.chasm.embedding.shapes.Store
+import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.ext.data
 import io.github.charlietap.chasm.runtime.ext.element
 import io.github.charlietap.chasm.runtime.ext.global
@@ -17,6 +18,9 @@ fun dropInstance(
 ): ChasmResult<Unit, ChasmError.ExecutionError> {
     if (instance.store !== store.store) {
         return Error(ChasmError.ExecutionError("Instance belongs to a different Store"))
+    }
+    if (store.isDropped) {
+        return Error(ChasmError.ExecutionError(InvocationError.StoreDropped.toString()))
     }
 
     store.diagnostics.unregister(instance.instance)

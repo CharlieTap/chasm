@@ -18,6 +18,7 @@ import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.Instance
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.transform.ImportableMapper
+import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.instance.Import as RuntimeImport
@@ -32,15 +33,20 @@ inline fun instantiate(
     noinline trapSource: (ModuleInstance) -> TrapSource?,
     instantiator: (RuntimeConfig, RuntimeStore, List<RuntimeImport>) -> Result<ModuleInstance, ModuleTrapError>,
 ): ChasmResult<Instance, ChasmError.ExecutionError> {
+    val runtime = liveRuntime(store) ?: return Error(ChasmError.ExecutionError(InvocationError.StoreDropped.toString()))
     if (importsFromAnotherStore(store, imports)) {
         return Error(ChasmError.ExecutionError("Importable belongs to a different Store"))
     }
-    val runtime = store.store
     val firstFunctionAddress = runtime.functions.size
     val effectiveConfig = config.withStoreSettings(runtime.config)
     val result = instantiator(effectiveConfig, runtime, runtimeImports(store, imports))
     return wrapInstantiationResult(result, effectiveConfig, store, firstFunctionAddress, invoker, trapSource)
 }
+
+@PublishedApi
+internal fun liveRuntime(
+    store: Store,
+): RuntimeStore? = store.store.takeUnless { store.isDropped }
 
 @PublishedApi
 internal fun importsFromAnotherStore(

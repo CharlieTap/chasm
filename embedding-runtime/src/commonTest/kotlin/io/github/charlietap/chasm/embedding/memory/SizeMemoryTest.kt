@@ -21,7 +21,7 @@ class SizeMemoryTest {
         val instance = memoryInstance()
         val store = publicStore(store(memories = mutableListOf(instance)))
         val address = memoryAddress()
-        val memory = publicMemory(memoryExternalValue(address))
+        val memory = publicMemory(memoryExternalValue(address), store.store)
         val size = 117
 
         val sizer: MemoryInstanceSizer = { _instance ->

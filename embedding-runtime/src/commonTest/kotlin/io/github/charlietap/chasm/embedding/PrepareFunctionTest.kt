@@ -130,9 +130,7 @@ class PrepareFunctionTest {
 
         dropStore(store)
 
-        val expected = ChasmResult.Error(
-            ChasmError.ExecutionError(InvocationError.FunctionLookupFailed(address).toString()),
-        )
+        val expected = ChasmResult.Error(ChasmError.ExecutionError(InvocationError.StoreDropped.toString()))
         assertEquals(expected, prepared())
 
         internalStore.functions += hostFunctionInstance { _, results -> results.writeI64(0, 9L) }

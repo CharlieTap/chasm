@@ -33,7 +33,7 @@ class WriteTableTest {
             ),
         )
         val address = tableAddress(0)
-        val table = publicTable(tableExternalValue(address))
+        val table = publicTable(tableExternalValue(address), store.store)
 
         val expected: ChasmResult<Unit, ChasmError.ExecutionError> = ChasmResult.Success(Unit)
 

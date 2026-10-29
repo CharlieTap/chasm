@@ -1,17 +1,19 @@
 package io.github.charlietap.chasm.embedding.table
 
 import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.binding
 import com.github.michaelbull.result.fold
 import com.github.michaelbull.result.mapError
+import com.github.michaelbull.result.runCatching
 import io.github.charlietap.chasm.embedding.error.ChasmError
+import io.github.charlietap.chasm.embedding.ext.table
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Error
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Success
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.shapes.Table
+import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
-import io.github.charlietap.chasm.runtime.ext.table
+import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.ext.toLongFromBoxed
 import io.github.charlietap.chasm.runtime.value.ReferenceValue
 
@@ -35,7 +37,13 @@ internal fun internalWriteTable(
     table: Table,
     elementIndex: Int,
     value: ReferenceValue,
-): Result<Unit, ModuleTrapError> = binding {
-    val table = store.store.table(table.reference.address)
+): Result<Unit, ModuleTrapError> = runCatching {
+    val table = store.table(table)
     table.elements[elementIndex] = value.toLongFromBoxed()
+}.mapError { e ->
+    when (e) {
+        is InvocationException -> e.error
+        is IndexOutOfBoundsException -> InvocationError.TableOperationOutOfBounds
+        else -> throw e
+    }
 }

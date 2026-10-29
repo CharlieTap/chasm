@@ -22,7 +22,7 @@ class ReadIntTest {
         val instance = memoryInstance()
         val store = publicStore(store(memories = mutableListOf(instance)))
         val address = memoryAddress()
-        val memory = publicMemory(memoryExternalValue(address))
+        val memory = publicMemory(memoryExternalValue(address), store.store)
         val memoryPointer = 118
         val expectedInt = 117
 

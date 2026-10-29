@@ -14,6 +14,10 @@ sealed interface InvocationError : ModuleTrapError {
 
     data object InvocationOfADeinstantiatedInstance : InvocationError
 
+    data object StoreDropped : InvocationError
+
+    data object ForeignHandle : InvocationError
+
     @JvmInline
     value class FunctionNotFound(val function: String) : InvocationError
 

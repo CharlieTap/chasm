@@ -30,7 +30,7 @@ class GrowMemoryTest {
         )
         val store = publicStore(store(memories = mutableListOf(instance)))
         val address = memoryAddress()
-        val memory = publicMemory(memoryExternalValue(address))
+        val memory = publicMemory(memoryExternalValue(address), store.store)
 
         val expected = ChasmResult.Success(1)
 
@@ -58,7 +58,7 @@ class GrowMemoryTest {
         )
         val store = publicStore(store(memories = mutableListOf(instance)))
         val address = memoryAddress()
-        val memory = publicMemory(memoryExternalValue(address))
+        val memory = publicMemory(memoryExternalValue(address), store.store)
 
         val expected = ChasmResult.Success(1)
 
@@ -85,7 +85,7 @@ class GrowMemoryTest {
         )
         val store = publicStore(store(memories = mutableListOf(instance)))
         val address = memoryAddress()
-        val memory = publicMemory(memoryExternalValue(address))
+        val memory = publicMemory(memoryExternalValue(address), store.store)
 
         val expected = ChasmResult.Success(-1)
 
@@ -110,7 +110,7 @@ class GrowMemoryTest {
             data = initialMemory,
         )
         val store = publicStore(store(memories = mutableListOf(instance)))
-        val memory = publicMemory(memoryExternalValue(memoryAddress()))
+        val memory = publicMemory(memoryExternalValue(memoryAddress()), store.store)
 
         assertEquals(ChasmResult.Success(-1), growMemory(store, memory, -1))
         assertEquals(ChasmResult.Success(-1), growMemory(store, memory, Int.MAX_VALUE))
@@ -129,7 +129,7 @@ class GrowMemoryTest {
                 data = initialMemory,
             )
             val store = publicStore(store(memories = mutableListOf(instance)))
-            val memory = publicMemory(memoryExternalValue(memoryAddress()))
+            val memory = publicMemory(memoryExternalValue(memoryAddress()), store.store)
 
             assertEquals(ChasmResult.Success(-1), growMemory(store, memory, 1))
             assertEquals(1u, instance.type.limits.min)

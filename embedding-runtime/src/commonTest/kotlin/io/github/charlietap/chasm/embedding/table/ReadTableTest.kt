@@ -25,7 +25,7 @@ class ReadTableTest {
         val instance = tableInstance(elements = longArrayOf(functionReferenceValue(functionAddress).toLong()))
         val store = publicStore(store(tables = mutableListOf(instance)))
         val address = tableAddress(0)
-        val table = publicTable(tableExternalValue(address))
+        val table = publicTable(tableExternalValue(address), store.store)
 
         val expected: ChasmResult<ReferenceValue, ChasmError.ExecutionError> = ChasmResult.Success(value)
 

@@ -23,7 +23,7 @@ class ReadUtf8StringTest {
             store(memories = mutableListOf(instance)),
         )
         val address = memoryAddress()
-        val memory = publicMemory(memoryExternalValue(address))
+        val memory = publicMemory(memoryExternalValue(address), store.store)
         val pointer = 1
         val stringLengthInBytes = 117
 

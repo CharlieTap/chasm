@@ -1,9 +1,11 @@
 package io.github.charlietap.chasm.embedding
 
+import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.fold
 import com.github.michaelbull.result.mapError
 import io.github.charlietap.chasm.embedding.diagnostic.executionError
 import io.github.charlietap.chasm.embedding.error.ChasmError
+import io.github.charlietap.chasm.embedding.ext.owning
 import io.github.charlietap.chasm.embedding.internal.InstanceInvoker
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Error
@@ -13,8 +15,10 @@ import io.github.charlietap.chasm.embedding.shapes.Instance
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.runtime.error.InvocationError
+import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
+import io.github.charlietap.chasm.runtime.store.Store as RuntimeStore
 
 fun invoke(
     store: Store,
@@ -67,6 +71,7 @@ internal fun invoke(
     address = function.reference.address,
     args = args,
     invoker = invoker,
+    handleStore = function.store,
 )
 
 internal fun invoke(
@@ -102,6 +107,7 @@ internal inline fun invoke(
     address: Address.Function,
     args: List<ExecutionValue>,
     invoker: InstanceInvoker,
+    handleStore: RuntimeStore = instance.store,
 ): ChasmResult<List<ExecutionValue>, ChasmError.ExecutionError> {
 
     if (instance.instance.deallocated) {
@@ -117,7 +123,7 @@ internal inline fun invoke(
         )
     }
 
-    return invokeExported(store, instance, address, args, invoker)
+    return invokeExported(store, instance, address, args, invoker, handleStore)
 }
 
 private inline fun invokeExported(
@@ -126,8 +132,11 @@ private inline fun invokeExported(
     address: Address.Function,
     args: List<ExecutionValue>,
     invoker: InstanceInvoker,
-): ChasmResult<List<ExecutionValue>, ChasmError.ExecutionError> {
-    return invoker.invoke(instance.config, store.store, instance.instance, address, args)
-        .mapError { error -> executionError(store, error) }
-        .fold(::Success, ::Error)
-}
+    handleStore: RuntimeStore = instance.store,
+): ChasmResult<List<ExecutionValue>, ChasmError.ExecutionError> = try {
+    store.owning(handleStore)
+    invoker.invoke(instance.config, store.owning(instance.store), instance.instance, address, args)
+} catch (exception: InvocationException) {
+    Err(exception.error)
+}.mapError { error -> executionError(store, error) }
+    .fold(::Success, ::Error)

@@ -5,6 +5,7 @@ import com.github.michaelbull.result.fold
 import com.github.michaelbull.result.mapError
 import com.github.michaelbull.result.runCatching
 import io.github.charlietap.chasm.embedding.error.ChasmError
+import io.github.charlietap.chasm.embedding.ext.memory
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Error
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Success
@@ -15,7 +16,6 @@ import io.github.charlietap.chasm.memory.read.BytesReader
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
-import io.github.charlietap.chasm.runtime.ext.memory
 
 fun readFloat(
     store: Store,
@@ -37,7 +37,7 @@ internal fun readFloat(
     memoryPointer: Int,
     bytesReader: BytesReader,
 ): Result<Float, ModuleTrapError> = runCatching {
-    val instance = store.store.memory(memory.reference.address)
+    val instance = store.memory(memory)
     val bytes = bytesReader(instance.data, ByteArray(4), memoryPointer, 4, 0)
     bytes.toFloatLittleEndian()
 }.mapError { e ->

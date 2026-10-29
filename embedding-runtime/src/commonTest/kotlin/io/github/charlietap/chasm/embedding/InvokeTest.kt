@@ -68,7 +68,7 @@ class InvokeTest {
         val store = publicStore()
         val address = functionAddress(117)
         val functionExtern = functionExternalValue(address)
-        val function = publicFunction(functionExtern)
+        val function = publicFunction(functionExtern, store.store)
         val instance = publicInstance(
             store = store.store,
             moduleInstance = moduleInstance(
@@ -95,7 +95,7 @@ class InvokeTest {
         val store = publicStore()
         val instance = publicInstance(store = store.store)
         val address = functionAddress(117)
-        val function = publicFunction(functionExternalValue(address))
+        val function = publicFunction(functionExternalValue(address), store.store)
 
         val expected = ChasmError.ExecutionError(InvocationError.FunctionNotFound("Function with address: ${address.address}").toString())
 
@@ -190,7 +190,7 @@ class InvokeTest {
         val args = emptyList<ExecutionValue>()
         val address = functionAddress(0)
         val functionExtern = functionExternalValue(address)
-        val function = publicFunction(functionExtern)
+        val function = publicFunction(functionExtern, store.store)
 
         val config = runtimeConfig()
         val instance = publicInstance(
@@ -231,7 +231,7 @@ class InvokeTest {
         val args = emptyList<ExecutionValue>()
         val address = functionAddress(0)
         val functionExtern = functionExternalValue(address)
-        val function = publicFunction(functionExtern)
+        val function = publicFunction(functionExtern, store.store)
         val config = runtimeConfig()
         val instance = publicInstance(
             store = store.store,

@@ -5,6 +5,7 @@ import com.github.michaelbull.result.fold
 import com.github.michaelbull.result.mapError
 import com.github.michaelbull.result.runCatching
 import io.github.charlietap.chasm.embedding.error.ChasmError
+import io.github.charlietap.chasm.embedding.ext.runtime
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Error
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Success
@@ -37,9 +38,10 @@ internal fun internalReadStructField(
     index: Int,
     fieldValueDecoder: FieldValueDecoder,
 ): Result<FieldValue, ModuleTrapError> = runCatching {
+    val heap = store.runtime().heap
     val rawReference = struct.toLong()
-    val fieldType = store.store.heap.structFieldType(rawReference, index)
-    fieldValueDecoder(store.store.heap.getStructField(rawReference, index), fieldType)
+    val fieldType = heap.structFieldType(rawReference, index)
+    fieldValueDecoder(heap.getStructField(rawReference, index), fieldType)
 }.mapError { e ->
     when (e) {
         is InvocationException -> e.error

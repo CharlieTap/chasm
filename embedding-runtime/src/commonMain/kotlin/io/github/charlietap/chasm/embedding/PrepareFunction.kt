@@ -1,9 +1,11 @@
 package io.github.charlietap.chasm.embedding
 
+import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.fold
 import com.github.michaelbull.result.mapError
 import io.github.charlietap.chasm.embedding.diagnostic.executionError
 import io.github.charlietap.chasm.embedding.error.ChasmError
+import io.github.charlietap.chasm.embedding.ext.owning
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Error
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Success
@@ -33,7 +35,7 @@ fun prepareFunction(
     )
 
     val function = try {
-        store.store.function(address)
+        store.owning(instance.store).function(address)
     } catch (exception: InvocationException) {
         return Error(ChasmError.ExecutionError(exception.error.toString()))
     }
@@ -56,16 +58,12 @@ private fun invokePrepared(
         return Error(ChasmError.ExecutionError(InvocationError.InvocationOfADeinstantiatedInstance.toString()))
     }
 
-    val currentFunction = try {
-        store.store.function(address)
+    return try {
+        val runtime = store.owning(instance.store)
+        if (runtime.function(address) !== function) throw InvocationException(InvocationError.FunctionLookupFailed(address))
+        instance.invoker.invoke(instance.config, runtime, instance.instance, function, args)
     } catch (exception: InvocationException) {
-        return Error(ChasmError.ExecutionError(exception.error.toString()))
-    }
-    if (currentFunction !== function) {
-        return Error(ChasmError.ExecutionError(InvocationError.FunctionLookupFailed(address).toString()))
-    }
-
-    return instance.invoker.invoke(instance.config, store.store, instance.instance, function, args)
-        .mapError { error -> executionError(store, error) }
+        Err(exception.error)
+    }.mapError { error -> executionError(store, error) }
         .fold(::Success, ::Error)
 }

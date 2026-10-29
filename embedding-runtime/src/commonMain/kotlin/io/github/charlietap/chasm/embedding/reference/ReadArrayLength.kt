@@ -5,6 +5,7 @@ import com.github.michaelbull.result.fold
 import com.github.michaelbull.result.mapError
 import com.github.michaelbull.result.runCatching
 import io.github.charlietap.chasm.embedding.error.ChasmError
+import io.github.charlietap.chasm.embedding.ext.runtime
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Error
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Success
@@ -30,7 +31,7 @@ internal fun internalReadArrayLength(
     store: Store,
     array: ReferenceValue.Array,
 ): Result<Int, ModuleTrapError> = runCatching {
-    store.store.heap.arrayLengthChecked(array.toLong())
+    store.runtime().heap.arrayLengthChecked(array.toLong())
 }.mapError { e ->
     when (e) {
         is InvocationException -> e.error
