@@ -1,0 +1,28 @@
+public final class io/github/charlietap/chasm/aot/CodeIdentity {
+	public static final field Companion Lio/github/charlietap/chasm/aot/CodeIdentity$Companion;
+	public static final field RUNTIME_ABI I
+	public fun <init> (IZZ)V
+	public final fun getAbi ()I
+	public final fun getInterruptible ()Z
+	public final fun getMeterFuel ()Z
+}
+
+public final class io/github/charlietap/chasm/aot/CodeIdentity$Companion {
+}
+
+public abstract class io/github/charlietap/chasm/aot/CompiledModule {
+	protected fun <init> ()V
+	protected abstract fun buildDeclarations ()Lio/github/charlietap/chasm/declarations/ModuleDeclarations;
+	public abstract fun getIdentity ()Lio/github/charlietap/chasm/aot/CodeIdentity;
+	public abstract fun install (Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;)V
+}
+
+public final class io/github/charlietap/chasm/aot/InstanceKt {
+	public static final fun instance (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/aot/CompiledModule;Ljava/util/List;Lio/github/charlietap/chasm/config/RuntimeConfig;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+	public static synthetic fun instance$default (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/aot/CompiledModule;Ljava/util/List;Lio/github/charlietap/chasm/config/RuntimeConfig;ILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+}
+
+public final class io/github/charlietap/chasm/aot/ModuleInfoKt {
+	public static final fun moduleInfo (Lio/github/charlietap/chasm/aot/CompiledModule;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+}
+

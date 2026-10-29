@@ -127,6 +127,7 @@ tooling-bindgen = { module = "io.github.charlietap.chasm:tooling-bindgen", versi
 
 asm = { module = "org.ow2.asm:asm", version.ref = "asm" }
 asm-tree = { module = "org.ow2.asm:asm-tree", version.ref = "asm" }
+asm-util = { module = "org.ow2.asm:asm-util", version.ref = "asm" }
 
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "dagger"}
 hilt-core = { module = "com.google.dagger:hilt-core", version.ref = "dagger"}
