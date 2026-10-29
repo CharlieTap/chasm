@@ -794,3 +794,133 @@ public final class io/github/charlietap/chasm/declarations/TableDeclaration {
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class io/github/charlietap/chasm/declarations/construction/ConstantOps {
+	public static final field ANY_CONVERT_EXTERN I
+	public static final field EXTERN_CONVERT_ANY I
+	public static final field I32_ADD I
+	public static final field I32_MUL I
+	public static final field I32_SUB I
+	public static final field I64_ADD I
+	public static final field I64_MUL I
+	public static final field I64_SUB I
+	public static final field INSTANCE Lio/github/charlietap/chasm/declarations/construction/ConstantOps;
+	public static final field REF_I31 I
+	public final fun instruction (I)Lio/github/charlietap/chasm/declarations/ConstantInstruction;
+	public final fun op (Lio/github/charlietap/chasm/declarations/ConstantInstruction;)I
+}
+
+public final class io/github/charlietap/chasm/declarations/construction/DeclarationsBuilder {
+	public fun <init> ()V
+	public final fun abstractHeapType (I)V
+	public final fun arrayComposite ()V
+	public final fun arrayNew (I)V
+	public final fun arrayNewDefault (I)V
+	public final fun arrayNewFixed (II)V
+	public final fun build (Lio/github/charlietap/chasm/declarations/DataSource;)Lio/github/charlietap/chasm/declarations/ModuleDeclarations;
+	public final fun constantExpression (I)V
+	public final fun dataSegment (ZIJI)V
+	public final fun definedHeapType (I)V
+	public final fun elementSegment (III)V
+	public final fun endStrings ()V
+	public final fun exportIndices (Ljava/lang/String;)V
+	public final fun exportKinds (Ljava/lang/String;)V
+	public final fun exportNames (Ljava/lang/String;)V
+	public final fun f32Const (I)V
+	public final fun f64Const (J)V
+	public final fun fieldType (IZ)V
+	public final fun functionComposite (II)V
+	public final fun functionNameIndices (Ljava/lang/String;)V
+	public final fun functionNames (Ljava/lang/String;)V
+	public final fun functions (Ljava/lang/String;)V
+	public final fun global ()V
+	public final fun globalGet (I)V
+	public final fun globalType (Z)V
+	public final fun group (I)V
+	public final fun groupBody (II)V
+	public final fun i32Const (I)V
+	public final fun i64Const (J)V
+	public final fun importFunction (III)V
+	public final fun importGlobal (II)V
+	public final fun importMemory (II)V
+	public final fun importTable (II)V
+	public final fun importTag (III)V
+	public final fun limits (JZJ)V
+	public final fun localNames (ILjava/lang/String;)V
+	public final fun memory ()V
+	public final fun memoryType (ZZ)V
+	public final fun moduleName (I)V
+	public final fun numberType (I)V
+	public final fun op (I)V
+	public final fun recursiveHeapType (I)V
+	public final fun refFunc (I)V
+	public final fun refFuncConstantExpressions (Ljava/lang/String;)V
+	public final fun refNull ()V
+	public final fun referenceType (Z)V
+	public final fun referenceValueType ()V
+	public final fun startFunction (I)V
+	public final fun stringLengths (Ljava/lang/String;)V
+	public final fun strings (Ljava/lang/String;)V
+	public final fun structComposite (I)V
+	public final fun structNew (I)V
+	public final fun structNewDefault (I)V
+	public final fun subType (ZI)V
+	public final fun table ()V
+	public final fun tableType (Z)V
+	public final fun tag (I)V
+	public final fun trapNameIndices (Ljava/lang/String;)V
+	public final fun trapNames (Ljava/lang/String;)V
+	public final fun typeIndexHeapType (I)V
+	public final fun v128Const (JJ)V
+	public final fun vectorType ()V
+}
+
+public final class io/github/charlietap/chasm/declarations/construction/ElementModes {
+	public static final field ACTIVE I
+	public static final field DECLARATIVE I
+	public static final field INSTANCE Lio/github/charlietap/chasm/declarations/construction/ElementModes;
+	public static final field PASSIVE I
+}
+
+public final class io/github/charlietap/chasm/declarations/construction/ExportKinds {
+	public static final field FUNCTION I
+	public static final field GLOBAL I
+	public static final field INSTANCE Lio/github/charlietap/chasm/declarations/construction/ExportKinds;
+	public static final field MEMORY I
+	public static final field TABLE I
+	public static final field TAG I
+	public final fun descriptor (II)Lio/github/charlietap/chasm/ast/module/Export$Descriptor;
+	public final fun index (Lio/github/charlietap/chasm/ast/module/Export$Descriptor;)I
+	public final fun kind (Lio/github/charlietap/chasm/ast/module/Export$Descriptor;)I
+}
+
+public final class io/github/charlietap/chasm/declarations/construction/HeapTypes {
+	public static final field ANY I
+	public static final field ARRAY I
+	public static final field EQ I
+	public static final field EXCEPTION I
+	public static final field EXTERN I
+	public static final field FUNC I
+	public static final field I31 I
+	public static final field INSTANCE Lio/github/charlietap/chasm/declarations/construction/HeapTypes;
+	public static final field NONE I
+	public static final field NO_EXCEPTION I
+	public static final field NO_EXTERN I
+	public static final field NO_FUNC I
+	public static final field STRUCT I
+	public final fun abstract (I)Lio/github/charlietap/chasm/type/AbstractHeapType;
+	public final fun tag (Lio/github/charlietap/chasm/type/AbstractHeapType;)I
+}
+
+public final class io/github/charlietap/chasm/declarations/construction/ValueTypes {
+	public static final field F32 I
+	public static final field F64 I
+	public static final field I32 I
+	public static final field I64 I
+	public static final field INSTANCE Lio/github/charlietap/chasm/declarations/construction/ValueTypes;
+	public static final field STORAGE_I16 I
+	public static final field STORAGE_I8 I
+	public static final field STORAGE_VALUE I
+	public final fun number (I)Lio/github/charlietap/chasm/type/NumberType;
+	public final fun tag (Lio/github/charlietap/chasm/type/NumberType;)I
+}
+
