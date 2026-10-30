@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.bindgen
 
+import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
@@ -122,6 +123,12 @@ internal class WasmInterfaceGenerator(
         implementationVisibility: ImplementationVisibility,
         compiledCode: String,
     ): FileSpec = FileSpec.builder(wasmInterface.packageName, wasmInterface.interfaceName + "Compiled").apply {
+        addAnnotation(
+            AnnotationSpec.builder(OPT_IN_CLASS_NAME)
+                .useSiteTarget(AnnotationSpec.UseSiteTarget.FILE)
+                .addMember("%T::class", CHASM_EXPERIMENTAL_API_CLASS_NAME)
+                .build(),
+        )
         addFunction(
             chasmFactoryFunctionGenerator.compiledFactory(
                 packageName = wasmInterface.packageName,

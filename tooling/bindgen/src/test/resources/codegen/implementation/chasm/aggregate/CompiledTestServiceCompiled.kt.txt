@@ -1,6 +1,9 @@
+@file:OptIn(ExperimentalChasmApi::class)
+
 package com.test.chasm
 
 import com.test.chasm.aot.WasmModule
+import io.github.charlietap.chasm.ExperimentalChasmApi
 import io.github.charlietap.chasm.aot.instance
 import io.github.charlietap.chasm.embedding.codegen.CodegenImport
 import io.github.charlietap.chasm.embedding.codegen.CompiledInstanceFactory
@@ -27,6 +30,7 @@ import kotlin.Double
 import kotlin.Float
 import kotlin.Int
 import kotlin.Long
+import kotlin.OptIn
 import kotlin.String
 import kotlin.collections.List
 import kotlin.collections.MutableList

@@ -1,9 +1,11 @@
 package io.github.charlietap.chasm.aot
 
+import io.github.charlietap.chasm.ExperimentalChasmApi
 import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.aot.internal.CompiledCode
 import io.github.charlietap.chasm.declarations.ModuleDeclarations
 
+@ExperimentalChasmApi
 @OptIn(InternalChasmApi::class)
 class CompiledModule internal constructor(
     @property:InternalChasmApi val code: CompiledCode,

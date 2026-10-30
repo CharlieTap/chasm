@@ -158,6 +158,8 @@ internal val CHASM_SUSPEND_INSTANCE_FACTORY_CLASS_NAME =
     ClassName("io.github.charlietap.chasm.embedding.codegen", "SuspendInstanceFactory")
 internal val CHASM_COMPILED_INSTANCE_FACTORY_CLASS_NAME =
     ClassName("io.github.charlietap.chasm.embedding.codegen", "CompiledInstanceFactory")
+internal val CHASM_EXPERIMENTAL_API_CLASS_NAME = ClassName("io.github.charlietap.chasm", "ExperimentalChasmApi")
+internal val OPT_IN_CLASS_NAME = ClassName("kotlin", "OptIn")
 internal val WASI_EMBEDDER_HOST_CLASS_NAME = ClassName("at.released.weh.host", "EmbedderHost")
 internal val WASI_PREVIEW1_BUILDER_CLASS_NAME =
     ClassName("at.released.weh.bindings.chasm.wasip1", "ChasmWasiPreview1Builder")

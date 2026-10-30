@@ -1,7 +1,8 @@
-@file:OptIn(InternalChasmApi::class)
+@file:OptIn(ExperimentalChasmApi::class, InternalChasmApi::class)
 
 package io.github.charlietap.chasm.compiler.backend.jvm.abi
 
+import io.github.charlietap.chasm.ExperimentalChasmApi
 import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.aot.CompiledModule
 import io.github.charlietap.chasm.aot.internal.CompiledCode

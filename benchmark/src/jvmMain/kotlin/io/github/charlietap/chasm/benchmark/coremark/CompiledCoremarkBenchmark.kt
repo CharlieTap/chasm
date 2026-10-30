@@ -1,6 +1,9 @@
+@file:OptIn(ExperimentalChasmApi::class)
+
 package io.github.charlietap.chasm.benchmark.coremark
 
 import com.goncalossilva.resources.Resource
+import io.github.charlietap.chasm.ExperimentalChasmApi
 import io.github.charlietap.chasm.aot.CompileConfig
 import io.github.charlietap.chasm.aot.CompileOutput
 import io.github.charlietap.chasm.aot.CompiledModule

@@ -1089,10 +1089,11 @@ class ChasmPluginFunctionalTest {
         project.write(
             "src/main/kotlin/test/consumer/Main.kt",
             """
-                @file:OptIn(InternalChasmApi::class)
+                @file:OptIn(InternalChasmApi::class, ExperimentalChasmApi::class)
 
                 package test.consumer
 
+                import io.github.charlietap.chasm.ExperimentalChasmApi
                 import io.github.charlietap.chasm.InternalChasmApi
                 import io.github.charlietap.chasm.aot.CompiledModule
                 import io.github.charlietap.chasm.aot.internal.CompiledCode

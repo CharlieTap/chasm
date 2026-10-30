@@ -100,6 +100,10 @@ kotlin {
     @OptIn(ExperimentalAbiValidation::class)
     abiValidation()
 
+    compilerOptions {
+        optIn.add("io.github.charlietap.chasm.ExperimentalChasmApi")
+    }
+
     sourceSets {
         commonMain {
             dependencies {

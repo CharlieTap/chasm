@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.aot
 
+import io.github.charlietap.chasm.ExperimentalChasmApi
 import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.aot.diagnostic.CompiledTrapSource
 import io.github.charlietap.chasm.config.RuntimeConfig
@@ -13,6 +14,7 @@ import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.executor.instantiator.ModuleInstantiator
 import io.github.charlietap.chasm.runtime.compiled.ModuleCodeInstallation
 
+@ExperimentalChasmApi
 fun instance(
     store: Store,
     module: CompiledModule,

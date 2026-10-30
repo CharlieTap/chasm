@@ -6,6 +6,10 @@
 // - Show declarations: true
 
 // Library unique name: <io.github.charlietap.chasm:embedding-api>
+open annotation class io.github.charlietap.chasm/ExperimentalChasmApi : kotlin/Annotation { // io.github.charlietap.chasm/ExperimentalChasmApi|null[0]
+    constructor <init>() // io.github.charlietap.chasm/ExperimentalChasmApi.<init>|<init>(){}[0]
+}
+
 open annotation class io.github.charlietap.chasm/InternalChasmApi : kotlin/Annotation { // io.github.charlietap.chasm/InternalChasmApi|null[0]
     constructor <init>() // io.github.charlietap.chasm/InternalChasmApi.<init>|<init>(){}[0]
 }
