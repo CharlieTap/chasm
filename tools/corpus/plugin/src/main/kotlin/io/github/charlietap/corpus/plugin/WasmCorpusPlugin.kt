@@ -11,6 +11,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.Delete
+import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.register
@@ -32,7 +33,6 @@ class WasmCorpusPlugin : Plugin<Project> {
         extension.targets.convention(
             project.providers.gradleProperty(PROP_TARGETS).map(::parseTargets).orElse(emptyList()),
         )
-        val corpusRequested = project.isCorpusRequested()
         val baselineRequested = project.isTaskRequested(TASK_NAME_UPDATE_BASELINE)
 
         val syncCorpus = project.tasks.register<SyncCorpusRepositoryTask>(TASK_NAME_SYNC_CORPUS) {
@@ -134,10 +134,30 @@ class WasmCorpusPlugin : Plugin<Project> {
         val jvmTarget = kotlinExtension.targets.withType(KotlinJvmTarget::class.java).single()
         val jvmTestCompilation = jvmTarget.compilations.getByName(TEST_COMPILATION_NAME)
         val jvmTest = jvmTarget.testRuns.getByName(DEFAULT_TEST_RUN_NAME).executionTask
-        val testJavaLauncher = jvmTest.flatMap { test -> test.javaLauncher }
+        val corpusTest = project.tasks.register<Test>(TASK_NAME_CORPUS_TEST) {
+            group = GROUP
+            description = "Runs the generated wasm-corpus tests against the JVM test runtime"
+
+            val tests = jvmTest.get()
+            testClassesDirs = tests.testClassesDirs
+            classpath = tests.classpath
+            javaLauncher.set(tests.javaLauncher)
+            maxHeapSize = "2g"
+            jvmArgs("-Xss32m")
+            workingDirectory.set(project.layout.projectDirectory)
+            binaryResultsDirectory.set(extension.corpusResultsDirectory)
+            inputs.property("corpusMachine", machineMetadata)
+            include("**/corpus/generated/**")
+
+            if (baselineRequested) {
+                outputs.upToDateWhen { false }
+                outputs.doNotCacheIf("Baseline updates require a fresh corpus measurement") { true }
+            }
+        }
+        val testJavaLauncher = corpusTest.flatMap { test -> test.javaLauncher }
         generateCorpusReport.configure {
             resultFiles.from(
-                jvmTest.flatMap { test -> test.binaryResultsDirectory }.map { directory ->
+                corpusTest.flatMap { test -> test.binaryResultsDirectory }.map { directory ->
                     directory.asFileTree.matching {
                         include("**/*.json")
                     }
@@ -158,18 +178,8 @@ class WasmCorpusPlugin : Plugin<Project> {
         }
 
         jvmTestCompilation.defaultSourceSet.apply {
-            val corpusTestsDirectory = if (corpusRequested) {
-                generateTests.flatMap { it.outputDirectory }
-            } else {
-                extension.corpusTestsDirectory
-            }
-            kotlin.srcDir(corpusTestsDirectory)
-            val corpusResourcesDirectory = if (corpusRequested) {
-                prepareResources.flatMap { it.outputDirectory }
-            } else {
-                extension.corpusResourcesDirectory
-            }
-            resources.srcDir(corpusResourcesDirectory)
+            kotlin.srcDir(generateTests.flatMap { it.outputDirectory })
+            resources.srcDir(prepareResources.flatMap { it.outputDirectory })
         }
 
         val corpus = project.tasks.register(TASK_NAME_CORPUS) {
@@ -178,7 +188,7 @@ class WasmCorpusPlugin : Plugin<Project> {
 
             dependsOn(generateTests)
             dependsOn(prepareResources)
-            dependsOn(jvmTest)
+            dependsOn(corpusTest)
             dependsOn(generateCorpusReport)
         }
 
@@ -195,32 +205,12 @@ class WasmCorpusPlugin : Plugin<Project> {
         jvmTest.configure {
             maxHeapSize = "2g"
             jvmArgs("-Xss32m")
-
-            if (corpusRequested) {
-                workingDirectory.set(project.layout.projectDirectory)
-                binaryResultsDirectory.set(extension.corpusResultsDirectory)
-                inputs.property("corpusMachine", machineMetadata)
-                include("**/corpus/generated/**")
-
-                if (baselineRequested) {
-                    outputs.upToDateWhen { false }
-                    outputs.doNotCacheIf("Baseline updates require a fresh corpus measurement") { true }
-                }
-            } else {
-                exclude("**/corpus/generated/**")
-            }
+            exclude("**/corpus/generated/**")
         }
-    }
 
-    private fun Project.isCorpusRequested(): Boolean = gradle.startParameter.taskNames.any { taskName ->
-        taskName == TASK_NAME_CORPUS ||
-            taskName == TASK_NAME_LEGACY_CORPUS ||
-            taskName == TASK_NAME_GENERATE_REPORT ||
-            taskName == TASK_NAME_UPDATE_BASELINE ||
-            taskName.endsWith(":$TASK_NAME_CORPUS") ||
-            taskName.endsWith(":$TASK_NAME_LEGACY_CORPUS") ||
-            taskName.endsWith(":$TASK_NAME_GENERATE_REPORT") ||
-            taskName.endsWith(":$TASK_NAME_UPDATE_BASELINE")
+        project.tasks.matching { task -> task.name == TASK_NAME_TEST }.configureEach {
+            dependsOn(corpusTest)
+        }
     }
 
     private fun Project.isTaskRequested(name: String): Boolean = gradle.startParameter.taskNames.any { taskName ->
@@ -248,7 +238,8 @@ class WasmCorpusPlugin : Plugin<Project> {
         const val PROP_TARGETS = "wasmCorpus.targets"
         const val GROUP = "corpus"
         const val TASK_NAME_CORPUS = "corpus"
-        const val TASK_NAME_LEGACY_CORPUS = "wasmCorpusTest"
+        const val TASK_NAME_CORPUS_TEST = "corpusTest"
+        const val TASK_NAME_TEST = "test"
         const val TASK_NAME_SYNC_CORPUS = "syncWasmCorpus"
         const val TASK_NAME_RESOLVE_FIXTURES = "resolveCorpusFixtures"
         const val TASK_NAME_GENERATE_TESTS = "generateCorpusTests"

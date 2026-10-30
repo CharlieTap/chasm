@@ -10,7 +10,7 @@ rather than a published artifact.
 
 ```sh
 ./gradlew :chasm:generateCorpusTests
-./gradlew :chasm:jvmTest --tests '*corpus.generated*'
+./gradlew :chasm:corpusTest
 ./gradlew corpus
 ./gradlew corpus -PwasmCorpus.phase=decoding
 ./gradlew updateCorpusBaseline

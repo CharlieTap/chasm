@@ -861,7 +861,7 @@ class ChasmCorpusRunner(
         detail = detail,
         expected = expected,
         actual = actual,
-        rerun = "./gradlew :chasm:jvmTest --tests '*${fixture.name}*'",
+        rerun = "./gradlew :chasm:corpus -PwasmCorpus.targets=${fixture.name}",
     )
 
     private data class ImportResolution(
