@@ -1,0 +1,35 @@
+public final class io/github/charlietap/chasm/aot/CompiledModule {
+	public final fun getCode ()Lio/github/charlietap/chasm/aot/internal/CompiledCode;
+	public final fun getDeclarations-d1pmJ48 ()Ljava/lang/Object;
+}
+
+public abstract interface class io/github/charlietap/chasm/aot/internal/CompiledCode {
+	public abstract fun buildDeclarations ()Lio/github/charlietap/chasm/declarations/ModuleDeclarations;
+	public abstract fun install (Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;)V
+}
+
+public final class io/github/charlietap/chasm/aot/internal/CompiledModuleKt {
+	public static final fun compiledModule (Lio/github/charlietap/chasm/aot/internal/CompiledCode;)Lio/github/charlietap/chasm/aot/CompiledModule;
+}
+
+public abstract class io/github/charlietap/chasm/runtime/compiled/CodeInstallation {
+	public static final field Companion Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation$Companion;
+	protected fun <init> ()V
+	public abstract fun data (I)Lio/github/charlietap/chasm/runtime/instance/DataInstance;
+	public abstract fun element (I)Lio/github/charlietap/chasm/runtime/instance/ElementInstance;
+	public abstract fun function (I)Lio/github/charlietap/chasm/runtime/instance/FunctionInstance;
+	public abstract fun functionReference (I)J
+	public abstract fun getInstance ()Lio/github/charlietap/chasm/runtime/instance/ModuleInstance;
+	public abstract fun global (I)Lio/github/charlietap/chasm/runtime/instance/GlobalInstance;
+	public abstract fun install (ILio/github/charlietap/chasm/runtime/function/CompiledFunction;)V
+	public abstract fun memory (I)Lio/github/charlietap/chasm/runtime/instance/MemoryInstance;
+	public abstract fun runtimeType (I)I
+	public abstract fun table (I)Lio/github/charlietap/chasm/runtime/instance/TableInstance;
+	public abstract fun tagAddress (I)I
+	public abstract fun typeTest (ZI)Ljava/lang/Object;
+}
+
+public final class io/github/charlietap/chasm/runtime/compiled/CodeInstallation$Companion {
+	public final fun getAbstractHeapTypes ()Ljava/util/List;
+}
+

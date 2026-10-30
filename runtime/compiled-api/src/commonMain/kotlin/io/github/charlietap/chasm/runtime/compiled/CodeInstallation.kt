@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.runtime.compiled
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.runtime.function.CompiledFunction
 import io.github.charlietap.chasm.runtime.instance.DataInstance
 import io.github.charlietap.chasm.runtime.instance.ElementInstance
@@ -9,7 +10,8 @@ import io.github.charlietap.chasm.runtime.instance.MemoryInstance
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.instance.TableInstance
 
-abstract class CodeInstallation internal constructor() {
+@InternalChasmApi
+abstract class CodeInstallation protected constructor() {
 
     abstract val instance: ModuleInstance
 

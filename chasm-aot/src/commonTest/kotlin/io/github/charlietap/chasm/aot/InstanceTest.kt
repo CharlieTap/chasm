@@ -3,6 +3,8 @@ package io.github.charlietap.chasm.aot
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.getOrThrow
 import io.github.charlietap.chasm.InternalChasmApi
+import io.github.charlietap.chasm.aot.internal.CompiledCode
+import io.github.charlietap.chasm.aot.internal.compiledModule
 import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.config.StoreConfig
@@ -27,39 +29,9 @@ class InstanceTest {
     private val emptyDeclarations = emptyModuleDeclarations()
 
     @Test
-    fun `a module compiled for another runtime is rejected before anything is instantiated`() {
-        val module = FakeModule(CodeIdentity(abi = CodeIdentity.RUNTIME_ABI - 1, meterFuel = false, interruptible = false))
-
-        val result = instance(
-            store = store(),
-            module = module,
-            imports = emptyList(),
-            config = RuntimeConfig(),
-            instantiator = { _, _, _, _, _ -> fail("a rejected module is never instantiated") },
-        )
-
-        assertIs<ChasmResult.Error<*>>(result)
-    }
-
-    @Test
-    fun `a module compiled without fuel metering is rejected by a metered store`() {
-        val module = FakeModule(CodeIdentity(abi = CodeIdentity.RUNTIME_ABI, meterFuel = false, interruptible = false))
-
-        val result = instance(
-            store = store(StoreConfig(meterFuel = true)),
-            module = module,
-            imports = emptyList(),
-            config = RuntimeConfig(),
-            instantiator = { _, _, _, _, _ -> fail("a rejected module is never instantiated") },
-        )
-
-        assertIs<ChasmResult.Error<*>>(result)
-    }
-
-    @Test
     fun `a module is instantiated from its declarations into the store`() {
         val store = store(StoreConfig())
-        val module = FakeModule(CodeIdentity(abi = CodeIdentity.RUNTIME_ABI, meterFuel = false, interruptible = false))
+        val module = compiledModule(FakeCode())
         var instantiated = false
 
         val result = instance(
@@ -81,9 +53,7 @@ class InstanceTest {
         assertTrue("no data" in result.error.toString(), result.error.toString())
     }
 
-    private inner class FakeModule(
-        override val identity: CodeIdentity,
-    ) : CompiledModule() {
+    private inner class FakeCode : CompiledCode {
 
         override fun install(
             installation: CodeInstallation,

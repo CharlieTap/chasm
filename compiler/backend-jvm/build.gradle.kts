@@ -14,6 +14,7 @@ kotlin {
         api(projects.moduleDeclarations)
 
         implementation(projects.compiler.backendAnalysis)
+        implementation(projects.runtime.compiledApi)
         implementation(libs.asm)
         implementation(libs.asm.tree)
 

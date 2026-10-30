@@ -1094,15 +1094,14 @@ class ChasmPluginFunctionalTest {
                 package test.consumer
 
                 import io.github.charlietap.chasm.InternalChasmApi
-                import io.github.charlietap.chasm.aot.CodeIdentity
                 import io.github.charlietap.chasm.aot.CompiledModule
+                import io.github.charlietap.chasm.aot.internal.CompiledCode
+                import io.github.charlietap.chasm.aot.internal.compiledModule
                 import io.github.charlietap.chasm.declarations.ModuleDeclarations
                 import io.github.charlietap.chasm.runtime.compiled.CodeInstallation
                 import test.generated.compiledService
 
-                class StaleCode private constructor() : CompiledModule() {
-                    override val identity = CodeIdentity(abi = 0, meterFuel = false, interruptible = false)
-
+                class StaleCode private constructor() : CompiledCode {
                     override fun install(
                         installation: CodeInstallation,
                     ) = error("stale code was installed")
@@ -1111,7 +1110,7 @@ class ChasmPluginFunctionalTest {
 
                     companion object {
                         @JvmField
-                        val INSTANCE = StaleCode()
+                        val INSTANCE: CompiledModule = compiledModule(StaleCode())
                     }
                 }
 

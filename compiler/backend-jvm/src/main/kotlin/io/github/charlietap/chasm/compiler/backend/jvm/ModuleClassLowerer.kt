@@ -1,12 +1,12 @@
 package io.github.charlietap.chasm.compiler.backend.jvm
 
-import io.github.charlietap.chasm.compiler.backend.abi.Fingerprint
 import io.github.charlietap.chasm.compiler.backend.abi.internalName
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.BUILD_DECLARATIONS
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.CLASS_FILE_VERSION
-import io.github.charlietap.chasm.compiler.backend.jvm.abi.CODE_IDENTITY
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.CODE_INSTALLATION
+import io.github.charlietap.chasm.compiler.backend.jvm.abi.COMPILED_CODE
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.COMPILED_MODULE
+import io.github.charlietap.chasm.compiler.backend.jvm.abi.COMPILED_MODULE_FACTORY
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.DATA_SOURCE
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.DATA_SOURCE_TYPE
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.INSTALL
@@ -38,17 +38,30 @@ internal fun ModuleClassLowerer(
 ) {
     val writer = supportClassWriter()
     val owner = internalName(moduleDescriptor)
-    val superclass = internalName(COMPILED_MODULE)
     val binding = module.bindingType
-    writer.visit(CLASS_FILE_VERSION, Opcodes.ACC_PUBLIC or Opcodes.ACC_FINAL or Opcodes.ACC_SUPER, owner, null, superclass, null)
-    writer.visitField(Opcodes.ACC_PUBLIC or Opcodes.ACC_STATIC or Opcodes.ACC_FINAL, INSTANCE_FIELD, moduleDescriptor, null, null).visitEnd()
+    writer.visit(
+        CLASS_FILE_VERSION,
+        Opcodes.ACC_PUBLIC or Opcodes.ACC_FINAL or Opcodes.ACC_SUPER,
+        owner,
+        null,
+        ModuleLowering.OBJECT,
+        arrayOf(internalName(COMPILED_CODE)),
+    )
+    writer.visitField(Opcodes.ACC_PUBLIC or Opcodes.ACC_STATIC or Opcodes.ACC_FINAL, INSTANCE_FIELD, COMPILED_MODULE, null, null).visitEnd()
 
     writer.visitMethod(Opcodes.ACC_STATIC, "<clinit>", "()V", null, null).apply {
         visitCode()
         visitTypeInsn(Opcodes.NEW, owner)
         visitInsn(Opcodes.DUP)
         visitMethodInsn(Opcodes.INVOKESPECIAL, owner, "<init>", "()V", false)
-        visitFieldInsn(Opcodes.PUTSTATIC, owner, INSTANCE_FIELD, moduleDescriptor)
+        visitMethodInsn(
+            Opcodes.INVOKESTATIC,
+            internalName(COMPILED_MODULE_FACTORY.owner),
+            COMPILED_MODULE_FACTORY.name,
+            COMPILED_MODULE_FACTORY.descriptor,
+            false,
+        )
+        visitFieldInsn(Opcodes.PUTSTATIC, owner, INSTANCE_FIELD, COMPILED_MODULE)
         visitInsn(Opcodes.RETURN)
         visitMaxs(0, 0)
         visitEnd()
@@ -57,22 +70,8 @@ internal fun ModuleClassLowerer(
     writer.visitMethod(Opcodes.ACC_PRIVATE, "<init>", "()V", null, null).apply {
         visitCode()
         visitVarInsn(Opcodes.ALOAD, 0)
-        visitMethodInsn(Opcodes.INVOKESPECIAL, superclass, "<init>", "()V", false)
+        visitMethodInsn(Opcodes.INVOKESPECIAL, ModuleLowering.OBJECT, "<init>", "()V", false)
         visitInsn(Opcodes.RETURN)
-        visitMaxs(0, 0)
-        visitEnd()
-    }
-
-    writer.visitMethod(Opcodes.ACC_PUBLIC, "getIdentity", "()$CODE_IDENTITY", null, null).apply {
-        val options = module.options
-        visitCode()
-        visitTypeInsn(Opcodes.NEW, internalName(CODE_IDENTITY))
-        visitInsn(Opcodes.DUP)
-        pushInt(Fingerprint.RUNTIME_ABI)
-        visitInsn(if (options.meterFuel) Opcodes.ICONST_1 else Opcodes.ICONST_0)
-        visitInsn(if (options.interruptible) Opcodes.ICONST_1 else Opcodes.ICONST_0)
-        visitMethodInsn(Opcodes.INVOKESPECIAL, internalName(CODE_IDENTITY), "<init>", "(IZZ)V", false)
-        visitInsn(Opcodes.ARETURN)
         visitMaxs(0, 0)
         visitEnd()
     }

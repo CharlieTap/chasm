@@ -10,9 +10,14 @@ kotlin {
         namespace = "io.github.charlietap.chasm.runtime.compiled"
     }
 
+    compilerOptions {
+        optIn.add("io.github.charlietap.chasm.InternalChasmApi")
+    }
+
     sourceSets {
         commonMain {
             dependencies {
+                api(projects.runtime.compiledApi)
                 api(projects.runtime.core)
 
                 implementation(projects.executor.callCore)

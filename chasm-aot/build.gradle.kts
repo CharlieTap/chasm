@@ -104,6 +104,7 @@ kotlin {
         commonMain {
             dependencies {
                 api(projects.embeddingRuntime)
+                api(projects.runtime.compiledApi)
 
                 implementation(projects.moduleDeclarations)
                 implementation(projects.runtime.compiled)

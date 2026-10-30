@@ -3,14 +3,11 @@
 package io.github.charlietap.chasm.aot.compiled
 
 import io.github.charlietap.chasm.InternalChasmApi
-import io.github.charlietap.chasm.aot.CodeIdentity
 import io.github.charlietap.chasm.aot.CompiledModule
 import io.github.charlietap.chasm.aot.instance
 import io.github.charlietap.chasm.compiler.backend.jvm.JvmModule
 import io.github.charlietap.chasm.compiler.backend.jvm.JvmOptions
 import io.github.charlietap.chasm.config.RuntimeConfig
-import io.github.charlietap.chasm.config.StoreConfig
-import io.github.charlietap.chasm.declarations.ModuleDeclarations
 import io.github.charlietap.chasm.embedding.error.ChasmError
 import io.github.charlietap.chasm.embedding.exports
 import io.github.charlietap.chasm.embedding.invoke
@@ -19,8 +16,6 @@ import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.expect
 import io.github.charlietap.chasm.embedding.store
-import io.github.charlietap.chasm.module.ModuleDeclarationsFactory
-import io.github.charlietap.chasm.runtime.compiled.CodeInstallation
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.runtime.value.NumberValue.I32
@@ -98,24 +93,6 @@ class CompiledModuleTest {
     }
 
     @Test
-    fun `code built for another runtime ABI is refused before its declarations are built`() {
-        val result = instance(store(), StaleModule(), emptyList())
-
-        assertIs<ChasmResult.Error<*>>(result)
-        assertTrue("runtime ABI 0" in result.error.toString(), result.error.toString())
-    }
-
-    private class StaleModule : CompiledModule() {
-        override val identity = CodeIdentity(abi = 0, meterFuel = false, interruptible = false)
-
-        override fun install(
-            installation: CodeInstallation,
-        ) = error("stale code was installed")
-
-        override fun buildDeclarations(): ModuleDeclarations = error("stale declarations were built")
-    }
-
-    @Test
     fun `instances made at once from many threads share one module and read nothing for a module without data`() {
         val generated = generate(fixture("add"))
         assertEquals(null, generated.module.data)
@@ -184,18 +161,6 @@ class CompiledModuleTest {
         assertEquals(listOf(I32(40)), invoke(store, second, "started", emptyList()).expect("second started"))
         assertEquals(listOf(I32(7)), invoke(store, second, "passive_data", emptyList()).expect("second passive"))
         assertEquals(listOf(I32(7)), invoke(store, first, "passive_data", emptyList()).expect("first passive"))
-    }
-
-    @Test
-    fun `a compiled module is refused by a store with other options`() {
-        val compiled = generate(fixture("add")).compiledModule()
-
-        listOf(StoreConfig(meterFuel = true) to "meterFuel", StoreConfig(interruptible = true) to "interruptible").forEach { (config, option) ->
-            val result = instance(store(config), compiled, emptyList())
-
-            assertIs<ChasmResult.Error<*>>(result)
-            assertTrue(option in result.error.toString(), result.error.toString())
-        }
     }
 
     @Test

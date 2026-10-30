@@ -1,17 +1,24 @@
+@file:OptIn(InternalChasmApi::class)
+
 package io.github.charlietap.chasm.compiler.backend.jvm.abi
 
+import io.github.charlietap.chasm.InternalChasmApi
+import io.github.charlietap.chasm.aot.CompiledModule
+import io.github.charlietap.chasm.aot.internal.CompiledCode
 import io.github.charlietap.chasm.compiler.backend.abi.CONTEXT_TYPE
 import io.github.charlietap.chasm.compiler.backend.abi.GLOBAL_INSTANCE
 import io.github.charlietap.chasm.compiler.backend.abi.MEMORY_INSTANCE
 import io.github.charlietap.chasm.compiler.backend.abi.MethodRef
 import io.github.charlietap.chasm.compiler.backend.abi.OBJECT_TYPE
+import io.github.charlietap.chasm.runtime.compiled.CodeInstallation
+import org.objectweb.asm.Type
 
 internal const val CLASS_FILE_VERSION = 55
 
 internal const val COMPILED_FUNCTION = "Lio/github/charlietap/chasm/runtime/function/CompiledFunction;"
-internal const val COMPILED_MODULE = "Lio/github/charlietap/chasm/aot/CompiledModule;"
-internal const val CODE_IDENTITY = "Lio/github/charlietap/chasm/aot/CodeIdentity;"
-internal const val CODE_INSTALLATION = "Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;"
+internal val COMPILED_MODULE: String = Type.getDescriptor(CompiledModule::class.java)
+internal val COMPILED_CODE: String = Type.getDescriptor(CompiledCode::class.java)
+internal val CODE_INSTALLATION: String = Type.getDescriptor(CodeInstallation::class.java)
 internal const val STACK_OVERFLOW = "Ljava/lang/StackOverflowError;"
 internal const val THROWABLE = "Ljava/lang/Throwable;"
 
@@ -21,6 +28,13 @@ private const val RUNTIME = "Lio/github/charlietap/chasm/runtime/compiled/Compil
 internal val ENTRY_INVOKE = MethodRef(COMPILED_FUNCTION, "invoke", listOf(CONTEXT_TYPE, "[J", "I"), "V")
 
 internal val ENTRY_CALL = MethodRef(COMPILED_FUNCTION, "call", listOf(CONTEXT_TYPE, "[J", "I"), "V")
+
+internal val COMPILED_MODULE_FACTORY = MethodRef(
+    "Lio/github/charlietap/chasm/aot/internal/CompiledModuleKt;",
+    "compiledModule",
+    listOf(COMPILED_CODE),
+    COMPILED_MODULE,
+)
 
 internal val INSTALL = MethodRef(CODE_INSTALLATION, "install", listOf("I", COMPILED_FUNCTION), "V")
 internal val INSTALLATION_INSTANCE = MethodRef(CODE_INSTALLATION, "getInstance", emptyList(), "Lio/github/charlietap/chasm/runtime/instance/ModuleInstance;")
