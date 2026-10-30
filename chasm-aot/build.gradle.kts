@@ -12,6 +12,23 @@ plugins {
     alias(libs.plugins.conventions.jvm.functional.test)
 
     alias(libs.plugins.wasm.testsuite)
+    alias(libs.plugins.wasm.corpus)
+}
+
+corpus {
+    corpusRef = libs.versions.wasm.corpus.ref
+    corpusRunner = "io.github.charlietap.chasm.aot.corpus.AotCorpusRunner"
+    testPackageName = "io.github.charlietap.chasm.aot.corpus.generated"
+    phase = io.github.charlietap.corpus.lib.CorpusPhase.INVOCATION
+    versions = listOf("1.0", "2.0", "3.0")
+    excludedFeatures = listOf("memory64", "simd", "relaxed-simd")
+    excludedTags = listOf("stress-test", "benchmark", "duration-extra-long")
+    excludedTargets = listOf(
+        "esbuild",
+        "jsquash_hqx",
+        "learning_rate_scheduling",
+    )
+    corpusBaselineDirectory = layout.settingsDirectory.dir("baselines/corpus/aot")
 }
 
 sweet {
@@ -110,10 +127,12 @@ kotlin {
                 implementation(projects.validator)
 
                 implementation(libs.asm.util)
+                implementation(libs.corpus.lib)
                 implementation(libs.kotlin.test)
                 implementation(libs.kotlinx.io.core)
                 implementation(libs.kotlinx.serialization)
                 implementation(libs.sweet.lib)
+                implementation(libs.wasi.emscripten.host.chasm.wasip1.kmp)
             }
         }
     }
