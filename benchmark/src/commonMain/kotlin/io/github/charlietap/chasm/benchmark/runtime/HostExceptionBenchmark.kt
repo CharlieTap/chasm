@@ -1,6 +1,9 @@
+@file:OptIn(InternalChasmApi::class)
+
 package io.github.charlietap.chasm.benchmark.runtime
 
 import com.github.michaelbull.result.Err
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.benchmark.BenchmarkConfig
 import io.github.charlietap.chasm.benchmark.StabilizedBenchmark
 import io.github.charlietap.chasm.config.RuntimeConfig
@@ -8,6 +11,7 @@ import io.github.charlietap.chasm.executor.invoker.FunctionInvoker
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.EndFunctionDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.HostCallDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.ThrowRefSDispatcher
+import io.github.charlietap.chasm.executor.invoker.thread.Interpreter
 import io.github.charlietap.chasm.fixture.runtime.function.runtimeExpression
 import io.github.charlietap.chasm.fixture.runtime.function.runtimeFunction
 import io.github.charlietap.chasm.fixture.runtime.instance.hostFunctionInstance
@@ -95,7 +99,7 @@ class HostExceptionBenchmark : StabilizedBenchmark() {
     private fun caughtInvocation(hostRaised: Boolean): () -> Any {
         val config = RuntimeConfig()
         val program = Program()
-        val runtimeStore = store(program = program)
+        val runtimeStore = store(program = program).also { store -> store.interpreter = Interpreter }
         val tagAddress = runtimeStore.heap.registerTag(RTT(0), payloadTagType())
         val module = moduleInstance(tagAddresses = mutableListOf(tagAddress))
         val exception = HostException(
@@ -178,7 +182,7 @@ class HostExceptionBenchmark : StabilizedBenchmark() {
     private fun escapingInvocation(): () -> Any {
         val config = RuntimeConfig()
         val program = Program()
-        val runtimeStore = store(program = program)
+        val runtimeStore = store(program = program).also { store -> store.interpreter = Interpreter }
         val tagAddress = runtimeStore.heap.registerTag(RTT(0), payloadTagType())
         val module = moduleInstance(tagAddresses = mutableListOf(tagAddress))
         val exception = HostException(
@@ -207,7 +211,7 @@ class HostExceptionBenchmark : StabilizedBenchmark() {
     private fun passthroughInvocation(): () -> Any {
         val config = RuntimeConfig()
         val program = Program()
-        val runtimeStore = store(program = program)
+        val runtimeStore = store(program = program).also { store -> store.interpreter = Interpreter }
         val tagAddress = runtimeStore.heap.registerTag(RTT(0), payloadTagType())
         val module = moduleInstance(tagAddresses = mutableListOf(tagAddress))
         val exception = HostException(

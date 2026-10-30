@@ -31,14 +31,14 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertIs
 
-class CompiledFunctionInvokerTest {
+class CompiledExecutionTest {
 
     @Test
     fun `a compiled function runs through its compiled entry alone`() {
         val store = store(program = Program())
         val function = compiledFunction(store) { _, frame, fp -> frame[fp] = frame[fp] + 1 }
 
-        val actual = CompiledFunctionInvoker(runtimeConfig(), store, function.module, function, listOf(I32(41)))
+        val actual = FunctionInvoker(runtimeConfig(), store, function.module, function, listOf(I32(41)))
 
         assertEquals(Ok(listOf(I32(42))), actual)
     }
@@ -59,7 +59,7 @@ class CompiledFunctionInvokerTest {
             function = runtimeFunction(body = runtimeExpression(entryIp), frameSlots = 2),
         )
 
-        val actual = CompiledFunctionInvoker(runtimeConfig(), store, function.module, function, listOf(I32(41)))
+        val actual = FunctionInvoker(runtimeConfig(), store, function.module, function, listOf(I32(41)))
 
         assertEquals(Err(InvocationError.InterpreterUnavailable), actual)
         assertFalse(ran)
@@ -75,7 +75,7 @@ class CompiledFunctionInvokerTest {
             frame[fp] = values[0]
         }
 
-        val actual = CompiledFunctionInvoker(runtimeConfig(), store, function.module, function, listOf(I32(41)))
+        val actual = FunctionInvoker(runtimeConfig(), store, function.module, function, listOf(I32(41)))
 
         assertEquals(Err(InvocationError.InterpreterUnavailable), actual)
     }
@@ -88,7 +88,7 @@ class CompiledFunctionInvokerTest {
             requestTailCall(context, context.instance, interpreted, longArrayOf(frame[fp]))
         }
 
-        val actual = CompiledFunctionInvoker(runtimeConfig(), store, function.module, function, listOf(I32(41)))
+        val actual = FunctionInvoker(runtimeConfig(), store, function.module, function, listOf(I32(41)))
 
         assertEquals(Err(InvocationError.InterpreterUnavailable), actual)
     }
@@ -98,7 +98,7 @@ class CompiledFunctionInvokerTest {
         val store = store(program = Program())
         val function = compiledFunction(store) { _, _, _ -> throw GuestHeapOutOfMemoryException("full") }
 
-        val actual = CompiledFunctionInvoker(runtimeConfig(debugInfo = true), store, function.module, function, listOf(I32(41)))
+        val actual = FunctionInvoker(runtimeConfig(debugInfo = true), store, function.module, function, listOf(I32(41)))
 
         val trapped = assertIs<InvocationError.Trapped>(actual.getError())
         assertEquals(InvocationError.GuestHeapOutOfMemory, trapped.error)
@@ -114,7 +114,7 @@ class CompiledFunctionInvokerTest {
             frame[fp] = frame[fp] + 1
         }
 
-        val actual = CompiledFunctionInvoker(runtimeConfig(), store, function.module, function, listOf(I32(41)))
+        val actual = FunctionInvoker(runtimeConfig(), store, function.module, function, listOf(I32(41)))
 
         assertEquals(Ok(listOf(I32(42))), actual)
         assertEquals(false to 1, seen)

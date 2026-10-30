@@ -10,6 +10,7 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.admin.EndFunctionDis
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.HostCallDispatcher
 import io.github.charlietap.chasm.executor.invoker.function.HostFunctionCall
 import io.github.charlietap.chasm.executor.invoker.instruction.control.ThrowRefValueExecutor
+import io.github.charlietap.chasm.executor.invoker.thread.Interpreter
 import io.github.charlietap.chasm.fixture.config.runtimeConfig
 import io.github.charlietap.chasm.fixture.runtime.dispatch.dispatchableInstruction
 import io.github.charlietap.chasm.fixture.runtime.exception.compiledCatch
@@ -47,7 +48,7 @@ class HostExceptionIntegrationTest {
     fun `host can inspect and swallow an exception from a nested guest invocation`() {
         val config = runtimeConfig()
         val program = Program()
-        val runtimeStore = store(program = program)
+        val runtimeStore = store(program = program).also { store -> store.interpreter = Interpreter }
         val tagAddress = runtimeStore.heap.registerTag(
             rtt(),
             tagType(
@@ -111,7 +112,7 @@ class HostExceptionIntegrationTest {
     fun `host can pass the same pending exception back to an outer guest`() {
         val config = runtimeConfig()
         val program = Program()
-        val runtimeStore = store(program = program)
+        val runtimeStore = store(program = program).also { store -> store.interpreter = Interpreter }
         val tagAddress = runtimeStore.heap.registerTag(rtt(), tagType())
         val module = moduleInstance(tagAddresses = mutableListOf(tagAddress))
         val exceptionReference = runtimeStore.heap.allocateException(tagAddress, LongArray(0))

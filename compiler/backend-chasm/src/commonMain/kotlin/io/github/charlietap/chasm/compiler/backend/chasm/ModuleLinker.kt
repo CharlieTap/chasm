@@ -1,8 +1,12 @@
+@file:OptIn(InternalChasmApi::class)
+
 package io.github.charlietap.chasm.compiler.backend.chasm
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.cir.CirModule
 import io.github.charlietap.chasm.compiler.backend.chasm.link.createLinkContext
+import io.github.charlietap.chasm.executor.invoker.thread.Interpreter
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.store.Store
 
@@ -38,4 +42,5 @@ internal inline fun ModuleLinker(
         plan.link(context, index, functionLinker)
     }
     programInstaller(store.program, context, plan, listOf(context.pendingWasmCalls))
+    store.interpreter = Interpreter
 }

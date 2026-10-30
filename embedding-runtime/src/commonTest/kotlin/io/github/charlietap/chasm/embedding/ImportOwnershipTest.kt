@@ -2,7 +2,6 @@ package io.github.charlietap.chasm.embedding
 
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.embedding.error.ChasmError
-import io.github.charlietap.chasm.embedding.fixture.instanceInvoker
 import io.github.charlietap.chasm.embedding.fixture.publicFunction
 import io.github.charlietap.chasm.embedding.fixture.publicGlobal
 import io.github.charlietap.chasm.embedding.fixture.publicImport
@@ -37,7 +36,6 @@ class ImportOwnershipTest {
                 store = targetStore,
                 imports = listOf(publicImport(value = importable)),
                 config = RuntimeConfig(),
-                invoker = instanceInvoker(),
                 trapSource = { null },
             ) { _, _, _ -> error("instantiation must not start") }
 

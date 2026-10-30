@@ -10,7 +10,6 @@ import io.github.charlietap.chasm.declarations.ModuleDeclarations
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.store
-import io.github.charlietap.chasm.executor.instantiator.StartFunctionInvoker
 import io.github.charlietap.chasm.module.ModuleDeclarationsFactory
 import io.github.charlietap.chasm.runtime.compiled.CodeInstallation
 import io.github.charlietap.chasm.runtime.error.InstantiationError
@@ -36,8 +35,7 @@ class InstanceTest {
             module = module,
             imports = emptyList(),
             config = RuntimeConfig(),
-            instantiator = { _, _, _, _, _, _ -> fail("a rejected module is never instantiated") },
-            startInvoker = { _, _, _, _ -> fail("a rejected module never starts") },
+            instantiator = { _, _, _, _, _ -> fail("a rejected module is never instantiated") },
         )
 
         assertIs<ChasmResult.Error<*>>(result)
@@ -52,8 +50,7 @@ class InstanceTest {
             module = module,
             imports = emptyList(),
             config = RuntimeConfig(),
-            instantiator = { _, _, _, _, _, _ -> fail("a rejected module is never instantiated") },
-            startInvoker = { _, _, _, _ -> fail("a rejected module never starts") },
+            instantiator = { _, _, _, _, _ -> fail("a rejected module is never instantiated") },
         )
 
         assertIs<ChasmResult.Error<*>>(result)
@@ -63,7 +60,6 @@ class InstanceTest {
     fun `a module is instantiated from its declarations into the store`() {
         val store = store(StoreConfig())
         val module = FakeModule(CodeIdentity(abi = CodeIdentity.RUNTIME_ABI, meterFuel = false, interruptible = false))
-        val startInvoker: StartFunctionInvoker = { _, _, _, _ -> fail("the instantiator decides when the start function runs") }
         var instantiated = false
 
         val result = instance(
@@ -71,15 +67,13 @@ class InstanceTest {
             module = module,
             imports = emptyList(),
             config = RuntimeConfig(),
-            instantiator = { _, runtimeStore, moduleDeclarations, imports, _, start ->
+            instantiator = { _, runtimeStore, moduleDeclarations, imports, _ ->
                 instantiated = true
                 assertSame(store.store, runtimeStore)
                 assertSame(emptyDeclarations, moduleDeclarations)
                 assertEquals(emptyList(), imports)
-                assertSame(startInvoker, start)
                 Err(InstantiationError.DataUnavailable("no data"))
             },
-            startInvoker = startInvoker,
         )
 
         assertEquals(true, instantiated)

@@ -18,6 +18,7 @@ kotlin {
                 api(projects.libs.parallel)
                 api(libs.result)
 
+                implementation(projects.executor.callCore)
                 implementation(projects.memory)
                 implementation(projects.runtime.resources)
             }

@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.runtime.store
 
 import io.github.charlietap.chasm.config.StoreConfig
+import io.github.charlietap.chasm.runtime.execution.NestedInterpreter
 import io.github.charlietap.chasm.runtime.heap.WasmHeap
 import io.github.charlietap.chasm.runtime.instance.DataInstance
 import io.github.charlietap.chasm.runtime.instance.ElementInstance
@@ -28,4 +29,6 @@ class Store(
     val maxStackSlots: Int = ValueStack.maxCapacityFor(config.limits.stackBytes)
 
     var compiledCallDepth: Int = 0
+
+    var interpreter: NestedInterpreter? = null
 }

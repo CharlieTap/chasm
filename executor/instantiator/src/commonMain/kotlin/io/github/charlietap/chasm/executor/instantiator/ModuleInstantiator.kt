@@ -14,6 +14,7 @@ import io.github.charlietap.chasm.executor.instantiator.compat.CompatibilityChec
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
 import io.github.charlietap.chasm.executor.instantiator.initialization.MemoryInitializer
 import io.github.charlietap.chasm.executor.instantiator.initialization.TableInitializer
+import io.github.charlietap.chasm.executor.invoker.FunctionInvoker
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.instance.Import
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
@@ -25,7 +26,6 @@ typealias ModuleInstantiator = (
     ModuleDeclarations,
     List<Import>,
     ModuleCodeInstaller,
-    StartFunctionInvoker,
 ) -> Result<ModuleInstance, ModuleTrapError>
 
 fun ModuleInstantiator(
@@ -34,7 +34,6 @@ fun ModuleInstantiator(
     module: ModuleDeclarations,
     imports: List<Import>,
     codeInstaller: ModuleCodeInstaller,
-    startInvoker: StartFunctionInvoker,
 ): Result<ModuleInstance, ModuleTrapError> =
     ModuleInstantiator(
         config = config,
@@ -42,7 +41,7 @@ fun ModuleInstantiator(
         module = module,
         imports = imports,
         codeInstaller = codeInstaller,
-        startInvoker = startInvoker,
+        invoker = ::FunctionInvoker,
         compatibilityChecker = ::CompatibilityChecker,
         partialAllocator = ::PartialModuleAllocator,
         allocator = ::ModuleAllocator,
@@ -59,7 +58,7 @@ internal inline fun ModuleInstantiator(
     module: ModuleDeclarations,
     imports: List<Import>,
     noinline codeInstaller: ModuleCodeInstaller,
-    crossinline startInvoker: StartFunctionInvoker,
+    crossinline invoker: FunctionInvoker,
     crossinline compatibilityChecker: CompatibilityChecker,
     crossinline partialAllocator: PartialModuleAllocator,
     crossinline allocator: ModuleAllocator,
@@ -90,7 +89,7 @@ internal inline fun ModuleInstantiator(
         CompleteModuleInstantiation(
             preparation.context,
             instance,
-            startInvoker,
+            invoker,
             tableInitializer,
             memoryInitializer,
         ).bind()
@@ -137,7 +136,7 @@ internal inline fun PrepareModuleInstantiation(
 internal inline fun CompleteModuleInstantiation(
     context: InstantiationContext,
     instance: ModuleInstance,
-    crossinline startInvoker: StartFunctionInvoker,
+    crossinline invoker: FunctionInvoker,
     crossinline tableInitializer: TableInitializer,
     crossinline memoryInitializer: MemoryInitializer,
 ): Result<Unit, ModuleTrapError> = binding {
@@ -147,7 +146,7 @@ internal inline fun CompleteModuleInstantiation(
 
     context.module.startFunction?.let { function ->
         val address = instance.functionAddresses[function.toInt()]
-        startInvoker(context.config, context.store, instance, address).bind()
+        invoker(context.config, context.store, instance, address, emptyList()).bind()
     }
 }
 

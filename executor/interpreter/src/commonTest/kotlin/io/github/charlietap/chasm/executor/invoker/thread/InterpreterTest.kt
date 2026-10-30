@@ -2,9 +2,12 @@ package io.github.charlietap.chasm.executor.invoker.thread
 
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
+import com.github.michaelbull.result.Result
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.config.GCStrategy
 import io.github.charlietap.chasm.config.GCThreshold
 import io.github.charlietap.chasm.config.RuntimeConfig
+import io.github.charlietap.chasm.executor.invoker.WasmFunctionExecutor
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.EndFunctionDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.HostCallDispatcher
 import io.github.charlietap.chasm.fixture.config.runtimeConfig
@@ -34,15 +37,17 @@ import io.github.charlietap.chasm.host.HostException
 import io.github.charlietap.chasm.host.HostFunction
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.error.InvocationError
+import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.program.Program
 import io.github.charlietap.chasm.runtime.resource.gc.GarbageCollector
 import io.github.charlietap.chasm.runtime.store.Store
+import io.github.charlietap.chasm.runtime.value.ExecutionValue
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class ThreadExecutorTest {
+class InterpreterTest {
 
     @Test
     fun `host raised exception resumes at a matching guest catch`() {
@@ -100,7 +105,7 @@ class ThreadExecutorTest {
             ),
         )
 
-        val actual = ThreadExecutor(runtimeConfig(), store, function, emptyList())
+        val actual = interpret(runtimeConfig(), store, function, emptyList())
 
         assertEquals(Ok(listOf(0x123456789ABCDEFL)), actual)
         assertFalse(store.heap.hasPending)
@@ -131,7 +136,7 @@ class ThreadExecutorTest {
             function = runtimeFunction(body = runtimeExpression(entryIp)),
         )
 
-        val actual = ThreadExecutor(runtimeConfig(), store, function, emptyList())
+        val actual = interpret(runtimeConfig(), store, function, emptyList())
 
         assertEquals(Err(InvocationError.ThrownException), actual)
         assertEquals(exceptionReference, store.heap.takePendingExceptionReference())
@@ -153,7 +158,7 @@ class ThreadExecutorTest {
         )
         val store = store(program = program)
 
-        val actual = ThreadExecutor(runtimeConfig(), store, function, emptyList())
+        val actual = interpret(runtimeConfig(), store, function, emptyList())
 
         assertEquals(Err(InvocationError.GuestHeapOutOfMemory), actual)
     }
@@ -183,7 +188,7 @@ class ThreadExecutorTest {
             ),
         )
 
-        val actual = ThreadExecutor(
+        val actual = interpret(
             config = runtimeConfig(),
             store = store(program = program),
             instance = function,
@@ -217,7 +222,7 @@ class ThreadExecutorTest {
             ),
         )
 
-        val actual = ThreadExecutor(
+        val actual = interpret(
             config = runtimeConfig(),
             store = store(program = program),
             instance = function,
@@ -261,7 +266,7 @@ class ThreadExecutorTest {
             Ok(Unit)
         }
 
-        val actual = ThreadExecutor(
+        val actual = interpret(
             config = RuntimeConfig(
                 gcStrategy = GCStrategy.ARENA,
                 gcThreshold = GCThreshold.KB(0),
@@ -298,7 +303,7 @@ class ThreadExecutorTest {
         }
 
         for (strategy in listOf(GCStrategy.MANUAL, GCStrategy.TRADITIONAL)) {
-            val actual = ThreadExecutor(
+            val actual = interpret(
                 config = RuntimeConfig(
                     gcStrategy = strategy,
                     gcThreshold = GCThreshold.KB(0),
@@ -328,7 +333,7 @@ class ThreadExecutorTest {
         allocateUnreachableGuestObject(store)
         val failure = InvocationError.GarbageCollectionFailed("injected")
 
-        val actual = ThreadExecutor(
+        val actual = interpret(
             config = RuntimeConfig(
                 gcStrategy = GCStrategy.ARENA,
                 gcThreshold = GCThreshold.KB(0),
@@ -340,6 +345,18 @@ class ThreadExecutorTest {
         )
 
         assertEquals(Err(failure), actual)
+    }
+
+    @OptIn(InternalChasmApi::class)
+    private fun interpret(
+        config: RuntimeConfig,
+        store: Store,
+        instance: FunctionInstance.WasmFunction,
+        values: List<ExecutionValue>,
+        garbageCollector: GarbageCollector = ::GarbageCollector,
+    ): Result<List<Long>, InvocationError> {
+        store.interpreter = Interpreter
+        return WasmFunctionExecutor(config, store, instance, values, garbageCollector)
     }
 
     private fun allocateUnreachableGuestObject(store: Store) {

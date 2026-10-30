@@ -13,6 +13,7 @@ import io.github.charlietap.chasm.executor.instantiator.allocation.type.TypeAllo
 import io.github.charlietap.chasm.executor.instantiator.compat.CompatibilityChecker
 import io.github.charlietap.chasm.executor.instantiator.initialization.MemoryInitializer
 import io.github.charlietap.chasm.executor.instantiator.initialization.TableInitializer
+import io.github.charlietap.chasm.executor.invoker.FunctionInvoker
 import io.github.charlietap.chasm.parallel.ParallelTaskExecutor
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.instance.Import
@@ -26,7 +27,6 @@ suspend fun ParallelModuleInstantiator(
     imports: List<Import>,
     taskExecutor: ParallelTaskExecutor,
     codeInstaller: ParallelModuleCodeInstaller,
-    startInvoker: StartFunctionInvoker,
 ): Result<ModuleInstance, ModuleTrapError> {
     val preparation = PrepareModuleInstantiation(
         config = config,
@@ -54,7 +54,7 @@ suspend fun ParallelModuleInstantiator(
         return CompleteModuleInstantiation(
             prepared.context,
             instantiated,
-            startInvoker,
+            ::FunctionInvoker,
             ::TableInitializer,
             ::MemoryInitializer,
         ).map { instantiated }

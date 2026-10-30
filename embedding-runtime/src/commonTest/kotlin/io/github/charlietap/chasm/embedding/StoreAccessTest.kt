@@ -2,7 +2,6 @@ package io.github.charlietap.chasm.embedding
 
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.embedding.error.ChasmError
-import io.github.charlietap.chasm.embedding.fixture.instanceInvoker
 import io.github.charlietap.chasm.embedding.fixture.publicFunction
 import io.github.charlietap.chasm.embedding.fixture.publicGlobal
 import io.github.charlietap.chasm.embedding.fixture.publicInstance
@@ -93,7 +92,7 @@ class StoreAccessTest {
         assertEquals(DROPPED, dropInstance(store, instance))
         assertEquals(
             DROPPED,
-            instantiate(store, emptyList(), RuntimeConfig(), instanceInvoker(), { null }) { _, _, _ -> fail("a dropped store is never instantiated into") },
+            instantiate(store, emptyList(), RuntimeConfig(), { null }) { _, _, _ -> fail("a dropped store is never instantiated into") },
         )
     }
 
@@ -106,12 +105,12 @@ class StoreAccessTest {
             moduleInstance = moduleInstance(
                 exports = mutableListOf(exportInstance(nameValue("run"), functionExternalValue(functionAddress(0)))),
             ),
-            invoker = instanceInvoker(byAddress = { _, _, _, _, _ -> throw failure }, byFunction = { _, _, _, _, _ -> throw failure }),
         )
         val expected = ChasmResult.Error(ChasmError.ExecutionError(failure.error.toString()))
         val prepared = assertIs<ChasmResult.Success<PreparedFunction>>(prepareFunction(store, instance, "run")).result
+        store.store.functions[0] = hostFunctionInstance()
 
-        assertEquals(expected, invoke(store, instance, "run"))
+        assertEquals(expected, invoke(store, instance, "run", emptyList(), invoker = { _, _, _, _, _ -> throw failure }))
         assertEquals(expected, prepared())
     }
 

@@ -8,9 +8,7 @@ import io.github.charlietap.chasm.declarations.ModuleDeclarations
 import io.github.charlietap.chasm.embedding.diagnostic.InterpreterTrapSource
 import io.github.charlietap.chasm.embedding.diagnostic.TrapSource
 import io.github.charlietap.chasm.embedding.error.ChasmError
-import io.github.charlietap.chasm.embedding.internal.InterpreterInvoker
 import io.github.charlietap.chasm.embedding.internal.ModuleCodeInstaller
-import io.github.charlietap.chasm.embedding.internal.StartFunctionInvoker
 import io.github.charlietap.chasm.embedding.internal.instantiate
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Import
@@ -45,6 +43,6 @@ internal fun instance(
     codeInstaller: ModuleCodeInstaller,
     trapSource: (RuntimeModuleInstance) -> TrapSource?,
 ): ChasmResult<Instance, ChasmError.ExecutionError> =
-    instantiate(store, imports, config, InterpreterInvoker, trapSource) { effectiveConfig, runtime, runtimeImports ->
-        instantiator(effectiveConfig, runtime, declarations, runtimeImports, codeInstaller, ::StartFunctionInvoker)
+    instantiate(store, imports, config, trapSource) { effectiveConfig, runtime, runtimeImports ->
+        instantiator(effectiveConfig, runtime, declarations, runtimeImports, codeInstaller)
     }

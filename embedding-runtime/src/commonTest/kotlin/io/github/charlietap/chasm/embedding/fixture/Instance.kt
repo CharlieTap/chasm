@@ -1,7 +1,6 @@
 package io.github.charlietap.chasm.embedding.fixture
 
 import io.github.charlietap.chasm.config.RuntimeConfig
-import io.github.charlietap.chasm.embedding.internal.InstanceInvoker
 import io.github.charlietap.chasm.embedding.shapes.Instance
 import io.github.charlietap.chasm.fixture.config.runtimeConfig
 import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
@@ -13,10 +12,8 @@ fun publicInstance(
     config: RuntimeConfig = runtimeConfig(),
     moduleInstance: ModuleInstance = moduleInstance(),
     store: Store = store(),
-    invoker: InstanceInvoker = hostFunctionInvoker(),
 ): Instance = Instance(
     config = config,
     instance = moduleInstance,
     store = store,
-    invoker = invoker,
 )

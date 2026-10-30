@@ -29,6 +29,36 @@ typealias FunctionInvoker = (RuntimeConfig, Store, ModuleInstance, Address.Funct
 typealias WasmFunctionExecutor =
     (RuntimeConfig, Store, FunctionInstance.WasmFunction, List<ExecutionValue>) -> Result<List<Long>, InvocationError>
 
+fun FunctionInvoker(
+    config: RuntimeConfig,
+    store: Store,
+    instance: ModuleInstance,
+    address: Address.Function,
+    values: List<ExecutionValue>,
+): Result<List<ExecutionValue>, InvocationError> = FunctionInvoker(
+    config = config,
+    store = store,
+    instance = instance,
+    function = store.function(address),
+    values = values,
+)
+
+@OptIn(InternalChasmApi::class)
+fun FunctionInvoker(
+    config: RuntimeConfig,
+    store: Store,
+    instance: ModuleInstance,
+    function: FunctionInstance,
+    values: List<ExecutionValue>,
+): Result<List<ExecutionValue>, InvocationError> = FunctionInvoker(
+    config = config,
+    store = store,
+    instance = instance,
+    function = function,
+    values = values,
+    wasmFunctionExecutor = ::WasmFunctionExecutor,
+)
+
 @InternalChasmApi
 inline fun FunctionInvoker(
     config: RuntimeConfig,

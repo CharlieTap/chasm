@@ -24,7 +24,6 @@ suspend fun _instance(
         store = store,
         imports = imports,
         config = config,
-        invoker = InterpreterInvoker,
         trapSource = { instance -> InterpreterTrapSource(instance, module) },
     ) { effectiveConfig, runtime, runtimeImports ->
         ParallelModuleInstantiator(
@@ -34,6 +33,5 @@ suspend fun _instance(
             imports = runtimeImports,
             taskExecutor = taskExecutor,
             codeInstaller = ParallelModuleCodeInstaller(module.module),
-            startInvoker = ::StartFunctionInvoker,
         )
     }

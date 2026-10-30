@@ -2,7 +2,6 @@ package io.github.charlietap.chasm.tools.compilerbaseline
 
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.map
 import com.github.michaelbull.result.unwrap
 import io.github.charlietap.chasm.ast.module.FunctionNameSubsection
 import io.github.charlietap.chasm.ast.module.Module
@@ -17,7 +16,6 @@ import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
 import io.github.charlietap.chasm.decoder.error.ModuleDecoderError
 import io.github.charlietap.chasm.executor.instantiator.ModuleInstantiator
-import io.github.charlietap.chasm.executor.invoker.FunctionInvoker
 import io.github.charlietap.chasm.module.ModuleDeclarationsFactory
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.ext.function
@@ -59,9 +57,6 @@ class ChasmModuleInstantiator : CompilerModuleInstantiator {
             module = ModuleDeclarationsFactory(module),
             imports = imports,
             codeInstaller = { linkStore, instance, _, _ -> Ok(ModuleLinker(linkStore, instance, module, code)) },
-            startInvoker = { invokeConfig, invokeStore, instance, address ->
-                FunctionInvoker(invokeConfig, invokeStore, instance, address, emptyList()).map { }
-            },
         )
 }
 

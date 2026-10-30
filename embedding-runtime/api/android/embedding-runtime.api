@@ -260,17 +260,12 @@ public final class io/github/charlietap/chasm/embedding/global/WriteGlobalKt {
 	public static final fun writeGlobal (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Global;Lio/github/charlietap/chasm/runtime/value/ExecutionValue;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 }
 
-public abstract interface class io/github/charlietap/chasm/embedding/internal/InstanceInvoker {
-	public abstract fun invoke-AKC83dc (Lio/github/charlietap/chasm/config/RuntimeConfig;Lio/github/charlietap/chasm/runtime/store/Store;Lio/github/charlietap/chasm/runtime/instance/ModuleInstance;ILjava/util/List;)Ljava/lang/Object;
-	public abstract fun invoke-iWd_AH8 (Lio/github/charlietap/chasm/config/RuntimeConfig;Lio/github/charlietap/chasm/runtime/store/Store;Lio/github/charlietap/chasm/runtime/instance/ModuleInstance;Lio/github/charlietap/chasm/runtime/instance/FunctionInstance;Ljava/util/List;)Ljava/lang/Object;
-}
-
 public final class io/github/charlietap/chasm/embedding/internal/InstantiateKt {
 	public static final fun importsFromAnotherStore (Lio/github/charlietap/chasm/embedding/shapes/Store;Ljava/util/List;)Z
-	public static final fun instantiate (Lio/github/charlietap/chasm/embedding/shapes/Store;Ljava/util/List;Lio/github/charlietap/chasm/config/RuntimeConfig;Lio/github/charlietap/chasm/embedding/internal/InstanceInvoker;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+	public static final fun instantiate (Lio/github/charlietap/chasm/embedding/shapes/Store;Ljava/util/List;Lio/github/charlietap/chasm/config/RuntimeConfig;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 	public static final fun liveRuntime (Lio/github/charlietap/chasm/embedding/shapes/Store;)Lio/github/charlietap/chasm/runtime/store/Store;
 	public static final fun runtimeImports (Lio/github/charlietap/chasm/embedding/shapes/Store;Ljava/util/List;)Ljava/util/List;
-	public static final fun wrapInstantiationResult-wRDtxRA (Ljava/lang/Object;Lio/github/charlietap/chasm/config/RuntimeConfig;Lio/github/charlietap/chasm/embedding/shapes/Store;ILio/github/charlietap/chasm/embedding/internal/InstanceInvoker;Lkotlin/jvm/functions/Function1;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+	public static final fun wrapInstantiationResult-agpoxn0 (Ljava/lang/Object;Lio/github/charlietap/chasm/config/RuntimeConfig;Lio/github/charlietap/chasm/embedding/shapes/Store;ILkotlin/jvm/functions/Function1;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 }
 
 public final class io/github/charlietap/chasm/embedding/memory/GrowMemoryKt {

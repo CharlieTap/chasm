@@ -1,10 +1,14 @@
+@file:OptIn(InternalChasmApi::class)
+
 package io.github.charlietap.chasm.compiler.backend.chasm
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.cir.CirModule
 import io.github.charlietap.chasm.compiler.backend.chasm.link.LinkContext
 import io.github.charlietap.chasm.compiler.backend.chasm.link.PendingWasmCall
 import io.github.charlietap.chasm.compiler.backend.chasm.link.createLinkContext
+import io.github.charlietap.chasm.executor.invoker.thread.Interpreter
 import io.github.charlietap.chasm.parallel.EarliestFailure
 import io.github.charlietap.chasm.parallel.ParallelPlatform
 import io.github.charlietap.chasm.parallel.ParallelTaskExecutor
@@ -79,6 +83,7 @@ internal suspend fun ParallelModuleLinker(
     }
     parallelLinking.failures.error?.let { failure -> throw failure }
     programInstaller(store.program, context, plan, pendingWasmCalls)
+    store.interpreter = Interpreter
 }
 
 private class ParallelLinking(

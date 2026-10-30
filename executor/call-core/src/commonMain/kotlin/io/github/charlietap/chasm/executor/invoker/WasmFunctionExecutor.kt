@@ -9,77 +9,53 @@ import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.executor.invoker.thread.ThreadInvocation
 import io.github.charlietap.chasm.executor.invoker.thread.traceableTrap
 import io.github.charlietap.chasm.gc.GuestHeapOutOfMemoryException
-import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.runtime.ext.function
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
-import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.program.EXIT_IP
 import io.github.charlietap.chasm.runtime.resource.gc.GarbageCollector
 import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
 
-fun CompiledFunctionInvoker(
-    config: RuntimeConfig,
-    store: Store,
-    instance: ModuleInstance,
-    address: Address.Function,
-    values: List<ExecutionValue>,
-): Result<List<ExecutionValue>, InvocationError> = CompiledFunctionInvoker(
-    config = config,
-    store = store,
-    instance = instance,
-    function = store.function(address),
-    values = values,
-)
-
-fun CompiledFunctionInvoker(
-    config: RuntimeConfig,
-    store: Store,
-    instance: ModuleInstance,
-    function: FunctionInstance,
-    values: List<ExecutionValue>,
-): Result<List<ExecutionValue>, InvocationError> = FunctionInvoker(
-    config = config,
-    store = store,
-    instance = instance,
-    function = function,
-    values = values,
-    wasmFunctionExecutor = ::executeCompiled,
-)
-
-private fun executeCompiled(
+fun WasmFunctionExecutor(
     config: RuntimeConfig,
     store: Store,
     function: FunctionInstance.WasmFunction,
     values: List<ExecutionValue>,
+): Result<List<Long>, InvocationError> = WasmFunctionExecutor(
+    config = config,
+    store = store,
+    function = function,
+    values = values,
+    garbageCollector = ::GarbageCollector,
+)
+
+fun WasmFunctionExecutor(
+    config: RuntimeConfig,
+    store: Store,
+    function: FunctionInstance.WasmFunction,
+    values: List<ExecutionValue>,
+    garbageCollector: GarbageCollector,
 ): Result<List<Long>, InvocationError> {
-    if (function.callStrategy.compiledEntry == null) return Err(InvocationError.InterpreterUnavailable)
-    return if (config.debugInfo) {
-        ThreadInvocation(
-            config = config,
-            store = store,
-            instance = function,
-            values = values,
-            nested = null,
-            garbageCollector = ::GarbageCollector,
-            run = { entryIp, context -> runCompiledTraceable(entryIp, context) },
-            trap = { exception, vstack -> traceableTrap(store, vstack, exception) },
-        )
-    } else {
-        ThreadInvocation(
-            config = config,
-            store = store,
-            instance = function,
-            values = values,
-            nested = null,
-            garbageCollector = ::GarbageCollector,
-            run = { entryIp, context -> runCompiled(entryIp, context) },
-            trap = { exception, _ -> exception.error },
-        )
-    }
+    val interpreter = store.interpreter
+    if (interpreter == null && function.callStrategy.compiledEntry == null) return Err(InvocationError.InterpreterUnavailable)
+    return ThreadInvocation(
+        config = config,
+        store = store,
+        instance = function,
+        values = values,
+        nested = interpreter,
+        garbageCollector = garbageCollector,
+        run = { entryIp, context ->
+            when {
+                interpreter != null -> interpreter.interpret(entryIp, context)
+                config.debugInfo -> runCompiledTraceable(entryIp, context)
+                else -> runCompiled(entryIp, context)
+            }
+        },
+        trap = { exception, vstack -> if (config.debugInfo) traceableTrap(store, vstack, exception) else exception.error },
+    )
 }
 
 private fun runCompiled(

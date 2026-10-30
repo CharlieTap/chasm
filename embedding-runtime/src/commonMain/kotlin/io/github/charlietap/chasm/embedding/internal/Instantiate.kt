@@ -29,7 +29,6 @@ inline fun instantiate(
     store: Store,
     imports: List<Import>,
     config: RuntimeConfig,
-    invoker: InstanceInvoker,
     noinline trapSource: (ModuleInstance) -> TrapSource?,
     instantiator: (RuntimeConfig, RuntimeStore, List<RuntimeImport>) -> Result<ModuleInstance, ModuleTrapError>,
 ): ChasmResult<Instance, ChasmError.ExecutionError> {
@@ -40,7 +39,7 @@ inline fun instantiate(
     val firstFunctionAddress = runtime.functions.size
     val effectiveConfig = config.withStoreSettings(runtime.config)
     val result = instantiator(effectiveConfig, runtime, runtimeImports(store, imports))
-    return wrapInstantiationResult(result, effectiveConfig, store, firstFunctionAddress, invoker, trapSource)
+    return wrapInstantiationResult(result, effectiveConfig, store, firstFunctionAddress, trapSource)
 }
 
 @PublishedApi
@@ -69,7 +68,6 @@ internal fun wrapInstantiationResult(
     config: RuntimeConfig,
     store: Store,
     firstFunctionAddress: Int,
-    invoker: InstanceInvoker,
     trapSource: (ModuleInstance) -> TrapSource?,
 ): ChasmResult<Instance, ChasmError.ExecutionError> =
     result
@@ -80,6 +78,5 @@ internal fun wrapInstantiationResult(
                 config = config,
                 instance = instance,
                 store = store.store,
-                invoker = invoker,
             )
         }.fold(::Success, ::Error)
