@@ -70,7 +70,7 @@ internal fun FunctionLowerer(
 ): FunctionResult {
     val declarations = module.declarations
     val frame = frameFacts(function, declarations)
-    val references = analyzeReferences(function, frame.type, frame.frameSlots, declarations, module.analysis.publishesRegisters)
+    val references = analyzeReferences(function, frame.type, frame.frameSlots, declarations, module.analysis)
     val lowering = FunctionLowering(module, function, frame, references, method)
     return try {
         val methods = try {

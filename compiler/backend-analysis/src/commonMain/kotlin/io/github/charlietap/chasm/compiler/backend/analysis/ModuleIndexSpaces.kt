@@ -38,6 +38,8 @@ class ModuleIndexSpaces(
 
     val importedFunctionCount: Int = module.imports.count { import -> import.descriptor is Import.Descriptor.Function }
 
+    val functionCount: Int = functionTypeIndices.size
+
     val memoryCount: Int = module.imports.count { import -> import.descriptor is Import.Descriptor.Memory } + module.memories.size
 
     fun isImported(

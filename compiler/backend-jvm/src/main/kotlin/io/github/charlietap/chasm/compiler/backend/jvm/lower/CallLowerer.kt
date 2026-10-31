@@ -124,7 +124,7 @@ private fun LowerContext.directCall(
     emit.load(Opcodes.ILOAD, Locals.DEPTH)
     if (takesArgumentArray(type)) pushArgumentArray(call.arguments) else pushArguments(type, call.arguments)
     emit.invokeStatic(module.functionMethod(callee))
-    afterCall(call, grows = callee.index in module.analysis.memoryGrowers)
+    afterCall(call, grows = module.analysis.mayGrowMemory[callee.index])
 }
 
 private fun LowerContext.afterCall(

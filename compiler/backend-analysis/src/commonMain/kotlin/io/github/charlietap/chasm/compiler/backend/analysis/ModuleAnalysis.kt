@@ -6,7 +6,6 @@ import io.github.charlietap.chasm.cir.CirFunction
 import io.github.charlietap.chasm.cir.CirModule
 import io.github.charlietap.chasm.cir.ControlInstruction
 import io.github.charlietap.chasm.cir.Instruction
-import io.github.charlietap.chasm.cir.MemoryInstruction
 import io.github.charlietap.chasm.compiler.backend.abi.MAX_PARAMETERS
 import io.github.charlietap.chasm.compiler.backend.abi.signatureKey
 import io.github.charlietap.chasm.type.AbstractHeapType
@@ -19,7 +18,8 @@ class ModuleAnalysis(
     val signatureTypes: Map<String, FunctionType>,
     val hasTailCalls: Boolean,
     val usesExceptions: Boolean,
-    val memoryGrowers: Set<Int>,
+    val mayGrowMemory: BooleanArray,
+    val mayCollect: BooleanArray,
     val publishesRegisters: Boolean,
 )
 
@@ -35,13 +35,15 @@ fun analyzeModule(
             signatureTypes.putIfAbsent(signatureKey(type), type)
         }
     }
+    val effects = CallEffects(code, declarations)
     return ModuleAnalysis(
         signatureTypes = signatureTypes,
         hasTailCalls = code.functions.any { function -> function.instructions.any(Instruction::isTailCall) },
         usesExceptions = code.functions.any { function ->
             function.exceptions != null || function.instructions.any(Instruction::raisesException)
         },
-        memoryGrowers = memoryGrowers(code, declarations),
+        mayGrowMemory = effects.mayGrowMemory,
+        mayCollect = effects.mayCollect,
         publishesRegisters = module.mayHoldCollectableReferences() || code.functions.any(CirFunction::catchesExceptionReference),
     )
 }
@@ -63,36 +65,6 @@ fun Instruction.isTailCall(): Boolean = this is ControlInstruction.ReturnCall ||
     this is ControlInstruction.ReturnCallRefS
 
 fun Instruction.raisesException(): Boolean = this is ControlInstruction.Throw || this is ControlInstruction.ThrowRefS
-
-private fun memoryGrowers(
-    code: CirModule,
-    declarations: ModuleIndexSpaces,
-): Set<Int> {
-    val growers = HashSet<Int>()
-    val callers = HashMap<Int, MutableList<Int>>()
-    for (function in code.functions) {
-        val index = function.index.index
-        for (instruction in function.instructions) {
-            val callee = when (instruction) {
-                is ControlInstruction.Call -> instruction.function
-                is ControlInstruction.ReturnCall -> instruction.function
-                else -> null
-            }
-            val grows = when {
-                callee != null -> declarations.isImported(callee)
-                instruction is MemoryInstruction.MemoryGrowI || instruction is MemoryInstruction.MemoryGrowS -> true
-                else -> instruction is ControlInstruction && (instruction.isTailCall() || instruction.indirectCallType(declarations) != null)
-            }
-            if (grows) growers += index
-            if (callee != null && !declarations.isImported(callee)) callers.getOrPut(callee.index) { ArrayList() } += index
-        }
-    }
-    val pending = ArrayDeque(growers)
-    while (pending.isNotEmpty()) {
-        callers[pending.removeFirst()]?.forEach { caller -> if (growers.add(caller)) pending += caller }
-    }
-    return growers
-}
 
 fun Module.mayHoldCollectableReferences(): Boolean {
     val compositeTypes = definedTypes.map { type -> type.asSubType.compositeType }

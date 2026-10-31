@@ -1,18 +1,18 @@
 package io.github.charlietap.chasm.compiler.backend.analysis
 
-internal class CopyGraph(
-    slots: Int,
+internal class PropagationGraph(
+    nodes: Int,
     sources: IntArray,
     destinations: IntArray,
 ) {
-    private val first = IntArray(slots + 1)
-    private val copiedTo = IntArray(sources.size)
+    private val first = IntArray(nodes + 1)
+    private val reaches = IntArray(sources.size)
 
     init {
         for (source in sources) first[source + 1]++
-        for (slot in 0 until slots) first[slot + 1] += first[slot]
-        val next = first.copyOf(slots)
-        for (edge in sources.indices) copiedTo[next[sources[edge]]++] = destinations[edge]
+        for (node in 0 until nodes) first[node + 1] += first[node]
+        val next = first.copyOf(nodes)
+        for (edge in sources.indices) reaches[next[sources[edge]]++] = destinations[edge]
     }
 
     fun spread(
@@ -21,11 +21,11 @@ internal class CopyGraph(
     ) {
         val pending = IntArray(marked.size)
         var count = 0
-        for (slot in marked.indices) if (marked[slot]) pending[count++] = slot
+        for (node in marked.indices) if (marked[node]) pending[count++] = node
         while (count > 0) {
-            val slot = pending[--count]
-            for (edge in first[slot] until first[slot + 1]) {
-                val destination = copiedTo[edge]
+            val node = pending[--count]
+            for (edge in first[node] until first[node + 1]) {
+                val destination = reaches[edge]
                 if (!marked[destination] && (blocked == null || !blocked[destination])) {
                     marked[destination] = true
                     pending[count++] = destination

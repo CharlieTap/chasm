@@ -163,8 +163,8 @@ fun analyzeSlotKinds(
         }
     }
 
-    val graph = CopyGraph(
-        slots = frameSlots,
+    val graph = PropagationGraph(
+        nodes = frameSlots,
         sources = IntArray(copies.size) { edge -> copies[edge].source },
         destinations = IntArray(copies.size) { edge -> copies[edge].destination },
     )
@@ -215,7 +215,7 @@ fun analyzeSlotKinds(
 private fun shadows(
     kinds: ByteArray,
     written: IntArray,
-    graph: CopyGraph,
+    graph: PropagationGraph,
     floatingHome: (Int) -> Boolean,
 ): ByteArray {
     val holdsFloat = BooleanArray(kinds.size) { slot -> written[slot] and WRITE_F32 != 0 || kinds[slot] == SlotKinds.FLOAT }

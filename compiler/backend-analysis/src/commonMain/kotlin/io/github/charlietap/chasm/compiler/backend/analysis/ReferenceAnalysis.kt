@@ -1,14 +1,7 @@
 package io.github.charlietap.chasm.compiler.backend.analysis
 
-import io.github.charlietap.chasm.cir.AggregateInstruction
 import io.github.charlietap.chasm.cir.CirFunction
-import io.github.charlietap.chasm.cir.ControlInstruction
-import io.github.charlietap.chasm.cir.Instruction
-import io.github.charlietap.chasm.cir.MemoryInstruction
-import io.github.charlietap.chasm.cir.ReferenceInstruction
-import io.github.charlietap.chasm.cir.TableInstruction
 import io.github.charlietap.chasm.compiler.backend.analysis.form.Operand
-import io.github.charlietap.chasm.compiler.backend.analysis.form.access
 import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.chasm.type.ValueType
 
@@ -27,9 +20,9 @@ fun analyzeReferences(
     type: FunctionType,
     frameSlots: Int,
     declarations: ModuleIndexSpaces,
-    publishesRegisters: Boolean,
+    analysis: ModuleAnalysis,
 ): References {
-    if (!publishesRegisters) return References(IntArray(0), writesThrough = false, frameSlots)
+    if (!analysis.publishesRegisters) return References(IntArray(0), writesThrough = false, frameSlots)
     val references = BooleanArray(frameSlots)
     function.exceptions?.regions?.forEach { region ->
         region.catches.forEach { handler -> handler.payloadSlots.forEach { references[it] = true } }
@@ -59,22 +52,14 @@ fun analyzeReferences(
         }
     }
     function.instructions.forEach { instruction -> visitSlotWrites(instruction, function, declarations, visitor) }
-    val graph = CopyGraph(
-        slots = frameSlots,
+    val graph = PropagationGraph(
+        nodes = frameSlots,
         sources = IntArray(copies.size) { edge -> (copies[edge] ushr 32).toInt() },
         destinations = IntArray(copies.size) { edge -> copies[edge].toInt() },
     )
     graph.spread(references)
     val slots = references.indices.filter { references[it] }.toIntArray()
-    val writesThrough = slots.isNotEmpty() && function.instructions.any(Instruction::mayCollect)
+    val writesThrough = slots.isNotEmpty() &&
+        function.instructions.any { instruction -> instruction.mayCollectWhileFrameLive(analysis.mayCollect) }
     return References(slots, writesThrough, frameSlots)
-}
-
-fun Instruction.mayCollect(): Boolean = when (this) {
-    is ControlInstruction.Call, is ControlInstruction.CallIndirectI, is ControlInstruction.CallIndirectS,
-    is ControlInstruction.CallRefS, is ControlInstruction.Throw, is ControlInstruction.ThrowRefS,
-    is AggregateInstruction, is TableInstruction, is ReferenceInstruction,
-    -> true
-    is MemoryInstruction -> access() == null
-    else -> false
 }
