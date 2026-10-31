@@ -19,6 +19,7 @@ import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
 import org.gradle.jvm.tasks.Jar
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 import org.jetbrains.kotlin.konan.target.HostManager
 import javax.inject.Inject
@@ -31,18 +32,20 @@ class JvmFunctionalTestConventionsPlugin @Inject constructor(
             configureJvmProjectRepository(project)
         }
         project.pluginManager.withPlugin("org.jetbrains.kotlin.multiplatform") {
-            project.extensions
-                .getByType<KotlinMultiplatformExtension>()
-                .targets
+            val kotlin = project.extensions.getByType<KotlinMultiplatformExtension>()
+            kotlin.targets
                 .withType<KotlinJvmTarget>()
                 .matching { target -> target.name == JVM_TARGET_NAME }
                 .configureEach {
-                    configureFunctionalTestRepository(project)
+                    configureFunctionalTestRepository(project, kotlin)
                 }
         }
     }
 
-    private fun configureFunctionalTestRepository(project: Project) {
+    private fun configureFunctionalTestRepository(
+        project: Project,
+        kotlin: KotlinMultiplatformExtension,
+    ) {
         val publicationGroup = project.group.toString()
         val publicationVersion = project.version.toString()
 
@@ -67,7 +70,8 @@ class JvmFunctionalTestConventionsPlugin @Inject constructor(
             )
         }
 
-        val generatedPomTaskName = if (HostManager.hostIsSupported) {
+        val publishesTargets = HostManager.hostIsSupported || kotlin.targets.withType<KotlinNativeTarget>().isEmpty()
+        val generatedPomTaskName = if (publishesTargets) {
             GENERATE_JVM_POM_TASK_NAME
         } else {
             val component = softwareComponentFactory.adhoc(FUNCTIONAL_TEST_JVM_PUBLICATION_NAME)
@@ -127,7 +131,7 @@ class JvmFunctionalTestConventionsPlugin @Inject constructor(
         generatedPom.builtBy(generatedPomTaskName)
         project.tasks.withType<GenerateMavenPom>().configureEach {
             if (name == generatedPomTaskName) {
-                generatedPom.from(destination)
+                generatedPom.from(outputs.files)
             }
         }
 
