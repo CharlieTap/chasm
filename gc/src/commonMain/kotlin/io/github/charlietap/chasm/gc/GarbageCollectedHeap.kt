@@ -1370,8 +1370,10 @@ class GarbageCollectedHeap(
         length: Int,
         index: Int,
     ) {
-        require(index in 0 until length) { "array element index is out of bounds" }
+        if (index < 0 || index >= length) elementIndexOutOfBounds()
     }
+
+    private fun elementIndexOutOfBounds(): Nothing = throw IllegalArgumentException("array element index is out of bounds")
 
     private fun requireRange(
         total: Int,
@@ -1379,13 +1381,12 @@ class GarbageCollectedHeap(
         length: Int,
         rangeName: String,
     ) {
-        require(
-            offset >= 0 &&
-                length >= 0 &&
-                offset <= total &&
-                length <= total - offset,
-        ) { "$rangeName range is out of bounds" }
+        if (offset < 0 || length < 0 || offset > total || length > total - offset) rangeOutOfBounds(rangeName)
     }
+
+    private fun rangeOutOfBounds(
+        rangeName: String,
+    ): Nothing = throw IllegalArgumentException("$rangeName range is out of bounds")
 
     private fun requireDataRange(
         sourceSize: Int,
