@@ -45,6 +45,26 @@ class RootFrameTest {
         assertEquals(listOf(I32(42)), run("survives_collection_beneath_ref_tail_call"))
     }
 
+    @Test
+    fun `a reference written after a collection survives the next one reached through a loop`() {
+        assertEquals(listOf(I32(3)), run("survives_collection_across_a_back_edge"))
+    }
+
+    @Test
+    fun `a reference written in a try region survives a collection in its handler`() {
+        assertEquals(listOf(I32(42)), run("survives_collection_in_a_handler"))
+    }
+
+    @Test
+    fun `a reference written in a nested try region survives a collection in an enclosing handler`() {
+        assertEquals(listOf(I32(42)), run("survives_collection_in_an_enclosing_handler"))
+    }
+
+    @Test
+    fun `a reference passed to a self tail call survives the collection at the function's start`() {
+        assertEquals(listOf(I32(1)), run("survives_collection_after_a_self_tail_call"))
+    }
+
     private fun run(
         export: String,
     ): List<Any> {

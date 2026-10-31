@@ -10,6 +10,7 @@ import io.github.charlietap.chasm.compiler.backend.abi.TAIL_CALL_INDIRECT
 import io.github.charlietap.chasm.compiler.backend.abi.TAIL_CALL_REF
 import io.github.charlietap.chasm.compiler.backend.analysis.form.Operand
 import io.github.charlietap.chasm.compiler.backend.analysis.form.tailCallArguments
+import io.github.charlietap.chasm.compiler.backend.analysis.isSelfTailCall
 import io.github.charlietap.chasm.type.FunctionType
 import org.objectweb.asm.Opcodes
 
@@ -19,7 +20,7 @@ internal fun LowerContext.lowerTailCall(
     val arguments = checkNotNull(instruction.tailCallArguments())
     when (instruction) {
         is ControlInstruction.ReturnCall -> {
-            if (instruction.function == function.index && regionAt(position) < 0) return selfTailCall(arguments)
+            if (instruction.isSelfTailCall(function, regionAt(position))) return selfTailCall(arguments)
             requestTailCall(arguments, instruction.function.let { callee -> declarations.functionType(callee) }) {
                 pushResource(Resource.Function(instruction.function.index))
                 TAIL_CALL

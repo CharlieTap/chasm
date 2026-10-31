@@ -139,6 +139,22 @@
     (drop (call $tail_alloc (local.get $box)))
     (struct.get $box 0 (local.get $box)))
 
+  ;; A copy before the call, which a collection follows, and one after it, which none does.
+  (func $copies_around_call (export "copies_around_call") (param $first (ref $box)) (param $second (ref $box)) (result i32)
+    (local $box (ref null $box))
+    (local.set $box (local.get $first))
+    (call $host)
+    (local.set $box (local.get $second))
+    (struct.get $box 0 (ref.as_non_null (local.get $box))))
+
+  ;; The same, but with the first copy after the call too.
+  (func $copies_after_call (export "copies_after_call") (param $first (ref $box)) (param $second (ref $box)) (result i32)
+    (local $box (ref null $box))
+    (call $host)
+    (local.set $box (local.get $first))
+    (local.set $box (local.get $second))
+    (struct.get $box 0 (ref.as_non_null (local.get $box))))
+
   ;; Memory growth, directly and through calls.
   (func $grows (export "grows") (result i32)
     (memory.grow (i32.const 1)))

@@ -60,6 +60,8 @@ internal class LowerContext(
 
     var position = SlotKinds.PROLOGUE
 
+    var publishesWrites = true
+
     private val firstPosition = chunk?.start ?: 0
 
     private val labels = arrayOfNulls<Label>((chunk?.end ?: function.instructions.size) - firstPosition + 1)

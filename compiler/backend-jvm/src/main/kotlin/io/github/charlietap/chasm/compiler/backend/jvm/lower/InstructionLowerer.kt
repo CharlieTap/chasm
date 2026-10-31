@@ -33,14 +33,18 @@ internal fun lowerInstruction(
 internal fun LowerContext.lowerFunctionBody(
     frameCost: Int,
 ) {
+    val publication = references.publication
+    publishesWrites = publication.afterEntry
     lowerPrologue(frameCost)
     function.instructions.forEachIndexed { position, instruction ->
         this.position = position
+        publishesWrites = publication.requiresPublicationAfter(position)
         val label = placement(position)
         emit.place(label)
         if (module.options.lineNumbers) emit.line(position + 1, label)
         lowerInstruction(instruction, this)
     }
+    publishesWrites = true
     emit.place(bodyEnd)
     trapUnreachable()
     lowerExceptionHandling()

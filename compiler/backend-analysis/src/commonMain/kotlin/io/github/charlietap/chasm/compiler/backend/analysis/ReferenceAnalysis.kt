@@ -9,6 +9,7 @@ class References(
     val slots: IntArray,
     val writesThrough: Boolean,
     frameSlots: Int,
+    val publication: RootPublication = RootPublication.EVERY_WRITE,
 ) {
     val isReference = BooleanArray(frameSlots).also { flags -> slots.forEach { flags[it] = true } }
 
@@ -61,5 +62,6 @@ fun analyzeReferences(
     val slots = references.indices.filter { references[it] }.toIntArray()
     val writesThrough = slots.isNotEmpty() &&
         function.instructions.any { instruction -> instruction.mayCollectWhileFrameLive(analysis.mayCollect) }
-    return References(slots, writesThrough, frameSlots)
+    if (!writesThrough) return References(slots, writesThrough = false, frameSlots)
+    return References(slots, writesThrough = true, frameSlots, analyzeRootPublication(function, analysis.mayCollect))
 }

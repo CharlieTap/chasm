@@ -201,7 +201,7 @@ private fun LowerContext.storeOwnLong(
         }
         else -> {
             emit.store(Opcodes.LSTORE, local)
-            if (references.writesThrough && references.isReference[slot]) publish(slot)
+            if (references.writesThrough && references.isReference[slot] && publishesWrites) publish(slot)
         }
     }
 }

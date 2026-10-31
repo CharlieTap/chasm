@@ -2,6 +2,8 @@ package io.github.charlietap.chasm.compiler.backend.jvm
 
 import com.github.michaelbull.result.getOrThrow
 import io.github.charlietap.chasm.ast.module.Export
+import io.github.charlietap.chasm.compiler.backend.abi.BRIDGE_CALL
+import io.github.charlietap.chasm.compiler.backend.abi.FRAME
 import io.github.charlietap.chasm.compiler.backend.abi.MethodRef
 import io.github.charlietap.chasm.compiler.backend.abi.OPEN_ROOTS
 import io.github.charlietap.chasm.compiler.frontend.ModuleCompiler
@@ -13,6 +15,7 @@ import org.objectweb.asm.tree.MethodInsnNode
 import org.objectweb.asm.tree.MethodNode
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class RootFramesTest {
 
@@ -35,6 +38,24 @@ class RootFramesTest {
     @Test
     fun `a tail call to a function that collects needs no root frame in the caller`() {
         listOf("tail_alloc", "tail_indirect", "tail_ref").forEach { name -> assertEquals(false, opensRoots(name), name) }
+    }
+
+    @Test
+    fun `a reference written before a call is published and one written after the last call is not`() {
+        val (aroundBefore, aroundAfter) = publicationsAroundCall("copies_around_call")
+        val (afterBefore, afterAfter) = publicationsAroundCall("copies_after_call")
+
+        assertEquals(afterBefore + 1, aroundBefore)
+        assertEquals(0, aroundAfter)
+        assertEquals(0, afterAfter)
+    }
+
+    private fun publicationsAroundCall(
+        name: String,
+    ): Pair<Int, Int> {
+        val calls = checkNotNull(methods[name]).instructions.filterIsInstance<MethodInsnNode>()
+        val bridge = calls.indexOfLast { call -> call.invokes(BRIDGE_CALL) }
+        return calls.take(bridge).count { call -> call.invokes(FRAME) } to calls.drop(bridge + 1).count { call -> call.invokes(FRAME) }
     }
 
     private fun opensRoots(
