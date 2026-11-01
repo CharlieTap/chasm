@@ -13,6 +13,7 @@ import io.github.charlietap.chasm.aot.instance
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.embedding.error.ChasmError
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
+import io.github.charlietap.chasm.embedding.shapes.Export
 import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.Instance
 import io.github.charlietap.chasm.embedding.shapes.Store
@@ -20,6 +21,8 @@ import io.github.charlietap.chasm.runtime.value.ExecutionValue
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.io.OutputStream
+import io.github.charlietap.chasm.embedding.exports as embeddingExports
+import io.github.charlietap.chasm.embedding.gc as embeddingGc
 import io.github.charlietap.chasm.embedding.invoke as embeddingInvoke
 
 class AotEngine : Engine {
@@ -49,6 +52,14 @@ class AotEngine : Engine {
         name: String,
         arguments: List<ExecutionValue>,
     ): ChasmResult<List<ExecutionValue>, ChasmError> = embeddingInvoke(store, instance, name, arguments)
+
+    override fun exports(
+        instance: Instance,
+    ): List<Export> = embeddingExports(instance)
+
+    override fun gc(
+        store: Store,
+    ): ChasmResult<Unit, ChasmError> = embeddingGc(store)
 
     private companion object {
         const val PACKAGE_NAME = "io.github.charlietap.chasm.integration.compiled"

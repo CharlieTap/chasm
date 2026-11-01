@@ -4,6 +4,7 @@ import io.github.charlietap.chasm.config.GCStrategy
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.embedding.error.ChasmError
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
+import io.github.charlietap.chasm.embedding.shapes.Export
 import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.store
@@ -35,4 +36,8 @@ fun TestScope.invoke(
         name = name,
         arguments = arguments,
     )
+}
+
+fun TestScope.exports(): ChasmResult<List<Export>, ChasmError> {
+    return runner().exports()
 }

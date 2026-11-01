@@ -1,21 +1,15 @@
-@file:OptIn(InternalChasmApi::class)
+package io.github.charlietap.chasm.integration.test
 
-package io.github.charlietap.chasm.integration
-
-import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.embedding.function
 import io.github.charlietap.chasm.embedding.global
 import io.github.charlietap.chasm.embedding.memory
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Import
-import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.store
 import io.github.charlietap.chasm.embedding.table
 import io.github.charlietap.chasm.embedding.tag
 import io.github.charlietap.chasm.fixture.type.constMutability
-import io.github.charlietap.chasm.fixture.type.definedType
 import io.github.charlietap.chasm.fixture.type.exceptionAttribute
-import io.github.charlietap.chasm.fixture.type.functionRecursiveType
 import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.fixture.type.globalType
 import io.github.charlietap.chasm.fixture.type.i32AddressType
@@ -27,18 +21,19 @@ import io.github.charlietap.chasm.fixture.type.resultType
 import io.github.charlietap.chasm.fixture.type.tableType
 import io.github.charlietap.chasm.fixture.type.tagType
 import io.github.charlietap.chasm.host.HostFunction
+import io.github.charlietap.chasm.integration.integrationTest
+import io.github.charlietap.chasm.integration.runner
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.runtime.value.NumberValue
 import io.github.charlietap.chasm.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.type.AbstractHeapType
-import io.github.charlietap.chasm.type.RecursiveType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class ImportTest {
 
     @Test
-    fun `can run a wasm file with all types of import and return a correct result`() {
+    fun `can run a wasm file with all types of import and return a correct result`() = integrationTest(FIXTURE) {
 
         val store = store()
 
@@ -93,25 +88,24 @@ class ImportTest {
             tagExternal,
         )
 
-        val result = testRunner(
-            fileName = "import.wasm",
-            fileDirectory = FILE_DIR,
-            store = store,
-            imports = listOf(
-                functionImport,
-                globalImport,
-                memoryImport,
-                tableImport,
-                tagImport,
-            ),
+        val imports = listOf(
+            functionImport,
+            globalImport,
+            memoryImport,
+            tableImport,
+            tagImport,
+        )
+
+        val result = runner(store, imports).invoke(
+            name = "import",
         )
 
         val expected = emptyList<ExecutionValue>()
 
-        assertEquals(ChasmResult.Success(expected), result)
+        assertEquals(ChasmResult.Success(expected), result, engine.name())
     }
 
-    companion object {
-        private const val FILE_DIR = "integration/"
+    private companion object {
+        const val FIXTURE = "import"
     }
 }

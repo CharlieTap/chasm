@@ -1,25 +1,18 @@
-package io.github.charlietap.chasm.integration
+package io.github.charlietap.chasm.integration.test
 
-import com.goncalossilva.resources.Resource
 import io.github.charlietap.chasm.embedding.dsl.imports
-import io.github.charlietap.chasm.embedding.instance
-import io.github.charlietap.chasm.embedding.module
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
-import io.github.charlietap.chasm.embedding.shapes.flatMap
 import io.github.charlietap.chasm.embedding.store
-import io.github.charlietap.chasm.embedding.validate
-import io.github.charlietap.chasm.fake.decoder.FakeSourceReader
+import io.github.charlietap.chasm.integration.integrationTest
+import io.github.charlietap.chasm.integration.runner
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
 import kotlin.test.Test
-import kotlin.test.assertIs
+import kotlin.test.assertEquals
 
 class WehTest {
 
     @Test
-    fun `can instantiate the weh demo`() {
-
-        val byteStream = Resource(FILE_DIR + "weh.wasm").readBytes()
-        val reader = FakeSourceReader(byteStream)
+    fun `can run a function from the weh demo`() = integrationTest(FIXTURE) {
 
         val store = store()
         val imports = imports(store) {
@@ -281,18 +274,14 @@ class WehTest {
             }
         }
 
-        val actual = module(reader)
-            .flatMap { module ->
-                validate(module)
-            }
-            .flatMap { module ->
-                instance(store, module, imports)
-            }
+        val actual = runner(store, imports).invoke(
+            name = "dummy",
+        )
 
-        assertIs<ChasmResult.Success<List<ExecutionValue>>>(actual)
+        assertEquals(ChasmResult.Success(emptyList<ExecutionValue>()), actual, engine.name())
     }
 
-    companion object {
-        private const val FILE_DIR = "integration/"
+    private companion object {
+        const val FIXTURE = "weh"
     }
 }

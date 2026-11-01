@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.integration
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.embedding.error.ChasmError
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
+import io.github.charlietap.chasm.embedding.shapes.Export
 import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.Instance
 import io.github.charlietap.chasm.embedding.shapes.Store
@@ -25,6 +26,14 @@ interface Engine {
         name: String,
         arguments: List<ExecutionValue>,
     ): ChasmResult<List<ExecutionValue>, ChasmError>
+
+    fun exports(
+        instance: Instance,
+    ): List<Export>
+
+    fun gc(
+        store: Store,
+    ): ChasmResult<Unit, ChasmError>
 }
 
 expect val engines: Set<Engine>
