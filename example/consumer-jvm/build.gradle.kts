@@ -11,6 +11,10 @@ plugins {
     alias(libs.plugins.conventions.linting)
 }
 
+kotlin {
+    jvmToolchain(libs.versions.java.compiler.version.get().toInt())
+}
+
 chasm {
     modules {
         create("TestService") {

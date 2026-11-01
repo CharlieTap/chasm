@@ -83,6 +83,7 @@ chasm {
 }
 
 kotlin {
+    jvmToolchain(libs.versions.java.compiler.version.get().toInt())
     jvm()
     js {
         nodejs()
