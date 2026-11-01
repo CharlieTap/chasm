@@ -3,12 +3,6 @@ plugins {
     `java-gradle-plugin`
 }
 
-repositories {
-    mavenCentral()
-    gradlePluginPortal()
-    google()
-}
-
 dependencies {
     implementation(libs.dokka.gradle.plugin)
     implementation(libs.gradle.maven.publish.plugin)

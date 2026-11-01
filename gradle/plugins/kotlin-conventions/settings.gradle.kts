@@ -1,4 +1,15 @@
 dependencyResolutionManagement {
+    repositoriesMode = RepositoriesMode.FAIL_ON_PROJECT_REPOS
+    repositories {
+        google {
+            content {
+                includeGroupByRegex("androidx(\\..*)?")
+                includeGroupByRegex("com\\.android(\\..*)?")
+                includeGroup("com.google.testing.platform")
+            }
+        }
+        mavenCentral()
+    }
     versionCatalogs {
         create("libs") {
             from(files("../../libs.versions.toml"))

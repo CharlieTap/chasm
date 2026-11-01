@@ -9,12 +9,6 @@ plugins {
 group = "io.github.charlietap.corpus"
 version = libs.versions.plugin.version.name.get()
 
-repositories {
-    gradlePluginPortal()
-    google()
-    mavenCentral()
-}
-
 kotlin {
     jvmToolchain {
         languageVersion.set(JavaLanguageVersion.of(libs.versions.java.compiler.version.get().toInt()))

@@ -1,7 +1,13 @@
 pluginManagement {
     repositories {
         gradlePluginPortal()
-        google()
+        google {
+            content {
+                includeGroupByRegex("androidx(\\..*)?")
+                includeGroupByRegex("com\\.android(\\..*)?")
+                includeGroup("com.google.testing.platform")
+            }
+        }
         mavenCentral()
     }
 
@@ -29,11 +35,14 @@ develocity {
 
 dependencyResolutionManagement {
     repositories {
-        gradlePluginPortal()
-        google()
+        google {
+            content {
+                includeGroupByRegex("androidx(\\..*)?")
+                includeGroupByRegex("com\\.android(\\..*)?")
+                includeGroup("com.google.testing.platform")
+            }
+        }
         mavenCentral()
-        mavenLocal()
-        maven(url = "https://jitpack.io" )
     }
 }
 

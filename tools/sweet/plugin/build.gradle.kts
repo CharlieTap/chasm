@@ -6,11 +6,6 @@ plugins {
     alias(libs.plugins.conventions.linting)
 }
 
-repositories {
-    gradlePluginPortal()
-    mavenCentral()
-}
-
 kotlin {
     jvmToolchain {
         languageVersion.set(JavaLanguageVersion.of(libs.versions.java.compiler.version.get().toInt()))

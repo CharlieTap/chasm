@@ -1,7 +1,13 @@
 pluginManagement {
     repositories {
         gradlePluginPortal()
-        google()
+        google {
+            content {
+                includeGroupByRegex("androidx(\\..*)?")
+                includeGroupByRegex("com\\.android(\\..*)?")
+                includeGroup("com.google.testing.platform")
+            }
+        }
         mavenCentral()
     }
 
@@ -14,11 +20,16 @@ plugins {
 }
 
 dependencyResolutionManagement {
+    repositoriesMode = RepositoriesMode.FAIL_ON_PROJECT_REPOS
     repositories {
-        google()
+        google {
+            content {
+                includeGroupByRegex("androidx(\\..*)?")
+                includeGroupByRegex("com\\.android(\\..*)?")
+                includeGroup("com.google.testing.platform")
+            }
+        }
         mavenCentral()
-        mavenLocal()
-        maven(url = "https://jitpack.io")
     }
     versionCatalogs {
         create("libs") {
