@@ -26,7 +26,6 @@ kotlin {
             dependencies {
                 implementation(projects.host)
                 implementation(projects.test.fixture.runtime)
-                implementation(projects.test.fixture.ast)
             }
         }
     }

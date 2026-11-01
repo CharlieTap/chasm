@@ -20,16 +20,13 @@ kotlin {
                 api(libs.result)
 
                 implementation(projects.memory)
-                implementation(projects.host)
-                implementation(projects.runtime.resources)
-                implementation(projects.libs.sse2)
             }
         }
 
         commonTest {
             dependencies {
+                implementation(projects.host)
                 implementation(projects.test.fixture.runtime)
-                implementation(projects.test.fixture.ast)
             }
         }
     }

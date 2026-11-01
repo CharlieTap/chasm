@@ -26,12 +26,6 @@ kotlin {
                 implementation(projects.host)
             }
         }
-
-        jvmTest {
-            dependencies {
-                implementation(projects.test.fixture.runtime)
-            }
-        }
     }
 }
 

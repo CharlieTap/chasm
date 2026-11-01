@@ -24,7 +24,6 @@ kotlin {
         commonTest {
             dependencies {
                 implementation(projects.test.fixture.ast)
-                implementation(projects.test.fixture.config)
 
                 implementation(libs.kotlinx.coroutines.test)
             }

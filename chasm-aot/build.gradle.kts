@@ -54,8 +54,6 @@ kotlin {
                 implementation(projects.runtime.compiled)
 
                 implementation(projects.executor.instantiator)
-                implementation(projects.executor.callCore)
-                implementation(projects.runtime.address)
                 implementation(projects.runtime.core)
 
                 implementation(libs.result)
@@ -69,6 +67,7 @@ kotlin {
                 implementation(projects.compiler.frontend)
                 implementation(projects.decoder)
                 implementation(projects.module)
+                implementation(projects.runtime.address)
                 implementation(projects.validator)
 
                 implementation(libs.asm.util)

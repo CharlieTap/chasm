@@ -71,11 +71,8 @@ kotlin {
                 implementation(projects.decoder)
                 implementation(projects.executor.instantiator)
                 implementation(projects.executor.invoker)
-                implementation(projects.memory)
                 implementation(projects.module)
                 implementation(projects.runtime.core)
-                implementation(projects.runtime.address)
-                implementation(projects.runtime.resources)
                 implementation(projects.typeSystem)
                 implementation(projects.validator)
 
@@ -85,6 +82,8 @@ kotlin {
 
         commonTest {
             dependencies {
+                implementation(projects.memory)
+                implementation(projects.runtime.address)
                 implementation(projects.test.fake.decoder)
                 implementation(projects.test.fixture.ast)
                 implementation(projects.test.fixture.chasm)
