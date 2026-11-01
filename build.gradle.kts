@@ -15,6 +15,7 @@ plugins {
     alias(libs.plugins.conventions.gradle.plugin) apply false
     alias(libs.plugins.conventions.publishing) apply false
     alias(libs.plugins.conventions.linting) apply false
+    alias(libs.plugins.conventions.sweet) apply false
     alias(libs.plugins.conventions.versions)
 }
 

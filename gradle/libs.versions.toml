@@ -97,6 +97,7 @@ conventions-jvm-functional-test = { id = "jvm-functional-test-conventions" }
 conventions-linting  = { id = "linting-conventions" }
 conventions-publishing  = { id = "publishing-conventions" }
 conventions-versions  = { id = "versions-conventions" }
+conventions-sweet = { id = "sweet-conventions" }
 
 [libraries]
 
