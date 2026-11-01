@@ -36,14 +36,6 @@ kotlin {
             }
         }
     }
-
-    sourceSets {
-        commonTest {
-            dependencies {
-                implementation(libs.kotlin.test)
-            }
-        }
-    }
 }
 
 tasks.withType<KotlinNativeCompile>().configureEach {

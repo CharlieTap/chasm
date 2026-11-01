@@ -19,11 +19,5 @@ kotlin {
                 implementation(libs.kotlinx.test.resources)
             }
         }
-
-        commonTest {
-            dependencies {
-                implementation(libs.kotlin.test)
-            }
-        }
     }
 }

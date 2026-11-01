@@ -39,7 +39,5 @@ kotlin {
         implementation(projects.stream)
         implementation(projects.validator)
         implementation(libs.result)
-
-        testImplementation(libs.kotlin.test)
     }
 }

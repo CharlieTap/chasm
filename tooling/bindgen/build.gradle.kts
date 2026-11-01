@@ -30,7 +30,6 @@ kotlin {
         api(projects.embeddingApi)
         api(libs.kotlin.poet)
 
-        testImplementation(libs.kotlin.test)
         testImplementation(libs.kotlinx.test.resources)
         testImplementation(projects.test.fixture.chasm)
     }

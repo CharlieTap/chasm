@@ -11,12 +11,6 @@ kotlin {
     }
 
     sourceSets {
-        commonTest {
-            dependencies {
-                implementation(libs.kotlin.test)
-            }
-        }
-
         jvmMain {
             dependencies {
                 implementation(libs.jna)

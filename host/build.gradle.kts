@@ -14,14 +14,6 @@ kotlin {
 
     @OptIn(ExperimentalAbiValidation::class)
     abiValidation()
-
-    sourceSets {
-        commonTest {
-            dependencies {
-                implementation(libs.kotlin.test)
-            }
-        }
-    }
 }
 
 configure<PublishingConventionsExtension> {

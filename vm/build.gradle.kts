@@ -84,7 +84,6 @@ kotlin {
 
         getByName("commonTest") {
             dependencies {
-                implementation(libs.kotlin.test)
                 implementation(libs.kotlinx.test.resources)
             }
         }

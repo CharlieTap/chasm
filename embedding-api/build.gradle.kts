@@ -23,12 +23,6 @@ kotlin {
                 api(projects.typeSystem)
             }
         }
-
-        commonTest {
-            dependencies {
-                implementation(libs.kotlin.test)
-            }
-        }
     }
 }
 

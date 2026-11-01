@@ -17,12 +17,6 @@ kotlin {
             }
         }
 
-        commonTest {
-            dependencies {
-                implementation(libs.kotlin.test)
-            }
-        }
-
         nativeMain {
             dependencies {
                 implementation(projects.libs.mmap)

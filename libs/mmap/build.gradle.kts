@@ -19,12 +19,6 @@ kotlin {
     applyDefaultHierarchyTemplate()
 
     sourceSets {
-        commonTest {
-            dependencies {
-                implementation(libs.kotlin.test)
-            }
-        }
-
         val nativeMain = getByName("nativeMain")
         val appleMain = getByName("appleMain")
         val linuxMain = getByName("linuxMain")

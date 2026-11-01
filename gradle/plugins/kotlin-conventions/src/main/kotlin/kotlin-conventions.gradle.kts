@@ -1,9 +1,11 @@
 import org.gradle.accessors.dm.LibrariesForLibs
+import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.compile.JavaCompile
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
@@ -44,6 +46,7 @@ plugins.withId("org.jetbrains.kotlin.jvm") {
     tasks.withType<JavaCompile>().configureEach {
         targetBytecodeVersion(conventions.jvmBytecodeVersion)
     }
+    dependencies.add(JavaPlugin.TEST_IMPLEMENTATION_CONFIGURATION_NAME, libs.kotlin.test)
 }
 
 plugins.withId("org.jetbrains.kotlin.multiplatform") {
@@ -53,6 +56,11 @@ plugins.withId("org.jetbrains.kotlin.multiplatform") {
         }
         targets.withType<KotlinJvmTarget>().configureEach {
             targetBytecodeVersion(conventions.jvmBytecodeVersion)
+        }
+        sourceSets.named(KotlinSourceSet.COMMON_TEST_SOURCE_SET_NAME) {
+            dependencies {
+                implementation(libs.kotlin.test)
+            }
         }
     }
 }

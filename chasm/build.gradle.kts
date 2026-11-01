@@ -149,7 +149,6 @@ kotlin {
                 implementation(projects.test.fixture.config)
                 implementation(projects.test.fixture.runtime)
 
-                implementation(libs.kotlin.test)
                 implementation(libs.kotlinx.coroutines.test)
                 implementation(libs.kotlinx.test.resources)
                 implementation(libs.sweet.lib)

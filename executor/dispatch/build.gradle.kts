@@ -30,7 +30,6 @@ kotlin {
             dependencies {
                 implementation(projects.test.fixture.runtime)
                 implementation(projects.test.fixture.ast)
-                implementation(libs.kotlin.test)
             }
         }
     }

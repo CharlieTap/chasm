@@ -133,7 +133,6 @@ kotlin {
 
                 implementation(libs.asm.util)
                 implementation(libs.corpus.lib)
-                implementation(libs.kotlin.test)
                 implementation(libs.kotlinx.io.core)
                 implementation(libs.kotlinx.serialization)
                 implementation(libs.sweet.lib)

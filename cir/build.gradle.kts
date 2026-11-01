@@ -14,8 +14,6 @@ kotlin {
         commonTest {
             dependencies {
                 implementation(projects.test.fixture.cir)
-
-                implementation(libs.kotlin.test)
             }
         }
     }

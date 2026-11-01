@@ -22,7 +22,6 @@ kotlin {
         testImplementation(projects.decoder)
         testImplementation(projects.module)
         testImplementation(projects.validator)
-        testImplementation(libs.kotlin.test)
         testImplementation(libs.result)
     }
 }

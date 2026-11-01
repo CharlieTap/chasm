@@ -26,7 +26,6 @@ kotlin {
                 implementation(projects.test.fixture.ast)
                 implementation(projects.test.fixture.config)
 
-                implementation(libs.kotlin.test)
                 implementation(libs.kotlinx.coroutines.test)
             }
         }

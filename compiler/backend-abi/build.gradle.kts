@@ -21,7 +21,6 @@ kotlin {
         jvmTest {
             dependencies {
                 implementation(projects.runtime.compiled)
-                implementation(libs.kotlin.test)
             }
         }
     }

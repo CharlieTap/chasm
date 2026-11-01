@@ -16,12 +16,6 @@ kotlin {
                 implementation(projects.runtime.value)
             }
         }
-
-        commonTest {
-            dependencies {
-                implementation(libs.kotlin.test)
-            }
-        }
     }
 }
 

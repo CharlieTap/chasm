@@ -24,7 +24,6 @@ kotlin {
             dependencies {
                 implementation(projects.executor.dispatch)
                 implementation(projects.test.fixture.runtime)
-                implementation(libs.kotlin.test)
             }
         }
     }

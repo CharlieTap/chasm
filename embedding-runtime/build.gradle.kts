@@ -45,8 +45,6 @@ kotlin {
                 implementation(projects.test.fixture.config)
                 implementation(projects.test.fixture.runtime)
                 implementation(projects.test.fixture.typeSystem)
-
-                implementation(libs.kotlin.test)
             }
         }
     }

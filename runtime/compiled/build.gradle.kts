@@ -30,7 +30,6 @@ kotlin {
         jvmTest {
             dependencies {
                 implementation(projects.test.fixture.runtime)
-                implementation(libs.kotlin.test)
             }
         }
     }

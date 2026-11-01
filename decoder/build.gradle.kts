@@ -37,7 +37,6 @@ kotlin {
                 implementation(projects.test.fixture.config)
                 implementation(projects.test.fake.decoder)
 
-                implementation(libs.kotlin.test)
                 implementation(libs.kotlinx.coroutines.test)
                 implementation(libs.kotlinx.test.resources)
             }

@@ -16,12 +16,6 @@ kotlin {
                 api(libs.result)
             }
         }
-
-        commonTest {
-            dependencies {
-                implementation(libs.kotlin.test)
-            }
-        }
     }
 }
 

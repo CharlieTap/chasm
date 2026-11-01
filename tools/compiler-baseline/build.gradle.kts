@@ -31,7 +31,6 @@ kotlin {
         implementation(libs.result)
 
         testImplementation(projects.test.fixture.cir)
-        testImplementation(libs.kotlin.test)
     }
 }
 

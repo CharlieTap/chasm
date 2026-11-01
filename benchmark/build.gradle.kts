@@ -92,12 +92,6 @@ kotlin {
                 implementation(projects.tooling.compiler)
             }
         }
-
-        commonTest {
-            dependencies {
-                implementation(libs.kotlin.test)
-            }
-        }
     }
 }
 

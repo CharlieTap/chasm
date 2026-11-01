@@ -26,7 +26,6 @@ kotlin {
                 implementation(projects.compiler.frontend)
                 implementation(projects.decoder)
                 implementation(projects.validator)
-                implementation(libs.kotlin.test)
                 implementation(libs.result)
             }
         }
