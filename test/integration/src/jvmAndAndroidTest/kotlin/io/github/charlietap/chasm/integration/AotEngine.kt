@@ -14,16 +14,23 @@ import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.embedding.error.ChasmError
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Export
+import io.github.charlietap.chasm.embedding.shapes.ExternRef
 import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.Instance
+import io.github.charlietap.chasm.embedding.shapes.Memory
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.io.OutputStream
 import io.github.charlietap.chasm.embedding.exports as embeddingExports
+import io.github.charlietap.chasm.embedding.extern.createExternRef as embeddingCreateExternRef
 import io.github.charlietap.chasm.embedding.gc as embeddingGc
 import io.github.charlietap.chasm.embedding.invoke as embeddingInvoke
+import io.github.charlietap.chasm.embedding.memory.readBytes as embeddingReadBytes
+import io.github.charlietap.chasm.embedding.memory.readNullTerminatedUtf8String as embeddingReadNullTerminatedUtf8String
+import io.github.charlietap.chasm.embedding.memory.readUtf8String as embeddingReadUtf8String
+import io.github.charlietap.chasm.embedding.memory.writeUtf8String as embeddingWriteUtf8String
 
 class AotEngine : Engine {
 
@@ -60,6 +67,39 @@ class AotEngine : Engine {
     override fun gc(
         store: Store,
     ): ChasmResult<Unit, ChasmError> = embeddingGc(store)
+
+    override fun readBytes(
+        store: Store,
+        memory: Memory,
+        buffer: ByteArray,
+        memoryPointer: Int,
+        bytesToRead: Int,
+    ): ChasmResult<ByteArray, ChasmError> = embeddingReadBytes(store, memory, buffer, memoryPointer, bytesToRead)
+
+    override fun readUtf8String(
+        store: Store,
+        memory: Memory,
+        pointer: Int,
+        stringLengthInBytes: Int,
+    ): ChasmResult<String, ChasmError> = embeddingReadUtf8String(store, memory, pointer, stringLengthInBytes)
+
+    override fun readNullTerminatedUtf8String(
+        store: Store,
+        memory: Memory,
+        pointer: Int,
+    ): ChasmResult<String, ChasmError> = embeddingReadNullTerminatedUtf8String(store, memory, pointer)
+
+    override fun writeUtf8String(
+        store: Store,
+        memory: Memory,
+        pointer: Int,
+        string: String,
+    ): ChasmResult<Unit, ChasmError> = embeddingWriteUtf8String(store, memory, pointer, string)
+
+    override fun createExternRef(
+        store: Store,
+        value: Any?,
+    ): ChasmResult<ExternRef, ChasmError> = embeddingCreateExternRef(store, value)
 
     private companion object {
         const val PACKAGE_NAME = "io.github.charlietap.chasm.integration.compiled"
