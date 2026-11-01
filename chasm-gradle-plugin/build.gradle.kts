@@ -1,6 +1,11 @@
 import org.gradle.api.artifacts.MinimalExternalModuleDependency
 import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.plugin.GradlePluginApiVersion
+import org.gradle.api.file.FileCollection
+import org.gradle.api.publish.maven.MavenPublication
+import org.gradle.api.publish.maven.tasks.GenerateMavenPom
+import org.gradle.api.publish.tasks.GenerateModuleMetadata
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.testing.Test
 import org.gradle.language.base.plugins.LifecycleBasePlugin
@@ -141,30 +146,35 @@ dependencies {
     add(functionalTestRepositoryDependencies.name, projects.vm)
 }
 
+fun publicationPom(publicationName: String): FileCollection = files(
+    tasks.withType<GenerateMavenPom>().matching { task ->
+        val publication = publishing.publications.findByName(publicationName)
+        publication is MavenPublication && task.pom === publication.pom
+    },
+)
+
+fun publicationModuleMetadata(publicationName: String): FileCollection = files(
+    tasks.withType<GenerateModuleMetadata>().matching { task ->
+        task.publication.orNull?.name == publicationName
+    },
+)
+
 val minimumAgpVersion = libs.versions.minimum.android.build.tools.plugin.get()
-val functionalTestRepository = layout.buildDirectory.dir("functional-test-repository")
 val stageFunctionalTestRepository = tasks.register<Sync>("stageFunctionalTestRepository") {
     from(functionalTestRepositories)
-    into(functionalTestRepository)
+    into(layout.buildDirectory.dir("functional-test-repository"))
 }
 val pluginVersion = project.version.toString()
-val pluginRepository = layout.buildDirectory.dir("functional-test-plugin-repository")
-val pluginPom = layout.buildDirectory.file("publications/pluginMaven/pom-default.xml")
-val pluginMarkerPom = layout.buildDirectory.file(
-    "publications/chasm-gradle-pluginPluginMarkerMaven/pom-default.xml",
-)
-val pluginModuleMetadata = layout.buildDirectory.file("publications/pluginMaven/module.json")
+val pluginPom = publicationPom("pluginMaven")
+val pluginMarkerPom = publicationPom("chasm-gradle-pluginPluginMarkerMaven")
+val pluginModuleMetadata = publicationModuleMetadata("pluginMaven")
 val pluginArtifactPath = "${project.group.toString().replace('.', '/')}/${project.name}/$pluginVersion"
 val pluginMarkerArtifactPath = "${chasmPluginId.replace('.', '/')}/${chasmPluginId}.gradle.plugin/$pluginVersion"
 val pluginJarName = "${project.name}-$pluginVersion.jar"
 val pluginPomName = "${project.name}-$pluginVersion.pom"
 val pluginMarkerPomName = "${chasmPluginId}.gradle.plugin-$pluginVersion.pom"
 val stagePluginForFunctionalTest = tasks.register<Sync>("stagePluginForFunctionalTest") {
-    dependsOn(
-        "generatePomFileForChasm-gradle-pluginPluginMarkerMavenPublication",
-        "generatePomFileForPluginMavenPublication",
-    )
-    into(pluginRepository)
+    into(layout.buildDirectory.dir("functional-test-plugin-repository"))
     from(tasks.jar.flatMap { task -> task.archiveFile }) {
         into(pluginArtifactPath)
         rename(".*\\.jar", pluginJarName)
@@ -180,22 +190,21 @@ val stagePluginForFunctionalTest = tasks.register<Sync>("stagePluginForFunctiona
 }
 
 functionalTest.configure {
-    dependsOn(
-        "generateMetadataFileForPluginMavenPublication",
-        stageFunctionalTestRepository,
-        stagePluginForFunctionalTest,
-    )
-    inputs.dir(functionalTestRepository)
-    inputs.dir(pluginRepository)
-    inputs.file(pluginPom)
-    inputs.file(pluginModuleMetadata)
-    systemProperty("chasm.functionalTest.repository", functionalTestRepository.get().asFile.toURI().toString())
-    systemProperty("chasm.functionalTest.pluginRepository", pluginRepository.get().asFile.toURI().toString())
-    systemProperty("chasm.functionalTest.pluginPom", pluginPom.get().asFile.absolutePath)
-    systemProperty(
-        "chasm.functionalTest.pluginModuleMetadata",
-        pluginModuleMetadata.get().asFile.absolutePath,
-    )
+    val repository = stageFunctionalTestRepository.flatMap { it.destinationDirectory }
+    val pluginRepository = stagePluginForFunctionalTest.flatMap { it.destinationDirectory }
+    val pom = pluginPom
+    val moduleMetadata = pluginModuleMetadata
+    inputs.dir(repository).withPathSensitivity(PathSensitivity.RELATIVE)
+    inputs.dir(pluginRepository).withPathSensitivity(PathSensitivity.RELATIVE)
+    inputs.files(pom).withPathSensitivity(PathSensitivity.NONE)
+    inputs.files(moduleMetadata).withPathSensitivity(PathSensitivity.NONE)
+    doFirst {
+        val test = this as Test
+        test.systemProperty("chasm.functionalTest.repository", repository.get().asFile.toURI().toString())
+        test.systemProperty("chasm.functionalTest.pluginRepository", pluginRepository.get().asFile.toURI().toString())
+        test.systemProperty("chasm.functionalTest.pluginPom", pom.singleFile.absolutePath)
+        test.systemProperty("chasm.functionalTest.pluginModuleMetadata", moduleMetadata.singleFile.absolutePath)
+    }
     systemProperty("chasm.functionalTest.pluginId", chasmPluginId)
     systemProperty("chasm.functionalTest.pluginVersion", pluginVersion)
     systemProperty("chasm.functionalTest.wasiPreview1Dependency", wasiPreview1Dependency)
