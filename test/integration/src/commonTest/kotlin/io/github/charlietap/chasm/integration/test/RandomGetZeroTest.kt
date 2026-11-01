@@ -1,29 +1,22 @@
-package io.github.charlietap.chasm.integration
+package io.github.charlietap.chasm.integration.test
 
-import com.goncalossilva.resources.Resource
+import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.embedding.dsl.imports
-import io.github.charlietap.chasm.embedding.instance
-import io.github.charlietap.chasm.embedding.invoke
-import io.github.charlietap.chasm.embedding.module
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
-import io.github.charlietap.chasm.embedding.shapes.flatMap
 import io.github.charlietap.chasm.embedding.store
-import io.github.charlietap.chasm.fake.decoder.FakeSourceReader
 import io.github.charlietap.chasm.host.HostFunctionException
 import io.github.charlietap.chasm.host.readI32
 import io.github.charlietap.chasm.host.writeI32
+import io.github.charlietap.chasm.integration.integrationTest
+import io.github.charlietap.chasm.integration.runner
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
-import io.github.charlietap.chasm.runtime.value.NumberValue
 import kotlin.test.Test
 import kotlin.test.assertIs
 
 class RandomGetZeroTest {
 
     @Test
-    fun `can execute _start from random_get_zero successfully`() {
-
-        val byteStream = Resource(FILE_DIR + "random_get_zero.wasm").readBytes()
-        val reader = FakeSourceReader(byteStream)
+    fun `can execute _start from random_get_zero successfully`() = integrationTest(FIXTURE) {
 
         val store = store()
         val imports = imports(store) {
@@ -63,14 +56,14 @@ class RandomGetZeroTest {
             }
         }
 
-        val actual = module(reader)
-            .flatMap { module -> instance(store, module, imports) }
-            .flatMap { instance -> invoke(store, instance, "_start") }
+        val actual = runner(store, imports, RuntimeConfig()).invoke(
+            name = "_start",
+        )
 
-        assertIs<ChasmResult.Success<List<ExecutionValue>>>(actual)
+        assertIs<ChasmResult.Success<List<ExecutionValue>>>(actual, engine.name())
     }
 
-    companion object {
-        private const val FILE_DIR = "integration/"
+    private companion object {
+        const val FIXTURE = "random_get_zero"
     }
 }

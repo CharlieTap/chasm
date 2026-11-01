@@ -110,6 +110,8 @@ include(":test:fixture:host")
 include(":test:fixture:runtime")
 include(":test:fixture:type-system")
 
+include(":test:integration")
+
 include(":tools:compiler-baseline")
 
 include(":tooling:bindgen")

@@ -1,4 +1,4 @@
-package io.github.charlietap.chasm.integration
+package io.github.charlietap.chasm.integration.test
 
 import io.github.charlietap.chasm.embedding.error.ChasmError
 import io.github.charlietap.chasm.embedding.function
@@ -10,6 +10,8 @@ import io.github.charlietap.chasm.fixture.type.i32ValueType
 import io.github.charlietap.chasm.fixture.type.resultType
 import io.github.charlietap.chasm.host.HostFunction
 import io.github.charlietap.chasm.host.HostFunctionException
+import io.github.charlietap.chasm.integration.integrationTest
+import io.github.charlietap.chasm.integration.runner
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -17,7 +19,7 @@ import kotlin.test.assertEquals
 class HostFunctionExceptionTest {
 
     @Test
-    fun `can run a host function that throws an exception and return a chasm error`() {
+    fun `can run a host function that throws an exception and return a chasm error`() = integrationTest(FIXTURE) {
 
         val store = store()
 
@@ -39,24 +41,22 @@ class HostFunctionExceptionTest {
             "host_function",
             functionExternal,
         )
-        val result = testRunner(
-            fileName = "host_function.wasm",
-            fileDirectory = FILE_DIR,
-            functionName = "call_host_function",
-            store = store,
-            imports = listOf(
-                functionImport,
-            ),
+        val imports = listOf(
+            functionImport,
+        )
+
+        val result = runner(store, imports).invoke(
+            name = "call_host_function",
         )
 
         val expected = ChasmError.ExecutionError(
             InvocationError.HostFunctionError(reason).toString(),
         )
 
-        assertEquals(ChasmResult.Error(expected), result)
+        assertEquals(ChasmResult.Error(expected), result, engine.name())
     }
 
-    companion object {
-        private const val FILE_DIR = "integration/"
+    private companion object {
+        const val FIXTURE = "host_function"
     }
 }
