@@ -2,6 +2,7 @@ package io.github.charlietap.corpus.plugin
 
 import io.github.charlietap.corpus.lib.CorpusPhase
 import io.github.charlietap.corpus.plugin.task.CorpusMatrixTask
+import io.github.charlietap.corpus.plugin.task.CorpusMeasurementTest
 import io.github.charlietap.corpus.plugin.task.GenerateCorpusReportTask
 import io.github.charlietap.corpus.plugin.task.GenerateCorpusTestsTask
 import io.github.charlietap.corpus.plugin.task.PrepareCorpusResourcesTask
@@ -9,12 +10,17 @@ import io.github.charlietap.corpus.plugin.task.ResolveCorpusFixturesTask
 import io.github.charlietap.corpus.plugin.task.SyncCorpusRepositoryTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.file.Directory
+import org.gradle.api.file.RegularFile
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.Delete
+import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.register
+import org.gradle.kotlin.dsl.withType
 import org.gradle.util.GradleVersion
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation.Companion.TEST_COMPILATION_NAME
@@ -29,11 +35,9 @@ class WasmCorpusPlugin : Plugin<Project> {
             .map(::parsePhase)
             .orElse(extension.phase)
         val machineMetadata = project.providers.of(CorpusMachineValueSource::class.java) {}
-        val projectDirectory = project.layout.projectDirectory.asFile.toPath()
         extension.targets.convention(
             project.providers.gradleProperty(PROP_TARGETS).map(::parseTargets).orElse(emptyList()),
         )
-        val baselineRequested = project.isTaskRequested(TASK_NAME_UPDATE_BASELINE)
 
         val syncCorpus = project.tasks.register<SyncCorpusRepositoryTask>(TASK_NAME_SYNC_CORPUS) {
             group = GROUP
@@ -67,11 +71,6 @@ class WasmCorpusPlugin : Plugin<Project> {
             corpusRunner.set(extension.corpusRunner)
             testPackageName.set(extension.testPackageName)
             phase.set(effectivePhase)
-            resultsDirectoryPath.set(
-                project.providers.provider {
-                    projectDirectory.relativize(extension.corpusResultsDirectory.get().asFile.toPath()).toString()
-                },
-            )
             outputDirectory.set(extension.corpusTestsDirectory)
         }
 
@@ -93,31 +92,8 @@ class WasmCorpusPlugin : Plugin<Project> {
             fixturesIndex.set(resolveFixtures.flatMap { it.outputFile })
         }
 
-        val generateCorpusReport = project.tasks.register<GenerateCorpusReportTask>(TASK_NAME_GENERATE_REPORT) {
-            group = GROUP
-            description = "Aggregates wasm-corpus fixture timings into a JSON report"
-
-            machine.set(machineMetadata)
-            repositoryUrl.set(extension.corpusRepositoryUrl)
-            revision.set(extension.corpusRef)
-            phase.set(effectivePhase.map { value -> value.name.lowercase() })
-            versions.set(extension.versions)
-            languages.set(extension.languages)
-            requiredFeatures.set(extension.requiredFeatures)
-            excludedFeatures.set(extension.excludedFeatures)
-            tags.set(extension.tags)
-            excludedTags.set(extension.excludedTags)
-            size.set(extension.size)
-            duration.set(extension.duration)
-            targets.set(extension.targets)
-            excludedTargets.set(extension.excludedTargets)
-            gradleVersion.set(GradleVersion.current().version)
-            gradleJavaLanguageVersion.set(project.providers.systemProperty("java.specification.version"))
-            gradleJavaRuntimeVersion.set(project.providers.systemProperty("java.runtime.version"))
-            gradleJvmVersion.set(project.providers.systemProperty("java.vm.version"))
-            gradleJavaVendor.set(project.providers.systemProperty("java.vendor"))
-            outputFile.set(extension.corpusReportFile)
-        }
+        val measurementResultsDirectory = project.layout.buildDirectory.dir(DIR_MEASUREMENT_RESULTS)
+        val measurementReportFile = project.layout.buildDirectory.file(FILE_MEASUREMENT_REPORT)
 
         project.tasks.register<Delete>(TASK_NAME_CLEAN_TESTS) {
             group = GROUP
@@ -128,93 +104,152 @@ class WasmCorpusPlugin : Plugin<Project> {
             delete(extension.corpusResourcesDirectory)
             delete(extension.corpusResultsDirectory)
             delete(extension.corpusReportFile)
+            delete(measurementResultsDirectory)
+            delete(measurementReportFile)
         }
 
-        val kotlinExtension = project.extensions.getByType<KotlinMultiplatformExtension>()
-        val jvmTarget = kotlinExtension.targets.withType(KotlinJvmTarget::class.java).single()
-        val jvmTestCompilation = jvmTarget.compilations.getByName(TEST_COMPILATION_NAME)
-        val jvmTest = jvmTarget.testRuns.getByName(DEFAULT_TEST_RUN_NAME).executionTask
-        val corpusTest = project.tasks.register<Test>(TASK_NAME_CORPUS_TEST) {
-            group = GROUP
-            description = "Runs the generated wasm-corpus tests against the JVM test runtime"
+        project.pluginManager.withPlugin(KOTLIN_MULTIPLATFORM_PLUGIN_ID) {
+            var jvmTargetConfigured = false
+            project.extensions.getByType<KotlinMultiplatformExtension>().targets.withType<KotlinJvmTarget>().configureEach {
+                check(!jvmTargetConfigured) { "wasm-corpus supports a single JVM target, found another: $name" }
+                jvmTargetConfigured = true
 
-            val tests = jvmTest.get()
-            testClassesDirs = tests.testClassesDirs
-            classpath = tests.classpath
-            javaLauncher.set(tests.javaLauncher)
-            maxHeapSize = "2g"
-            jvmArgs("-Xss32m")
-            workingDirectory.set(project.layout.projectDirectory)
-            binaryResultsDirectory.set(extension.corpusResultsDirectory)
-            inputs.property("corpusMachine", machineMetadata)
-            include("**/corpus/generated/**")
+                val jvmTestCompilation = compilations.getByName(TEST_COMPILATION_NAME)
+                val jvmTestRun = testRuns.named(DEFAULT_TEST_RUN_NAME)
+                val jvmTest = jvmTestRun.flatMap { run -> run.executionTask }
 
-            if (baselineRequested) {
-                outputs.upToDateWhen { false }
-                outputs.doNotCacheIf("Baseline updates require a fresh corpus measurement") { true }
-            }
-        }
-        val testJavaLauncher = corpusTest.flatMap { test -> test.javaLauncher }
-        generateCorpusReport.configure {
-            resultFiles.from(
-                corpusTest.flatMap { test -> test.binaryResultsDirectory }.map { directory ->
-                    directory.asFileTree.matching {
-                        include("**/*.json")
+                jvmTestCompilation.defaultSourceSet.apply {
+                    kotlin.srcDir(generateTests.flatMap { it.outputDirectory })
+                    resources.srcDir(prepareResources.flatMap { it.outputDirectory })
+                }
+
+                fun Test.configureCorpusTest(resultsDirectory: Provider<Directory>) {
+                    group = GROUP
+                    testClassesDirs = jvmTestCompilation.output.classesDirs
+                    classpath = project.files(jvmTestCompilation.output.allOutputs, jvmTestCompilation.runtimeDependencyFiles)
+                    javaLauncher.set(jvmTest.flatMap { test -> test.javaLauncher })
+                    maxHeapSize = "2g"
+                    jvmArgs("-Xss32m")
+                    workingDirectory.set(project.layout.projectDirectory)
+                    binaryResultsDirectory.set(resultsDirectory)
+                    doFirst {
+                        val test = this as Test
+                        test.systemProperty(
+                            GenerateCorpusTestsTask.RESULTS_DIRECTORY_PROPERTY,
+                            test.binaryResultsDirectory.get().asFile.absolutePath,
+                        )
                     }
-                },
-            )
-            testJavaLanguageVersion.set(
-                testJavaLauncher.map { launcher -> launcher.metadata.languageVersion.toString() },
-            )
-            testJavaRuntimeVersion.set(
-                testJavaLauncher.map { launcher -> launcher.metadata.javaRuntimeVersion },
-            )
-            testJvmVersion.set(
-                testJavaLauncher.map { launcher -> launcher.metadata.jvmVersion },
-            )
-            testJavaVendor.set(
-                testJavaLauncher.map { launcher -> launcher.metadata.vendor },
-            )
-        }
+                    inputs.property("corpusMachine", machineMetadata)
+                    include("**/corpus/generated/**")
+                }
 
-        jvmTestCompilation.defaultSourceSet.apply {
-            kotlin.srcDir(generateTests.flatMap { it.outputDirectory })
-            resources.srcDir(prepareResources.flatMap { it.outputDirectory })
-        }
+                val corpusTest = project.tasks.register<Test>(TASK_NAME_CORPUS_TEST) {
+                    description = "Runs the generated wasm-corpus tests against the JVM test runtime"
+                    configureCorpusTest(extension.corpusResultsDirectory)
+                }
+                val generateCorpusReport = registerReport(
+                    project = project,
+                    name = TASK_NAME_GENERATE_REPORT,
+                    description = "Aggregates wasm-corpus fixture timings into a JSON report",
+                    extension = extension,
+                    effectivePhase = effectivePhase,
+                    machineMetadata = machineMetadata,
+                    test = corpusTest,
+                    reportFile = extension.corpusReportFile,
+                )
 
-        val corpus = project.tasks.register(TASK_NAME_CORPUS) {
-            group = GROUP
-            description = "Runs wasm-corpus fixtures against the JVM test runtime"
+                val corpusMeasurement = project.tasks.register<CorpusMeasurementTest>(TASK_NAME_CORPUS_MEASUREMENT) {
+                    description = "Measures the generated wasm-corpus tests afresh for a baseline update"
+                    configureCorpusTest(measurementResultsDirectory)
+                }
+                val generateMeasurementReport = registerReport(
+                    project = project,
+                    name = TASK_NAME_GENERATE_MEASUREMENT_REPORT,
+                    description = "Aggregates a fresh wasm-corpus measurement into a JSON report",
+                    extension = extension,
+                    effectivePhase = effectivePhase,
+                    machineMetadata = machineMetadata,
+                    test = corpusMeasurement,
+                    reportFile = measurementReportFile,
+                )
 
-            dependsOn(generateTests)
-            dependsOn(prepareResources)
-            dependsOn(corpusTest)
-            dependsOn(generateCorpusReport)
-        }
+                project.tasks.register(TASK_NAME_CORPUS) {
+                    group = GROUP
+                    description = "Runs wasm-corpus fixtures against the JVM test runtime"
 
-        project.tasks.register<Copy>(TASK_NAME_UPDATE_BASELINE) {
-            group = GROUP
-            description = "Runs wasm-corpus and updates the checked-in results baseline"
+                    dependsOn(corpusTest)
+                    dependsOn(generateCorpusReport)
+                }
 
-            dependsOn(corpus)
-            from(generateCorpusReport.flatMap { task -> task.outputFile })
-            into(extension.corpusBaselineDirectory)
-            rename { BASELINE_FILE_NAME }
-        }
+                project.tasks.register<Copy>(TASK_NAME_UPDATE_BASELINE) {
+                    group = GROUP
+                    description = "Measures wasm-corpus afresh and updates the checked-in results baseline"
 
-        jvmTest.configure {
-            maxHeapSize = "2g"
-            jvmArgs("-Xss32m")
-            exclude("**/corpus/generated/**")
-        }
+                    from(generateMeasurementReport.flatMap { task -> task.outputFile })
+                    into(extension.corpusBaselineDirectory)
+                    rename { BASELINE_FILE_NAME }
+                }
 
-        project.tasks.matching { task -> task.name == TASK_NAME_TEST }.configureEach {
-            dependsOn(corpusTest)
+                jvmTestRun.configure {
+                    executionTask.configure {
+                        maxHeapSize = "2g"
+                        jvmArgs("-Xss32m")
+                        exclude("**/corpus/generated/**")
+                    }
+                }
+
+                project.tasks.matching { task -> task.name == TASK_NAME_TEST }.configureEach {
+                    dependsOn(corpusTest)
+                }
+            }
         }
     }
 
-    private fun Project.isTaskRequested(name: String): Boolean = gradle.startParameter.taskNames.any { taskName ->
-        taskName == name || taskName.endsWith(":$name")
+    private fun registerReport(
+        project: Project,
+        name: String,
+        description: String,
+        extension: WasmCorpusPluginExtension,
+        effectivePhase: Provider<CorpusPhase>,
+        machineMetadata: Provider<String>,
+        test: TaskProvider<out Test>,
+        reportFile: Provider<RegularFile>,
+    ): TaskProvider<GenerateCorpusReportTask> = project.tasks.register<GenerateCorpusReportTask>(name) {
+        group = GROUP
+        this.description = description
+
+        val testJavaLauncher = test.flatMap { task -> task.javaLauncher }
+        resultFiles.from(
+            test.flatMap { task -> task.binaryResultsDirectory }.map { directory ->
+                directory.asFileTree.matching {
+                    include("**/*.json")
+                }
+            },
+        )
+        machine.set(machineMetadata)
+        repositoryUrl.set(extension.corpusRepositoryUrl)
+        revision.set(extension.corpusRef)
+        phase.set(effectivePhase.map { value -> value.name.lowercase() })
+        versions.set(extension.versions)
+        languages.set(extension.languages)
+        requiredFeatures.set(extension.requiredFeatures)
+        excludedFeatures.set(extension.excludedFeatures)
+        tags.set(extension.tags)
+        excludedTags.set(extension.excludedTags)
+        size.set(extension.size)
+        duration.set(extension.duration)
+        targets.set(extension.targets)
+        excludedTargets.set(extension.excludedTargets)
+        gradleVersion.set(GradleVersion.current().version)
+        gradleJavaLanguageVersion.set(project.providers.systemProperty("java.specification.version"))
+        gradleJavaRuntimeVersion.set(project.providers.systemProperty("java.runtime.version"))
+        gradleJvmVersion.set(project.providers.systemProperty("java.vm.version"))
+        gradleJavaVendor.set(project.providers.systemProperty("java.vendor"))
+        testJavaLanguageVersion.set(testJavaLauncher.map { launcher -> launcher.metadata.languageVersion.toString() })
+        testJavaRuntimeVersion.set(testJavaLauncher.map { launcher -> launcher.metadata.javaRuntimeVersion })
+        testJvmVersion.set(testJavaLauncher.map { launcher -> launcher.metadata.jvmVersion })
+        testJavaVendor.set(testJavaLauncher.map { launcher -> launcher.metadata.vendor })
+        outputFile.set(reportFile)
     }
 
     private fun parseTargets(value: String): List<String> = value
@@ -234,20 +269,25 @@ class WasmCorpusPlugin : Plugin<Project> {
     }
 
     private companion object {
+        const val KOTLIN_MULTIPLATFORM_PLUGIN_ID = "org.jetbrains.kotlin.multiplatform"
         const val PROP_PHASE = "wasmCorpus.phase"
         const val PROP_TARGETS = "wasmCorpus.targets"
         const val GROUP = "corpus"
         const val TASK_NAME_CORPUS = "corpus"
         const val TASK_NAME_CORPUS_TEST = "corpusTest"
+        const val TASK_NAME_CORPUS_MEASUREMENT = "corpusMeasurementTest"
         const val TASK_NAME_TEST = "test"
         const val TASK_NAME_SYNC_CORPUS = "syncWasmCorpus"
         const val TASK_NAME_RESOLVE_FIXTURES = "resolveCorpusFixtures"
         const val TASK_NAME_GENERATE_TESTS = "generateCorpusTests"
         const val TASK_NAME_PREPARE_RESOURCES = "prepareCorpusResources"
         const val TASK_NAME_GENERATE_REPORT = "generateCorpusReport"
+        const val TASK_NAME_GENERATE_MEASUREMENT_REPORT = "generateCorpusMeasurementReport"
         const val TASK_NAME_UPDATE_BASELINE = "updateCorpusBaseline"
         const val TASK_NAME_MATRIX = "corpusMatrix"
         const val TASK_NAME_CLEAN_TESTS = "cleanCorpusTests"
+        const val DIR_MEASUREMENT_RESULTS = "wasm-corpus-measurement-results"
+        const val FILE_MEASUREMENT_REPORT = "wasm-corpus-measurement-report.json"
         const val BASELINE_FILE_NAME = "baseline.json"
     }
 }

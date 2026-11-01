@@ -22,9 +22,6 @@ abstract class GenerateCorpusTestsTask : DefaultTask() {
     @get:Input
     abstract val phase: Property<CorpusPhase>
 
-    @get:Input
-    abstract val resultsDirectoryPath: Property<String>
-
     @get:OutputDirectory
     abstract val outputDirectory: DirectoryProperty
 
@@ -75,7 +72,7 @@ abstract class GenerateCorpusTestsTask : DefaultTask() {
             |                .copy(version = version)
             |            val execution = runner.execute(CORPUS_ROOT, fixture, CorpusPhase.${phase.name})
             |            reportWriter.write(
-            |                Path.of(RESULTS_DIRECTORY),
+            |                Path.of(System.getProperty(RESULTS_DIRECTORY_PROPERTY)),
             |                CorpusFixtureResult.from(fixture, CorpusPhase.${phase.name}, execution),
             |            )
             |            when (val result = execution.result) {
@@ -93,7 +90,7 @@ abstract class GenerateCorpusTestsTask : DefaultTask() {
             |    companion object {
             |        const val CORPUS_ROOT = "corpus"
             |        const val FIXTURE_INDEX = "corpus/fixtures.json"
-            |        const val RESULTS_DIRECTORY = ${resultsDirectoryPath.get().quoted()}
+            |        const val RESULTS_DIRECTORY_PROPERTY = ${RESULTS_DIRECTORY_PROPERTY.quoted()}
             |    }
             |}
             |
@@ -102,4 +99,8 @@ abstract class GenerateCorpusTestsTask : DefaultTask() {
     }
 
     private fun String.quoted(): String = CodeBlock.of("%S", this).toString()
+
+    companion object {
+        const val RESULTS_DIRECTORY_PROPERTY = "corpus.resultsDirectory"
+    }
 }
