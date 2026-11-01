@@ -70,17 +70,15 @@ fun registerCompilerBaseline(
     val update = tasks.register<UpdateCompilerBaselineTask>("update${taskName}CompilerBaseline") {
         group = "verification"
         description = "Update the checked-in $displayName compiler baseline"
-        dependsOn(generate)
-        generatedFile.set(generated)
+        generatedFile.set(generate.flatMap { it.outputFile })
         baselineFile.set(baseline)
     }
     val check = tasks.register<CheckCompilerBaselineTask>("check${taskName}CompilerBaseline") {
         group = "verification"
         description = "Check the $displayName compiler baseline"
-        dependsOn(generate)
         mustRunAfter(update)
         baselineFile.set(baseline)
-        generatedFile.set(generated)
+        generatedFile.set(generate.flatMap { it.outputFile })
     }
 
     compilerBaseline.configure { dependsOn(generate) }

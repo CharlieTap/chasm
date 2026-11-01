@@ -118,7 +118,7 @@ tasks.withType<JavaExec>().configureEach {
 }
 
 tasks.withType<ConfigurableKtLintTask>().configureEach {
-    dependsOn(tasks.withType<NativeSourceGeneratorTask>())
+    mustRunAfter(tasks.withType<NativeSourceGeneratorTask>())
 }
 
 tasks.withType<KotlinNativeCompile>().configureEach {

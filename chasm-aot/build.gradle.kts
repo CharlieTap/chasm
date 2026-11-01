@@ -1,6 +1,4 @@
-import io.github.charlietap.sweet.plugin.task.GenerateTestsTask
 import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
-import org.jmailen.gradle.kotlinter.tasks.ConfigurableKtLintTask
 
 plugins {
     alias(libs.plugins.conventions.kmp.jvm)
@@ -102,8 +100,4 @@ tasks.withType<Test>().configureEach {
 configure<PublishingConventionsExtension> {
     name = "chasm-aot"
     description = "Runs Wasm modules compiled ahead of time to JVM classes on Chasm's runtime"
-}
-
-tasks.withType<ConfigurableKtLintTask>().configureEach {
-    dependsOn(tasks.withType<GenerateTestsTask>())
 }

@@ -1,8 +1,5 @@
 import io.github.charlietap.sweet.lib.SemanticPhase
-import io.github.charlietap.sweet.plugin.task.GenerateTestsTask
-import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
-import org.jmailen.gradle.kotlinter.tasks.ConfigurableKtLintTask
 
 plugins {
     alias(libs.plugins.conventions.kmp)
@@ -115,8 +112,4 @@ kotlin {
 configure<PublishingConventionsExtension> {
     name = "chasm"
     description = "A wasm runtime for Kotlin Multiplatform"
-}
-
-tasks.withType<ConfigurableKtLintTask>().configureEach {
-    dependsOn(tasks.withType<GenerateTestsTask>())
 }

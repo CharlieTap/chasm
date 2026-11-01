@@ -1,10 +1,7 @@
 import io.github.charlietap.chasm.gradle.CodegenConfig
 import io.github.charlietap.chasm.gradle.CodegenRuntime
-import io.github.charlietap.chasm.gradle.CodegenTask
 import io.github.charlietap.chasm.gradle.StringEncodingStrategy
 import io.github.charlietap.chasm.gradle.WasiLinking
-import org.gradle.kotlin.dsl.withType
-import org.jmailen.gradle.kotlinter.tasks.ConfigurableKtLintTask
 
 plugins {
     alias(libs.plugins.kotlin.jvm)
@@ -39,8 +36,4 @@ chasm {
             }
         }
     }
-}
-
-tasks.withType<ConfigurableKtLintTask>().configureEach {
-    dependsOn(tasks.withType<CodegenTask>())
 }
