@@ -32,8 +32,7 @@ fun main(
     val bytes = Resource("benchmark/coremark.wasm").readBytes()
     val output = CompileOutput.Memory()
     val compileConfig = CompileConfig("chasm.benchmark.coremark") {
-        meterFuel(config.meterFuel)
-        interruptible(config.interruptible)
+        store(config)
     }
     val compiled = output.load(compile(bytes, output, compileConfig).expect("CoreMark compiles"))
 

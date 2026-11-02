@@ -1098,6 +1098,32 @@ class ChasmPluginFunctionalTest {
 
                     override fun trapSitesResource(): String? = null
 
+                    override fun runtimeAbi(): Int = error("stale code was used")
+
+                    override fun meterFuel(): Boolean = error("stale code was used")
+
+                    override fun interruptible(): Boolean = error("stale code was used")
+
+                    override fun stacktraces(): Boolean = error("stale code was used")
+
+                    override fun initialFuel(): Long = error("stale code was used")
+
+                    override fun gcStrategy(): Int = error("stale code was used")
+
+                    override fun gcThresholdKind(): Int = error("stale code was used")
+
+                    override fun gcThresholdValue(): Int = error("stale code was used")
+
+                    override fun gcHeapBytes(): Long = error("stale code was used")
+
+                    override fun memoryPages(): Int = error("stale code was used")
+
+                    override fun tableElements(): Int = error("stale code was used")
+
+                    override fun trapOnGrowFailure(): Boolean = error("stale code was used")
+
+                    override fun stackBytes(): Long = error("stale code was used")
+
                     companion object {
                         @JvmField
                         val INSTANCE: CompiledModule = compiledModule(StaleCode())
@@ -1110,7 +1136,7 @@ class ChasmPluginFunctionalTest {
                         args: Array<String>,
                     ) {
                         val failure = runCatching { compiledService() }.exceptionOrNull()
-                        check(failure != null && "Failed to instantiate module" in failure.message.orEmpty()) { failure.toString() }
+                        check(failure != null && "stale code was used" in failure.message.orEmpty()) { failure.toString() }
                         println("COMPILED_CODE_REJECTED")
                     }
                 }

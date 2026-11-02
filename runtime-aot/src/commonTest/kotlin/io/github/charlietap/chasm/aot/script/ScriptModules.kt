@@ -65,8 +65,7 @@ internal object ScriptModules {
         storeConfig: StoreConfig,
     ): ChasmResult<CompiledModule, ChasmError> {
         val options = JvmOptions(
-            meterFuel = storeConfig.meterFuel,
-            interruptible = storeConfig.interruptible,
+            storeConfig = storeConfig,
             splitInstructions = SPLIT_INSTRUCTIONS,
             memory = MEMORY,
         )

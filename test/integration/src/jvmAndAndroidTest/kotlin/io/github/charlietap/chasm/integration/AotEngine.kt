@@ -1,8 +1,9 @@
-@file:OptIn(ExperimentalChasmApi::class)
+@file:OptIn(ExperimentalChasmApi::class, InternalChasmApi::class)
 
 package io.github.charlietap.chasm.integration
 
 import io.github.charlietap.chasm.ExperimentalChasmApi
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.aot.CompileConfig
 import io.github.charlietap.chasm.aot.CompileError.Stage
 import io.github.charlietap.chasm.aot.CompileOutput
@@ -10,6 +11,7 @@ import io.github.charlietap.chasm.aot.CompileResult
 import io.github.charlietap.chasm.aot.compile
 import io.github.charlietap.chasm.aot.instance
 import io.github.charlietap.chasm.config.RuntimeConfig
+import io.github.charlietap.chasm.config.StoreConfig
 import io.github.charlietap.chasm.embedding.error.ChasmError
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Export
@@ -43,11 +45,12 @@ class AotEngine(
     ): ChasmResult<Instance, ChasmError> {
         val output = CompileOutput.Memory()
         val compileConfig = CompileConfig("$PACKAGE_NAME.module${modules.incrementAndGet()}") {
-            trapDiagnostics(true)
+            store(storeConfig(store, config))
+            stacktraces(config.debugInfo)
             configure()
         }
         return when (val result = compile(bytes, output, compileConfig)) {
-            is CompileResult.Success -> instance(store, output.load(result.artifact), imports, config)
+            is CompileResult.Success -> instance(store, output.load(result.artifact), imports)
             is CompileResult.Error -> when (result.error.stage) {
                 Stage.DECODE -> ChasmResult.Error(ChasmError.DecodeError(result.error.error))
                 Stage.VALIDATION -> ChasmResult.Error(ChasmError.ValidationError(result.error.error))
@@ -110,4 +113,17 @@ class AotEngine(
         // Each compiled module gets its own package, as Transmute gives each module, so frames name one module.
         val modules = AtomicInteger()
     }
+}
+
+@Suppress("DEPRECATION")
+private fun storeConfig(
+    store: Store,
+    config: RuntimeConfig,
+): StoreConfig = store.store.config.let { storeConfig ->
+    StoreConfig(
+        meterFuel = storeConfig.meterFuel,
+        interruptible = storeConfig.interruptible,
+        gcStrategy = storeConfig.gcStrategy ?: config.gcStrategy,
+        gcThreshold = storeConfig.gcThreshold ?: config.gcThreshold,
+    )
 }

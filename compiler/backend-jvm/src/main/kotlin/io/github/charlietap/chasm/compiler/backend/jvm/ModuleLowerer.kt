@@ -123,7 +123,7 @@ internal inline fun ModuleLowerer(
                     is FunctionResult.Rejected -> reasons[function.index.index] = result.reason
                     is FunctionResult.Lowered -> {
                         lowering.layout.resolve(result.methods.map(GeneratedMethod::node), result.resources, lowering.bindingType)
-                        if (options.trapDiagnostics && result.methods.size > 1) {
+                        if (options.stacktraces && result.methods.size > 1) {
                             chunkStarts[function.index.index] = result.methods.mapNotNull { generated ->
                                 generated.chunkStart.takeIf { start -> start >= 0 }
                             }.toIntArray()
@@ -184,7 +184,7 @@ internal inline fun ModuleLowerer(
         declarationCallGenerator(declarations, OutputStream.nullOutputStream())
     }
     val declarationClasses = declarationsLowerer(calls, packagePath, output)
-    if (options.trapDiagnostics) {
+    if (options.stacktraces) {
         val sites = code.functions.associate { function ->
             val index = function.index.index
             val sites = trapSites[index] ?: FunctionTrapSites(IntArray(0), IntArray(0))

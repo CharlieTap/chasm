@@ -6,7 +6,6 @@ import io.github.charlietap.chasm.aot.script.ext.readTextFromPath
 import io.github.charlietap.chasm.aot.script.host.HostModuleResolver
 import io.github.charlietap.chasm.config.Config
 import io.github.charlietap.chasm.config.GCStrategy
-import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.config.StoreConfig
 import io.github.charlietap.chasm.embedding.dropStore
 import io.github.charlietap.chasm.embedding.store
@@ -26,7 +25,7 @@ class AotScriptRunner(
     private val scriptFilename: String,
     private val phaseSupport: SemanticPhase,
     private val excludedLines: Set<Int> = emptySet(),
-    private val storeConfig: StoreConfig = StoreConfig(),
+    private val storeConfig: StoreConfig = StoreConfig(gcStrategy = GCStrategy.TRADITIONAL),
     private val commandRunner: CommandRunner = ::CommandRunner,
     private val hostModuleResolver: HostModuleResolver = ::HostModuleResolver,
 ) : ScriptRunner {
@@ -47,9 +46,7 @@ class AotScriptRunner(
         script: Script,
     ): ScriptResult {
 
-        val config = Config(
-            runtimeConfig = RuntimeConfig(gcStrategy = GCStrategy.TRADITIONAL),
-        )
+        val config = Config()
         val store = store(storeConfig)
         val context = ScriptContext(
             config = config,

@@ -5,6 +5,7 @@ import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.aot.internal.CompiledCode
 import io.github.charlietap.chasm.aot.internal.TrapLines
 import io.github.charlietap.chasm.aot.internal.TrapSites
+import io.github.charlietap.chasm.aot.internal.readMetadata
 import io.github.charlietap.chasm.aot.internal.readTrapLines
 import io.github.charlietap.chasm.aot.internal.readTrapSites
 import io.github.charlietap.chasm.aot.internal.trapLinesResource
@@ -16,6 +17,12 @@ import io.github.charlietap.chasm.declarations.ModuleDeclarations
 class CompiledModule internal constructor(
     @property:InternalChasmApi val code: CompiledCode,
 ) {
+    @InternalChasmApi
+    val metadataResult: Result<CompiledModuleMetadata> by lazy { readMetadata(code) }
+
+    val metadata: CompiledModuleMetadata
+        get() = metadataResult.getOrThrow()
+
     @InternalChasmApi
     @Suppress("TooGenericExceptionCaught")
     val declarations: Result<ModuleDeclarations> by lazy {

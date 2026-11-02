@@ -102,7 +102,7 @@ internal class LowerContext(
         position: Int,
         label: Label,
     ) {
-        if (!module.options.trapDiagnostics || position < 0) return
+        if (!module.options.stacktraces || position < 0) return
         val line = position - firstPosition + 1
         // Past the largest line number the code is marked unknown rather than keeping the previous mark.
         emit.line(if (line <= MAX_LINE) line else UNKNOWN_LINE, label)

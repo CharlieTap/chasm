@@ -139,7 +139,7 @@ internal class InterpretedFixture(
 internal class CompiledFixture(
     bytes: ByteArray,
     storeConfig: StoreConfig = StoreConfig(),
-    options: JvmOptions = JvmOptions(meterFuel = storeConfig.meterFuel, interruptible = storeConfig.interruptible),
+    options: JvmOptions = JvmOptions(storeConfig = storeConfig),
 ) {
     val generated = generate(bytes, options)
     val store: Store = store(storeConfig)

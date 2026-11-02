@@ -11,6 +11,7 @@ kotlin {
         api(projects.ast)
         api(projects.cir)
         api(projects.compiler.backendAbi)
+        api(projects.config)
         api(projects.moduleDeclarations)
 
         implementation(projects.compiler.backendAnalysis)

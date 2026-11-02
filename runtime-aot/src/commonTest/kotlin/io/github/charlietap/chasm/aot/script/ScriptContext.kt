@@ -42,7 +42,7 @@ data class ScriptContext(
     fun instantiate(
         module: CompiledModule,
     ): ChasmResult<Instance, ChasmError> =
-        instance(store, module, imports, config.runtimeConfig)
+        instance(store, module, imports)
 
     fun instantiate(
         bytes: ByteArray,

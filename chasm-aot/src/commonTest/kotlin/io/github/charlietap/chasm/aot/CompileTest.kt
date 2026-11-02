@@ -8,9 +8,14 @@ import com.github.michaelbull.result.getOrThrow
 import io.github.charlietap.chasm.ExperimentalChasmApi
 import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.aot.CompileError.Stage
+import io.github.charlietap.chasm.aot.internal.COMPILED_RUNTIME_ABI
 import io.github.charlietap.chasm.aot.internal.readTrapSites
 import io.github.charlietap.chasm.aot.internal.trapSitesResource
+import io.github.charlietap.chasm.config.GCStrategy
+import io.github.charlietap.chasm.config.GCThreshold
 import io.github.charlietap.chasm.config.ModuleConfig
+import io.github.charlietap.chasm.config.StoreConfig
+import io.github.charlietap.chasm.config.StoreLimits
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
 import java.net.URLClassLoader
 import java.nio.file.Files
@@ -97,6 +102,12 @@ class CompileTest {
             compile(module("declarations"), CompileOutput.Memory(), CompileConfig("1test")) to Stage.CONFIGURATION,
             compile(module("declarations"), CompileOutput.Memory(), CompileConfig("test.small") { maxMethodBytes(999) }) to Stage.CONFIGURATION,
             compile(module("declarations"), CompileOutput.Memory(), CompileConfig("test.large") { maxMethodBytes(32_768) }) to Stage.CONFIGURATION,
+            compile(module("declarations"), CompileOutput.Memory(), CompileConfig("test.fuel") { initialFuel(10) }) to Stage.CONFIGURATION,
+            compile(
+                module("declarations"),
+                CompileOutput.Memory(),
+                CompileConfig("test.negative") { store(StoreConfig(meterFuel = true)).initialFuel(-1) },
+            ) to Stage.CONFIGURATION,
             compile(missing, CompileOutput.Memory(), CompileConfig("test.missing")) to Stage.INPUT,
             compile(byteArrayOf(1, 2, 3), CompileOutput.Memory(), CompileConfig("test.garbage")) to Stage.DECODE,
             compile(module("invalid"), CompileOutput.Memory(), CompileConfig("test.invalid")) to Stage.VALIDATION,
@@ -115,8 +126,33 @@ class CompileTest {
     }
 
     @Test
-    fun `a module loads from memory, a directory and a jar`() {
-        val config = CompileConfig("test.loaded")
+    fun `the metadata records what the module was built with`() {
+        val store = StoreConfig(
+            meterFuel = true,
+            interruptible = true,
+            gcStrategy = GCStrategy.TRADITIONAL,
+            gcThreshold = GCThreshold.MB(4),
+            limits = StoreLimits(gcHeapBytes = 1_024, memoryPages = 16, tableElements = 32, trapOnGrowFailure = true, stackBytes = 65_536),
+        )
+        val config = CompileConfig("test.metadata") { store(store).initialFuel(1_000).stacktraces(true) }
+
+        val artifact = compile(module("declarations"), CompileOutput.Memory(), config).expect("compiles")
+
+        assertEquals(Capabilities(meterFuel = true, interruptible = true, stacktraces = true), artifact.metadata.capabilities)
+        assertEquals(store, artifact.metadata.storeConfig)
+        assertEquals(1_000L, artifact.metadata.initialFuel)
+        assertEquals(COMPILED_RUNTIME_ABI, artifact.metadata.runtimeAbi)
+    }
+
+    @Test
+    fun `a module reads back its metadata from memory, a directory and a jar`() {
+        val store = StoreConfig(
+            meterFuel = true,
+            gcStrategy = GCStrategy.ARENA,
+            gcThreshold = GCThreshold.KB(64),
+            limits = StoreLimits(memoryPages = 8, trapOnGrowFailure = true, stackBytes = 32_768),
+        )
+        val config = CompileConfig("test.roundtrip") { store(store).initialFuel(77) }
         val directory = Files.createTempDirectory("compile")
 
         val memory = CompileOutput.Memory()
@@ -130,9 +166,26 @@ class CompileTest {
             loaded(jar.files.single(), jar),
         )
         modules.forEach { module ->
-            assertEquals("test.loaded.WasmModule", module.code.javaClass.name)
-            assertEquals(null, module.code.trapSitesResource())
+            assertEquals(Capabilities(meterFuel = true, interruptible = false, stacktraces = false), module.metadata.capabilities)
+            assertEquals(store, module.metadata.storeConfig)
+            assertEquals(77L, module.metadata.initialFuel)
         }
+    }
+
+    @Test
+    fun `a module that starts above the store limits baked into it fails compilation`() {
+        val memory = CompileConfig("test.memory.limit") { store(StoreConfig(limits = StoreLimits(memoryPages = 0))) }
+        val table = CompileConfig("test.table.limit") { store(StoreConfig(limits = StoreLimits(tableElements = 1))) }
+        val fits = CompileConfig("test.fits") { store(StoreConfig(limits = StoreLimits(memoryPages = 1, tableElements = 2))) }
+
+        val memoryResult = compile(module("declarations"), CompileOutput.Memory(), memory)
+        val tableResult = compile(module("declarations"), CompileOutput.Memory(), table)
+
+        assertIs<CompileResult.Error>(memoryResult)
+        assertEquals(CompileError("memory 0 starts at 1 pages, above the store's limit of 0 pages", Stage.CONFIGURATION), memoryResult.error)
+        assertIs<CompileResult.Error>(tableResult)
+        assertEquals(CompileError("table 0 starts at 2 elements, above the store's limit of 1 elements", Stage.CONFIGURATION), tableResult.error)
+        assertIs<CompileResult.Success>(compile(module("declarations"), CompileOutput.Memory(), fits))
     }
 
     @Test
@@ -190,10 +243,10 @@ class CompileTest {
     }
 
     @Test
-    fun `trap diagnostics record the offset of every trap and call site`() {
+    fun `stacktraces record the offset of every trap and call site`() {
         val output = CompileOutput.Memory()
 
-        compile(module("trap_diagnostics"), output, CompileConfig("test.sites") { trapDiagnostics(true) }).expect("compiles")
+        compile(module("trap_diagnostics"), output, CompileConfig("test.sites") { stacktraces(true) }).expect("compiles")
 
         val sites = checkNotNull(readTrapSites(output.resources.getValue(trapSitesResource("test/sites")).inputStream()))
         val expected = mapOf(
@@ -224,13 +277,13 @@ class CompileTest {
     }
 
     @Test
-    fun `an Android module records which inline access failed when trap diagnostics are on`() {
+    fun `an Android module records which inline access failed when stacktraces are on`() {
         val plain = CompileOutput.Memory()
         val diagnosed = CompileOutput.Memory()
 
         compile(module("trap_diagnostics"), plain, CompileConfig("test.android.plain") { target(CompileTarget.ANDROID) }).expect("compiles")
-        val config = CompileConfig("test.android.sites") { target(CompileTarget.ANDROID).trapDiagnostics(true) }
-        compile(module("trap_diagnostics"), diagnosed, config).expect("compiles with diagnostics")
+        val config = CompileConfig("test.android.sites") { target(CompileTarget.ANDROID).stacktraces(true) }
+        compile(module("trap_diagnostics"), diagnosed, config).expect("compiles with stacktraces")
 
         fun CompileOutput.Memory.records() = classes.values.any { bytes -> "memoryAccessOutOfBounds" in String(bytes, Charsets.ISO_8859_1) }
         assertTrue(diagnosed.records())
@@ -238,23 +291,24 @@ class CompileTest {
     }
 
     @Test
-    fun `a module compiled without trap diagnostics writes no trap sites and needs no shrinker rules`() {
+    fun `a module compiled without stacktraces writes no trap sites and keeps only its module class`() {
         val output = CompileOutput.Memory()
 
         val artifact = compile(module("trap_diagnostics"), output, CompileConfig("test.plain")).expect("compiles")
 
         assertTrue(output.resources.keys.none { name -> name.endsWith(".chasmsites") })
-        assertEquals(null, artifact.shrinkerRules)
+        assertEquals("-keep class test.plain.WasmModule { public static *** INSTANCE; }\n", artifact.shrinkerRules)
     }
 
     @Test
-    fun `trap diagnostics keep the compiled functions' names and line numbers through a shrinker`() {
-        val config = CompileConfig("test.rules") { trapDiagnostics(true) }
+    fun `stacktraces keep the compiled functions' names and line numbers through a shrinker`() {
+        val config = CompileConfig("test.rules") { stacktraces(true) }
 
         val artifact = compile(module("trap_diagnostics"), CompileOutput.Memory(), config).expect("compiles")
 
         assertEquals(
-            "-keepattributes LineNumberTable\n" +
+            "-keep class test.rules.WasmModule { public static *** INSTANCE; }\n" +
+                "-keepattributes LineNumberTable\n" +
                 "-keep class test.rules.Code*, test.rules.Chunks* { static *** f*(...); }\n" +
                 "-keep,allowobfuscation,allowshrinking class io.github.charlietap.chasm.executor.invoker.compiled.CompiledEntry " +
                 "{ *** invoke(...); }\n",

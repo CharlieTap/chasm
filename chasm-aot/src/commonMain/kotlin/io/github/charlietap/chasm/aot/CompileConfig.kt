@@ -1,13 +1,14 @@
 package io.github.charlietap.chasm.aot
 
 import io.github.charlietap.chasm.config.ModuleConfig
+import io.github.charlietap.chasm.config.StoreConfig
 
 class CompileConfig private constructor(
     val packageName: String,
     val target: CompileTarget,
-    val meterFuel: Boolean,
-    val interruptible: Boolean,
-    val trapDiagnostics: Boolean,
+    val stacktraces: Boolean,
+    val storeConfig: StoreConfig,
+    val initialFuel: Long?,
     val moduleConfig: ModuleConfig,
     val maxMethodBytes: Int,
     val functionMaxMethodBytes: Map<Int, Int>,
@@ -17,9 +18,9 @@ class CompileConfig private constructor(
         private val packageName: String,
     ) {
         private var target = CompileTarget.JVM
-        private var meterFuel = false
-        private var interruptible = false
-        private var trapDiagnostics = false
+        private var stacktraces = false
+        private var storeConfig = StoreConfig()
+        private var initialFuel: Long? = null
         private var moduleConfig = ModuleConfig()
         private var maxMethodBytes: Int? = null
         private val functionMaxMethodBytes = LinkedHashMap<Int, Int>()
@@ -37,22 +38,17 @@ class CompileConfig private constructor(
             maxMethodBytes: Int,
         ) = apply { functionMaxMethodBytes[function] = maxMethodBytes }
 
-        fun meterFuel(
-            meterFuel: Boolean,
-        ) = apply { this.meterFuel = meterFuel }
+        fun stacktraces(
+            stacktraces: Boolean,
+        ) = apply { this.stacktraces = stacktraces }
 
-        fun interruptible(
-            interruptible: Boolean,
-        ) = apply { this.interruptible = interruptible }
+        fun store(
+            config: StoreConfig,
+        ) = apply { this.storeConfig = config }
 
-        /**
-         * Traps report the same Wasm frames and offsets as the interpreter
-         * when `RuntimeConfig.debugInfo` is on. Makes the generated classes
-         * larger and compilation slower.
-         */
-        fun trapDiagnostics(
-            trapDiagnostics: Boolean,
-        ) = apply { this.trapDiagnostics = trapDiagnostics }
+        fun initialFuel(
+            units: Long,
+        ) = apply { this.initialFuel = units }
 
         fun moduleConfig(
             moduleConfig: ModuleConfig,
@@ -61,9 +57,9 @@ class CompileConfig private constructor(
         fun build(): CompileConfig = CompileConfig(
             packageName = packageName,
             target = target,
-            meterFuel = meterFuel,
-            interruptible = interruptible,
-            trapDiagnostics = trapDiagnostics,
+            stacktraces = stacktraces,
+            storeConfig = storeConfig,
+            initialFuel = initialFuel,
             moduleConfig = moduleConfig,
             maxMethodBytes = maxMethodBytes ?: target.maxMethodBytes,
             functionMaxMethodBytes = functionMaxMethodBytes.toMap(),

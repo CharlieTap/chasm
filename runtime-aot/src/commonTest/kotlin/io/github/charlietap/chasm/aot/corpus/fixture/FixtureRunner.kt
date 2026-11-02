@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.aot.corpus.fixture
 
 import io.github.charlietap.chasm.aot.corpus.failure
 import io.github.charlietap.chasm.aot.script.ScriptModules
+import io.github.charlietap.chasm.config.GCStrategy
 import io.github.charlietap.chasm.config.StoreConfig
 import io.github.charlietap.chasm.embedding.module
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
@@ -34,7 +35,7 @@ private fun FixtureRunner(
     }
     if (context.phase == CorpusPhase.DECODING) return CorpusResult.Success
 
-    val compiled = when (val result = timings.validate { ScriptModules.compile(bytes, moduleConfig, StoreConfig()) }) {
+    val compiled = when (val result = timings.validate { ScriptModules.compile(bytes, moduleConfig, STORE_CONFIG) }) {
         is ChasmResult.Success -> result.result
         is ChasmResult.Error -> return fixture.failure("validate", "failed to validate wasm", result.error.toString())
     }
@@ -49,3 +50,5 @@ private fun FixtureRunner(
     }
     return CorpusResult.Success
 }
+
+private val STORE_CONFIG = StoreConfig(gcStrategy = GCStrategy.TRADITIONAL)

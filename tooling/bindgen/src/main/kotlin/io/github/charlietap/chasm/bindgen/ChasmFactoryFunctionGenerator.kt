@@ -97,7 +97,6 @@ internal class ChasmFactoryFunctionGenerator {
         interfaceName: String,
         visibility: FactoryVisibility,
         compiledCode: String,
-        debugInfo: Boolean,
     ): FunSpec {
         val compiled = ClassName(compiledCode.substringBeforeLast('.', ""), compiledCode.substringAfterLast('.'))
         val visibilityModifier = when (visibility) {
@@ -123,11 +122,10 @@ internal class ChasmFactoryFunctionGenerator {
             addStatement("val allocatedImports = %M(store, imports)", CHASM_ALLOCATE_IMPORTS)
             addStatement(
                 "val instance = instanceFactory?.invoke(store, %T.INSTANCE, allocatedImports) ?: " +
-                    "%M(store, %T.INSTANCE, allocatedImports%L).%M(%S)",
+                    "%M(store, %T.INSTANCE, allocatedImports).%M(%S)",
                 compiled,
                 CHASM_COMPILED_INSTANCE,
                 compiled,
-                runtimeConfig(debugInfo),
                 CHASM_EXPECT,
                 "Failed to instantiate module",
             )

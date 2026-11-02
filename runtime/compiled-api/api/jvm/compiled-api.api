@@ -1,15 +1,62 @@
+public final class io/github/charlietap/chasm/aot/Capabilities {
+	public fun <init> (ZZZ)V
+	public final fun component1 ()Z
+	public final fun component2 ()Z
+	public final fun component3 ()Z
+	public final fun copy (ZZZ)Lio/github/charlietap/chasm/aot/Capabilities;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/aot/Capabilities;ZZZILjava/lang/Object;)Lio/github/charlietap/chasm/aot/Capabilities;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getInterruptible ()Z
+	public final fun getMeterFuel ()Z
+	public final fun getStacktraces ()Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
 public final class io/github/charlietap/chasm/aot/CompiledModule {
 	public final fun getCode ()Lio/github/charlietap/chasm/aot/internal/CompiledCode;
 	public final fun getDeclarations-d1pmJ48 ()Ljava/lang/Object;
+	public final fun getMetadata ()Lio/github/charlietap/chasm/aot/CompiledModuleMetadata;
+	public final fun getMetadataResult-d1pmJ48 ()Ljava/lang/Object;
 	public final fun getPackageName ()Ljava/lang/String;
 	public final fun getTrapLines ()Lio/github/charlietap/chasm/aot/internal/TrapLines;
 	public final fun getTrapSites ()Lio/github/charlietap/chasm/aot/internal/TrapSites;
 }
 
+public final class io/github/charlietap/chasm/aot/CompiledModuleMetadata {
+	public fun <init> (Lio/github/charlietap/chasm/aot/Capabilities;Lio/github/charlietap/chasm/config/StoreConfig;Ljava/lang/Long;I)V
+	public final fun getCapabilities ()Lio/github/charlietap/chasm/aot/Capabilities;
+	public final fun getInitialFuel ()Ljava/lang/Long;
+	public final fun getRuntimeAbi ()I
+	public final fun getStoreConfig ()Lio/github/charlietap/chasm/config/StoreConfig;
+}
+
 public abstract interface class io/github/charlietap/chasm/aot/internal/CompiledCode {
 	public abstract fun buildDeclarations ()Lio/github/charlietap/chasm/declarations/ModuleDeclarations;
+	public abstract fun gcHeapBytes ()J
+	public abstract fun gcStrategy ()I
+	public abstract fun gcThresholdKind ()I
+	public abstract fun gcThresholdValue ()I
+	public abstract fun initialFuel ()J
 	public abstract fun install (Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;)V
+	public abstract fun interruptible ()Z
+	public abstract fun memoryPages ()I
+	public abstract fun meterFuel ()Z
+	public abstract fun runtimeAbi ()I
+	public abstract fun stackBytes ()J
+	public abstract fun stacktraces ()Z
+	public abstract fun tableElements ()I
+	public abstract fun trapOnGrowFailure ()Z
 	public abstract fun trapSitesResource ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/aot/internal/CompiledMetadataKt {
+	public static final field COMPILED_RUNTIME_ABI I
+	public static final field UNSET I
+	public static final field UNSET_LONG J
+	public static final fun gcStrategyCode (Lio/github/charlietap/chasm/config/GCStrategy;)I
+	public static final fun gcThresholdKind (Lio/github/charlietap/chasm/config/GCThreshold;)I
+	public static final fun gcThresholdValue (Lio/github/charlietap/chasm/config/GCThreshold;)I
 }
 
 public final class io/github/charlietap/chasm/aot/internal/CompiledModuleKt {

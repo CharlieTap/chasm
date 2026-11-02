@@ -1,5 +1,9 @@
+public final class io/github/charlietap/chasm/aot/CompiledModulesKt {
+	public static final fun compiledModule (Ljava/lang/Class;)Lio/github/charlietap/chasm/aot/CompiledModule;
+	public static final fun compiledModule (Ljava/lang/String;Ljava/lang/ClassLoader;)Lio/github/charlietap/chasm/aot/CompiledModule;
+}
+
 public final class io/github/charlietap/chasm/aot/InstanceKt {
-	public static final fun instance (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/aot/CompiledModule;Ljava/util/List;Lio/github/charlietap/chasm/config/RuntimeConfig;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
-	public static synthetic fun instance$default (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/aot/CompiledModule;Ljava/util/List;Lio/github/charlietap/chasm/config/RuntimeConfig;ILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+	public static final fun instance (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/aot/CompiledModule;Ljava/util/List;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 }
 

@@ -18,13 +18,19 @@ import io.github.charlietap.chasm.decoder.WasmFunctionBodyOffsets
 
 // A shrinker that renames the compiled function methods or drops their line numbers leaves traps unattributable, and one
 // that merges other classes into the entry into compiled code, or inlines its invoke, blurs where compiled runs begin.
-internal fun trapDiagnosticRules(
-    packageName: String,
-): String = """
-    -keepattributes LineNumberTable
-    -keep class $packageName.$CODE_CLASS_PREFIX*, $packageName.$CHUNK_CLASS_PREFIX* { static *** $FUNCTION_METHOD_PREFIX*(...); }
-    -keep,allowobfuscation,allowshrinking class $COMPILED_ENTRY_CLASS { *** invoke(...); }
+internal fun shrinkerRules(
+    moduleClass: String,
+    config: CompileConfig,
+): String {
+    val module = "-keep class $moduleClass { public static *** INSTANCE; }\n"
+    if (!config.stacktraces) return module
+    val packageName = config.packageName
+    return module + """
+        -keepattributes LineNumberTable
+        -keep class $packageName.$CODE_CLASS_PREFIX*, $packageName.$CHUNK_CLASS_PREFIX* { static *** $FUNCTION_METHOD_PREFIX*(...); }
+        -keep,allowobfuscation,allowshrinking class $COMPILED_ENTRY_CLASS { *** invoke(...); }
     """.trimIndent() + "\n"
+}
 
 internal typealias TrapSitesFactory = (ModuleConfig, ByteArray, Module, CirModule) -> Map<Int, FunctionTrapSites>
 

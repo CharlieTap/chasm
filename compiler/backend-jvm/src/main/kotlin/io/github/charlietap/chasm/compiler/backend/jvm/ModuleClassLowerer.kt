@@ -3,6 +3,12 @@
 package io.github.charlietap.chasm.compiler.backend.jvm
 
 import io.github.charlietap.chasm.InternalChasmApi
+import io.github.charlietap.chasm.aot.internal.COMPILED_RUNTIME_ABI
+import io.github.charlietap.chasm.aot.internal.UNSET
+import io.github.charlietap.chasm.aot.internal.UNSET_LONG
+import io.github.charlietap.chasm.aot.internal.gcStrategyCode
+import io.github.charlietap.chasm.aot.internal.gcThresholdKind
+import io.github.charlietap.chasm.aot.internal.gcThresholdValue
 import io.github.charlietap.chasm.aot.internal.trapSitesResource
 import io.github.charlietap.chasm.compiler.backend.abi.internalName
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.BUILD_DECLARATIONS
@@ -16,12 +22,27 @@ import io.github.charlietap.chasm.compiler.backend.jvm.abi.DATA_SOURCE_TYPE
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.INSTALL
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.INSTALLS_PER_METHOD
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.MAX_FANOUT
+import io.github.charlietap.chasm.compiler.backend.jvm.abi.META_GC_HEAP_BYTES
+import io.github.charlietap.chasm.compiler.backend.jvm.abi.META_GC_STRATEGY
+import io.github.charlietap.chasm.compiler.backend.jvm.abi.META_GC_THRESHOLD_KIND
+import io.github.charlietap.chasm.compiler.backend.jvm.abi.META_GC_THRESHOLD_VALUE
+import io.github.charlietap.chasm.compiler.backend.jvm.abi.META_INITIAL_FUEL
+import io.github.charlietap.chasm.compiler.backend.jvm.abi.META_INTERRUPTIBLE
+import io.github.charlietap.chasm.compiler.backend.jvm.abi.META_MEMORY_PAGES
+import io.github.charlietap.chasm.compiler.backend.jvm.abi.META_METER_FUEL
+import io.github.charlietap.chasm.compiler.backend.jvm.abi.META_STACKTRACES
+import io.github.charlietap.chasm.compiler.backend.jvm.abi.META_STACK_BYTES
+import io.github.charlietap.chasm.compiler.backend.jvm.abi.META_TABLE_ELEMENTS
+import io.github.charlietap.chasm.compiler.backend.jvm.abi.META_TRAP_ON_GROW_FAILURE
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.MODULE_DECLARATIONS
+import io.github.charlietap.chasm.compiler.backend.jvm.abi.RUNTIME_ABI
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.TRAP_SITES_RESOURCE
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.installClassDescriptor
 import io.github.charlietap.chasm.compiler.backend.jvm.declarations.DECLARATIONS_BUILDER
 import io.github.charlietap.chasm.compiler.backend.jvm.declarations.DECLARE
 import io.github.charlietap.chasm.compiler.backend.jvm.declarations.DECLARE_DESCRIPTOR
+import org.objectweb.asm.ClassWriter
+import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Type
 
@@ -108,11 +129,13 @@ internal fun ModuleClassLowerer(
     // The path is written here because a shrinker may rename the classes it is derived from.
     writer.visitMethod(Opcodes.ACC_PUBLIC, TRAP_SITES_RESOURCE, "()Ljava/lang/String;", null, null).apply {
         visitCode()
-        if (module.options.trapDiagnostics) visitLdcInsn(trapSitesResource(module.packagePath)) else visitInsn(Opcodes.ACONST_NULL)
+        if (module.options.stacktraces) visitLdcInsn(trapSitesResource(module.packagePath)) else visitInsn(Opcodes.ACONST_NULL)
         visitInsn(Opcodes.ARETURN)
         visitMaxs(0, 0)
         visitEnd()
     }
+
+    writeMetadata(writer, module.options)
 
     val chunks = entries.chunked(INSTALLS_PER_METHOD)
     val chunkClasses = chunks.indices.map { chunk -> installClassDescriptor(module.packagePath, chunk) }
@@ -167,6 +190,57 @@ internal fun ModuleClassLowerer(
         }
         chunkWriter.visitEnd()
         output.classFile(chunkOwner, chunkWriter.toByteArray())
+    }
+}
+
+private fun writeMetadata(
+    writer: ClassWriter,
+    options: JvmOptions,
+) {
+    val store = options.storeConfig
+    val limits = store.limits
+    writer.constant(RUNTIME_ABI, COMPILED_RUNTIME_ABI)
+    writer.constant(META_METER_FUEL, store.meterFuel)
+    writer.constant(META_INTERRUPTIBLE, store.interruptible)
+    writer.constant(META_STACKTRACES, options.stacktraces)
+    writer.constant(META_INITIAL_FUEL, options.initialFuel ?: UNSET_LONG)
+    writer.constant(META_GC_STRATEGY, gcStrategyCode(store.gcStrategy))
+    writer.constant(META_GC_THRESHOLD_KIND, gcThresholdKind(store.gcThreshold))
+    writer.constant(META_GC_THRESHOLD_VALUE, gcThresholdValue(store.gcThreshold))
+    writer.constant(META_GC_HEAP_BYTES, limits.gcHeapBytes ?: UNSET_LONG)
+    writer.constant(META_MEMORY_PAGES, limits.memoryPages ?: UNSET)
+    writer.constant(META_TABLE_ELEMENTS, limits.tableElements ?: UNSET)
+    writer.constant(META_TRAP_ON_GROW_FAILURE, limits.trapOnGrowFailure)
+    writer.constant(META_STACK_BYTES, limits.stackBytes ?: UNSET_LONG)
+}
+
+private fun ClassWriter.constant(
+    name: String,
+    value: Int,
+) = constantMethod(name, "()I", Opcodes.IRETURN) { visitLdcInsn(value) }
+
+private fun ClassWriter.constant(
+    name: String,
+    value: Long,
+) = constantMethod(name, "()J", Opcodes.LRETURN) { visitLdcInsn(value) }
+
+private fun ClassWriter.constant(
+    name: String,
+    value: Boolean,
+) = constantMethod(name, "()Z", Opcodes.IRETURN) { visitInsn(if (value) Opcodes.ICONST_1 else Opcodes.ICONST_0) }
+
+private inline fun ClassWriter.constantMethod(
+    name: String,
+    descriptor: String,
+    returnOpcode: Int,
+    push: MethodVisitor.() -> Unit,
+) {
+    visitMethod(Opcodes.ACC_PUBLIC, name, descriptor, null, null).apply {
+        visitCode()
+        push()
+        visitInsn(returnOpcode)
+        visitMaxs(0, 0)
+        visitEnd()
     }
 }
 

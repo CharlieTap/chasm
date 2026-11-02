@@ -8,8 +8,10 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.getError
 import com.github.michaelbull.result.getOrElse
 import com.github.michaelbull.result.mapError
+import io.github.charlietap.chasm.ExperimentalChasmApi
 import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.aot.CompileError.Stage
+import io.github.charlietap.chasm.aot.internal.COMPILED_RUNTIME_ABI
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.typeResolver
 import io.github.charlietap.chasm.compiler.backend.jvm.ClassTooLarge
@@ -21,6 +23,7 @@ import io.github.charlietap.chasm.compiler.backend.jvm.UnsupportedFunctions
 import io.github.charlietap.chasm.compiler.frontend.ModuleCompiler
 import io.github.charlietap.chasm.compiler.frontend.UncompilableFunctions
 import io.github.charlietap.chasm.config.ModuleConfig
+import io.github.charlietap.chasm.config.StoreLimits
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
 import io.github.charlietap.chasm.module.ModuleDeclarationsFactory
 import io.github.charlietap.chasm.stream.SourceReader
@@ -41,7 +44,7 @@ fun compile(
     output: CompileOutput,
     config: CompileConfig,
 ): CompileResult {
-    if (config.trapDiagnostics) {
+    if (config.stacktraces) {
         val bytes = try {
             Files.readAllBytes(input)
         } catch (failure: IOException) {
@@ -81,7 +84,7 @@ private fun compile(
         source = source,
         binary = binary,
         validator = ::WasmModuleValidator,
-        moduleCompiler = { module, types -> ModuleCompiler(module, types, recordProvenance = config.trapDiagnostics) },
+        moduleCompiler = { module, types -> ModuleCompiler(module, types, recordProvenance = config.stacktraces) },
         uncompilableFunctions = ::UncompilableFunctions,
         declarationsFactory = ::ModuleDeclarationsFactory,
         trapSitesFactory = ::TrapSitesFactory,
@@ -107,22 +110,23 @@ internal inline fun compile(
         val module = validator(config.moduleConfig, decoded).getOrElse { failure ->
             return error(Stage.VALIDATION, failure.toString())
         }
+        exceededLimit(module, config.storeConfig.limits)?.let { reason -> return error(Stage.CONFIGURATION, reason) }
         val types = module.typeResolver()
         val code = moduleCompiler(module, types).getOrElse { failure ->
             val functions = uncompilableFunctions(module, types)
             val reasons = functions.entries.joinToString { (index, reason) -> "$index ($reason)" }
             return error(Stage.GENERATION, "cannot compile functions: ${reasons.ifEmpty { failure.toString() }}", functions.keys.toList())
         }
-        val sites = if (config.trapDiagnostics && binary != null) trapSitesFactory(config.moduleConfig, binary, module, code) else emptyMap()
+        val sites = if (config.stacktraces && binary != null) trapSitesFactory(config.moduleConfig, binary, module, code) else emptyMap()
         val generated = moduleLowerer(module, code, options, CompileOutputAdapter(sink), declarationsFactory(module), sites)
         val files = guardOutput { sink.commit() }
-        val rules = if (config.trapDiagnostics) trapDiagnosticRules(config.packageName) else null
         CompileResult.Success(
             CompiledModuleArtifact(
                 moduleClassName = generated.moduleClass,
+                metadata = metadata(config),
                 dataResourcePath = generated.data,
                 files = files,
-                shrinkerRules = rules,
+                shrinkerRules = shrinkerRules(generated.moduleClass, config),
             ),
         )
     } catch (unsupported: UnsupportedFunctions) {
@@ -140,6 +144,41 @@ internal inline fun compile(
     if (result is CompileResult.Error) sink.discard()
     return result
 }
+
+private fun exceededLimit(
+    module: Module,
+    limits: StoreLimits,
+): String? {
+    val memoryPages = limits.memoryPages?.toULong()
+    val tableElements = limits.tableElements?.toULong()
+    module.memories.forEachIndexed { index, memory ->
+        val pages = memory.type.limits.min
+        if (memoryPages != null && pages > memoryPages) {
+            return "memory $index starts at $pages pages, above the store's limit of $memoryPages pages"
+        }
+    }
+    module.tables.forEachIndexed { index, table ->
+        val elements = table.type.limits.min
+        if (tableElements != null && elements > tableElements) {
+            return "table $index starts at $elements elements, above the store's limit of $tableElements elements"
+        }
+    }
+    return null
+}
+
+@OptIn(ExperimentalChasmApi::class)
+private fun metadata(
+    config: CompileConfig,
+): CompiledModuleMetadata = CompiledModuleMetadata(
+    capabilities = Capabilities(
+        meterFuel = config.storeConfig.meterFuel,
+        interruptible = config.storeConfig.interruptible,
+        stacktraces = config.stacktraces,
+    ),
+    storeConfig = config.storeConfig,
+    initialFuel = config.initialFuel,
+    runtimeAbi = COMPILED_RUNTIME_ABI,
+)
 
 internal typealias ModuleSource = (ModuleConfig) -> Result<Module, CompileError>
 
@@ -178,17 +217,23 @@ private fun jvmOptions(
     if (!isPackageName(config.packageName)) {
         return Err(CompileError("\"${config.packageName}\" is not a Java package name", Stage.CONFIGURATION))
     }
+    if (config.initialFuel != null && !config.storeConfig.meterFuel) {
+        return Err(CompileError("initialFuel needs a store that meters fuel", Stage.CONFIGURATION))
+    }
+    if (config.initialFuel != null && config.initialFuel < 0) {
+        return Err(CompileError("initialFuel must not be negative, not ${config.initialFuel}", Stage.CONFIGURATION))
+    }
     return try {
         Ok(
             JvmOptions(
                 packageName = config.packageName,
-                meterFuel = config.meterFuel,
-                interruptible = config.interruptible,
+                storeConfig = config.storeConfig,
+                initialFuel = config.initialFuel,
                 memory = when (config.target) {
                     CompileTarget.JVM -> MemoryLowering.HELPERS
                     CompileTarget.ANDROID -> MemoryLowering.UNSAFE
                 },
-                trapDiagnostics = config.trapDiagnostics,
+                stacktraces = config.stacktraces,
                 maxMethodBytes = config.maxMethodBytes,
                 functionMaxMethodBytes = config.functionMaxMethodBytes,
             ),

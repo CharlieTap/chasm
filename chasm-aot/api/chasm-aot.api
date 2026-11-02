@@ -1,24 +1,24 @@
 public final class io/github/charlietap/chasm/aot/CompileConfig {
 	public final fun getFunctionMaxMethodBytes ()Ljava/util/Map;
-	public final fun getInterruptible ()Z
+	public final fun getInitialFuel ()Ljava/lang/Long;
 	public final fun getMaxMethodBytes ()I
-	public final fun getMeterFuel ()Z
 	public final fun getModuleConfig ()Lio/github/charlietap/chasm/config/ModuleConfig;
 	public final fun getPackageName ()Ljava/lang/String;
+	public final fun getStacktraces ()Z
+	public final fun getStoreConfig ()Lio/github/charlietap/chasm/config/StoreConfig;
 	public final fun getTarget ()Lio/github/charlietap/chasm/aot/CompileTarget;
-	public final fun getTrapDiagnostics ()Z
 }
 
 public final class io/github/charlietap/chasm/aot/CompileConfig$Builder {
 	public fun <init> (Ljava/lang/String;)V
 	public final fun build ()Lio/github/charlietap/chasm/aot/CompileConfig;
-	public final fun interruptible (Z)Lio/github/charlietap/chasm/aot/CompileConfig$Builder;
+	public final fun initialFuel (J)Lio/github/charlietap/chasm/aot/CompileConfig$Builder;
 	public final fun maxMethodBytes (I)Lio/github/charlietap/chasm/aot/CompileConfig$Builder;
 	public final fun maxMethodBytes (II)Lio/github/charlietap/chasm/aot/CompileConfig$Builder;
-	public final fun meterFuel (Z)Lio/github/charlietap/chasm/aot/CompileConfig$Builder;
 	public final fun moduleConfig (Lio/github/charlietap/chasm/config/ModuleConfig;)Lio/github/charlietap/chasm/aot/CompileConfig$Builder;
+	public final fun stacktraces (Z)Lio/github/charlietap/chasm/aot/CompileConfig$Builder;
+	public final fun store (Lio/github/charlietap/chasm/config/StoreConfig;)Lio/github/charlietap/chasm/aot/CompileConfig$Builder;
 	public final fun target (Lio/github/charlietap/chasm/aot/CompileTarget;)Lio/github/charlietap/chasm/aot/CompileConfig$Builder;
-	public final fun trapDiagnostics (Z)Lio/github/charlietap/chasm/aot/CompileConfig$Builder;
 }
 
 public final class io/github/charlietap/chasm/aot/CompileConfigKt {
@@ -121,6 +121,7 @@ public final class io/github/charlietap/chasm/aot/CompiledModuleArtifact {
 	public static final field DATA_RESOURCE_EXTENSION Ljava/lang/String;
 	public final fun getDataResourcePath ()Ljava/lang/String;
 	public final fun getFiles ()Ljava/util/List;
+	public final fun getMetadata ()Lio/github/charlietap/chasm/aot/CompiledModuleMetadata;
 	public final fun getModuleClassName ()Ljava/lang/String;
 	public final fun getShrinkerRules ()Ljava/lang/String;
 }

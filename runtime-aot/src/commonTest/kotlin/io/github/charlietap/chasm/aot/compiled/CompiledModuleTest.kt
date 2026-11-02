@@ -7,7 +7,6 @@ import io.github.charlietap.chasm.aot.CompiledModule
 import io.github.charlietap.chasm.aot.instance
 import io.github.charlietap.chasm.compiler.backend.jvm.JvmModule
 import io.github.charlietap.chasm.compiler.backend.jvm.JvmOptions
-import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.embedding.error.ChasmError
 import io.github.charlietap.chasm.embedding.exports
 import io.github.charlietap.chasm.embedding.invoke
@@ -244,24 +243,23 @@ class CompiledModuleTest {
     @Test
     fun `a module whose name section does not decode instantiates without names`() {
         val bytes = fixture("add") + byteArrayOf(0x00, 0x06, 0x04, 0x6E, 0x61, 0x6D, 0x65, 0x00)
-        val compiled = generate(bytes).compiledModule()
+        val compiled = generate(bytes, JvmOptions(stacktraces = true)).compiledModule()
         val store = store()
 
-        val instance = instance(store, compiled, emptyList(), RuntimeConfig(debugInfo = true)).expect("instantiates")
+        val instance = instance(store, compiled, emptyList()).expect("instantiates")
 
         assertEquals(listOf(I32(5)), invoke(store, instance, "add", listOf(I32(2), I32(3))).expect("add"))
     }
 
     @Test
     fun `a trap in an imported start function is named by the module that defines it`() {
-        val boom = generate(fixture("boom"), JvmOptions(packageName = "chasm.aot.boom")).compiledModule()
-        val starting = generate(fixture("imported_start"), JvmOptions(packageName = "chasm.aot.starting")).compiledModule()
-        val config = RuntimeConfig(debugInfo = true)
+        val boom = generate(fixture("boom"), JvmOptions(packageName = "chasm.aot.boom", stacktraces = true)).compiledModule()
+        val starting = generate(fixture("imported_start"), JvmOptions(packageName = "chasm.aot.starting", stacktraces = true)).compiledModule()
         val store = store()
-        val exporter = instance(store, boom, emptyList(), config).expect("boom instantiates")
+        val exporter = instance(store, boom, emptyList()).expect("boom instantiates")
         val imports = exports(exporter).map { export -> Import("boom", export.name, export.value) }
 
-        val result = instance(store, starting, imports, config)
+        val result = instance(store, starting, imports)
 
         assertIs<ChasmResult.Error<ChasmError.ExecutionError>>(result)
         val frames = checkNotNull(result.error.trap).frames
@@ -271,9 +269,9 @@ class CompiledModuleTest {
 
     @Test
     fun `a trap in a compiled start function names every frame`() {
-        val compiled = generate(fixture("start_trap")).compiledModule()
+        val compiled = generate(fixture("start_trap"), JvmOptions(stacktraces = true)).compiledModule()
 
-        val result = instance(store(), compiled, emptyList(), RuntimeConfig(debugInfo = true))
+        val result = instance(store(), compiled, emptyList())
 
         assertIs<ChasmResult.Error<ChasmError.ExecutionError>>(result)
         val frames = checkNotNull(result.error.trap).frames

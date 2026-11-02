@@ -100,7 +100,7 @@ private fun LowerContext.inlineAccess(
     val reach = offset + width
     val address = access.address
     if (reach > Int.MAX_VALUE) return accessOutOfBounds(access) { pushUnsignedAddress(address, offset) }
-    val shared = if (module.options.trapDiagnostics) null else sharedOutOfBounds()
+    val shared = if (module.options.stacktraces) null else sharedOutOfBounds()
     if (address is Operand.Immediate) {
         val effective = (address.bits and 0xFFFF_FFFFL) + offset
         if (effective + width > Int.MAX_VALUE) return accessOutOfBounds(access) { emit.long(effective) }
@@ -167,7 +167,7 @@ private fun LowerContext.siteOutOfBounds(
 private fun LowerContext.accessOutOfBounds(
     access: MemoryAccess,
     pushAddress: LowerContext.() -> Unit,
-) = if (module.options.trapDiagnostics) trapAccess(access, pushAddress) else trap(MEMORY_OUT_OF_BOUNDS)
+) = if (module.options.stacktraces) trapAccess(access, pushAddress) else trap(MEMORY_OUT_OF_BOUNDS)
 
 private fun LowerContext.trapAccess(
     access: MemoryAccess,

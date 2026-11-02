@@ -40,7 +40,7 @@ private fun ModuleInstantiator(
 ): Result<RuntimeSetup, CorpusResult> {
     val imports = importResolver(context.fixture, store, module.decoded, test).getOrElse { error -> return Err(error) }
 
-    return instance(store, module.compiled, imports.imports, context.config.runtimeConfig).fold(
+    return instance(store, module.compiled, imports.imports).fold(
         { instance ->
             val exportedMemory = instance.exports.firstNotNullOfOrNull { export -> export.value as? Memory }
             if (imports.memories.isEmpty() && exportedMemory != null) {
