@@ -22,14 +22,19 @@ import io.github.charlietap.chasm.embedding.shapes.Memory
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
 import java.util.concurrent.atomic.AtomicInteger
+import io.github.charlietap.chasm.embedding.addFuel as embeddingAddFuel
 import io.github.charlietap.chasm.embedding.exports as embeddingExports
 import io.github.charlietap.chasm.embedding.extern.createExternRef as embeddingCreateExternRef
 import io.github.charlietap.chasm.embedding.gc as embeddingGc
+import io.github.charlietap.chasm.embedding.interrupt as embeddingInterrupt
 import io.github.charlietap.chasm.embedding.invoke as embeddingInvoke
+import io.github.charlietap.chasm.embedding.memory.growMemory as embeddingGrowMemory
 import io.github.charlietap.chasm.embedding.memory.readBytes as embeddingReadBytes
 import io.github.charlietap.chasm.embedding.memory.readNullTerminatedUtf8String as embeddingReadNullTerminatedUtf8String
 import io.github.charlietap.chasm.embedding.memory.readUtf8String as embeddingReadUtf8String
 import io.github.charlietap.chasm.embedding.memory.writeUtf8String as embeddingWriteUtf8String
+import io.github.charlietap.chasm.embedding.remainingFuel as embeddingRemainingFuel
+import io.github.charlietap.chasm.embedding.resetFuel as embeddingResetFuel
 
 class AotEngine(
     private val configure: CompileConfig.Builder.() -> Unit = {},
@@ -73,6 +78,29 @@ class AotEngine(
     override fun gc(
         store: Store,
     ): ChasmResult<Unit, ChasmError> = embeddingGc(store)
+
+    override fun addFuel(
+        store: Store,
+        units: Long,
+    ): ChasmResult<Unit, ChasmError> = embeddingAddFuel(store, units)
+
+    override fun remainingFuel(
+        store: Store,
+    ): ChasmResult<Long, ChasmError> = embeddingRemainingFuel(store)
+
+    override fun resetFuel(
+        store: Store,
+    ): ChasmResult<Unit, ChasmError> = embeddingResetFuel(store)
+
+    override fun interrupt(
+        store: Store,
+    ): ChasmResult<Boolean, ChasmError> = embeddingInterrupt(store)
+
+    override fun growMemory(
+        store: Store,
+        memory: Memory,
+        pagesToAdd: Int,
+    ): ChasmResult<Int, ChasmError> = embeddingGrowMemory(store, memory, pagesToAdd)
 
     override fun readBytes(
         store: Store,

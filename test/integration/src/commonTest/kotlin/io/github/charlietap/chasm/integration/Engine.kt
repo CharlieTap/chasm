@@ -37,6 +37,29 @@ interface Engine {
         store: Store,
     ): ChasmResult<Unit, ChasmError>
 
+    fun addFuel(
+        store: Store,
+        units: Long,
+    ): ChasmResult<Unit, ChasmError>
+
+    fun remainingFuel(
+        store: Store,
+    ): ChasmResult<Long, ChasmError>
+
+    fun resetFuel(
+        store: Store,
+    ): ChasmResult<Unit, ChasmError>
+
+    fun interrupt(
+        store: Store,
+    ): ChasmResult<Boolean, ChasmError>
+
+    fun growMemory(
+        store: Store,
+        memory: Memory,
+        pagesToAdd: Int,
+    ): ChasmResult<Int, ChasmError>
+
     fun readBytes(
         store: Store,
         memory: Memory,

@@ -7,6 +7,7 @@ import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Export
 import io.github.charlietap.chasm.embedding.shapes.ExternRef
 import io.github.charlietap.chasm.embedding.shapes.Import
+import io.github.charlietap.chasm.embedding.shapes.Instance
 import io.github.charlietap.chasm.embedding.shapes.Memory
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.shapes.flatMap
@@ -14,6 +15,8 @@ import io.github.charlietap.chasm.embedding.shapes.map
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
 
 interface TestRunner {
+
+    fun instance(): ChasmResult<Instance, ChasmError>
 
     fun invoke(
         name: String,
@@ -67,6 +70,8 @@ class IntegrationTestRunner(
         imports,
         config,
     )
+
+    override fun instance(): ChasmResult<Instance, ChasmError> = instance
 
     override fun invoke(
         name: String,

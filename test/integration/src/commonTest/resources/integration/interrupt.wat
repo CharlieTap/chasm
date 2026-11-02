@@ -13,6 +13,13 @@
     (loop $continue
       (br $continue)))
 
+  (func $interrupt_then_call (export "interrupt_then_call") (result i32)
+    (call $interrupt)
+    (call $leaf))
+
+  (func $leaf (result i32)
+    (i32.const 1))
+
   (func $callback_then_spin (export "callback_then_spin")
     (call $callback)
     (loop $continue

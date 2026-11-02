@@ -1,10 +1,8 @@
-package io.github.charlietap.chasm.integration
+package io.github.charlietap.chasm.integration.test
 
 import io.github.charlietap.chasm.config.StoreConfig
-import io.github.charlietap.chasm.embedding.interrupt
-import io.github.charlietap.chasm.embedding.invoke
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
-import io.github.charlietap.chasm.integration.InterruptTest.Companion.interrupted
+import io.github.charlietap.chasm.integration.integrationTest
 import io.github.charlietap.chasm.runtime.value.NumberValue
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.FutureTask
@@ -18,10 +16,10 @@ import kotlin.test.assertTrue
 class InterruptThreadTest {
 
     @Test
-    fun `another thread stops a running loop, and the next call runs`() {
+    fun `another thread stops a running loop, and the next call runs`() = integrationTest(INTERRUPT_FIXTURE) {
         val started = CountDownLatch(1)
         val abandoned = AtomicBoolean(false)
-        val (store, instance) = InterruptTest.instantiate(
+        val (store, runner) = interruptRunner(
             StoreConfig(interruptible = true),
             keepRunning = {
                 started.countDown()
@@ -30,7 +28,7 @@ class InterruptThreadTest {
         )
 
         val invocation = FutureTask {
-            invoke(store, instance, "spin_while_host_allows")
+            runner.invoke("spin_while_host_allows")
         }
         // A daemon worker and timed waits let a broken interrupt fail the test rather than hang the JVM.
         thread(isDaemon = true, name = "interrupt-test") {
@@ -38,11 +36,11 @@ class InterruptThreadTest {
         }
 
         try {
-            assertTrue(started.await(5, TimeUnit.SECONDS), "Wasm execution did not reach the host callback")
+            assertTrue(started.await(5, TimeUnit.SECONDS), "${engine.name()}: Wasm execution did not reach the host callback")
 
-            assertEquals(ChasmResult.Success(true), interrupt(store))
+            assertEquals(ChasmResult.Success(true), engine.interrupt(store), engine.name())
 
-            assertEquals(interrupted(), invocation.get(5, TimeUnit.SECONDS))
+            assertEquals(interrupted(), invocation.get(5, TimeUnit.SECONDS), engine.name())
         } finally {
             // Ends the loop if the interrupt did not, so a failure leaves no thread spinning.
             abandoned.set(true)
@@ -50,7 +48,8 @@ class InterruptThreadTest {
 
         assertEquals(
             ChasmResult.Success(listOf(NumberValue.I32(0))),
-            invoke(store, instance, "count", listOf(NumberValue.I32(3))),
+            runner.invoke("count", listOf(NumberValue.I32(3))),
+            engine.name(),
         )
     }
 }
