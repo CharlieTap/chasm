@@ -1,4 +1,4 @@
-package io.github.charlietap.chasm.aot
+package io.github.charlietap.chasm.bindgen
 
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
@@ -18,7 +18,11 @@ import io.github.charlietap.chasm.embedding.shapes.ModuleInfo
 import io.github.charlietap.chasm.module.ModuleDeclarationsFactory
 import io.github.charlietap.chasm.declarations.moduleInfo as declarationsModuleInfo
 
-fun inspectModule(
+/**
+ * What the module in [bytes] imports and exports, read by decoding it alone: a lighter `moduleInfo` that needs neither
+ * Chasm's runtime nor a valid module.
+ */
+fun moduleInfo(
     bytes: ByteArray,
     config: ModuleConfig = ModuleConfig(),
 ): ChasmResult<ModuleInfo, DecodeError> =

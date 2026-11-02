@@ -1,8 +1,8 @@
 package io.github.charlietap.chasm.gradle
 
-import io.github.charlietap.chasm.aot.inspectModule
 import io.github.charlietap.chasm.bindgen.BindingGenerator
 import io.github.charlietap.chasm.bindgen.BindingOptions
+import io.github.charlietap.chasm.bindgen.moduleInfo
 import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.embedding.shapes.expect
 import org.gradle.api.file.DirectoryProperty
@@ -50,7 +50,7 @@ internal abstract class CodegenWorkAction : WorkAction<CodegenWorkParameters> {
     override fun execute() {
         val params = parameters
         val binaryFile = params.binary.get().asFile
-        val info = inspectModule(
+        val info = moduleInfo(
             binaryFile.readBytes(),
             ModuleConfig(decodeNameSection = true),
         ).expect("Failed to find module at path: ${binaryFile.absolutePath}")

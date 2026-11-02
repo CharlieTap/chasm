@@ -112,11 +112,6 @@ public final class io/github/charlietap/chasm/aot/CompiledModuleArtifact {
 public final class io/github/charlietap/chasm/aot/CompiledModuleArtifact$Companion {
 }
 
-public final class io/github/charlietap/chasm/aot/InspectModuleKt {
-	public static final fun inspectModule ([BLio/github/charlietap/chasm/config/ModuleConfig;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
-	public static synthetic fun inspectModule$default ([BLio/github/charlietap/chasm/config/ModuleConfig;ILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
-}
-
 public final class io/github/charlietap/chasm/aot/RetraceTrapLinesKt {
 	public static final fun retraceTrapLines (Ljava/io/Reader;)Ljava/util/Map;
 }

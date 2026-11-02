@@ -137,6 +137,11 @@ public final class io/github/charlietap/chasm/bindgen/InterfaceVisibility : java
 	public static fun values ()[Lio/github/charlietap/chasm/bindgen/InterfaceVisibility;
 }
 
+public final class io/github/charlietap/chasm/bindgen/ModuleInfoKt {
+	public static final fun moduleInfo ([BLio/github/charlietap/chasm/config/ModuleConfig;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+	public static synthetic fun moduleInfo$default ([BLio/github/charlietap/chasm/config/ModuleConfig;ILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+}
+
 public final class io/github/charlietap/chasm/bindgen/ReturnTypeDefinition : java/io/Serializable {
 	public fun <init> (Lio/github/charlietap/chasm/bindgen/Type;Lio/github/charlietap/chasm/bindgen/StringEncodingStrategy;)V
 	public synthetic fun <init> (Lio/github/charlietap/chasm/bindgen/Type;Lio/github/charlietap/chasm/bindgen/StringEncodingStrategy;ILkotlin/jvm/internal/DefaultConstructorMarker;)V

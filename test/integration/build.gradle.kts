@@ -34,7 +34,7 @@ kotlin {
         named("jvmAndAndroidTest") {
             dependencies {
                 implementation(projects.runtimeAot)
-                implementation(projects.tooling.compiler)
+                implementation(projects.chasmAot)
             }
         }
     }

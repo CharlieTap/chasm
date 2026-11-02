@@ -27,8 +27,14 @@ kotlin {
     abiValidation()
 
     dependencies {
+        api(projects.config)
         api(projects.embeddingApi)
         api(libs.kotlin.poet)
+
+        implementation(projects.decoder)
+        implementation(projects.module)
+        implementation(projects.moduleDeclarations)
+        implementation(libs.result)
 
         testImplementation(libs.kotlinx.test.resources)
         testImplementation(projects.test.fixture.chasm)

@@ -951,7 +951,7 @@ class ChasmPluginFunctionalTest {
 
                 val aotTool = sourceSets.create("aotTool")
                 dependencies {
-                    "aotToolImplementation"("io.github.charlietap.chasm:tooling-compiler:${pluginVersion.substringAfter('-')}")
+                    "aotToolImplementation"("io.github.charlietap.chasm:chasm-aot-jvm:${pluginVersion.substringAfter('-')}")
                 }
                 val compiledModule = layout.buildDirectory.dir("compiled-module")
                 val compileModule = tasks.register<JavaExec>("compileModule") {
@@ -1043,7 +1043,8 @@ class ChasmPluginFunctionalTest {
             ":validator-jvm:",
             ":ast-jvm:",
             ":frontend-jvm:",
-            ":tooling-compiler:",
+            ":chasm-aot:",
+            ":chasm-aot-jvm:",
             ":tooling-bindgen:",
         ).forEach { artifact ->
             assertFalse(runtime.contains(artifact), "$artifact reaches the app")

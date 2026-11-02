@@ -89,7 +89,7 @@ kotlin {
         jvmMain {
             dependencies {
                 implementation(projects.runtimeAot)
-                implementation(projects.tooling.compiler)
+                implementation(projects.chasmAot)
             }
         }
     }

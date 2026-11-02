@@ -32,7 +32,6 @@ val wasiPreview1Dependency = libs.wasi.emscripten.host.chasm.wasip1.kmp.get().no
 
 buildConfig {
     buildConfigField("TOOLING_BINDGEN_DEPENDENCY", libs.tooling.bindgen.get().notation())
-    buildConfigField("TOOLING_COMPILER_DEPENDENCY", libs.tooling.compiler.get().notation())
     buildConfigField("CHASM_DEPENDENCY", libs.chasm.kmp.get().notation())
     buildConfigField("CHASM_JVM_DEPENDENCY", libs.chasm.jvm.get().notation())
     buildConfigField("CHASM_COROUTINES_DEPENDENCY", libs.chasm.coroutines.kmp.get().notation())
@@ -90,7 +89,6 @@ kotlin {
         compileOnly(libs.android.gradle.plugin)
         compileOnly(libs.kotlin.stdlib)
 
-        compileOnly(projects.tooling.compiler)
         compileOnly(projects.tooling.bindgen)
         compileOnly(libs.kotlin.poet)
     }
@@ -140,7 +138,7 @@ val functionalTestRepositories = configurations.resolvable("functionalTestReposi
 dependencies {
     add(functionalTestRepositoryDependencies.name, projects.chasm)
     add(functionalTestRepositoryDependencies.name, projects.tooling.bindgen)
-    add(functionalTestRepositoryDependencies.name, projects.tooling.compiler)
+    add(functionalTestRepositoryDependencies.name, projects.chasmAot)
     add(functionalTestRepositoryDependencies.name, projects.chasmCoroutines)
     add(functionalTestRepositoryDependencies.name, projects.runtimeAot)
     add(functionalTestRepositoryDependencies.name, projects.vm)
