@@ -63,7 +63,7 @@ internal class WasmInterfaceGenerator(
             return listOf(interfaceFile, implementationFile(factoryVisibility, wasmInterface, implementationVisibility, config))
         }
 
-        return listOf(interfaceFile, compiledFile(factoryVisibility, wasmInterface, implementationVisibility, compiledCode))
+        return listOf(interfaceFile, compiledFile(factoryVisibility, wasmInterface, implementationVisibility, compiledCode, config.debugInfo))
     }
 
     private fun interfaceFile(
@@ -96,6 +96,7 @@ internal class WasmInterfaceGenerator(
                     visibility = factoryVisibility,
                     generateSuspendingFactory = config.generateSuspendingFactories,
                     linksWasiPreview1 = wasmInterface.linksWasiPreview1,
+                    debugInfo = config.debugInfo,
                 )
             },
         )
@@ -122,6 +123,7 @@ internal class WasmInterfaceGenerator(
         wasmInterface: WasmInterface,
         implementationVisibility: ImplementationVisibility,
         compiledCode: String,
+        debugInfo: Boolean,
     ): FileSpec = FileSpec.builder(wasmInterface.packageName, wasmInterface.interfaceName + "Compiled").apply {
         addAnnotation(
             AnnotationSpec.builder(OPT_IN_CLASS_NAME)
@@ -135,6 +137,7 @@ internal class WasmInterfaceGenerator(
                 interfaceName = wasmInterface.interfaceName,
                 visibility = factoryVisibility,
                 compiledCode = compiledCode,
+                debugInfo = debugInfo,
             ),
         )
         addType(

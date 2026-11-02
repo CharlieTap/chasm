@@ -11,6 +11,7 @@ internal fun codegenConfig(
     runtime: CodegenRuntime = CodegenRuntime.PORTABLE_VM,
     wasi: WasiLinking = WasiLinking.DISABLED,
     compiledCode: String? = null,
+    debugInfo: Boolean = false,
 ) = CodegenConfig(
     generateTypesafeGlobalProperties = generateTypesafeGlobalProperties,
     generateTypesafeMemoryProperties = generateTypesafeMemoryProperties,
@@ -18,4 +19,5 @@ internal fun codegenConfig(
     runtime = runtime,
     wasi = wasi,
     compiledCode = compiledCode,
+    debugInfo = debugInfo,
 )

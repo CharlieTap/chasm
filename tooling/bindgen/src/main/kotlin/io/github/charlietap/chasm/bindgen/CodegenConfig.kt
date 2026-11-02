@@ -52,6 +52,7 @@ data class CodegenConfig(
     val runtime: CodegenRuntime = CodegenRuntime.PORTABLE_VM,
     val wasi: WasiLinking = WasiLinking.DISABLED,
     val compiledCode: String? = null,
+    val debugInfo: Boolean = false,
 ) : Serializable
 
 internal val CodegenConfig.runsCompiledCode: Boolean

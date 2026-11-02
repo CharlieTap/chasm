@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.bindgen
 
 import com.squareup.kotlinpoet.ClassName
+import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.MemberName
@@ -15,6 +16,7 @@ internal class ChasmFactoryFunctionGenerator {
         visibility: FactoryVisibility,
         generateSuspendingFactory: Boolean,
         linksWasiPreview1: Boolean,
+        debugInfo: Boolean,
     ): FunSpec {
         val moduleFactoryType = if (generateSuspendingFactory) {
             CHASM_SUSPEND_MODULE_FACTORY_CLASS_NAME
@@ -77,8 +79,9 @@ internal class ChasmFactoryFunctionGenerator {
             }
             addStatement(
                 "val instance = instanceFactory?.invoke(store, module, allocatedImports) ?: " +
-                    "%M(store, module, allocatedImports).%M(%S)",
+                    "%M(store, module, allocatedImports%L).%M(%S)",
                 createInstance,
+                runtimeConfig(debugInfo),
                 CHASM_EXPECT,
                 "Failed to instantiate module",
             )
@@ -94,6 +97,7 @@ internal class ChasmFactoryFunctionGenerator {
         interfaceName: String,
         visibility: FactoryVisibility,
         compiledCode: String,
+        debugInfo: Boolean,
     ): FunSpec {
         val compiled = ClassName(compiledCode.substringBeforeLast('.', ""), compiledCode.substringAfterLast('.'))
         val visibilityModifier = when (visibility) {
@@ -119,10 +123,11 @@ internal class ChasmFactoryFunctionGenerator {
             addStatement("val allocatedImports = %M(store, imports)", CHASM_ALLOCATE_IMPORTS)
             addStatement(
                 "val instance = instanceFactory?.invoke(store, %T.INSTANCE, allocatedImports) ?: " +
-                    "%M(store, %T.INSTANCE, allocatedImports).%M(%S)",
+                    "%M(store, %T.INSTANCE, allocatedImports%L).%M(%S)",
                 compiled,
                 CHASM_COMPILED_INSTANCE,
                 compiled,
+                runtimeConfig(debugInfo),
                 CHASM_EXPECT,
                 "Failed to instantiate module",
             )
@@ -132,8 +137,13 @@ internal class ChasmFactoryFunctionGenerator {
             )
         }.build()
     }
+
+    private fun runtimeConfig(
+        debugInfo: Boolean,
+    ): CodeBlock = if (debugInfo) CodeBlock.of(", %T(debugInfo = true)", CHASM_RUNTIME_CONFIG_CLASS_NAME) else CodeBlock.of("")
 }
 
+internal val CHASM_RUNTIME_CONFIG_CLASS_NAME = ClassName("io.github.charlietap.chasm.config", "RuntimeConfig")
 internal val CHASM_STORE_CLASS_NAME = ClassName("io.github.charlietap.chasm.embedding.shapes", "Store")
 internal val CHASM_INSTANCE_CLASS_NAME = ClassName("io.github.charlietap.chasm.embedding.shapes", "Instance")
 internal val CHASM_MEMORY_CLASS_NAME = ClassName("io.github.charlietap.chasm.embedding.shapes", "Memory")

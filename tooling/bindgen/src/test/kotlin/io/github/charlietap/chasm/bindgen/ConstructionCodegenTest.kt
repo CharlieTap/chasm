@@ -49,6 +49,27 @@ class ConstructionCodegenTest {
     )
 
     @Test
+    fun `generates construction reporting traps with debug info`() = assertConstruction(
+        scenario = "DebugInfoConstruction",
+        config = codegenConfig(debugInfo = true),
+        runtimes = listOf(CodegenRuntime.CHASM),
+    )
+
+    @Test
+    fun `generates suspending construction reporting traps with debug info`() = assertConstruction(
+        scenario = "SuspendingDebugInfoConstruction",
+        config = codegenConfig(generateSuspendingFactories = true, debugInfo = true),
+        runtimes = listOf(CodegenRuntime.CHASM),
+    )
+
+    @Test
+    fun `generates construction with compiled code reporting traps with debug info`() = assertConstruction(
+        scenario = "CompiledDebugInfoConstruction",
+        config = codegenConfig(compiledCode = "com.test.aot.WasmModule", debugInfo = true),
+        runtimes = listOf(CodegenRuntime.CHASM),
+    )
+
+    @Test
     fun `generates initializers`() = assertGenerates(
         category = "construction",
         wasmInterface = wasmInterface(
