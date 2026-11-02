@@ -24,6 +24,7 @@ fun TestScope.runner(
     store: Store = store(),
     imports: List<Import> = [],
     config: RuntimeConfig = RuntimeConfig(gcStrategy = GCStrategy.TRADITIONAL),
+    script: String = this.script,
 ): TestRunner {
     return IntegrationTestRunner(engine, script, store, imports, config)
 }

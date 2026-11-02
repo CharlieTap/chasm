@@ -23,6 +23,7 @@ import io.github.charlietap.chasm.runtime.value.ExecutionValue
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.io.OutputStream
+import java.util.concurrent.atomic.AtomicInteger
 import io.github.charlietap.chasm.embedding.exports as embeddingExports
 import io.github.charlietap.chasm.embedding.extern.createExternRef as embeddingCreateExternRef
 import io.github.charlietap.chasm.embedding.gc as embeddingGc
@@ -32,7 +33,9 @@ import io.github.charlietap.chasm.embedding.memory.readNullTerminatedUtf8String 
 import io.github.charlietap.chasm.embedding.memory.readUtf8String as embeddingReadUtf8String
 import io.github.charlietap.chasm.embedding.memory.writeUtf8String as embeddingWriteUtf8String
 
-class AotEngine : Engine {
+class AotEngine(
+    private val configure: CompileConfig.Builder.() -> Unit = {},
+) : Engine {
 
     override fun name(): String = "aot"
 
@@ -43,7 +46,11 @@ class AotEngine : Engine {
         config: RuntimeConfig,
     ): ChasmResult<Instance, ChasmError> {
         val classes = CompiledClasses()
-        return when (val result = compile(bytes, classes, CompileConfig(PACKAGE_NAME))) {
+        val compileConfig = CompileConfig("$PACKAGE_NAME.module${modules.incrementAndGet()}") {
+            trapDiagnostics(true)
+            configure()
+        }
+        return when (val result = compile(bytes, classes, compileConfig)) {
             is CompileResult.Success -> instance(store, classes.module(result.artifact.moduleClassName), imports, config)
             is CompileResult.Error -> when (result.error.stage) {
                 Stage.DECODE -> ChasmResult.Error(ChasmError.DecodeError(result.error.error))
@@ -103,6 +110,9 @@ class AotEngine : Engine {
 
     private companion object {
         const val PACKAGE_NAME = "io.github.charlietap.chasm.integration.compiled"
+
+        // Each compiled module gets its own package, as Transmute gives each module, so frames name one module.
+        val modules = AtomicInteger()
     }
 }
 
