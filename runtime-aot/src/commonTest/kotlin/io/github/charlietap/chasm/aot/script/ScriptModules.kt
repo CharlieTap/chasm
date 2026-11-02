@@ -109,7 +109,7 @@ private class GeneratedCode : ClassLoader(GeneratedCode::class.java.classLoader)
     private val resources = ConcurrentHashMap<String, ByteArray>()
     private val files = ConcurrentHashMap<String, URL>()
     private val directory by lazy {
-        Files.createTempDirectory("chasm-aot-resources").also { directory -> directory.toFile().deleteOnExit() }
+        Files.createTempDirectory("runtime-aot-resources").also { directory -> directory.toFile().deleteOnExit() }
     }
 
     override fun classFile(

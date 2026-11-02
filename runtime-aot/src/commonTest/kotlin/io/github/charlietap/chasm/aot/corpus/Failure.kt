@@ -16,5 +16,5 @@ internal fun Fixture.failure(
     detail = detail,
     expected = expected,
     actual = actual,
-    rerun = "./gradlew :chasm-aot:corpus -PwasmCorpus.targets=$name",
+    rerun = "./gradlew :runtime-aot:corpus -PwasmCorpus.targets=$name",
 )

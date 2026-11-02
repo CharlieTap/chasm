@@ -97,6 +97,6 @@ tasks.withType<Test>().configureEach {
 }
 
 configure<PublishingConventionsExtension> {
-    name = "chasm-aot"
+    name = "runtime-aot"
     description = "Runs Wasm modules compiled ahead of time to JVM classes on Chasm's runtime"
 }

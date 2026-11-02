@@ -4,7 +4,7 @@
 
 - **Fast dev loop:** run `./gradlew test`. This executes the runtime unit
   tests, the official Wasm test suite and the configured `wasm-corpus` slice
-  via the JVM backend, for both Chasm and chasm-aot, giving quick signal
+  via the JVM backend, for both Chasm and runtime-aot, giving quick signal
   without longer-running native targets.
 - **Corpus only:** `./gradlew corpus` runs just the `wasm-corpus` slice and
   writes its report. Use it to iterate on a corpus failure from `test`,

@@ -147,7 +147,7 @@ class ChasmPlugin : Plugin<Project> {
         val runtimeNotation = config.map { value ->
             when {
                 value.runtime == CodegenRuntime.PORTABLE_VM -> resolveVMRuntimeNotation(jvmArtifact)
-                value.compiledCode != null -> resolveChasmAotRuntimeNotation(jvmArtifact)
+                value.compiledCode != null -> resolveRuntimeAotNotation(jvmArtifact)
                 else -> resolveChasmRuntimeNotation(jvmArtifact)
             }
         }
@@ -250,10 +250,10 @@ class ChasmPlugin : Plugin<Project> {
         return if (jvmArtifact) BuildConfig.CHASM_JVM_DEPENDENCY else BuildConfig.CHASM_DEPENDENCY
     }
 
-    private fun resolveChasmAotRuntimeNotation(
+    private fun resolveRuntimeAotNotation(
         jvmArtifact: Boolean = false,
     ): String {
-        return if (jvmArtifact) BuildConfig.CHASM_AOT_JVM_DEPENDENCY else BuildConfig.CHASM_AOT_DEPENDENCY
+        return if (jvmArtifact) BuildConfig.RUNTIME_AOT_JVM_DEPENDENCY else BuildConfig.RUNTIME_AOT_DEPENDENCY
     }
 
     private fun resolveChasmCoroutinesRuntimeNotation(jvmArtifact: Boolean = false): String {

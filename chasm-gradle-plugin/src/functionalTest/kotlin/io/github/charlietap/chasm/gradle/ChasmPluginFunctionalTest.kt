@@ -397,7 +397,7 @@ class ChasmPluginFunctionalTest {
 
         val generated = project.file("build/generated/kotlin/commonMain/CompiledService/test/chasm")
         assertEquals(setOf("CompiledService.kt", "CompiledServiceCompiled.kt"), generated.list()?.toSet())
-        assertContains(project.build("dependencies", "--configuration=jvmCompileClasspath", gradleVersion = "9.7.1").output, ":chasm-aot:")
+        assertContains(project.build("dependencies", "--configuration=jvmCompileClasspath", gradleVersion = "9.7.1").output, ":runtime-aot:")
     }
 
     @Test
@@ -1036,7 +1036,7 @@ class ChasmPluginFunctionalTest {
 
         assertContains(result.output, "COMPILED_MODULE_RAN")
         val runtime = project.build("dependencies", "--configuration=runtimeClasspath").output
-        assertContains(runtime, ":chasm-aot-jvm:")
+        assertContains(runtime, ":runtime-aot-jvm:")
         listOf(
             ":chasm-jvm:",
             ":decoder-jvm:",
