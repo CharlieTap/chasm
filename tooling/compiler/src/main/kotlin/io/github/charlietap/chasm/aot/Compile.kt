@@ -1,3 +1,5 @@
+@file:OptIn(InternalChasmApi::class)
+
 package io.github.charlietap.chasm.aot
 
 import com.github.michaelbull.result.Err
@@ -6,6 +8,7 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.getError
 import com.github.michaelbull.result.getOrElse
 import com.github.michaelbull.result.mapError
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.aot.CompileError.Stage
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.typeResolver
@@ -30,6 +33,7 @@ import java.io.OutputStream
 import java.io.UncheckedIOException
 import java.nio.channels.Channels
 import java.nio.channels.FileChannel
+import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
 
@@ -38,6 +42,14 @@ fun compile(
     output: CompileOutput,
     config: CompileConfig,
 ): CompileResult {
+    if (config.trapDiagnostics) {
+        val bytes = try {
+            Files.readAllBytes(binary)
+        } catch (failure: IOException) {
+            return error(Stage.INPUT, "cannot read $binary: ${failure.message}")
+        }
+        return compile(bytes, output, config)
+    }
     val channel = try {
         FileChannel.open(binary, StandardOpenOption.READ)
     } catch (failure: IOException) {
@@ -56,21 +68,24 @@ fun compile(
     binary: ByteArray,
     output: CompileOutput,
     config: CompileConfig,
-): CompileResult = compile(output, config, byteArraySource(binary))
+): CompileResult = compile(output, config, byteArraySource(binary), binary)
 
 private fun compile(
     output: CompileOutput,
     config: CompileConfig,
     source: ModuleSource,
+    binary: ByteArray? = null,
 ): CompileResult =
     compile(
         output = output,
         config = config,
         source = source,
+        binary = binary,
         validator = ::WasmModuleValidator,
-        moduleCompiler = ::ModuleCompiler,
+        moduleCompiler = { module, types -> ModuleCompiler(module, types, recordProvenance = config.trapDiagnostics) },
         uncompilableFunctions = ::UncompilableFunctions,
         declarationsFactory = ::ModuleDeclarationsFactory,
+        trapSitesFactory = ::TrapSitesFactory,
         moduleLowerer = ::ModuleLowerer,
     )
 
@@ -78,10 +93,12 @@ internal inline fun compile(
     output: CompileOutput,
     config: CompileConfig,
     noinline source: ModuleSource,
+    binary: ByteArray?,
     crossinline validator: WasmModuleValidator,
     crossinline moduleCompiler: ModuleCompiler,
     crossinline uncompilableFunctions: UncompilableFunctions,
     crossinline declarationsFactory: ModuleDeclarationsFactory,
+    crossinline trapSitesFactory: TrapSitesFactory,
     crossinline moduleLowerer: ModuleLowerer,
 ): CompileResult {
     val options = jvmOptions(config).getOrElse { failure -> return CompileResult.Error(failure) }
@@ -96,8 +113,10 @@ internal inline fun compile(
             val reasons = functions.entries.joinToString { (index, reason) -> "$index ($reason)" }
             return error(Stage.GENERATION, "cannot compile functions: ${reasons.ifEmpty { failure.toString() }}", functions.keys.toList())
         }
-        val generated = moduleLowerer(module, code, options, CompileOutputAdapter(output), declarationsFactory(module))
-        CompileResult.Success(CompiledModuleArtifact(generated.moduleClass, generated.data))
+        val sites = if (config.trapDiagnostics && binary != null) trapSitesFactory(config.moduleConfig, binary, module, code) else emptyMap()
+        val generated = moduleLowerer(module, code, options, CompileOutputAdapter(output), declarationsFactory(module), sites)
+        val rules = if (config.trapDiagnostics) trapDiagnosticRules(config.packageName) else null
+        CompileResult.Success(CompiledModuleArtifact(generated.moduleClass, generated.data, rules))
     } catch (unsupported: UnsupportedFunctions) {
         error(Stage.GENERATION, unsupported.message.orEmpty(), unsupported.reasons.keys.toList())
     } catch (tooLarge: ClassTooLarge) {
@@ -156,6 +175,7 @@ private fun jvmOptions(
                     CompileTarget.JVM -> MemoryLowering.HELPERS
                     CompileTarget.ANDROID -> MemoryLowering.UNSAFE
                 },
+                trapDiagnostics = config.trapDiagnostics,
                 maxMethodBytes = config.maxMethodBytes,
                 functionMaxMethodBytes = config.functionMaxMethodBytes,
             ),

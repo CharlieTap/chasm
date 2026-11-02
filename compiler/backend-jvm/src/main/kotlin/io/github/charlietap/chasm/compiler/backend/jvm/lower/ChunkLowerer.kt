@@ -52,7 +52,7 @@ internal fun LowerContext.lowerChunkBody() {
         this.position = position
         val label = placement(position)
         emit.place(label)
-        if (module.options.lineNumbers) emit.line(position + 1, label)
+        markSite(position, label)
         lowerInstruction(function.instructions[position], this)
     }
     emit.place(chunk.endMarker)

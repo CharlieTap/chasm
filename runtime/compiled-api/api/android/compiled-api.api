@@ -1,15 +1,46 @@
 public final class io/github/charlietap/chasm/aot/CompiledModule {
 	public final fun getCode ()Lio/github/charlietap/chasm/aot/internal/CompiledCode;
 	public final fun getDeclarations-d1pmJ48 ()Ljava/lang/Object;
+	public final fun getPackageName ()Ljava/lang/String;
+	public final fun getTrapSites ()Lio/github/charlietap/chasm/aot/internal/TrapSites;
 }
 
 public abstract interface class io/github/charlietap/chasm/aot/internal/CompiledCode {
 	public abstract fun buildDeclarations ()Lio/github/charlietap/chasm/declarations/ModuleDeclarations;
 	public abstract fun install (Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;)V
+	public abstract fun trapSitesResource ()Ljava/lang/String;
 }
 
 public final class io/github/charlietap/chasm/aot/internal/CompiledModuleKt {
 	public static final fun compiledModule (Lio/github/charlietap/chasm/aot/internal/CompiledCode;)Lio/github/charlietap/chasm/aot/CompiledModule;
+}
+
+public final class io/github/charlietap/chasm/aot/internal/FunctionTrapSites {
+	public fun <init> ([I[I[I)V
+	public synthetic fun <init> ([I[I[IILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun getChunkStarts ()[I
+	public final fun getSize ()I
+	public final fun memoryIndex (IZ)I
+	public final fun offset (I)I
+	public final fun withChunkStarts ([I)Lio/github/charlietap/chasm/aot/internal/FunctionTrapSites;
+}
+
+public final class io/github/charlietap/chasm/aot/internal/TrapSites {
+	public fun <init> (Ljava/util/Map;)V
+	public final fun function (I)Lio/github/charlietap/chasm/aot/internal/FunctionTrapSites;
+}
+
+public final class io/github/charlietap/chasm/aot/internal/TrapSitesKt {
+	public static final field CHUNK_CLASS_PREFIX Ljava/lang/String;
+	public static final field CHUNK_METHOD_SEPARATOR Ljava/lang/String;
+	public static final field CODE_CLASS_PREFIX Ljava/lang/String;
+	public static final field COMPILED_ENTRY_CLASS Ljava/lang/String;
+	public static final field FUNCTION_METHOD_PREFIX Ljava/lang/String;
+	public static final field TRAP_DIAGNOSTICS_SOURCE_FILE Ljava/lang/String;
+	public static final field TRAP_SITES_EXTENSION Ljava/lang/String;
+	public static final fun readTrapSites (Ljava/io/InputStream;)Lio/github/charlietap/chasm/aot/internal/TrapSites;
+	public static final fun trapSitesResource (Ljava/lang/String;)Ljava/lang/String;
+	public static final fun writeTrapSites (Ljava/io/OutputStream;Ljava/util/Map;)V
 }
 
 public abstract class io/github/charlietap/chasm/runtime/compiled/CodeInstallation {

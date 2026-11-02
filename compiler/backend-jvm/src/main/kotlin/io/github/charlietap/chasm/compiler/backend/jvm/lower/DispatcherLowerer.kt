@@ -1,5 +1,9 @@
+@file:OptIn(InternalChasmApi::class)
+
 package io.github.charlietap.chasm.compiler.backend.jvm.lower
 
+import io.github.charlietap.chasm.InternalChasmApi
+import io.github.charlietap.chasm.aot.internal.CHUNK_METHOD_SEPARATOR
 import io.github.charlietap.chasm.compiler.backend.abi.ARRAYCOPY
 import io.github.charlietap.chasm.compiler.backend.abi.CALL_STACK_EXHAUSTED
 import io.github.charlietap.chasm.compiler.backend.abi.CLOSE_FRAME
@@ -206,4 +210,4 @@ private fun LowerContext.closeFrame() {
 internal fun chunkName(
     functionName: String,
     index: Int,
-) = "$functionName\$c$index"
+) = "$functionName$CHUNK_METHOD_SEPARATOR$index"

@@ -38,6 +38,7 @@ kotlin {
         implementation(projects.module)
         implementation(projects.stream)
         implementation(projects.validator)
+        implementation(projects.runtime.compiledApi)
         implementation(libs.result)
     }
 }

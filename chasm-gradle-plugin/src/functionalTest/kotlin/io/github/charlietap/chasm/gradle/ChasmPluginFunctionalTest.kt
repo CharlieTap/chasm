@@ -1109,6 +1109,8 @@ class ChasmPluginFunctionalTest {
 
                     override fun buildDeclarations(): ModuleDeclarations = error("stale declarations were built")
 
+                    override fun trapSitesResource(): String? = null
+
                     companion object {
                         @JvmField
                         val INSTANCE: CompiledModule = compiledModule(StaleCode())

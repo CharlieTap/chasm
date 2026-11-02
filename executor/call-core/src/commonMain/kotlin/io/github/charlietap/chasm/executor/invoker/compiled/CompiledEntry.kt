@@ -20,11 +20,16 @@ import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.program.EXIT_IP
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
+import kotlin.reflect.KClass
 
 class CompiledFunctionInstallation(
     val function: FunctionInstance.WasmFunction,
     val entry: CompiledFunction,
 )
+
+// The class whose frames mark each entry from the interpreter into compiled code in a stack trace, by reference so
+// its name follows a shrinker's renaming.
+val compiledEntryClass: KClass<*> = CompiledEntry::class
 
 fun installCompiledFunctions(
     store: Store,
@@ -45,6 +50,7 @@ fun installCompiledFunctions(
         val strategy = function.callStrategy
         val entry = CompiledEntry(
             compiled = installation.entry,
+            entryIp = program.size,
             resultCount = function.functionType.results.types.size,
             activationHeaderSlot = strategy.interfaceSlotCount,
             frameSlots = strategy.interfaceSlotCount + 1,
@@ -59,6 +65,7 @@ fun installCompiledFunctions(
 @OptIn(UnsafeHostApi::class)
 private class CompiledEntry(
     private val compiled: CompiledFunction,
+    private val entryIp: Int,
     private val resultCount: Int,
     private val activationHeaderSlot: Int,
     private val frameSlots: Int,
@@ -73,7 +80,7 @@ private class CompiledEntry(
         try {
             compiled.invoke(context, vstack.unsafeElements(), fp)
         } catch (exception: InvocationException) {
-            if (exception.error != InvocationError.ThrownException) throw exception
+            if (exception.error != InvocationError.ThrownException) throw leaving(exception, context, fp)
             return resumeUnwinding(vstack, context, fp)
         } catch (_: HostRaisedWasmException) {
             return resumeUnwinding(vstack, context, fp)
@@ -86,7 +93,7 @@ private class CompiledEntry(
             return try {
                 tailCall(vstack, context, fp)
             } catch (exception: InvocationException) {
-                if (exception.error != InvocationError.ThrownException) throw exception
+                if (exception.error != InvocationError.ThrownException) throw leaving(exception, context, fp)
                 resumeUnwinding(vstack, context, fp)
             } catch (_: HostRaisedWasmException) {
                 resumeUnwinding(vstack, context, fp)
@@ -94,6 +101,13 @@ private class CompiledEntry(
         }
         return returnToCaller(vstack, context.store, resultCount, activationHeaderSlot)
     }
+
+    // Only a trap report reads where the trap left compiled code.
+    private fun leaving(
+        exception: InvocationException,
+        context: ExecutionContext,
+        fp: Int,
+    ): InvocationException = if (context.config.debugInfo) exception.leftCompiledEntry(fp, entryIp) else exception
 
     private fun resumeUnwinding(
         vstack: ValueStack,

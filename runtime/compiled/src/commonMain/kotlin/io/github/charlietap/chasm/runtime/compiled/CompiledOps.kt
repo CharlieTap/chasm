@@ -3,6 +3,7 @@
 package io.github.charlietap.chasm.runtime.compiled
 
 import io.github.charlietap.chasm.memory.init.LinearMemoryInitialiser
+import io.github.charlietap.chasm.runtime.diagnostic.FailedMemoryAccess
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
@@ -44,7 +45,16 @@ fun memoryInit(
     sourceOffset: Int,
     destinationOffset: Int,
     count: Int,
-) = LinearMemoryInitialiser(data.bytes, memory.data, sourceOffset, destinationOffset, count, data.bytes.size, memory.size)
+) = try {
+    LinearMemoryInitialiser(data.bytes, memory.data, sourceOffset, destinationOffset, count, data.bytes.size, memory.size)
+} catch (exception: InvocationException) {
+    // The segment's range is checked first; an invalid one is not a memory access.
+    throw if (unsigned(sourceOffset) + unsigned(count) > data.bytes.size) {
+        exception
+    } else {
+        accessFailed(exception, FailedMemoryAccess.Kind.INIT, memory, unsigned(destinationOffset), unsigned(count))
+    }
+}
 
 fun dataDrop(
     data: DataInstance,

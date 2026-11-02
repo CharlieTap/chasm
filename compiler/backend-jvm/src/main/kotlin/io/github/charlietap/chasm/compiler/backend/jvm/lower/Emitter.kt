@@ -201,14 +201,30 @@ internal class Emitter(
         type: String?,
     ) = visitor.visitTryCatchBlock(start, end, handler, type?.let(::internalName))
 
+    /**
+     * Marks the code that follows [start] with [line]. A later mark before any
+     * code replaces it, so code is never marked twice at one offset, where the
+     * JVM would report the first mark.
+     */
     fun line(
         line: Int,
         start: Label,
-    ) = visitor.visitLineNumber(line, start)
+    ) {
+        pendingLine = line
+        pendingLineStart = start
+    }
+
+    private var pendingLine = 0
+
+    private var pendingLineStart: Label? = null
 
     private inline fun code(
         write: () -> Unit,
     ) {
+        pendingLineStart?.let { start ->
+            visitor.visitLineNumber(pendingLine, start)
+            pendingLineStart = null
+        }
         write()
         codeSinceFrame = true
     }

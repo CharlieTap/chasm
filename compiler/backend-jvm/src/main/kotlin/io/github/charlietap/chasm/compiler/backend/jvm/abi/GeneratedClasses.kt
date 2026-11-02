@@ -1,5 +1,13 @@
+@file:OptIn(InternalChasmApi::class)
+
 package io.github.charlietap.chasm.compiler.backend.jvm.abi
 
+import io.github.charlietap.chasm.InternalChasmApi
+import io.github.charlietap.chasm.aot.internal.CHUNK_CLASS_PREFIX
+import io.github.charlietap.chasm.aot.internal.CHUNK_METHOD_SEPARATOR
+import io.github.charlietap.chasm.aot.internal.CODE_CLASS_PREFIX
+import io.github.charlietap.chasm.aot.internal.FUNCTION_METHOD_PREFIX
+import io.github.charlietap.chasm.aot.internal.TRAP_DIAGNOSTICS_SOURCE_FILE
 import io.github.charlietap.chasm.compiler.backend.abi.MethodRef
 import io.github.charlietap.chasm.compiler.backend.abi.returnDescriptor
 import io.github.charlietap.chasm.compiler.backend.abi.staticParameters
@@ -13,13 +21,13 @@ internal fun bindingClassDescriptor(
 internal fun codeClassDescriptor(
     packagePath: String,
     batch: Int,
-) = "L$packagePath/Code$batch;"
+) = "L$packagePath/$CODE_CLASS_PREFIX$batch;"
 
 internal fun chunkClassDescriptor(
     packagePath: String,
     index: Int,
     group: Int,
-) = "L$packagePath/Chunks$index\$$group;"
+) = "L$packagePath/$CHUNK_CLASS_PREFIX$index\$$group;"
 
 internal fun entriesClassDescriptor(
     packagePath: String,
@@ -46,7 +54,7 @@ internal fun installClassDescriptor(
 
 internal fun functionName(
     index: Int,
-) = "f$index"
+) = "$FUNCTION_METHOD_PREFIX$index"
 
 internal fun functionMethod(
     owner: String,
@@ -58,4 +66,4 @@ internal fun functionMethod(
 
 internal const val TYPED_CALL = "typed"
 
-internal const val SOURCE_FILE = "module.wasm"
+internal const val SOURCE_FILE = TRAP_DIAGNOSTICS_SOURCE_FILE

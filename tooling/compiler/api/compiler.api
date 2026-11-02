@@ -6,6 +6,7 @@ public final class io/github/charlietap/chasm/aot/CompileConfig {
 	public final fun getModuleConfig ()Lio/github/charlietap/chasm/config/ModuleConfig;
 	public final fun getPackageName ()Ljava/lang/String;
 	public final fun getTarget ()Lio/github/charlietap/chasm/aot/CompileTarget;
+	public final fun getTrapDiagnostics ()Z
 }
 
 public final class io/github/charlietap/chasm/aot/CompileConfig$Builder {
@@ -17,6 +18,7 @@ public final class io/github/charlietap/chasm/aot/CompileConfig$Builder {
 	public final fun meterFuel (Z)Lio/github/charlietap/chasm/aot/CompileConfig$Builder;
 	public final fun moduleConfig (Lio/github/charlietap/chasm/config/ModuleConfig;)Lio/github/charlietap/chasm/aot/CompileConfig$Builder;
 	public final fun target (Lio/github/charlietap/chasm/aot/CompileTarget;)Lio/github/charlietap/chasm/aot/CompileConfig$Builder;
+	public final fun trapDiagnostics (Z)Lio/github/charlietap/chasm/aot/CompileConfig$Builder;
 }
 
 public final class io/github/charlietap/chasm/aot/CompileConfigKt {
@@ -104,6 +106,7 @@ public final class io/github/charlietap/chasm/aot/CompiledModuleArtifact {
 	public static final field DATA_RESOURCE_EXTENSION Ljava/lang/String;
 	public final fun getDataResourcePath ()Ljava/lang/String;
 	public final fun getModuleClassName ()Ljava/lang/String;
+	public final fun getShrinkerRules ()Ljava/lang/String;
 }
 
 public final class io/github/charlietap/chasm/aot/CompiledModuleArtifact$Companion {

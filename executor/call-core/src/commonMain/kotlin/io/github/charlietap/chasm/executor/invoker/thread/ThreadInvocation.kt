@@ -89,7 +89,7 @@ fun traceableTrap(
     if (error == InvocationError.ThrownException || exception.faultIp == InvocationException.UNKNOWN_FAULT_IP) {
         return error
     }
-    return InvocationError.Trapped(error, TrapSnapshot(store, vstack, exception.faultIp))
+    return InvocationError.Trapped(error, TrapSnapshot(store, vstack, exception.faultIp, exception))
 }
 
 @PublishedApi

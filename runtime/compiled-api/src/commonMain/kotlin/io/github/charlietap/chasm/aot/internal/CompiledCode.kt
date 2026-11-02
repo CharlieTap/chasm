@@ -12,4 +12,7 @@ interface CompiledCode {
     fun install(
         installation: CodeInstallation,
     )
+
+    /** The resource holding the module's trap sites, or null when it was compiled without them. */
+    fun trapSitesResource(): String?
 }

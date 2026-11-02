@@ -85,7 +85,7 @@ internal class ModuleLowering(
     ): ByteArray = ClassWriter(ClassWriter.COMPUTE_MAXS).apply {
         val access = (if (public) Opcodes.ACC_PUBLIC else 0) or Opcodes.ACC_FINAL or Opcodes.ACC_SUPER
         visit(CLASS_FILE_VERSION, access, internalName(owner), null, OBJECT, null)
-        if (options.lineNumbers) visitSource(SOURCE_FILE, null)
+        if (options.trapDiagnostics) visitSource(SOURCE_FILE, null)
         methods.forEach { method -> method.accept(this) }
         visitEnd()
     }.toByteArray()

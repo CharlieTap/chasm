@@ -1,5 +1,11 @@
+@file:OptIn(InternalChasmApi::class)
+
 package io.github.charlietap.chasm.compiler.backend.jvm
 
+import io.github.charlietap.chasm.InternalChasmApi
+import io.github.charlietap.chasm.aot.internal.FunctionTrapSites
+import io.github.charlietap.chasm.aot.internal.trapSitesResource
+import io.github.charlietap.chasm.aot.internal.writeTrapSites
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.cir.CirModule
 import io.github.charlietap.chasm.compiler.backend.abi.internalName
@@ -33,7 +39,7 @@ internal fun <T> completed(
     throw failure.cause ?: failure
 }
 
-typealias ModuleLowerer = (Module, CirModule, JvmOptions, JvmOutput, ModuleDeclarations) -> JvmModule
+typealias ModuleLowerer = (Module, CirModule, JvmOptions, JvmOutput, ModuleDeclarations, Map<Int, FunctionTrapSites>) -> JvmModule
 
 fun ModuleLowerer(
     module: Module,
@@ -41,6 +47,15 @@ fun ModuleLowerer(
     options: JvmOptions,
     output: JvmOutput,
     declarations: ModuleDeclarations,
+): JvmModule = ModuleLowerer(module, code, options, output, declarations, emptyMap())
+
+fun ModuleLowerer(
+    module: Module,
+    code: CirModule,
+    options: JvmOptions,
+    output: JvmOutput,
+    declarations: ModuleDeclarations,
+    trapSites: Map<Int, FunctionTrapSites>,
 ): JvmModule =
     ModuleLowerer(
         module = module,
@@ -48,6 +63,7 @@ fun ModuleLowerer(
         options = options,
         output = output,
         declarations = declarations,
+        trapSites = trapSites,
         parallelism = Runtime.getRuntime().availableProcessors(),
         functionLowerer = ::FunctionLowerer,
         signatureLowerer = ::SignatureLowerer,
@@ -64,6 +80,7 @@ internal inline fun ModuleLowerer(
     options: JvmOptions,
     output: JvmOutput,
     declarations: ModuleDeclarations,
+    trapSites: Map<Int, FunctionTrapSites> = emptyMap(),
     parallelism: Int,
     crossinline functionLowerer: FunctionLowerer,
     crossinline signatureLowerer: SignatureLowerer,
@@ -76,6 +93,7 @@ internal inline fun ModuleLowerer(
     val lowering = ModuleLowering(module, code, options)
     val packagePath = lowering.packagePath
     val reasons = LinkedHashMap<Int, String>()
+    val chunkStarts = HashMap<Int, IntArray>()
     var entries: MutableList<InstalledEntry> = ArrayList()
     val pool = if (parallelism > 1) Executors.newFixedThreadPool(parallelism) else null
     try {
@@ -105,6 +123,11 @@ internal inline fun ModuleLowerer(
                     is FunctionResult.Rejected -> reasons[function.index.index] = result.reason
                     is FunctionResult.Lowered -> {
                         lowering.layout.resolve(result.methods.map(GeneratedMethod::node), result.resources, lowering.bindingType)
+                        if (options.trapDiagnostics && result.methods.size > 1) {
+                            chunkStarts[function.index.index] = result.methods.mapNotNull { generated ->
+                                generated.chunkStart.takeIf { start -> start >= 0 }
+                            }.toIntArray()
+                        }
                         result.methods.filter { generated -> generated.owner == null }.forEach { generated -> methods += generated.node }
                         result.methods.filter { generated -> generated.owner != null }.groupBy({ it.owner }, { it.node }).forEach { (chunks, nodes) ->
                             val name = checkNotNull(chunks)
@@ -161,6 +184,14 @@ internal inline fun ModuleLowerer(
         declarationCallGenerator(declarations, OutputStream.nullOutputStream())
     }
     val declarationClasses = declarationsLowerer(calls, packagePath, output)
+    if (options.trapDiagnostics) {
+        val sites = code.functions.associate { function ->
+            val index = function.index.index
+            val sites = trapSites[index] ?: FunctionTrapSites(IntArray(0), IntArray(0))
+            index to sites.withChunkStarts(chunkStarts[index] ?: IntArray(0))
+        }
+        output.resource(trapSitesResource(packagePath)) { stream -> writeTrapSites(stream, sites) }
+    }
     val moduleDescriptor = moduleClassDescriptor(packagePath)
     moduleClassLowerer(lowering, moduleDescriptor, declarationClasses, dataResourcePath, entries, output)
     JvmModule(internalName(moduleDescriptor).replace('/', '.'), dataResourcePath)

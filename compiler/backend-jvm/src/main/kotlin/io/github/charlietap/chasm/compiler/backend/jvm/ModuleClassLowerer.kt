@@ -1,5 +1,9 @@
+@file:OptIn(InternalChasmApi::class)
+
 package io.github.charlietap.chasm.compiler.backend.jvm
 
+import io.github.charlietap.chasm.InternalChasmApi
+import io.github.charlietap.chasm.aot.internal.trapSitesResource
 import io.github.charlietap.chasm.compiler.backend.abi.internalName
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.BUILD_DECLARATIONS
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.CLASS_FILE_VERSION
@@ -13,6 +17,7 @@ import io.github.charlietap.chasm.compiler.backend.jvm.abi.INSTALL
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.INSTALLS_PER_METHOD
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.MAX_FANOUT
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.MODULE_DECLARATIONS
+import io.github.charlietap.chasm.compiler.backend.jvm.abi.TRAP_SITES_RESOURCE
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.installClassDescriptor
 import io.github.charlietap.chasm.compiler.backend.jvm.declarations.DECLARATIONS_BUILDER
 import io.github.charlietap.chasm.compiler.backend.jvm.declarations.DECLARE
@@ -95,6 +100,15 @@ internal fun ModuleClassLowerer(
             visitInsn(Opcodes.ACONST_NULL)
         }
         visitMethodInsn(Opcodes.INVOKEVIRTUAL, DECLARATIONS_BUILDER, "build", "($DATA_SOURCE_TYPE)$MODULE_DECLARATIONS", false)
+        visitInsn(Opcodes.ARETURN)
+        visitMaxs(0, 0)
+        visitEnd()
+    }
+
+    // The path is written here because a shrinker may rename the classes it is derived from.
+    writer.visitMethod(Opcodes.ACC_PUBLIC, TRAP_SITES_RESOURCE, "()Ljava/lang/String;", null, null).apply {
+        visitCode()
+        if (module.options.trapDiagnostics) visitLdcInsn(trapSitesResource(module.packagePath)) else visitInsn(Opcodes.ACONST_NULL)
         visitInsn(Opcodes.ARETURN)
         visitMaxs(0, 0)
         visitEnd()

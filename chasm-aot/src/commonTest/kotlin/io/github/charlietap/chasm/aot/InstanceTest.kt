@@ -60,6 +60,8 @@ class InstanceTest {
         ) = fail("installation belongs to the instantiator")
 
         override fun buildDeclarations(): ModuleDeclarations = emptyDeclarations
+
+        override fun trapSitesResource(): String? = null
     }
 
     private fun emptyModuleDeclarations(): ModuleDeclarations {

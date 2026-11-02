@@ -4,7 +4,6 @@
 package io.github.charlietap.chasm.runtime.compiled
 
 import io.github.charlietap.chasm.host.UnsafeHostApi
-import io.github.charlietap.chasm.memory.OptimisticBoundsChecker
 import io.github.charlietap.chasm.memory.copy.LinearMemoryCopier
 import io.github.charlietap.chasm.memory.fill.LinearMemoryFiller
 import io.github.charlietap.chasm.memory.read.F32Reader
@@ -30,8 +29,12 @@ import io.github.charlietap.chasm.memory.write.I64ToI16Writer
 import io.github.charlietap.chasm.memory.write.I64ToI32Writer
 import io.github.charlietap.chasm.memory.write.I64ToI8Writer
 import io.github.charlietap.chasm.memory.write.I64Writer
+import io.github.charlietap.chasm.runtime.diagnostic.FailedMemoryAccess
+import io.github.charlietap.chasm.runtime.error.InvocationError
+import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.instance.MemoryInstance
-import io.github.charlietap.chasm.runtime.operations.effectiveAddress
+import java.nio.BufferOverflowException
+import java.nio.BufferUnderflowException
 import kotlin.jvm.JvmName
 
 fun i32Load(
@@ -201,15 +204,34 @@ fun memoryCopy(
     sourceOffset: Int,
     destinationOffset: Int,
     count: Int,
-) = LinearMemoryCopier(source.data, destination.data, sourceOffset, destinationOffset, count, source.size, destination.size)
+) = try {
+    LinearMemoryCopier(source.data, destination.data, sourceOffset, destinationOffset, count, source.size, destination.size)
+} catch (exception: InvocationException) {
+    throw copyFailed(exception, source, destination, sourceOffset, destinationOffset, count)
+}
 
 fun memoryFill(
     memory: MemoryInstance,
     offset: Int,
     value: Int,
     count: Int,
-) = LinearMemoryFiller(memory.data, offset, count, value.toByte(), memory.size)
+) = try {
+    LinearMemoryFiller(memory.data, offset, count, value.toByte(), memory.size)
+} catch (exception: InvocationException) {
+    throw accessFailed(exception, FailedMemoryAccess.Kind.FILL, memory, unsigned(offset), unsigned(count))
+}
 
+/** Traps for an inline access compiled code found out of bounds, recording which access it was. */
+fun memoryAccessOutOfBounds(
+    memory: MemoryInstance,
+    kind: Int,
+    address: Long,
+    width: Int,
+): Nothing = throw InvocationException(InvocationError.MemoryOperationOutOfBounds)
+    .failedAccess(FailedMemoryAccess(FailedMemoryAccess.Kind.entries[kind], memory, address, width.toLong()))
+
+// The JVM checks each access against the memory's bounds, so a negative address or offset, which Wasm reads as unsigned,
+// is the only check left. Failures are handled out of line to keep these small enough to inline into compiled code.
 private inline fun <T> load(
     memory: MemoryInstance,
     address: Int,
@@ -217,8 +239,12 @@ private inline fun <T> load(
     bytes: Int,
     crossinline read: (Int) -> T,
 ): T {
-    val effectiveAddress = effectiveAddress(address, offset)
-    return OptimisticBoundsChecker(effectiveAddress, bytes, memory.size) { read(effectiveAddress) }
+    if ((address or offset) < 0) throw outOfBounds(FailedMemoryAccess.Kind.READ, memory, address, offset, bytes)
+    return try {
+        read(address + offset)
+    } catch (exception: RuntimeException) {
+        throw outOfBounds(exception, FailedMemoryAccess.Kind.READ, memory, address, offset, bytes)
+    }
 }
 
 private inline fun store(
@@ -228,6 +254,68 @@ private inline fun store(
     bytes: Int,
     crossinline write: (Int) -> Unit,
 ) {
-    val effectiveAddress = effectiveAddress(address, offset)
-    OptimisticBoundsChecker(effectiveAddress, bytes, memory.size) { write(effectiveAddress) }
+    if ((address or offset) < 0) throw outOfBounds(FailedMemoryAccess.Kind.WRITE, memory, address, offset, bytes)
+    try {
+        write(address + offset)
+    } catch (exception: RuntimeException) {
+        throw outOfBounds(exception, FailedMemoryAccess.Kind.WRITE, memory, address, offset, bytes)
+    }
 }
+
+private fun outOfBounds(
+    kind: FailedMemoryAccess.Kind,
+    memory: MemoryInstance,
+    address: Int,
+    offset: Int,
+    bytes: Int,
+): InvocationException = accessFailed(
+    InvocationException(InvocationError.MemoryOperationOutOfBounds),
+    kind,
+    memory,
+    unsigned(address) + unsigned(offset),
+    bytes.toLong(),
+)
+
+// Only what the JVM's bounds checks throw is a trap; anything else is rethrown as it was.
+private fun outOfBounds(
+    exception: RuntimeException,
+    kind: FailedMemoryAccess.Kind,
+    memory: MemoryInstance,
+    address: Int,
+    offset: Int,
+    bytes: Int,
+): Exception = when (exception) {
+    is IndexOutOfBoundsException,
+    is IllegalArgumentException,
+    is BufferOverflowException,
+    is BufferUnderflowException,
+    -> outOfBounds(kind, memory, address, offset, bytes)
+    else -> exception
+}
+
+internal fun accessFailed(
+    exception: InvocationException,
+    kind: FailedMemoryAccess.Kind,
+    memory: MemoryInstance,
+    address: Long,
+    width: Long,
+    source: Boolean = false,
+): InvocationException = exception.failedAccess(FailedMemoryAccess(kind, memory, address, width, source))
+
+// An invalid source range is checked first, so it is the one reported when both are.
+private fun copyFailed(
+    exception: InvocationException,
+    source: MemoryInstance,
+    destination: MemoryInstance,
+    sourceOffset: Int,
+    destinationOffset: Int,
+    count: Int,
+): InvocationException = if (unsigned(sourceOffset) + unsigned(count) > source.size) {
+    accessFailed(exception, FailedMemoryAccess.Kind.COPY, source, unsigned(sourceOffset), unsigned(count), source = true)
+} else {
+    accessFailed(exception, FailedMemoryAccess.Kind.COPY, destination, unsigned(destinationOffset), unsigned(count))
+}
+
+internal fun unsigned(
+    value: Int,
+): Long = value.toLong() and 0xFFFF_FFFFL

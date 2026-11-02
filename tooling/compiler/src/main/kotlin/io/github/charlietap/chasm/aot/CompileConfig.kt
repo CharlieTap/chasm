@@ -7,6 +7,7 @@ class CompileConfig private constructor(
     val target: CompileTarget,
     val meterFuel: Boolean,
     val interruptible: Boolean,
+    val trapDiagnostics: Boolean,
     val moduleConfig: ModuleConfig,
     val maxMethodBytes: Int,
     val functionMaxMethodBytes: Map<Int, Int>,
@@ -18,6 +19,7 @@ class CompileConfig private constructor(
         private var target = CompileTarget.JVM
         private var meterFuel = false
         private var interruptible = false
+        private var trapDiagnostics = false
         private var moduleConfig = ModuleConfig()
         private var maxMethodBytes: Int? = null
         private val functionMaxMethodBytes = LinkedHashMap<Int, Int>()
@@ -43,6 +45,15 @@ class CompileConfig private constructor(
             interruptible: Boolean,
         ) = apply { this.interruptible = interruptible }
 
+        /**
+         * Traps report the same Wasm frames and offsets as the interpreter
+         * when `RuntimeConfig.debugInfo` is on. Makes the generated classes
+         * larger and compilation slower.
+         */
+        fun trapDiagnostics(
+            trapDiagnostics: Boolean,
+        ) = apply { this.trapDiagnostics = trapDiagnostics }
+
         fun moduleConfig(
             moduleConfig: ModuleConfig,
         ) = apply { this.moduleConfig = moduleConfig }
@@ -52,6 +63,7 @@ class CompileConfig private constructor(
             target = target,
             meterFuel = meterFuel,
             interruptible = interruptible,
+            trapDiagnostics = trapDiagnostics,
             moduleConfig = moduleConfig,
             maxMethodBytes = maxMethodBytes ?: target.maxMethodBytes,
             functionMaxMethodBytes = functionMaxMethodBytes.toMap(),

@@ -270,15 +270,15 @@ class CompiledModuleTest {
     }
 
     @Test
-    fun `a trap in a compiled start function names the function`() {
+    fun `a trap in a compiled start function names every frame`() {
         val compiled = generate(fixture("start_trap")).compiledModule()
 
         val result = instance(store(), compiled, emptyList(), RuntimeConfig(debugInfo = true))
 
         assertIs<ChasmResult.Error<ChasmError.ExecutionError>>(result)
         val frames = checkNotNull(result.error.trap).frames
-        assertEquals(listOf("start" to 1), frames.map { frame -> frame.functionName to frame.functionIndex })
-        assertEquals(null, frames.single().wasmOffset)
+        assertEquals(listOf("boom" to 0, "start" to 1), frames.map { frame -> frame.functionName to frame.functionIndex })
+        assertTrue(frames.all { frame -> frame.wasmOffset == null })
     }
 
     private fun JarOutputStream.entry(

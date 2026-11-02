@@ -14,6 +14,7 @@ import io.github.charlietap.chasm.compiler.backend.analysis.form.Operand
 import io.github.charlietap.chasm.compiler.backend.analysis.form.access
 import io.github.charlietap.chasm.compiler.backend.analysis.form.bulk
 import io.github.charlietap.chasm.compiler.backend.analysis.form.helperCall
+import io.github.charlietap.chasm.compiler.backend.jvm.abi.MEMORY_ACCESS_OUT_OF_BOUNDS
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.MEMORY_BYTE_ARRAY_FIELD
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.MEMORY_COPY
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.MEMORY_FILL
@@ -26,7 +27,9 @@ import io.github.charlietap.chasm.compiler.backend.jvm.abi.UNSAFE_PUT_BYTE
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.UNSAFE_PUT_INT
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.UNSAFE_PUT_LONG
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.memoryAccess
+import io.github.charlietap.chasm.runtime.diagnostic.FailedMemoryAccess
 import io.github.charlietap.chasm.type.NumberType
+import org.objectweb.asm.Label
 import org.objectweb.asm.Opcodes
 
 internal enum class InlineMemory {
@@ -93,13 +96,15 @@ private fun LowerContext.inlineAccess(
     access: MemoryAccess,
 ) {
     val width = access.operation.width
-    val reach = (access.offset.toLong() and 0xFFFF_FFFFL) + width
-    if (reach > Int.MAX_VALUE) return trap(MEMORY_OUT_OF_BOUNDS)
-    val outOfBounds = outOfBounds()
+    val offset = access.offset.toLong() and 0xFFFF_FFFFL
+    val reach = offset + width
     val address = access.address
+    if (reach > Int.MAX_VALUE) return accessOutOfBounds(access) { pushUnsignedAddress(address, offset) }
+    val shared = if (module.options.trapDiagnostics) null else sharedOutOfBounds()
     if (address is Operand.Immediate) {
-        val effective = (address.bits and 0xFFFF_FFFFL) + reach - width
-        if (effective + width > Int.MAX_VALUE) return trap(MEMORY_OUT_OF_BOUNDS)
+        val effective = (address.bits and 0xFFFF_FFFFL) + offset
+        if (effective + width > Int.MAX_VALUE) return accessOutOfBounds(access) { emit.long(effective) }
+        val outOfBounds = shared ?: siteOutOfBounds(access) { emit.long(effective) }
         emit.int(effective.toInt())
         emit.load(Opcodes.ILOAD, locals.memorySize)
         emit.int(width)
@@ -115,6 +120,7 @@ private fun LowerContext.inlineAccess(
         }
         emit.store(Opcodes.ISTORE, locals.scratchInt)
     } else {
+        val outOfBounds = shared ?: siteOutOfBounds(access) { pushUnsignedScratch(offset) }
         pushInt(address)
         emit.insn(Opcodes.DUP)
         emit.store(Opcodes.ISTORE, locals.scratchInt)
@@ -135,12 +141,69 @@ private fun LowerContext.inlineAccess(
     if (value == null) inlineLoad(access.operation, access.destination) else inlineStore(access.operation, value)
 }
 
-private fun LowerContext.outOfBounds() = outOfBoundsLabel ?: emit.label().also { label ->
+private fun LowerContext.sharedOutOfBounds(): Label = outOfBoundsLabel ?: emit.label().also { label ->
     outOfBoundsLabel = label
     outOfLine += {
         emit.place(label)
         trap(MEMORY_OUT_OF_BOUNDS)
     }
+}
+
+// With trap diagnostics each access gets its own cold block, which marks its site and records the access.
+private fun LowerContext.siteOutOfBounds(
+    access: MemoryAccess,
+    pushAddress: LowerContext.() -> Unit,
+): Label {
+    val origin = position
+    return emit.label().also { label ->
+        outOfLine += {
+            emit.place(label)
+            markSite(origin, label)
+            trapAccess(access, pushAddress)
+        }
+    }
+}
+
+private fun LowerContext.accessOutOfBounds(
+    access: MemoryAccess,
+    pushAddress: LowerContext.() -> Unit,
+) = if (module.options.trapDiagnostics) trapAccess(access, pushAddress) else trap(MEMORY_OUT_OF_BOUNDS)
+
+private fun LowerContext.trapAccess(
+    access: MemoryAccess,
+    pushAddress: LowerContext.() -> Unit,
+) {
+    pushResource(Resource.Memory(access.memory.index))
+    emit.int(if (access.value == null) FailedMemoryAccess.Kind.READ.ordinal else FailedMemoryAccess.Kind.WRITE.ordinal)
+    pushAddress()
+    emit.int(access.operation.width)
+    trap(MEMORY_ACCESS_OUT_OF_BOUNDS)
+}
+
+private fun LowerContext.pushUnsignedAddress(
+    address: Operand,
+    offset: Long,
+) {
+    pushInt(address)
+    widenUnsigned(offset)
+}
+
+private fun LowerContext.pushUnsignedScratch(
+    offset: Long,
+) {
+    emit.load(Opcodes.ILOAD, locals.scratchInt)
+    widenUnsigned(offset)
+}
+
+private fun LowerContext.widenUnsigned(
+    offset: Long,
+) {
+    emit.insn(Opcodes.I2L)
+    emit.long(0xFFFF_FFFFL)
+    emit.insn(Opcodes.LAND)
+    if (offset == 0L) return
+    emit.long(offset)
+    emit.insn(Opcodes.LADD)
 }
 
 private fun LowerContext.inlineLoad(

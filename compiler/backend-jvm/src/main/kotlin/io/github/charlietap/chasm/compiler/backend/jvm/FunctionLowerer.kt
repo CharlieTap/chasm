@@ -49,6 +49,7 @@ internal typealias FunctionLowerer = (ModuleLowering, CirFunction, MethodRef) ->
 internal class GeneratedMethod(
     val owner: String?,
     val node: MethodNode,
+    val chunkStart: Int = -1,
 )
 
 internal sealed interface FunctionResult {
@@ -237,7 +238,8 @@ private class FunctionLowering(
         if (finish(dispatcher) > MAX_SHORT_BRANCH_METHOD_BYTES) {
             throw Unsupported("function needs ${chunks.size} chunks, more than one dispatcher holds")
         }
-        return chunks.mapIndexed { index, (_, chunk) -> GeneratedMethod(owners[index], chunk.node) } + GeneratedMethod(null, dispatcher)
+        return chunks.mapIndexed { index, (range, chunk) -> GeneratedMethod(owners[index], chunk.node, range.first) } +
+            GeneratedMethod(null, dispatcher)
     }
 
     private fun reach(

@@ -5,7 +5,10 @@ import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.get
 import com.github.michaelbull.result.getError
 import com.github.michaelbull.result.getOrThrow
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.aot.CompileError.Stage
+import io.github.charlietap.chasm.aot.internal.readTrapSites
+import io.github.charlietap.chasm.aot.internal.trapSitesResource
 import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
 import java.io.ByteArrayOutputStream
@@ -159,6 +162,80 @@ class CompileTest {
 
         assertIs<CompileResult.Error>(result)
         assertEquals(Stage.OUTPUT, result.error.stage)
+    }
+
+    @OptIn(InternalChasmApi::class)
+    @Test
+    fun `trap diagnostics record the offset of every trap and call site`() {
+        val output = MemoryOutput()
+
+        compile(module("trap_diagnostics"), output, CompileConfig("test.sites") { trapDiagnostics(true) }).expect("compiles")
+
+        val sites = checkNotNull(readTrapSites(output.entries.getValue(trapSitesResource("test/sites")).inputStream()))
+        val expected = mapOf(
+            1 to listOf(0x14f),
+            2 to listOf(0x153),
+            3 to listOf(0x158),
+            4 to listOf(0x161),
+            5 to listOf(0x16b),
+            6 to listOf(0x176),
+            7 to listOf(0x17e),
+            8 to listOf(0x187),
+            9 to listOf(0x191),
+            10 to listOf(0x19d),
+            11 to listOf(0x1a9),
+            12 to listOf(0x1b0),
+            13 to listOf(0x1b7),
+            14 to listOf(0x1c2, 0x1c9),
+            15 to listOf(0x1d0),
+            16 to listOf(0x1d5),
+            18 to listOf(0x1de),
+            19 to listOf(0x1e8),
+        )
+        expected.forEach { (function, offsets) ->
+            val table = checkNotNull(sites.function(function)) { "no sites for function $function" }
+            val recorded = (0 until table.size).map(table::offset).toSet()
+            offsets.forEach { offset -> assertTrue(offset in recorded, "function $function has no site at 0x${offset.toString(16)}") }
+        }
+    }
+
+    @Test
+    fun `an Android module records which inline access failed when trap diagnostics are on`() {
+        val plain = MemoryOutput()
+        val diagnosed = MemoryOutput()
+
+        compile(module("trap_diagnostics"), plain, CompileConfig("test.android.plain") { target(CompileTarget.ANDROID) }).expect("compiles")
+        val config = CompileConfig("test.android.sites") { target(CompileTarget.ANDROID).trapDiagnostics(true) }
+        compile(module("trap_diagnostics"), diagnosed, config).expect("compiles with diagnostics")
+
+        fun MemoryOutput.records() = entries.values.any { bytes -> "memoryAccessOutOfBounds" in String(bytes, Charsets.ISO_8859_1) }
+        assertTrue(diagnosed.records())
+        assertTrue(!plain.records())
+    }
+
+    @Test
+    fun `a module compiled without trap diagnostics writes no trap sites and needs no shrinker rules`() {
+        val output = MemoryOutput()
+
+        val artifact = compile(module("trap_diagnostics"), output, CompileConfig("test.plain")).expect("compiles")
+
+        assertTrue(output.entries.keys.none { name -> name.endsWith(".chasmsites") })
+        assertEquals(null, artifact.shrinkerRules)
+    }
+
+    @Test
+    fun `trap diagnostics keep the compiled functions' names and line numbers through a shrinker`() {
+        val config = CompileConfig("test.rules") { trapDiagnostics(true) }
+
+        val artifact = compile(module("trap_diagnostics"), MemoryOutput(), config).expect("compiles")
+
+        assertEquals(
+            "-keepattributes LineNumberTable\n" +
+                "-keep class test.rules.Code*, test.rules.Chunks* { static *** f*(...); }\n" +
+                "-keep,allowobfuscation,allowshrinking class io.github.charlietap.chasm.executor.invoker.compiled.CompiledEntry " +
+                "{ *** invoke(...); }\n",
+            artifact.shrinkerRules,
+        )
     }
 
     private fun module(

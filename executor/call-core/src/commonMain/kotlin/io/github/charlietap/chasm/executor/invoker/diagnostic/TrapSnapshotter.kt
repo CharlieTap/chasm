@@ -1,7 +1,12 @@
 package io.github.charlietap.chasm.executor.invoker.diagnostic
 
 import io.github.charlietap.chasm.executor.invoker.function.exceptionalCallSiteIp
+import io.github.charlietap.chasm.runtime.diagnostic.CompiledTrace
+import io.github.charlietap.chasm.runtime.diagnostic.FailedMemoryAccess
+import io.github.charlietap.chasm.runtime.diagnostic.TrapMemoryAccess
 import io.github.charlietap.chasm.runtime.diagnostic.TrapSnapshot
+import io.github.charlietap.chasm.runtime.exception.InvocationException
+import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.program.EXIT_IP
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.stack.decodeActivationCallerFrameDelta
@@ -11,11 +16,14 @@ import io.github.charlietap.chasm.runtime.store.Store
 /**
  * Walks the activation headers without changing [vstack]. An inconsistent
  * header ends the walk incomplete rather than reporting a guessed frame.
+ * Where the interpreter entered compiled code, the frames compiled code ran
+ * are read from [exception] and take the place of that one entry.
  */
 internal fun TrapSnapshot(
     store: Store,
     vstack: ValueStack,
     faultIp: Int,
+    exception: Throwable? = null,
     headFrames: Int = HEAD_FRAMES,
     tailFrames: Int = TAIL_FRAMES,
 ): TrapSnapshot {
@@ -25,9 +33,13 @@ internal fun TrapSnapshot(
     var innermostFrameSlots = EMPTY_SLOTS
     var memorySizes = EMPTY_SLOTS
     var complete = true
+    var trace: CompiledTrace? = null
+    val entries = CompiledEntries(exception)
 
     var ip = faultIp
-    var fp = vstack.fp
+    // Compiled code may leave a frame of its own active; its entry recorded where the walk starts.
+    val innermostEntry = entries.innermost(faultIp)
+    var fp = if (innermostEntry < 0) vstack.fp else entries.framePointer(innermostEntry)
     while (true) {
         val index = if (ip in 0 until programSize) lookup.indexOf(ip) else -1
         if (index < 0) {
@@ -36,14 +48,28 @@ internal fun TrapSnapshot(
         }
         val function = lookup.function(index)
         val strategy = function.callStrategy
-        frames.add(lookup.address(index), ip, lookup.entryIp(index), lookup.endIp(index))
-
-        if (frames.total == 1) {
-            val slotCount = minOf(strategy.frameSlots, vstack.sp - fp).coerceAtLeast(0)
-            innermostFrameSlots = LongArray(slotCount) { slot -> vstack.getFrameSlot(fp, slot) }
-            val memories = function.module.memAddresses
-            memorySizes = LongArray(memories.size) { memoryIndex ->
-                store.memories.getOrNull(memories[memoryIndex].address)?.size?.toLong() ?: -1L
+        val innermost = frames.total == 0
+        val compiled = if (strategy.compiledEntry != null) function.module.compiledFrames else null
+        if (compiled != null && exception != null) {
+            val reader = trace ?: compiled.trace(store, exception).also { created -> trace = created }
+            val before = frames.total
+            val reachedEntry = reader.segment(function) { address, position ->
+                frames.add(address, position, TrapSnapshot.COMPILED_FRAME, TrapSnapshot.COMPILED_FRAME)
+            }
+            if (!reachedEntry) complete = false
+            if (frames.total == before) {
+                frames.add(lookup.address(index), -1, TrapSnapshot.COMPILED_FRAME, TrapSnapshot.COMPILED_FRAME)
+            }
+        } else {
+            frames.add(lookup.address(index), ip, lookup.entryIp(index), lookup.endIp(index))
+            // Only the interpreter's own frame needs its memories' sizes; compiled code records the access it failed.
+            if (innermost) {
+                val slotCount = minOf(strategy.frameSlots, vstack.sp - fp).coerceAtLeast(0)
+                innermostFrameSlots = LongArray(slotCount) { slot -> vstack.getFrameSlot(fp, slot) }
+                val memories = function.module.memAddresses
+                memorySizes = LongArray(memories.size) { memoryIndex ->
+                    store.memories.getOrNull(memories[memoryIndex].address)?.size?.toLong() ?: -1L
+                }
             }
         }
 
@@ -56,8 +82,15 @@ internal fun TrapSnapshot(
         val returnIp = decodeActivationReturnIp(header)
         val delta = decodeActivationCallerFrameDelta(header)
         if (returnIp == EXIT_IP) {
-            complete = delta == 0 && fp == 0
-            break
+            // Compiled code called this function: carry on at the compiled code's entry below it.
+            val entry = if (delta > 0) entries.below(fp - delta) else -1
+            if (entry < 0) {
+                complete = complete && delta == 0 && fp == 0
+                break
+            }
+            fp = entries.framePointer(entry)
+            ip = entries.entryIp(entry)
+            continue
         }
         if (delta <= 0 || delta > fp) {
             complete = false
@@ -67,7 +100,19 @@ internal fun TrapSnapshot(
         ip = exceptionalCallSiteIp(returnIp, function.functionType.results.types.size)
     }
 
-    return frames.snapshot(complete, innermostFrameSlots, memorySizes)
+    val failedAccess = (exception as? InvocationException)?.memoryAccess
+    val memoryAccess = if (failedAccess != null && frames.total > 0) memoryAccess(store, frames.firstAddress, failedAccess) else null
+    return frames.snapshot(complete, innermostFrameSlots, memorySizes, memoryAccess)
+}
+
+private fun memoryAccess(
+    store: Store,
+    address: Int,
+    access: FailedMemoryAccess,
+): TrapMemoryAccess? {
+    val function = store.functions.getOrNull(address) as? FunctionInstance.WasmFunction ?: return null
+    val index = function.module.memAddresses.indexOfFirst { memory -> store.memories.getOrNull(memory.address) === access.memory }
+    return TrapMemoryAccess(access.kind, index, access.address, access.width, access.source, access.memory.size.toLong())
 }
 
 private class FrameRecorder(
@@ -78,6 +123,9 @@ private class FrameRecorder(
     private val tail = IntArray(tailCapacity * FIELDS)
     var total = 0
         private set
+
+    val firstAddress: Int
+        get() = if (headCapacity > 0) head[0] else tail[0]
 
     fun add(address: Int, ip: Int, entryIp: Int, endIp: Int) {
         val target: IntArray
@@ -103,6 +151,7 @@ private class FrameRecorder(
         complete: Boolean,
         innermostFrameSlots: LongArray,
         memorySizes: LongArray,
+        memoryAccess: TrapMemoryAccess?,
     ): TrapSnapshot {
         val headCount = minOf(total, headCapacity)
         val tailRecorded = total - headCount
@@ -136,6 +185,7 @@ private class FrameRecorder(
             complete = complete,
             innermostFrameSlots = innermostFrameSlots,
             memorySizes = memorySizes,
+            memoryAccess = memoryAccess,
         )
     }
 

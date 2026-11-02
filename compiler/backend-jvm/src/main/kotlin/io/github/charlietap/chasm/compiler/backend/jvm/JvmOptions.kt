@@ -9,7 +9,7 @@ data class JvmOptions(
     val meterFuel: Boolean = false,
     val interruptible: Boolean = false,
     val memory: MemoryLowering = MemoryLowering.HELPERS,
-    val lineNumbers: Boolean = false,
+    val trapDiagnostics: Boolean = false,
     val splitInstructions: Int? = null,
     val maxMethodBytes: Int = DEFAULT_METHOD_BYTE_BUDGET,
     val functionMaxMethodBytes: Map<Int, Int> = emptyMap(),

@@ -41,7 +41,7 @@ internal fun LowerContext.lowerFunctionBody(
         publishesWrites = publication.requiresPublicationAfter(position)
         val label = placement(position)
         emit.place(label)
-        if (module.options.lineNumbers) emit.line(position + 1, label)
+        markSite(position, label)
         lowerInstruction(instruction, this)
     }
     publishesWrites = true

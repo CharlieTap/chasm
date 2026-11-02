@@ -13,6 +13,8 @@ import io.github.charlietap.chasm.ast.module.toInt
 import io.github.charlietap.chasm.compiler.backend.chasm.diagnostic.FunctionProvenance
 import io.github.charlietap.chasm.compiler.backend.chasm.diagnostic.FunctionProvenanceLinker
 import io.github.charlietap.chasm.compiler.frontend.DefinedFunctionCompiler
+import io.github.charlietap.chasm.compiler.frontend.diagnostic.NO_SOURCE_INDEX
+import io.github.charlietap.chasm.compiler.frontend.diagnostic.trapSourceIndex
 import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.decoder.WasmFunctionBodyOffsets
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
@@ -196,10 +198,8 @@ private class FunctionResolution(
         frames: InterpreterFrames,
     ): SourceSite? {
         if (compiledOffset !in 0 until provenance.size) return null
-        val start = provenance.sourceStart(compiledOffset)
-        val end = provenance.sourceEnd(compiledOffset)
-        if (start == FunctionProvenance.NO_SOURCE || start !in body.indices || end <= start) return null
-        val chosen = (start until minOf(end, body.size)).firstOrNull { index -> body[index].canTrap() } ?: start
+        val chosen = trapSourceIndex(body, provenance.sourceStart(compiledOffset), provenance.sourceEnd(compiledOffset))
+        if (chosen == NO_SOURCE_INDEX) return null
         return SourceSite(
             offset = offsets[chosen],
             instruction = body[chosen],

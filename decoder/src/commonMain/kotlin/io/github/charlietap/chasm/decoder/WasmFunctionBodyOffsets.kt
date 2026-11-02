@@ -19,7 +19,26 @@ fun WasmFunctionBodyOffsets(
     bytes: ByteArray,
     definedFunctionIndex: Int,
 ): IntArray? {
-    val entry = findCodeEntry(bytes, definedFunctionIndex) ?: return null
+    if (definedFunctionIndex < 0) return null
+    val entry = codeEntries(bytes, definedFunctionIndex, definedFunctionIndex + 1)?.singleOrNull() ?: return null
+    return bodyOffsets(config, bytes, entry)
+}
+
+/**
+ * The body offsets of every defined function in one pass, in definition
+ * order. An entry is null when that body cannot be decoded; the list is empty
+ * when the code section cannot be found.
+ */
+fun WasmFunctionBodyOffsets(
+    config: ModuleConfig,
+    bytes: ByteArray,
+): List<IntArray?> = codeEntries(bytes, 0, Int.MAX_VALUE)?.map { entry -> bodyOffsets(config, bytes, entry) }.orEmpty()
+
+private fun bodyOffsets(
+    config: ModuleConfig,
+    bytes: ByteArray,
+    entry: IntRange,
+): IntArray? {
     val slice = bytes.copyOfRange(entry.first, entry.last + 1)
     val context = CodeBodyDecoderContext(config, BinaryReader(slice))
     val offsets = ArrayList<Int>()
@@ -42,10 +61,14 @@ fun WasmFunctionBodyOffsets(
     return if (result.isOk) offsets.toIntArray() else null
 }
 
-/** The range includes the entry's size prefix. */
-private fun findCodeEntry(bytes: ByteArray, definedFunctionIndex: Int): IntRange? {
+/** The ranges of entries [from] until [until], each including its entry's size prefix. */
+private fun codeEntries(
+    bytes: ByteArray,
+    from: Int,
+    until: Int,
+): List<IntRange>? {
     val cursor = Cursor(bytes, MODULE_HEADER_SIZE)
-    if (bytes.size < MODULE_HEADER_SIZE || definedFunctionIndex < 0) return null
+    if (bytes.size < MODULE_HEADER_SIZE) return null
     while (cursor.position < bytes.size) {
         val id = bytes[cursor.position++].toUByte()
         val size = cursor.unsigned() ?: return null
@@ -56,16 +79,16 @@ private fun findCodeEntry(bytes: ByteArray, definedFunctionIndex: Int): IntRange
             continue
         }
         val count = cursor.unsigned() ?: return null
-        if (definedFunctionIndex >= count) return null
-        repeat(definedFunctionIndex + 1) { index ->
+        val entries = ArrayList<IntRange>()
+        repeat(minOf(count, until)) { index ->
             val entryStart = cursor.position
             val entrySize = cursor.unsigned() ?: return null
             val entryEnd = cursor.position + entrySize
             if (entryEnd > sectionEnd || entryEnd < cursor.position) return null
-            if (index == definedFunctionIndex) return entryStart until entryEnd
+            if (index >= from) entries += entryStart until entryEnd
             cursor.position = entryEnd
         }
-        return null
+        return entries
     }
     return null
 }

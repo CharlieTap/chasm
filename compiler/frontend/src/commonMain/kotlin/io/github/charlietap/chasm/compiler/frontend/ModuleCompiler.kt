@@ -21,6 +21,16 @@ fun ModuleCompiler(
     functionCompiler = ::FunctionCompiler,
 )
 
+fun ModuleCompiler(
+    module: Module,
+    types: ModuleTypeResolver,
+    recordProvenance: Boolean,
+): Result<CirModule, CompilationError> = ModuleCompiler(
+    module = module,
+    types = types,
+    functionCompiler = { context, function, workspace -> FunctionCompiler(context, function, workspace, recordProvenance) },
+)
+
 internal inline fun ModuleCompiler(
     module: Module,
     types: ModuleTypeResolver,

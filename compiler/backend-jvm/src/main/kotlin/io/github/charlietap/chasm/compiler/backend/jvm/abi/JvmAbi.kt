@@ -56,6 +56,13 @@ internal fun memoryAccess(
     result ?: "V",
 )
 
+internal val MEMORY_ACCESS_OUT_OF_BOUNDS = MethodRef(
+    MEMORY,
+    "memoryAccessOutOfBounds",
+    listOf(MEMORY_INSTANCE, "I", "J", "I"),
+    "Ljava/lang/Void;",
+)
+
 internal const val UNSAFE_TYPE = "Lsun/misc/Unsafe;"
 internal const val MEMORY_BYTE_ARRAY_FIELD = "byteArray"
 internal val MEMORY_SIZE = MethodRef(MEMORY_INSTANCE, "getSize", emptyList(), "I")
@@ -69,6 +76,7 @@ internal val UNSAFE_PUT_INT = MethodRef(UNSAFE_TYPE, "putInt", listOf(OBJECT_TYP
 internal val UNSAFE_PUT_LONG = MethodRef(UNSAFE_TYPE, "putLong", listOf(OBJECT_TYPE, "J", "J"), "V")
 
 internal const val BUILD_DECLARATIONS = "buildDeclarations"
+internal const val TRAP_SITES_RESOURCE = "trapSitesResource"
 internal const val MODULE_DECLARATIONS = "Lio/github/charlietap/chasm/declarations/ModuleDeclarations;"
 internal const val DATA_SOURCE_TYPE = "Lio/github/charlietap/chasm/declarations/DataSource;"
 

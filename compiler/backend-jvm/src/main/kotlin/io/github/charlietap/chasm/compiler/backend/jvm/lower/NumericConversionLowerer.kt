@@ -92,8 +92,10 @@ private fun LowerContext.trunc(
     if (narrow != null) emit.insn(narrow)
     val result = if (helper.returns == "J") Opcodes.LONG else Opcodes.INTEGER
     emit.place(done, result)
+    val origin = position
     outOfLine += {
         emit.place(trap, if (double) Opcodes.DOUBLE else Opcodes.FLOAT)
+        markSite(origin, trap)
         emit.invokeStatic(helper)
         emit.jump(Opcodes.GOTO, done)
     }
