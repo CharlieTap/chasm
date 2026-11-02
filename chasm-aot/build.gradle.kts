@@ -29,6 +29,7 @@ kotlin {
             dependencies {
                 api(projects.config)
                 api(projects.embeddingApi)
+                api(projects.runtime.compiledApi)
 
                 implementation(projects.ast)
                 implementation(projects.moduleDeclarations)
@@ -38,7 +39,6 @@ kotlin {
                 implementation(projects.module)
                 implementation(projects.stream)
                 implementation(projects.validator)
-                implementation(projects.runtime.compiledApi)
                 implementation(libs.result)
             }
         }

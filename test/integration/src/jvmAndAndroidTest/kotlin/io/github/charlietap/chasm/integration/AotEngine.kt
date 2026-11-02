@@ -7,7 +7,6 @@ import io.github.charlietap.chasm.aot.CompileConfig
 import io.github.charlietap.chasm.aot.CompileError.Stage
 import io.github.charlietap.chasm.aot.CompileOutput
 import io.github.charlietap.chasm.aot.CompileResult
-import io.github.charlietap.chasm.aot.CompiledModule
 import io.github.charlietap.chasm.aot.compile
 import io.github.charlietap.chasm.aot.instance
 import io.github.charlietap.chasm.config.RuntimeConfig
@@ -20,9 +19,6 @@ import io.github.charlietap.chasm.embedding.shapes.Instance
 import io.github.charlietap.chasm.embedding.shapes.Memory
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
-import java.io.ByteArrayOutputStream
-import java.io.InputStream
-import java.io.OutputStream
 import java.util.concurrent.atomic.AtomicInteger
 import io.github.charlietap.chasm.embedding.exports as embeddingExports
 import io.github.charlietap.chasm.embedding.extern.createExternRef as embeddingCreateExternRef
@@ -45,13 +41,13 @@ class AotEngine(
         imports: List<Import>,
         config: RuntimeConfig,
     ): ChasmResult<Instance, ChasmError> {
-        val classes = CompiledClasses()
+        val output = CompileOutput.Memory()
         val compileConfig = CompileConfig("$PACKAGE_NAME.module${modules.incrementAndGet()}") {
             trapDiagnostics(true)
             configure()
         }
-        return when (val result = compile(bytes, classes, compileConfig)) {
-            is CompileResult.Success -> instance(store, classes.module(result.artifact.moduleClassName), imports, config)
+        return when (val result = compile(bytes, output, compileConfig)) {
+            is CompileResult.Success -> instance(store, output.load(result.artifact), imports, config)
             is CompileResult.Error -> when (result.error.stage) {
                 Stage.DECODE -> ChasmResult.Error(ChasmError.DecodeError(result.error.error))
                 Stage.VALIDATION -> ChasmResult.Error(ChasmError.ValidationError(result.error.error))
@@ -114,39 +110,4 @@ class AotEngine(
         // Each compiled module gets its own package, as Transmute gives each module, so frames name one module.
         val modules = AtomicInteger()
     }
-}
-
-private class CompiledClasses : ClassLoader(CompiledClasses::class.java.classLoader), CompileOutput {
-
-    private val classes = mutableMapOf<String, ByteArray>()
-    private val resources = mutableMapOf<String, ByteArray>()
-
-    override fun classFile(
-        internalName: String,
-        bytes: ByteArray,
-    ) {
-        classes[internalName] = bytes
-    }
-
-    override fun resource(
-        path: String,
-        write: (OutputStream) -> Unit,
-    ) {
-        resources[path] = ByteArrayOutputStream().also(write).toByteArray()
-    }
-
-    fun module(
-        className: String,
-    ): CompiledModule = loadClass(className).getField("INSTANCE").get(null) as CompiledModule
-
-    override fun findClass(
-        name: String,
-    ): Class<*> {
-        val bytes = classes[name.replace('.', '/')] ?: throw ClassNotFoundException(name)
-        return defineClass(name, bytes, 0, bytes.size)
-    }
-
-    override fun getResourceAsStream(
-        name: String,
-    ): InputStream? = resources[name.removePrefix("/")]?.inputStream() ?: super.getResourceAsStream(name)
 }

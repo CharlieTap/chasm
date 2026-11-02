@@ -60,8 +60,23 @@ public final class io/github/charlietap/chasm/aot/CompileKt {
 }
 
 public abstract interface class io/github/charlietap/chasm/aot/CompileOutput {
-	public abstract fun classFile (Ljava/lang/String;[B)V
-	public abstract fun resource (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+}
+
+public final class io/github/charlietap/chasm/aot/CompileOutput$Directory : io/github/charlietap/chasm/aot/CompileOutput {
+	public fun <init> (Ljava/nio/file/Path;)V
+	public final fun getPath ()Ljava/nio/file/Path;
+}
+
+public final class io/github/charlietap/chasm/aot/CompileOutput$Jar : io/github/charlietap/chasm/aot/CompileOutput {
+	public fun <init> (Ljava/nio/file/Path;)V
+	public final fun getPath ()Ljava/nio/file/Path;
+}
+
+public final class io/github/charlietap/chasm/aot/CompileOutput$Memory : io/github/charlietap/chasm/aot/CompileOutput {
+	public fun <init> ()V
+	public final fun getClasses ()Ljava/util/Map;
+	public final fun getResources ()Ljava/util/Map;
+	public final fun load (Lio/github/charlietap/chasm/aot/CompiledModuleArtifact;)Lio/github/charlietap/chasm/aot/CompiledModule;
 }
 
 public abstract interface class io/github/charlietap/chasm/aot/CompileResult {
@@ -105,6 +120,7 @@ public final class io/github/charlietap/chasm/aot/CompiledModuleArtifact {
 	public static final field Companion Lio/github/charlietap/chasm/aot/CompiledModuleArtifact$Companion;
 	public static final field DATA_RESOURCE_EXTENSION Ljava/lang/String;
 	public final fun getDataResourcePath ()Ljava/lang/String;
+	public final fun getFiles ()Ljava/util/List;
 	public final fun getModuleClassName ()Ljava/lang/String;
 	public final fun getShrinkerRules ()Ljava/lang/String;
 }

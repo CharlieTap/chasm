@@ -5,30 +5,33 @@ import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.get
 import com.github.michaelbull.result.getError
 import com.github.michaelbull.result.getOrThrow
+import io.github.charlietap.chasm.ExperimentalChasmApi
 import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.aot.CompileError.Stage
 import io.github.charlietap.chasm.aot.internal.readTrapSites
 import io.github.charlietap.chasm.aot.internal.trapSitesResource
 import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
-import java.io.ByteArrayOutputStream
-import java.io.IOException
-import java.io.OutputStream
+import java.net.URLClassLoader
 import java.nio.file.Files
+import java.nio.file.Path
+import java.util.jar.JarFile
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertIs
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
 private val EMPTY_MODULE = byteArrayOf(0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00)
 
+@OptIn(ExperimentalChasmApi::class, InternalChasmApi::class)
 class CompileTest {
 
     @Test
     fun `a compiled module names its class and the data resource it wrote`() {
-        val output = MemoryOutput()
+        val output = CompileOutput.Memory()
 
         val artifact = compile(module("declarations"), output, CompileConfig("test.compiled.declarations")).expect("compiles")
 
@@ -36,43 +39,44 @@ class CompileTest {
         assertEquals("test.compiled.declarations.WasmModule", artifact.moduleClassName)
         assertEquals("test/compiled/declarations/data.chasmdata", data)
         assertTrue(data.endsWith(CompiledModuleArtifact.DATA_RESOURCE_EXTENSION))
-        assertTrue("test/compiled/declarations/WasmModule.class" in output.entries)
-        assertTrue(output.entries.getValue(data).isNotEmpty())
+        assertTrue("test/compiled/declarations/WasmModule" in output.classes)
+        assertTrue(output.resources.getValue(data).isNotEmpty())
+        assertEquals(emptyList(), artifact.files)
     }
 
     @Test
     fun `a module without data segments writes no data resource`() {
-        val output = MemoryOutput()
+        val output = CompileOutput.Memory()
 
         val artifact = compile(EMPTY_MODULE, output, CompileConfig("test.empty")).expect("compiles")
 
         assertEquals(null, artifact.dataResourcePath)
-        assertTrue(output.entries.keys.none { name -> name.endsWith(CompiledModuleArtifact.DATA_RESOURCE_EXTENSION) })
+        assertTrue(output.resources.keys.none { name -> name.endsWith(CompiledModuleArtifact.DATA_RESOURCE_EXTENSION) })
     }
 
     @Test
     fun `a module compiles to the same output from a file as from its bytes`() {
         val bytes = module("declarations")
         val file = Files.createTempFile("module", ".wasm").also { Files.write(it, bytes) }
-        val fromFile = MemoryOutput()
-        val fromBytes = MemoryOutput()
+        val fromFile = CompileOutput.Memory()
+        val fromBytes = CompileOutput.Memory()
 
         compile(file, fromFile, CompileConfig("test.same")).expect("compiles from the file")
         compile(bytes, fromBytes, CompileConfig("test.same")).expect("compiles from the bytes")
         Files.delete(file)
 
-        assertEquals(fromBytes.entries.keys, fromFile.entries.keys)
-        fromBytes.entries.forEach { (name, contents) -> assertContentEquals(contents, fromFile.entries.getValue(name), name) }
+        assertEquals(fromBytes.entries().keys, fromFile.entries().keys)
+        fromBytes.entries().forEach { (name, contents) -> assertContentEquals(contents, fromFile.entries().getValue(name), name) }
     }
 
     @Test
     fun `an Android module reaches memory as Android's memories allow`() {
-        val output = MemoryOutput()
+        val output = CompileOutput.Memory()
         val config = CompileConfig("test.android") { target(CompileTarget.ANDROID) }
 
         compile(module("declarations"), output, config).expect("compiles")
 
-        assertTrue(output.entries.values.any { bytes -> "sun/misc/Unsafe" in String(bytes, Charsets.ISO_8859_1) })
+        assertTrue(output.classes.values.any { bytes -> "sun/misc/Unsafe" in String(bytes, Charsets.ISO_8859_1) })
     }
 
     @Test
@@ -87,17 +91,19 @@ class CompileTest {
     @Test
     fun `failures say where compilation failed`() {
         val missing = Files.createTempDirectory("compile").resolve("missing.wasm")
+        val blocked = Files.createTempFile("compile", ".blocked")
         val cases = listOf(
-            compile(module("declarations"), MemoryOutput(), CompileConfig("test.class.name")) to Stage.CONFIGURATION,
-            compile(module("declarations"), MemoryOutput(), CompileConfig("1test")) to Stage.CONFIGURATION,
-            compile(module("declarations"), MemoryOutput(), CompileConfig("test.small") { maxMethodBytes(999) }) to Stage.CONFIGURATION,
-            compile(module("declarations"), MemoryOutput(), CompileConfig("test.large") { maxMethodBytes(32_768) }) to Stage.CONFIGURATION,
-            compile(missing, MemoryOutput(), CompileConfig("test.missing")) to Stage.INPUT,
-            compile(byteArrayOf(1, 2, 3), MemoryOutput(), CompileConfig("test.garbage")) to Stage.DECODE,
-            compile(module("invalid"), MemoryOutput(), CompileConfig("test.invalid")) to Stage.VALIDATION,
-            compile(module("simd"), MemoryOutput(), CompileConfig("test.simd")) to Stage.GENERATION,
-            compile(module("declarations"), FailingOutput(), CompileConfig("test.failing")) to Stage.OUTPUT,
+            compile(module("declarations"), CompileOutput.Memory(), CompileConfig("test.class.name")) to Stage.CONFIGURATION,
+            compile(module("declarations"), CompileOutput.Memory(), CompileConfig("1test")) to Stage.CONFIGURATION,
+            compile(module("declarations"), CompileOutput.Memory(), CompileConfig("test.small") { maxMethodBytes(999) }) to Stage.CONFIGURATION,
+            compile(module("declarations"), CompileOutput.Memory(), CompileConfig("test.large") { maxMethodBytes(32_768) }) to Stage.CONFIGURATION,
+            compile(missing, CompileOutput.Memory(), CompileConfig("test.missing")) to Stage.INPUT,
+            compile(byteArrayOf(1, 2, 3), CompileOutput.Memory(), CompileConfig("test.garbage")) to Stage.DECODE,
+            compile(module("invalid"), CompileOutput.Memory(), CompileConfig("test.invalid")) to Stage.VALIDATION,
+            compile(module("simd"), CompileOutput.Memory(), CompileConfig("test.simd")) to Stage.GENERATION,
+            compile(module("declarations"), CompileOutput.Directory(blocked.resolve("classes")), CompileConfig("test.failing")) to Stage.OUTPUT,
         )
+        Files.delete(blocked)
 
         cases.forEach { (result, stage) ->
             assertIs<CompileResult.Error>(result)
@@ -109,69 +115,87 @@ class CompileTest {
     }
 
     @Test
-    fun `a resource stream that fails part way fails at the output`() {
-        val output = object : MemoryOutput() {
-            override fun resource(
-                path: String,
-                write: (OutputStream) -> Unit,
-            ) {
-                write(
-                    object : OutputStream() {
-                        override fun write(
-                            b: Int,
-                        ) = throw IOException("disk full")
-                    },
-                )
-            }
+    fun `a module loads from memory, a directory and a jar`() {
+        val config = CompileConfig("test.loaded")
+        val directory = Files.createTempDirectory("compile")
+
+        val memory = CompileOutput.Memory()
+        val inMemory = memory.load(compile(module("declarations"), memory, config).expect("compiles into memory"))
+        val classes = compile(module("declarations"), CompileOutput.Directory(directory.resolve("classes")), config).expect("compiles into a directory")
+        val jar = compile(module("declarations"), CompileOutput.Jar(directory.resolve("module.jar")), config).expect("compiles into a jar")
+
+        val modules = listOf(
+            inMemory,
+            loaded(directory.resolve("classes"), classes),
+            loaded(jar.files.single(), jar),
+        )
+        modules.forEach { module ->
+            assertEquals("test.loaded.WasmModule", module.code.javaClass.name)
+            assertEquals(null, module.code.trapSitesResource())
         }
-
-        val result = compile(module("declarations"), output, CompileConfig("test.partial"))
-
-        assertIs<CompileResult.Error>(result)
-        assertEquals(Stage.OUTPUT, result.error.stage, result.error.toString())
     }
 
     @Test
-    fun `an output that writes a resource twice fails compilation`() {
-        val output = object : MemoryOutput() {
-            override fun resource(
-                path: String,
-                write: (OutputStream) -> Unit,
-            ) {
-                write(ByteArrayOutputStream())
-                write(ByteArrayOutputStream())
-            }
-        }
+    fun `a directory output lists the files it wrote`() {
+        val directory = Files.createTempDirectory("compile").resolve("classes")
 
-        val result = compile(module("declarations"), output, CompileConfig("test.twice"))
+        val artifact = compile(module("declarations"), CompileOutput.Directory(directory), CompileConfig("test.listed")).expect("compiles")
 
-        assertIs<CompileResult.Error>(result)
-        assertEquals(Stage.OUTPUT, result.error.stage)
+        assertTrue(directory.resolve("test/listed/WasmModule.class") in artifact.files)
+        assertTrue(directory.resolve(checkNotNull(artifact.dataResourcePath)) in artifact.files)
+        assertTrue(artifact.files.all(Files::exists))
     }
 
     @Test
-    fun `an output that does not write a resource fails compilation`() {
-        val output = object : MemoryOutput() {
-            override fun resource(
-                path: String,
-                write: (OutputStream) -> Unit,
-            ) = Unit
-        }
+    fun `a jar output replaces the jars an earlier compilation left`() {
+        val directory = Files.createTempDirectory("compile")
+        val first = directory.resolve("module.jar")
+        Files.write(first, byteArrayOf(1))
+        Files.write(directory.resolve("module-2.jar"), byteArrayOf(2))
+        Files.write(directory.resolve("other-2.jar"), byteArrayOf(3))
 
-        val result = compile(module("declarations"), output, CompileConfig("test.unwritten"))
+        val artifact = compile(module("declarations"), CompileOutput.Jar(first), CompileConfig("test.jar")).expect("compiles")
 
-        assertIs<CompileResult.Error>(result)
-        assertEquals(Stage.OUTPUT, result.error.stage)
+        assertEquals(listOf(first), artifact.files)
+        assertFalse(Files.exists(directory.resolve("module-2.jar")))
+        assertTrue(Files.exists(directory.resolve("other-2.jar")))
+        JarFile(first.toFile()).use { jar -> assertTrue(jar.getEntry("test/jar/WasmModule.class") != null) }
+        assertEquals(setOf("module.jar", "other-2.jar"), Files.list(directory).use { files -> files.map { it.fileName.toString() }.toList().toSet() })
     }
 
-    @OptIn(InternalChasmApi::class)
+    @Test
+    fun `a jar compiles to the same bytes every time`() {
+        val directory = Files.createTempDirectory("compile")
+
+        compile(module("declarations"), CompileOutput.Jar(directory.resolve("a.jar")), CompileConfig("test.same.jar")).expect("compiles")
+        compile(module("declarations"), CompileOutput.Jar(directory.resolve("b.jar")), CompileConfig("test.same.jar")).expect("compiles")
+
+        assertContentEquals(Files.readAllBytes(directory.resolve("a.jar")), Files.readAllBytes(directory.resolve("b.jar")))
+    }
+
+    @Test
+    fun `a failed compilation leaves earlier output alone`() {
+        val directory = Files.createTempDirectory("compile")
+        val jar = directory.resolve("module.jar")
+        Files.write(jar, byteArrayOf(1, 2, 3))
+        val memory = CompileOutput.Memory()
+
+        assertIs<CompileResult.Error>(compile(module("simd"), CompileOutput.Jar(jar), CompileConfig("test.failed")))
+        assertIs<CompileResult.Error>(compile(module("simd"), memory, CompileConfig("test.failed")))
+        assertIs<CompileResult.Error>(compile(module("simd"), CompileOutput.Directory(directory.resolve("classes")), CompileConfig("test.failed")))
+
+        assertContentEquals(byteArrayOf(1, 2, 3), Files.readAllBytes(jar))
+        assertEquals(setOf("module.jar"), Files.list(directory).use { files -> files.map { it.fileName.toString() }.toList().toSet() })
+        assertTrue(memory.classes.isEmpty())
+    }
+
     @Test
     fun `trap diagnostics record the offset of every trap and call site`() {
-        val output = MemoryOutput()
+        val output = CompileOutput.Memory()
 
         compile(module("trap_diagnostics"), output, CompileConfig("test.sites") { trapDiagnostics(true) }).expect("compiles")
 
-        val sites = checkNotNull(readTrapSites(output.entries.getValue(trapSitesResource("test/sites")).inputStream()))
+        val sites = checkNotNull(readTrapSites(output.resources.getValue(trapSitesResource("test/sites")).inputStream()))
         val expected = mapOf(
             1 to listOf(0x14f),
             2 to listOf(0x153),
@@ -201,25 +225,25 @@ class CompileTest {
 
     @Test
     fun `an Android module records which inline access failed when trap diagnostics are on`() {
-        val plain = MemoryOutput()
-        val diagnosed = MemoryOutput()
+        val plain = CompileOutput.Memory()
+        val diagnosed = CompileOutput.Memory()
 
         compile(module("trap_diagnostics"), plain, CompileConfig("test.android.plain") { target(CompileTarget.ANDROID) }).expect("compiles")
         val config = CompileConfig("test.android.sites") { target(CompileTarget.ANDROID).trapDiagnostics(true) }
         compile(module("trap_diagnostics"), diagnosed, config).expect("compiles with diagnostics")
 
-        fun MemoryOutput.records() = entries.values.any { bytes -> "memoryAccessOutOfBounds" in String(bytes, Charsets.ISO_8859_1) }
+        fun CompileOutput.Memory.records() = classes.values.any { bytes -> "memoryAccessOutOfBounds" in String(bytes, Charsets.ISO_8859_1) }
         assertTrue(diagnosed.records())
         assertTrue(!plain.records())
     }
 
     @Test
     fun `a module compiled without trap diagnostics writes no trap sites and needs no shrinker rules`() {
-        val output = MemoryOutput()
+        val output = CompileOutput.Memory()
 
         val artifact = compile(module("trap_diagnostics"), output, CompileConfig("test.plain")).expect("compiles")
 
-        assertTrue(output.entries.keys.none { name -> name.endsWith(".chasmsites") })
+        assertTrue(output.resources.keys.none { name -> name.endsWith(".chasmsites") })
         assertEquals(null, artifact.shrinkerRules)
     }
 
@@ -227,7 +251,7 @@ class CompileTest {
     fun `trap diagnostics keep the compiled functions' names and line numbers through a shrinker`() {
         val config = CompileConfig("test.rules") { trapDiagnostics(true) }
 
-        val artifact = compile(module("trap_diagnostics"), MemoryOutput(), config).expect("compiles")
+        val artifact = compile(module("trap_diagnostics"), CompileOutput.Memory(), config).expect("compiles")
 
         assertEquals(
             "-keepattributes LineNumberTable\n" +
@@ -236,29 +260,6 @@ class CompileTest {
                 "{ *** invoke(...); }\n",
             artifact.shrinkerRules,
         )
-    }
-
-    private fun module(
-        name: String,
-    ): ByteArray =
-        checkNotNull(CompileTest::class.java.getResourceAsStream("/modules/$name.wasm")) { "missing module $name" }.use { it.readBytes() }
-
-    private open class MemoryOutput : CompileOutput {
-        val entries = LinkedHashMap<String, ByteArray>()
-
-        override fun classFile(
-            internalName: String,
-            bytes: ByteArray,
-        ) {
-            entries["$internalName.class"] = bytes
-        }
-
-        override fun resource(
-            path: String,
-            write: (OutputStream) -> Unit,
-        ) {
-            entries[path] = ByteArrayOutputStream().also(write).toByteArray()
-        }
     }
 
     @Test
@@ -288,10 +289,19 @@ class CompileTest {
         assertEquals(Stage.INPUT, decoded.getError()?.stage)
     }
 
-    private class FailingOutput : MemoryOutput() {
-        override fun classFile(
-            internalName: String,
-            bytes: ByteArray,
-        ) = throw IOException("disk full")
+    private fun module(
+        name: String,
+    ): ByteArray =
+        checkNotNull(CompileTest::class.java.getResourceAsStream("/modules/$name.wasm")) { "missing module $name" }.use { it.readBytes() }
+
+    private fun CompileOutput.Memory.entries(): Map<String, ByteArray> =
+        classes.mapKeys { (name, _) -> "$name.class" } + resources
+
+    private fun loaded(
+        path: Path,
+        artifact: CompiledModuleArtifact,
+    ): CompiledModule {
+        val loader = URLClassLoader(arrayOf(path.toUri().toURL()), CompileTest::class.java.classLoader)
+        return loader.loadClass(artifact.moduleClassName).getField("INSTANCE").get(null) as CompiledModule
     }
 }

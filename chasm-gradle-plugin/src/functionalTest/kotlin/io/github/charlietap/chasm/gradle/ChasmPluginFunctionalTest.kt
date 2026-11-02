@@ -988,27 +988,13 @@ class ChasmPluginFunctionalTest {
                 import io.github.charlietap.chasm.aot.compile
                 import io.github.charlietap.chasm.aot.expect
                 import java.io.File
-                import java.io.OutputStream
                 import java.nio.file.Path
 
                 fun main(
                     args: Array<String>,
                 ) {
-                    val directory = File(args[1]).apply { deleteRecursively(); mkdirs() }
-                    val output = object : CompileOutput {
-                        override fun classFile(
-                            internalName: String,
-                            bytes: ByteArray,
-                        ) =
-                            File(directory, "${'$'}internalName.class").apply { parentFile.mkdirs() }.writeBytes(bytes)
-
-                        override fun resource(
-                            path: String,
-                            write: (OutputStream) -> Unit,
-                        ) =
-                            File(directory, path).apply { parentFile.mkdirs() }.outputStream().use(write)
-                    }
-                    compile(Path.of(args[0]), output, CompileConfig("test.compiled")).expect("compiles")
+                    File(args[1]).deleteRecursively()
+                    compile(Path.of(args[0]), CompileOutput.Directory(Path.of(args[1])), CompileConfig("test.compiled")).expect("compiles")
                 }
             """,
         )

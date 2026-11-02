@@ -26,7 +26,6 @@ import io.github.charlietap.chasm.module.ModuleDeclarationsFactory
 import io.github.charlietap.chasm.stream.SourceReader
 import io.github.charlietap.chasm.validator.WasmModuleValidator
 import java.io.FilterInputStream
-import java.io.FilterOutputStream
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
@@ -38,37 +37,37 @@ import java.nio.file.Path
 import java.nio.file.StandardOpenOption
 
 fun compile(
-    binary: Path,
+    input: Path,
     output: CompileOutput,
     config: CompileConfig,
 ): CompileResult {
     if (config.trapDiagnostics) {
         val bytes = try {
-            Files.readAllBytes(binary)
+            Files.readAllBytes(input)
         } catch (failure: IOException) {
-            return error(Stage.INPUT, "cannot read $binary: ${failure.message}")
+            return error(Stage.INPUT, "cannot read $input: ${failure.message}")
         }
         return compile(bytes, output, config)
     }
     val channel = try {
-        FileChannel.open(binary, StandardOpenOption.READ)
+        FileChannel.open(input, StandardOpenOption.READ)
     } catch (failure: IOException) {
-        return error(Stage.INPUT, "cannot read $binary: ${failure.message}")
+        return error(Stage.INPUT, "cannot read $input: ${failure.message}")
     }
     return try {
         channel.use {
             compile(output, config, streamSource { Channels.newInputStream(channel.position(0)).buffered() })
         }
     } catch (failure: IOException) {
-        error(Stage.INPUT, "cannot read $binary: ${failure.message}")
+        error(Stage.INPUT, "cannot read $input: ${failure.message}")
     }
 }
 
 fun compile(
-    binary: ByteArray,
+    input: ByteArray,
     output: CompileOutput,
     config: CompileConfig,
-): CompileResult = compile(output, config, byteArraySource(binary), binary)
+): CompileResult = compile(output, config, byteArraySource(input), input)
 
 private fun compile(
     output: CompileOutput,
@@ -102,7 +101,8 @@ internal inline fun compile(
     crossinline moduleLowerer: ModuleLowerer,
 ): CompileResult {
     val options = jvmOptions(config).getOrElse { failure -> return CompileResult.Error(failure) }
-    return try {
+    val sink = output.sink()
+    val result = try {
         val decoded = decodeForCompilation(config.moduleConfig, source).getOrElse { failure -> return CompileResult.Error(failure) }
         val module = validator(config.moduleConfig, decoded).getOrElse { failure ->
             return error(Stage.VALIDATION, failure.toString())
@@ -114,9 +114,17 @@ internal inline fun compile(
             return error(Stage.GENERATION, "cannot compile functions: ${reasons.ifEmpty { failure.toString() }}", functions.keys.toList())
         }
         val sites = if (config.trapDiagnostics && binary != null) trapSitesFactory(config.moduleConfig, binary, module, code) else emptyMap()
-        val generated = moduleLowerer(module, code, options, CompileOutputAdapter(output), declarationsFactory(module), sites)
+        val generated = moduleLowerer(module, code, options, CompileOutputAdapter(sink), declarationsFactory(module), sites)
+        val files = guardOutput { sink.commit() }
         val rules = if (config.trapDiagnostics) trapDiagnosticRules(config.packageName) else null
-        CompileResult.Success(CompiledModuleArtifact(generated.moduleClass, generated.data, rules))
+        CompileResult.Success(
+            CompiledModuleArtifact(
+                moduleClassName = generated.moduleClass,
+                dataResourcePath = generated.data,
+                files = files,
+                shrinkerRules = rules,
+            ),
+        )
     } catch (unsupported: UnsupportedFunctions) {
         error(Stage.GENERATION, unsupported.message.orEmpty(), unsupported.reasons.keys.toList())
     } catch (tooLarge: ClassTooLarge) {
@@ -125,7 +133,12 @@ internal inline fun compile(
         error(Stage.INPUT, "the module's binary changed or could not be read again: ${input.cause?.message}")
     } catch (failure: OutputFailure) {
         error(Stage.OUTPUT, "cannot write the compiled module: ${failure.cause?.message}")
+    } catch (failure: Throwable) {
+        sink.discard()
+        throw failure
     }
+    if (result is CompileResult.Error) sink.discard()
+    return result
 }
 
 internal typealias ModuleSource = (ModuleConfig) -> Result<Module, CompileError>
@@ -213,44 +226,36 @@ private class ReadGuard(
 }
 
 internal class CompileOutputAdapter(
-    private val output: CompileOutput,
+    private val sink: OutputSink,
 ) : JvmOutput {
 
     override fun classFile(
         internalName: String,
         bytes: ByteArray,
-    ) = guard { output.classFile(internalName, bytes) }
+    ) = guardOutput { sink.classFile(internalName, bytes) }
 
     override fun <T> resource(
         path: String,
         write: (OutputStream) -> T,
-    ): T = guard {
-        var written = false
+    ): T = guardOutput {
         val results = ArrayList<T>(1)
-        output.resource(path) { stream ->
-            check(!written) { "the resource $path was written twice" }
-            written = true
-            results += write(stream)
-        }
-        check(results.isNotEmpty()) { "the output did not write the resource $path" }
+        sink.resource(path) { stream -> results += write(stream) }
         results.single()
     }
+}
 
-    private inline fun <T> guard(
-        block: () -> T,
-    ): T = try {
-        block()
-    } catch (failure: InputFailure) {
-        throw failure
-    } catch (failure: OutputFailure) {
-        throw failure
-    } catch (failure: IOException) {
-        throw OutputFailure(failure)
-    } catch (failure: UncheckedIOException) {
-        throw OutputFailure(failure)
-    } catch (failure: IllegalStateException) {
-        throw OutputFailure(failure)
-    }
+internal inline fun <T> guardOutput(
+    block: () -> T,
+): T = try {
+    block()
+} catch (failure: InputFailure) {
+    throw failure
+} catch (failure: OutputFailure) {
+    throw failure
+} catch (failure: IOException) {
+    throw OutputFailure(failure)
+} catch (failure: UncheckedIOException) {
+    throw OutputFailure(failure)
 }
 
 internal class InputFailure(
