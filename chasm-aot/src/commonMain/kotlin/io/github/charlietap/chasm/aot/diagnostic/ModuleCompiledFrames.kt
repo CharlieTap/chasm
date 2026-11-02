@@ -44,7 +44,9 @@ internal class ModuleCompiledFrames(
         methodName: String,
         line: Int,
     ): Int {
-        if (line <= 0) return -1
+        // Once a shrinker has renumbered the lines, only its mapping says which line Chasm gave a frame.
+        val original = module.trapLines?.original(className.substringAfterLast('.'), methodName, line) ?: line
+        if (original <= 0) return -1
         val separator = methodName.indexOf(CHUNK_METHOD_SEPARATOR)
         val start = if (separator < 0) {
             0
@@ -52,7 +54,7 @@ internal class ModuleCompiledFrames(
             val chunk = methodName.substring(separator + CHUNK_METHOD_SEPARATOR.length).toIntOrNull() ?: return -1
             module.trapSites?.function(function)?.chunkStarts?.getOrNull(chunk) ?: return -1
         }
-        return start + line - 1
+        return start + original - 1
     }
 
     override fun trace(

@@ -210,6 +210,11 @@ internal class Reader(
         return (encoded ushr 1) xor -(encoded and 1)
     }
 
+    fun string(): String {
+        val length = count()
+        return bytes.decodeToString(position, position + length).also { position += length }
+    }
+
     fun finished(): Boolean = position == bytes.size
 }
 

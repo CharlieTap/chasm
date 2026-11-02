@@ -2,6 +2,7 @@ public final class io/github/charlietap/chasm/aot/CompiledModule {
 	public final fun getCode ()Lio/github/charlietap/chasm/aot/internal/CompiledCode;
 	public final fun getDeclarations-d1pmJ48 ()Ljava/lang/Object;
 	public final fun getPackageName ()Ljava/lang/String;
+	public final fun getTrapLines ()Lio/github/charlietap/chasm/aot/internal/TrapLines;
 	public final fun getTrapSites ()Lio/github/charlietap/chasm/aot/internal/TrapSites;
 }
 
@@ -23,6 +24,27 @@ public final class io/github/charlietap/chasm/aot/internal/FunctionTrapSites {
 	public final fun memoryIndex (IZ)I
 	public final fun offset (I)I
 	public final fun withChunkStarts ([I)Lio/github/charlietap/chasm/aot/internal/FunctionTrapSites;
+}
+
+public final class io/github/charlietap/chasm/aot/internal/LineRange {
+	public fun <init> (IIIZ)V
+	public final fun getFirst ()I
+	public final fun getLast ()I
+	public final fun getLinear ()Z
+	public final fun getOriginal ()I
+}
+
+public final class io/github/charlietap/chasm/aot/internal/TrapLines {
+	public fun <init> (Ljava/util/Map;)V
+	public final fun original (Ljava/lang/String;Ljava/lang/String;I)I
+}
+
+public final class io/github/charlietap/chasm/aot/internal/TrapLinesKt {
+	public static final field TRAP_LINES_EXTENSION Ljava/lang/String;
+	public static final fun readTrapLines (Ljava/io/InputStream;)Lio/github/charlietap/chasm/aot/internal/TrapLines;
+	public static final fun trapLinesKey (Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+	public static final fun trapLinesResource (Ljava/lang/String;)Ljava/lang/String;
+	public static final fun writeTrapLines (Ljava/io/OutputStream;Ljava/util/Map;)V
 }
 
 public final class io/github/charlietap/chasm/aot/internal/TrapSites {

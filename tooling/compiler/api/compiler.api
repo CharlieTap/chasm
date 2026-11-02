@@ -117,3 +117,7 @@ public final class io/github/charlietap/chasm/aot/InspectModuleKt {
 	public static synthetic fun inspectModule$default ([BLio/github/charlietap/chasm/config/ModuleConfig;ILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 }
 
+public final class io/github/charlietap/chasm/aot/RetraceTrapLinesKt {
+	public static final fun retraceTrapLines (Ljava/io/Reader;)Ljava/util/Map;
+}
+
