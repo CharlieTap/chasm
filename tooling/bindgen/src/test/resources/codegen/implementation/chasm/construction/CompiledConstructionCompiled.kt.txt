@@ -6,7 +6,6 @@ import com.test.aot.WasmModule
 import io.github.charlietap.chasm.ExperimentalChasmApi
 import io.github.charlietap.chasm.aot.instance
 import io.github.charlietap.chasm.embedding.codegen.CodegenImport
-import io.github.charlietap.chasm.embedding.codegen.CompiledInstanceFactory
 import io.github.charlietap.chasm.embedding.codegen.allocateImports
 import io.github.charlietap.chasm.embedding.shapes.Instance
 import io.github.charlietap.chasm.embedding.shapes.Store
@@ -14,11 +13,14 @@ import io.github.charlietap.chasm.embedding.shapes.`expect`
 import io.github.charlietap.chasm.embedding.store
 import kotlin.OptIn
 import kotlin.collections.List
+import io.github.charlietap.chasm.embedding.addFuel as chasmAddFuel
 
-public fun compiledConstruction(imports: List<CodegenImport> = emptyList(), instanceFactory: CompiledInstanceFactory? = null): CompiledConstruction {
-  val store = store()
+public fun compiledConstruction(imports: List<CodegenImport> = emptyList()): CompiledConstruction {
+  val module = WasmModule.INSTANCE
+  val store = store(module.metadata.storeConfig)
+  module.metadata.initialFuel?.let { fuel -> chasmAddFuel(store, fuel).`expect`("Failed to add fuel") }
   val allocatedImports = allocateImports(store, imports)
-  val instance = instanceFactory?.invoke(store, WasmModule.INSTANCE, allocatedImports) ?: instance(store, WasmModule.INSTANCE, allocatedImports).`expect`("Failed to instantiate module")
+  val instance = instance(store, module, allocatedImports).`expect`("Failed to instantiate module")
   return CompiledConstructionCompiledImpl(store = store, instance = instance)
 }
 

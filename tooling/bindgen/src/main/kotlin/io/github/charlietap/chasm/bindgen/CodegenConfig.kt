@@ -53,7 +53,29 @@ data class CodegenConfig(
     val wasi: WasiLinking = WasiLinking.DISABLED,
     val compiledCode: String? = null,
     val debugInfo: Boolean = false,
+    val fuelControls: Boolean = false,
+    val interruptControl: Boolean = false,
 ) : Serializable
 
 internal val CodegenConfig.runsCompiledCode: Boolean
     get() = runtime == CodegenRuntime.CHASM && compiledCode != null
+
+internal class StoreControls(
+    val fuel: Boolean = false,
+    val interrupt: Boolean = false,
+) {
+    val names: List<String>
+        get() = buildList {
+            if (fuel) addAll(listOf(ADD_FUEL, REMAINING_FUEL))
+            if (interrupt) add(INTERRUPT)
+        }
+
+    companion object {
+        const val ADD_FUEL = "addFuel"
+        const val REMAINING_FUEL = "remainingFuel"
+        const val INTERRUPT = "interrupt"
+    }
+}
+
+internal val CodegenConfig.storeControls: StoreControls
+    get() = StoreControls(fuel = fuelControls, interrupt = interruptControl)

@@ -63,9 +63,9 @@ class ConstructionCodegenTest {
     )
 
     @Test
-    fun `generates construction with compiled code reporting traps with debug info`() = assertConstruction(
-        scenario = "CompiledDebugInfoConstruction",
-        config = codegenConfig(compiledCode = "com.test.aot.WasmModule", debugInfo = true),
+    fun `generates construction with compiled code and store controls`() = assertConstruction(
+        scenario = "CompiledControlsConstruction",
+        config = codegenConfig(compiledCode = "com.test.aot.WasmModule", fuelControls = true, interruptControl = true),
         runtimes = listOf(CodegenRuntime.CHASM),
     )
 

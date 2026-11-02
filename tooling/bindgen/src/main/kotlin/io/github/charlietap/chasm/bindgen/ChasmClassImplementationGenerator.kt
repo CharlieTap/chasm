@@ -26,6 +26,7 @@ internal class ChasmClassImplementationGenerator(
         interfaceName: String,
         visibility: ImplementationVisibility,
         wasmInterface: WasmInterface,
+        controls: StoreControls = StoreControls(),
     ): TypeSpec = TypeSpec.classBuilder(interfaceName + implementationSuffix).apply {
         addModifiers(visibility.modifier())
         addSuperinterface(ClassName(packageName, interfaceName))
@@ -42,7 +43,23 @@ internal class ChasmClassImplementationGenerator(
         wasmInterface.functions.forEach { function ->
             addFunction(functionImplementation(packageName, function))
         }
+        storeControlFunctions(controls).forEach { function -> addFunction(storeControlImplementation(function)) }
     }.build()
+
+    private fun storeControlImplementation(
+        function: FunSpec,
+    ): FunSpec {
+        val (alias, failure) = when (function.name) {
+            StoreControls.ADD_FUEL -> CHASM_ADD_FUEL_ALIAS to "Failed to add fuel"
+            StoreControls.REMAINING_FUEL -> CHASM_REMAINING_FUEL_ALIAS to "Failed to read fuel"
+            else -> CHASM_INTERRUPT_ALIAS to "Failed to interrupt"
+        }
+        val arguments = if (function.name == StoreControls.ADD_FUEL) "store, units" else "store"
+        return function.toBuilder()
+            .addModifiers(KModifier.OVERRIDE)
+            .addStatement("return %N($arguments).%M(%S)", alias, CHASM_EXPECT, failure)
+            .build()
+    }
 
     private fun TypeSpec.Builder.addConstructor() {
         primaryConstructor(

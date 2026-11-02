@@ -111,21 +111,20 @@ internal class ChasmFactoryFunctionGenerator {
                     .defaultValue("emptyList()")
                     .build(),
             )
-            addParameter(
-                ParameterSpec.builder("instanceFactory", CHASM_COMPILED_INSTANCE_FACTORY_CLASS_NAME.copy(nullable = true))
-                    .defaultValue("null")
-                    .build(),
-            )
             returns(ClassName(packageName, interfaceName))
 
-            addStatement("val store = %M()", CHASM_STORE)
+            addStatement("val module = %T.INSTANCE", compiled)
+            addStatement("val store = %M(module.metadata.storeConfig)", CHASM_STORE)
+            addStatement(
+                "module.metadata.initialFuel?.let { fuel -> %M(store, fuel).%M(%S) }",
+                CHASM_ADD_FUEL,
+                CHASM_EXPECT,
+                "Failed to add fuel",
+            )
             addStatement("val allocatedImports = %M(store, imports)", CHASM_ALLOCATE_IMPORTS)
             addStatement(
-                "val instance = instanceFactory?.invoke(store, %T.INSTANCE, allocatedImports) ?: " +
-                    "%M(store, %T.INSTANCE, allocatedImports).%M(%S)",
-                compiled,
+                "val instance = %M(store, module, allocatedImports).%M(%S)",
                 CHASM_COMPILED_INSTANCE,
-                compiled,
                 CHASM_EXPECT,
                 "Failed to instantiate module",
             )
@@ -164,8 +163,6 @@ internal val CHASM_INSTANCE_FACTORY_CLASS_NAME =
     ClassName("io.github.charlietap.chasm.embedding.codegen", "InstanceFactory")
 internal val CHASM_SUSPEND_INSTANCE_FACTORY_CLASS_NAME =
     ClassName("io.github.charlietap.chasm.embedding.codegen", "SuspendInstanceFactory")
-internal val CHASM_COMPILED_INSTANCE_FACTORY_CLASS_NAME =
-    ClassName("io.github.charlietap.chasm.embedding.codegen", "CompiledInstanceFactory")
 internal val CHASM_EXPERIMENTAL_API_CLASS_NAME = ClassName("io.github.charlietap.chasm", "ExperimentalChasmApi")
 internal val OPT_IN_CLASS_NAME = ClassName("kotlin", "OptIn")
 internal val WASI_EMBEDDER_HOST_CLASS_NAME = ClassName("at.released.weh.host", "EmbedderHost")
@@ -180,3 +177,9 @@ internal val CHASM_SUSPENDING_MODULE = MemberName("io.github.charlietap.chasm.co
 internal val CHASM_SUSPENDING_INSTANCE = MemberName("io.github.charlietap.chasm.coroutines", "instance")
 internal val CHASM_ALLOCATE_IMPORTS = MemberName("io.github.charlietap.chasm.embedding.codegen", "allocateImports")
 internal val CHASM_EXPECT = MemberName("io.github.charlietap.chasm.embedding.shapes", "expect")
+internal val CHASM_ADD_FUEL = MemberName("io.github.charlietap.chasm.embedding", "addFuel")
+internal val CHASM_REMAINING_FUEL = MemberName("io.github.charlietap.chasm.embedding", "remainingFuel")
+internal val CHASM_INTERRUPT = MemberName("io.github.charlietap.chasm.embedding", "interrupt")
+internal const val CHASM_ADD_FUEL_ALIAS = "chasmAddFuel"
+internal const val CHASM_REMAINING_FUEL_ALIAS = "chasmRemainingFuel"
+internal const val CHASM_INTERRUPT_ALIAS = "chasmInterrupt"

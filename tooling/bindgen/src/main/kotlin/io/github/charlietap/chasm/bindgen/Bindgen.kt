@@ -62,6 +62,15 @@ private class KotlinPoetBindingGenerator(
             "WasiLinking.AUTOMATIC is not supported for compiled code yet. Use WasiLinking.DISABLED and " +
                 "pass the module's WASI imports."
         }
+        val controls = options.config.storeControls
+        require(controls.names.isEmpty() || options.config.runsCompiledCode) {
+            "fuelControls and interruptControl need compiled code: set CodegenRuntime.CHASM and compiledCode."
+        }
+        val clashes = wasmInterface.functions.map { function -> function.name }.filter { name -> name in controls.names }
+        require(clashes.isEmpty()) {
+            "The module exports ${clashes.distinct().joinToString()}, which the generated store controls also " +
+                "name. Leave the export out with ignoredExports."
+        }
         return WasmInterfaceGenerator()(
             interfaceVisibility = options.interfaceVisibility,
             implementationVisibility = options.implementationVisibility,

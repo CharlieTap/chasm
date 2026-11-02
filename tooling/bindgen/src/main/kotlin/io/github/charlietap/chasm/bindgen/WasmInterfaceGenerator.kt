@@ -57,23 +57,30 @@ internal class WasmInterfaceGenerator(
             implementationVisibility = implementationVisibility,
         )
 
-        val interfaceFile = interfaceFile(interfaceVisibility, wasmInterface)
         val compiledCode = config.compiledCode?.takeIf { config.runsCompiledCode }
         if (compiledCode == null) {
-            return listOf(interfaceFile, implementationFile(factoryVisibility, wasmInterface, implementationVisibility, config))
+            return listOf(
+                interfaceFile(interfaceVisibility, wasmInterface, StoreControls()),
+                implementationFile(factoryVisibility, wasmInterface, implementationVisibility, config),
+            )
         }
 
-        return listOf(interfaceFile, compiledFile(factoryVisibility, wasmInterface, implementationVisibility, compiledCode))
+        val controls = config.storeControls
+        return listOf(
+            interfaceFile(interfaceVisibility, wasmInterface, controls),
+            compiledFile(factoryVisibility, wasmInterface, implementationVisibility, compiledCode, controls),
+        )
     }
 
     private fun interfaceFile(
         interfaceVisibility: InterfaceVisibility,
         wasmInterface: WasmInterface,
+        controls: StoreControls,
     ): FileSpec = FileSpec.builder(wasmInterface.packageName, wasmInterface.interfaceName).apply {
         wasmInterface.types.forEach { type ->
             addType(dataClassGenerator(wasmInterface.packageName, type))
         }
-        addType(classInterfaceGenerator(wasmInterface.packageName, wasmInterface.interfaceName, interfaceVisibility, wasmInterface))
+        addType(classInterfaceGenerator(wasmInterface.packageName, wasmInterface.interfaceName, interfaceVisibility, wasmInterface, controls))
     }.build()
 
     private fun implementationFile(
@@ -123,6 +130,7 @@ internal class WasmInterfaceGenerator(
         wasmInterface: WasmInterface,
         implementationVisibility: ImplementationVisibility,
         compiledCode: String,
+        controls: StoreControls,
     ): FileSpec = FileSpec.builder(wasmInterface.packageName, wasmInterface.interfaceName + "Compiled").apply {
         addAnnotation(
             AnnotationSpec.builder(OPT_IN_CLASS_NAME)
@@ -130,6 +138,9 @@ internal class WasmInterfaceGenerator(
                 .addMember("%T::class", CHASM_EXPERIMENTAL_API_CLASS_NAME)
                 .build(),
         )
+        addAliasedImport(CHASM_ADD_FUEL, CHASM_ADD_FUEL_ALIAS)
+        if (controls.fuel) addAliasedImport(CHASM_REMAINING_FUEL, CHASM_REMAINING_FUEL_ALIAS)
+        if (controls.interrupt) addAliasedImport(CHASM_INTERRUPT, CHASM_INTERRUPT_ALIAS)
         addFunction(
             chasmFactoryFunctionGenerator.compiledFactory(
                 packageName = wasmInterface.packageName,
@@ -144,6 +155,7 @@ internal class WasmInterfaceGenerator(
                 interfaceName = wasmInterface.interfaceName,
                 visibility = implementationVisibility,
                 wasmInterface = wasmInterface,
+                controls = controls,
             ),
         )
     }.build()

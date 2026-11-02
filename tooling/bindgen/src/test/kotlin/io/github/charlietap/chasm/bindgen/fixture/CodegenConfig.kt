@@ -12,6 +12,8 @@ internal fun codegenConfig(
     wasi: WasiLinking = WasiLinking.DISABLED,
     compiledCode: String? = null,
     debugInfo: Boolean = false,
+    fuelControls: Boolean = false,
+    interruptControl: Boolean = false,
 ) = CodegenConfig(
     generateTypesafeGlobalProperties = generateTypesafeGlobalProperties,
     generateTypesafeMemoryProperties = generateTypesafeMemoryProperties,
@@ -20,4 +22,6 @@ internal fun codegenConfig(
     wasi = wasi,
     compiledCode = compiledCode,
     debugInfo = debugInfo,
+    fuelControls = fuelControls,
+    interruptControl = interruptControl,
 )
