@@ -1,0 +1,21 @@
+// Klib ABI Dump
+// Targets: [iosArm64, iosSimulatorArm64, linuxArm64, linuxX64, macosArm64, mingwX64]
+// Rendering settings:
+// - Signature version: 2
+// - Show manifest properties: true
+// - Show declarations: true
+
+// Library unique name: <io.github.charlietap.chasm:embedding-module>
+final class io.github.charlietap.chasm.embedding.shapes/Module { // io.github.charlietap.chasm.embedding.shapes/Module|null[0]
+    final val exports // io.github.charlietap.chasm.embedding.shapes/Module.exports|{}exports[0]
+        final fun <get-exports>(): kotlin.collections/List<io.github.charlietap.chasm.embedding.shapes/ExportDefinition> // io.github.charlietap.chasm.embedding.shapes/Module.exports.<get-exports>|<get-exports>(){}[0]
+    final val imports // io.github.charlietap.chasm.embedding.shapes/Module.imports|{}imports[0]
+        final fun <get-imports>(): kotlin.collections/List<io.github.charlietap.chasm.embedding.shapes/ImportDefinition> // io.github.charlietap.chasm.embedding.shapes/Module.imports.<get-imports>|<get-imports>(){}[0]
+}
+
+final fun (io.github.charlietap.chasm.embedding.shapes/Module).io.github.charlietap.chasm.embedding.shapes/_binary(): kotlin/ByteArray? // io.github.charlietap.chasm.embedding.shapes/_binary|_binary@io.github.charlietap.chasm.embedding.shapes.Module(){}[0]
+final fun (io.github.charlietap.chasm.embedding.shapes/Module).io.github.charlietap.chasm.embedding.shapes/_config(): io.github.charlietap.chasm.config/ModuleConfig // io.github.charlietap.chasm.embedding.shapes/_config|_config@io.github.charlietap.chasm.embedding.shapes.Module(){}[0]
+final fun (io.github.charlietap.chasm.embedding.shapes/Module).io.github.charlietap.chasm.embedding.shapes/_declarations(): io.github.charlietap.chasm.declarations/ModuleDeclarations // io.github.charlietap.chasm.embedding.shapes/_declarations|_declarations@io.github.charlietap.chasm.embedding.shapes.Module(){}[0]
+final fun (io.github.charlietap.chasm.embedding.shapes/Module).io.github.charlietap.chasm.embedding.shapes/_module(): io.github.charlietap.chasm.ast.module/Module // io.github.charlietap.chasm.embedding.shapes/_module|_module@io.github.charlietap.chasm.embedding.shapes.Module(){}[0]
+final fun (io.github.charlietap.chasm.embedding.shapes/Module).io.github.charlietap.chasm.embedding.shapes/_validated(): kotlin/Boolean // io.github.charlietap.chasm.embedding.shapes/_validated|_validated@io.github.charlietap.chasm.embedding.shapes.Module(){}[0]
+final fun io.github.charlietap.chasm.embedding.shapes/_module(io.github.charlietap.chasm.config/ModuleConfig, io.github.charlietap.chasm.ast.module/Module, kotlin/ByteArray? = ..., kotlin/Boolean = ...): io.github.charlietap.chasm.embedding.shapes/Module // io.github.charlietap.chasm.embedding.shapes/_module|_module(io.github.charlietap.chasm.config.ModuleConfig;io.github.charlietap.chasm.ast.module.Module;kotlin.ByteArray?;kotlin.Boolean){}[0]

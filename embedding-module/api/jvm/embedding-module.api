@@ -1,0 +1,15 @@
+public final class io/github/charlietap/chasm/embedding/shapes/Module {
+	public final fun getExports ()Ljava/util/List;
+	public final fun getImports ()Ljava/util/List;
+}
+
+public final class io/github/charlietap/chasm/embedding/shapes/ModuleKt {
+	public static final fun _binary (Lio/github/charlietap/chasm/embedding/shapes/Module;)[B
+	public static final fun _config (Lio/github/charlietap/chasm/embedding/shapes/Module;)Lio/github/charlietap/chasm/config/ModuleConfig;
+	public static final fun _declarations (Lio/github/charlietap/chasm/embedding/shapes/Module;)Lio/github/charlietap/chasm/declarations/ModuleDeclarations;
+	public static final fun _module (Lio/github/charlietap/chasm/config/ModuleConfig;Lio/github/charlietap/chasm/ast/module/Module;[BZ)Lio/github/charlietap/chasm/embedding/shapes/Module;
+	public static final fun _module (Lio/github/charlietap/chasm/embedding/shapes/Module;)Lio/github/charlietap/chasm/ast/module/Module;
+	public static synthetic fun _module$default (Lio/github/charlietap/chasm/config/ModuleConfig;Lio/github/charlietap/chasm/ast/module/Module;[BZILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/Module;
+	public static final fun _validated (Lio/github/charlietap/chasm/embedding/shapes/Module;)Z
+}
+

@@ -28,10 +28,8 @@ kotlin {
                 api(projects.runtime.type)
                 api(projects.runtime.value)
 
-                implementation(projects.ast)
                 implementation(projects.executor.callCore)
                 implementation(projects.memory)
-                implementation(projects.module)
                 implementation(projects.moduleDeclarations)
                 implementation(projects.runtime.address)
                 implementation(projects.runtime.core)

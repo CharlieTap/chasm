@@ -64,6 +64,7 @@ kotlin {
             dependencies {
                 api(projects.config)
                 api(projects.embeddingApi)
+                api(projects.embeddingModule)
                 api(projects.embeddingRuntime)
                 api(projects.stream)
 
