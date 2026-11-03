@@ -33,6 +33,7 @@ compose-activity = "1.13.0"
 compose-viewmodel = "2.11.0"
 
 asm = "9.11.1"
+dexter = "0.1.0"
 dokka="2.2.0"
 
 gradle-maven-publish-plugin = "0.37.0"
@@ -131,6 +132,7 @@ tooling-bindgen = { module = "io.github.charlietap.chasm:tooling-bindgen", versi
 asm = { module = "org.ow2.asm:asm", version.ref = "asm" }
 asm-tree = { module = "org.ow2.asm:asm-tree", version.ref = "asm" }
 asm-util = { module = "org.ow2.asm:asm-util", version.ref = "asm" }
+dexter = { module = "io.github.charlietap.dexter:dexter", version.ref = "dexter" }
 
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "dagger"}
 hilt-core = { module = "com.google.dagger:hilt-core", version.ref = "dagger"}
@@ -160,6 +162,8 @@ metrox-android = { module = "dev.zacsweers.metro:metrox-android", version.ref = 
 metrox-viewmodel = { module = "dev.zacsweers.metro:metrox-viewmodel", version.ref = "metro"}
 
 result = { module = "com.michael-bull.kotlin-result:kotlin-result", version.ref = "result"}
+
+smali-baksmali = { module = "com.android.tools.smali:smali-baksmali", version = "3.0.10" }
 
 sweet-lib = { module = "io.github.charlietap.sweet:lib" }
 corpus-lib = { module = "io.github.charlietap.corpus:lib" }
