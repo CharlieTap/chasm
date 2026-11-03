@@ -100,6 +100,8 @@ include(":runtime:value")
 
 include(":stream")
 
+include(":test:compiled")
+
 include(":test:fake:decoder")
 
 include(":test:fixture:ast")

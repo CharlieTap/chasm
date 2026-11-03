@@ -63,6 +63,7 @@ kotlin {
         commonTest {
             dependencies {
                 implementation(projects.chasm)
+                implementation(projects.test.compiled)
                 implementation(projects.compiler.backendJvm)
                 implementation(projects.compiler.frontend)
                 implementation(projects.decoder)
