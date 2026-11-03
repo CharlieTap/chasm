@@ -1,15 +1,22 @@
+@file:OptIn(InternalChasmApi::class)
+
 package io.github.charlietap.chasm.embedding
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.fold
 import com.github.michaelbull.result.map
 import com.github.michaelbull.result.mapError
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.embedding.error.ChasmError.ValidationError
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Error
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Success
 import io.github.charlietap.chasm.embedding.shapes.Component
 import io.github.charlietap.chasm.embedding.shapes.Module
+import io.github.charlietap.chasm.embedding.shapes._binary
+import io.github.charlietap.chasm.embedding.shapes._config
+import io.github.charlietap.chasm.embedding.shapes._module
+import io.github.charlietap.chasm.embedding.shapes._validated
 import io.github.charlietap.chasm.validator.WasmComponentAnalyzer
 import io.github.charlietap.chasm.validator.WasmModuleValidator
 import io.github.charlietap.chasm.validator.error.ComponentValidatorError
@@ -45,9 +52,9 @@ internal fun validate(
     module: Module,
     validator: WasmModuleValidator,
 ): ChasmResult<Module, ValidationError> {
-    if (module.validated) return Success(module)
+    if (module._validated()) return Success(module)
 
-    return validate(module, validator(module.config, module.module))
+    return validate(module, validator(module._config(), module._module()))
 }
 
 internal fun validate(
@@ -58,10 +65,10 @@ internal fun validate(
         .mapError(ModuleValidatorError::toString)
         .mapError(::ValidationError)
         .map { internal ->
-            Module(
-                config = module.config,
+            _module(
+                config = module._config(),
                 module = internal,
-                binary = module.binary,
+                binary = module._binary(),
                 validated = true,
             )
         }.fold(::Success, ::Error)

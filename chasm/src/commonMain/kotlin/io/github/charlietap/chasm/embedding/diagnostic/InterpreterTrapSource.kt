@@ -20,6 +20,8 @@ import io.github.charlietap.chasm.decoder.WasmFunctionBodyOffsets
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
 import io.github.charlietap.chasm.embedding.error.MemoryAccess
 import io.github.charlietap.chasm.embedding.shapes.Module
+import io.github.charlietap.chasm.embedding.shapes._binary
+import io.github.charlietap.chasm.embedding.shapes._config
 import io.github.charlietap.chasm.runtime.diagnostic.TrapSnapshot
 import io.github.charlietap.chasm.runtime.ext.data
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
@@ -46,8 +48,8 @@ internal class InterpreterTrapSource private constructor(
             instance: ModuleInstance,
             module: Module,
         ): TrapSource? {
-            val binary = module.binary ?: return null
-            return InterpreterTrapSource(instance, binary, module.config)
+            val binary = module._binary() ?: return null
+            return InterpreterTrapSource(instance, binary, module._config())
         }
     }
 }

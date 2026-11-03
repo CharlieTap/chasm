@@ -8,13 +8,6 @@
 // Library unique name: <io.github.charlietap.chasm:chasm>
 final class io.github.charlietap.chasm.embedding.shapes/Component // io.github.charlietap.chasm.embedding.shapes/Component|null[0]
 
-final class io.github.charlietap.chasm.embedding.shapes/Module { // io.github.charlietap.chasm.embedding.shapes/Module|null[0]
-    final val exports // io.github.charlietap.chasm.embedding.shapes/Module.exports|{}exports[0]
-        final fun <get-exports>(): kotlin.collections/List<io.github.charlietap.chasm.embedding.shapes/ExportDefinition> // io.github.charlietap.chasm.embedding.shapes/Module.exports.<get-exports>|<get-exports>(){}[0]
-    final val imports // io.github.charlietap.chasm.embedding.shapes/Module.imports|{}imports[0]
-        final fun <get-imports>(): kotlin.collections/List<io.github.charlietap.chasm.embedding.shapes/ImportDefinition> // io.github.charlietap.chasm.embedding.shapes/Module.imports.<get-imports>|<get-imports>(){}[0]
-}
-
 final fun io.github.charlietap.chasm.embedding/component(io.github.charlietap.chasm.stream/SourceReader, io.github.charlietap.chasm.config/ComponentConfig = ...): io.github.charlietap.chasm.embedding.shapes/ChasmResult<io.github.charlietap.chasm.embedding.shapes/Component, io.github.charlietap.chasm.embedding.error/ChasmError.DecodeError> // io.github.charlietap.chasm.embedding/component|component(io.github.charlietap.chasm.stream.SourceReader;io.github.charlietap.chasm.config.ComponentConfig){}[0]
 final fun io.github.charlietap.chasm.embedding/component(kotlin/ByteArray, io.github.charlietap.chasm.config/ComponentConfig = ...): io.github.charlietap.chasm.embedding.shapes/ChasmResult<io.github.charlietap.chasm.embedding.shapes/Component, io.github.charlietap.chasm.embedding.error/ChasmError.DecodeError> // io.github.charlietap.chasm.embedding/component|component(kotlin.ByteArray;io.github.charlietap.chasm.config.ComponentConfig){}[0]
 final fun io.github.charlietap.chasm.embedding/instance(io.github.charlietap.chasm.embedding.shapes/Store, io.github.charlietap.chasm.embedding.shapes/Module, kotlin.collections/List<io.github.charlietap.chasm.embedding.shapes/Import>, io.github.charlietap.chasm.config/RuntimeConfig = ...): io.github.charlietap.chasm.embedding.shapes/ChasmResult<io.github.charlietap.chasm.embedding.shapes/Instance, io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError> // io.github.charlietap.chasm.embedding/instance|instance(io.github.charlietap.chasm.embedding.shapes.Store;io.github.charlietap.chasm.embedding.shapes.Module;kotlin.collections.List<io.github.charlietap.chasm.embedding.shapes.Import>;io.github.charlietap.chasm.config.RuntimeConfig){}[0]

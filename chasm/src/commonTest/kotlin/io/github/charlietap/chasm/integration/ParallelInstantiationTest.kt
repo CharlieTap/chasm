@@ -17,6 +17,8 @@ import io.github.charlietap.chasm.embedding.module
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Module
 import io.github.charlietap.chasm.embedding.shapes.Store
+import io.github.charlietap.chasm.embedding.shapes._config
+import io.github.charlietap.chasm.embedding.shapes._module
 import io.github.charlietap.chasm.embedding.shapes.expect
 import io.github.charlietap.chasm.embedding.store
 import io.github.charlietap.chasm.embedding.validate
@@ -163,6 +165,7 @@ class ParallelInstantiationTest {
         }
 
     private fun Module.withParallelCompilationWork(): Module {
+        val module = _module()
         val nextFunctionIndex = module.functions.maxOf { function -> function.idx.idx } + 1u
         val typeIndex = module.functions.first().typeIndex
         val functions = List(PARALLEL_FUNCTION_COUNT) { index ->
@@ -172,7 +175,7 @@ class ParallelInstantiationTest {
                 body = Expression(List(PARALLEL_INSTRUCTION_COUNT) { ControlInstruction.Nop }),
             )
         }
-        return Module(config, module.copy(functions = module.functions + functions))
+        return _module(_config(), module.copy(functions = module.functions + functions))
     }
 
     private fun unsupportedInstructionModule(): Module {
@@ -198,7 +201,7 @@ class ParallelInstantiationTest {
                 )
             }
         }
-        return Module(
+        return _module(
             config = ModuleConfig(),
             module = astModule(
                 definedTypes = listOf(definedType(recursiveType = functionRecursiveType())),

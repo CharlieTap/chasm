@@ -15,6 +15,8 @@ import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.Instance
 import io.github.charlietap.chasm.embedding.shapes.Module
 import io.github.charlietap.chasm.embedding.shapes.Store
+import io.github.charlietap.chasm.embedding.shapes._declarations
+import io.github.charlietap.chasm.embedding.shapes._module
 import io.github.charlietap.chasm.executor.instantiator.ModuleCodeInstaller
 import io.github.charlietap.chasm.executor.instantiator.ModuleInstantiator
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance as RuntimeModuleInstance
@@ -26,11 +28,11 @@ fun instance(
     config: RuntimeConfig = RuntimeConfig(),
 ): ChasmResult<Instance, ChasmError.ExecutionError> = instance(
     store = store,
-    declarations = module.declarations,
+    declarations = module._declarations(),
     imports = imports,
     config = config,
     instantiator = ::ModuleInstantiator,
-    codeInstaller = ModuleCodeInstaller(module.module),
+    codeInstaller = ModuleCodeInstaller(module._module()),
     trapSource = { instance -> InterpreterTrapSource(instance, module) },
 )
 

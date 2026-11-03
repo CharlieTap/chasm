@@ -9,6 +9,8 @@ import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.Instance
 import io.github.charlietap.chasm.embedding.shapes.Module
 import io.github.charlietap.chasm.embedding.shapes.Store
+import io.github.charlietap.chasm.embedding.shapes._declarations
+import io.github.charlietap.chasm.embedding.shapes._module
 import io.github.charlietap.chasm.executor.instantiator.ParallelModuleInstantiator
 import io.github.charlietap.chasm.parallel.ParallelTaskExecutor
 
@@ -29,9 +31,9 @@ suspend fun _instance(
         ParallelModuleInstantiator(
             config = effectiveConfig,
             store = runtime,
-            module = module.declarations,
+            module = module._declarations(),
             imports = runtimeImports,
             taskExecutor = taskExecutor,
-            codeInstaller = ParallelModuleCodeInstaller(module.module),
+            codeInstaller = ParallelModuleCodeInstaller(module._module()),
         )
     }

@@ -42,8 +42,3 @@ public final class io/github/charlietap/chasm/embedding/internal/ValidateKt {
 public final class io/github/charlietap/chasm/embedding/shapes/Component {
 }
 
-public final class io/github/charlietap/chasm/embedding/shapes/Module {
-	public final fun getExports ()Ljava/util/List;
-	public final fun getImports ()Ljava/util/List;
-}
-

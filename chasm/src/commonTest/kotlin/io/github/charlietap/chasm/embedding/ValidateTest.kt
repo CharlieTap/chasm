@@ -1,7 +1,10 @@
+@file:OptIn(InternalChasmApi::class)
+
 package io.github.charlietap.chasm.embedding
 
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.embedding.error.ChasmError
 import io.github.charlietap.chasm.embedding.fixture.componentTypes
 import io.github.charlietap.chasm.embedding.fixture.publicComponent
@@ -9,6 +12,8 @@ import io.github.charlietap.chasm.embedding.fixture.publicModule
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Component
 import io.github.charlietap.chasm.embedding.shapes.Module
+import io.github.charlietap.chasm.embedding.shapes._module
+import io.github.charlietap.chasm.embedding.shapes._validated
 import io.github.charlietap.chasm.fixture.ast.component.component
 import io.github.charlietap.chasm.fixture.ast.module.module
 import io.github.charlietap.chasm.fixture.config.componentConfig
@@ -81,14 +86,14 @@ class ValidateTest {
 
         val validator: WasmModuleValidator = { _config, _module ->
             assertEquals(config, _config)
-            assertEquals(module.module, _module)
-            Ok(module.module)
+            assertEquals(module._module(), _module)
+            Ok(module._module())
         }
 
         val actual = validate(module, validator)
 
         assertIs<ChasmResult.Success<Module>>(actual)
-        assertEquals(internalModule, actual.result.module)
+        assertEquals(internalModule, actual.result._module())
     }
 
     @Test
@@ -106,12 +111,12 @@ class ValidateTest {
     fun `calling validate on a module marks it as validated`() {
 
         val module = publicModule()
-        val validator: WasmModuleValidator = { _, _ -> Ok(module.module) }
+        val validator: WasmModuleValidator = { _, _ -> Ok(module._module()) }
 
         val actual = validate(module, validator)
 
         assertIs<ChasmResult.Success<Module>>(actual)
-        assertEquals(true, actual.result.validated)
+        assertEquals(true, actual.result._validated())
     }
 
     @Test
@@ -124,7 +129,7 @@ class ValidateTest {
 
         val validator: WasmModuleValidator = { _config, _module ->
             assertEquals(config, _config)
-            assertEquals(module.module, _module)
+            assertEquals(module._module(), _module)
             Err(TypeValidatorError.TypeMismatch)
         }
 

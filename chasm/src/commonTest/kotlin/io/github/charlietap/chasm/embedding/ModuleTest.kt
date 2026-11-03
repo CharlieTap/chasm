@@ -1,10 +1,15 @@
+@file:OptIn(InternalChasmApi::class)
+
 package io.github.charlietap.chasm.embedding
 
 import com.github.michaelbull.result.Ok
 import com.goncalossilva.resources.Resource
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.decoder.ModuleDecoder
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Module
+import io.github.charlietap.chasm.embedding.shapes._config
+import io.github.charlietap.chasm.embedding.shapes._module
 import io.github.charlietap.chasm.fake.decoder.FakeSourceReader
 import io.github.charlietap.chasm.fixture.config.moduleConfig
 import io.github.charlietap.chasm.stream.SourceReader
@@ -53,8 +58,8 @@ class ModuleTest {
             module(bytes, config, decoder),
         ).result
 
-        assertEquals(config, actual.config)
-        assertEquals(decoded, actual.module)
+        assertEquals(config, actual._config())
+        assertEquals(decoded, actual._module())
     }
 
     @Test
@@ -72,8 +77,8 @@ class ModuleTest {
             module(source, config, decoder),
         ).result
 
-        assertEquals(config, actual.config)
-        assertEquals(decoded, actual.module)
+        assertEquals(config, actual._config())
+        assertEquals(decoded, actual._module())
     }
 
     private companion object {

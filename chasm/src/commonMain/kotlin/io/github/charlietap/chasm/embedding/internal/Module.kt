@@ -14,6 +14,7 @@ import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Error
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Success
 import io.github.charlietap.chasm.embedding.shapes.Module
+import io.github.charlietap.chasm.embedding.shapes._module
 import io.github.charlietap.chasm.module.ModuleFactoryError
 import io.github.charlietap.chasm.module.WasmModuleFactory
 import io.github.charlietap.chasm.parallel.ParallelTaskExecutor
@@ -27,7 +28,7 @@ suspend fun _module(
     return ParallelWasmModuleDecoder(config, bytes, taskExecutor)
         .mapError(ModuleDecoderError::toString)
         .mapError(::DecodeError)
-        .map { internal -> Module(config, internal, bytes) }
+        .map { internal -> _module(config, internal, bytes) }
         .fold(::Success, ::Error)
 }
 
@@ -46,6 +47,6 @@ suspend fun _module(
                 is ModuleFactoryError.Malformed -> DecodeError(error.error.toString())
                 is ModuleFactoryError.Invalid -> ValidationError(error.error.toString())
             }
-        }.map { internal -> Module(config, internal, bytes, validated = true) }
+        }.map { internal -> _module(config, internal, bytes, validated = true) }
         .fold(::Success, ::Error)
 }

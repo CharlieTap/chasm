@@ -1,8 +1,11 @@
+@file:OptIn(InternalChasmApi::class)
+
 package io.github.charlietap.chasm.embedding
 
 import com.github.michaelbull.result.fold
 import com.github.michaelbull.result.map
 import com.github.michaelbull.result.mapError
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.decoder.ModuleDecoder
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
@@ -12,6 +15,7 @@ import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Error
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Success
 import io.github.charlietap.chasm.embedding.shapes.Module
+import io.github.charlietap.chasm.embedding.shapes._module
 import io.github.charlietap.chasm.stream.SourceReader
 
 fun module(
@@ -45,7 +49,7 @@ internal fun <Source> module(
         .mapError(ModuleDecoderError::toString)
         .mapError(::DecodeError)
         .map { internal ->
-            Module(
+            _module(
                 config = config,
                 module = internal,
                 binary = source as? ByteArray,
