@@ -1,17 +1,20 @@
 package io.github.charlietap.chasm.compiler.backend.jvm
 
-import io.github.charlietap.chasm.cir.HeapType
+import io.github.charlietap.chasm.compiler.backend.abi.BYTE_ARRAY_BASE
+import io.github.charlietap.chasm.compiler.backend.abi.CODE_INSTALLATION
+import io.github.charlietap.chasm.compiler.backend.abi.INSTALLATION_INSTANCE
+import io.github.charlietap.chasm.compiler.backend.abi.INSTALLATION_TYPE_TEST
 import io.github.charlietap.chasm.compiler.backend.abi.MethodRef
-import io.github.charlietap.chasm.compiler.backend.abi.OBJECT_TYPE
 import io.github.charlietap.chasm.compiler.backend.abi.Resource
 import io.github.charlietap.chasm.compiler.backend.abi.UNPACK_LONGS
+import io.github.charlietap.chasm.compiler.backend.abi.UNSAFE_INSTANCE
+import io.github.charlietap.chasm.compiler.backend.abi.UNSAFE_TYPE
+import io.github.charlietap.chasm.compiler.backend.abi.heapTypeNumber
+import io.github.charlietap.chasm.compiler.backend.abi.installationAccessor
+import io.github.charlietap.chasm.compiler.backend.abi.installationIndex
 import io.github.charlietap.chasm.compiler.backend.abi.internalName
 import io.github.charlietap.chasm.compiler.backend.abi.packLongs
-import io.github.charlietap.chasm.compiler.backend.jvm.abi.BYTE_ARRAY_BASE
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.CLASS_FILE_VERSION
-import io.github.charlietap.chasm.compiler.backend.jvm.abi.CODE_INSTALLATION
-import io.github.charlietap.chasm.compiler.backend.jvm.abi.UNSAFE_INSTANCE
-import io.github.charlietap.chasm.compiler.backend.jvm.abi.UNSAFE_TYPE
 import io.github.charlietap.chasm.compiler.backend.jvm.binding.bindingPartField
 import io.github.charlietap.chasm.compiler.backend.jvm.binding.bindingPartType
 import org.objectweb.asm.MethodVisitor
@@ -108,32 +111,19 @@ private fun MethodVisitor.loadResource(
     }
     visitVarInsn(Opcodes.ALOAD, 1)
     val accessor = when (resource) {
-        Resource.Instance -> return installation(INSTANCE)
-        is Resource.Memory -> indexed(MEMORY, resource.index)
-        is Resource.Table -> indexed(TABLE, resource.index)
-        is Resource.Global -> indexed(GLOBAL, resource.index)
-        is Resource.Function -> indexed(FUNCTION, resource.index)
-        is Resource.Element -> indexed(ELEMENT, resource.index)
-        is Resource.Data -> indexed(DATA, resource.index)
-        is Resource.RuntimeType -> indexed(RUNTIME_TYPE, resource.typeIndex)
-        is Resource.TagAddress -> indexed(TAG_ADDRESS, resource.index)
-        is Resource.FunctionReference -> indexed(FUNCTION_REFERENCE, resource.index)
+        Resource.Instance -> return installation(INSTALLATION_INSTANCE)
         is Resource.TypeTest -> {
             visitInsn(if (resource.type.nullable) Opcodes.ICONST_1 else Opcodes.ICONST_0)
             pushInt(heapTypeNumber(resource.type.heapType))
-            TYPE_TEST
+            INSTALLATION_TYPE_TEST
         }
-        else -> error("$resource has no binding field")
+        else -> {
+            val accessor = installationAccessor(resource) ?: error("$resource has no binding field")
+            pushInt(installationIndex(resource))
+            accessor
+        }
     }
     installation(accessor)
-}
-
-private fun MethodVisitor.indexed(
-    accessor: MethodRef,
-    index: Int,
-): MethodRef {
-    pushInt(index)
-    return accessor
 }
 
 private fun MethodVisitor.installation(
@@ -167,29 +157,3 @@ private fun MethodVisitor.pushLongs(
 }
 
 private const val INLINE_LONGS = 16
-
-private fun heapTypeNumber(
-    heapType: HeapType,
-): Int = when (heapType) {
-    is HeapType.Concrete -> heapType.type.index
-    is HeapType.Abstract -> -1 - ABSTRACT_HEAP_TYPES.indexOf(heapType.type.text).also { check(it >= 0) { "unknown heap type $heapType" } }
-}
-
-private val ABSTRACT_HEAP_TYPES = listOf("func", "nofunc", "extern", "noextern", "any", "eq", "i31", "struct", "array", "none", "exn", "noexn")
-
-private fun accessor(
-    name: String,
-    returns: String,
-) = MethodRef(CODE_INSTALLATION, name, listOf("I"), returns)
-
-private val INSTANCE = MethodRef(CODE_INSTALLATION, "getInstance", emptyList(), "Lio/github/charlietap/chasm/runtime/instance/ModuleInstance;")
-private val MEMORY = accessor("memory", "Lio/github/charlietap/chasm/runtime/instance/MemoryInstance;")
-private val TABLE = accessor("table", "Lio/github/charlietap/chasm/runtime/instance/TableInstance;")
-private val GLOBAL = accessor("global", "Lio/github/charlietap/chasm/runtime/instance/GlobalInstance;")
-private val FUNCTION = accessor("function", "Lio/github/charlietap/chasm/runtime/instance/FunctionInstance;")
-private val ELEMENT = accessor("element", "Lio/github/charlietap/chasm/runtime/instance/ElementInstance;")
-private val DATA = accessor("data", "Lio/github/charlietap/chasm/runtime/instance/DataInstance;")
-private val RUNTIME_TYPE = accessor("runtimeType", "I")
-private val TAG_ADDRESS = accessor("tagAddress", "I")
-private val FUNCTION_REFERENCE = accessor("functionReference", "J")
-private val TYPE_TEST = MethodRef(CODE_INSTALLATION, "typeTest", listOf("Z", "I"), OBJECT_TYPE)

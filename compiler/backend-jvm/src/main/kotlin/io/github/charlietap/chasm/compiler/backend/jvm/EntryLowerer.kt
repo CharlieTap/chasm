@@ -2,8 +2,11 @@ package io.github.charlietap.chasm.compiler.backend.jvm
 
 import io.github.charlietap.chasm.compiler.backend.abi.CALL_DEPTH_FIELD
 import io.github.charlietap.chasm.compiler.backend.abi.CALL_STACK_EXHAUSTED
+import io.github.charlietap.chasm.compiler.backend.abi.COMPILED_FUNCTION
 import io.github.charlietap.chasm.compiler.backend.abi.CONTEXT_TYPE
 import io.github.charlietap.chasm.compiler.backend.abi.DOUBLE_TO_RAW_LONG_BITS
+import io.github.charlietap.chasm.compiler.backend.abi.ENTRY_CALL
+import io.github.charlietap.chasm.compiler.backend.abi.ENTRY_INVOKE
 import io.github.charlietap.chasm.compiler.backend.abi.FLOAT_TO_RAW_INT_BITS
 import io.github.charlietap.chasm.compiler.backend.abi.FRAME
 import io.github.charlietap.chasm.compiler.backend.abi.INT_BITS_TO_FLOAT
@@ -15,9 +18,6 @@ import io.github.charlietap.chasm.compiler.backend.abi.returnDescriptor
 import io.github.charlietap.chasm.compiler.backend.abi.takesArgumentArray
 import io.github.charlietap.chasm.compiler.backend.abi.valueDescriptor
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.CLASS_FILE_VERSION
-import io.github.charlietap.chasm.compiler.backend.jvm.abi.COMPILED_FUNCTION
-import io.github.charlietap.chasm.compiler.backend.jvm.abi.ENTRY_CALL
-import io.github.charlietap.chasm.compiler.backend.jvm.abi.ENTRY_INVOKE
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.STACK_OVERFLOW
 import io.github.charlietap.chasm.type.FunctionType
 import org.objectweb.asm.ClassWriter

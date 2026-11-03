@@ -29,6 +29,10 @@ private const val THROWABLE = "Ljava/lang/Throwable;"
 private const val NOTHING = "Ljava/lang/Void;"
 private const val STRINGS = "[Ljava/lang/String;"
 
+const val UNSAFE_TYPE = "Lsun/misc/Unsafe;"
+
+const val MEMORY_BYTE_ARRAY_FIELD = "byteArray"
+
 private class Owner(
     val descriptor: String,
 ) {
@@ -45,12 +49,16 @@ private val compiledExceptions = Owner("Lio/github/charlietap/chasm/runtime/comp
 private val compiledGc = Owner("Lio/github/charlietap/chasm/runtime/compiled/CompiledGc;")
 private val compiledOps = Owner("Lio/github/charlietap/chasm/runtime/compiled/CompiledOps;")
 private val compiledNumerics = Owner("Lio/github/charlietap/chasm/runtime/compiled/CompiledNumerics;")
+private val compiledMemory = Owner("Lio/github/charlietap/chasm/runtime/compiled/CompiledMemory;")
+private val memoryInstance = Owner(MEMORY_INSTANCE)
+private val unsafe = Owner(UNSAFE_TYPE)
 private val globalInstance = Owner(GLOBAL_INSTANCE)
 private val javaInteger = Owner("Ljava/lang/Integer;")
 private val javaLong = Owner("Ljava/lang/Long;")
 private val javaFloat = Owner("Ljava/lang/Float;")
 private val javaDouble = Owner("Ljava/lang/Double;")
 private val javaSystem = Owner("Ljava/lang/System;")
+private val javaMath = Owner("Ljava/lang/Math;")
 
 val FUEL_CHECK = compiledRuntime.method("fuelCheck", CONTEXT_TYPE, returns = "V")
 val INTERRUPT_CHECK = compiledRuntime.method("interruptCheck", CONTEXT_TYPE, returns = "V")
@@ -58,6 +66,34 @@ val FUEL_AND_INTERRUPT_CHECK = compiledRuntime.method("fuelAndInterruptCheck", C
 val CALL_STACK_EXHAUSTED = compiledRuntime.method("callStackExhausted", returns = NOTHING)
 val UNREACHABLE = compiledRuntime.method("unreachable", returns = NOTHING)
 val UNPACK_LONGS = compiledRuntime.method("unpackLongs", STRINGS, returns = "[J")
+val DIVIDE_BY_ZERO = compiledRuntime.method("divideByZero", returns = NOTHING)
+val INTEGER_OVERFLOW = compiledRuntime.method("integerOverflow", returns = NOTHING)
+val CONVERSION_FAILED = compiledRuntime.method("conversionFailed", returns = NOTHING)
+val MEMORY_OUT_OF_BOUNDS = compiledRuntime.method("memoryOutOfBounds", returns = NOTHING)
+
+val MEMORY_ACCESS_OUT_OF_BOUNDS = compiledMemory.method("memoryAccessOutOfBounds", MEMORY_INSTANCE, "I", "J", "I", returns = NOTHING)
+val MEMORY_COPY = compiledMemory.method("memoryCopy", MEMORY_INSTANCE, MEMORY_INSTANCE, "I", "I", "I", returns = "V")
+val MEMORY_FILL = compiledMemory.method("memoryFill", MEMORY_INSTANCE, "I", "I", "I", returns = "V")
+val UNSAFE_INSTANCE = compiledMemory.method("unsafe", returns = OBJECT_TYPE)
+val BYTE_ARRAY_BASE = compiledMemory.method("byteArrayBase", returns = "J")
+val MEMORY_SIZE = memoryInstance.method("getSize", returns = "I")
+val UNSAFE_GET_BYTE = unsafe.method("getByte", OBJECT_TYPE, "J", returns = "B")
+val UNSAFE_PUT_BYTE = unsafe.method("putByte", OBJECT_TYPE, "J", "B", returns = "V")
+val UNSAFE_GET_INT = unsafe.method("getInt", OBJECT_TYPE, "J", returns = "I")
+val UNSAFE_GET_LONG = unsafe.method("getLong", OBJECT_TYPE, "J", returns = "J")
+val UNSAFE_PUT_INT = unsafe.method("putInt", OBJECT_TYPE, "J", "I", returns = "V")
+val UNSAFE_PUT_LONG = unsafe.method("putLong", OBJECT_TYPE, "J", "J", returns = "V")
+
+fun memoryAccess(
+    name: String,
+    value: String?,
+    result: String?,
+) = MethodRef(
+    compiledMemory.descriptor,
+    name,
+    if (value == null) listOf(MEMORY_INSTANCE, "I", "I") else listOf(MEMORY_INSTANCE, "I", "I", value),
+    result ?: "V",
+)
 
 val OPEN_FRAME = compiledCalls.method("openFrame", CONTEXT_TYPE, "I", returns = "J")
 val FRAME = compiledCalls.method("frame", CONTEXT_TYPE, returns = "[J")
@@ -197,4 +233,8 @@ val INT_BITS_TO_FLOAT = javaFloat.method("intBitsToFloat", "I", returns = "F")
 val FLOAT_TO_RAW_INT_BITS = javaFloat.method("floatToRawIntBits", "F", returns = "I")
 val LONG_BITS_TO_DOUBLE = javaDouble.method("longBitsToDouble", "J", returns = "D")
 val DOUBLE_TO_RAW_LONG_BITS = javaDouble.method("doubleToRawLongBits", "D", returns = "J")
+val MATH_CEIL = javaMath.method("ceil", "D", returns = "D")
+val MATH_FLOOR = javaMath.method("floor", "D", returns = "D")
+val MATH_RINT = javaMath.method("rint", "D", returns = "D")
+val MATH_SQRT = javaMath.method("sqrt", "D", returns = "D")
 val ARRAYCOPY = javaSystem.method("arraycopy", OBJECT_TYPE, "I", OBJECT_TYPE, "I", "I", returns = "V")

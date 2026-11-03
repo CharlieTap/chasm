@@ -1,16 +1,18 @@
-package io.github.charlietap.chasm.compiler.backend.jvm
+package io.github.charlietap.chasm.compiler.backend.analysis
 
 import com.github.michaelbull.result.getOrThrow
+import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.cir.CirFunction
-import io.github.charlietap.chasm.compiler.backend.analysis.jumpTargets
 import io.github.charlietap.chasm.compiler.frontend.ModuleCompiler
+import io.github.charlietap.chasm.config.ModuleConfig
+import io.github.charlietap.chasm.decoder.WasmModuleDecoder
+import io.github.charlietap.chasm.validator.WasmModuleValidator
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class LoopCutsTest {
 
-    private val bytes = fixture("loops")
-    private val function: CirFunction = ModuleCompiler(decodeModule(bytes)).getOrThrow { IllegalStateException(it.toString()) }
+    private val function: CirFunction = ModuleCompiler(module("loops")).getOrThrow { IllegalStateException(it.toString()) }
         .functions.single()
 
     private val loop: IntRange = function.instructions.withIndex()
@@ -49,5 +51,15 @@ class LoopCutsTest {
         val start = loop.first + 1
 
         assertEquals(loop.last, cheapestCut(crossings, start = start, limit = loop.last))
+    }
+
+    private fun module(
+        name: String,
+    ): Module {
+        val bytes = checkNotNull(javaClass.classLoader.getResourceAsStream("fixtures/$name.wasm")) { "missing fixture $name" }
+            .use { it.readBytes() }
+        val config = ModuleConfig()
+        val module = WasmModuleDecoder(config, bytes).getOrThrow { IllegalStateException(it.toString()) }
+        return WasmModuleValidator(config, module).getOrThrow { IllegalStateException(it.toString()) }
     }
 }

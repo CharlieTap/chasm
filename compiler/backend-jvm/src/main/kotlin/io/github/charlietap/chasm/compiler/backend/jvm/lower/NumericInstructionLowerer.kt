@@ -33,6 +33,10 @@ import io.github.charlietap.chasm.compiler.backend.abi.LONG_LEADING_ZEROS
 import io.github.charlietap.chasm.compiler.backend.abi.LONG_ROTATE_LEFT
 import io.github.charlietap.chasm.compiler.backend.abi.LONG_ROTATE_RIGHT
 import io.github.charlietap.chasm.compiler.backend.abi.LONG_TRAILING_ZEROS
+import io.github.charlietap.chasm.compiler.backend.abi.MATH_CEIL
+import io.github.charlietap.chasm.compiler.backend.abi.MATH_FLOOR
+import io.github.charlietap.chasm.compiler.backend.abi.MATH_RINT
+import io.github.charlietap.chasm.compiler.backend.abi.MATH_SQRT
 import io.github.charlietap.chasm.compiler.backend.abi.MethodRef
 import io.github.charlietap.chasm.compiler.backend.analysis.form.BinaryOperation
 import io.github.charlietap.chasm.compiler.backend.analysis.form.NumericForm
@@ -320,8 +324,3 @@ private fun LowerContext.wide(
 internal fun unsupported(
     form: Any,
 ): Nothing = throw Unsupported("${form::class.simpleName}")
-
-private val MATH_CEIL = MethodRef("Ljava/lang/Math;", "ceil", listOf("D"), "D")
-private val MATH_FLOOR = MethodRef("Ljava/lang/Math;", "floor", listOf("D"), "D")
-private val MATH_RINT = MethodRef("Ljava/lang/Math;", "rint", listOf("D"), "D")
-private val MATH_SQRT = MethodRef("Ljava/lang/Math;", "sqrt", listOf("D"), "D")

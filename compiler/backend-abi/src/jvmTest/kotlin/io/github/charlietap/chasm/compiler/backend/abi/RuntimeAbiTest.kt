@@ -16,12 +16,27 @@ class RuntimeAbiTest {
     }
 
     @Test
-    fun `only global accessors are instance methods`() {
+    fun `only global, memory and unsafe accessors are instance methods`() {
         methods().forEach { method ->
-            val expectedStatic = method.owner != GLOBAL_INSTANCE
+            val expectedStatic = method.owner !in setOf(GLOBAL_INSTANCE, MEMORY_INSTANCE, UNSAFE_TYPE)
             val actualStatic = Modifier.isStatic(resolve(method).modifiers)
             assertEquals(expectedStatic, actualStatic, method.toString())
         }
+    }
+
+    @Test
+    fun `every installation method compiled code calls exists`() {
+        val missing = methods(INSTALLATION).filterNot(::exists).map(MethodRef::toString)
+
+        assertEquals(emptyList(), missing)
+    }
+
+    @Test
+    fun `a memory instance has the byte array field compiled code reads`() {
+        val field = Class.forName(binaryName(MEMORY_INSTANCE)).getField(MEMORY_BYTE_ARRAY_FIELD)
+
+        assertTrue(Modifier.isPublic(field.modifiers))
+        assertEquals("[B", descriptor(field.type))
     }
 
     @Test
@@ -42,7 +57,9 @@ class RuntimeAbiTest {
         }
     }
 
-    private fun methods(): List<MethodRef> = Class.forName("io.github.charlietap.chasm.compiler.backend.abi.RuntimeAbiKt").declaredFields
+    private fun methods(
+        file: String = RUNTIME_ABI,
+    ): List<MethodRef> = Class.forName(file).declaredFields
         .filter { field -> field.type == MethodRef::class.java }
         .map { field -> field.apply { isAccessible = true }.get(null) as MethodRef }
 
@@ -79,5 +96,10 @@ class RuntimeAbiTest {
         type == Character.TYPE -> "C"
         type.isArray -> type.name.replace('.', '/')
         else -> "L" + type.name.replace('.', '/') + ";"
+    }
+
+    private companion object {
+        const val RUNTIME_ABI = "io.github.charlietap.chasm.compiler.backend.abi.RuntimeAbiKt"
+        const val INSTALLATION = "io.github.charlietap.chasm.compiler.backend.abi.InstallationKt"
     }
 }

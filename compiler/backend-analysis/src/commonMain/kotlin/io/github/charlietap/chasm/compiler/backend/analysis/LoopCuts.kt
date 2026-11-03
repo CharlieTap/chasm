@@ -1,9 +1,8 @@
-package io.github.charlietap.chasm.compiler.backend.jvm
+package io.github.charlietap.chasm.compiler.backend.analysis
 
 import io.github.charlietap.chasm.cir.CirFunction
-import io.github.charlietap.chasm.compiler.backend.analysis.jumpTargets
 
-internal fun loopCrossings(
+fun loopCrossings(
     function: CirFunction,
 ): IntArray {
     val size = function.instructions.size
@@ -23,7 +22,7 @@ internal fun loopCrossings(
     }
 }
 
-internal fun cheapestCut(
+fun cheapestCut(
     crossings: IntArray,
     start: Int,
     limit: Int,

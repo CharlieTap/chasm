@@ -9,8 +9,8 @@ import io.github.charlietap.chasm.compiler.backend.abi.MODULE_INSTANCE
 import io.github.charlietap.chasm.compiler.backend.abi.OBJECT_TYPE
 import io.github.charlietap.chasm.compiler.backend.abi.Resource
 import io.github.charlietap.chasm.compiler.backend.abi.TABLE_INSTANCE
+import io.github.charlietap.chasm.compiler.backend.abi.UNSAFE_TYPE
 import io.github.charlietap.chasm.compiler.backend.abi.internalName
-import io.github.charlietap.chasm.compiler.backend.jvm.abi.UNSAFE_TYPE
 import org.objectweb.asm.tree.FieldInsnNode
 import org.objectweb.asm.tree.MethodNode
 

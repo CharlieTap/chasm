@@ -10,9 +10,11 @@ import io.github.charlietap.chasm.compiler.backend.analysis.References
 import io.github.charlietap.chasm.compiler.backend.analysis.SlotKinds
 import io.github.charlietap.chasm.compiler.backend.analysis.analyzeReferences
 import io.github.charlietap.chasm.compiler.backend.analysis.analyzeSlotKinds
+import io.github.charlietap.chasm.compiler.backend.analysis.cheapestCut
 import io.github.charlietap.chasm.compiler.backend.analysis.form.access
 import io.github.charlietap.chasm.compiler.backend.analysis.frameFacts
 import io.github.charlietap.chasm.compiler.backend.analysis.jumpTargets
+import io.github.charlietap.chasm.compiler.backend.analysis.loopCrossings
 import io.github.charlietap.chasm.compiler.backend.analysis.redundantBoundsChecks
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.BATCH_INSTRUCTIONS
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.CLASS_FILE_VERSION
