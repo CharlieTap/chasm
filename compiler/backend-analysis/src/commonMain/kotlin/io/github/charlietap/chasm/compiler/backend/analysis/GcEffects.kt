@@ -40,7 +40,7 @@ fun Instruction.mayCollectWhileFrameLive(
     else -> allocatesGuestObject()
 }
 
-private fun ControlInstruction.allocatesGuestObject(): Boolean = when (this) {
+internal fun ControlInstruction.allocatesGuestObject(): Boolean = when (this) {
     is ControlInstruction.Throw -> true
     is ControlInstruction.Call,
     is ControlInstruction.CallIndirectI,
@@ -56,7 +56,7 @@ private fun ControlInstruction.allocatesGuestObject(): Boolean = when (this) {
     -> false
 }
 
-private fun AggregateInstruction.allocatesGuestObject(): Boolean = when (this) {
+internal fun AggregateInstruction.allocatesGuestObject(): Boolean = when (this) {
     is AggregateInstruction.ArrayNewDataIi,
     is AggregateInstruction.ArrayNewDataIs,
     is AggregateInstruction.ArrayNewDataSi,

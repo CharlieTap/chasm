@@ -46,7 +46,7 @@ fun signatureKey(
 
 fun functionParameters(
     type: FunctionType,
-): List<String> = listOf(CONTEXT_TYPE, DEPTH) + type.params.types.map(::valueDescriptor)
+): List<String> = parameters(type, leading = 0)
 
 fun takesArgumentArray(
     type: FunctionType,
@@ -58,5 +58,18 @@ fun staticParameters(
 ): List<String> = if (takesArgumentArray(type)) {
     listOf(binding, CONTEXT_TYPE, DEPTH, ARGUMENTS)
 } else {
-    listOf(binding) + functionParameters(type)
+    parameters(type, leading = 1).also { parameters -> parameters[0] = binding }
+}
+
+private fun parameters(
+    type: FunctionType,
+    leading: Int,
+): MutableList<String> {
+    val types = type.params.types
+    val parameters = ArrayList<String>(leading + 2 + types.size)
+    repeat(leading) { parameters.add("") }
+    parameters.add(CONTEXT_TYPE)
+    parameters.add(DEPTH)
+    for (index in types.indices) parameters.add(valueDescriptor(types[index]))
+    return parameters
 }

@@ -71,7 +71,14 @@ class HelperCall(
     val words: Int get() = arguments.sumOf { it.words }
 }
 
-fun Instruction.helperCall(): HelperCall? = when (val i = this) {
+fun Instruction.helperCall(): HelperCall? = when (this) {
+    is MemoryInstruction -> memoryHelperCall()
+    is TableInstruction -> tableHelperCall()
+    is AggregateInstruction -> aggregateHelperCall()
+    else -> null
+}
+
+private fun MemoryInstruction.memoryHelperCall(): HelperCall? = when (val i = this) {
     is MemoryInstruction.MemorySizeS -> HelperCall(MEMORY_SIZE_PAGES, listOf(memory(i.memory)), i.destinationSlot)
     is MemoryInstruction.MemoryGrowI -> memoryGrow(i.memory, immediate(i.pagesToAdd), i.destinationSlot)
     is MemoryInstruction.MemoryGrowS -> memoryGrow(i.memory, slot(i.pagesToAddSlot), i.destinationSlot)
@@ -84,7 +91,10 @@ fun Instruction.helperCall(): HelperCall? = when (val i = this) {
     is MemoryInstruction.MemoryInitSsi -> memoryInit(i.memory, i.data, slot(i.sourceOffsetSlot), immediate(i.destinationOffset), slot(i.bytesToCopySlot))
     is MemoryInstruction.MemoryInitSss -> memoryInit(i.memory, i.data, slot(i.sourceOffsetSlot), slot(i.destinationOffsetSlot), slot(i.bytesToCopySlot))
     is MemoryInstruction.DataDrop -> HelperCall(DATA_DROP, listOf(data(i.data)), null)
+    else -> null
+}
 
+private fun TableInstruction.tableHelperCall(): HelperCall? = when (val i = this) {
     is TableInstruction.TableGetI -> HelperCall(TABLE_GET, listOf(table(i.table), int(immediate(i.elementIndex))), i.destinationSlot, producesReference = true)
     is TableInstruction.TableGetS -> HelperCall(TABLE_GET, listOf(table(i.table), int(slot(i.elementIndexSlot))), i.destinationSlot, producesReference = true)
     is TableInstruction.TableSetSi -> HelperCall(TABLE_SET, listOf(table(i.table), int(immediate(i.elementIndex)), long(slot(i.valueSlot))), null)
@@ -113,7 +123,10 @@ fun Instruction.helperCall(): HelperCall? = when (val i = this) {
     is TableInstruction.TableInitSsi -> tableInit(i.table, i.element, slot(i.segmentOffsetSlot), immediate(i.tableOffset), slot(i.elementsToInitialiseSlot))
     is TableInstruction.TableInitSss -> tableInit(i.table, i.element, slot(i.segmentOffsetSlot), slot(i.tableOffsetSlot), slot(i.elementsToInitialiseSlot))
     is TableInstruction.ElemDrop -> HelperCall(ELEM_DROP, listOf(element(i.element)), null)
+    else -> null
+}
 
+private fun AggregateInstruction.aggregateHelperCall(): HelperCall? = when (val i = this) {
     is AggregateInstruction.ArrayNewIi -> arrayNew(i.type, immediate(i.size), immediate(i.value), i.destinationSlot)
     is AggregateInstruction.ArrayNewIs -> arrayNew(i.type, immediate(i.size), slot(i.valueSlot), i.destinationSlot)
     is AggregateInstruction.ArrayNewSi -> arrayNew(i.type, slot(i.sizeSlot), immediate(i.value), i.destinationSlot)

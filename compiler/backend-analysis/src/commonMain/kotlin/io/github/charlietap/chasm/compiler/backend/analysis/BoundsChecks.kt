@@ -13,62 +13,78 @@ fun CirFunction.redundantBoundsChecks(
     declarations: ModuleIndexSpaces,
 ): BooleanArray {
     val size = instructions.size
+    val redundant = BooleanArray(size)
     val targets = jumpTargets()
+    val loopEnds = IntArray(size + 1) { -1 }
+    val earliestEntry = IntArray(size + 1) { Int.MAX_VALUE }
+    instructions.forEachIndexed { position, instruction ->
+        for (target in instruction.jumpTargets()) {
+            if (target <= position) {
+                loopEnds[target] = maxOf(loopEnds[target], position)
+            } else {
+                earliestEntry[target] = minOf(earliestEntry[target], position)
+            }
+        }
+    }
     val handlerEntries = BooleanArray(size + 1)
     exceptions?.regions?.forEach { region -> region.catches.forEach { handler -> handlerEntries[handler.target.index] = true } }
-    val incomingByTarget = HashMap<Int, HashMap<Int, CheckedReachBySlot>>()
+    val incoming = arrayOfNulls<CheckedReachBySlot>(size + 1)
     val writes = PositionWrites(this, declarations)
-    var redundant: BooleanArray
-    var passes = 0
-    var retainedFacts = 0L
-    do {
-        if (++passes > MAX_PASSES) return BooleanArray(size)
-        var changed = false
-        redundant = BooleanArray(size)
-        var facts: CheckedReachBySlot? = HashMap()
-        for (position in 0 until size) {
-            if (position == 0 || handlerEntries[position]) {
-                facts = HashMap()
-            } else if (targets[position]) {
-                facts = incomingByTarget[position]?.values.orEmpty().fold(facts) { met, carried -> meet(met, carried) }
+    var facts: CheckedReachBySlot? = HashMap()
+    for (position in 0 until size) {
+        if (handlerEntries[position]) {
+            facts = HashMap()
+        } else if (targets[position]) {
+            val carried = incoming[position]
+            facts = when {
+                carried == null -> facts
+                facts == null -> carried
+                else -> meet(facts, carried)
             }
-            val current = facts ?: HashMap()
-            val instruction = instructions[position]
-            val access = (instruction as? MemoryInstruction)?.access()
-            val address = access?.address
-            if (access != null && access.memory.index == 0 && address is Operand.Slot) {
-                val reach = (access.offset.toLong() and 0xFFFF_FFFFL) + access.operation.width
-                val proven = current[address.slot]
-                if (proven != null && reach <= proven) {
-                    redundant[position] = true
-                } else {
-                    current[address.slot] = maxOf(proven ?: 0L, reach)
-                }
-            }
-            val jumps = instruction.jumpTargets()
-            writes.apply(position, current, carryCopiedReach = jumps.isEmpty())
-            var snapshot: CheckedReachBySlot? = null
-            for (target in jumps) {
-                val carried = incomingByTarget.getOrPut(target) { HashMap() }
-                val previous = carried[position]
-                if ((snapshot == null || previous !== snapshot) && previous != current) {
-                    carried[position] = snapshot ?: HashMap(current).also { copy ->
-                        snapshot = copy
-                        retainedFacts += copy.size
-                        if (retainedFacts > MAX_RETAINED_FACTS) return BooleanArray(size)
-                    }
-                    changed = true
-                }
-            }
-            facts = if (instruction.endsPath()) null else current
         }
-    } while (changed)
+        incoming[position] = null
+        val loopEnd = loopEnds[position]
+        if (loopEnd >= 0) facts = facts?.let { entry -> loopInvariant(entry, position, loopEnd, writes, earliestEntry, loopEnds, handlerEntries) }
+        val current = facts ?: HashMap()
+        val instruction = instructions[position]
+        val access = (instruction as? MemoryInstruction)?.access()
+        val address = access?.address
+        if (access != null && access.memory.index == 0 && address is Operand.Slot) {
+            val reach = (access.offset.toLong() and 0xFFFF_FFFFL) + access.operation.width
+            val proven = current[address.slot]
+            if (proven != null && reach <= proven) {
+                redundant[position] = true
+            } else {
+                current[address.slot] = maxOf(proven ?: 0L, reach)
+            }
+        }
+        val jumps = instruction.jumpTargets()
+        writes.apply(position, current, carryCopiedReach = jumps.isEmpty())
+        for (target in jumps) {
+            if (target <= position) continue
+            val carried = incoming[target]
+            incoming[target] = if (carried == null) HashMap(current) else meet(carried, current)
+        }
+        facts = if (instruction.endsPath()) null else current
+    }
     return redundant
 }
 
-private const val MAX_PASSES = 64
-
-private const val MAX_RETAINED_FACTS = 4_000_000L
+private fun loopInvariant(
+    entry: CheckedReachBySlot,
+    header: Int,
+    end: Int,
+    writes: PositionWrites,
+    earliestEntry: IntArray,
+    loopEnds: IntArray,
+    handlerEntries: BooleanArray,
+): CheckedReachBySlot {
+    for (position in header + 1..end) {
+        if (handlerEntries[position] || earliestEntry[position] < header || loopEnds[position] > end) return HashMap()
+    }
+    for (position in header..end) writes.kill(position, entry)
+    return entry
+}
 
 private typealias CheckedReachBySlot = HashMap<Int, Long>
 
@@ -145,6 +161,13 @@ private class PositionWrites(
     ) {
         if (count == slots.size) slots = slots.copyOf(maxOf(16, count * 2))
         slots[count++] = slot
+    }
+
+    fun kill(
+        position: Int,
+        facts: CheckedReachBySlot,
+    ) {
+        for (index in first[position] until first[position + 1]) facts.remove(slots[index])
     }
 
     fun apply(

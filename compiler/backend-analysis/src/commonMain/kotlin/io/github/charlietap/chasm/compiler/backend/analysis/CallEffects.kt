@@ -1,9 +1,9 @@
 package io.github.charlietap.chasm.compiler.backend.analysis
 
+import io.github.charlietap.chasm.cir.AggregateInstruction
 import io.github.charlietap.chasm.cir.CirModule
 import io.github.charlietap.chasm.cir.ControlInstruction
 import io.github.charlietap.chasm.cir.FunctionIndex
-import io.github.charlietap.chasm.cir.Instruction
 import io.github.charlietap.chasm.cir.MemoryInstruction
 
 /**
@@ -26,20 +26,26 @@ internal class CallEffects(
         for (function in code.functions) {
             val caller = function.index.index
             for (instruction in function.instructions) {
-                val callee = instruction.directCallee()
-                if (callee != null) {
-                    if (calls == callees.size) {
-                        callees = callees.copyOf(calls * 2)
-                        callers = callers.copyOf(calls * 2)
+                when (instruction) {
+                    is ControlInstruction -> {
+                        val callee = instruction.directCallee()
+                        if (callee != null) {
+                            if (calls == callees.size) {
+                                callees = callees.copyOf(calls * 2)
+                                callers = callers.copyOf(calls * 2)
+                            }
+                            callees[calls] = callee.index
+                            callers[calls++] = caller
+                        } else if (instruction.callsUnknownFunction()) {
+                            mayGrowMemory[caller] = true
+                            mayCollect[caller] = true
+                        } else if (instruction.allocatesGuestObject()) {
+                            mayCollect[caller] = true
+                        }
                     }
-                    callees[calls] = callee.index
-                    callers[calls++] = caller
-                } else if (instruction.callsUnknownFunction()) {
-                    mayGrowMemory[caller] = true
-                    mayCollect[caller] = true
-                } else {
-                    if (instruction.growsMemory()) mayGrowMemory[caller] = true
-                    if (instruction.allocatesGuestObject()) mayCollect[caller] = true
+                    is MemoryInstruction -> if (instruction.growsMemory()) mayGrowMemory[caller] = true
+                    is AggregateInstruction -> if (instruction.allocatesGuestObject()) mayCollect[caller] = true
+                    else -> Unit
                 }
             }
         }
@@ -49,17 +55,17 @@ internal class CallEffects(
     }
 }
 
-private fun Instruction.directCallee(): FunctionIndex? = when (this) {
+private fun ControlInstruction.directCallee(): FunctionIndex? = when (this) {
     is ControlInstruction.Call -> function
     is ControlInstruction.ReturnCall -> function
     else -> null
 }
 
-private fun Instruction.callsUnknownFunction(): Boolean = this is ControlInstruction.CallIndirectI ||
+private fun ControlInstruction.callsUnknownFunction(): Boolean = this is ControlInstruction.CallIndirectI ||
     this is ControlInstruction.CallIndirectS || this is ControlInstruction.CallRefS ||
     this is ControlInstruction.ReturnCallIndirectI || this is ControlInstruction.ReturnCallIndirectS ||
     this is ControlInstruction.ReturnCallRefS
 
-private fun Instruction.growsMemory(): Boolean = this is MemoryInstruction.MemoryGrowI || this is MemoryInstruction.MemoryGrowS
+private fun MemoryInstruction.growsMemory(): Boolean = this is MemoryInstruction.MemoryGrowI || this is MemoryInstruction.MemoryGrowS
 
 private const val INITIAL_CALLS = 64

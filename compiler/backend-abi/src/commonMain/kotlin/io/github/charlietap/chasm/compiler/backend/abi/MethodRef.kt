@@ -8,11 +8,8 @@ data class MethodRef(
 ) {
     val words: Int = parameters.sumOf(::descriptorWords)
 
-    val descriptor: String = parameters.joinToString("", "(", ")") + returns
-
-    private val hash = listOf(owner, name, descriptor).hashCode()
-
-    override fun hashCode(): Int = hash
+    val descriptor: String
+        get() = parameters.joinToString("", "(", ")") + returns
 
     override fun toString(): String = "$owner->$name$descriptor"
 }

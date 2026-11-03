@@ -7,7 +7,7 @@ import io.github.charlietap.chasm.type.ValueType
 
 class SlotKinds(
     private val kinds: ByteArray,
-    private val accountedWrites: Set<Long>,
+    private val accountedWrites: LongArray,
     private val shadows: ByteArray = ByteArray(kinds.size),
 ) {
 
@@ -26,7 +26,7 @@ class SlotKinds(
     fun accountsFor(
         position: Int,
         slot: Int,
-    ): Boolean = mixWriteKey(writeKey(position, slot)) in accountedWrites
+    ): Boolean = accountedWrites.binarySearch(writeKey(position, slot)) >= 0
 
     companion object {
         const val LONG: Byte = 0
@@ -41,7 +41,7 @@ class SlotKinds(
 
         fun wide(
             frameSlots: Int,
-        ) = SlotKinds(ByteArray(frameSlots), emptySet())
+        ) = SlotKinds(ByteArray(frameSlots), LongArray(0))
     }
 }
 
@@ -59,9 +59,17 @@ private fun writeKeySlot(
     key: Long,
 ) = (key and 0xFFFF_FFFFL).toInt()
 
-private fun mixWriteKey(
-    key: Long,
-) = key * -0x61c8864680b583ebL
+private class LongList {
+    var values = LongArray(16)
+    var size = 0
+
+    fun add(
+        value: Long,
+    ) {
+        if (size == values.size) values = values.copyOf(size * 2)
+        values[size++] = value
+    }
+}
 
 private class SlotCopy(
     val position: Int,
@@ -88,7 +96,7 @@ fun analyzeSlotKinds(
     floatingHome: (Int) -> Boolean = { true },
 ): SlotKinds {
     val written = IntArray(frameSlots)
-    val narrowWriteCandidates = ArrayList<Long>()
+    val narrowWriteCandidates = LongList()
     val copies = ArrayList<SlotCopy>()
 
     fun write(
@@ -97,7 +105,7 @@ fun analyzeSlotKinds(
         flag: Int,
     ) {
         written[slot] = written[slot] or flag
-        if (flag == WRITE_I32 || flag == WRITE_F32) narrowWriteCandidates += writeKey(position, slot)
+        if (flag == WRITE_I32 || flag == WRITE_F32) narrowWriteCandidates.add(writeKey(position, slot))
     }
 
     fun other(
@@ -110,37 +118,35 @@ fun analyzeSlotKinds(
     initialValues.forEachIndexed { slot, value -> if (value.toInt().toLong() != value) other(slot) }
     function.exceptions?.regions?.forEach { region -> region.catches.forEach { handler -> handler.payloadSlots.forEach(::other) } }
     references.slots.forEach(::other)
-    function.instructions.forEachIndexed { position, instruction ->
-        visitSlotWrites(
-            instruction,
-            function,
-            declarations,
-            object : SlotWriteVisitor {
-                override fun value(
-                    slot: Int,
-                    type: ValueType,
-                ) = write(position, slot, writeFlag(type))
+    var position = 0
+    val visitor = object : SlotWriteVisitor {
+        override fun value(
+            slot: Int,
+            type: ValueType,
+        ) = write(position, slot, writeFlag(type))
 
-                override fun opaque(
-                    slot: Int,
-                    reference: Boolean,
-                ) = other(slot)
+        override fun opaque(
+            slot: Int,
+            reference: Boolean,
+        ) = other(slot)
 
-                override fun copy(
-                    source: Operand,
-                    destination: Int,
-                ) {
-                    when (source) {
-                        is Operand.Slot -> copies += SlotCopy(position, source.slot, destination)
-                        is Operand.Immediate -> if (source.bits.toInt().toLong() == source.bits) {
-                            narrowWriteCandidates += writeKey(position, destination)
-                        } else {
-                            written[destination] = written[destination] or WRITE_WIDE_CONSTANT
-                        }
-                    }
+        override fun copy(
+            source: Operand,
+            destination: Int,
+        ) {
+            when (source) {
+                is Operand.Slot -> copies += SlotCopy(position, source.slot, destination)
+                is Operand.Immediate -> if (source.bits.toInt().toLong() == source.bits) {
+                    narrowWriteCandidates.add(writeKey(position, destination))
+                } else {
+                    written[destination] = written[destination] or WRITE_WIDE_CONSTANT
                 }
-            },
-        )
+            }
+        }
+    }
+    function.instructions.forEachIndexed { index, instruction ->
+        position = index
+        visitSlotWrites(instruction, function, declarations, visitor)
     }
     val copied = BooleanArray(frameSlots).also { flags -> copies.forEach { copy -> flags[copy.destination] = true } }
 
@@ -205,11 +211,15 @@ fun analyzeSlotKinds(
             else -> SlotKinds.LONG
         }
     }
-    val accountedWrites = HashSet<Long>()
-    narrowWriteCandidates.forEach { key -> if (narrow[writeKeySlot(key)]) accountedWrites += mixWriteKey(key) }
-    copies.forEach { copy -> if (narrow[copy.destination]) accountedWrites += mixWriteKey(writeKey(copy.position, copy.destination)) }
-    parameters.indices.forEach { if (narrow[it]) accountedWrites += mixWriteKey(writeKey(SlotKinds.PROLOGUE, it)) }
-    return SlotKinds(kinds, accountedWrites, shadows(kinds, written, graph, floatingHome))
+    val accountedWrites = LongList()
+    for (index in 0 until narrowWriteCandidates.size) {
+        val key = narrowWriteCandidates.values[index]
+        if (narrow[writeKeySlot(key)]) accountedWrites.add(key)
+    }
+    copies.forEach { copy -> if (narrow[copy.destination]) accountedWrites.add(writeKey(copy.position, copy.destination)) }
+    parameters.indices.forEach { if (narrow[it]) accountedWrites.add(writeKey(SlotKinds.PROLOGUE, it)) }
+    val accounted = accountedWrites.values.copyOf(accountedWrites.size).also { keys -> keys.sort() }
+    return SlotKinds(kinds, accounted, shadows(kinds, written, graph, floatingHome))
 }
 
 private fun shadows(
