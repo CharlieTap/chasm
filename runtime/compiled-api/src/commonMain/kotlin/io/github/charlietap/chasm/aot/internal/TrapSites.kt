@@ -1,51 +1,10 @@
 package io.github.charlietap.chasm.aot.internal
 
 import io.github.charlietap.chasm.InternalChasmApi
+import io.github.charlietap.chasm.runtime.diagnostic.FunctionTrapSites
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.io.OutputStream
-
-/**
- * Where each compiled instruction of a function came from in the Wasm
- * binary. [chunkStarts] holds the first compiled instruction of each chunk
- * method when the function was split, and is empty otherwise.
- */
-@InternalChasmApi
-class FunctionTrapSites(
-    val chunkStarts: IntArray,
-    private val offsets: IntArray,
-    private val memories: IntArray = IntArray(0),
-) {
-    val size: Int get() = offsets.size
-
-    /** The Wasm offset of the compiled instruction at [position], or -1. */
-    fun offset(
-        position: Int,
-    ): Int = if (position in offsets.indices) offsets[position] else -1
-
-    /**
-     * The memory index the memory instruction at [position] accesses, or -1.
-     * A copy names its source when [source] is true and its destination
-     * otherwise.
-     */
-    fun memoryIndex(
-        position: Int,
-        source: Boolean,
-    ): Int {
-        val packed = packedMemories(position)
-        val first = (packed and 0xFFFF) - 1
-        val second = (packed ushr 16) - 1
-        return if (second >= 0 && !source) second else first
-    }
-
-    fun withChunkStarts(
-        chunkStarts: IntArray,
-    ): FunctionTrapSites = FunctionTrapSites(chunkStarts, offsets, memories)
-
-    internal fun packedMemories(
-        position: Int,
-    ): Int = if (position in memories.indices) memories[position] else 0
-}
 
 @InternalChasmApi
 class TrapSites(
@@ -63,28 +22,6 @@ fun trapSitesResource(
 
 @InternalChasmApi
 const val TRAP_SITES_EXTENSION = "chasmsites"
-
-// Generated function methods are named FUNCTION_METHOD_PREFIX + index, and the chunks of a split function
-// add CHUNK_METHOD_SEPARATOR + chunk; they live in classes named with CODE_CLASS_PREFIX or CHUNK_CLASS_PREFIX.
-@InternalChasmApi
-const val FUNCTION_METHOD_PREFIX = "f"
-
-@InternalChasmApi
-const val CHUNK_METHOD_SEPARATOR = "\$c"
-
-@InternalChasmApi
-const val CODE_CLASS_PREFIX = "Code"
-
-@InternalChasmApi
-const val CHUNK_CLASS_PREFIX = "Chunks"
-
-// The interpreter's entry into compiled code as the shrinker rules name it, before any renaming.
-@InternalChasmApi
-const val COMPILED_ENTRY_CLASS = "io.github.charlietap.chasm.executor.invoker.compiled.CompiledEntry"
-
-// The source file classes compiled with trap diagnostics name, which tells them apart from classes that share their names.
-@InternalChasmApi
-const val TRAP_DIAGNOSTICS_SOURCE_FILE = "module.wasm"
 
 @InternalChasmApi
 fun writeTrapSites(

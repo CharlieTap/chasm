@@ -65,6 +65,12 @@ public final class io/github/charlietap/chasm/embedding/codegen/CodegenImportKt 
 	public static final fun allocateImports (Lio/github/charlietap/chasm/embedding/shapes/Store;Ljava/util/List;)Ljava/util/List;
 }
 
+public final class io/github/charlietap/chasm/embedding/diagnostic/CompiledTrapSource : io/github/charlietap/chasm/embedding/diagnostic/TrapSource {
+	public fun <init> (Lio/github/charlietap/chasm/runtime/instance/ModuleInstance;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function1;)V
+	public fun frames (Lio/github/charlietap/chasm/runtime/store/Store;Lio/github/charlietap/chasm/runtime/diagnostic/TrapSnapshot;)Lio/github/charlietap/chasm/embedding/diagnostic/ModuleFrames;
+	public fun getInstance ()Lio/github/charlietap/chasm/runtime/instance/ModuleInstance;
+}
+
 public abstract interface class io/github/charlietap/chasm/embedding/diagnostic/ModuleFrames {
 	public abstract fun functionName (I)Ljava/lang/String;
 	public abstract fun getModuleName ()Ljava/lang/String;

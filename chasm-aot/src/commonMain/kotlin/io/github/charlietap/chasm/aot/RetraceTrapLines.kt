@@ -3,14 +3,14 @@
 package io.github.charlietap.chasm.aot
 
 import io.github.charlietap.chasm.InternalChasmApi
-import io.github.charlietap.chasm.aot.internal.CHUNK_CLASS_PREFIX
-import io.github.charlietap.chasm.aot.internal.CODE_CLASS_PREFIX
-import io.github.charlietap.chasm.aot.internal.FUNCTION_METHOD_PREFIX
 import io.github.charlietap.chasm.aot.internal.LineRange
-import io.github.charlietap.chasm.aot.internal.TRAP_DIAGNOSTICS_SOURCE_FILE
 import io.github.charlietap.chasm.aot.internal.trapLinesKey
 import io.github.charlietap.chasm.aot.internal.trapLinesResource
 import io.github.charlietap.chasm.aot.internal.writeTrapLines
+import io.github.charlietap.chasm.runtime.compiled.CHUNK_CLASS_PREFIX
+import io.github.charlietap.chasm.runtime.compiled.CODE_CLASS_PREFIX
+import io.github.charlietap.chasm.runtime.compiled.FUNCTION_METHOD_PREFIX
+import io.github.charlietap.chasm.runtime.compiled.TRAP_DIAGNOSTICS_SOURCE_FILE
 import java.io.ByteArrayOutputStream
 import java.io.Reader
 

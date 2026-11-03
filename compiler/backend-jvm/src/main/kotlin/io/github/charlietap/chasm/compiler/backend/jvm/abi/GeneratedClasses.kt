@@ -3,15 +3,15 @@
 package io.github.charlietap.chasm.compiler.backend.jvm.abi
 
 import io.github.charlietap.chasm.InternalChasmApi
-import io.github.charlietap.chasm.aot.internal.CHUNK_CLASS_PREFIX
-import io.github.charlietap.chasm.aot.internal.CHUNK_METHOD_SEPARATOR
-import io.github.charlietap.chasm.aot.internal.CODE_CLASS_PREFIX
-import io.github.charlietap.chasm.aot.internal.FUNCTION_METHOD_PREFIX
-import io.github.charlietap.chasm.aot.internal.TRAP_DIAGNOSTICS_SOURCE_FILE
 import io.github.charlietap.chasm.compiler.backend.abi.MethodRef
 import io.github.charlietap.chasm.compiler.backend.abi.returnDescriptor
 import io.github.charlietap.chasm.compiler.backend.abi.staticParameters
 import io.github.charlietap.chasm.compiler.backend.jvm.DATA_EXTENSION
+import io.github.charlietap.chasm.runtime.compiled.CHUNK_CLASS_PREFIX
+import io.github.charlietap.chasm.runtime.compiled.CHUNK_METHOD_SEPARATOR
+import io.github.charlietap.chasm.runtime.compiled.CODE_CLASS_PREFIX
+import io.github.charlietap.chasm.runtime.compiled.FUNCTION_METHOD_PREFIX
+import io.github.charlietap.chasm.runtime.compiled.TRAP_DIAGNOSTICS_SOURCE_FILE
 import io.github.charlietap.chasm.type.FunctionType
 
 internal fun bindingClassDescriptor(

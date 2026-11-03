@@ -17,7 +17,6 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                api(projects.runtime.compiledApi)
                 api(projects.runtime.core)
 
                 implementation(projects.executor.callCore)

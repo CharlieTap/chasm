@@ -1,25 +1,19 @@
-@file:OptIn(ExperimentalChasmApi::class, InternalChasmApi::class)
+package io.github.charlietap.chasm.runtime.compiled
 
-package io.github.charlietap.chasm.aot.diagnostic
-
-import io.github.charlietap.chasm.ExperimentalChasmApi
 import io.github.charlietap.chasm.InternalChasmApi
-import io.github.charlietap.chasm.aot.CompiledModule
-import io.github.charlietap.chasm.aot.internal.CHUNK_CLASS_PREFIX
-import io.github.charlietap.chasm.aot.internal.CHUNK_METHOD_SEPARATOR
-import io.github.charlietap.chasm.aot.internal.CODE_CLASS_PREFIX
-import io.github.charlietap.chasm.aot.internal.FUNCTION_METHOD_PREFIX
-import io.github.charlietap.chasm.runtime.compiled.CompiledStackTrace
 import io.github.charlietap.chasm.runtime.diagnostic.CompiledFrames
 import io.github.charlietap.chasm.runtime.diagnostic.CompiledFrames.Companion.NOT_COMPILED
 import io.github.charlietap.chasm.runtime.diagnostic.CompiledTrace
 import io.github.charlietap.chasm.runtime.store.Store
 
-internal class ModuleCompiledFrames(
-    private val module: CompiledModule,
+@InternalChasmApi
+class ModuleCompiledFrames(
+    packageName: String,
+    private val chunkStarts: (function: Int) -> IntArray?,
+    private val originalLine: (className: String, methodName: String, line: Int) -> Int,
 ) : CompiledFrames {
 
-    private val classPrefix = module.packageName + "."
+    private val classPrefix = "$packageName."
 
     override fun function(
         className: String,
@@ -44,15 +38,14 @@ internal class ModuleCompiledFrames(
         methodName: String,
         line: Int,
     ): Int {
-        // Once a shrinker has renumbered the lines, only its mapping says which line Chasm gave a frame.
-        val original = module.trapLines?.original(className.substringAfterLast('.'), methodName, line) ?: line
+        val original = originalLine(className, methodName, line)
         if (original <= 0) return -1
         val separator = methodName.indexOf(CHUNK_METHOD_SEPARATOR)
         val start = if (separator < 0) {
             0
         } else {
             val chunk = methodName.substring(separator + CHUNK_METHOD_SEPARATOR.length).toIntOrNull() ?: return -1
-            module.trapSites?.function(function)?.chunkStarts?.getOrNull(chunk) ?: return -1
+            chunkStarts(function)?.getOrNull(chunk) ?: return -1
         }
         return start + original - 1
     }

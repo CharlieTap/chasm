@@ -2,10 +2,9 @@ package io.github.charlietap.chasm.aot
 
 import io.github.charlietap.chasm.ExperimentalChasmApi
 import io.github.charlietap.chasm.InternalChasmApi
-import io.github.charlietap.chasm.aot.diagnostic.CompiledTrapSource
-import io.github.charlietap.chasm.aot.diagnostic.ModuleCompiledFrames
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.config.StoreConfig
+import io.github.charlietap.chasm.embedding.diagnostic.CompiledTrapSource
 import io.github.charlietap.chasm.embedding.error.ChasmError
 import io.github.charlietap.chasm.embedding.internal.instantiate
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
@@ -15,6 +14,7 @@ import io.github.charlietap.chasm.embedding.shapes.Instance
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.executor.instantiator.ModuleInstantiator
 import io.github.charlietap.chasm.runtime.compiled.ModuleCodeInstallation
+import io.github.charlietap.chasm.runtime.compiled.ModuleCompiledFrames
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 
 @ExperimentalChasmApi
@@ -40,10 +40,16 @@ internal inline fun instance(
     val metadata = module.metadataResult.getOrElse { failure -> return rejected(failure.message ?: failure.toString()) }
     mismatch(metadata.capabilities, store.store.config)?.let { reason -> return rejected(reason) }
     val declarations = module.declarations.getOrElse { failure -> return rejected(failure.message ?: failure.toString()) }
-    val trapSource = { instance: ModuleInstance -> CompiledTrapSource(instance, declarations.names, module) }
+    val trapSource = { instance: ModuleInstance ->
+        CompiledTrapSource(instance, { declarations.names }) { function -> module.trapSites?.function(function) }
+    }
     return instantiate(store, imports, runtimeConfig(metadata), trapSource) { effectiveConfig, runtime, runtimeImports ->
         instantiator(effectiveConfig, runtime, declarations, runtimeImports) { runtimeStore, instance, runtimeTypes, _ ->
-            instance.compiledFrames = ModuleCompiledFrames(module)
+            instance.compiledFrames = ModuleCompiledFrames(
+                packageName = module.packageName,
+                chunkStarts = { function -> module.trapSites?.function(function)?.chunkStarts },
+                originalLine = { className, methodName, line -> module.trapLines?.original(className.substringAfterLast('.'), methodName, line) ?: line },
+            )
             ModuleCodeInstallation(module.code::install, runtimeStore, declarations.functionTypeIndices.size, instance, runtimeTypes)
         }
     }

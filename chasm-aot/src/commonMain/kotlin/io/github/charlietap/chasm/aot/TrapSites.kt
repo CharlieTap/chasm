@@ -3,16 +3,16 @@
 package io.github.charlietap.chasm.aot
 
 import io.github.charlietap.chasm.InternalChasmApi
-import io.github.charlietap.chasm.aot.internal.CHUNK_CLASS_PREFIX
-import io.github.charlietap.chasm.aot.internal.CODE_CLASS_PREFIX
-import io.github.charlietap.chasm.aot.internal.COMPILED_ENTRY_CLASS
-import io.github.charlietap.chasm.aot.internal.FUNCTION_METHOD_PREFIX
-import io.github.charlietap.chasm.aot.internal.FunctionTrapSites
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.cir.CirModule
 import io.github.charlietap.chasm.compiler.frontend.diagnostic.TrapSiteTables
 import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.decoder.WasmFunctionBodyOffsets
+import io.github.charlietap.chasm.runtime.compiled.CHUNK_CLASS_PREFIX
+import io.github.charlietap.chasm.runtime.compiled.CODE_CLASS_PREFIX
+import io.github.charlietap.chasm.runtime.compiled.COMPILED_ENTRY_CLASS
+import io.github.charlietap.chasm.runtime.compiled.FUNCTION_METHOD_PREFIX
+import io.github.charlietap.chasm.runtime.diagnostic.FunctionTrapSites
 
 // A shrinker that renames the compiled function methods or drops their line numbers leaves traps unattributable, and one
 // that merges other classes into the entry into compiled code, or inlines its invoke, blurs where compiled runs begin.

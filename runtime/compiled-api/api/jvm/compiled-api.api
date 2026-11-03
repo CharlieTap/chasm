@@ -63,16 +63,6 @@ public final class io/github/charlietap/chasm/aot/internal/CompiledModuleKt {
 	public static final fun compiledModule (Lio/github/charlietap/chasm/aot/internal/CompiledCode;)Lio/github/charlietap/chasm/aot/CompiledModule;
 }
 
-public final class io/github/charlietap/chasm/aot/internal/FunctionTrapSites {
-	public fun <init> ([I[I[I)V
-	public synthetic fun <init> ([I[I[IILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public final fun getChunkStarts ()[I
-	public final fun getSize ()I
-	public final fun memoryIndex (IZ)I
-	public final fun offset (I)I
-	public final fun withChunkStarts ([I)Lio/github/charlietap/chasm/aot/internal/FunctionTrapSites;
-}
-
 public final class io/github/charlietap/chasm/aot/internal/LineRange {
 	public fun <init> (IIIZ)V
 	public final fun getFirst ()I
@@ -96,40 +86,13 @@ public final class io/github/charlietap/chasm/aot/internal/TrapLinesKt {
 
 public final class io/github/charlietap/chasm/aot/internal/TrapSites {
 	public fun <init> (Ljava/util/Map;)V
-	public final fun function (I)Lio/github/charlietap/chasm/aot/internal/FunctionTrapSites;
+	public final fun function (I)Lio/github/charlietap/chasm/runtime/diagnostic/FunctionTrapSites;
 }
 
 public final class io/github/charlietap/chasm/aot/internal/TrapSitesKt {
-	public static final field CHUNK_CLASS_PREFIX Ljava/lang/String;
-	public static final field CHUNK_METHOD_SEPARATOR Ljava/lang/String;
-	public static final field CODE_CLASS_PREFIX Ljava/lang/String;
-	public static final field COMPILED_ENTRY_CLASS Ljava/lang/String;
-	public static final field FUNCTION_METHOD_PREFIX Ljava/lang/String;
-	public static final field TRAP_DIAGNOSTICS_SOURCE_FILE Ljava/lang/String;
 	public static final field TRAP_SITES_EXTENSION Ljava/lang/String;
 	public static final fun readTrapSites (Ljava/io/InputStream;)Lio/github/charlietap/chasm/aot/internal/TrapSites;
 	public static final fun trapSitesResource (Ljava/lang/String;)Ljava/lang/String;
 	public static final fun writeTrapSites (Ljava/io/OutputStream;Ljava/util/Map;)V
-}
-
-public abstract class io/github/charlietap/chasm/runtime/compiled/CodeInstallation {
-	public static final field Companion Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation$Companion;
-	protected fun <init> ()V
-	public abstract fun data (I)Lio/github/charlietap/chasm/runtime/instance/DataInstance;
-	public abstract fun element (I)Lio/github/charlietap/chasm/runtime/instance/ElementInstance;
-	public abstract fun function (I)Lio/github/charlietap/chasm/runtime/instance/FunctionInstance;
-	public abstract fun functionReference (I)J
-	public abstract fun getInstance ()Lio/github/charlietap/chasm/runtime/instance/ModuleInstance;
-	public abstract fun global (I)Lio/github/charlietap/chasm/runtime/instance/GlobalInstance;
-	public abstract fun install (ILio/github/charlietap/chasm/runtime/function/CompiledFunction;)V
-	public abstract fun memory (I)Lio/github/charlietap/chasm/runtime/instance/MemoryInstance;
-	public abstract fun runtimeType (I)I
-	public abstract fun table (I)Lio/github/charlietap/chasm/runtime/instance/TableInstance;
-	public abstract fun tagAddress (I)I
-	public abstract fun typeTest (ZI)Ljava/lang/Object;
-}
-
-public final class io/github/charlietap/chasm/runtime/compiled/CodeInstallation$Companion {
-	public final fun getAbstractHeapTypes ()Ljava/util/List;
 }
 

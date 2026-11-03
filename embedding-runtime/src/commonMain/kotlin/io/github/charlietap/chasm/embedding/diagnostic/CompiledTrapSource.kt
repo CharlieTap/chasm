@@ -1,36 +1,30 @@
-@file:OptIn(ExperimentalChasmApi::class, InternalChasmApi::class)
+package io.github.charlietap.chasm.embedding.diagnostic
 
-package io.github.charlietap.chasm.aot.diagnostic
-
-import io.github.charlietap.chasm.ExperimentalChasmApi
 import io.github.charlietap.chasm.InternalChasmApi
-import io.github.charlietap.chasm.aot.CompiledModule
-import io.github.charlietap.chasm.aot.internal.FunctionTrapSites
 import io.github.charlietap.chasm.declarations.ModuleNames
-import io.github.charlietap.chasm.embedding.diagnostic.ModuleFrames
-import io.github.charlietap.chasm.embedding.diagnostic.TrapSite
-import io.github.charlietap.chasm.embedding.diagnostic.TrapSource
 import io.github.charlietap.chasm.embedding.error.MemoryAccess
 import io.github.charlietap.chasm.runtime.diagnostic.FailedMemoryAccess
+import io.github.charlietap.chasm.runtime.diagnostic.FunctionTrapSites
 import io.github.charlietap.chasm.runtime.diagnostic.TrapSnapshot
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.store.Store
 
-internal class CompiledTrapSource(
+@InternalChasmApi
+class CompiledTrapSource(
     override val instance: ModuleInstance,
-    private val names: ModuleNames,
-    private val module: CompiledModule,
+    private val names: () -> ModuleNames,
+    private val sites: (function: Int) -> FunctionTrapSites?,
 ) : TrapSource {
 
     override fun frames(
         runtime: Store,
         snapshot: TrapSnapshot,
-    ): ModuleFrames = CompiledModuleFrames(names, module, snapshot)
+    ): ModuleFrames = CompiledModuleFrames(names(), sites, snapshot)
 }
 
 private class CompiledModuleFrames(
     private val names: ModuleNames,
-    private val module: CompiledModule,
+    private val sites: (function: Int) -> FunctionTrapSites?,
     private val snapshot: TrapSnapshot,
 ) : ModuleFrames {
 
@@ -46,7 +40,7 @@ private class CompiledModuleFrames(
         frameIndex: Int,
     ): TrapSite? {
         if (snapshot.entryIps[frameIndex] != TrapSnapshot.COMPILED_FRAME) return null
-        val sites = module.trapSites?.function(functionIndex) ?: return null
+        val sites = sites(functionIndex) ?: return null
         val position = snapshot.ips[frameIndex]
         val offset = sites.offset(position)
         if (offset < 0) return null

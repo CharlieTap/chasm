@@ -3,7 +3,6 @@
 package io.github.charlietap.chasm.compiler.backend.jvm
 
 import io.github.charlietap.chasm.InternalChasmApi
-import io.github.charlietap.chasm.aot.internal.FunctionTrapSites
 import io.github.charlietap.chasm.aot.internal.trapSitesResource
 import io.github.charlietap.chasm.aot.internal.writeTrapSites
 import io.github.charlietap.chasm.ast.module.Module
@@ -16,6 +15,7 @@ import io.github.charlietap.chasm.compiler.backend.jvm.abi.moduleClassDescriptor
 import io.github.charlietap.chasm.compiler.backend.jvm.declarations.DeclarationCallGenerator
 import io.github.charlietap.chasm.compiler.backend.jvm.declarations.DeclarationsLowerer
 import io.github.charlietap.chasm.declarations.ModuleDeclarations
+import io.github.charlietap.chasm.runtime.diagnostic.FunctionTrapSites
 import org.objectweb.asm.ClassTooLargeException
 import org.objectweb.asm.tree.MethodNode
 import java.io.OutputStream

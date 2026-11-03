@@ -33,6 +33,15 @@ abstract interface io.github.charlietap.chasm.embedding.diagnostic/TrapSource { 
     abstract fun frames(io.github.charlietap.chasm.runtime.store/Store, io.github.charlietap.chasm.runtime.diagnostic/TrapSnapshot): io.github.charlietap.chasm.embedding.diagnostic/ModuleFrames? // io.github.charlietap.chasm.embedding.diagnostic/TrapSource.frames|frames(io.github.charlietap.chasm.runtime.store.Store;io.github.charlietap.chasm.runtime.diagnostic.TrapSnapshot){}[0]
 }
 
+final class io.github.charlietap.chasm.embedding.diagnostic/CompiledTrapSource : io.github.charlietap.chasm.embedding.diagnostic/TrapSource { // io.github.charlietap.chasm.embedding.diagnostic/CompiledTrapSource|null[0]
+    constructor <init>(io.github.charlietap.chasm.runtime.instance/ModuleInstance, kotlin/Function0<io.github.charlietap.chasm.declarations/ModuleNames>, kotlin/Function1<kotlin/Int, io.github.charlietap.chasm.runtime.diagnostic/FunctionTrapSites?>) // io.github.charlietap.chasm.embedding.diagnostic/CompiledTrapSource.<init>|<init>(io.github.charlietap.chasm.runtime.instance.ModuleInstance;kotlin.Function0<io.github.charlietap.chasm.declarations.ModuleNames>;kotlin.Function1<kotlin.Int,io.github.charlietap.chasm.runtime.diagnostic.FunctionTrapSites?>){}[0]
+
+    final val instance // io.github.charlietap.chasm.embedding.diagnostic/CompiledTrapSource.instance|{}instance[0]
+        final fun <get-instance>(): io.github.charlietap.chasm.runtime.instance/ModuleInstance // io.github.charlietap.chasm.embedding.diagnostic/CompiledTrapSource.instance.<get-instance>|<get-instance>(){}[0]
+
+    final fun frames(io.github.charlietap.chasm.runtime.store/Store, io.github.charlietap.chasm.runtime.diagnostic/TrapSnapshot): io.github.charlietap.chasm.embedding.diagnostic/ModuleFrames // io.github.charlietap.chasm.embedding.diagnostic/CompiledTrapSource.frames|frames(io.github.charlietap.chasm.runtime.store.Store;io.github.charlietap.chasm.runtime.diagnostic.TrapSnapshot){}[0]
+}
+
 final class io.github.charlietap.chasm.embedding.dsl/FunctionImportBuilder { // io.github.charlietap.chasm.embedding.dsl/FunctionImportBuilder|null[0]
     constructor <init>(io.github.charlietap.chasm.embedding.shapes/Store) // io.github.charlietap.chasm.embedding.dsl/FunctionImportBuilder.<init>|<init>(io.github.charlietap.chasm.embedding.shapes.Store){}[0]
 

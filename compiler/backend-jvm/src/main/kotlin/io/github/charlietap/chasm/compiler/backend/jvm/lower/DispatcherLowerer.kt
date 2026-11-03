@@ -3,7 +3,6 @@
 package io.github.charlietap.chasm.compiler.backend.jvm.lower
 
 import io.github.charlietap.chasm.InternalChasmApi
-import io.github.charlietap.chasm.aot.internal.CHUNK_METHOD_SEPARATOR
 import io.github.charlietap.chasm.compiler.backend.abi.ARRAYCOPY
 import io.github.charlietap.chasm.compiler.backend.abi.CALL_STACK_EXHAUSTED
 import io.github.charlietap.chasm.compiler.backend.abi.CLOSE_FRAME
@@ -16,6 +15,7 @@ import io.github.charlietap.chasm.compiler.backend.abi.OPEN_FRAME
 import io.github.charlietap.chasm.compiler.backend.abi.Resource
 import io.github.charlietap.chasm.compiler.backend.abi.STACK_LIMIT_FIELD
 import io.github.charlietap.chasm.compiler.backend.abi.UNREACHABLE
+import io.github.charlietap.chasm.runtime.compiled.CHUNK_METHOD_SEPARATOR
 import org.objectweb.asm.Opcodes
 
 internal class ChunkMethod(
