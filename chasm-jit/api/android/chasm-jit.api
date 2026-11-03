@@ -1,0 +1,12 @@
+public final class io/github/charlietap/chasm/jit/InstanceKt {
+	public static final fun instance (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Module;Ljava/util/List;Lio/github/charlietap/chasm/config/RuntimeConfig;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+	public static synthetic fun instance$default (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Module;Ljava/util/List;Lio/github/charlietap/chasm/config/RuntimeConfig;ILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+}
+
+public final class io/github/charlietap/chasm/jit/ModuleKt {
+	public static final fun module (Lio/github/charlietap/chasm/stream/SourceReader;Lio/github/charlietap/chasm/config/ModuleConfig;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+	public static final fun module ([BLio/github/charlietap/chasm/config/ModuleConfig;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+	public static synthetic fun module$default (Lio/github/charlietap/chasm/stream/SourceReader;Lio/github/charlietap/chasm/config/ModuleConfig;ILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+	public static synthetic fun module$default ([BLio/github/charlietap/chasm/config/ModuleConfig;ILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+}
+

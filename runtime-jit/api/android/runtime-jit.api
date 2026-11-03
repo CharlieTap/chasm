@@ -1,0 +1,4 @@
+public final class io/github/charlietap/chasm/jit/internal/InstanceKt {
+	public static final fun _instance (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Module;Ljava/util/List;Lio/github/charlietap/chasm/config/RuntimeConfig;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+}
+

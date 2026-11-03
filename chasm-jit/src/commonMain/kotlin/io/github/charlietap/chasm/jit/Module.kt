@@ -1,0 +1,61 @@
+@file:OptIn(InternalChasmApi::class)
+
+package io.github.charlietap.chasm.jit
+
+import com.github.michaelbull.result.fold
+import com.github.michaelbull.result.map
+import com.github.michaelbull.result.mapError
+import io.github.charlietap.chasm.ExperimentalChasmApi
+import io.github.charlietap.chasm.InternalChasmApi
+import io.github.charlietap.chasm.config.ModuleConfig
+import io.github.charlietap.chasm.decoder.ModuleDecoder
+import io.github.charlietap.chasm.decoder.WasmModuleDecoder
+import io.github.charlietap.chasm.decoder.error.ModuleDecoderError
+import io.github.charlietap.chasm.embedding.error.ChasmError.DecodeError
+import io.github.charlietap.chasm.embedding.shapes.ChasmResult
+import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Error
+import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Success
+import io.github.charlietap.chasm.embedding.shapes.Module
+import io.github.charlietap.chasm.embedding.shapes._module
+import io.github.charlietap.chasm.stream.SourceReader
+
+@ExperimentalChasmApi
+fun module(
+    sourceReader: SourceReader,
+    config: ModuleConfig = ModuleConfig(),
+): ChasmResult<Module, DecodeError> {
+    return module(
+        source = sourceReader,
+        config = config,
+        decoder = ::WasmModuleDecoder,
+    )
+}
+
+@ExperimentalChasmApi
+fun module(
+    bytes: ByteArray,
+    config: ModuleConfig = ModuleConfig(),
+): ChasmResult<Module, DecodeError> {
+    return module(
+        source = bytes,
+        config = config,
+        decoder = ::WasmModuleDecoder,
+    )
+}
+
+internal fun <Source> module(
+    source: Source,
+    config: ModuleConfig,
+    decoder: ModuleDecoder<Source>,
+): ChasmResult<Module, DecodeError> {
+    return decoder(config, source)
+        .mapError(ModuleDecoderError::toString)
+        .mapError(::DecodeError)
+        .map { internal ->
+            _module(
+                config = config,
+                module = internal,
+                binary = source as? ByteArray,
+            )
+        }.fold(::Success, ::Error)
+}

@@ -43,7 +43,7 @@ fun ModuleDeclarationsFactory(
     startFunction = module.startFunction?.idx,
     elementSegments = module.elementSegments.map(::elementSegment),
     dataSegments = module.dataSegments.map(::dataSegment),
-    names = names(module),
+    names = moduleNames(module),
 )
 
 private fun elementSegment(
@@ -122,7 +122,7 @@ private fun v128Const(
     return ConstantInstruction.V128Const(low = littleEndian(0), high = littleEndian(8))
 }
 
-private fun names(
+fun moduleNames(
     module: Module,
 ): ModuleNames {
     val sections = module.customs.filterIsInstance<NameData>()
