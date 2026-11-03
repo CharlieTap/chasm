@@ -46,7 +46,7 @@ abstract class GenerateCorpusTestsTask : DefaultTask() {
             |import io.github.charlietap.corpus.lib.fixture.Fixture
             |import io.github.charlietap.corpus.lib.report.CorpusFixtureResult
             |import io.github.charlietap.corpus.lib.report.CorpusReportWriter
-            |import java.nio.file.Path
+            |import java.nio.file.Paths
             |import kotlin.test.Test
             |import kotlin.test.assertTrue
             |import kotlinx.serialization.json.Json
@@ -72,7 +72,7 @@ abstract class GenerateCorpusTestsTask : DefaultTask() {
             |                .copy(version = version)
             |            val execution = runner.execute(CORPUS_ROOT, fixture, CorpusPhase.${phase.name})
             |            reportWriter.write(
-            |                Path.of(System.getProperty(RESULTS_DIRECTORY_PROPERTY)),
+            |                Paths.get(System.getProperty(RESULTS_DIRECTORY_PROPERTY) ?: System.getProperty(TEMPORARY_DIRECTORY_PROPERTY)),
             |                CorpusFixtureResult.from(fixture, CorpusPhase.${phase.name}, execution),
             |            )
             |            when (val result = execution.result) {
@@ -91,6 +91,7 @@ abstract class GenerateCorpusTestsTask : DefaultTask() {
             |        const val CORPUS_ROOT = "corpus"
             |        const val FIXTURE_INDEX = "corpus/fixtures.json"
             |        const val RESULTS_DIRECTORY_PROPERTY = ${RESULTS_DIRECTORY_PROPERTY.quoted()}
+            |        const val TEMPORARY_DIRECTORY_PROPERTY = "java.io.tmpdir"
             |    }
             |}
             |

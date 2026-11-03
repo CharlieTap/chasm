@@ -66,7 +66,7 @@ fun testFileSpec(
                 )
                 .addProperty(runnerProperty)
                 .addFunction(
-                    FunSpec.builder("script ${script.name.replace(".", " ")} passes successfully")
+                    FunSpec.builder("script_${script.name.replace(".", "_")}_passes_successfully")
                         .addAnnotation(testAnnotation)
                         .addStatement("%M(%T.Success, %N.run())", assertEqualsFunction, scriptResultClassName, runnerProperty)
                         .build(),

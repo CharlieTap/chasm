@@ -202,6 +202,15 @@ class WasmCorpusPlugin : Plugin<Project> {
                     dependsOn(corpusTest)
                 }
             }
+
+            project.pluginManager.withPlugin(ANDROID_KOTLIN_MULTIPLATFORM_LIBRARY_PLUGIN_ID) {
+                project.extensions.getByType<KotlinMultiplatformExtension>().sourceSets
+                    .matching { sourceSet -> sourceSet.name == ANDROID_DEVICE_TEST_SOURCE_SET_NAME }
+                    .configureEach {
+                        kotlin.srcDir(generateTests.flatMap { it.outputDirectory })
+                        resources.srcDir(prepareResources.flatMap { it.outputDirectory })
+                    }
+            }
         }
     }
 
@@ -270,6 +279,8 @@ class WasmCorpusPlugin : Plugin<Project> {
 
     private companion object {
         const val KOTLIN_MULTIPLATFORM_PLUGIN_ID = "org.jetbrains.kotlin.multiplatform"
+        const val ANDROID_KOTLIN_MULTIPLATFORM_LIBRARY_PLUGIN_ID = "com.android.kotlin.multiplatform.library"
+        const val ANDROID_DEVICE_TEST_SOURCE_SET_NAME = "androidDeviceTest"
         const val PROP_PHASE = "wasmCorpus.phase"
         const val PROP_TARGETS = "wasmCorpus.targets"
         const val GROUP = "corpus"

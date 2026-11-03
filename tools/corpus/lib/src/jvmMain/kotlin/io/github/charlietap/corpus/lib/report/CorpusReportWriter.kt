@@ -19,7 +19,7 @@ class CorpusReportWriter(
 
         val outputFile = versionDirectory.resolve("${result.fixture}.json")
         val temporaryFile = Files.createTempFile(versionDirectory, result.fixture, ".tmp")
-        Files.writeString(temporaryFile, json.encodeToString(result))
+        Files.write(temporaryFile, json.encodeToString(result).encodeToByteArray())
         try {
             Files.move(
                 temporaryFile,
