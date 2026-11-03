@@ -16,7 +16,7 @@ import kotlin.test.assertTrue
 class InterruptThreadTest {
 
     @Test
-    fun `another thread stops a running loop, and the next call runs`() = integrationTest(INTERRUPT_FIXTURE) {
+    fun `another thread stops a running loop and the next call runs`() = integrationTest(INTERRUPT_FIXTURE) {
         val started = CountDownLatch(1)
         val abandoned = AtomicBoolean(false)
         val (store, runner) = interruptRunner(

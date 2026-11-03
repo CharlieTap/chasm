@@ -10,13 +10,22 @@ plugins {
 kotlin {
     android {
         namespace = "io.github.charlietap.chasm.integration"
+        minSdk = 30
+        withDeviceTestBuilder {
+            sourceSetTreeName = "test"
+        }.configure {
+            instrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        }
     }
 
     @OptIn(ExperimentalKotlinGradlePluginApi::class)
     applyDefaultHierarchyTemplate {
         common {
             group("jvmAndAndroid") {
-                withJvm()
+                group("jvmHost") {
+                    withJvm()
+                    withCompilations { it.target.platformType == KotlinPlatformType.androidJvm && it.name != "deviceTest" }
+                }
                 withCompilations { it.target.platformType == KotlinPlatformType.androidJvm }
             }
         }
@@ -31,10 +40,19 @@ kotlin {
             }
         }
 
-        named("jvmAndAndroidTest") {
+        named("jvmHostTest") {
             dependencies {
-                implementation(projects.runtimeAot)
                 implementation(projects.chasmAot)
+                implementation(projects.runtimeAot)
+            }
+        }
+
+        named("androidDeviceTest") {
+            dependencies {
+                implementation(projects.chasmJit)
+                implementation(libs.kotlin.junit)
+                implementation(libs.androidx.test.junit)
+                implementation(libs.androidx.test.runner)
             }
         }
     }

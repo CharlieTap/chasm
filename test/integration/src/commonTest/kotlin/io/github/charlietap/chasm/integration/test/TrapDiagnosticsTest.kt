@@ -37,7 +37,7 @@ import kotlin.test.assertTrue
 class TrapDiagnosticsTest {
 
     @Test
-    fun `a trap without diagnostics keeps today's error and exception`() = integrationTest(FIXTURE) {
+    fun `a trap without diagnostics keeps the existing error and exception`() = integrationTest(FIXTURE) {
         val runner = fixture(RuntimeConfig())
 
         val error = fail(runner, "load_out_of_bounds", i32(65534))
@@ -214,7 +214,7 @@ class TrapDiagnosticsTest {
     }
 
     @Test
-    fun `a trap in a call a host function makes back into the module reports that call's frames`() = integrationTest(FIXTURE) {
+    fun `a trap in a call a host function makes back into the module reports the frames of that call`() = integrationTest(FIXTURE) {
         val store = store()
         lateinit var runner: TestRunner
         var inner: ChasmResult<List<ExecutionValue>, ChasmError>? = null
