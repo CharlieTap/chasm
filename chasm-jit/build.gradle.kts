@@ -15,7 +15,7 @@ plugins {
 
 corpus {
     corpusRef = libs.versions.wasm.corpus.ref
-    corpusRunner = "io.github.charlietap.chasm.jit.corpus.DexCorpusRunner"
+    corpusRunner = "io.github.charlietap.chasm.corpus.ChasmCorpusRunner"
     testPackageName = "io.github.charlietap.chasm.jit.corpus.generated"
     phase = io.github.charlietap.corpus.lib.CorpusPhase.INVOCATION
     versions = listOf("1.0", "2.0", "3.0")
@@ -29,7 +29,7 @@ corpus {
 }
 
 sweet {
-    scriptRunner = "io.github.charlietap.chasm.jit.script.DexScriptRunner"
+    scriptRunner = "io.github.charlietap.chasm.script.ChasmScriptRunner"
     testPackageName = "io.github.charlietap.chasm.jit.testsuite"
 }
 
@@ -77,11 +77,18 @@ kotlin {
         }
 
         commonTest {
+            languageSettings.optIn("io.github.charlietap.chasm.ExperimentalChasmApi")
             dependencies {
-                implementation(projects.test.compiled)
+                implementation(projects.chasm)
+                implementation(projects.runtime.address)
+                implementation(projects.runtime.core)
+                implementation(projects.typeSystem)
                 implementation(libs.sweet.lib)
                 implementation(libs.corpus.lib)
+                implementation(libs.kotlinx.coroutines.core)
                 implementation(libs.kotlinx.serialization)
+                implementation(libs.kotlinx.test.resources)
+                implementation(libs.wasi.emscripten.host.chasm.wasip1.kmp)
                 implementation(libs.kotlin.test)
             }
         }
