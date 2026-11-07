@@ -7,3 +7,7 @@ public final class io/github/charlietap/chasm/aot/InstanceKt {
 	public static final fun instance (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/aot/CompiledModule;Ljava/util/List;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 }
 
+public final class io/github/charlietap/chasm/aot/ModuleInfoKt {
+	public static final fun moduleInfo (Lio/github/charlietap/chasm/aot/CompiledModule;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+}
+
