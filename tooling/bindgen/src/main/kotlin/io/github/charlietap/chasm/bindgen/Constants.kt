@@ -48,10 +48,8 @@ internal const val PREPARE_FUNCTION = "prepareFunction"
 internal const val INVOKE_TYPED_FUNCTION = "functionInvokeTyped"
 internal const val FUNCTION_INPUT_BUFFER_NAME = "functionInputBuffer"
 
-internal const val EXPORT_FUNCTION = "exportFunction"
 internal const val EXPORT_GLOBAL = "exportGlobal"
 internal const val EXPORT_MEMORY = "exportMemory"
-internal const val EXPORT_TABLE = "exportTable"
 
 internal const val READ_GLOBAL_FUNCTION = "globalRead"
 internal const val WRITE_GLOBAL_FUNCTION = "globalWrite"
@@ -66,12 +64,6 @@ internal val MAP_RESULT_FUNCTION = MemberName("io.github.charlietap.chasm.vm", "
 internal val FLATMAP_RESULT_FUNCTION = MemberName("io.github.charlietap.chasm.vm", "flatMap")
 
 internal val EXPECT_RESULT_FUNCTION = MemberName("io.github.charlietap.chasm.vm", "expect")
-internal val EXPECT_VALUE_FUNCTION = MemberName("io.github.charlietap.chasm.vm", "expectValue")
-internal val EXPECT_INT_FUNCTION = MemberName("io.github.charlietap.chasm.vm", "expectInt")
-internal val EXPECT_LONG_FUNCTION = MemberName("io.github.charlietap.chasm.vm", "expectLong")
-internal val EXPECT_FLOAT_FUNCTION = MemberName("io.github.charlietap.chasm.vm", "expectFloat")
-internal val EXPECT_DOUBLE_FUNCTION = MemberName("io.github.charlietap.chasm.vm", "expectDouble")
-internal val EXPECT_FIRST_VALUE_FUNCTION = MemberName("io.github.charlietap.chasm.vm", "expectFirstValue")
 internal val EXPECT_FIRST_INT_FUNCTION = MemberName("io.github.charlietap.chasm.vm", "expectFirstInt")
 internal val EXPECT_FIRST_LONG_FUNCTION = MemberName("io.github.charlietap.chasm.vm", "expectFirstLong")
 internal val EXPECT_FIRST_FLOAT_FUNCTION = MemberName("io.github.charlietap.chasm.vm", "expectFirstFloat")

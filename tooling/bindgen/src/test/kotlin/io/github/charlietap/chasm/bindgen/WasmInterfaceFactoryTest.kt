@@ -9,7 +9,6 @@ import io.github.charlietap.chasm.bindgen.fixture.doubleScalarType
 import io.github.charlietap.chasm.bindgen.fixture.field
 import io.github.charlietap.chasm.bindgen.fixture.floatScalarType
 import io.github.charlietap.chasm.bindgen.fixture.function
-import io.github.charlietap.chasm.bindgen.fixture.functionImplementation
 import io.github.charlietap.chasm.bindgen.fixture.functionParameter
 import io.github.charlietap.chasm.bindgen.fixture.functionParameterDefinition
 import io.github.charlietap.chasm.bindgen.fixture.functionProxy
@@ -37,7 +36,6 @@ import io.github.charlietap.chasm.fixture.type.i64ValueType
 import io.github.charlietap.chasm.fixture.type.resultType
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.fail
 
 class WasmInterfaceFactoryTest {
 
