@@ -40,7 +40,7 @@ class AotEngine(
     private val configure: CompileConfig.Builder.() -> Unit = {},
 ) : Engine {
 
-    override fun name(): String = "aot"
+    override fun name(): String = AOT
 
     override fun instantiate(
         bytes: ByteArray,

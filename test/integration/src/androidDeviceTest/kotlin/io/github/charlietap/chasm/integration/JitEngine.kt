@@ -33,7 +33,7 @@ import io.github.charlietap.chasm.embedding.resetFuel as embeddingResetFuel
 
 class JitEngine : Engine {
 
-    override fun name(): String = "jit"
+    override fun name(): String = JIT
 
     override fun instantiate(
         bytes: ByteArray,

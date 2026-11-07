@@ -176,9 +176,9 @@ class StoreLimitsTest {
     }
 
     @Test
-    fun `the default stack limit admits recursion that a small limit rejects`() = integrationTest(STACK_FIXTURE) {
-        val defaults = stackRunner(StoreConfig())
-        val small = stackRunner(StoreConfig(limits = StoreLimits(stackBytes = SMALL_STACK_BYTES)))
+    fun `the default stack limit admits recursion that a small limit rejects`() = integrationTest(DEEP_STACK_FIXTURE) {
+        val defaults = runner(store(StoreConfig()))
+        val small = runner(store(StoreConfig(limits = StoreLimits(stackBytes = SMALL_STACK_BYTES))))
 
         assertEquals(success(DEEP_RECURSION), recurse(defaults, DEEP_RECURSION), engine.name())
         assertEquals(trap(InvocationError.CallStackExhausted), recurse(small, DEEP_RECURSION), engine.name())
@@ -248,6 +248,7 @@ class StoreLimitsTest {
         const val LARGE_MEMORY_FIXTURE = "store_limits_large_memory"
         const val LARGE_TABLE_FIXTURE = "store_limits_large_table"
         const val STACK_FIXTURE = "store_limits_stack"
+        const val DEEP_STACK_FIXTURE = "store_limits_deep_stack"
 
         // Arrays this long take dedicated storage of 4097 words, about 32 KiB each.
         const val ARRAY_LENGTH = 4096

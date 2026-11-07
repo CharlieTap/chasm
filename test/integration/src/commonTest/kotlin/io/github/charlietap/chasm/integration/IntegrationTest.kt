@@ -2,9 +2,12 @@ package io.github.charlietap.chasm.integration
 
 fun integrationTest(
     script: String,
+    exclusions: Map<String, Set<String>> = EXCLUSIONS,
     block: TestScope.() -> Unit,
 ) {
-    engines.forEach { engine ->
-        block(IntegrationTestScope(engine, script))
-    }
+    engines
+        .filterNot { engine -> script in exclusions[engine.name()].orEmpty() }
+        .forEach { engine ->
+            block(IntegrationTestScope(engine, script))
+        }
 }

@@ -30,7 +30,7 @@ import io.github.charlietap.chasm.embedding.resetFuel as embeddingResetFuel
 
 class Interpreter : Engine {
 
-    override fun name(): String = "interpreter"
+    override fun name(): String = INTERPRETER
 
     override fun instantiate(
         bytes: ByteArray,

@@ -248,15 +248,15 @@ class TrapDiagnosticsTest {
     }
 
     @Test
-    fun `a deep trace keeps both ends and counts the omitted frames`() = integrationTest(FIXTURE) {
-        val trap = trap(fixture(DIAGNOSTICS), "deep", i32(1000))
+    fun `a deep trace keeps both ends and counts the omitted frames`() = integrationTest(DEEP_TRACE_FIXTURE) {
+        val trap = trap(fixture(DIAGNOSTICS, imports = false), "deep", i32(1000))
 
         // 1,001 recursive activations plus the exported entry point.
         assertEquals(128, trap.frames.size, engine.name())
         assertEquals(1002 - 128, trap.omittedFrames, engine.name())
-        assertEquals(frame(14, "recurse", 0x1c2), trap.frames.first(), engine.name())
-        assertEquals(frame(14, "recurse", 0x1c9), trap.frames[1], engine.name())
-        assertEquals(frame(15, "deep", 0x1d0), trap.frames.last(), engine.name())
+        assertEquals(WasmFrame("deep_trace_fixture", 0, "recurse", 0x28), trap.frames.first(), engine.name())
+        assertEquals(WasmFrame("deep_trace_fixture", 0, "recurse", 0x2f), trap.frames[1], engine.name())
+        assertEquals(WasmFrame("deep_trace_fixture", 1, "deep", 0x36), trap.frames.last(), engine.name())
         assertTrue(trap.traceComplete, engine.name())
         assertTrue(trap.toString().contains("... 874 frames omitted ..."), engine.name())
     }
@@ -380,6 +380,7 @@ class TrapDiagnosticsTest {
         const val FIXTURE = "trap_diagnostics"
         const val MEMORY_FIXTURE = "trap_diagnostics_memory"
         const val DROPPED_SEGMENT_FIXTURE = "trap_diagnostics_dropped_segment"
+        const val DEEP_TRACE_FIXTURE = "trap_diagnostics_deep_trace"
         const val START_FIXTURE = "trap_diagnostics_start"
         const val START_OWNER_FIXTURE = "trap_diagnostics_start_owner"
         const val START_IMPORT_FIXTURE = "trap_diagnostics_start_import"
