@@ -1,5 +1,7 @@
 package io.github.charlietap.chasm.bindgen
 
+import io.github.charlietap.chasm.config.GCStrategy
+
 /** The runtime targeted by generated module bindings. */
 enum class CodegenRuntime {
     /**
@@ -43,37 +45,33 @@ enum class WasiLinking {
     AUTOMATIC,
 }
 
+sealed interface ExecutionTier {
+    class Interpreter : ExecutionTier
+
+    class Jit : ExecutionTier
+
+    data class Aot(
+        val compiledModule: String,
+    ) : ExecutionTier
+}
+
 data class CodegenConfig(
     val generateTypesafeGlobalProperties: Boolean = false,
     val generateTypesafeMemoryProperties: Boolean = false,
     val generateSuspendingFactories: Boolean = false,
     val runtime: CodegenRuntime = CodegenRuntime.PORTABLE_VM,
     val wasi: WasiLinking = WasiLinking.DISABLED,
-    val compiledCode: String? = null,
-    val debugInfo: Boolean = false,
-    val fuelControls: Boolean = false,
-    val interruptControl: Boolean = false,
+    val executionTier: ExecutionTier = ExecutionTier.Interpreter(),
+    val cpu: CpuLimits = CpuLimits.Unmetered(),
+    val memory: MemoryLimits = MemoryLimits.Unconstrained(),
+    val interrupts: Boolean = false,
+    val stacktraces: Boolean = false,
+    val gcStrategy: GCStrategy? = null,
 )
 
-internal val CodegenConfig.runsCompiledCode: Boolean
-    get() = runtime == CodegenRuntime.CHASM && compiledCode != null
-
-internal class StoreControls(
-    val fuel: Boolean = false,
-    val interrupt: Boolean = false,
-) {
-    val names: List<String>
-        get() = buildList {
-            if (fuel) addAll(listOf(ADD_FUEL, REMAINING_FUEL))
-            if (interrupt) add(INTERRUPT)
-        }
-
-    companion object {
-        const val ADD_FUEL = "addFuel"
-        const val REMAINING_FUEL = "remainingFuel"
-        const val INTERRUPT = "interrupt"
-    }
-}
-
-internal val CodegenConfig.storeControls: StoreControls
-    get() = StoreControls(fuel = fuelControls, interrupt = interruptControl)
+internal val CodegenConfig.usesStoreSettings: Boolean
+    get() = cpu is CpuLimits.Metered ||
+        memory is MemoryLimits.Constrained ||
+        interrupts ||
+        stacktraces ||
+        gcStrategy != null

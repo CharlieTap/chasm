@@ -1,0 +1,12 @@
+package com.test
+
+import kotlin.Boolean
+import kotlin.Long
+
+public interface AotStoreSettingsConstruction {
+  public fun addFuel(units: Long)
+
+  public fun remainingFuel(): Long
+
+  public fun interrupt(): Boolean
+}

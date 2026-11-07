@@ -10,6 +10,7 @@ import io.github.charlietap.chasm.bindgen.fixture.memoryBinding
 import io.github.charlietap.chasm.bindgen.fixture.property
 import io.github.charlietap.chasm.bindgen.fixture.stringScalarType
 import io.github.charlietap.chasm.bindgen.fixture.wasmInterface
+import io.github.charlietap.chasm.config.GCStrategy
 import io.github.charlietap.chasm.fixture.type.i32ValueType
 import kotlin.test.Test
 import kotlin.test.assertContains
@@ -42,30 +43,44 @@ class ConstructionCodegenTest {
     )
 
     @Test
-    fun `generates construction with compiled code`() = assertConstruction(
-        scenario = "CompiledConstruction",
-        config = codegenConfig(compiledCode = "com.test.aot.WasmModule"),
+    fun `generates JIT construction`() = assertConstruction(
+        scenario = "JitConstruction",
+        config = codegenConfig(executionTier = ExecutionTier.Jit()),
         runtimes = listOf(CodegenRuntime.CHASM),
     )
 
     @Test
-    fun `generates construction reporting traps with debug info`() = assertConstruction(
-        scenario = "DebugInfoConstruction",
-        config = codegenConfig(debugInfo = true),
+    fun `generates AOT construction`() = assertConstruction(
+        scenario = "AotConstruction",
+        config = codegenConfig(executionTier = ExecutionTier.Aot("com.test.aot.WasmModule")),
         runtimes = listOf(CodegenRuntime.CHASM),
     )
 
     @Test
-    fun `generates suspending construction reporting traps with debug info`() = assertConstruction(
-        scenario = "SuspendingDebugInfoConstruction",
-        config = codegenConfig(generateSuspendingFactories = true, debugInfo = true),
+    fun `generates construction with store settings`() = assertConstruction(
+        scenario = "StoreSettingsConstruction",
+        config = storeSettings(ExecutionTier.Interpreter()),
         runtimes = listOf(CodegenRuntime.CHASM),
     )
 
     @Test
-    fun `generates construction with compiled code and store controls`() = assertConstruction(
-        scenario = "CompiledControlsConstruction",
-        config = codegenConfig(compiledCode = "com.test.aot.WasmModule", fuelControls = true, interruptControl = true),
+    fun `generates suspending construction with store settings`() = assertConstruction(
+        scenario = "SuspendingStoreSettingsConstruction",
+        config = storeSettings(ExecutionTier.Interpreter()).copy(generateSuspendingFactories = true),
+        runtimes = listOf(CodegenRuntime.CHASM),
+    )
+
+    @Test
+    fun `generates JIT construction with store settings`() = assertConstruction(
+        scenario = "JitStoreSettingsConstruction",
+        config = storeSettings(ExecutionTier.Jit()),
+        runtimes = listOf(CodegenRuntime.CHASM),
+    )
+
+    @Test
+    fun `generates AOT construction with store settings`() = assertConstruction(
+        scenario = "AotStoreSettingsConstruction",
+        config = storeSettings(ExecutionTier.Aot("com.test.aot.WasmModule")),
         runtimes = listOf(CodegenRuntime.CHASM),
     )
 
@@ -181,6 +196,17 @@ class ConstructionCodegenTest {
 
         assertContains(error.message.orEmpty(), "public implementation for internal interface InternalService")
     }
+
+    private fun storeSettings(
+        executionTier: ExecutionTier,
+    ) = codegenConfig(
+        executionTier = executionTier,
+        cpu = CpuLimits.Metered(1_000.fuel),
+        memory = MemoryLimits.Constrained(linearMemory = 1.MB, gcHeap = 1.MB),
+        interrupts = true,
+        stacktraces = true,
+        gcStrategy = GCStrategy.TRADITIONAL,
+    )
 
     private fun assertConstruction(
         scenario: String,

@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.bindgen
 
-import com.squareup.kotlinpoet.BOOLEAN
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.DOUBLE
 import com.squareup.kotlinpoet.FLOAT
@@ -103,7 +102,7 @@ internal class ClassInterfaceGenerator(
         interfaceName: String,
         visibility: InterfaceVisibility,
         wasmInterface: WasmInterface,
-        controls: StoreControls = StoreControls(),
+        controls: List<StoreControl> = emptyList(),
     ) = TypeSpec.interfaceBuilder(interfaceName).apply {
 
         val visibilityModifier = when (visibility) {
@@ -129,20 +128,8 @@ internal class ClassInterfaceGenerator(
             addProperty(memoryPropertyGenerator(packageName, interfaceName, memory))
         }
 
-        storeControlFunctions(controls).forEach { function ->
-            addFunction(function.toBuilder().addModifiers(KModifier.ABSTRACT).build())
+        controls.forEach { control ->
+            addFunction(control.signature().addModifiers(KModifier.ABSTRACT).build())
         }
     }.build()
-}
-
-internal fun storeControlFunctions(
-    controls: StoreControls,
-): List<FunSpec> = buildList {
-    if (controls.fuel) {
-        add(FunSpec.builder(StoreControls.ADD_FUEL).addParameter("units", LONG).build())
-        add(FunSpec.builder(StoreControls.REMAINING_FUEL).returns(LONG).build())
-    }
-    if (controls.interrupt) {
-        add(FunSpec.builder(StoreControls.INTERRUPT).returns(BOOLEAN).build())
-    }
 }

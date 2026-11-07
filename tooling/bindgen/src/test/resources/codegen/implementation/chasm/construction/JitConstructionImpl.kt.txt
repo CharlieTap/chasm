@@ -1,0 +1,40 @@
+@file:OptIn(ExperimentalChasmApi::class)
+
+package com.test
+
+import io.github.charlietap.chasm.ExperimentalChasmApi
+import io.github.charlietap.chasm.embedding.codegen.CodegenImport
+import io.github.charlietap.chasm.embedding.codegen.allocateImports
+import io.github.charlietap.chasm.embedding.shapes.Import
+import io.github.charlietap.chasm.embedding.shapes.Instance
+import io.github.charlietap.chasm.embedding.shapes.Module
+import io.github.charlietap.chasm.embedding.shapes.Store
+import io.github.charlietap.chasm.embedding.shapes.`expect`
+import io.github.charlietap.chasm.embedding.store
+import io.github.charlietap.chasm.jit.instance
+import io.github.charlietap.chasm.jit.module
+import kotlin.ByteArray
+import kotlin.OptIn
+import kotlin.collections.List
+
+public fun jitConstruction(
+  binary: ByteArray,
+  imports: List<CodegenImport> = emptyList(),
+  moduleFactory: ((ByteArray) -> Module)? = null,
+  instanceFactory: ((
+    Store,
+    Module,
+    List<Import>,
+  ) -> Instance)? = null,
+): JitConstruction {
+  val store = store()
+  val module = moduleFactory?.invoke(binary) ?: module(binary).`expect`("Failed to decode binary")
+  val allocatedImports = allocateImports(store, imports)
+  val instance = instanceFactory?.invoke(store, module, allocatedImports) ?: instance(store, module, allocatedImports).`expect`("Failed to instantiate module")
+  return JitConstructionImpl(store = store, instance = instance)
+}
+
+private class JitConstructionImpl(
+  private val store: Store,
+  private val instance: Instance,
+) : JitConstruction

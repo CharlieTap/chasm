@@ -20,19 +20,20 @@ import io.github.charlietap.chasm.embedding.addFuel as chasmAddFuel
 import io.github.charlietap.chasm.embedding.interrupt as chasmInterrupt
 import io.github.charlietap.chasm.embedding.remainingFuel as chasmRemainingFuel
 
-public fun compiledControlsConstruction(imports: List<CodegenImport> = emptyList()): CompiledControlsConstruction {
+public fun aotStoreSettingsConstruction(imports: List<CodegenImport> = emptyList()): AotStoreSettingsConstruction {
   val module = WasmModule.INSTANCE
+  check(module.metadata.capabilities.stacktraces) { "com.test.aot.WasmModule was compiled without stack traces" }
   val store = store(module.metadata.storeConfig)
   module.metadata.initialFuel?.let { fuel -> chasmAddFuel(store, fuel).`expect`("Failed to add fuel") }
   val allocatedImports = allocateImports(store, imports)
   val instance = instance(store, module, allocatedImports).`expect`("Failed to instantiate module")
-  return CompiledControlsConstructionCompiledImpl(store = store, instance = instance)
+  return AotStoreSettingsConstructionImpl(store = store, instance = instance)
 }
 
-private class CompiledControlsConstructionCompiledImpl(
+private class AotStoreSettingsConstructionImpl(
   private val store: Store,
   private val instance: Instance,
-) : CompiledControlsConstruction {
+) : AotStoreSettingsConstruction {
   override fun addFuel(units: Long): Unit = chasmAddFuel(store, units).`expect`("Failed to add fuel")
 
   override fun remainingFuel(): Long = chasmRemainingFuel(store).`expect`("Failed to read fuel")

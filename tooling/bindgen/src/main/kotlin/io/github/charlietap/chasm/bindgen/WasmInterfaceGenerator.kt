@@ -40,7 +40,6 @@ internal class WasmInterfaceGenerator(
     private val portableVmClassImplementationGenerator: PortableVmClassImplementationGenerator = PortableVmClassImplementationGenerator(),
     private val chasmFactoryFunctionGenerator: ChasmFactoryFunctionGenerator = ChasmFactoryFunctionGenerator(),
     private val chasmClassImplementationGenerator: ChasmClassImplementationGenerator = ChasmClassImplementationGenerator(),
-    private val compiledClassImplementationGenerator: ChasmClassImplementationGenerator = ChasmClassImplementationGenerator("CompiledImpl"),
     private val visibilityValidator: VisibilityValidator = VisibilityValidator(),
 ) {
     operator fun invoke(
@@ -57,25 +56,16 @@ internal class WasmInterfaceGenerator(
             implementationVisibility = implementationVisibility,
         )
 
-        val compiledCode = config.compiledCode?.takeIf { config.runsCompiledCode }
-        if (compiledCode == null) {
-            return listOf(
-                interfaceFile(interfaceVisibility, wasmInterface, StoreControls()),
-                implementationFile(factoryVisibility, wasmInterface, implementationVisibility, config),
-            )
-        }
-
-        val controls = config.storeControls
         return listOf(
-            interfaceFile(interfaceVisibility, wasmInterface, controls),
-            compiledFile(factoryVisibility, wasmInterface, implementationVisibility, compiledCode, controls),
+            interfaceFile(interfaceVisibility, wasmInterface, config.storeControls),
+            implementationFile(factoryVisibility, wasmInterface, implementationVisibility, config),
         )
     }
 
     private fun interfaceFile(
         interfaceVisibility: InterfaceVisibility,
         wasmInterface: WasmInterface,
-        controls: StoreControls,
+        controls: List<StoreControl>,
     ): FileSpec = FileSpec.builder(wasmInterface.packageName, wasmInterface.interfaceName).apply {
         wasmInterface.types.forEach { type ->
             addType(dataClassGenerator(wasmInterface.packageName, type))
@@ -89,6 +79,17 @@ internal class WasmInterfaceGenerator(
         implementationVisibility: ImplementationVisibility,
         config: CodegenConfig,
     ): FileSpec = FileSpec.builder(wasmInterface.packageName, wasmInterface.interfaceName + "Impl").apply {
+        if (config.executionTier !is ExecutionTier.Interpreter) {
+            addAnnotation(
+                AnnotationSpec.builder(OPT_IN_CLASS_NAME)
+                    .useSiteTarget(AnnotationSpec.UseSiteTarget.FILE)
+                    .addMember("%T::class", CHASM_EXPERIMENTAL_API_CLASS_NAME)
+                    .build(),
+            )
+        }
+        val controls = config.storeControls
+        controls.forEach { control -> addAliasedImport(control.function, control.alias) }
+        if (config.executionTier is ExecutionTier.Aot) addAliasedImport(CHASM_ADD_FUEL, CHASM_ADD_FUEL_ALIAS)
         addFunction(
             when (config.runtime) {
                 CodegenRuntime.PORTABLE_VM -> portableVmFactoryFunctionGenerator(
@@ -101,9 +102,8 @@ internal class WasmInterfaceGenerator(
                     packageName = wasmInterface.packageName,
                     interfaceName = wasmInterface.interfaceName,
                     visibility = factoryVisibility,
-                    generateSuspendingFactory = config.generateSuspendingFactories,
                     linksWasiPreview1 = wasmInterface.linksWasiPreview1,
-                    debugInfo = config.debugInfo,
+                    config = config,
                 )
             },
         )
@@ -120,43 +120,9 @@ internal class WasmInterfaceGenerator(
                     interfaceName = wasmInterface.interfaceName,
                     visibility = implementationVisibility,
                     wasmInterface = wasmInterface,
+                    controls = controls,
                 )
             },
-        )
-    }.build()
-
-    private fun compiledFile(
-        factoryVisibility: FactoryVisibility,
-        wasmInterface: WasmInterface,
-        implementationVisibility: ImplementationVisibility,
-        compiledCode: String,
-        controls: StoreControls,
-    ): FileSpec = FileSpec.builder(wasmInterface.packageName, wasmInterface.interfaceName + "Compiled").apply {
-        addAnnotation(
-            AnnotationSpec.builder(OPT_IN_CLASS_NAME)
-                .useSiteTarget(AnnotationSpec.UseSiteTarget.FILE)
-                .addMember("%T::class", CHASM_EXPERIMENTAL_API_CLASS_NAME)
-                .build(),
-        )
-        addAliasedImport(CHASM_ADD_FUEL, CHASM_ADD_FUEL_ALIAS)
-        if (controls.fuel) addAliasedImport(CHASM_REMAINING_FUEL, CHASM_REMAINING_FUEL_ALIAS)
-        if (controls.interrupt) addAliasedImport(CHASM_INTERRUPT, CHASM_INTERRUPT_ALIAS)
-        addFunction(
-            chasmFactoryFunctionGenerator.compiledFactory(
-                packageName = wasmInterface.packageName,
-                interfaceName = wasmInterface.interfaceName,
-                visibility = factoryVisibility,
-                compiledCode = compiledCode,
-            ),
-        )
-        addType(
-            compiledClassImplementationGenerator(
-                packageName = wasmInterface.packageName,
-                interfaceName = wasmInterface.interfaceName,
-                visibility = implementationVisibility,
-                wasmInterface = wasmInterface,
-                controls = controls,
-            ),
         )
     }.build()
 }

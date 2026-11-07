@@ -35,19 +35,20 @@ import kotlin.collections.List
 import kotlin.collections.MutableList
 import io.github.charlietap.chasm.embedding.addFuel as chasmAddFuel
 
-public fun compiledTestService(imports: List<CodegenImport> = emptyList()): CompiledTestService {
+public fun aotTestService(imports: List<CodegenImport> = emptyList()): AotTestService {
   val module = WasmModule.INSTANCE
+  check(!module.metadata.capabilities.stacktraces) { "com.test.chasm.aot.WasmModule was compiled with stack traces" }
   val store = store(module.metadata.storeConfig)
   module.metadata.initialFuel?.let { fuel -> chasmAddFuel(store, fuel).`expect`("Failed to add fuel") }
   val allocatedImports = allocateImports(store, imports)
   val instance = instance(store, module, allocatedImports).`expect`("Failed to instantiate module")
-  return CompiledTestServiceCompiledImpl(store = store, instance = instance)
+  return AotTestServiceImpl(store = store, instance = instance)
 }
 
-private class CompiledTestServiceCompiledImpl(
+private class AotTestServiceImpl(
   private val store: Store,
   private val instance: Instance,
-) : CompiledTestService {
+) : AotTestService {
   private val intFunctionPreparedFunction: PreparedFunction =
       prepareFunction(store, instance, "int_function").`expect`("Failed to prepare function int_function")
 
@@ -104,7 +105,7 @@ private class CompiledTestServiceCompiledImpl(
   override val immutableGlobal: Int
     get() = (readGlobal(store, _immutableGlobal).`expect`("Failed to read global immutable_global") as NumberValue.I32).value
 
-  override val memory: CompiledTestService.Memory = MemoryImpl(store, _memory)
+  override val memory: AotTestService.Memory = MemoryImpl(store, _memory)
 
   override fun intFunction(): Int {
     val args = emptyList<ExecutionValue>()
@@ -197,7 +198,7 @@ private class CompiledTestServiceCompiledImpl(
   private class MemoryImpl(
     private val store: Store,
     private val memory: Memory,
-  ) : CompiledTestService.Memory {
+  ) : AotTestService.Memory {
     override fun read(
       buffer: ByteArray,
       memoryPointer: Int,

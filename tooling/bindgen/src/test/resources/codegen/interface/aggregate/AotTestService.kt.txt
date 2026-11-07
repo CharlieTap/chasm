@@ -12,7 +12,7 @@ public data class MultipleReturnFunctionResult(
   public val r1: Long,
 )
 
-public interface CompiledTestService {
+public interface AotTestService {
   public var mutableGlobal: Int
 
   public val immutableGlobal: Int

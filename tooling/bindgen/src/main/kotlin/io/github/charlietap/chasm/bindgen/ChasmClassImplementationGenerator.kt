@@ -15,18 +15,17 @@ import com.squareup.kotlinpoet.STRING
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.UNIT
+import com.squareup.kotlinpoet.joinToCode
 import io.github.charlietap.chasm.bindgen.ext.asTypeName
 
-internal class ChasmClassImplementationGenerator(
-    private val implementationSuffix: String = "Impl",
-) {
+internal class ChasmClassImplementationGenerator {
     operator fun invoke(
         packageName: String,
         interfaceName: String,
         visibility: ImplementationVisibility,
         wasmInterface: WasmInterface,
-        controls: StoreControls = StoreControls(),
-    ): TypeSpec = TypeSpec.classBuilder(interfaceName + implementationSuffix).apply {
+        controls: List<StoreControl> = emptyList(),
+    ): TypeSpec = TypeSpec.classBuilder(interfaceName + "Impl").apply {
         addModifiers(visibility.modifier())
         addSuperinterface(ClassName(packageName, interfaceName))
         addConstructor()
@@ -42,21 +41,16 @@ internal class ChasmClassImplementationGenerator(
         wasmInterface.functions.forEach { function ->
             addFunction(functionImplementation(packageName, function))
         }
-        storeControlFunctions(controls).forEach { function -> addFunction(storeControlImplementation(function)) }
+        controls.forEach { control -> addFunction(storeControlImplementation(control)) }
     }.build()
 
     private fun storeControlImplementation(
-        function: FunSpec,
+        control: StoreControl,
     ): FunSpec {
-        val (alias, failure) = when (function.name) {
-            StoreControls.ADD_FUEL -> CHASM_ADD_FUEL_ALIAS to "Failed to add fuel"
-            StoreControls.REMAINING_FUEL -> CHASM_REMAINING_FUEL_ALIAS to "Failed to read fuel"
-            else -> CHASM_INTERRUPT_ALIAS to "Failed to interrupt"
-        }
-        val arguments = if (function.name == StoreControls.ADD_FUEL) "store, units" else "store"
-        return function.toBuilder()
+        val arguments = listOf(CodeBlock.of("store")) + control.parameters.map { parameter -> CodeBlock.of("%N", parameter) }
+        return control.signature()
             .addModifiers(KModifier.OVERRIDE)
-            .addStatement("return %N($arguments).%M(%S)", alias, CHASM_EXPECT, failure)
+            .addStatement("return %N(%L).%M(%S)", control.alias, arguments.joinToCode(), CHASM_EXPECT, control.failure)
             .build()
     }
 
@@ -156,7 +150,7 @@ internal class ChasmClassImplementationGenerator(
             addProperty(
                 PropertySpec.builder(memory.name, ClassName(packageName, interfaceName, "Memory"))
                     .addModifiers(KModifier.OVERRIDE)
-                    .initializer("%T(store, %N)", ClassName(packageName, interfaceName + implementationSuffix, "MemoryImpl"), memory.backingName)
+                    .initializer("%T(store, %N)", ClassName(packageName, interfaceName + "Impl", "MemoryImpl"), memory.backingName)
                     .build(),
             )
         }

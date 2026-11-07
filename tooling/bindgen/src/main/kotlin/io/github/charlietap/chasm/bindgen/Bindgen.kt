@@ -42,9 +42,29 @@ private class KotlinPoetBindingGenerator(
 ) : BindingGenerator {
 
     override fun generate(info: ModuleInfo, options: BindingOptions): List<FileSpec> {
-        require(options.config.wasi != WasiLinking.AUTOMATIC || options.config.runtime == CodegenRuntime.CHASM) {
+        val config = options.config
+        val tier = config.executionTier
+        require(config.wasi != WasiLinking.AUTOMATIC || config.runtime == CodegenRuntime.CHASM) {
             "WasiLinking.AUTOMATIC requires CodegenRuntime.CHASM because the WASI binding uses " +
                 "Chasm's direct host-function API."
+        }
+        require(config.runtime == CodegenRuntime.CHASM || tier is ExecutionTier.Interpreter) {
+            "ExecutionTier.Jit and ExecutionTier.Aot require CodegenRuntime.CHASM because they run on " +
+                "Chasm's own runtime."
+        }
+        require(config.runtime == CodegenRuntime.CHASM || !config.usesStoreSettings) {
+            "cpu, memory, interrupts, stacktraces and gcStrategy require CodegenRuntime.CHASM because they " +
+                "configure Chasm's store."
+        }
+        require(tier is ExecutionTier.Interpreter || !config.generateSuspendingFactories) {
+            "generateSuspendingFactories requires ExecutionTier.Interpreter because the JIT and compiled code " +
+                "have no suspending entry points."
+        }
+        if (tier is ExecutionTier.Aot) {
+            require(QUALIFIED_CLASS_NAME.matches(tier.compiledModule)) {
+                "compiledModule must name a class as Kotlin source does, such as com.example.aot.WasmModule: " +
+                    "\"${tier.compiledModule}\" is not one."
+            }
         }
         val wasmInterface = WasmInterfaceFactory()(
             interfaceName = options.interfaceName,
@@ -57,15 +77,12 @@ private class KotlinPoetBindingGenerator(
             ignoredExports = options.ignoredExports,
             logger = logger,
         )
-        require(!options.config.runsCompiledCode || !wasmInterface.linksWasiPreview1) {
-            "WasiLinking.AUTOMATIC is not supported for compiled code yet. Use WasiLinking.DISABLED and " +
+        require(tier !is ExecutionTier.Aot || !wasmInterface.linksWasiPreview1) {
+            "WasiLinking.AUTOMATIC is not supported for ExecutionTier.Aot yet. Use WasiLinking.DISABLED and " +
                 "pass the module's WASI imports."
         }
-        val controls = options.config.storeControls
-        require(controls.names.isEmpty() || options.config.runsCompiledCode) {
-            "fuelControls and interruptControl need compiled code: set CodegenRuntime.CHASM and compiledCode."
-        }
-        val clashes = wasmInterface.functions.map { function -> function.name }.filter { name -> name in controls.names }
+        val controls = config.storeControls.map { control -> control.name }
+        val clashes = wasmInterface.functions.map { function -> function.name }.filter { name -> name in controls }
         require(clashes.isEmpty()) {
             "The module exports ${clashes.distinct().joinToString()}, which the generated store controls also " +
                 "name. Leave the export out with ignoredExports."
@@ -75,7 +92,9 @@ private class KotlinPoetBindingGenerator(
             implementationVisibility = options.implementationVisibility,
             factoryVisibility = options.factoryVisibility,
             wasmInterface = wasmInterface,
-            config = options.config,
+            config = config,
         )
     }
 }
+
+private val QUALIFIED_CLASS_NAME = Regex("[A-Za-z_][A-Za-z0-9_]*(\\.[A-Za-z_][A-Za-z0-9_]*)*")

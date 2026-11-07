@@ -48,30 +48,64 @@ public final class io/github/charlietap/chasm/bindgen/BindingOptions {
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class io/github/charlietap/chasm/bindgen/ByteSize : java/lang/Comparable {
+	public static final field Companion Lio/github/charlietap/chasm/bindgen/ByteSize$Companion;
+	public static final synthetic fun box-impl (J)Lio/github/charlietap/chasm/bindgen/ByteSize;
+	public synthetic fun compareTo (Ljava/lang/Object;)I
+	public fun compareTo-NhtaEjY (J)I
+	public static fun compareTo-NhtaEjY (JJ)I
+	public static fun constructor-impl (J)J
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (JLjava/lang/Object;)Z
+	public static final fun equals-impl0 (JJ)Z
+	public final fun getBytes ()J
+	public fun hashCode ()I
+	public static fun hashCode-impl (J)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (J)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()J
+}
+
+public final class io/github/charlietap/chasm/bindgen/ByteSize$Companion {
+	public final fun getWASM_PAGE-6OCb8xE ()J
+}
+
+public final class io/github/charlietap/chasm/bindgen/ByteSizeKt {
+	public static final fun getBytes (I)J
+	public static final fun getGB (I)J
+	public static final fun getKB (I)J
+	public static final fun getMB (I)J
+	public static final fun getWasmPages (I)J
+}
+
 public final class io/github/charlietap/chasm/bindgen/CodegenConfig {
 	public fun <init> ()V
-	public fun <init> (ZZZLio/github/charlietap/chasm/bindgen/CodegenRuntime;Lio/github/charlietap/chasm/bindgen/WasiLinking;Ljava/lang/String;ZZZ)V
-	public synthetic fun <init> (ZZZLio/github/charlietap/chasm/bindgen/CodegenRuntime;Lio/github/charlietap/chasm/bindgen/WasiLinking;Ljava/lang/String;ZZZILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (ZZZLio/github/charlietap/chasm/bindgen/CodegenRuntime;Lio/github/charlietap/chasm/bindgen/WasiLinking;Lio/github/charlietap/chasm/bindgen/ExecutionTier;Lio/github/charlietap/chasm/bindgen/CpuLimits;Lio/github/charlietap/chasm/bindgen/MemoryLimits;ZZLio/github/charlietap/chasm/config/GCStrategy;)V
+	public synthetic fun <init> (ZZZLio/github/charlietap/chasm/bindgen/CodegenRuntime;Lio/github/charlietap/chasm/bindgen/WasiLinking;Lio/github/charlietap/chasm/bindgen/ExecutionTier;Lio/github/charlietap/chasm/bindgen/CpuLimits;Lio/github/charlietap/chasm/bindgen/MemoryLimits;ZZLio/github/charlietap/chasm/config/GCStrategy;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1 ()Z
+	public final fun component10 ()Z
+	public final fun component11 ()Lio/github/charlietap/chasm/config/GCStrategy;
 	public final fun component2 ()Z
 	public final fun component3 ()Z
 	public final fun component4 ()Lio/github/charlietap/chasm/bindgen/CodegenRuntime;
 	public final fun component5 ()Lio/github/charlietap/chasm/bindgen/WasiLinking;
-	public final fun component6 ()Ljava/lang/String;
-	public final fun component7 ()Z
-	public final fun component8 ()Z
+	public final fun component6 ()Lio/github/charlietap/chasm/bindgen/ExecutionTier;
+	public final fun component7 ()Lio/github/charlietap/chasm/bindgen/CpuLimits;
+	public final fun component8 ()Lio/github/charlietap/chasm/bindgen/MemoryLimits;
 	public final fun component9 ()Z
-	public final fun copy (ZZZLio/github/charlietap/chasm/bindgen/CodegenRuntime;Lio/github/charlietap/chasm/bindgen/WasiLinking;Ljava/lang/String;ZZZ)Lio/github/charlietap/chasm/bindgen/CodegenConfig;
-	public static synthetic fun copy$default (Lio/github/charlietap/chasm/bindgen/CodegenConfig;ZZZLio/github/charlietap/chasm/bindgen/CodegenRuntime;Lio/github/charlietap/chasm/bindgen/WasiLinking;Ljava/lang/String;ZZZILjava/lang/Object;)Lio/github/charlietap/chasm/bindgen/CodegenConfig;
+	public final fun copy (ZZZLio/github/charlietap/chasm/bindgen/CodegenRuntime;Lio/github/charlietap/chasm/bindgen/WasiLinking;Lio/github/charlietap/chasm/bindgen/ExecutionTier;Lio/github/charlietap/chasm/bindgen/CpuLimits;Lio/github/charlietap/chasm/bindgen/MemoryLimits;ZZLio/github/charlietap/chasm/config/GCStrategy;)Lio/github/charlietap/chasm/bindgen/CodegenConfig;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/bindgen/CodegenConfig;ZZZLio/github/charlietap/chasm/bindgen/CodegenRuntime;Lio/github/charlietap/chasm/bindgen/WasiLinking;Lio/github/charlietap/chasm/bindgen/ExecutionTier;Lio/github/charlietap/chasm/bindgen/CpuLimits;Lio/github/charlietap/chasm/bindgen/MemoryLimits;ZZLio/github/charlietap/chasm/config/GCStrategy;ILjava/lang/Object;)Lio/github/charlietap/chasm/bindgen/CodegenConfig;
 	public fun equals (Ljava/lang/Object;)Z
-	public final fun getCompiledCode ()Ljava/lang/String;
-	public final fun getDebugInfo ()Z
-	public final fun getFuelControls ()Z
+	public final fun getCpu ()Lio/github/charlietap/chasm/bindgen/CpuLimits;
+	public final fun getExecutionTier ()Lio/github/charlietap/chasm/bindgen/ExecutionTier;
+	public final fun getGcStrategy ()Lio/github/charlietap/chasm/config/GCStrategy;
 	public final fun getGenerateSuspendingFactories ()Z
 	public final fun getGenerateTypesafeGlobalProperties ()Z
 	public final fun getGenerateTypesafeMemoryProperties ()Z
-	public final fun getInterruptControl ()Z
+	public final fun getInterrupts ()Z
+	public final fun getMemory ()Lio/github/charlietap/chasm/bindgen/MemoryLimits;
 	public final fun getRuntime ()Lio/github/charlietap/chasm/bindgen/CodegenRuntime;
+	public final fun getStacktraces ()Z
 	public final fun getWasi ()Lio/github/charlietap/chasm/bindgen/WasiLinking;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
@@ -83,6 +117,46 @@ public final class io/github/charlietap/chasm/bindgen/CodegenRuntime : java/lang
 	public static fun getEntries ()Lkotlin/enums/EnumEntries;
 	public static fun valueOf (Ljava/lang/String;)Lio/github/charlietap/chasm/bindgen/CodegenRuntime;
 	public static fun values ()[Lio/github/charlietap/chasm/bindgen/CodegenRuntime;
+}
+
+public abstract interface class io/github/charlietap/chasm/bindgen/CpuLimits {
+}
+
+public final class io/github/charlietap/chasm/bindgen/CpuLimits$Metered : io/github/charlietap/chasm/bindgen/CpuLimits {
+	public synthetic fun <init> (JLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-DPjBnl8 ()J
+	public final fun copy-5ZuxZtA (J)Lio/github/charlietap/chasm/bindgen/CpuLimits$Metered;
+	public static synthetic fun copy-5ZuxZtA$default (Lio/github/charlietap/chasm/bindgen/CpuLimits$Metered;JILjava/lang/Object;)Lio/github/charlietap/chasm/bindgen/CpuLimits$Metered;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getFuel-DPjBnl8 ()J
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/bindgen/CpuLimits$Unmetered : io/github/charlietap/chasm/bindgen/CpuLimits {
+	public fun <init> ()V
+}
+
+public abstract interface class io/github/charlietap/chasm/bindgen/ExecutionTier {
+}
+
+public final class io/github/charlietap/chasm/bindgen/ExecutionTier$Aot : io/github/charlietap/chasm/bindgen/ExecutionTier {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Lio/github/charlietap/chasm/bindgen/ExecutionTier$Aot;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/bindgen/ExecutionTier$Aot;Ljava/lang/String;ILjava/lang/Object;)Lio/github/charlietap/chasm/bindgen/ExecutionTier$Aot;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCompiledModule ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/bindgen/ExecutionTier$Interpreter : io/github/charlietap/chasm/bindgen/ExecutionTier {
+	public fun <init> ()V
+}
+
+public final class io/github/charlietap/chasm/bindgen/ExecutionTier$Jit : io/github/charlietap/chasm/bindgen/ExecutionTier {
+	public fun <init> ()V
 }
 
 public final class io/github/charlietap/chasm/bindgen/ExportedAllocator {
@@ -104,6 +178,29 @@ public final class io/github/charlietap/chasm/bindgen/FactoryVisibility : java/l
 	public static fun getEntries ()Lkotlin/enums/EnumEntries;
 	public static fun valueOf (Ljava/lang/String;)Lio/github/charlietap/chasm/bindgen/FactoryVisibility;
 	public static fun values ()[Lio/github/charlietap/chasm/bindgen/FactoryVisibility;
+}
+
+public final class io/github/charlietap/chasm/bindgen/Fuel : java/lang/Comparable {
+	public static final synthetic fun box-impl (J)Lio/github/charlietap/chasm/bindgen/Fuel;
+	public synthetic fun compareTo (Ljava/lang/Object;)I
+	public fun compareTo-5ZuxZtA (J)I
+	public static fun compareTo-5ZuxZtA (JJ)I
+	public static fun constructor-impl (J)J
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (JLjava/lang/Object;)Z
+	public static final fun equals-impl0 (JJ)Z
+	public final fun getUnits ()J
+	public fun hashCode ()I
+	public static fun hashCode-impl (J)I
+	public static final fun plus-cV8H8fI (JJ)J
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (J)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()J
+}
+
+public final class io/github/charlietap/chasm/bindgen/FuelKt {
+	public static final fun getFuel (I)J
+	public static final fun getFuel (J)J
 }
 
 public final class io/github/charlietap/chasm/bindgen/FunctionParameterDefinition {
@@ -139,6 +236,41 @@ public final class io/github/charlietap/chasm/bindgen/InterfaceVisibility : java
 	public static fun getEntries ()Lkotlin/enums/EnumEntries;
 	public static fun valueOf (Ljava/lang/String;)Lio/github/charlietap/chasm/bindgen/InterfaceVisibility;
 	public static fun values ()[Lio/github/charlietap/chasm/bindgen/InterfaceVisibility;
+}
+
+public abstract interface class io/github/charlietap/chasm/bindgen/MemoryLimits {
+	public static final field Companion Lio/github/charlietap/chasm/bindgen/MemoryLimits$Companion;
+}
+
+public final class io/github/charlietap/chasm/bindgen/MemoryLimits$Companion {
+	public final fun getMAX_STACK-6OCb8xE ()J
+}
+
+public final class io/github/charlietap/chasm/bindgen/MemoryLimits$Constrained : io/github/charlietap/chasm/bindgen/MemoryLimits {
+	public fun <init> ()V
+	public synthetic fun <init> (JJJJILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (JJJJLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-6OCb8xE ()J
+	public final fun component2-6OCb8xE ()J
+	public final fun component3-6OCb8xE ()J
+	public final fun component4-6OCb8xE ()J
+	public final fun copy-frcV9d4 (JJJJ)Lio/github/charlietap/chasm/bindgen/MemoryLimits$Constrained;
+	public static synthetic fun copy-frcV9d4$default (Lio/github/charlietap/chasm/bindgen/MemoryLimits$Constrained;JJJJILjava/lang/Object;)Lio/github/charlietap/chasm/bindgen/MemoryLimits$Constrained;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getGcHeap-6OCb8xE ()J
+	public final fun getLinearMemory-6OCb8xE ()J
+	public final fun getStack-6OCb8xE ()J
+	public final fun getTables-6OCb8xE ()J
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/bindgen/MemoryLimits$Unconstrained : io/github/charlietap/chasm/bindgen/MemoryLimits {
+	public fun <init> ()V
+}
+
+public final class io/github/charlietap/chasm/bindgen/MemoryLimitsKt {
+	public static final fun toStoreLimits (Lio/github/charlietap/chasm/bindgen/MemoryLimits;)Lio/github/charlietap/chasm/config/StoreLimits;
 }
 
 public final class io/github/charlietap/chasm/bindgen/ModuleInfoKt {

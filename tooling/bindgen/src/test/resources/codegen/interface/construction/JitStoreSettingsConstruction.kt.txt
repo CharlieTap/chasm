@@ -3,7 +3,7 @@ package com.test
 import kotlin.Boolean
 import kotlin.Long
 
-public interface CompiledControlsConstruction {
+public interface JitStoreSettingsConstruction {
   public fun addFuel(units: Long)
 
   public fun remainingFuel(): Long

@@ -15,16 +15,17 @@ import kotlin.OptIn
 import kotlin.collections.List
 import io.github.charlietap.chasm.embedding.addFuel as chasmAddFuel
 
-public fun compiledConstruction(imports: List<CodegenImport> = emptyList()): CompiledConstruction {
+public fun aotConstruction(imports: List<CodegenImport> = emptyList()): AotConstruction {
   val module = WasmModule.INSTANCE
+  check(!module.metadata.capabilities.stacktraces) { "com.test.aot.WasmModule was compiled with stack traces" }
   val store = store(module.metadata.storeConfig)
   module.metadata.initialFuel?.let { fuel -> chasmAddFuel(store, fuel).`expect`("Failed to add fuel") }
   val allocatedImports = allocateImports(store, imports)
   val instance = instance(store, module, allocatedImports).`expect`("Failed to instantiate module")
-  return CompiledConstructionCompiledImpl(store = store, instance = instance)
+  return AotConstructionImpl(store = store, instance = instance)
 }
 
-private class CompiledConstructionCompiledImpl(
+private class AotConstructionImpl(
   private val store: Store,
   private val instance: Instance,
-) : CompiledConstruction
+) : AotConstruction

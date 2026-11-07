@@ -35,8 +35,8 @@ class AggregateCodegenTest {
     @Test
     fun `generates complete test service run as compiled code`() = assertGenerates(
         category = "aggregate",
-        wasmInterface = testService("CompiledTestService"),
-        config = codegenConfig(compiledCode = "com.test.chasm.aot.WasmModule"),
+        wasmInterface = testService("AotTestService"),
+        config = codegenConfig(executionTier = ExecutionTier.Aot("com.test.chasm.aot.WasmModule")),
         runtimes = listOf(CodegenRuntime.CHASM),
     )
 
