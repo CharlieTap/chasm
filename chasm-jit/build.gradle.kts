@@ -71,6 +71,7 @@ kotlin {
                 implementation(projects.ast)
                 implementation(projects.decoder)
                 implementation(projects.runtimeJit)
+                implementation(projects.validator)
                 implementation(libs.result)
             }
         }
