@@ -15,6 +15,7 @@ import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.shapes.flatMap
 import io.github.charlietap.chasm.jit.instance
 import io.github.charlietap.chasm.jit.module
+import io.github.charlietap.chasm.jit.validate
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.embedding.addFuel as embeddingAddFuel
 import io.github.charlietap.chasm.embedding.exports as embeddingExports
@@ -42,6 +43,8 @@ class JitEngine : Engine {
     ): ChasmResult<Instance, ChasmError> =
         module(bytes)
             .flatMap { module ->
+                validate(module)
+            }.flatMap { module ->
                 instance(store, module, imports, config)
             }
 
