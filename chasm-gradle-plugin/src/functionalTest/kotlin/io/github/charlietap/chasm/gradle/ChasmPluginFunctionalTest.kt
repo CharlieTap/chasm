@@ -7,6 +7,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.util.Comparator
 import kotlin.io.path.createTempDirectory
+import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
@@ -544,6 +545,33 @@ class ChasmPluginFunctionalTest {
         val generated = project.readGenerated("main", "SwitchingService", "SwitchingServiceImpl.kt")
         assertContains(generated, "io.github.charlietap.chasm.embedding")
         assertFalse(generated.contains("io.github.charlietap.chasm.vm"))
+    }
+
+    @Test
+    fun `package change removes the previously generated sources`() {
+        fun build(packageName: String) = """
+            plugins {
+                id("$pluginId")
+                id("org.jetbrains.kotlin.jvm")
+            }
+
+            chasm {
+                modules.create("MovingService") {
+                    packageName.set("$packageName")
+                }
+            }
+        """
+        val project = project(build = build("test.chasm"))
+        val task = "codegenModuleMainMovingService"
+
+        project.build(task, "--configuration-cache")
+        project.write("build.gradle.kts", build("test.moved"))
+        project.build(task, "--configuration-cache")
+
+        assertEquals(
+            listOf("test/moved/MovingService.kt", "test/moved/MovingServiceImpl.kt"),
+            project.generatedFiles("main", "MovingService"),
+        )
     }
 
     @Test
@@ -2047,6 +2075,19 @@ class ChasmPluginFunctionalTest {
             val outputDirectory = directory.resolve("build/generated/kotlin/$sourceSetName/$moduleName")
             Files.walk(outputDirectory).use { files ->
                 files.sorted(Comparator.reverseOrder()).forEach(Files::delete)
+            }
+        }
+
+        fun generatedFiles(
+            sourceSetName: String,
+            moduleName: String,
+        ): List<String> {
+            val outputDirectory = directory.resolve("build/generated/kotlin/$sourceSetName/$moduleName")
+            return Files.walk(outputDirectory).use { files ->
+                files.filter(Files::isRegularFile)
+                    .map { file -> outputDirectory.relativize(file).invariantSeparatorsPathString }
+                    .sorted()
+                    .toList()
             }
         }
 
