@@ -9,9 +9,9 @@ on:
         required: false
         type: choice
         options:
-          - ''
+          - 'all'
           - ':chasm-gradle-plugin:'
-        default: ''
+        default: 'all'
 jobs:
   publish:
     name: Release build and publish
@@ -40,7 +40,7 @@ jobs:
             ${{ runner.os }}-${{ runner.arch }}-konan-
 
       - name: Publish to MavenCentral
-        run: ./gradlew ${{ github.event.inputs.module }}publishToMavenCentral
+        run: ./gradlew ${{ github.event.inputs.module != 'all' && github.event.inputs.module || '' }}publishToMavenCentral
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
