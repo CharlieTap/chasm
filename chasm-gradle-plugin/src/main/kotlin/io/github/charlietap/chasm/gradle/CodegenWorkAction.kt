@@ -87,7 +87,6 @@ private fun CodegenConfig.toBindgen() = BindgenCodegenConfig(
     generateSuspendingFactories = generateSuspendingFactories,
     runtime = BindgenCodegenRuntime.valueOf(runtime.name),
     wasi = BindgenWasiLinking.valueOf(wasi.name),
-    compiledCode = compiledCode,
 )
 
 private fun WasmFunction.toBindgen() = BindgenWasmFunction(

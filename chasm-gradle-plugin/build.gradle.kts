@@ -36,8 +36,6 @@ buildConfig {
     buildConfigField("CHASM_JVM_DEPENDENCY", libs.chasm.jvm.get().notation())
     buildConfigField("CHASM_COROUTINES_DEPENDENCY", libs.chasm.coroutines.kmp.get().notation())
     buildConfigField("CHASM_COROUTINES_JVM_DEPENDENCY", libs.chasm.coroutines.jvm.get().notation())
-    buildConfigField("RUNTIME_AOT_DEPENDENCY", libs.runtime.aot.kmp.get().notation())
-    buildConfigField("RUNTIME_AOT_JVM_DEPENDENCY", libs.runtime.aot.jvm.get().notation())
     buildConfigField("VM_DEPENDENCY", libs.vm.kmp.get().notation())
     buildConfigField("VM_JVM_DEPENDENCY", libs.vm.jvm.get().notation())
     buildConfigField("WASI_PREVIEW1_DEPENDENCY", wasiPreview1Dependency)
@@ -138,9 +136,7 @@ val functionalTestRepositories = configurations.resolvable("functionalTestReposi
 dependencies {
     add(functionalTestRepositoryDependencies.name, projects.chasm)
     add(functionalTestRepositoryDependencies.name, projects.tooling.bindgen)
-    add(functionalTestRepositoryDependencies.name, projects.chasmAot)
     add(functionalTestRepositoryDependencies.name, projects.chasmCoroutines)
-    add(functionalTestRepositoryDependencies.name, projects.runtimeAot)
     add(functionalTestRepositoryDependencies.name, projects.vm)
 }
 
