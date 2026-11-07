@@ -35,7 +35,9 @@ kotlin {
         commonTest {
             dependencies {
                 implementation(projects.chasm)
+                implementation(projects.runtime.core)
                 implementation(projects.test.fixture.typeSystem)
+                implementation(projects.typeSystem)
                 implementation(libs.kotlinx.test.resources)
             }
         }
