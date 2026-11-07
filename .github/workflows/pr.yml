@@ -58,6 +58,20 @@ jobs:
       runner: ${{ matrix.os }}
       task: ${{ matrix.task }}
 
+  device:
+    strategy:
+      fail-fast: false
+      matrix:
+        api: [30, 36]
+        suite:
+          - { module: ':test:integration', name: integration }
+          - { module: ':chasm-jit', name: chasm-jit }
+    uses: ./.github/workflows/device-runner.yml
+    with:
+      api-level: ${{ matrix.api }}
+      module: ${{ matrix.suite.module }}
+      name: ${{ matrix.suite.name }}
+
   compile-example:
     uses: ./.github/workflows/task-runner.yml
     with:
