@@ -1,7 +1,5 @@
 package io.github.charlietap.chasm.bindgen
 
-import java.io.Serializable
-
 /** The runtime targeted by generated module bindings. */
 enum class CodegenRuntime {
     /**
@@ -55,7 +53,7 @@ data class CodegenConfig(
     val debugInfo: Boolean = false,
     val fuelControls: Boolean = false,
     val interruptControl: Boolean = false,
-) : Serializable
+)
 
 internal val CodegenConfig.runsCompiledCode: Boolean
     get() = runtime == CodegenRuntime.CHASM && compiledCode != null

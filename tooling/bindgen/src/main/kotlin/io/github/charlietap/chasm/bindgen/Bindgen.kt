@@ -2,7 +2,6 @@ package io.github.charlietap.chasm.bindgen
 
 import com.squareup.kotlinpoet.FileSpec
 import io.github.charlietap.chasm.embedding.shapes.ModuleInfo
-import java.io.Serializable
 
 data class BindingOptions(
     val interfaceName: String,
@@ -15,7 +14,7 @@ data class BindingOptions(
     val initializers: Set<String> = emptySet(),
     val functions: List<WasmFunction> = emptyList(),
     val ignoredExports: Set<String> = emptySet(),
-) : Serializable
+)
 
 interface BindgenLogger {
     fun lifecycle(message: String)

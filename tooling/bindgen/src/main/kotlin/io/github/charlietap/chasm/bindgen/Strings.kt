@@ -1,15 +1,13 @@
 package io.github.charlietap.chasm.bindgen
 
-import java.io.Serializable
-
 data class ExportedAllocator(
     val allocationFunction: String,
     val deallocationFunction: String,
-) : Serializable
+)
 
 data class StringAllocationStrategy(
     val freeAfterCall: Boolean,
-) : Serializable
+)
 
 /**
  * Defines how strings are encoded when passed to or returned from WASM functions.

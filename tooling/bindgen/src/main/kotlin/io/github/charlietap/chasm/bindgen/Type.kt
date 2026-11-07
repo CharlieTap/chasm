@@ -1,8 +1,6 @@
 package io.github.charlietap.chasm.bindgen
 
-import java.io.Serializable
-
-interface Type : Serializable
+interface Type
 
 enum class Scalar : Type {
     Integer,
