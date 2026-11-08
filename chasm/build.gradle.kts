@@ -71,7 +71,6 @@ kotlin {
                 implementation(projects.compiler.frontend)
                 implementation(projects.decoder)
                 implementation(projects.executor.instantiator)
-                implementation(projects.executor.invoker)
                 implementation(projects.module)
                 implementation(projects.runtime.core)
                 implementation(projects.typeSystem)

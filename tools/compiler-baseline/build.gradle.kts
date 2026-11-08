@@ -19,7 +19,6 @@ kotlin {
         implementation(projects.config)
         implementation(projects.decoder)
         implementation(projects.executor.instantiator)
-        implementation(projects.executor.invoker)
         implementation(projects.module)
         implementation(projects.runtime.address)
         implementation(projects.runtime.core)
@@ -30,6 +29,7 @@ kotlin {
         implementation(libs.kotlinx.serialization)
         implementation(libs.result)
 
+        testImplementation(projects.executor.dispatch)
         testImplementation(projects.test.fixture.cir)
     }
 }

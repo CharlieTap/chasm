@@ -75,7 +75,9 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(projects.chasm)
-                implementation(projects.executor.invoker)
+                implementation(projects.executor.callCore)
+                implementation(projects.executor.dispatch)
+                implementation(projects.executor.interpreter)
                 implementation(projects.libs.benchmark)
                 implementation(projects.libs.stack)
                 implementation(projects.memory)

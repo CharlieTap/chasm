@@ -19,7 +19,8 @@ kotlin {
                 api(projects.runtime.core)
                 api(libs.result)
 
-                implementation(projects.executor.invoker)
+                implementation(projects.executor.dispatch)
+                implementation(projects.executor.interpreter)
             }
         }
 
