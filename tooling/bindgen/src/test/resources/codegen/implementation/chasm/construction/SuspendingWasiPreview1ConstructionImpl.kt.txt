@@ -8,6 +8,7 @@ import io.github.charlietap.chasm.embedding.codegen.CodegenImport
 import io.github.charlietap.chasm.embedding.codegen.SuspendInstanceFactory
 import io.github.charlietap.chasm.embedding.codegen.SuspendModuleFactory
 import io.github.charlietap.chasm.embedding.codegen.allocateImports
+import io.github.charlietap.chasm.embedding.moduleInfo
 import io.github.charlietap.chasm.embedding.shapes.Instance
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.shapes.`expect`
@@ -25,7 +26,7 @@ public suspend fun suspendingWasiPreview1Construction(
   val store = store()
   val module = moduleFactory?.invoke(binary) ?: module(binary).`expect`("Failed to decode binary")
   val explicitImports = allocateImports(store, imports)
-  val wasiImports = ChasmWasiPreview1Builder(store, module) { host = wasiHost }.buildRequired(providedImports = explicitImports)
+  val wasiImports = ChasmWasiPreview1Builder(store, moduleInfo(module)) { host = wasiHost }.buildRequired(providedImports = explicitImports)
   val allocatedImports = explicitImports + wasiImports
   val instance = instanceFactory?.invoke(store, module, allocatedImports) ?: instance(store, module, allocatedImports).`expect`("Failed to instantiate module")
   return SuspendingWasiPreview1ConstructionImpl(store = store, instance = instance)

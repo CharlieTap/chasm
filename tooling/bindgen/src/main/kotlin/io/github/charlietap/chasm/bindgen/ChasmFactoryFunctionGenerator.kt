@@ -47,9 +47,10 @@ internal class ChasmFactoryFunctionGenerator {
             if (linksWasiPreview1) {
                 addStatement("val explicitImports = %M(store, imports)", CHASM_ALLOCATE_IMPORTS)
                 addStatement(
-                    "val wasiImports = %T(store, module) { host = wasiHost }" +
+                    "val wasiImports = %T(store, %M(module)) { host = wasiHost }" +
                         ".buildRequired(providedImports = explicitImports)",
                     WASI_PREVIEW1_BUILDER_CLASS_NAME,
+                    CHASM_MODULE_INFO,
                 )
                 addStatement("val allocatedImports = explicitImports + wasiImports")
             } else {
@@ -241,6 +242,7 @@ internal val WASI_PREVIEW1_BUILDER_CLASS_NAME =
 
 internal val CHASM_STORE = MemberName("io.github.charlietap.chasm.embedding", "store")
 internal val CHASM_MODULE = MemberName("io.github.charlietap.chasm.embedding", "module")
+internal val CHASM_MODULE_INFO = MemberName("io.github.charlietap.chasm.embedding", "moduleInfo")
 internal val CHASM_INSTANCE = MemberName("io.github.charlietap.chasm.embedding", "instance")
 internal val CHASM_JIT_MODULE = MemberName("io.github.charlietap.chasm.jit", "module")
 internal val CHASM_JIT_INSTANCE = MemberName("io.github.charlietap.chasm.jit", "instance")

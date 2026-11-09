@@ -27,6 +27,7 @@ import io.github.charlietap.chasm.embedding.memory
 import io.github.charlietap.chasm.embedding.memory.growMemory
 import io.github.charlietap.chasm.embedding.memory.readBytes
 import io.github.charlietap.chasm.embedding.memory.writeBytes
+import io.github.charlietap.chasm.embedding.moduleInfo
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Global
 import io.github.charlietap.chasm.embedding.shapes.Import
@@ -256,7 +257,7 @@ class ChasmCorpusRunner(
         }
 
         if (wasi != null && hasWasiImports) {
-            imports += ChasmWasiPreview1Builder(store, module) {
+            imports += ChasmWasiPreview1Builder(store, moduleInfo(module)) {
                 host = wasi.host
             }.build()
         }
