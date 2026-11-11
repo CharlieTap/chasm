@@ -66,6 +66,7 @@ jobs:
         suite:
           - { module: ':test:integration', name: integration }
           - { module: ':chasm-jit', name: chasm-jit }
+          - { module: ':runtime-jit', name: runtime-jit }
     uses: ./.github/workflows/device-runner.yml
     with:
       api-level: ${{ matrix.api }}

@@ -45,6 +45,14 @@ internal class PackageNames {
     }
 
     private fun Boolean.byte(): Byte = if (this) 1 else 0
+
+    companion object {
+
+        /** Whether [name] was derived from a module's bytes, so it names the same code in every process. */
+        fun hashed(
+            name: String,
+        ): Boolean = name.startsWith(PACKAGE_PREFIX)
+    }
 }
 
 private const val PACKAGE_PREFIX = "chasm.jit.h"

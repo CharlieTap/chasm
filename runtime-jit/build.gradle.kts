@@ -10,6 +10,19 @@ plugins {
     alias(libs.plugins.conventions.publishing)
 }
 
+val generateChasmVersion = tasks.register("generateChasmVersion") {
+    // The version publishing uses: version-name unless the build overrides it.
+    val version = project.version.toString()
+    val output = layout.buildDirectory.dir("generated/chasmVersion")
+    inputs.property("version", version)
+    outputs.dir(output)
+    doLast {
+        val file = output.get().file("io/github/charlietap/chasm/jit/internal/ChasmVersion.kt").asFile
+        file.parentFile.mkdirs()
+        file.writeText("package io.github.charlietap.chasm.jit.internal\n\ninternal const val CHASM_VERSION = \"$version\"\n")
+    }
+}
+
 kotlin {
     android {
         namespace = "io.github.charlietap.chasm.runtime.jit"
@@ -17,6 +30,11 @@ kotlin {
         minSdk = libs.versions.min.sdk.get().toInt()
         compilerOptions {
             jvmTarget.set(JvmTarget.fromTarget(libs.versions.android.library.bytecode.version.get()))
+        }
+        withDeviceTestBuilder {
+            sourceSetTreeName = "test"
+        }.configure {
+            instrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         }
         optimization {
             consumerKeepRules.publish = true
@@ -29,6 +47,7 @@ kotlin {
 
     sourceSets {
         commonMain {
+            kotlin.srcDir(generateChasmVersion)
             dependencies {
                 api(projects.config)
                 api(projects.embeddingApi)
@@ -45,6 +64,15 @@ kotlin {
                 implementation(projects.runtime.compiled)
                 implementation(projects.runtime.core)
                 implementation(libs.result)
+            }
+        }
+
+        getByName("androidDeviceTest") {
+            dependencies {
+                implementation(projects.chasm)
+                implementation(libs.kotlin.junit)
+                implementation(libs.androidx.test.junit)
+                implementation(libs.androidx.test.runner)
             }
         }
     }
