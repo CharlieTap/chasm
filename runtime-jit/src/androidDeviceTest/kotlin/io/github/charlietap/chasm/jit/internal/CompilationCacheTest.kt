@@ -19,6 +19,7 @@ import io.github.charlietap.chasm.embedding.store
 import io.github.charlietap.chasm.executor.instantiator.ModuleInstantiator
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.runtime.value.NumberValue.I32
+import java.nio.ByteBuffer
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
@@ -44,7 +45,7 @@ class CompilationCacheTest {
     }
 
     @Test
-    fun aLaterProcessReusesTheStoredCompilation() {
+    fun anotherStoreReusesTheStoredCompilation() {
         val cache = MapCache()
         Run(cache).roundtrip()
         val stored = cache.entries.toMap()
@@ -58,7 +59,7 @@ class CompilationCacheTest {
     }
 
     @Test
-    fun aSecondInstanceInTheSameProcessHasAnEntryOfItsOwn() {
+    fun aSecondInstanceInTheSameStoreHasAnEntryOfItsOwn() {
         val cache = MapCache()
         val run = Run(cache)
 
@@ -111,6 +112,28 @@ class CompilationCacheTest {
     }
 
     @Test
+    fun anEntryRoundTripsSeveralDexFilesAndChunkStarts() {
+        val first = byteArrayOf(1, 2, 3)
+        val second = byteArrayOf(4, 5, 6, 7)
+        val module = DexModule(listOf(first, second), "chasm.Installer", true, mapOf(3 to intArrayOf(0, 40), 9 to intArrayOf(0, 12, 80)))
+
+        val decoded = checkNotNull(decodeCompilation(encodeCompilation(PACKAGE, module), PACKAGE))
+
+        assertEquals(listOf(first.toList(), second.toList()), decoded.dex.map(::contents))
+        assertEquals("chasm.Installer", decoded.installer)
+        assertTrue(decoded.inlineMemory)
+        assertEquals(module.chunkStarts.mapValues { (_, starts) -> starts.toList() }, decoded.chunkStarts.mapValues { (_, starts) -> starts.toList() })
+    }
+
+    @Test
+    fun aTruncatedEntryDecodesToNothing() {
+        val module = DexModule(listOf(byteArrayOf(1, 2, 3)), "chasm.Installer", false, mapOf(3 to intArrayOf(0, 40)))
+        val entry = encodeCompilation(PACKAGE, module)
+
+        (0 until entry.size).forEach { size -> assertNull(decodeCompilation(entry.copyOf(size), PACKAGE), "truncated to $size") }
+    }
+
+    @Test
     fun aFailingCacheLeavesCompilationUnaffected() {
         val run = Run(FailingCache())
 
@@ -147,7 +170,7 @@ class CompilationCacheTest {
         ) = error("unwritable")
     }
 
-    /** One process's worth of compilation: its own package names, sharing [cache] with other runs. */
+    /** Compilation for one store's package names, sharing [cache] with other runs. */
     private inner class Run(
         private val cache: CompilationCache,
     ) {
@@ -188,11 +211,16 @@ class CompilationCacheTest {
         )
     }
 
+    private fun contents(
+        buffer: ByteBuffer,
+    ): List<Byte> = ByteArray(buffer.remaining()).also { bytes -> buffer.duplicate().get(bytes) }.toList()
+
     private fun fixture(
         name: String,
     ): ByteArray = checkNotNull(javaClass.classLoader?.getResourceAsStream("modules/$name.wasm")) { "missing $name" }.use { it.readBytes() }
 
     private companion object {
         const val DEX_HEADER_SIZE = 112
+        const val PACKAGE = "chasm.jit.h00"
     }
 }

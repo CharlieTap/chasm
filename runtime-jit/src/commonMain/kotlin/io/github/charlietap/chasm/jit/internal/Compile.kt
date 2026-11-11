@@ -17,18 +17,21 @@ import io.github.charlietap.chasm.jit.internal.CompileError.Stage
 import io.github.charlietap.chasm.runtime.compiled.CodeInstallation
 import io.github.charlietap.chasm.runtime.compiled.byteArrayBase
 import java.nio.ByteBuffer
+import java.util.WeakHashMap
 import java.util.function.Consumer
+import io.github.charlietap.chasm.runtime.store.Store as RuntimeStore
 
 internal fun compile(
     module: Module,
     config: CompileConfig,
-    cache: CompilationCache? = null,
+    store: RuntimeStore,
+    cache: CompilationCache?,
 ): CompileResult =
     compile(
         module = module,
         config = config,
         cache = cache,
-        packageNames = packageNames::next,
+        packageNames = packageNames(store)::next,
         moduleCompiler = { ast, types -> ModuleCompiler(ast, types) },
         uncompilableFunctions = ::UncompilableFunctions,
         moduleLowerer = ::ModuleLowerer,
@@ -135,7 +138,13 @@ internal fun CompilationCache.write(
     }
 }
 
-private val packageNames = PackageNames()
+// Two instances of a module only need distinct package names when they share a store, the scope in which
+// compiled stack traces are resolved. Naming per store lets a module in a new store reuse its cache entry.
+private val storePackageNames = WeakHashMap<RuntimeStore, PackageNames>()
+
+private fun packageNames(
+    store: RuntimeStore,
+): PackageNames = synchronized(storePackageNames) { storePackageNames.getOrPut(store, ::PackageNames) }
 
 internal fun error(
     stage: Stage,

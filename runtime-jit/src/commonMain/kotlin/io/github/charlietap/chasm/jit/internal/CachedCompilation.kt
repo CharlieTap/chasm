@@ -63,12 +63,12 @@ internal fun decodeCompilation(
         val installer = input.readUTF()
         val inlineMemory = input.readBoolean()
         val chunkStarts = HashMap<Int, IntArray>()
-        repeat(input.count(bytes.size)) {
+        repeat(input.count { source.available() / CHUNK_HEADER }) {
             val function = input.readInt()
-            chunkStarts[function] = IntArray(input.count(bytes.size)) { input.readInt() }
+            chunkStarts[function] = IntArray(input.count { source.available() / Int.SIZE_BYTES }) { input.readInt() }
         }
-        val dex = List(input.count(bytes.size)) {
-            val size = input.count(source.available())
+        val dex = List(input.count { source.available() / Int.SIZE_BYTES }) {
+            val size = input.count { source.available() }
             val offset = bytes.size - source.available()
             input.skipBytes(size)
             // Not sliced: ART reads a heap buffer from its position in array() and ignores arrayOffset.
@@ -96,13 +96,16 @@ private class ExactOutput(
     fun bytes(): ByteArray = if (count == buf.size) buf else toByteArray()
 }
 
-// A count can never exceed what remains of the entry, so a corrupt one fails here rather than in an allocation.
-private fun DataInputStream.count(
-    limit: Int,
-): Int = readInt().also { count -> if (count !in 0..limit) throw CorruptEntry() }
+// A count can never exceed what the rest of the entry, measured after the count itself, could hold, so a
+// corrupt one fails here rather than in an allocation.
+private inline fun DataInputStream.count(
+    limit: () -> Int,
+): Int = readInt().also { count -> if (count !in 0..limit()) throw CorruptEntry() }
 
 private class CorruptEntry : RuntimeException()
 
 private const val MAGIC = 0x434A4954
 
 private const val FORMAT = 1
+
+private const val CHUNK_HEADER = Int.SIZE_BYTES * 2

@@ -34,7 +34,7 @@ fun _instance(
         module = module,
         imports = imports,
         config = config,
-        compiler = { compiled, compileConfig -> compile(compiled, compileConfig, cache) },
+        compiler = { compiled, compileConfig -> compile(compiled, compileConfig, store.store, cache) },
         instantiator = ::ModuleInstantiator,
     )
 
