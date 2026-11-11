@@ -61,8 +61,6 @@ internal inline fun compileUnchecked(
         val reasons = functions.entries.joinToString { (index, reason) -> "$index ($reason)" }
         return error(Stage.GENERATION, "cannot compile functions: ${reasons.ifEmpty { failure.toString() }}", functions.keys.toList())
     }
-    // Linear memory is accessed through the byte array rather than sun.misc.Unsafe: ART reaches Unsafe
-    // from generated code through generic JNI, which costs far more than the array accesses it replaces.
     val emission = DexOptions(
         stacktraces = config.stacktraces,
         meterFuel = config.meterFuel,
