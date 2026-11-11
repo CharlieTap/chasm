@@ -15,7 +15,6 @@ import io.github.charlietap.chasm.embedding.shapes._binary
 import io.github.charlietap.chasm.embedding.shapes._module
 import io.github.charlietap.chasm.jit.internal.CompileError.Stage
 import io.github.charlietap.chasm.runtime.compiled.CodeInstallation
-import io.github.charlietap.chasm.runtime.compiled.byteArrayBase
 import java.util.function.Consumer
 
 internal fun compile(
@@ -62,11 +61,12 @@ internal inline fun compileUnchecked(
         val reasons = functions.entries.joinToString { (index, reason) -> "$index ($reason)" }
         return error(Stage.GENERATION, "cannot compile functions: ${reasons.ifEmpty { failure.toString() }}", functions.keys.toList())
     }
+    // Linear memory is accessed through the byte array rather than sun.misc.Unsafe: ART reaches Unsafe
+    // from generated code through generic JNI, which costs far more than the array accesses it replaces.
     val emission = DexOptions(
         stacktraces = config.stacktraces,
         meterFuel = config.meterFuel,
         interruptible = config.interruptible,
-        byteArrayBaseOffset = byteArrayBase().takeIf { base -> base >= 0 },
     )
     val packageName = packageNames(module._binary(), emission)
     val options = emission.copy(packageName = packageName)
