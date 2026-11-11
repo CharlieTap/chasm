@@ -8,7 +8,6 @@ import java.io.DataOutputStream
 import java.io.IOException
 import java.nio.ByteBuffer
 
-/** A compilation read back from a cache entry; its DEX files are views of the entry, not copies. */
 internal class CachedCompilation(
     val dex: List<ByteBuffer>,
     val installer: String,
@@ -16,19 +15,17 @@ internal class CachedCompilation(
     val chunkStarts: Map<Int, IntArray>,
 )
 
+internal fun DexModule.toCachedCompilation(): CachedCompilation =
+    CachedCompilation(dex.map(ByteBuffer::wrap), installer, inlineMemory, chunkStarts)
+
 internal fun encodeCompilation(
     packageName: String,
     module: DexModule,
-    version: String = CHASM_VERSION,
 ): ByteArray {
-    val size = Int.SIZE_BYTES * 2 + utfSize(version) + utfSize(packageName) + utfSize(module.installer) + 1 +
-        Int.SIZE_BYTES + module.chunkStarts.values.sumOf { starts -> Int.SIZE_BYTES * (2 + starts.size) } +
-        Int.SIZE_BYTES + module.dex.sumOf { dex -> Int.SIZE_BYTES + dex.size }
-    val bytes = ExactOutput(size)
+    val bytes = ByteArrayOutputStream()
     DataOutputStream(bytes).use { out ->
         out.writeInt(MAGIC)
         out.writeInt(FORMAT)
-        out.writeUTF(version)
         out.writeUTF(packageName)
         out.writeUTF(module.installer)
         out.writeBoolean(module.inlineMemory)
@@ -44,22 +41,20 @@ internal fun encodeCompilation(
             out.write(dex)
         }
     }
-    return bytes.bytes()
+    return bytes.toByteArray()
 }
 
 /**
- * The compilation [encodeCompilation] wrote for [packageName] with this version of chasm, or null when
- * [bytes] hold anything else, including a truncated or corrupt entry.
+ * The compilation [encodeCompilation] wrote for [packageName], or null when [bytes] hold anything else,
+ * including a truncated or corrupt entry. Its DEX files are views of [bytes], not copies.
  */
 internal fun decodeCompilation(
     bytes: ByteArray,
     packageName: String,
-    version: String = CHASM_VERSION,
 ): CachedCompilation? = try {
     val source = ByteArrayInputStream(bytes)
     DataInputStream(source).use { input ->
-        if (input.readInt() != MAGIC || input.readInt() != FORMAT) return null
-        if (input.readUTF() != version || input.readUTF() != packageName) return null
+        if (input.readInt() != MAGIC || input.readInt() != FORMAT || input.readUTF() != packageName) return null
         val installer = input.readUTF()
         val inlineMemory = input.readBoolean()
         val chunkStarts = HashMap<Int, IntArray>()
@@ -81,19 +76,6 @@ internal fun decodeCompilation(
     null
 } catch (_: CorruptEntry) {
     null
-}
-
-// Package names, installers and versions are ASCII, which modified UTF-8 stores a byte per character.
-private fun utfSize(
-    value: String,
-): Int = Short.SIZE_BYTES + value.length
-
-/** Hands back its buffer without copying when the size it was given turns out to be exact. */
-private class ExactOutput(
-    size: Int,
-) : ByteArrayOutputStream(size) {
-
-    fun bytes(): ByteArray = if (count == buf.size) buf else toByteArray()
 }
 
 // A count can never exceed what the rest of the entry, measured after the count itself, could hold, so a

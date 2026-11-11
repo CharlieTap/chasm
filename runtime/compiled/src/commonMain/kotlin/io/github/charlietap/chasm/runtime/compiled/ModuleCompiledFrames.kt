@@ -8,7 +8,7 @@ import io.github.charlietap.chasm.runtime.store.Store
 
 @InternalChasmApi
 class ModuleCompiledFrames(
-    packageName: String,
+    val packageName: String,
     private val chunkStarts: (function: Int) -> IntArray?,
     private val originalLine: (className: String, methodName: String, line: Int) -> Int,
 ) : CompiledFrames {

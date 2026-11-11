@@ -8,19 +8,14 @@ plugins {
     alias(libs.plugins.conventions.kotlin)
     alias(libs.plugins.conventions.linting)
     alias(libs.plugins.conventions.publishing)
+    alias(libs.plugins.build.config)
 }
 
-val generateChasmVersion = tasks.register("generateChasmVersion") {
+buildConfig {
+    packageName("io.github.charlietap.chasm.jit.internal")
+    useKotlinOutput { internalVisibility = true }
     // The version publishing uses: version-name unless the build overrides it.
-    val version = project.version.toString()
-    val output = layout.buildDirectory.dir("generated/chasmVersion")
-    inputs.property("version", version)
-    outputs.dir(output)
-    doLast {
-        val file = output.get().file("io/github/charlietap/chasm/jit/internal/ChasmVersion.kt").asFile
-        file.parentFile.mkdirs()
-        file.writeText("package io.github.charlietap.chasm.jit.internal\n\ninternal const val CHASM_VERSION = \"$version\"\n")
-    }
+    buildConfigField("CHASM_VERSION", project.version.toString())
 }
 
 kotlin {
@@ -31,11 +26,7 @@ kotlin {
         compilerOptions {
             jvmTarget.set(JvmTarget.fromTarget(libs.versions.android.library.bytecode.version.get()))
         }
-        withDeviceTestBuilder {
-            sourceSetTreeName = "test"
-        }.configure {
-            instrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        }
+        withHostTest {}
         optimization {
             consumerKeepRules.publish = true
             consumerKeepRules.file("consumer-rules.pro")
@@ -47,7 +38,6 @@ kotlin {
 
     sourceSets {
         commonMain {
-            kotlin.srcDir(generateChasmVersion)
             dependencies {
                 api(projects.config)
                 api(projects.embeddingApi)
@@ -67,12 +57,9 @@ kotlin {
             }
         }
 
-        getByName("androidDeviceTest") {
+        commonTest {
             dependencies {
-                implementation(projects.chasm)
-                implementation(libs.kotlin.junit)
-                implementation(libs.androidx.test.junit)
-                implementation(libs.androidx.test.runner)
+                implementation(libs.kotlin.test)
             }
         }
     }

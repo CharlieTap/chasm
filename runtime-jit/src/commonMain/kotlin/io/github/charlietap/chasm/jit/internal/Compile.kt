@@ -15,9 +15,9 @@ import io.github.charlietap.chasm.embedding.shapes._binary
 import io.github.charlietap.chasm.embedding.shapes._module
 import io.github.charlietap.chasm.jit.internal.CompileError.Stage
 import io.github.charlietap.chasm.runtime.compiled.CodeInstallation
+import io.github.charlietap.chasm.runtime.compiled.ModuleCompiledFrames
 import io.github.charlietap.chasm.runtime.compiled.byteArrayBase
-import java.nio.ByteBuffer
-import java.util.WeakHashMap
+import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import java.util.function.Consumer
 import io.github.charlietap.chasm.runtime.store.Store as RuntimeStore
 
@@ -31,7 +31,7 @@ internal fun compile(
         module = module,
         config = config,
         cache = cache,
-        packageNames = packageNames(store)::next,
+        packageNames = { bytes, options -> packageName(bytes, options, packageNamesIn(store)) },
         moduleCompiler = { ast, types -> ModuleCompiler(ast, types) },
         uncompilableFunctions = ::UncompilableFunctions,
         moduleLowerer = ::ModuleLowerer,
@@ -70,11 +70,11 @@ internal inline fun compileUnchecked(
         byteArrayBaseOffset = byteArrayBase().takeIf { base -> base >= 0 },
     )
     val packageName = packageNames(module._binary(), emission)
-    // The package name digests the module and the options, so it serves as the key for the compiled code.
-    val activeCache = cache?.takeIf { PackageNames.hashed(packageName) }
+    // A module with bytes has a package name that identifies its compiled code, so it is the cache key.
+    val activeCache = cache?.takeIf { module._binary() != null }
     val cached = activeCache?.read(packageName)?.let { bytes -> decodeCompilation(bytes, packageName) }
     if (cached != null) {
-        val loaded = load(packageName, cached.dex, cached.installer, cached.chunkStarts, cached.inlineMemory, dexLoader)
+        val loaded = load(packageName, cached, dexLoader)
         if (loaded is CompileResult.Success) return loaded
     }
     val ast = module._module()
@@ -90,23 +90,20 @@ internal inline fun compileUnchecked(
     } catch (unsupported: UnsupportedFunctions) {
         return error(Stage.GENERATION, unsupported.message.orEmpty(), unsupported.reasons.keys.toList())
     }
-    val loaded = load(packageName, dex.dex.map(ByteBuffer::wrap), dex.installer, dex.chunkStarts, dex.inlineMemory, dexLoader)
+    val loaded = load(packageName, dex.toCachedCompilation(), dexLoader)
     if (loaded is CompileResult.Success) activeCache?.write(packageName, encodeCompilation(packageName, dex))
     return loaded
 }
 
 internal inline fun load(
     packageName: String,
-    dex: List<ByteBuffer>,
-    installerName: String,
-    chunkStarts: Map<Int, IntArray>,
-    inlineMemory: Boolean,
+    compilation: CachedCompilation,
     crossinline dexLoader: DexLoader,
 ): CompileResult {
     val installer = try {
-        val loader = dexLoader(dex, CodeInstallation::class.java.classLoader!!)
+        val loader = dexLoader(compilation.dex, CodeInstallation::class.java.classLoader!!)
         @Suppress("UNCHECKED_CAST")
-        loader.loadClass(installerName).getDeclaredConstructor().newInstance() as Consumer<CodeInstallation>
+        loader.loadClass(compilation.installer).getDeclaredConstructor().newInstance() as Consumer<CodeInstallation>
     } catch (failure: ReflectiveOperationException) {
         return error(Stage.LOADING, failure.toString())
     } catch (failure: LinkageError) {
@@ -114,7 +111,7 @@ internal inline fun load(
     } catch (failure: RuntimeException) {
         return error(Stage.LOADING, failure.toString())
     }
-    return CompileResult.Success(JitCompilation(packageName, chunkStarts, installer, inlineMemory))
+    return CompileResult.Success(JitCompilation(packageName, compilation.chunkStarts, installer, compilation.inlineMemory))
 }
 
 // A cache is the host's code: if it fails, the module is compiled as though the cache were absent.
@@ -138,13 +135,11 @@ internal fun CompilationCache.write(
     }
 }
 
-// Two instances of a module only need distinct package names when they share a store, the scope in which
-// compiled stack traces are resolved. Naming per store lets a module in a new store reuse its cache entry.
-private val storePackageNames = WeakHashMap<RuntimeStore, PackageNames>()
-
-private fun packageNames(
+private fun packageNamesIn(
     store: RuntimeStore,
-): PackageNames = synchronized(storePackageNames) { storePackageNames.getOrPut(store, ::PackageNames) }
+): Set<String> = store.functions.mapNotNullTo(HashSet()) { function ->
+    ((function as? FunctionInstance.WasmFunction)?.module?.compiledFrames as? ModuleCompiledFrames)?.packageName
+}
 
 internal fun error(
     stage: Stage,
