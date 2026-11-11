@@ -27,13 +27,14 @@ fun _instance(
     module: Module,
     imports: List<Import>,
     config: RuntimeConfig,
+    cache: CompilationCache? = null,
 ): ChasmResult<Instance, ChasmError.ExecutionError> =
     instance(
         store = store,
         module = module,
         imports = imports,
         config = config,
-        compiler = ::compile,
+        compiler = { compiled, compileConfig -> compile(compiled, compileConfig, store.store, cache) },
         instantiator = ::ModuleInstantiator,
     )
 

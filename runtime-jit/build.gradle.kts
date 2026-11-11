@@ -8,6 +8,14 @@ plugins {
     alias(libs.plugins.conventions.kotlin)
     alias(libs.plugins.conventions.linting)
     alias(libs.plugins.conventions.publishing)
+    alias(libs.plugins.build.config)
+}
+
+buildConfig {
+    packageName("io.github.charlietap.chasm.jit.internal")
+    useKotlinOutput { internalVisibility = true }
+    // The version publishing uses: version-name unless the build overrides it.
+    buildConfigField("CHASM_VERSION", project.version.toString())
 }
 
 kotlin {
@@ -18,6 +26,7 @@ kotlin {
         compilerOptions {
             jvmTarget.set(JvmTarget.fromTarget(libs.versions.android.library.bytecode.version.get()))
         }
+        withHostTest {}
         optimization {
             consumerKeepRules.publish = true
             consumerKeepRules.file("consumer-rules.pro")
@@ -45,6 +54,12 @@ kotlin {
                 implementation(projects.runtime.compiled)
                 implementation(projects.runtime.core)
                 implementation(libs.result)
+            }
+        }
+
+        commonTest {
+            dependencies {
+                implementation(libs.kotlin.test)
             }
         }
     }
