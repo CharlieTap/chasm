@@ -771,6 +771,7 @@ public final class io/github/charlietap/chasm/declarations/ModuleTypeResolver {
 	public final fun definedType-UfKnbfY (I)Lio/github/charlietap/chasm/type/DefinedType;
 	public final fun functionType-8BqobMM (I)Lio/github/charlietap/chasm/type/DefinedType;
 	public final fun functionType-UfKnbfY (I)Lio/github/charlietap/chasm/type/FunctionType;
+	public final fun functionTypeIndex-bdxTTqc (I)I
 	public final fun resolve (Lio/github/charlietap/chasm/type/GlobalType;)Lio/github/charlietap/chasm/type/GlobalType;
 	public final fun resolve (Lio/github/charlietap/chasm/type/ReferenceType;)Lio/github/charlietap/chasm/type/ReferenceType;
 	public final fun resolve (Lio/github/charlietap/chasm/type/TableType;)Lio/github/charlietap/chasm/type/TableType;

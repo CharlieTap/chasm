@@ -4,6 +4,7 @@ import com.github.michaelbull.result.fold
 import io.github.charlietap.chasm.aot.CompiledModule
 import io.github.charlietap.chasm.aot.instance
 import io.github.charlietap.chasm.ast.module.Module
+import io.github.charlietap.chasm.ast.module.typeResolver
 import io.github.charlietap.chasm.compiled.Instantiable
 import io.github.charlietap.chasm.compiled.script.ScriptModules
 import io.github.charlietap.chasm.compiler.backend.jvm.JvmModule
@@ -13,6 +14,7 @@ import io.github.charlietap.chasm.compiler.backend.jvm.MemoryLowering
 import io.github.charlietap.chasm.compiler.backend.jvm.ModuleLowerer
 import io.github.charlietap.chasm.compiler.backend.jvm.UnsupportedFunctions
 import io.github.charlietap.chasm.compiler.frontend.ModuleCompiler
+import io.github.charlietap.chasm.compiler.frontend.ModuleRewriter
 import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.config.StoreConfig
 import io.github.charlietap.chasm.embedding.error.ChasmError
@@ -68,10 +70,16 @@ internal object AotCompiler {
         module: Module,
         options: JvmOptions,
     ): CompiledModule {
-        val cir = ModuleCompiler(module).fold({ it }) { error -> throw IllegalStateException("cannot compile: $error") }
+        val types = module.typeResolver()
+        val source = ModuleRewriter(
+            module = module,
+            types = types,
+            preserveSource = options.stacktraces || options.meterFuel || options.interruptible,
+        )
+        val cir = ModuleCompiler(source, types).fold({ it }) { error -> throw IllegalStateException("cannot compile: $error") }
         val generated = GeneratedCode()
         val result = try {
-            ModuleLowerer(module, cir, options, generated, ModuleDeclarationsFactory(module))
+            ModuleLowerer(source, cir, options, generated, ModuleDeclarationsFactory(source))
         } catch (unsupported: UnsupportedFunctions) {
             throw IllegalStateException("AOT: ${unsupported.message}")
         }

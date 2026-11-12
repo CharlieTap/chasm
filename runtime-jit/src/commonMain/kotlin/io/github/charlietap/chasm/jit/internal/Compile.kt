@@ -9,6 +9,7 @@ import io.github.charlietap.chasm.compiler.backend.dex.DexOptions
 import io.github.charlietap.chasm.compiler.backend.dex.ModuleLowerer
 import io.github.charlietap.chasm.compiler.backend.dex.UnsupportedFunctions
 import io.github.charlietap.chasm.compiler.frontend.ModuleCompiler
+import io.github.charlietap.chasm.compiler.frontend.ModuleRewriter
 import io.github.charlietap.chasm.compiler.frontend.UncompilableFunctions
 import io.github.charlietap.chasm.embedding.shapes.Module
 import io.github.charlietap.chasm.embedding.shapes._binary
@@ -26,7 +27,14 @@ internal fun compile(
         module = module,
         config = config,
         packageNames = packageNames::next,
-        moduleCompiler = { ast, types -> ModuleCompiler(ast, types) },
+        moduleRewriter = { source, types ->
+            ModuleRewriter(
+                module = source,
+                types = types,
+                preserveSource = config.stacktraces || config.meterFuel || config.interruptible,
+            )
+        },
+        moduleCompiler = ::ModuleCompiler,
         uncompilableFunctions = ::UncompilableFunctions,
         moduleLowerer = ::ModuleLowerer,
         dexLoader = ::DexLoader,
@@ -36,12 +44,13 @@ internal inline fun compile(
     module: Module,
     config: CompileConfig,
     crossinline packageNames: (ByteArray?, DexOptions) -> String,
+    crossinline moduleRewriter: ModuleRewriter,
     crossinline moduleCompiler: ModuleCompiler,
     crossinline uncompilableFunctions: UncompilableFunctions,
     crossinline moduleLowerer: ModuleLowerer,
     crossinline dexLoader: DexLoader,
 ): CompileResult = try {
-    compileUnchecked(module, config, packageNames, moduleCompiler, uncompilableFunctions, moduleLowerer, dexLoader)
+    compileUnchecked(module, config, packageNames, moduleRewriter, moduleCompiler, uncompilableFunctions, moduleLowerer, dexLoader)
 } catch (failure: RuntimeException) {
     error(Stage.GENERATION, failure.message ?: failure.toString())
 }
@@ -50,13 +59,15 @@ internal inline fun compileUnchecked(
     module: Module,
     config: CompileConfig,
     crossinline packageNames: (ByteArray?, DexOptions) -> String,
+    crossinline moduleRewriter: ModuleRewriter,
     crossinline moduleCompiler: ModuleCompiler,
     crossinline uncompilableFunctions: UncompilableFunctions,
     crossinline moduleLowerer: ModuleLowerer,
     crossinline dexLoader: DexLoader,
 ): CompileResult {
-    val ast = module._module()
-    val types = ast.typeResolver()
+    val source = module._module()
+    val types = source.typeResolver()
+    val ast = moduleRewriter(source, types)
     val code = moduleCompiler(ast, types).getOrElse { failure ->
         val functions = uncompilableFunctions(ast, types)
         val reasons = functions.entries.joinToString { (index, reason) -> "$index ($reason)" }

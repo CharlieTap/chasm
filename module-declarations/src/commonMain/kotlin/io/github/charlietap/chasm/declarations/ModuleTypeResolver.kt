@@ -39,6 +39,8 @@ class ModuleTypeResolver(
 
     fun functionType(index: Index.FunctionIndex): DefinedType = definedTypes[functionTypeIndices[index.toInt()]]
 
+    fun functionTypeIndex(index: Index.FunctionIndex): Index.TypeIndex = Index.TypeIndex(functionTypeIndices[index.toInt()].toUInt())
+
     fun blockType(type: BlockType): FunctionType = BlockTypeExpander(definedTypes, type)
         ?: error("block type is not a function type: $type")
 
