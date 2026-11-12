@@ -227,14 +227,22 @@ internal fun compileIfCondition(
     instruction: ControlInstruction.If,
     condition: NumericCondition,
 ) {
-    enterIf(state, instruction) { elseTarget ->
-        state.emitBranchIf(condition, elseTarget, emptySlotTransfer, branchOnMatch = false)
+    val ifIndex = state.instructions.index + 1
+    enterIf(state, instruction, state.ifChainDefault(ifIndex)) { elseTarget ->
+        val case = state.ifChainCase(ifIndex) ?: state.beginIfChain(ifIndex, condition)
+        if (case != null) {
+            state.bind(case)
+            BranchOutcome.Dynamic
+        } else {
+            state.emitBranchIf(condition, elseTarget, emptySlotTransfer, branchOnMatch = false)
+        }
     }
 }
 
 private inline fun enterIf(
     state: FunctionCompilationContext,
     instruction: ControlInstruction.If,
+    chainDefault: ProgramTarget? = null,
     emitCondition: (ProgramTarget) -> BranchOutcome,
 ) {
     val type = state.blockType(instruction.blockType)
@@ -253,7 +261,7 @@ private inline fun enterIf(
         }
     }
     val continuationTarget = state.program.target()
-    val elseTarget = state.program.target()
+    val elseTarget = chainDefault ?: state.program.target()
     val block = state.controls.push(
         kind = BlockKind.If,
         baseHeight = baseHeight,

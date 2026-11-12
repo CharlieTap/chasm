@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.compiler.frontend.context
 import io.github.charlietap.chasm.cir.Instruction
 import io.github.charlietap.chasm.cir.InstructionIndex
 import io.github.charlietap.chasm.compiler.frontend.ExceptionTableBuilder
+import io.github.charlietap.chasm.compiler.frontend.IfChains
 import io.github.charlietap.chasm.compiler.frontend.emptyIntArray
 import io.github.charlietap.chasm.compiler.frontend.instruction.CopyInstructionBuffer
 import io.github.charlietap.chasm.compiler.frontend.instruction.DeferredBranchPaths
@@ -41,6 +42,7 @@ internal class FunctionCompilationContext(
     var rootControl: BlockContext? = null
     var reachable = true
     var exceptionTableBuilder: ExceptionTableBuilder? = null
+    var ifChains: IfChains? = null
 
     fun blockType(type: io.github.charlietap.chasm.type.BlockType): io.github.charlietap.chasm.type.FunctionType =
         workspace.blockType(compiler, type)

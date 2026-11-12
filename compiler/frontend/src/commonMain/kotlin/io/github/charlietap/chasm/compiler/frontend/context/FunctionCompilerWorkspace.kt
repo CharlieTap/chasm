@@ -1,7 +1,9 @@
 package io.github.charlietap.chasm.compiler.frontend.context
 
+import io.github.charlietap.chasm.compiler.frontend.emptyIntArray
 import io.github.charlietap.chasm.compiler.frontend.operand.Operand
 import io.github.charlietap.chasm.compiler.frontend.program.ProgramBuilder
+import io.github.charlietap.chasm.compiler.frontend.program.ProgramTarget
 import io.github.charlietap.chasm.type.BlockType
 import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.chasm.type.ValueType
@@ -19,6 +21,40 @@ internal class FunctionCompilerWorkspace {
         val body = body
         for (index in instructions.indices) body[index] = instructions[index]
         return body
+    }
+
+    private var chainElses = emptyIntArray
+    private var rejectedChains = BooleanArray(0)
+
+    fun chainElses(
+        size: Int,
+    ): IntArray {
+        if (size > chainElses.size) chainElses = IntArray(maxOf(size, chainElses.size * 2))
+        return chainElses
+    }
+
+    fun rejectedChains(
+        size: Int,
+    ): BooleanArray {
+        if (size > rejectedChains.size) rejectedChains = BooleanArray(maxOf(size, rejectedChains.size * 2))
+        return rejectedChains
+    }
+
+    private var chainCases = arrayOfNulls<ProgramTarget>(0)
+    private var chainDefaults = arrayOfNulls<ProgramTarget>(0)
+
+    fun chainCases(
+        size: Int,
+    ): Array<ProgramTarget?> {
+        if (size > chainCases.size) chainCases = arrayOfNulls(maxOf(size, chainCases.size * 2))
+        return chainCases
+    }
+
+    fun chainDefaults(
+        size: Int,
+    ): Array<ProgramTarget?> {
+        if (size > chainDefaults.size) chainDefaults = arrayOfNulls(maxOf(size, chainDefaults.size * 2))
+        return chainDefaults
     }
 
     val controlPool = ObjectPool<BlockContext>()

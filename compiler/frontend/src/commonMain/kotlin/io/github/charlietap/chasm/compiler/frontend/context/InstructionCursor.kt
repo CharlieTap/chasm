@@ -2,7 +2,7 @@ package io.github.charlietap.chasm.compiler.frontend.context
 
 internal class InstructionCursor(
     private val instructions: Array<Any?>,
-    private val count: Int = instructions.size,
+    val size: Int = instructions.size,
 ) {
 
     var index: Int = -1
@@ -14,13 +14,17 @@ internal class InstructionCursor(
     val current: Any?
         get() = instructions[index]
 
+    fun at(
+        position: Int,
+    ): Any? = if (position in 0 until size) instructions[position] else null
+
     fun next(): Any? = peek(nextIndex - index)
 
     fun peek(
         distance: Int,
     ): Any? {
         val position = index + distance
-        return if (position < count) instructions[position] else null
+        return if (position < size) instructions[position] else null
     }
 
     fun consume(
@@ -32,6 +36,6 @@ internal class InstructionCursor(
     fun advance(): Boolean {
         index = nextIndex
         nextIndex = index + 1
-        return index < count
+        return index < size
     }
 }
