@@ -51,7 +51,7 @@ fun installCompiledFunctions(
         val entry = CompiledEntry(
             compiled = installation.entry,
             entryIp = program.size,
-            resultCount = function.functionType.results.types.size,
+            resultCount = function.resultCount,
             activationHeaderSlot = strategy.interfaceSlotCount,
             frameSlots = strategy.interfaceSlotCount + 1,
         )
@@ -135,7 +135,7 @@ private class CompiledEntry(
             val caller = checkNotNull(context.pendingTailCaller)
             var arguments = checkNotNull(context.pendingTailArguments)
             clearPendingTailCall(context)
-            val results = function.functionType.results.types.size
+            val results = function.resultCount
             if (arguments.size < results) arguments = arguments.copyOf(results)
             val compiled = (function as? FunctionInstance.WasmFunction)?.callStrategy?.compiledEntry
             when {
@@ -147,7 +147,7 @@ private class CompiledEntry(
                     if (context.nestedInterpreter == null) throw InvocationException(InvocationError.InterpreterUnavailable)
                     val strategy = function.callStrategy
                     vstack.ensureCapacity(fp + strategy.frameSlots)
-                    val parameters = function.functionType.params.types.size
+                    val parameters = function.parameterCount
                     arguments.copyInto(vstack.unsafeElements(), fp, 0, parameters)
                     initializeLocals(vstack, strategy, fp)
                     vstack.setFrameSlot(fp, strategy.interfaceSlotCount, header)

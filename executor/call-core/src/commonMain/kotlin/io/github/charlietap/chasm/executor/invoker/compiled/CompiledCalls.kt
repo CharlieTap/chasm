@@ -63,12 +63,12 @@ fun callFunction(
         targetCaller = checkNotNull(context.pendingTailCaller)
         val nextArguments = checkNotNull(context.pendingTailArguments)
         clearPendingTailCall(context)
-        val results = next.functionType.results.types.size
+        val results = next.resultCount
         target = next
         arguments = if (nextArguments.size >= results) nextArguments else nextArguments.copyOf(results)
     }
     if (arguments !== values) {
-        val results = target.functionType.results.types.size
+        val results = target.resultCount
         arguments.copyInto(values, 0, 0, minOf(results, values.size))
     }
 }
@@ -92,18 +92,18 @@ fun interpretFunction(
                 val calleeFp = callerSp
                 val frameEnd = calleeFp + strategy.frameSlots
                 vstack.ensureCapacity(frameEnd)
-                val parameters = function.functionType.params.types.size
+                val parameters = function.parameterCount
                 values.copyInto(vstack.unsafeElements(), calleeFp, 0, parameters)
                 initializeLocals(vstack, strategy, calleeFp)
                 vstack.writeActivationHeader(calleeFp, strategy.interfaceSlotCount, activationHeader(EXIT_IP, calleeFp - callerFp))
                 vstack.activateFrameAtDepth(calleeFp, frameEnd)
                 interpreter.interpret(strategy.entryIp, context)
-                val results = function.functionType.results.types.size
+                val results = function.resultCount
                 vstack.unsafeElements().copyInto(values, 0, calleeFp, calleeFp + results)
             }
             is FunctionInstance.HostFunction -> {
-                val parameters = function.functionType.params.types.size
-                val results = function.functionType.results.types.size
+                val parameters = function.parameterCount
+                val results = function.resultCount
                 val base = callerSp
                 vstack.ensureCapacity(base + maxOf(parameters, results))
                 copySlots(values, 0, vstack.unsafeElements(), base, parameters)
@@ -175,7 +175,7 @@ fun completeTailCall(
     clearPendingTailCall(context)
     callFunction(context, caller, function, arguments, depth)
     if (context.compiledUnwinding) return
-    val results = function.functionType.results.types.size
+    val results = function.resultCount
     arguments.copyInto(values, 0, 0, minOf(results, values.size))
 }
 

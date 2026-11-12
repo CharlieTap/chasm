@@ -9,17 +9,27 @@ sealed class FunctionInstance {
 
     abstract val rtt: RTT
     abstract val functionType: FunctionType
+    abstract val parameterCount: Int
+    abstract val resultCount: Int
 
     data class WasmFunction(
         override val rtt: RTT,
         override val functionType: FunctionType,
         val module: ModuleInstance,
         val callStrategy: WasmFunctionCallStrategy,
-    ) : FunctionInstance()
+    ) : FunctionInstance() {
+        override val parameterCount: Int = functionType.params.types.size
+
+        override val resultCount: Int = functionType.results.types.size
+    }
 
     data class HostFunction(
         override val rtt: RTT,
         override val functionType: FunctionType,
         val function: HostCallback,
-    ) : FunctionInstance()
+    ) : FunctionInstance() {
+        override val parameterCount: Int = functionType.params.types.size
+
+        override val resultCount: Int = functionType.results.types.size
+    }
 }
