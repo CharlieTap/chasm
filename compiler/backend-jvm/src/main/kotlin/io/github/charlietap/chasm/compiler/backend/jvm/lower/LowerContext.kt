@@ -62,9 +62,20 @@ internal class LowerContext(
 
     val resultDescriptor = returnDescriptor(type)
 
-    var position = SlotKinds.PROLOGUE
+    val roots = RootFrame(references, locals, emit, chunk != null)
 
-    var publishesWrites = true
+    var position = SlotKinds.PROLOGUE
+        private set
+
+    fun enterPrologue() {
+        position = SlotKinds.PROLOGUE
+        roots.enterPrologue()
+    }
+
+    fun enterInstruction(position: Int) {
+        this.position = position
+        roots.enterInstruction(position)
+    }
 
     private val firstPosition = chunk?.start ?: 0
 

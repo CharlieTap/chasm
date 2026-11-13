@@ -33,18 +33,9 @@ internal fun lowerInstruction(
 internal fun LowerContext.lowerFunctionBody(
     frameCost: Int,
 ) {
-    val publication = references.publication
-    publishesWrites = publication.afterEntry
+
     lowerPrologue(frameCost)
-    function.instructions.forEachIndexed { position, instruction ->
-        this.position = position
-        publishesWrites = publication.requiresPublicationAfter(position)
-        val label = placement(position)
-        emit.place(label)
-        markSite(position, label)
-        lowerInstruction(instruction, this)
-    }
-    publishesWrites = true
+    lowerPositions(function.instructions.indices)
 
     val needsEndTrap = emit.fallsThrough() || function.exceptions != null || hasLabel(function.instructions.size)
     if (needsEndTrap) {
@@ -55,7 +46,27 @@ internal fun LowerContext.lowerFunctionBody(
     }
 
     lowerExceptionHandling()
-    outOfLine.forEach { path -> path() }
+    lowerOutOfLine()
+}
+
+internal fun LowerContext.lowerPositions(positions: IntRange) {
+
+    for (position in positions) {
+        enterInstruction(position)
+        val label = placement(position)
+        emit.place(label)
+        markSite(position, label)
+        lowerInstruction(function.instructions[position], this)
+    }
+
+    roots.enterColdCode()
+}
+
+internal fun LowerContext.lowerOutOfLine() {
+    outOfLine.forEach { path ->
+        roots.enterColdCode()
+        path()
+    }
 }
 
 private fun LowerContext.trapUnreachable() = trap(UNREACHABLE)

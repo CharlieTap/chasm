@@ -102,6 +102,16 @@ class InstructionTableTest {
         assertEquals(listOf(-1, 0, -1), function.instructions.indices.map(table::innermostRegion))
     }
 
+    @Test
+    fun `aggregate and reference instructions read their operand slots`() {
+
+        val reads = table("aggregates").reads
+
+        assertEquals(listOf(0, 3), reads.slotsAt(1))
+        assertEquals(listOf(1, 3, 2), reads.slotsAt(2))
+        assertEquals(listOf(5, 6), reads.slotsAt(4))
+    }
+
     private fun JumpTable.targetsAt(position: Int): List<Int> {
         return (start[position] until end(position)).map { edge -> targets[edge] }
     }
@@ -116,6 +126,10 @@ class InstructionTableTest {
 
     private fun SlotWriteTable.kindsAt(position: Int): List<Byte> {
         return (start[position] until end(position)).map { index -> kinds[index] }
+    }
+
+    private fun SlotReadTable.slotsAt(position: Int): List<Int> {
+        return (start[position] until end(position)).map { index -> slots[index] }
     }
 
     private fun table(name: String): InstructionTable {

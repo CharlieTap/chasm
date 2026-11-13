@@ -118,6 +118,7 @@ private fun LowerContext.emitMatcher(
     val current = regions[region]
     emit.place(entry)
     refreshMemory()
+    roots.refresh()
     pushContext()
     emit.invokeStatic(PENDING_TAG)
     emit.store(Opcodes.ISTORE, locals.scratchInt)
@@ -159,6 +160,6 @@ private fun LowerContext.emitPropagation(
     pushContext()
     emit.int(1)
     emit.putField(CONTEXT_TYPE, UNWINDING_FIELD, "Z")
-    closeRoots()
+    roots.close()
     returnNothing()
 }

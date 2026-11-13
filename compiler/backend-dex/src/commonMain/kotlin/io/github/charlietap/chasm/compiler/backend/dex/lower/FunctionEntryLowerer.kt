@@ -3,12 +3,10 @@ package io.github.charlietap.chasm.compiler.backend.dex.lower
 import io.github.charlietap.chasm.compiler.backend.abi.CALL_STACK_EXHAUSTED
 import io.github.charlietap.chasm.compiler.backend.abi.CONTEXT_TYPE
 import io.github.charlietap.chasm.compiler.backend.abi.MAX_UNCHARGED_LEAF_FRAME_COST
-import io.github.charlietap.chasm.compiler.backend.abi.OPEN_ROOTS
 import io.github.charlietap.chasm.compiler.backend.abi.Resource
 import io.github.charlietap.chasm.compiler.backend.abi.SAVE_STACK
 import io.github.charlietap.chasm.compiler.backend.abi.STACK_LIMIT_FIELD
 import io.github.charlietap.chasm.compiler.backend.abi.UNSAFE_TYPE
-import io.github.charlietap.chasm.compiler.backend.analysis.SlotKinds
 import io.github.charlietap.dexter.ArrayKind
 import io.github.charlietap.dexter.BinaryOp
 import io.github.charlietap.dexter.Cond
@@ -27,15 +25,7 @@ internal fun LowerContext.lowerPrologue() {
     if (!analysis.isLeaf || frameCost(registers) > MAX_UNCHARGED_LEAF_FRAME_COST) {
         chargeStackBudget()
     }
-    if (references.writesThrough) {
-        emit.const(Registers.I0, references.slots.size)
-        emit.invoke(OPEN_ROOTS, Registers.CONTEXT, Registers.I0)
-        emit.moveResultWide(Registers.W0)
-        emit.moveWide(registers.activationSaved, Registers.W0)
-        emit.convert(Conversion.LongToInt, Registers.I0, Registers.W0)
-        emit.move(registers.activationFp, Registers.I0)
-        refreshActivation()
-    }
+    roots.open()
     analysis.cachedConstants.forEachIndexed { index, constant ->
         loadCachedConstant(constant)
         emit.moveObject(registers.cachedConstant(index), Registers.OBJECT)
@@ -47,7 +37,6 @@ internal fun LowerContext.lowerPrologue() {
         emit.moveResultWide(Registers.W0)
         emit.moveWide(registers.savedStack, Registers.W0)
     }
-    position = SlotKinds.PROLOGUE
     receiveParameters()
     initializeLocals()
     if (analysis.window.callBufferWords > 0) {

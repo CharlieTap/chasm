@@ -1,67 +1,93 @@
 package io.github.charlietap.chasm.compiler.backend.analysis
 
 import io.github.charlietap.chasm.cir.CirFunction
-import io.github.charlietap.chasm.compiler.backend.analysis.form.Operand
 import io.github.charlietap.chasm.type.FunctionType
-import io.github.charlietap.chasm.type.ValueType
 
-class References(
+class References internal constructor(
     val slots: IntArray,
     val writesThrough: Boolean,
-    frameSlots: Int,
+    val isReference: BooleanArray,
+    val rootIndex: IntArray,
     val publication: RootPublication = RootPublication.EVERY_WRITE,
 ) {
-    val isReference = BooleanArray(frameSlots).also { flags -> slots.forEach { flags[it] = true } }
+    fun publishesAfter(position: Int): Boolean {
+        return writesThrough && publication.requiresPublicationAfter(position)
+    }
 
-    val rootIndex = IntArray(frameSlots).also { index -> slots.forEachIndexed { root, slot -> index[slot] = root } }
+    fun publishes(
+        position: Int,
+        slot: Int,
+    ): Boolean {
+        return writesThrough && isReference[slot] && publication.requiresPublication(position, rootIndex[slot])
+    }
+
+    companion object {
+        fun none(frameSlots: Int): References {
+            return References(IntArray(0), writesThrough = false, BooleanArray(frameSlots), IntArray(frameSlots))
+        }
+    }
 }
 
 fun analyzeReferences(
+    table: InstructionTable,
     function: CirFunction,
     type: FunctionType,
     frameSlots: Int,
-    declarations: ModuleIndexSpaces,
     analysis: ModuleAnalysis,
 ): References {
-    if (!analysis.publishesRegisters) return References(IntArray(0), writesThrough = false, frameSlots)
+
+    if (!analysis.publishesRegisters) {
+        return References.none(frameSlots)
+    }
+
     val references = BooleanArray(frameSlots)
     function.exceptions?.regions?.forEach { region ->
         region.catches.forEach { handler -> handler.payloadSlots.forEach { references[it] = true } }
     }
     type.params.types.forEachIndexed { index, parameter -> if (collectable(parameter)) references[index] = true }
-    val copies = ArrayList<Long>()
-    val visitor = object : SlotWriteVisitor {
-        override fun value(
-            slot: Int,
-            type: ValueType,
-        ) {
-            if (collectable(type)) references[slot] = true
+    val writes = table.writes
+    var copies = 0
+    for (index in 0 until writes.count) {
+        if (writes.references[index]) {
+            references[writes.slots[index]] = true
         }
-
-        override fun opaque(
-            slot: Int,
-            reference: Boolean,
-        ) {
-            if (reference) references[slot] = true
-        }
-
-        override fun copy(
-            source: Operand,
-            destination: Int,
-        ) {
-            if (source is Operand.Slot) copies += (source.slot.toLong() shl 32) or destination.toLong()
+        if (writes.sources[index] != SlotWriteTable.NOT_A_COPY) {
+            copies++
         }
     }
-    function.instructions.forEach { instruction -> visitSlotWrites(instruction, function, declarations, visitor) }
+
+    val sources = IntArray(copies)
+    val destinations = IntArray(copies)
+    copies = 0
+    for (index in 0 until writes.count) {
+        if (writes.sources[index] == SlotWriteTable.NOT_A_COPY) {
+            continue
+        }
+        sources[copies] = writes.sources[index]
+        destinations[copies++] = writes.slots[index]
+    }
     val graph = PropagationGraph(
         nodes = frameSlots,
-        sources = IntArray(copies.size) { edge -> (copies[edge] ushr 32).toInt() },
-        destinations = IntArray(copies.size) { edge -> copies[edge].toInt() },
+        sources = sources,
+        destinations = destinations,
     )
     graph.spread(references)
+
     val slots = references.indices.filter { references[it] }.toIntArray()
+    val rootIndex = IntArray(frameSlots).also { index -> slots.forEachIndexed { root, slot -> index[slot] = root } }
+    val unpublished = References(slots, writesThrough = false, references, rootIndex)
     val writesThrough = slots.isNotEmpty() &&
         function.instructions.any { instruction -> instruction.mayCollectWhileFrameLive(analysis.mayCollect) }
-    if (!writesThrough) return References(slots, writesThrough = false, frameSlots)
-    return References(slots, writesThrough = true, frameSlots, analyzeRootPublication(function, analysis.mayCollect))
+    if (!writesThrough) {
+        return unpublished
+    }
+
+    val flow = flowGraph(table, function)
+    val needs = analyzeRootNeeds(table, flow, function, analysis.mayCollect, rootIndex, references, slots.size)
+    if (needs != null && needs.isEmpty()) {
+        return unpublished
+    }
+
+    val publication = analyzeRootPublication(flow, function, analysis.mayCollect, needs)
+    return References(slots, writesThrough = true, references, rootIndex, publication)
 }

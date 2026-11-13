@@ -23,6 +23,7 @@ kotlin {
         testImplementation(projects.decoder)
         testImplementation(projects.module)
         testImplementation(projects.validator)
+        testImplementation(libs.asm.analysis)
         testImplementation(libs.result)
     }
 }

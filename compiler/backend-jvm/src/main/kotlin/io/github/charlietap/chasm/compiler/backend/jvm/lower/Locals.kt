@@ -28,6 +28,7 @@ internal class Locals(
 
     val scratchValue: Int
     val scratchObject: Int
+    val rootsArray: Int
 
     val rootsSaved: Int
     val rootBase: Int
@@ -81,6 +82,7 @@ internal class Locals(
         scratchValue = local(Opcodes.INTEGER, 1)
         scratchValues = local("[J", 1)
         scratchObject = local("java/lang/Object", 1)
+        rootsArray = local("[J", 1)
         rootsSaved = local(Opcodes.LONG, 2)
         rootBase = local(Opcodes.INTEGER, 1)
         exitPosition = local(Opcodes.INTEGER, 1)

@@ -93,7 +93,9 @@ internal fun LowerContext.store(
         }
         else -> {
             emit.moveWide(home, pair)
-            if (references.writesThrough && references.isReference[slot] && publishesWrites) publish(slot, pair)
+            if (roots.publishes(slot)) {
+                roots.publish(slot, pair)
+            }
         }
     }
 }
@@ -146,7 +148,9 @@ internal fun LowerContext.finishWide(
     register: Int,
 ) {
     if (register != registers.home(slot)) return store(slot, register)
-    if (references.writesThrough && references.isReference[slot] && publishesWrites) publish(slot, register)
+    if (roots.publishes(slot)) {
+        roots.publish(slot, register)
+    }
 }
 
 internal fun LowerContext.floatSource(
@@ -201,13 +205,13 @@ internal fun LowerContext.copyToSlot(
                 return emit.move(registers.home(destination), registers.home(source.slot))
             }
             emit.moveWide(registers.home(destination), registers.home(source.slot))
-            if (references.writesThrough && references.isReference[destination] && publishesWrites) {
+            if (roots.publishes(destination)) {
                 val home = registers.home(destination)
                 if (home < 256) {
-                    publish(destination, home)
+                    roots.publish(destination, home)
                 } else {
                     emit.moveWide(Registers.W0, home)
-                    publish(destination, Registers.W0)
+                    roots.publish(destination, Registers.W0)
                 }
             }
         }
@@ -338,9 +342,9 @@ internal fun LowerContext.parallelCopy(
             return@forEachIndexed store(destination, Registers.W0)
         }
         emit.moveWide(registers.home(destination), registers.temporary(temporary))
-        if (references.writesThrough && references.isReference[destination] && publishesWrites) {
+        if (roots.publishes(destination)) {
             emit.moveWide(Registers.W0, registers.temporary(temporary))
-            publish(destination, Registers.W0)
+            roots.publish(destination, Registers.W0)
         }
     }
 }

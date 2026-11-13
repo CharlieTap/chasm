@@ -155,6 +155,17 @@
     (local.set $box (local.get $second))
     (struct.get $box 0 (ref.as_non_null (local.get $box))))
 
+  (func $dead_across_call (export "dead_across_call") (param $first (ref $box)) (result i32)
+    (local $box (ref null $box))
+    (local.set $box (local.get $first))
+    (call $host)
+    (local.set $box (ref.null $box))
+    (i32.const 0))
+
+  (func $live_across_call (export "live_across_call") (param $first (ref $box)) (result i32)
+    (call $host)
+    (struct.get $box 0 (local.get $first)))
+
   ;; Memory growth, directly and through calls.
   (func $grows (export "grows") (result i32)
     (memory.grow (i32.const 1)))

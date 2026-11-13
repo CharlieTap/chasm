@@ -11,11 +11,14 @@ import io.github.charlietap.chasm.type.ValueType
 
 class InstructionTable internal constructor(
     private val function: CirFunction,
+    private val declarations: ModuleIndexSpaces,
     val writes: SlotWriteTable,
     val jumps: JumpTable,
     val accesses: MemoryAccessTable,
     private val innermostRegions: IntArray?,
 ) {
+    val reads: SlotReadTable by lazy(LazyThreadSafetyMode.NONE) { slotReadTable(function, declarations) }
+
     fun innermostRegion(position: Int): Int {
         val regions = innermostRegions ?: return -1
         return regions[position]
@@ -96,6 +99,16 @@ class MemoryAccessTable internal constructor(
     }
 }
 
+class SlotReadTable internal constructor(
+    val start: IntArray,
+    val slots: IntArray,
+    val unknown: BooleanArray?,
+) {
+    fun end(position: Int): Int {
+        return start[position + 1]
+    }
+}
+
 fun instructionTable(
     function: CirFunction,
     declarations: ModuleIndexSpaces,
@@ -151,6 +164,7 @@ fun instructionTable(
     val regions = function.exceptions?.regions.orEmpty()
     return InstructionTable(
         function = function,
+        declarations = declarations,
         writes = SlotWriteTable(modes, writeStart, writes.slots, writes.sources, writes.kinds, writes.references),
         jumps = JumpTable(targetStart, targets.targets),
         accesses = MemoryAccessTable(
@@ -265,5 +279,46 @@ private class MemoryAccessBuilder {
         addresses[size] = if (address is Operand.Slot) address.slot else MemoryAccessTable.CONSTANT_ADDRESS
         endOffsets[size] = (access.offset.toLong() and 0xFFFF_FFFFL) + access.operation.width
         size++
+    }
+}
+
+private fun slotReadTable(
+    function: CirFunction,
+    declarations: ModuleIndexSpaces,
+): SlotReadTable {
+
+    val instructions = function.instructions
+    val size = instructions.size
+    val start = IntArray(size + 1)
+    val reads = SlotReadBuilder(size)
+    var unknown: BooleanArray? = null
+
+    for (position in 0 until size) {
+        start[position] = reads.size
+        if (!visitSlotReads(instructions[position], declarations, reads)) {
+            reads.size = start[position]
+            val flags = unknown ?: BooleanArray(size)
+            flags[position] = true
+            unknown = flags
+        }
+    }
+    start[size] = reads.size
+
+    return SlotReadTable(start, reads.slots, unknown)
+}
+
+private class SlotReadBuilder(
+    instructions: Int,
+) : SlotReadVisitor {
+    var slots = IntArray(maxOf(16, instructions * 2))
+    var size = 0
+
+    override fun read(slot: Int) {
+
+        if (size == slots.size) {
+            slots = slots.copyOf(size * 2)
+        }
+
+        slots[size++] = slot
     }
 }

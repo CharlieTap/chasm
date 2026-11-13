@@ -134,7 +134,7 @@ private fun LowerContext.lowerMatcher(
     val current = checkNotNull(function.exceptions).regions[region]
     emit.place("match$region")
     refreshMemory()
-    refreshActivation()
+    roots.refresh()
     emit.invoke(PENDING_TAG, Registers.CONTEXT)
     emit.moveResult(Registers.I0)
     current.catches.forEach { handler ->
@@ -173,6 +173,6 @@ private fun LowerContext.lowerPropagation() {
     emit.place(PROPAGATE)
     emit.const(Registers.I0, 1)
     emit.putField(Registers.I0, Registers.CONTEXT, CONTEXT_TYPE, UNWINDING_FIELD, "Z")
-    closeActivation()
+    roots.close()
     returnAnything()
 }

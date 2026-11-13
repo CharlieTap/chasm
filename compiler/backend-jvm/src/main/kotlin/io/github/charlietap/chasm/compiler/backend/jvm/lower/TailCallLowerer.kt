@@ -2,7 +2,6 @@ package io.github.charlietap.chasm.compiler.backend.jvm.lower
 
 import io.github.charlietap.chasm.cir.ControlInstruction
 import io.github.charlietap.chasm.compiler.backend.abi.ARRAYCOPY
-import io.github.charlietap.chasm.compiler.backend.abi.FRAME
 import io.github.charlietap.chasm.compiler.backend.abi.MethodRef
 import io.github.charlietap.chasm.compiler.backend.abi.Resource
 import io.github.charlietap.chasm.compiler.backend.abi.TAIL_CALL
@@ -63,11 +62,12 @@ private fun LowerContext.chunkSelfTailCall(
     chunk: Chunk,
     arguments: List<Operand>,
 ) {
-    pushContext()
-    emit.invokeStatic(FRAME)
-    emit.store(Opcodes.ASTORE, locals.scratchValues)
+    if (!roots.isArrayCurrent) {
+        roots.loadArray()
+    }
+
     arguments.forEachIndexed { index, argument ->
-        emit.load(Opcodes.ALOAD, locals.scratchValues)
+        emit.load(Opcodes.ALOAD, locals.rootsArray)
         emit.load(Opcodes.ILOAD, locals.rootBase)
         emit.int(index)
         emit.insn(Opcodes.IADD)
@@ -75,7 +75,7 @@ private fun LowerContext.chunkSelfTailCall(
         emit.insn(Opcodes.LASTORE)
     }
     if (chunk.resetsSlots) {
-        resetSlots(locals.scratchValues)
+        resetSlots(locals.rootsArray)
     }
     emit.int(0)
     emit.insn(Opcodes.IRETURN)
@@ -106,6 +106,6 @@ private inline fun LowerContext.requestTailCall(
     val method = target()
     emit.load(Opcodes.ALOAD, locals.scratchValues)
     emit.invokeStatic(method)
-    closeRoots()
+    roots.close()
     returnNothing()
 }

@@ -147,6 +147,7 @@ private fun LowerContext.afterCall(
 
     val type = call.type
     if (!checksPendingTailCall && !checksUnwinding) {
+        roots.refresh()
         storeResults(type, call.resultBase)
         if (grows) refreshMemory()
         return
@@ -187,6 +188,7 @@ private fun LowerContext.afterCall(
     if (checksUnwinding) {
         unwindCheck()
     }
+    roots.refresh()
 
     when (results) {
         0 -> Unit
@@ -211,6 +213,7 @@ private inline fun LowerContext.runtimeCall(
     emit.load(Opcodes.ILOAD, Locals.DEPTH)
     emit.invokeStatic(method)
     unwindCheck()
+    roots.refresh()
     storeEncodedResults(call.type, call.resultBase)
     refreshMemory()
 }

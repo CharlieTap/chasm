@@ -62,9 +62,137 @@ fun visitSlotReads(
         true
     }
     is TableInstruction -> instruction.helperCall()?.let { call -> visitor.helper(call) } ?: false
-    is ReferenceInstruction,
-    is AggregateInstruction,
-    -> false
+    is AggregateInstruction -> instruction.helperCall()?.let { call -> visitor.helper(call) } ?: visitAggregateReads(instruction, declarations, visitor)
+    is ReferenceInstruction -> {
+        visitReferenceReads(instruction, visitor)
+        true
+    }
+}
+
+private fun visitAggregateReads(
+    instruction: AggregateInstruction,
+    declarations: ModuleIndexSpaces,
+    visitor: SlotReadVisitor,
+): Boolean {
+    when (instruction) {
+        is AggregateInstruction.ArrayCopyIii -> {
+            visitor.read(instruction.sourceAddressSlot)
+            visitor.read(instruction.destinationAddressSlot)
+        }
+        is AggregateInstruction.ArrayCopyIis -> {
+            visitor.read(instruction.sourceAddressSlot)
+            visitor.read(instruction.destinationAddressSlot)
+            visitor.read(instruction.destinationOffsetSlot)
+        }
+        is AggregateInstruction.ArrayCopyIsi -> {
+            visitor.read(instruction.sourceAddressSlot)
+            visitor.read(instruction.destinationAddressSlot)
+            visitor.read(instruction.sourceOffsetSlot)
+        }
+        is AggregateInstruction.ArrayCopyIss -> {
+            visitor.read(instruction.sourceAddressSlot)
+            visitor.read(instruction.destinationAddressSlot)
+            visitor.read(instruction.sourceOffsetSlot)
+            visitor.read(instruction.destinationOffsetSlot)
+        }
+        is AggregateInstruction.ArrayCopySii -> {
+            visitor.read(instruction.sourceAddressSlot)
+            visitor.read(instruction.destinationAddressSlot)
+            visitor.read(instruction.elementsToCopySlot)
+        }
+        is AggregateInstruction.ArrayCopySis -> {
+            visitor.read(instruction.sourceAddressSlot)
+            visitor.read(instruction.destinationAddressSlot)
+            visitor.read(instruction.elementsToCopySlot)
+            visitor.read(instruction.destinationOffsetSlot)
+        }
+        is AggregateInstruction.ArrayCopySsi -> {
+            visitor.read(instruction.sourceAddressSlot)
+            visitor.read(instruction.destinationAddressSlot)
+            visitor.read(instruction.elementsToCopySlot)
+            visitor.read(instruction.sourceOffsetSlot)
+        }
+        is AggregateInstruction.ArrayCopySss -> {
+            visitor.read(instruction.sourceAddressSlot)
+            visitor.read(instruction.destinationAddressSlot)
+            visitor.read(instruction.elementsToCopySlot)
+            visitor.read(instruction.sourceOffsetSlot)
+            visitor.read(instruction.destinationOffsetSlot)
+        }
+        is AggregateInstruction.ArrayGetI -> visitor.read(instruction.addressSlot)
+        is AggregateInstruction.ArrayGetS -> {
+            visitor.read(instruction.addressSlot)
+            visitor.read(instruction.fieldSlot)
+        }
+        is AggregateInstruction.ArrayGetSignedI -> visitor.read(instruction.addressSlot)
+        is AggregateInstruction.ArrayGetSignedS -> {
+            visitor.read(instruction.addressSlot)
+            visitor.read(instruction.fieldSlot)
+        }
+        is AggregateInstruction.ArrayGetUnsignedI -> visitor.read(instruction.addressSlot)
+        is AggregateInstruction.ArrayGetUnsignedS -> {
+            visitor.read(instruction.addressSlot)
+            visitor.read(instruction.fieldSlot)
+        }
+        is AggregateInstruction.ArrayLenS -> visitor.read(instruction.addressSlot)
+        is AggregateInstruction.ArrayNewDefaultI -> Unit
+        is AggregateInstruction.ArrayNewDefaultS -> visitor.read(instruction.sizeSlot)
+        is AggregateInstruction.ArrayNewFixedS -> for (slot in instruction.firstElementSlot until instruction.firstElementSlot + instruction.size) visitor.read(slot)
+        is AggregateInstruction.ArraySetIi -> visitor.read(instruction.addressSlot)
+        is AggregateInstruction.ArraySetIs -> {
+            visitor.read(instruction.addressSlot)
+            visitor.read(instruction.fieldSlot)
+        }
+        is AggregateInstruction.ArraySetSi -> {
+            visitor.read(instruction.addressSlot)
+            visitor.read(instruction.valueSlot)
+        }
+        is AggregateInstruction.ArraySetSs -> {
+            visitor.read(instruction.addressSlot)
+            visitor.read(instruction.valueSlot)
+            visitor.read(instruction.fieldSlot)
+        }
+        is AggregateInstruction.RefI31I -> Unit
+        is AggregateInstruction.RefI31S -> visitor.read(instruction.valueSlot)
+        is AggregateInstruction.I31GetSignedS -> visitor.read(instruction.valueSlot)
+        is AggregateInstruction.I31GetUnsignedS -> visitor.read(instruction.valueSlot)
+        is AggregateInstruction.StructGetS -> visitor.read(instruction.addressSlot)
+        is AggregateInstruction.StructGetSignedS -> visitor.read(instruction.addressSlot)
+        is AggregateInstruction.StructGetUnsignedS -> visitor.read(instruction.addressSlot)
+        is AggregateInstruction.RefCastStructGetS -> visitor.read(instruction.referenceSlot)
+        is AggregateInstruction.StructGetStructGetS -> visitor.read(instruction.addressSlot)
+        is AggregateInstruction.LocalSetStructGetS -> visitor.read(instruction.sourceSlot)
+        is AggregateInstruction.StructNewS -> {
+            val fields = declarations.structFields(instruction.type).size
+            for (slot in instruction.firstFieldSlot until instruction.firstFieldSlot + fields) visitor.read(slot)
+        }
+        is AggregateInstruction.StructNewDefaultS -> Unit
+        is AggregateInstruction.StructSetI -> visitor.read(instruction.addressSlot)
+        is AggregateInstruction.StructSetS -> {
+            visitor.read(instruction.addressSlot)
+            visitor.read(instruction.valueSlot)
+        }
+        else -> return false
+    }
+    return true
+}
+
+private fun visitReferenceReads(
+    instruction: ReferenceInstruction,
+    visitor: SlotReadVisitor,
+) {
+    when (instruction) {
+        is ReferenceInstruction.RefCastS -> visitor.read(instruction.referenceSlot)
+        is ReferenceInstruction.RefEqSs -> {
+            visitor.read(instruction.reference1Slot)
+            visitor.read(instruction.reference2Slot)
+        }
+        is ReferenceInstruction.RefIsNullS -> visitor.read(instruction.valueSlot)
+        is ReferenceInstruction.RefAsNonNullS -> visitor.read(instruction.valueSlot)
+        is ReferenceInstruction.RefNullS -> Unit
+        is ReferenceInstruction.RefFuncS -> Unit
+        is ReferenceInstruction.RefTestS -> visitor.read(instruction.referenceSlot)
+    }
 }
 
 private fun SlotReadVisitor.operand(

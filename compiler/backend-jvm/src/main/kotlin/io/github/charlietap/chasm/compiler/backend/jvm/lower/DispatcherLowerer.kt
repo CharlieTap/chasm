@@ -35,6 +35,7 @@ internal fun LowerContext.lowerDispatcher(
     emit.store(Opcodes.LSTORE, locals.rootsSaved)
     emit.int(0)
     emit.store(Opcodes.ISTORE, locals.rootBase)
+    roots.initialize(loadArray = false)
 
     chargeStackBudget(frameCost)
 

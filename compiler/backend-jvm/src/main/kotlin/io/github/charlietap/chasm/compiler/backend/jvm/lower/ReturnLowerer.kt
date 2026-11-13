@@ -10,7 +10,7 @@ internal fun LowerContext.ret(
     results: List<Operand> = List(resultCount) { Operand.Slot(it) },
 ) {
     if (chunk != null) return chunkReturn(results)
-    closeRoots()
+    roots.close()
     when (resultDescriptor) {
         "V" -> emit.insn(Opcodes.RETURN)
         "I" -> {

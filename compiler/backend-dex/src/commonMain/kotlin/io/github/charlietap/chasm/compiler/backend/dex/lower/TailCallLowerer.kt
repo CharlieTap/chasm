@@ -45,7 +45,7 @@ internal fun LowerContext.lowerTailCall(
         }
         else -> throw Unsupported(instruction::class.simpleName ?: "tail call")
     }
-    closeActivation()
+    roots.close()
     returnUnreachable()
 }
 
@@ -63,7 +63,7 @@ private fun LowerContext.restart(
         for (slot in 0 until parameterCount) {
             if (!references.isReference[slot]) continue
             loadWide(Registers.W0, slot)
-            publish(slot, Registers.W0)
+            roots.publish(slot, Registers.W0)
         }
     }
     initializeLocals()

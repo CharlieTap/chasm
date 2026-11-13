@@ -17,12 +17,14 @@ internal fun chunkDescriptor(
 
 internal fun LowerContext.lowerChunkBody() {
     val chunk = checkNotNull(chunk)
-    position = SlotKinds.PROLOGUE
+    enterPrologue()
     initializeScratch()
     emit.long(0L)
     emit.store(Opcodes.LSTORE, locals.rootsSaved)
     emit.load(Opcodes.ILOAD, locals.argumentLocals[0])
     emit.store(Opcodes.ISTORE, locals.rootBase)
+    val reloaded = reloadedSlots(chunk)
+    roots.initialize(references.writesThrough || reloaded.isNotEmpty())
     if (function.exceptions != null) {
         emit.load(Opcodes.ILOAD, locals.rootBase)
         emit.insn(Opcodes.I2L)
@@ -35,7 +37,7 @@ internal fun LowerContext.lowerChunkBody() {
         emit.insn(Opcodes.LOR)
         emit.store(Opcodes.LSTORE, locals.stackSaved)
     }
-    loadSlots()
+    loadSlots(chunk, reloaded)
     val entries = chunk.entries
     val unknown = emit.label()
     emit.load(Opcodes.ILOAD, locals.argumentLocals[1])
@@ -48,13 +50,7 @@ internal fun LowerContext.lowerChunkBody() {
     emit.place(unknown)
     trap(UNREACHABLE)
 
-    for (position in chunk.start until chunk.end) {
-        this.position = position
-        val label = placement(position)
-        emit.place(label)
-        markSite(position, label)
-        lowerInstruction(function.instructions[position], this)
-    }
+    lowerPositions(chunk.start until chunk.end)
     emit.place(chunk.endMarker)
     if (chunk.end < function.instructions.size) {
         emit.jump(Opcodes.GOTO, label(chunk.end))
@@ -63,22 +59,32 @@ internal fun LowerContext.lowerChunkBody() {
         trap(UNREACHABLE)
     }
     lowerExceptionHandling()
-    outOfLine.forEach { path -> path() }
+    lowerOutOfLine()
     lowerExits()
 }
 
-private fun LowerContext.loadSlots() {
-    if (locals.isRecording) return
-    val chunk = checkNotNull(chunk)
+private fun LowerContext.reloadedSlots(chunk: Chunk): List<Int> {
+
+    if (locals.isRecording) {
+        return emptyList()
+    }
+
     val reloads = chunk.reloads
-    val loaded = locals.heldSlots.filter { slot -> reloads == null || reloads[slot] }
+    return locals.heldSlots.filter { slot -> reloads == null || reloads[slot] }
+}
+
+private fun LowerContext.loadSlots(
+    chunk: Chunk,
+    reloaded: List<Int>,
+) {
+
+    if (locals.isRecording) return
+
+    val reloads = chunk.reloads
     locals.heldSlots.forEach { slot -> if (reloads != null && !reloads[slot]) initialize(slot, frame.initialValues[slot]) }
-    if (loaded.isEmpty()) return
-    pushContext()
-    emit.invokeStatic(FRAME)
-    emit.store(Opcodes.ASTORE, locals.scratchValues)
-    for (slot in loaded) {
-        emit.load(Opcodes.ALOAD, locals.scratchValues)
+
+    for (slot in reloaded) {
+        emit.load(Opcodes.ALOAD, locals.rootsArray)
         frameIndex(slot)
         emit.insn(Opcodes.LALOAD)
         val local = locals.slot(slot)

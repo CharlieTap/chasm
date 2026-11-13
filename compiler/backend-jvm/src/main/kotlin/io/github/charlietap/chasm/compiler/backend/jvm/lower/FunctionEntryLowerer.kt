@@ -12,8 +12,9 @@ import org.objectweb.asm.Opcodes
 internal fun LowerContext.lowerPrologue(
     frameCost: Int,
 ) {
-    position = SlotKinds.PROLOGUE
-    openRoots()
+    enterPrologue()
+    initializeScratch()
+    roots.open()
     for (slot in 0 until parameterCount) initializeShadows(slot, 0L)
     parameterDescriptors.forEachIndexed { index, descriptor ->
         if (argumentArray) {
@@ -43,7 +44,6 @@ internal fun LowerContext.lowerPrologue(
         }
     }
     for (slot in parameterCount until frame.frameSlots) initialize(slot, frame.initialValues[slot])
-    initializeScratch()
     if (function.exceptions != null) {
         pushContext()
         emit.invokeStatic(SAVE_STACK)

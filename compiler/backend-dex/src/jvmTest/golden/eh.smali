@@ -1630,9 +1630,9 @@
 
     invoke-static {v14, v6, v7}, Lio/github/charlietap/chasm/runtime/compiled/CompiledCalls;->closeFrame(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;J)V
 
-    goto/16 :goto_ac
+    goto/16 :goto_a8
     :try_end_5d
-    .catch Ljava/lang/Throwable; {:try_start_35 .. :try_end_5d} :catch_a1
+    .catch Ljava/lang/Throwable; {:try_start_35 .. :try_end_5d} :catch_9d
 
     .line 4
     :goto_5d
@@ -1650,7 +1650,7 @@
 
     const v9, -0x7ffff830
 
-    if-ge v8, v9, :cond_96
+    if-ge v8, v9, :cond_92
 
     .line 7
     move/from16 v0, v23
@@ -1695,10 +1695,6 @@
 
     move-wide/from16 v26, v0
 
-    add-int/lit8 v19, v18, 0x1
-
-    aput-wide v0, v17, v19
-
     .line 9
     add-int/lit8 v23, v23, 0x1
 
@@ -1706,7 +1702,7 @@
     goto :goto_63
 
     .line 11
-    :cond_96
+    :cond_92
     move-wide/from16 v26, v24
 
     .line 12
@@ -1714,13 +1710,13 @@
 
     invoke-static {v14, v0, v1}, Lio/github/charlietap/chasm/runtime/compiled/CompiledExceptions;->throwRef(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;J)V
 
-    goto/16 :goto_d6
+    goto/16 :goto_d2
 
     const/4 v8, 0x0
 
     return v8
 
-    :catch_a1
+    :catch_9d
     move-exception v12
 
     invoke-static {v12}, Lio/github/charlietap/chasm/runtime/compiled/CompiledExceptions;->wasmException(Ljava/lang/Throwable;)Ljava/lang/Throwable;
@@ -1729,9 +1725,9 @@
 
     invoke-static {v14, v6, v7}, Lio/github/charlietap/chasm/runtime/compiled/CompiledCalls;->closeFrame(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;J)V
 
-    goto/16 :goto_ac
+    goto/16 :goto_a8
 
-    :goto_ac
+    :goto_a8
     invoke-static {v14}, Lio/github/charlietap/chasm/runtime/compiled/CompiledCalls;->frame(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;)[J
 
     move-result-object v17
@@ -1748,7 +1744,7 @@
 
     long-to-int v9, v4
 
-    if-ne v8, v9, :cond_d4
+    if-ne v8, v9, :cond_d0
 
     const/4 v9, 0x1
 
@@ -1778,10 +1774,10 @@
 
     goto :goto_5d
 
-    :cond_d4
-    goto/16 :goto_d6
+    :cond_d0
+    goto/16 :goto_d2
 
-    :goto_d6
+    :goto_d2
     const/4 v8, 0x1
 
     iput-boolean v8, v14, Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;->compiledUnwinding:Z

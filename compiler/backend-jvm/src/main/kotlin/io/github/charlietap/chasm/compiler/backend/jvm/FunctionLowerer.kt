@@ -4,7 +4,6 @@ import io.github.charlietap.chasm.cir.CirFunction
 import io.github.charlietap.chasm.cir.MemoryInstruction
 import io.github.charlietap.chasm.compiler.backend.abi.MethodRef
 import io.github.charlietap.chasm.compiler.backend.abi.Resource
-import io.github.charlietap.chasm.compiler.backend.analysis.FrameFacts
 import io.github.charlietap.chasm.compiler.backend.analysis.NarrowHomeMismatch
 import io.github.charlietap.chasm.compiler.backend.analysis.References
 import io.github.charlietap.chasm.compiler.backend.analysis.SlotKinds
@@ -72,10 +71,9 @@ internal fun FunctionLowerer(
     function: CirFunction,
     method: MethodRef,
 ): FunctionResult {
-    val declarations = module.declarations
-    val frame = frameFacts(function, declarations)
-    val references = analyzeReferences(function, frame.type, frame.frameSlots, declarations, module.analysis)
-    val lowering = FunctionLowering(module, function, frame, references, method)
+
+    val lowering = FunctionLowering(module, function, method)
+
     return try {
         val methods = try {
             lowering.lower(narrowSlots = true)
@@ -91,15 +89,21 @@ internal fun FunctionLowerer(
 private class FunctionLowering(
     private val module: ModuleLowering,
     private val function: CirFunction,
-    private val frame: FrameFacts,
-    private val references: References,
     private val method: MethodRef,
 ) {
+    private val frame = frameFacts(function, module.declarations)
+
     private val parameterCount = frame.type.params.types.size
 
-    private val maxMethodBytes = module.options.functionMaxMethodBytes[function.index.index] ?: module.options.maxMethodBytes
-
     private val table by lazy(LazyThreadSafetyMode.NONE) { instructionTable(function, module.declarations) }
+
+    private val references = if (module.analysis.publishesRegisters) {
+        analyzeReferences(table, function, frame.type, frame.frameSlots, module.analysis)
+    } else {
+        References.none(frame.frameSlots)
+    }
+
+    private val maxMethodBytes = module.options.functionMaxMethodBytes[function.index.index] ?: module.options.maxMethodBytes
 
     private val inlineMemory = inlineMemory(function.instructions.indices)
 

@@ -15,17 +15,15 @@ import io.github.charlietap.dexter.Conversion
 
 internal fun LowerContext.lowerChunkBody() {
     val chunk = checkNotNull(chunk)
-    val publication = references.publication
-    publishesWrites = publication.afterEntry
+    enterPrologue()
     lowerChunkPrologue(chunk)
     for (position in chunk.start until chunk.end) {
         emit.place(label(position))
-        this.position = position
-        publishesWrites = publication.requiresPublicationAfter(position)
+        enterInstruction(position)
         if (module.options.stacktraces) emit.line(line(position))
         lowerInstruction(function.instructions[position], this)
     }
-    publishesWrites = true
+    enterColdCode()
     emit.place(CHUNK_END)
     if (chunk.end < function.instructions.size) {
         emit.gotoLabel(label(chunk.end))
@@ -34,7 +32,10 @@ internal fun LowerContext.lowerChunkBody() {
         returnUnreachable()
     }
     lowerExceptionHandling()
-    outOfLine.forEach { path -> path() }
+    outOfLine.forEach { path ->
+        enterColdCode()
+        path()
+    }
     lowerExits(chunk)
 }
 
@@ -50,10 +51,7 @@ private fun LowerContext.lowerChunkPrologue(
         loadObject(registers.unsafe, Resource.Unsafe, UNSAFE_TYPE)
         emit.constWide(registers.byteArrayBase, checkNotNull(module.options.byteArrayBaseOffset))
     }
-    if (references.writesThrough) {
-        emit.move(registers.activationFp, registers.frameBase)
-        refreshActivation()
-    }
+    roots.initialize()
     analysis.cachedConstants.forEachIndexed { index, constant ->
         if (chunk.constants?.get(index) == false) return@forEachIndexed
         loadCachedConstant(constant)
@@ -71,7 +69,6 @@ private fun LowerContext.lowerChunkPrologue(
         emit.binary(BinaryOp.OrLong, Registers.W0, Registers.W0, Registers.W1)
         emit.moveWide(registers.savedStack, Registers.W0)
     }
-    position = SlotKinds.PROLOGUE
     reloadSlots()
     if (analysis.window.callBufferWords > 0) {
         emit.const(Registers.I0, 0)

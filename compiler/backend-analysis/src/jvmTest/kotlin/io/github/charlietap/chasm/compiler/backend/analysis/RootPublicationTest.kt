@@ -19,7 +19,8 @@ class RootPublicationTest {
 
     private val module = module("root_publication")
     private val code: CirModule = ModuleCompiler(module).getOrThrow { IllegalStateException(it.toString()) }
-    private val analysis = analyzeModule(module, code, ModuleIndexSpaces(module))
+    private val declarations = ModuleIndexSpaces(module)
+    private val analysis = analyzeModule(module, code, declarations)
 
     @Test
     fun `a write followed by a collection is published and one after the last is not`() {
@@ -28,7 +29,7 @@ class RootPublicationTest {
         assertCopies(function, call - 1)
         assertCopies(function, call + 1)
 
-        val publication = analyzeRootPublication(function, analysis.mayCollect)
+        val publication = publication(function)
 
         assertEquals(true, publication.requiresPublicationAfter(call - 1))
         assertEquals(false, publication.requiresPublicationAfter(call + 1))
@@ -40,15 +41,20 @@ class RootPublicationTest {
         val call = call(function)
         assertCopies(function, call + 1)
 
-        val publication = analyzeRootPublication(function, analysis.mayCollect)
+        val publication = publication(function)
 
         assertEquals(true, publication.requiresPublicationAfter(call + 1))
     }
 
     @Test
     fun `parameters are published only when a collection follows the entry`() {
-        assertEquals(true, analyzeRootPublication(function("trailing"), analysis.mayCollect).afterEntry)
-        assertEquals(false, analyzeRootPublication(function("reads"), analysis.mayCollect).afterEntry)
+        assertEquals(true, publication(function("trailing")).afterEntry)
+        assertEquals(false, publication(function("reads")).afterEntry)
+    }
+
+    private fun publication(function: CirFunction): RootPublication {
+        val table = instructionTable(function, declarations)
+        return analyzeRootPublication(flowGraph(table, function), function, analysis.mayCollect, needs = null)
     }
 
     private fun assertCopies(

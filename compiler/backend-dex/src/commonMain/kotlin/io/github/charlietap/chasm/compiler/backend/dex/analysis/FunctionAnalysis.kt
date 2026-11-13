@@ -67,6 +67,7 @@ internal fun analyzeFunction(
     val type = frame.type
     val frameSlots = frame.frameSlots
     val instructions = function.instructions
+    val table = instructionTable(function, declarations)
 
     val inlineMemory = module.inlineMemory.takeIf { inlineAccesses && (split || instructions.size <= INLINE_MEMORY_INSTRUCTIONS) }
     val usesInlineMemory = inlineMemory != null &&
@@ -94,9 +95,9 @@ internal fun analyzeFunction(
         isLeaf = function.isLeaf(),
         cachedConstants = cachedConstants(function, if (usesInlineMemory) inlineMemory else null),
         window = analyzeCallWindow(module, function, typedSignatures),
-        references = analyzeReferences(function, type, frameSlots, declarations, module.analysis),
+        references = analyzeReferences(table, function, type, frameSlots, module.analysis),
         checkedAccesses = if (usesInlineMemory) {
-            function.redundantBoundsChecks(instructionTable(function, declarations))
+            function.redundantBoundsChecks(table)
         } else {
             BooleanArray(instructions.size)
         },

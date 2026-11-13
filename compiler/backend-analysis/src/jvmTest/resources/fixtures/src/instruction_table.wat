@@ -2,6 +2,8 @@
   (memory 1)
   (memory $second 1)
   (table $references 1 externref)
+  (type $pair (struct (field (mut i32)) (field (mut i32))))
+  (type $numbers (array (mut i32)))
 
   (func (export "accesses") (param $address i32) (param $value i32) (result i32)
     (i32.store offset=8 (local.get $address) (local.get $value))
@@ -38,4 +40,9 @@
     (block $caught
       (try_table (catch_all $caught)
         (return_call $guarded (local.get $count))))
-    (i32.const 0)))
+    (i32.const 0))
+
+  (func (export "aggregates") (param $pair (ref $pair)) (param $numbers (ref $numbers)) (param $index i32) (param $value i32) (result i32)
+    (struct.set $pair 1 (local.get $pair) (local.get $value))
+    (array.set $numbers (local.get $numbers) (local.get $index) (local.get $value))
+    (ref.eq (local.get $pair) (local.get $numbers))))

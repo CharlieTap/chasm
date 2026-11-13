@@ -14,7 +14,7 @@ internal fun LowerContext.ret(
     results: List<Operand> = List(resultCount) { Operand.Slot(it) },
 ) {
     if (chunk != null) return chunkReturn(results)
-    closeActivation()
+    roots.close()
     when (resultCount) {
         0 -> emit.returnVoid()
         1 -> when (resultDescriptor) {

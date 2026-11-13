@@ -122,12 +122,13 @@ private fun LowerContext.finishCall(
     if (direct && returns == "I" && isInt(call.resultBase) && registers.home(call.resultBase) < 256) {
         val home = narrowTarget(call.resultBase)
         emit.moveResult(home)
-        return refreshActivation()
+        roots.refresh()
+        return
     }
     if (direct && returns == "J" && isLong(call.resultBase) && registers.home(call.resultBase) < 256) {
         val home = wideTarget(call.resultBase)
         emit.moveResultWide(home)
-        refreshActivation()
+        roots.refresh()
         return finishWide(call.resultBase, home)
     }
     when (returns) {
@@ -143,7 +144,7 @@ private fun LowerContext.finishCall(
     if (checksPendingTailCall) {
         completePendingTailCall(returns, results)
     }
-    refreshActivation()
+    roots.refresh()
     when (results) {
         0 -> Unit
         1 -> when (returns) {
@@ -295,7 +296,7 @@ private fun LowerContext.bridgeCall(
         else -> throw Unsupported(instruction::class.simpleName ?: "call")
     }
     unwindCheck()
-    refreshActivation()
+    roots.refresh()
     for (index in call.type.results.types.indices) {
         emit.const(Registers.I2, index)
         emit.arrayGet(ArrayKind.Wide, Registers.W0, Registers.OBJECT, Registers.I2)

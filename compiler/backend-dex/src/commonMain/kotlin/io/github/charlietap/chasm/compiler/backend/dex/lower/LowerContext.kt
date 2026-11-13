@@ -50,7 +50,24 @@ internal class LowerContext(
 
     val resultDescriptor = returnDescriptor(type)
 
+    val roots = RootFrame(references, registers, emit, chunk != null)
+
     var position = SlotKinds.PROLOGUE
+        private set
+
+    fun enterPrologue() {
+        position = SlotKinds.PROLOGUE
+        roots.enterPrologue()
+    }
+
+    fun enterInstruction(position: Int) {
+        this.position = position
+        roots.enterInstruction(position)
+    }
+
+    fun enterColdCode() {
+        roots.enterColdCode()
+    }
 
     private val innermostRegion: IntArray by lazy {
         innermostRegions(function.exceptions?.regions.orEmpty(), function.instructions.size)
@@ -69,8 +86,6 @@ internal class LowerContext(
     var cachesLoaded = false
 
     val sharedTrapLabels = HashMap<MethodRef, String>()
-
-    var publishesWrites = true
 
     var propagates = false
 
