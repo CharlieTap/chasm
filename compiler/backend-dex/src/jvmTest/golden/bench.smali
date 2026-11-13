@@ -533,13 +533,23 @@
     shl-int/lit8 v31, v28, 0x3
 
     .line 8
-    move/from16 v8, v28
-
     const/4 v9, 0x7
 
-    invoke-static {v8, v9}, Lio/github/charlietap/chasm/runtime/compiled/CompiledNumerics;->i32RemU(II)I
+    move/from16 v8, v28
 
-    move-result v8
+    int-to-long v0, v8
+
+    int-to-long v2, v9
+
+    const-wide v4, 0xffffffffL
+
+    and-long/2addr v0, v4
+
+    and-long/2addr v2, v4
+
+    rem-long/2addr v0, v2
+
+    long-to-int v8, v0
 
     int-to-long v0, v8
 
@@ -567,11 +577,11 @@
     .line 10
     move/from16 v8, v31
 
-    if-ltz v8, :cond_2ee
+    if-ltz v8, :cond_2fc
 
     add-int/lit8 v11, v17, -0x8
 
-    if-gt v8, v11, :cond_2ee
+    if-gt v8, v11, :cond_2fc
 
     move-wide/from16 v2, v32
 
@@ -640,13 +650,23 @@
     add-int v31, v29, v9
 
     .line 13
-    move/from16 v8, v28
-
     const/4 v9, 0x5
 
-    invoke-static {v8, v9}, Lio/github/charlietap/chasm/runtime/compiled/CompiledNumerics;->i32RemU(II)I
+    move/from16 v8, v28
 
-    move-result v8
+    int-to-long v0, v8
+
+    int-to-long v2, v9
+
+    const-wide v4, 0xffffffffL
+
+    and-long/2addr v0, v4
+
+    and-long/2addr v2, v4
+
+    rem-long/2addr v0, v2
+
+    long-to-int v8, v0
 
     int-to-long v0, v8
 
@@ -674,11 +694,11 @@
     .line 15
     move/from16 v8, v31
 
-    if-ltz v8, :cond_305
+    if-ltz v8, :cond_313
 
     add-int/lit8 v11, v17, -0x8
 
-    if-gt v8, v11, :cond_305
+    if-gt v8, v11, :cond_313
 
     move-wide/from16 v2, v32
 
@@ -759,18 +779,18 @@
     const/16 v28, 0x0
 
     .line 21
-    :cond_10d
+    :cond_11b
     const/16 v22, 0x0
 
     .line 23
-    :cond_10f
+    :cond_11d
     const-wide/16 v24, 0x0
 
     .line 24
     const/16 v23, 0x0
 
     .line 26
-    :cond_113
+    :cond_121
     mul-int v8, v28, v19
 
     int-to-long v0, v8
@@ -804,11 +824,11 @@
 
     long-to-int v8, v0
 
-    if-ltz v8, :cond_31c
+    if-ltz v8, :cond_32a
 
     add-int/lit8 v11, v17, -0x8
 
-    if-gt v8, v11, :cond_31c
+    if-gt v8, v11, :cond_32a
 
     aget-byte v9, v18, v8
 
@@ -913,11 +933,11 @@
 
     long-to-int v8, v0
 
-    if-ltz v8, :cond_334
+    if-ltz v8, :cond_342
 
     add-int/lit8 v11, v17, -0x8
 
-    if-gt v8, v11, :cond_334
+    if-gt v8, v11, :cond_342
 
     aget-byte v9, v18, v8
 
@@ -1041,7 +1061,7 @@
 
     add-int v9, v19, v10
 
-    if-lt v8, v9, :cond_113
+    if-lt v8, v9, :cond_121
 
     .line 39
     mul-int v8, v28, v19
@@ -1082,11 +1102,11 @@
     .line 43
     move/from16 v8, v31
 
-    if-ltz v8, :cond_34c
+    if-ltz v8, :cond_35a
 
     add-int/lit8 v11, v17, -0x8
 
-    if-gt v8, v11, :cond_34c
+    if-gt v8, v11, :cond_35a
 
     move-wide/from16 v2, v24
 
@@ -1154,7 +1174,7 @@
 
     add-int v9, v19, v10
 
-    if-lt v8, v9, :cond_10f
+    if-lt v8, v9, :cond_11d
 
     .line 46
     add-int/lit8 v28, v28, 0x1
@@ -1166,13 +1186,13 @@
 
     add-int v9, v19, v10
 
-    if-lt v8, v9, :cond_10d
+    if-lt v8, v9, :cond_11b
 
     .line 48
     const/16 v28, 0x0
 
     .line 50
-    :cond_26c
+    :cond_27a
     add-int/lit8 v36, v19, 0x1
 
     .line 51
@@ -1209,11 +1229,11 @@
 
     long-to-int v8, v0
 
-    if-ltz v8, :cond_363
+    if-ltz v8, :cond_371
 
     add-int/lit8 v11, v17, -0x8
 
-    if-gt v8, v11, :cond_363
+    if-gt v8, v11, :cond_371
 
     aget-byte v9, v18, v8
 
@@ -1316,7 +1336,7 @@
 
     add-int v9, v19, v10
 
-    if-lt v8, v9, :cond_26c
+    if-lt v8, v9, :cond_27a
 
     .line 58
     move-wide/from16 v0, v26
@@ -1328,7 +1348,7 @@
     return-wide v0
 
     .line 10
-    :cond_2ee
+    :cond_2fc
     move-object/from16 v12, v39
 
     const/4 v10, 0x1
@@ -1354,7 +1374,7 @@
     return-wide v0
 
     .line 15
-    :cond_305
+    :cond_313
     move-object/from16 v12, v39
 
     const/4 v10, 0x1
@@ -1380,7 +1400,7 @@
     return-wide v0
 
     .line 29
-    :cond_31c
+    :cond_32a
     move-object/from16 v12, v39
 
     const/4 v10, 0x0
@@ -1408,7 +1428,7 @@
     return-wide v0
 
     .line 34
-    :cond_334
+    :cond_342
     move-object/from16 v12, v39
 
     const/4 v10, 0x0
@@ -1436,7 +1456,7 @@
     return-wide v0
 
     .line 43
-    :cond_34c
+    :cond_35a
     move-object/from16 v12, v39
 
     const/4 v10, 0x1
@@ -1462,7 +1482,7 @@
     return-wide v0
 
     .line 54
-    :cond_363
+    :cond_371
     move-object/from16 v12, v39
 
     const/4 v10, 0x0

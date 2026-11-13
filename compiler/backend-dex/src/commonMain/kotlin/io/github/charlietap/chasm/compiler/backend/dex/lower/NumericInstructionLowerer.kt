@@ -1,40 +1,37 @@
 package io.github.charlietap.chasm.compiler.backend.dex.lower
 
 import io.github.charlietap.chasm.cir.NumericInstruction
+import io.github.charlietap.chasm.compiler.backend.abi.DIVIDE_BY_ZERO
 import io.github.charlietap.chasm.compiler.backend.abi.DOUBLE_TO_RAW_LONG_BITS
 import io.github.charlietap.chasm.compiler.backend.abi.F32_COPYSIGN
-import io.github.charlietap.chasm.compiler.backend.abi.F32_MAX
-import io.github.charlietap.chasm.compiler.backend.abi.F32_MIN
 import io.github.charlietap.chasm.compiler.backend.abi.F32_TRUNC
 import io.github.charlietap.chasm.compiler.backend.abi.F64_COPYSIGN
-import io.github.charlietap.chasm.compiler.backend.abi.F64_MAX
-import io.github.charlietap.chasm.compiler.backend.abi.F64_MIN
 import io.github.charlietap.chasm.compiler.backend.abi.F64_TRUNC
 import io.github.charlietap.chasm.compiler.backend.abi.FLOAT_TO_RAW_INT_BITS
-import io.github.charlietap.chasm.compiler.backend.abi.I32_DIV_S
-import io.github.charlietap.chasm.compiler.backend.abi.I32_DIV_U
-import io.github.charlietap.chasm.compiler.backend.abi.I32_REM_S
-import io.github.charlietap.chasm.compiler.backend.abi.I32_REM_U
-import io.github.charlietap.chasm.compiler.backend.abi.I64_DIV_S
-import io.github.charlietap.chasm.compiler.backend.abi.I64_DIV_U
 import io.github.charlietap.chasm.compiler.backend.abi.I64_MUL_WIDE_HIGH_S
 import io.github.charlietap.chasm.compiler.backend.abi.I64_MUL_WIDE_HIGH_U
-import io.github.charlietap.chasm.compiler.backend.abi.I64_REM_S
-import io.github.charlietap.chasm.compiler.backend.abi.I64_REM_U
+import io.github.charlietap.chasm.compiler.backend.abi.INTEGER_OVERFLOW
 import io.github.charlietap.chasm.compiler.backend.abi.INT_BITS_TO_FLOAT
 import io.github.charlietap.chasm.compiler.backend.abi.INT_BIT_COUNT
+import io.github.charlietap.chasm.compiler.backend.abi.INT_DIVIDE_UNSIGNED
 import io.github.charlietap.chasm.compiler.backend.abi.INT_LEADING_ZEROS
 import io.github.charlietap.chasm.compiler.backend.abi.INT_ROTATE_LEFT
 import io.github.charlietap.chasm.compiler.backend.abi.INT_ROTATE_RIGHT
 import io.github.charlietap.chasm.compiler.backend.abi.INT_TRAILING_ZEROS
 import io.github.charlietap.chasm.compiler.backend.abi.LONG_BITS_TO_DOUBLE
 import io.github.charlietap.chasm.compiler.backend.abi.LONG_BIT_COUNT
+import io.github.charlietap.chasm.compiler.backend.abi.LONG_DIVIDE_UNSIGNED
 import io.github.charlietap.chasm.compiler.backend.abi.LONG_LEADING_ZEROS
+import io.github.charlietap.chasm.compiler.backend.abi.LONG_REMAINDER_UNSIGNED
 import io.github.charlietap.chasm.compiler.backend.abi.LONG_ROTATE_LEFT
 import io.github.charlietap.chasm.compiler.backend.abi.LONG_ROTATE_RIGHT
 import io.github.charlietap.chasm.compiler.backend.abi.LONG_TRAILING_ZEROS
 import io.github.charlietap.chasm.compiler.backend.abi.MATH_CEIL
 import io.github.charlietap.chasm.compiler.backend.abi.MATH_FLOOR
+import io.github.charlietap.chasm.compiler.backend.abi.MATH_MAX_DOUBLE
+import io.github.charlietap.chasm.compiler.backend.abi.MATH_MAX_FLOAT
+import io.github.charlietap.chasm.compiler.backend.abi.MATH_MIN_DOUBLE
+import io.github.charlietap.chasm.compiler.backend.abi.MATH_MIN_FLOAT
 import io.github.charlietap.chasm.compiler.backend.abi.MATH_RINT
 import io.github.charlietap.chasm.compiler.backend.abi.MATH_SQRT
 import io.github.charlietap.chasm.compiler.backend.abi.MethodRef
@@ -47,6 +44,7 @@ import io.github.charlietap.chasm.compiler.backend.analysis.form.form
 import io.github.charlietap.chasm.type.NumberType
 import io.github.charlietap.dexter.BinaryOp
 import io.github.charlietap.dexter.CompareOp
+import io.github.charlietap.dexter.Cond
 import io.github.charlietap.dexter.Conversion
 import io.github.charlietap.dexter.LiteralOp
 import io.github.charlietap.dexter.UnaryOp
@@ -110,18 +108,24 @@ private fun LowerContext.i32Binary(
         }
         return finishNarrow(destination, target)
     }
-    val helper = when (operation) {
-        BinaryOperation.DivS -> I32_DIV_S
-        BinaryOperation.DivU -> I32_DIV_U
-        BinaryOperation.RemS -> I32_REM_S
-        BinaryOperation.RemU -> I32_REM_U
-        BinaryOperation.Rotl -> INT_ROTATE_LEFT
-        BinaryOperation.Rotr -> INT_ROTATE_RIGHT
+    when (operation) {
+        BinaryOperation.DivS, BinaryOperation.DivU, BinaryOperation.RemS, BinaryOperation.RemU ->
+            i32Divide(operation, left, right, destination)
+        BinaryOperation.Rotl -> i32Rotate(INT_ROTATE_LEFT, left, right, destination)
+        BinaryOperation.Rotr -> i32Rotate(INT_ROTATE_RIGHT, left, right, destination)
         else -> throw Unsupported("i32 $operation")
     }
+}
+
+private fun LowerContext.i32Rotate(
+    rotate: MethodRef,
+    left: Operand,
+    right: Operand,
+    destination: Int,
+) {
     loadInt(Registers.I0, Registers.W0, left)
     loadInt(Registers.I1, Registers.W1, right)
-    emit.invoke(helper, Registers.I0, Registers.I1)
+    emit.invoke(rotate, Registers.I0, Registers.I1)
     emit.moveResult(Registers.I0)
     storeInt(destination, Registers.I0)
 }
@@ -217,25 +221,24 @@ private fun LowerContext.i64Binary(
         emit.binary(shift, target, l, Registers.I1)
         return finishWide(destination, target)
     }
-    loadWide(Registers.W0, left)
     when (operation) {
-        BinaryOperation.Rotl, BinaryOperation.Rotr -> {
-            loadInt(Registers.I1, Registers.W1, right)
-            val rotate = if (operation == BinaryOperation.Rotl) LONG_ROTATE_LEFT else LONG_ROTATE_RIGHT
-            emit.invoke(rotate, Registers.W0, Registers.W0 + 1, Registers.I1)
-        }
-        else -> {
-            val helper = when (operation) {
-                BinaryOperation.DivS -> I64_DIV_S
-                BinaryOperation.DivU -> I64_DIV_U
-                BinaryOperation.RemS -> I64_REM_S
-                BinaryOperation.RemU -> I64_REM_U
-                else -> throw Unsupported("i64 $operation")
-            }
-            loadWide(Registers.W1, right)
-            emit.invoke(helper, Registers.W0, Registers.W0 + 1, Registers.W1, Registers.W1 + 1)
-        }
+        BinaryOperation.DivS, BinaryOperation.DivU, BinaryOperation.RemS, BinaryOperation.RemU ->
+            i64Divide(operation, left, right, destination)
+        BinaryOperation.Rotl -> i64Rotate(LONG_ROTATE_LEFT, left, right, destination)
+        BinaryOperation.Rotr -> i64Rotate(LONG_ROTATE_RIGHT, left, right, destination)
+        else -> throw Unsupported("i64 $operation")
     }
+}
+
+private fun LowerContext.i64Rotate(
+    rotate: MethodRef,
+    left: Operand,
+    right: Operand,
+    destination: Int,
+) {
+    loadWide(Registers.W0, left)
+    loadInt(Registers.I1, Registers.W1, right)
+    emit.invoke(rotate, Registers.W0, Registers.W0 + 1, Registers.I1)
     emit.moveResultWide(Registers.W0)
     store(destination, Registers.W0)
 }
@@ -290,8 +293,8 @@ private fun LowerContext.f32Binary(
         return storeFloat(destination, Registers.I0)
     }
     val helper = when (operation) {
-        BinaryOperation.Min -> F32_MIN
-        BinaryOperation.Max -> F32_MAX
+        BinaryOperation.Min -> MATH_MIN_FLOAT
+        BinaryOperation.Max -> MATH_MAX_FLOAT
         BinaryOperation.Copysign -> F32_COPYSIGN
         else -> throw Unsupported("f32 $operation")
     }
@@ -353,8 +356,8 @@ private fun LowerContext.f64Binary(
         return storeDouble(destination, Registers.W0)
     }
     val helper = when (operation) {
-        BinaryOperation.Min -> F64_MIN
-        BinaryOperation.Max -> F64_MAX
+        BinaryOperation.Min -> MATH_MIN_DOUBLE
+        BinaryOperation.Max -> MATH_MAX_DOUBLE
         BinaryOperation.Copysign -> F64_COPYSIGN
         else -> throw Unsupported("f64 $operation")
     }
@@ -448,3 +451,170 @@ private fun LowerContext.wide(
         }
     }
 }
+
+private fun LowerContext.i32Divide(
+    operation: BinaryOperation,
+    left: Operand,
+    right: Operand,
+    destination: Int,
+) {
+
+    val immediate = right as? Operand.Immediate
+    if (immediate != null && immediate.bits.toInt() == 0) {
+        emit.gotoLabel(trapLabel(DIVIDE_BY_ZERO))
+        return
+    }
+
+    val signed = operation == BinaryOperation.DivS || operation == BinaryOperation.RemS
+    val rightRegister = if (signed) {
+        narrowSource(right, Registers.I1)
+    } else {
+        loadInt(Registers.I1, Registers.W1, right)
+        Registers.I1
+    }
+    if (immediate == null) {
+        emit.branchZero(Cond.Eq, rightRegister, trapLabel(DIVIDE_BY_ZERO))
+    }
+
+    when (operation) {
+        BinaryOperation.DivS -> {
+            i32OverflowCheck(left, rightRegister, immediate)
+            i32Signed(BinaryOp.DivInt, left, rightRegister, destination)
+        }
+        BinaryOperation.RemS -> i32Signed(BinaryOp.RemInt, left, rightRegister, destination)
+        BinaryOperation.DivU -> {
+            loadInt(Registers.I0, Registers.W0, left)
+            emit.invoke(INT_DIVIDE_UNSIGNED, Registers.I0, Registers.I1)
+            emit.moveResult(Registers.I0)
+            storeInt(destination, Registers.I0)
+        }
+        else -> {
+            loadInt(Registers.I0, Registers.W0, left)
+            emit.convert(Conversion.IntToLong, Registers.W0, Registers.I0)
+            emit.convert(Conversion.IntToLong, Registers.W1, Registers.I1)
+            emit.constWide(Registers.W2, UNSIGNED_INT_MASK)
+            emit.binary(BinaryOp.AndLong, Registers.W0, Registers.W0, Registers.W2)
+            emit.binary(BinaryOp.AndLong, Registers.W1, Registers.W1, Registers.W2)
+            emit.binary(BinaryOp.RemLong, Registers.W0, Registers.W0, Registers.W1)
+            emit.convert(Conversion.LongToInt, Registers.I0, Registers.W0)
+            storeInt(destination, Registers.I0)
+        }
+    }
+}
+
+private fun LowerContext.i32OverflowCheck(
+    left: Operand,
+    rightRegister: Int,
+    immediate: Operand.Immediate?,
+) {
+
+    if (immediate != null && immediate.bits.toInt() != -1) {
+        return
+    }
+
+    val proceed = emit.freshLabel()
+    if (immediate == null) {
+        emit.literal(LiteralOp.AddInt, Registers.I2, rightRegister, 1)
+        emit.branchZero(Cond.Ne, Registers.I2, proceed)
+    }
+
+    loadInt(Registers.I0, Registers.W0, left)
+    emit.const(Registers.I2, Int.MIN_VALUE)
+    emit.branchCompare(Cond.Eq, Registers.I0, Registers.I2, trapLabel(INTEGER_OVERFLOW))
+    if (immediate == null) {
+        emit.place(proceed)
+    }
+}
+
+private fun LowerContext.i32Signed(
+    operation: BinaryOp,
+    left: Operand,
+    rightRegister: Int,
+    destination: Int,
+) {
+    val leftRegister = narrowSource(left, Registers.I0)
+    val target = narrowTarget(destination)
+    emit.binary(operation, target, leftRegister, rightRegister)
+    finishNarrow(destination, target)
+}
+
+private fun LowerContext.i64Divide(
+    operation: BinaryOperation,
+    left: Operand,
+    right: Operand,
+    destination: Int,
+) {
+
+    val immediate = right as? Operand.Immediate
+    if (immediate != null && immediate.bits == 0L) {
+        emit.gotoLabel(trapLabel(DIVIDE_BY_ZERO))
+        return
+    }
+
+    val signed = operation == BinaryOperation.DivS || operation == BinaryOperation.RemS
+    val rightRegister = if (signed) {
+        wideSource(right, Registers.W1)
+    } else {
+        loadWide(Registers.W1, right)
+        Registers.W1
+    }
+    if (immediate == null) {
+        emit.constWide(Registers.W2, 0L)
+        emit.compare(CompareOp.CmpLong, Registers.I2, rightRegister, Registers.W2)
+        emit.branchZero(Cond.Eq, Registers.I2, trapLabel(DIVIDE_BY_ZERO))
+    }
+
+    when (operation) {
+        BinaryOperation.DivS -> {
+            i64OverflowCheck(left, rightRegister, immediate)
+            i64Signed(BinaryOp.DivLong, left, rightRegister, destination)
+        }
+        BinaryOperation.RemS -> i64Signed(BinaryOp.RemLong, left, rightRegister, destination)
+        else -> {
+            loadWide(Registers.W0, left)
+            val helper = if (operation == BinaryOperation.DivU) LONG_DIVIDE_UNSIGNED else LONG_REMAINDER_UNSIGNED
+            emit.invoke(helper, Registers.W0, Registers.W0 + 1, Registers.W1, Registers.W1 + 1)
+            emit.moveResultWide(Registers.W0)
+            store(destination, Registers.W0)
+        }
+    }
+}
+
+private fun LowerContext.i64OverflowCheck(
+    left: Operand,
+    rightRegister: Int,
+    immediate: Operand.Immediate?,
+) {
+
+    if (immediate != null && immediate.bits != -1L) {
+        return
+    }
+
+    val proceed = emit.freshLabel()
+    if (immediate == null) {
+        emit.constWide(Registers.W2, -1L)
+        emit.compare(CompareOp.CmpLong, Registers.I2, rightRegister, Registers.W2)
+        emit.branchZero(Cond.Ne, Registers.I2, proceed)
+    }
+
+    emit.constWide(Registers.W2, Long.MIN_VALUE)
+    emit.compare(CompareOp.CmpLong, Registers.I2, wideSource(left, Registers.W0), Registers.W2)
+    emit.branchZero(Cond.Eq, Registers.I2, trapLabel(INTEGER_OVERFLOW))
+    if (immediate == null) {
+        emit.place(proceed)
+    }
+}
+
+private fun LowerContext.i64Signed(
+    operation: BinaryOp,
+    left: Operand,
+    rightRegister: Int,
+    destination: Int,
+) {
+    val leftRegister = wideSource(left, Registers.W0)
+    val target = wideTarget(destination)
+    emit.binary(operation, target, leftRegister, rightRegister)
+    finishWide(destination, target)
+}
+
+private const val UNSIGNED_INT_MASK = 0xFFFF_FFFFL

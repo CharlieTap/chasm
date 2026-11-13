@@ -1,36 +1,31 @@
 package io.github.charlietap.chasm.compiler.backend.jvm.lower
 
 import io.github.charlietap.chasm.cir.NumericInstruction
+import io.github.charlietap.chasm.compiler.backend.abi.DIVIDE_BY_ZERO
 import io.github.charlietap.chasm.compiler.backend.abi.DOUBLE_TO_RAW_LONG_BITS
-import io.github.charlietap.chasm.compiler.backend.abi.F32_COPYSIGN
-import io.github.charlietap.chasm.compiler.backend.abi.F32_MAX
-import io.github.charlietap.chasm.compiler.backend.abi.F32_MIN
 import io.github.charlietap.chasm.compiler.backend.abi.F32_TRUNC
-import io.github.charlietap.chasm.compiler.backend.abi.F64_COPYSIGN
-import io.github.charlietap.chasm.compiler.backend.abi.F64_MAX
-import io.github.charlietap.chasm.compiler.backend.abi.F64_MIN
 import io.github.charlietap.chasm.compiler.backend.abi.F64_TRUNC
 import io.github.charlietap.chasm.compiler.backend.abi.FLOAT_TO_RAW_INT_BITS
-import io.github.charlietap.chasm.compiler.backend.abi.I32_DIV_S
-import io.github.charlietap.chasm.compiler.backend.abi.I32_DIV_U
-import io.github.charlietap.chasm.compiler.backend.abi.I32_REM_S
-import io.github.charlietap.chasm.compiler.backend.abi.I32_REM_U
-import io.github.charlietap.chasm.compiler.backend.abi.I64_DIV_S
-import io.github.charlietap.chasm.compiler.backend.abi.I64_DIV_U
 import io.github.charlietap.chasm.compiler.backend.abi.I64_MUL_WIDE_HIGH_S
 import io.github.charlietap.chasm.compiler.backend.abi.I64_MUL_WIDE_HIGH_U
-import io.github.charlietap.chasm.compiler.backend.abi.I64_REM_S
-import io.github.charlietap.chasm.compiler.backend.abi.I64_REM_U
+import io.github.charlietap.chasm.compiler.backend.abi.INTEGER_OVERFLOW
 import io.github.charlietap.chasm.compiler.backend.abi.INT_BITS_TO_FLOAT
 import io.github.charlietap.chasm.compiler.backend.abi.INT_BIT_COUNT
+import io.github.charlietap.chasm.compiler.backend.abi.INT_DIVIDE_UNSIGNED
 import io.github.charlietap.chasm.compiler.backend.abi.INT_LEADING_ZEROS
 import io.github.charlietap.chasm.compiler.backend.abi.INT_TRAILING_ZEROS
 import io.github.charlietap.chasm.compiler.backend.abi.LONG_BITS_TO_DOUBLE
 import io.github.charlietap.chasm.compiler.backend.abi.LONG_BIT_COUNT
+import io.github.charlietap.chasm.compiler.backend.abi.LONG_DIVIDE_UNSIGNED
 import io.github.charlietap.chasm.compiler.backend.abi.LONG_LEADING_ZEROS
+import io.github.charlietap.chasm.compiler.backend.abi.LONG_REMAINDER_UNSIGNED
 import io.github.charlietap.chasm.compiler.backend.abi.LONG_TRAILING_ZEROS
 import io.github.charlietap.chasm.compiler.backend.abi.MATH_CEIL
 import io.github.charlietap.chasm.compiler.backend.abi.MATH_FLOOR
+import io.github.charlietap.chasm.compiler.backend.abi.MATH_MAX_DOUBLE
+import io.github.charlietap.chasm.compiler.backend.abi.MATH_MAX_FLOAT
+import io.github.charlietap.chasm.compiler.backend.abi.MATH_MIN_DOUBLE
+import io.github.charlietap.chasm.compiler.backend.abi.MATH_MIN_FLOAT
 import io.github.charlietap.chasm.compiler.backend.abi.MATH_RINT
 import io.github.charlietap.chasm.compiler.backend.abi.MATH_SQRT
 import io.github.charlietap.chasm.compiler.backend.abi.MethodRef
@@ -194,9 +189,21 @@ private fun LowerContext.binary(
     form: NumericForm.Binary,
 ) {
     val type = form.type
-    if (form.operation == BinaryOperation.Rotl || form.operation == BinaryOperation.Rotr) {
-        rotate(form)
-        return
+    when (form.operation) {
+        BinaryOperation.DivS, BinaryOperation.DivU, BinaryOperation.RemS, BinaryOperation.RemU -> {
+            val divisor = form.immediateDivisor()
+            if (divisor == 0L) {
+                emit.jump(Opcodes.GOTO, trapLabel(DIVIDE_BY_ZERO))
+            } else {
+                divide(form, divisor)
+            }
+            return
+        }
+        BinaryOperation.Rotl, BinaryOperation.Rotr -> {
+            rotate(form)
+            return
+        }
+        else -> Unit
     }
     push(type, form.left)
     if (type == NumberType.I64 && form.operation.takesIntCount()) {
@@ -209,10 +216,6 @@ private fun LowerContext.binary(
             BinaryOperation.Add -> emit.insn(Opcodes.IADD)
             BinaryOperation.Sub -> emit.insn(Opcodes.ISUB)
             BinaryOperation.Mul -> emit.insn(Opcodes.IMUL)
-            BinaryOperation.DivS -> emit.invokeStatic(I32_DIV_S)
-            BinaryOperation.DivU -> emit.invokeStatic(I32_DIV_U)
-            BinaryOperation.RemS -> emit.invokeStatic(I32_REM_S)
-            BinaryOperation.RemU -> emit.invokeStatic(I32_REM_U)
             BinaryOperation.And -> emit.insn(Opcodes.IAND)
             BinaryOperation.Or -> emit.insn(Opcodes.IOR)
             BinaryOperation.Xor -> emit.insn(Opcodes.IXOR)
@@ -225,10 +228,6 @@ private fun LowerContext.binary(
             BinaryOperation.Add -> emit.insn(Opcodes.LADD)
             BinaryOperation.Sub -> emit.insn(Opcodes.LSUB)
             BinaryOperation.Mul -> emit.insn(Opcodes.LMUL)
-            BinaryOperation.DivS -> emit.invokeStatic(I64_DIV_S)
-            BinaryOperation.DivU -> emit.invokeStatic(I64_DIV_U)
-            BinaryOperation.RemS -> emit.invokeStatic(I64_REM_S)
-            BinaryOperation.RemU -> emit.invokeStatic(I64_REM_U)
             BinaryOperation.And -> emit.insn(Opcodes.LAND)
             BinaryOperation.Or -> emit.insn(Opcodes.LOR)
             BinaryOperation.Xor -> emit.insn(Opcodes.LXOR)
@@ -242,9 +241,9 @@ private fun LowerContext.binary(
             BinaryOperation.Sub -> emit.insn(Opcodes.FSUB)
             BinaryOperation.Mul -> emit.insn(Opcodes.FMUL)
             BinaryOperation.Div -> emit.insn(Opcodes.FDIV)
-            BinaryOperation.Min -> emit.invokeStatic(F32_MIN)
-            BinaryOperation.Max -> emit.invokeStatic(F32_MAX)
-            BinaryOperation.Copysign -> emit.invokeStatic(F32_COPYSIGN)
+            BinaryOperation.Min -> emit.invokeStatic(MATH_MIN_FLOAT)
+            BinaryOperation.Max -> emit.invokeStatic(MATH_MAX_FLOAT)
+            BinaryOperation.Copysign -> copySignFloat()
             else -> unsupported(form)
         }
         NumberType.F64 -> when (form.operation) {
@@ -252,14 +251,114 @@ private fun LowerContext.binary(
             BinaryOperation.Sub -> emit.insn(Opcodes.DSUB)
             BinaryOperation.Mul -> emit.insn(Opcodes.DMUL)
             BinaryOperation.Div -> emit.insn(Opcodes.DDIV)
-            BinaryOperation.Min -> emit.invokeStatic(F64_MIN)
-            BinaryOperation.Max -> emit.invokeStatic(F64_MAX)
-            BinaryOperation.Copysign -> emit.invokeStatic(F64_COPYSIGN)
+            BinaryOperation.Min -> emit.invokeStatic(MATH_MIN_DOUBLE)
+            BinaryOperation.Max -> emit.invokeStatic(MATH_MAX_DOUBLE)
+            BinaryOperation.Copysign -> copySignDouble()
             else -> unsupported(form)
         }
         else -> unsupported(form)
     }
     store(type, form.destination)
+}
+
+private fun NumericForm.Binary.immediateDivisor(): Long? {
+    return (right as? Operand.Immediate)?.bits?.let { bits -> if (type == NumberType.I64) bits else bits.toInt().toLong() }
+}
+
+private fun LowerContext.divide(
+    form: NumericForm.Binary,
+    divisor: Long?,
+) {
+
+    val operation = form.operation
+    val type = form.type
+    val wide = type == NumberType.I64
+
+    if (divisor == null) {
+        trapOnZeroDivisor(type, form.right)
+    }
+    if (operation == BinaryOperation.DivS && (divisor == null || divisor == -1L)) {
+        trapOnOverflow(form, divisor)
+    }
+    if (!wide && operation == BinaryOperation.RemU) {
+        unsignedIntRemainder(form)
+        return
+    }
+
+    push(type, form.left)
+    push(type, form.right)
+    when (operation) {
+        BinaryOperation.DivS -> emit.insn(if (wide) Opcodes.LDIV else Opcodes.IDIV)
+        BinaryOperation.RemS -> emit.insn(if (wide) Opcodes.LREM else Opcodes.IREM)
+        BinaryOperation.DivU -> emit.invokeStatic(if (wide) LONG_DIVIDE_UNSIGNED else INT_DIVIDE_UNSIGNED)
+        else -> emit.invokeStatic(LONG_REMAINDER_UNSIGNED)
+    }
+    store(type, form.destination)
+}
+
+private fun LowerContext.trapOnZeroDivisor(
+    type: NumberType,
+    divisor: Operand,
+) {
+    push(type, divisor)
+    if (type == NumberType.I64) {
+        emit.insn(Opcodes.LCONST_0)
+        emit.insn(Opcodes.LCMP)
+    }
+    emit.jump(Opcodes.IFEQ, trapLabel(DIVIDE_BY_ZERO))
+}
+
+private fun LowerContext.trapOnOverflow(
+    form: NumericForm.Binary,
+    divisor: Long?,
+) {
+
+    val type = form.type
+    val wide = type == NumberType.I64
+    val proceed = emit.label()
+
+    if (divisor == null) {
+        push(type, form.right)
+        if (wide) {
+            emit.long(-1L)
+            emit.insn(Opcodes.LCMP)
+            emit.jump(Opcodes.IFNE, proceed)
+        } else {
+            emit.int(-1)
+            emit.jump(Opcodes.IF_ICMPNE, proceed)
+        }
+    }
+
+    push(type, form.left)
+    if (wide) {
+        emit.long(Long.MIN_VALUE)
+        emit.insn(Opcodes.LCMP)
+        emit.jump(Opcodes.IFEQ, trapLabel(INTEGER_OVERFLOW))
+    } else {
+        emit.int(Int.MIN_VALUE)
+        emit.jump(Opcodes.IF_ICMPEQ, trapLabel(INTEGER_OVERFLOW))
+    }
+
+    if (divisor == null) {
+        emit.place(proceed)
+    }
+}
+
+private fun LowerContext.unsignedIntRemainder(form: NumericForm.Binary) {
+
+    pushInt(form.left)
+    emit.insn(Opcodes.I2L)
+    emit.long(UNSIGNED_INT_MASK)
+    emit.insn(Opcodes.LAND)
+
+    pushInt(form.right)
+    emit.insn(Opcodes.I2L)
+    emit.long(UNSIGNED_INT_MASK)
+    emit.insn(Opcodes.LAND)
+
+    emit.insn(Opcodes.LREM)
+    emit.insn(Opcodes.L2I)
+    storeInt(form.destination)
 }
 
 private fun LowerContext.rotate(form: NumericForm.Binary) {
@@ -304,6 +403,33 @@ private fun shiftLeft(wide: Boolean): Int {
 private fun shiftRight(wide: Boolean): Int {
     return if (wide) Opcodes.LUSHR else Opcodes.IUSHR
 }
+
+private fun LowerContext.copySignFloat() {
+    emit.invokeStatic(FLOAT_TO_RAW_INT_BITS)
+    emit.int(Int.MIN_VALUE)
+    emit.insn(Opcodes.IAND)
+    emit.insn(Opcodes.SWAP)
+    emit.invokeStatic(FLOAT_TO_RAW_INT_BITS)
+    emit.int(Int.MAX_VALUE)
+    emit.insn(Opcodes.IAND)
+    emit.insn(Opcodes.IOR)
+    emit.invokeStatic(INT_BITS_TO_FLOAT)
+}
+
+private fun LowerContext.copySignDouble() {
+    emit.invokeStatic(DOUBLE_TO_RAW_LONG_BITS)
+    emit.long(Long.MIN_VALUE)
+    emit.insn(Opcodes.LAND)
+    emit.store(Opcodes.LSTORE, locals.scratchLong[0])
+    emit.invokeStatic(DOUBLE_TO_RAW_LONG_BITS)
+    emit.long(Long.MAX_VALUE)
+    emit.insn(Opcodes.LAND)
+    emit.load(Opcodes.LLOAD, locals.scratchLong[0])
+    emit.insn(Opcodes.LOR)
+    emit.invokeStatic(LONG_BITS_TO_DOUBLE)
+}
+
+private const val UNSIGNED_INT_MASK = 0xFFFF_FFFFL
 
 private fun BinaryOperation.takesIntCount(): Boolean {
     return this == BinaryOperation.Shl || this == BinaryOperation.ShrS || this == BinaryOperation.ShrU

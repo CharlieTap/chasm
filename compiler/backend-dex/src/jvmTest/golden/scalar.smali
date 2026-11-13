@@ -157,11 +157,13 @@
     move-wide/from16 v19, v0
 
     .line 2
-    move/from16 v8, v17
-
     move/from16 v9, v18
 
-    invoke-static {v8, v9}, Lio/github/charlietap/chasm/runtime/compiled/CompiledNumerics;->i32DivU(II)I
+    if-eqz v9, :cond_2c
+
+    move/from16 v8, v17
+
+    invoke-static {v8, v9}, Ljava/lang/Integer;->divideUnsigned(II)I
 
     move-result v8
 
@@ -171,6 +173,14 @@
     move/from16 v8, v17
 
     return v8
+
+    const/4 v8, 0x0
+
+    return v8
+
+    .line 2
+    :cond_2c
+    invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/CompiledRuntime;->divideByZero()Ljava/lang/Void;
 
     const/4 v8, 0x0
 

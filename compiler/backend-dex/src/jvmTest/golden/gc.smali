@@ -1132,11 +1132,11 @@
     move-result-wide v25
 
     .line 3
-    move/from16 v8, v20
-
     const/4 v9, 0x2
 
-    invoke-static {v8, v9}, Lio/github/charlietap/chasm/runtime/compiled/CompiledNumerics;->i32DivU(II)I
+    move/from16 v8, v20
+
+    invoke-static {v8, v9}, Ljava/lang/Integer;->divideUnsigned(II)I
 
     move-result v8
 
