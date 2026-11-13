@@ -40,6 +40,7 @@ internal class ModuleLowering(
     val inlineMemory: InlineMemory? = when (options.memory) {
         MemoryLowering.HELPERS -> null
         MemoryLowering.BYTE_ARRAY -> InlineMemory.BYTES
+        MemoryLowering.BYTE_BUFFER -> InlineMemory.BUFFER
         MemoryLowering.UNSAFE -> InlineMemory.UNSAFE
     }.takeIf { declarations.memoryCount > 0 }
     val packagePath = options.packageName.replace('.', '/')

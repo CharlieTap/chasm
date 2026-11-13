@@ -237,7 +237,7 @@ private fun jvmOptions(
                 storeConfig = config.storeConfig,
                 initialFuel = config.initialFuel,
                 memory = when (config.target) {
-                    CompileTarget.JVM -> MemoryLowering.HELPERS
+                    CompileTarget.JVM -> MemoryLowering.BYTE_BUFFER
                     CompileTarget.ANDROID -> MemoryLowering.UNSAFE
                 },
                 stacktraces = config.stacktraces,

@@ -36,7 +36,7 @@ internal object AotCompiler {
 
     private val SPLIT_INSTRUCTIONS: Int? = System.getProperty("chasm.test.aot.split")?.toInt()
 
-    private val MEMORY: MemoryLowering = System.getProperty("chasm.test.aot.memory")?.let(MemoryLowering::valueOf) ?: MemoryLowering.HELPERS
+    private val MEMORY: MemoryLowering = System.getProperty("chasm.test.aot.memory")?.let(MemoryLowering::valueOf) ?: JvmOptions().memory
 
     private val compiled = ConcurrentHashMap<CompileKey, ChasmResult<CompiledModule, ChasmError>>()
 

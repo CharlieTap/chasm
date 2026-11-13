@@ -16,9 +16,9 @@ class RuntimeAbiTest {
     }
 
     @Test
-    fun `only global, memory and unsafe accessors are instance methods`() {
+    fun `only global, memory, unsafe and byte buffer accessors are instance methods`() {
         methods().forEach { method ->
-            val expectedStatic = method.owner !in setOf(GLOBAL_INSTANCE, MEMORY_INSTANCE, UNSAFE_TYPE)
+            val expectedStatic = method.owner !in setOf(GLOBAL_INSTANCE, MEMORY_INSTANCE, UNSAFE_TYPE, BYTE_BUFFER_TYPE)
             val actualStatic = Modifier.isStatic(resolve(method).modifiers)
             assertEquals(expectedStatic, actualStatic, method.toString())
         }
@@ -32,11 +32,20 @@ class RuntimeAbiTest {
     }
 
     @Test
-    fun `a memory instance has the byte array field compiled code reads`() {
-        val field = Class.forName(binaryName(MEMORY_INSTANCE)).getField(MEMORY_BYTE_ARRAY_FIELD)
+    fun `a memory instance has the fields compiled code reads`() {
 
-        assertTrue(Modifier.isPublic(field.modifiers))
-        assertEquals("[B", descriptor(field.type))
+        val memory = Class.forName(binaryName(MEMORY_INSTANCE))
+        val fields = mapOf(
+            MEMORY_BYTE_ARRAY_FIELD to "[B",
+            MEMORY_BYTE_BUFFER_FIELD to OBJECT_TYPE,
+        )
+
+        fields.forEach { (name, type) ->
+            val field = memory.getField(name)
+            assertTrue(Modifier.isPublic(field.modifiers), name)
+            assertFalse(Modifier.isStatic(field.modifiers), name)
+            assertEquals(type, descriptor(field.type), name)
+        }
     }
 
     @Test

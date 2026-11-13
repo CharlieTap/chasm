@@ -35,5 +35,7 @@ enum class MemoryLowering {
 
     BYTE_ARRAY,
 
+    BYTE_BUFFER,
+
     UNSAFE,
 }

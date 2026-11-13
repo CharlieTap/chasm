@@ -37,6 +37,7 @@ internal class Locals(
     val stackSaved: Int
 
     val memoryBytes: Int
+    val memoryBuffer: Int
     val memorySize: Int
     val unsafe: Int
     val byteArrayBase: Int
@@ -81,7 +82,8 @@ internal class Locals(
         rootBase = local(Opcodes.INTEGER, 1)
         exitPosition = local(Opcodes.INTEGER, 1)
         stackSaved = local(Opcodes.LONG, 2)
-        memoryBytes = if (inlineMemory != null) local("[B", 1) else -1
+        memoryBytes = if (inlineMemory == InlineMemory.BYTES || inlineMemory == InlineMemory.UNSAFE) local("[B", 1) else -1
+        memoryBuffer = if (inlineMemory == InlineMemory.BUFFER) local("java/nio/ByteBuffer", 1) else -1
         memorySize = if (inlineMemory != null) local(Opcodes.INTEGER, 1) else -1
         unsafe = if (inlineMemory == InlineMemory.UNSAFE) local("sun/misc/Unsafe", 1) else -1
         byteArrayBase = if (inlineMemory == InlineMemory.UNSAFE) local(Opcodes.LONG, 2) else -1

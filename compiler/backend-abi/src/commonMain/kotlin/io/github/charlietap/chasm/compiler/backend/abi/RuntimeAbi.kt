@@ -32,6 +32,8 @@ private const val STRINGS = "[Ljava/lang/String;"
 const val UNSAFE_TYPE = "Lsun/misc/Unsafe;"
 
 const val MEMORY_BYTE_ARRAY_FIELD = "byteArray"
+const val MEMORY_BYTE_BUFFER_FIELD = "byteBuffer"
+const val BYTE_BUFFER_TYPE = "Ljava/nio/ByteBuffer;"
 
 private class Owner(
     val descriptor: String,
@@ -52,6 +54,8 @@ private val compiledNumerics = Owner("Lio/github/charlietap/chasm/runtime/compil
 private val compiledMemory = Owner("Lio/github/charlietap/chasm/runtime/compiled/CompiledMemory;")
 private val memoryInstance = Owner(MEMORY_INSTANCE)
 private val unsafe = Owner(UNSAFE_TYPE)
+private val byteBuffer = Owner(BYTE_BUFFER_TYPE)
+private val compiledBufferMemory = Owner("Lio/github/charlietap/chasm/runtime/compiled/CompiledBufferMemory;")
 private val globalInstance = Owner(GLOBAL_INSTANCE)
 private val javaInteger = Owner("Ljava/lang/Integer;")
 private val javaLong = Owner("Ljava/lang/Long;")
@@ -83,6 +87,24 @@ val UNSAFE_GET_INT = unsafe.method("getInt", OBJECT_TYPE, "J", returns = "I")
 val UNSAFE_GET_LONG = unsafe.method("getLong", OBJECT_TYPE, "J", returns = "J")
 val UNSAFE_PUT_INT = unsafe.method("putInt", OBJECT_TYPE, "J", "I", returns = "V")
 val UNSAFE_PUT_LONG = unsafe.method("putLong", OBJECT_TYPE, "J", "J", returns = "V")
+
+val BYTE_BUFFER_GET_BYTE = byteBuffer.method("get", "I", returns = "B")
+val BYTE_BUFFER_GET_SHORT = byteBuffer.method("getShort", "I", returns = "S")
+val BYTE_BUFFER_GET_INT = byteBuffer.method("getInt", "I", returns = "I")
+val BYTE_BUFFER_GET_LONG = byteBuffer.method("getLong", "I", returns = "J")
+val BYTE_BUFFER_PUT_BYTE = byteBuffer.method("put", "I", "B", returns = BYTE_BUFFER_TYPE)
+val BYTE_BUFFER_PUT_SHORT = byteBuffer.method("putShort", "I", "S", returns = BYTE_BUFFER_TYPE)
+val BYTE_BUFFER_PUT_INT = byteBuffer.method("putInt", "I", "I", returns = BYTE_BUFFER_TYPE)
+val BYTE_BUFFER_PUT_LONG = byteBuffer.method("putLong", "I", "J", returns = BYTE_BUFFER_TYPE)
+
+val BUFFER_I32_LOAD_8_S = compiledBufferMemory.method("i32Load8S", BYTE_BUFFER_TYPE, "I", "I", "I", returns = "I")
+val BUFFER_I32_LOAD_16_S = compiledBufferMemory.method("i32Load16S", BYTE_BUFFER_TYPE, "I", "I", "I", returns = "I")
+val BUFFER_I32_LOAD = compiledBufferMemory.method("i32Load", BYTE_BUFFER_TYPE, "I", "I", "I", returns = "I")
+val BUFFER_I64_LOAD = compiledBufferMemory.method("i64Load", BYTE_BUFFER_TYPE, "I", "I", "I", returns = "J")
+val BUFFER_I32_STORE_8 = compiledBufferMemory.method("i32Store8", BYTE_BUFFER_TYPE, "I", "I", "I", "I", returns = "V")
+val BUFFER_I32_STORE_16 = compiledBufferMemory.method("i32Store16", BYTE_BUFFER_TYPE, "I", "I", "I", "I", returns = "V")
+val BUFFER_I32_STORE = compiledBufferMemory.method("i32Store", BYTE_BUFFER_TYPE, "I", "I", "I", "I", returns = "V")
+val BUFFER_I64_STORE = compiledBufferMemory.method("i64Store", BYTE_BUFFER_TYPE, "I", "I", "I", "J", returns = "V")
 
 fun memoryAccess(
     name: String,

@@ -23,10 +23,14 @@ data class MemoryInstance(
     @JvmField
     var byteArray: ByteArray? = byteArray()
 
+    @JvmField
+    var byteBuffer: Any? = borrowedBuffer(data)
+
     fun refresh() {
         size = size()
         bounds = bounds()
         byteArray = byteArray()
+        byteBuffer = borrowedBuffer(data)
     }
 
     fun grow(pagesToAdd: Int): Int {

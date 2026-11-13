@@ -84,13 +84,9 @@ kotlin {
 
 tasks.withType<Test>().configureEach {
     jvmArgs("-Xss32m")
-    val properties = if (name == "testAndroidHostTest") {
-        listOf("chasm.test.aot.split", "chasm.test.aot.memory")
-    } else {
-        listOf("chasm.test.aot.split")
-    }
-    properties.forEach { property ->
-        providers.systemProperty(property).orNull?.let { value ->
+    val defaults = if (name == "testAndroidHostTest") emptyMap() else mapOf("chasm.test.aot.memory" to "BYTE_BUFFER")
+    listOf("chasm.test.aot.split", "chasm.test.aot.memory").forEach { property ->
+        (providers.systemProperty(property).orNull ?: defaults[property])?.let { value ->
             systemProperty(property, value)
             inputs.property(property, value)
         }
