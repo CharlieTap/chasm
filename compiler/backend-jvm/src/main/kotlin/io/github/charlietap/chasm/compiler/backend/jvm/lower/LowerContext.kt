@@ -12,6 +12,7 @@ import io.github.charlietap.chasm.compiler.backend.analysis.ModuleIndexSpaces
 import io.github.charlietap.chasm.compiler.backend.analysis.References
 import io.github.charlietap.chasm.compiler.backend.analysis.SlotKinds
 import io.github.charlietap.chasm.compiler.backend.analysis.innermostRegions
+import io.github.charlietap.chasm.compiler.backend.analysis.isLeaf
 import io.github.charlietap.chasm.compiler.backend.jvm.ModuleLowering
 import io.github.charlietap.chasm.type.FunctionType
 import org.objectweb.asm.Label
@@ -28,6 +29,8 @@ internal class FunctionFacts(
     val checkedAccesses: BooleanArray,
 ) {
     val innermostRegion = innermostRegions(function.exceptions?.regions.orEmpty(), function.instructions.size)
+
+    val isLeaf = function.isLeaf()
 
     val resources = ArrayList<Resource>()
     private val resourceIds = HashMap<Resource, Int>()

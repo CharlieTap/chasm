@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.compiler.backend.jvm.lower
 
 import io.github.charlietap.chasm.compiler.backend.abi.CALL_STACK_EXHAUSTED
 import io.github.charlietap.chasm.compiler.backend.abi.CONTEXT_TYPE
+import io.github.charlietap.chasm.compiler.backend.abi.MAX_UNCHARGED_LEAF_FRAME_COST
 import io.github.charlietap.chasm.compiler.backend.abi.SAVE_STACK
 import io.github.charlietap.chasm.compiler.backend.abi.STACK_LIMIT_FIELD
 import io.github.charlietap.chasm.compiler.backend.analysis.SlotKinds
@@ -48,12 +49,19 @@ internal fun LowerContext.lowerPrologue(
         emit.invokeStatic(SAVE_STACK)
         emit.store(Opcodes.LSTORE, locals.stackSaved)
     }
+    if (!facts.isLeaf || frameCost > MAX_UNCHARGED_LEAF_FRAME_COST) {
+        chargeStackBudget(frameCost)
+    }
+}
+
+internal fun LowerContext.chargeStackBudget(frameCost: Int) {
 
     emit.load(Opcodes.ILOAD, Locals.DEPTH)
     emit.int(frameCost)
     emit.insn(Opcodes.IADD)
     emit.insn(Opcodes.DUP)
     emit.store(Opcodes.ISTORE, Locals.DEPTH)
+
     emit.load(Opcodes.ALOAD, Locals.CONTEXT)
     emit.getField(CONTEXT_TYPE, STACK_LIMIT_FIELD, "I")
     val fits = emit.label()

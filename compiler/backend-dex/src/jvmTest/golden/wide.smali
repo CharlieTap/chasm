@@ -13,21 +13,6 @@
 
     move-object/from16 v16, p0
 
-    add-int/lit16 v8, v13, 0x13
-
-    iget v9, v14, Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;->compiledStackLimit:I
-
-    if-le v8, v9, :cond_11
-
-    invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/CompiledRuntime;->callStackExhausted()Ljava/lang/Void;
-
-    const/4 v8, 0x0
-
-    return-object v8
-
-    :cond_11
-    move v13, v8
-
     move-wide/from16 v17, p3
 
     move-wide/from16 v19, p5
@@ -101,21 +86,6 @@
     move/from16 v13, p2
 
     move-object/from16 v16, p0
-
-    add-int/lit16 v8, v13, 0x13
-
-    iget v9, v14, Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;->compiledStackLimit:I
-
-    if-le v8, v9, :cond_11
-
-    invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/CompiledRuntime;->callStackExhausted()Ljava/lang/Void;
-
-    const/4 v8, 0x0
-
-    return-object v8
-
-    :cond_11
-    move v13, v8
 
     move-wide/from16 v17, p3
 
@@ -197,21 +167,6 @@
 
     move-object/from16 v16, p0
 
-    add-int/lit16 v8, v13, 0x12
-
-    iget v9, v14, Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;->compiledStackLimit:I
-
-    if-le v8, v9, :cond_11
-
-    invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/CompiledRuntime;->callStackExhausted()Ljava/lang/Void;
-
-    const/4 v8, 0x0
-
-    return-object v8
-
-    :cond_11
-    move v13, v8
-
     move-wide/from16 v17, p3
 
     move-wide/from16 v19, p5
@@ -270,21 +225,6 @@
 
     move-object/from16 v16, p0
 
-    add-int/lit16 v8, v13, 0x12
-
-    iget v9, v14, Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;->compiledStackLimit:I
-
-    if-le v8, v9, :cond_11
-
-    invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/CompiledRuntime;->callStackExhausted()Ljava/lang/Void;
-
-    const/4 v8, 0x0
-
-    return-object v8
-
-    :cond_11
-    move v13, v8
-
     move-wide/from16 v17, p3
 
     move-wide/from16 v19, p5
@@ -342,21 +282,6 @@
     move/from16 v13, p2
 
     move-object/from16 v16, p0
-
-    add-int/lit16 v8, v13, 0x14
-
-    iget v9, v14, Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;->compiledStackLimit:I
-
-    if-le v8, v9, :cond_12
-
-    invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/CompiledRuntime;->callStackExhausted()Ljava/lang/Void;
-
-    const-wide/16 v0, 0x0
-
-    return-wide v0
-
-    :cond_12
-    move v13, v8
 
     move-wide/from16 v17, p3
 

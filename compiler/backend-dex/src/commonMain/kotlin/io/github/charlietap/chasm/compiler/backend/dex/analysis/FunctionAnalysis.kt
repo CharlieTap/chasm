@@ -22,6 +22,7 @@ import io.github.charlietap.chasm.compiler.backend.analysis.form.helperCall
 import io.github.charlietap.chasm.compiler.backend.analysis.frameFacts
 import io.github.charlietap.chasm.compiler.backend.analysis.indirectCallType
 import io.github.charlietap.chasm.compiler.backend.analysis.instructionTable
+import io.github.charlietap.chasm.compiler.backend.analysis.isLeaf
 import io.github.charlietap.chasm.compiler.backend.analysis.redundantBoundsChecks
 import io.github.charlietap.chasm.compiler.backend.dex.ModuleLowering
 import io.github.charlietap.chasm.compiler.backend.dex.abi.INLINE_MEMORY_INSTRUCTIONS
@@ -48,6 +49,7 @@ internal class FunctionAnalysis(
     val unsafeMemory: Boolean,
     val typedSignatures: Array<String?>,
     val callsDirectly: Boolean,
+    val isLeaf: Boolean,
     val cachedConstants: List<CachedConstant>,
     val window: CallWindow,
     val references: References,
@@ -89,6 +91,7 @@ internal fun analyzeFunction(
         unsafeMemory = unsafeMemory,
         typedSignatures = typedSignatures,
         callsDirectly = callsDirectly,
+        isLeaf = function.isLeaf(),
         cachedConstants = cachedConstants(function, if (usesInlineMemory) inlineMemory else null),
         window = analyzeCallWindow(module, function, typedSignatures),
         references = analyzeReferences(function, type, frameSlots, declarations, module.analysis),

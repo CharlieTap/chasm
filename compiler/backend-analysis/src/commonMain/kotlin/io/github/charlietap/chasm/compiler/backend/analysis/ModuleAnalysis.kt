@@ -68,6 +68,16 @@ fun Instruction.isTailCall(): Boolean = this is ControlInstruction.ReturnCall ||
     this is ControlInstruction.ReturnCallIndirectI || this is ControlInstruction.ReturnCallIndirectS ||
     this is ControlInstruction.ReturnCallRefS
 
+internal fun Instruction.isCall(): Boolean {
+    return isTailCall() || this is ControlInstruction.Call ||
+        this is ControlInstruction.CallIndirectI || this is ControlInstruction.CallIndirectS ||
+        this is ControlInstruction.CallRefS
+}
+
+fun CirFunction.isLeaf(): Boolean {
+    return instructions.none(Instruction::isCall)
+}
+
 fun Instruction.raisesException(): Boolean = this is ControlInstruction.Throw || this is ControlInstruction.ThrowRefS
 
 fun Module.mayHoldCollectableReferences(): Boolean {

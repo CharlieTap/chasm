@@ -13,21 +13,6 @@
 
     move-object/from16 v16, p0
 
-    add-int/lit16 v8, v13, 0x11
-
-    iget v9, v14, Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;->compiledStackLimit:I
-
-    if-le v8, v9, :cond_12
-
-    invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/CompiledRuntime;->callStackExhausted()Ljava/lang/Void;
-
-    const-wide/16 v0, 0x0
-
-    return-wide v0
-
-    :cond_12
-    move v13, v8
-
     move/from16 v17, p3
 
     const-wide/16 v0, 0x0
@@ -41,12 +26,12 @@
     move-wide/from16 v21, v0
 
     .line 3
-    :goto_1e
+    :goto_11
     move/from16 v8, v20
 
     move/from16 v9, v17
 
-    if-ge v8, v9, :cond_2e
+    if-ge v8, v9, :cond_21
 
     .line 4
     move/from16 v0, v20
@@ -62,10 +47,10 @@
     add-int/lit8 v20, v20, 0x1
 
     .line 7
-    goto :goto_1e
+    goto :goto_11
 
     .line 8
-    :cond_2e
+    :cond_21
     move-wide/from16 v0, v21
 
     return-wide v0
@@ -84,21 +69,6 @@
 
     move-object/from16 v16, p0
 
-    add-int/lit16 v8, v13, 0x10
-
-    iget v9, v14, Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;->compiledStackLimit:I
-
-    if-le v8, v9, :cond_11
-
-    invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/CompiledRuntime;->callStackExhausted()Ljava/lang/Void;
-
-    const/4 v8, 0x0
-
-    return v8
-
-    :cond_11
-    move v13, v8
-
     move/from16 v17, p3
 
     const-wide/16 v0, 0x0
@@ -110,24 +80,24 @@
     .line 2
     move/from16 v8, v17
 
-    packed-switch v8, :pswitch_data_2c
+    packed-switch v8, :pswitch_data_20
 
-    goto/16 :goto_26
+    goto/16 :goto_1a
 
     .line 3
-    :pswitch_20
+    :pswitch_14
     const/16 v8, 0xa
 
     return v8
 
     .line 4
-    :pswitch_23
+    :pswitch_17
     const/16 v8, 0x14
 
     return v8
 
     .line 5
-    :goto_26
+    :goto_1a
     const/16 v8, 0x1e
 
     return v8
@@ -138,10 +108,10 @@
 
     nop
 
-    :pswitch_data_2c
+    :pswitch_data_20
     .packed-switch 0x0
-        :pswitch_20
-        :pswitch_23
+        :pswitch_14
+        :pswitch_17
     .end packed-switch
 .end method
 
@@ -153,21 +123,6 @@
     move/from16 v13, p2
 
     move-object/from16 v16, p0
-
-    add-int/lit16 v8, v13, 0x10
-
-    iget v9, v14, Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;->compiledStackLimit:I
-
-    if-le v8, v9, :cond_11
-
-    invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/CompiledRuntime;->callStackExhausted()Ljava/lang/Void;
-
-    const/4 v8, 0x0
-
-    return v8
-
-    :cond_11
-    move v13, v8
 
     move/from16 v17, p3
 
@@ -184,20 +139,20 @@
 
     move/from16 v9, v18
 
-    if-le v8, v9, :cond_25
+    if-le v8, v9, :cond_19
 
     .line 3
     move/from16 v21, v17
 
     .line 4
-    goto/16 :goto_27
+    goto/16 :goto_1b
 
     .line 5
-    :cond_25
+    :cond_19
     move/from16 v21, v18
 
     .line 6
-    :goto_27
+    :goto_1b
     move/from16 v8, v21
 
     return v8
@@ -216,21 +171,6 @@
 
     move-object/from16 v16, p0
 
-    add-int/lit16 v8, v13, 0x11
-
-    iget v9, v14, Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;->compiledStackLimit:I
-
-    if-le v8, v9, :cond_11
-
-    invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/CompiledRuntime;->callStackExhausted()Ljava/lang/Void;
-
-    const/4 v8, 0x0
-
-    return v8
-
-    :cond_11
-    move v13, v8
-
     move/from16 v17, p3
 
     move/from16 v18, p4
@@ -246,8 +186,8 @@
     move/from16 v22, v15
 
     .line 3
-    :goto_1f
-    if-eqz v19, :cond_2a
+    :goto_13
+    if-eqz v19, :cond_1e
 
     .line 4
     move/from16 v22, v17
@@ -260,10 +200,10 @@
     add-int/lit8 v19, v19, -0x1
 
     .line 6
-    goto :goto_1f
+    goto :goto_13
 
     .line 7
-    :cond_2a
+    :cond_1e
     sub-int v17, v17, v18
 
     .line 8
@@ -285,19 +225,6 @@
 
     move-object/from16 v16, p0
 
-    add-int/lit16 v8, v13, 0xf
-
-    iget v9, v14, Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;->compiledStackLimit:I
-
-    if-le v8, v9, :cond_10
-
-    invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/CompiledRuntime;->callStackExhausted()Ljava/lang/Void;
-
-    return-void
-
-    :cond_10
-    move v13, v8
-
     const-wide/16 v0, 0x0
 
     const/4 v15, 0x0
@@ -305,8 +232,8 @@
     move-wide/from16 v17, v0
 
     .line 3
-    :goto_16
-    goto/32 :goto_16
+    :goto_b
+    goto/32 :goto_b
 
     return-void
 .end method

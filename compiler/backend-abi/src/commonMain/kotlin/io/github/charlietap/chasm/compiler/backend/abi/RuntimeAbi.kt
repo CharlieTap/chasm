@@ -25,6 +25,8 @@ const val PENDING_TAIL_FIELD = "pendingTailFunction"
 
 const val REFERENCE_TYPE_TEST = OBJECT_TYPE
 
+const val MAX_UNCHARGED_LEAF_FRAME_COST = 64
+
 private const val THROWABLE = "Ljava/lang/Throwable;"
 private const val NOTHING = "Ljava/lang/Void;"
 private const val STRINGS = "[Ljava/lang/String;"

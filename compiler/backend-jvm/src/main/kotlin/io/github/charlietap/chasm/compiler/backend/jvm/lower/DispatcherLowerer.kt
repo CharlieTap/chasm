@@ -4,7 +4,6 @@ package io.github.charlietap.chasm.compiler.backend.jvm.lower
 
 import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.compiler.backend.abi.ARRAYCOPY
-import io.github.charlietap.chasm.compiler.backend.abi.CALL_STACK_EXHAUSTED
 import io.github.charlietap.chasm.compiler.backend.abi.CLOSE_FRAME
 import io.github.charlietap.chasm.compiler.backend.abi.CONTEXT_TYPE
 import io.github.charlietap.chasm.compiler.backend.abi.FRAME
@@ -13,7 +12,6 @@ import io.github.charlietap.chasm.compiler.backend.abi.LONG_BITS_TO_DOUBLE
 import io.github.charlietap.chasm.compiler.backend.abi.MethodRef
 import io.github.charlietap.chasm.compiler.backend.abi.OPEN_FRAME
 import io.github.charlietap.chasm.compiler.backend.abi.Resource
-import io.github.charlietap.chasm.compiler.backend.abi.STACK_LIMIT_FIELD
 import io.github.charlietap.chasm.compiler.backend.abi.UNREACHABLE
 import io.github.charlietap.chasm.runtime.compiled.CHUNK_METHOD_SEPARATOR
 import org.objectweb.asm.Opcodes
@@ -38,17 +36,7 @@ internal fun LowerContext.lowerDispatcher(
     emit.int(0)
     emit.store(Opcodes.ISTORE, locals.rootBase)
 
-    emit.load(Opcodes.ILOAD, Locals.DEPTH)
-    emit.int(frameCost)
-    emit.insn(Opcodes.IADD)
-    emit.insn(Opcodes.DUP)
-    emit.store(Opcodes.ISTORE, Locals.DEPTH)
-    pushContext()
-    emit.getField(CONTEXT_TYPE, STACK_LIMIT_FIELD, "I")
-    val fits = emit.label()
-    emit.jump(Opcodes.IF_ICMPLE, fits)
-    trap(CALL_STACK_EXHAUSTED)
-    emit.place(fits)
+    chargeStackBudget(frameCost)
 
     pushContext()
     emit.int(frame.frameSlots)

@@ -13,19 +13,6 @@
 
     move-object/from16 v16, p0
 
-    add-int/lit16 v8, v13, 0xf
-
-    iget v9, v14, Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;->compiledStackLimit:I
-
-    if-le v8, v9, :cond_10
-
-    invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/CompiledRuntime;->callStackExhausted()Ljava/lang/Void;
-
-    return-void
-
-    :cond_10
-    move v13, v8
-
     move/from16 v17, p3
 
     const-wide/16 v0, 0x0
@@ -78,11 +65,11 @@
 
     invoke-static {v14, v6, v7}, Lio/github/charlietap/chasm/runtime/compiled/CompiledCalls;->closeFrame(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;J)V
 
-    goto/16 :goto_40
+    goto/16 :goto_35
 
     return-void
 
-    :goto_40
+    :goto_35
     const/4 v8, 0x1
 
     iput-boolean v8, v14, Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;->compiledUnwinding:Z
@@ -98,21 +85,6 @@
     move/from16 v13, p2
 
     move-object/from16 v16, p0
-
-    add-int/lit16 v8, v13, 0x12
-
-    iget v9, v14, Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;->compiledStackLimit:I
-
-    if-le v8, v9, :cond_11
-
-    invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/CompiledRuntime;->callStackExhausted()Ljava/lang/Void;
-
-    const/4 v8, 0x0
-
-    return v8
-
-    :cond_11
-    move v13, v8
 
     const/4 v8, 0x1
 
@@ -149,7 +121,7 @@
     move-wide/from16 v25, v0
 
     .line 2
-    if-eqz v20, :cond_5b
+    if-eqz v20, :cond_4f
 
     .line 3
     const-wide/16 v23, 0x7
@@ -195,10 +167,10 @@
 
     invoke-static {v14, v6, v7}, Lio/github/charlietap/chasm/runtime/compiled/CompiledCalls;->closeFrame(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;J)V
 
-    goto/16 :goto_71
+    goto/16 :goto_65
 
     .line 5
-    :cond_5b
+    :cond_4f
     move-wide/from16 v6, v29
 
     invoke-static {v14, v6, v7}, Lio/github/charlietap/chasm/runtime/compiled/CompiledCalls;->closeFrame(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;J)V
@@ -227,7 +199,7 @@
 
     return v8
 
-    :goto_71
+    :goto_65
     const/4 v8, 0x1
 
     iput-boolean v8, v14, Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;->compiledUnwinding:Z
@@ -324,21 +296,6 @@
 
     move-object/from16 v16, p0
 
-    add-int/lit16 v8, v13, 0x12
-
-    iget v9, v14, Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;->compiledStackLimit:I
-
-    if-le v8, v9, :cond_11
-
-    invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/CompiledRuntime;->callStackExhausted()Ljava/lang/Void;
-
-    const/4 v8, 0x0
-
-    return v8
-
-    :cond_11
-    move v13, v8
-
     const/4 v8, 0x1
 
     invoke-static {v14, v8}, Lio/github/charlietap/chasm/runtime/compiled/CompiledCalls;->openRoots(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;I)J
@@ -374,12 +331,12 @@
     move-wide/from16 v25, v0
 
     .line 2
-    :try_start_31
+    :try_start_25
     move/from16 v8, v20
 
     const/4 v9, 0x5
 
-    if-le v8, v9, :cond_61
+    if-le v8, v9, :cond_55
 
     .line 3
     move/from16 v0, v20
@@ -429,17 +386,17 @@
 
     invoke-static {v14, v6, v7}, Lio/github/charlietap/chasm/runtime/compiled/CompiledCalls;->closeFrame(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;J)V
 
-    goto/16 :goto_8b
+    goto/16 :goto_7f
 
     .line 5
-    :cond_61
+    :cond_55
     move/from16 v0, v20
 
     int-to-long v0, v0
 
     move-wide/from16 v23, v0
-    :try_end_66
-    .catch Ljava/lang/Throwable; {:try_start_31 .. :try_end_66} :catch_80
+    :try_end_5a
+    .catch Ljava/lang/Throwable; {:try_start_25 .. :try_end_5a} :catch_74
 
     .line 6
     move-wide/from16 v6, v29
@@ -453,7 +410,7 @@
     return v8
 
     .line 7
-    :goto_6f
+    :goto_63
     move-wide/from16 v0, v23
 
     long-to-int v8, v0
@@ -475,7 +432,7 @@
 
     return v8
 
-    :catch_80
+    :catch_74
     move-exception v12
 
     invoke-static {v12}, Lio/github/charlietap/chasm/runtime/compiled/CompiledExceptions;->wasmException(Ljava/lang/Throwable;)Ljava/lang/Throwable;
@@ -484,9 +441,9 @@
 
     invoke-static {v14, v6, v7}, Lio/github/charlietap/chasm/runtime/compiled/CompiledCalls;->closeFrame(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;J)V
 
-    goto/16 :goto_8b
+    goto/16 :goto_7f
 
-    :goto_8b
+    :goto_7f
     invoke-static {v14}, Lio/github/charlietap/chasm/runtime/compiled/CompiledCalls;->frame(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;)[J
 
     move-result-object v17
@@ -507,7 +464,7 @@
 
     long-to-int v9, v4
 
-    if-ne v8, v9, :cond_b0
+    if-ne v8, v9, :cond_a4
 
     const/4 v9, 0x1
 
@@ -529,12 +486,12 @@
 
     aput-wide v0, v17, v19
 
-    goto :goto_6f
+    goto :goto_63
 
-    :cond_b0
-    goto/16 :goto_b2
+    :cond_a4
+    goto/16 :goto_a6
 
-    :goto_b2
+    :goto_a6
     const/4 v8, 0x1
 
     iput-boolean v8, v14, Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;->compiledUnwinding:Z
@@ -1021,21 +978,6 @@
 
     move-object/from16 v16, p0
 
-    add-int/lit16 v8, v13, 0x11
-
-    iget v9, v14, Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;->compiledStackLimit:I
-
-    if-le v8, v9, :cond_11
-
-    invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/CompiledRuntime;->callStackExhausted()Ljava/lang/Void;
-
-    const/4 v8, 0x0
-
-    return v8
-
-    :cond_11
-    move v13, v8
-
     invoke-static {v14}, Lio/github/charlietap/chasm/runtime/compiled/CompiledCalls;->saveStack(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;)J
 
     move-result-wide v0
@@ -1055,8 +997,8 @@
     move-wide/from16 v22, v0
 
     .line 2
-    :try_start_23
-    if-eqz v17, :cond_3c
+    :try_start_17
+    if-eqz v17, :cond_30
 
     .line 3
     const/4 v8, 0x0
@@ -1083,15 +1025,15 @@
 
     invoke-static {v14, v6, v7}, Lio/github/charlietap/chasm/runtime/compiled/CompiledCalls;->closeFrame(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;J)V
 
-    goto/16 :goto_57
+    goto/16 :goto_4b
 
     .line 4
-    :cond_3c
+    :cond_30
     move/from16 v8, v17
 
     const/4 v9, 0x2
 
-    if-ne v8, v9, :cond_46
+    if-ne v8, v9, :cond_3a
 
     .line 5
     invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/CompiledRuntime;->unreachable()Ljava/lang/Void;
@@ -1099,17 +1041,17 @@
     const/4 v8, 0x0
 
     return v8
-    :try_end_46
-    .catch Ljava/lang/Throwable; {:try_start_23 .. :try_end_46} :catch_4c
+    :try_end_3a
+    .catch Ljava/lang/Throwable; {:try_start_17 .. :try_end_3a} :catch_40
 
     .line 6
-    :cond_46
+    :cond_3a
     const/4 v8, 0x0
 
     return v8
 
     .line 7
-    :goto_48
+    :goto_3c
     const/4 v8, 0x1
 
     return v8
@@ -1118,7 +1060,7 @@
 
     return v8
 
-    :catch_4c
+    :catch_40
     move-exception v12
 
     invoke-static {v12}, Lio/github/charlietap/chasm/runtime/compiled/CompiledExceptions;->wasmException(Ljava/lang/Throwable;)Ljava/lang/Throwable;
@@ -1127,9 +1069,9 @@
 
     invoke-static {v14, v6, v7}, Lio/github/charlietap/chasm/runtime/compiled/CompiledCalls;->closeFrame(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;J)V
 
-    goto/16 :goto_57
+    goto/16 :goto_4b
 
-    :goto_57
+    :goto_4b
     invoke-static {v14}, Lio/github/charlietap/chasm/runtime/compiled/CompiledExceptions;->pendingTag(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;)I
 
     move-result v8
@@ -1144,11 +1086,11 @@
 
     move-result-wide v2
 
-    goto :goto_48
+    goto :goto_3c
 
-    goto/16 :goto_66
+    goto/16 :goto_5a
 
-    :goto_66
+    :goto_5a
     const/4 v8, 0x1
 
     iput-boolean v8, v14, Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;->compiledUnwinding:Z
@@ -1180,19 +1122,6 @@
     invoke-virtual {v12}, Lio/github/charlietap/chasm/runtime/instance/MemoryInstance;->getSize()I
 
     move-result v17
-
-    add-int/lit16 v8, v13, 0x11
-
-    iget v9, v14, Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;->compiledStackLimit:I
-
-    if-le v8, v9, :cond_1d
-
-    invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/CompiledRuntime;->callStackExhausted()Ljava/lang/Void;
-
-    return-void
-
-    :cond_1d
-    move v13, v8
 
     const/4 v9, 0x1
 
@@ -1242,7 +1171,7 @@
 
     add-int/lit8 v11, v17, -0x4
 
-    if-gt v8, v11, :cond_7e
+    if-gt v8, v11, :cond_73
 
     const/16 v9, 0x4d
 
@@ -1291,11 +1220,11 @@
 
     invoke-static {v14, v6, v7}, Lio/github/charlietap/chasm/runtime/compiled/CompiledCalls;->closeFrame(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;J)V
 
-    goto/16 :goto_7a
+    goto/16 :goto_6f
 
     return-void
 
-    :goto_7a
+    :goto_6f
     const/4 v8, 0x1
 
     iput-boolean v8, v14, Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;->compiledUnwinding:Z
@@ -1303,7 +1232,7 @@
     return-void
 
     .line 3
-    :cond_7e
+    :cond_73
     move-object/from16 v12, v25
 
     const/4 v10, 0x1
@@ -1604,21 +1533,6 @@
 
     move-object/from16 v16, p0
 
-    add-int/lit16 v8, v13, 0x13
-
-    iget v9, v14, Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;->compiledStackLimit:I
-
-    if-le v8, v9, :cond_11
-
-    invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/CompiledRuntime;->callStackExhausted()Ljava/lang/Void;
-
-    const/4 v8, 0x0
-
-    return v8
-
-    :cond_11
-    move v13, v8
-
     const/4 v8, 0x3
 
     invoke-static {v14, v8}, Lio/github/charlietap/chasm/runtime/compiled/CompiledCalls;->openRoots(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;I)J
@@ -1672,7 +1586,7 @@
     move-object/from16 v34, v8
 
     .line 2
-    :try_start_41
+    :try_start_35
     move/from16 v0, v20
 
     int-to-long v0, v0
@@ -1716,12 +1630,12 @@
 
     invoke-static {v14, v6, v7}, Lio/github/charlietap/chasm/runtime/compiled/CompiledCalls;->closeFrame(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;J)V
 
-    goto/16 :goto_b8
-    :try_end_69
-    .catch Ljava/lang/Throwable; {:try_start_41 .. :try_end_69} :catch_ad
+    goto/16 :goto_ac
+    :try_end_5d
+    .catch Ljava/lang/Throwable; {:try_start_35 .. :try_end_5d} :catch_a1
 
     .line 4
-    :goto_69
+    :goto_5d
     move-wide/from16 v24, v28
 
     add-int/lit8 v19, v18, 0x0
@@ -1729,14 +1643,14 @@
     aput-wide v24, v17, v19
 
     .line 6
-    :goto_6f
+    :goto_63
     const/high16 v10, -0x80000000
 
     add-int v8, v23, v10
 
     const v9, -0x7ffff830
 
-    if-ge v8, v9, :cond_a2
+    if-ge v8, v9, :cond_96
 
     .line 7
     move/from16 v0, v23
@@ -1760,7 +1674,7 @@
 
     move-object/from16 v12, v34
 
-    if-nez v12, :cond_90
+    if-nez v12, :cond_84
 
     const/4 v8, 0x1
 
@@ -1768,7 +1682,7 @@
 
     move-object/from16 v34, v12
 
-    :cond_90
+    :cond_84
     move-wide/from16 v0, v26
 
     const/4 v10, 0x0
@@ -1789,10 +1703,10 @@
     add-int/lit8 v23, v23, 0x1
 
     .line 10
-    goto :goto_6f
+    goto :goto_63
 
     .line 11
-    :cond_a2
+    :cond_96
     move-wide/from16 v26, v24
 
     .line 12
@@ -1800,13 +1714,13 @@
 
     invoke-static {v14, v0, v1}, Lio/github/charlietap/chasm/runtime/compiled/CompiledExceptions;->throwRef(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;J)V
 
-    goto/16 :goto_e2
+    goto/16 :goto_d6
 
     const/4 v8, 0x0
 
     return v8
 
-    :catch_ad
+    :catch_a1
     move-exception v12
 
     invoke-static {v12}, Lio/github/charlietap/chasm/runtime/compiled/CompiledExceptions;->wasmException(Ljava/lang/Throwable;)Ljava/lang/Throwable;
@@ -1815,9 +1729,9 @@
 
     invoke-static {v14, v6, v7}, Lio/github/charlietap/chasm/runtime/compiled/CompiledCalls;->closeFrame(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;J)V
 
-    goto/16 :goto_b8
+    goto/16 :goto_ac
 
-    :goto_b8
+    :goto_ac
     invoke-static {v14}, Lio/github/charlietap/chasm/runtime/compiled/CompiledCalls;->frame(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;)[J
 
     move-result-object v17
@@ -1834,7 +1748,7 @@
 
     long-to-int v9, v4
 
-    if-ne v8, v9, :cond_e0
+    if-ne v8, v9, :cond_d4
 
     const/4 v9, 0x1
 
@@ -1862,12 +1776,12 @@
 
     aput-wide v2, v17, v19
 
-    goto :goto_69
+    goto :goto_5d
 
-    :cond_e0
-    goto/16 :goto_e2
+    :cond_d4
+    goto/16 :goto_d6
 
-    :goto_e2
+    :goto_d6
     const/4 v8, 0x1
 
     iput-boolean v8, v14, Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;->compiledUnwinding:Z
@@ -2092,19 +2006,6 @@
 
     move-object/from16 v16, p0
 
-    add-int/lit16 v8, v13, 0xf
-
-    iget v9, v14, Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;->compiledStackLimit:I
-
-    if-le v8, v9, :cond_10
-
-    invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/CompiledRuntime;->callStackExhausted()Ljava/lang/Void;
-
-    return-void
-
-    :cond_10
-    move v13, v8
-
     const-wide/16 v0, 0x0
 
     const/4 v15, 0x0
@@ -2123,11 +2024,11 @@
 
     invoke-static {v14, v0, v1}, Lio/github/charlietap/chasm/runtime/compiled/CompiledExceptions;->throwRef(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;J)V
 
-    goto/16 :goto_24
+    goto/16 :goto_19
 
     return-void
 
-    :goto_24
+    :goto_19
     const/4 v8, 0x1
 
     iput-boolean v8, v14, Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;->compiledUnwinding:Z
