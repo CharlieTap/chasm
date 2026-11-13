@@ -346,7 +346,7 @@
 
     instance-of v8, v12, Lchasm/jit/Sig0;
 
-    if-eqz v8, :cond_61
+    if-eqz v8, :cond_5d
 
     check-cast v12, Lchasm/jit/Sig0;
 
@@ -368,18 +368,14 @@
 
     move/from16 v34, v13
 
-    invoke-static {v14}, Lio/github/charlietap/chasm/runtime/compiled/CompiledCalls;->frame(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;)[J
-
-    move-result-object v17
-
     move/from16 v24, v9
 
-    goto/16 :goto_9f
+    goto/16 :goto_97
 
-    :cond_61
+    :cond_5d
     move-object/from16 v12, v31
 
-    if-nez v12, :cond_6a
+    if-nez v12, :cond_66
 
     const/4 v8, 0x2
 
@@ -387,7 +383,7 @@
 
     move-object/from16 v31, v12
 
-    :cond_6a
+    :cond_66
     const-wide/16 v0, 0x1
 
     const/4 v10, 0x0
@@ -428,15 +424,11 @@
 
     iget-boolean v8, v14, Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;->compiledUnwinding:Z
 
-    if-eqz v8, :cond_95
+    if-eqz v8, :cond_91
 
     invoke-static {v14}, Lio/github/charlietap/chasm/runtime/compiled/CompiledCalls;->raiseUnwinding(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;)V
 
-    :cond_95
-    invoke-static {v14}, Lio/github/charlietap/chasm/runtime/compiled/CompiledCalls;->frame(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;)[J
-
-    move-result-object v17
-
+    :cond_91
     const/4 v10, 0x0
 
     aget-wide v0, v12, v10
@@ -446,7 +438,7 @@
     move/from16 v24, v15
 
     .line 4
-    :goto_9f
+    :goto_97
     move-wide/from16 v6, v29
 
     invoke-static {v14, v6, v7}, Lio/github/charlietap/chasm/runtime/compiled/CompiledCalls;->closeFrame(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;J)V

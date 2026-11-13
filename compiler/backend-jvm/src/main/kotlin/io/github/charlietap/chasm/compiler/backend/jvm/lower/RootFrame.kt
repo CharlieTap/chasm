@@ -31,7 +31,7 @@ internal class RootFrame(
 
     fun enterInstruction(position: Int) {
         this.position = position
-        isArrayCurrent = references.writesThrough
+        isArrayCurrent = references.writesThrough && references.refreshes.arrayCurrentAt(position)
     }
 
     fun enterColdCode() {
@@ -70,7 +70,7 @@ internal class RootFrame(
         emit.insn(Opcodes.L2I)
         emit.store(Opcodes.ISTORE, locals.rootBase)
 
-        initialize(loadArray = true)
+        initialize(references.refreshes.afterEntry)
     }
 
     fun initialize(loadArray: Boolean) {
@@ -91,6 +91,19 @@ internal class RootFrame(
 
         loadArray()
         isArrayCurrent = true
+    }
+
+    fun refreshAfterCall(position: Int) {
+
+        if (!references.writesThrough) {
+            return
+        }
+
+        if (references.refreshes.refreshRequiredAfter(position)) {
+            refresh()
+        } else {
+            isArrayCurrent = false
+        }
     }
 
     fun loadArray() {

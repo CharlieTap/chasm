@@ -147,11 +147,12 @@ private fun LowerContext.afterCall(
 
     val type = call.type
     if (!checksPendingTailCall && !checksUnwinding) {
-        roots.refresh()
+        roots.refreshAfterCall(position)
         storeResults(type, call.resultBase)
         if (grows) refreshMemory()
         return
     }
+
     val results = type.results.types.size
     when (val returns = returnDescriptor(type)) {
         "V" -> Unit
@@ -161,6 +162,7 @@ private fun LowerContext.afterCall(
             emit.store(Opcodes.LSTORE, locals.scratchLong[0])
         }
     }
+
     if (checksPendingTailCall) {
         val done = emit.label()
         pushContext()
@@ -188,7 +190,7 @@ private fun LowerContext.afterCall(
     if (checksUnwinding) {
         unwindCheck()
     }
-    roots.refresh()
+    roots.refreshAfterCall(position)
 
     when (results) {
         0 -> Unit
@@ -198,6 +200,7 @@ private fun LowerContext.afterCall(
         }
         else -> storeEncodedResults(type, call.resultBase)
     }
+
     if (grows) refreshMemory()
 }
 
@@ -213,7 +216,7 @@ private inline fun LowerContext.runtimeCall(
     emit.load(Opcodes.ILOAD, Locals.DEPTH)
     emit.invokeStatic(method)
     unwindCheck()
-    roots.refresh()
+    roots.refreshAfterCall(position)
     storeEncodedResults(call.type, call.resultBase)
     refreshMemory()
 }

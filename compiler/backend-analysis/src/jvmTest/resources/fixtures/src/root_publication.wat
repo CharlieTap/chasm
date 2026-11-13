@@ -19,6 +19,13 @@
       (br_if $again (local.tee $count (i32.sub (local.get $count) (i32.const 1)))))
     (struct.get $box 0 (ref.as_non_null (local.get $box))))
 
+  (func (export "between") (param $first (ref $box)) (result i32)
+    (local $box (ref null $box))
+    (call $host)
+    (local.set $box (local.get $first))
+    (call $host)
+    (struct.get $box 0 (ref.as_non_null (local.get $box))))
+
   ;; Nothing that runs after the parameters are stored collects.
   (func (export "reads") (param $first (ref $box)) (result i32)
     (struct.get $box 0 (local.get $first))))

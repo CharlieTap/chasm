@@ -9,6 +9,7 @@ class References internal constructor(
     val isReference: BooleanArray,
     val rootIndex: IntArray,
     val publication: RootPublication = RootPublication.EVERY_WRITE,
+    val refreshes: RootRefreshes = RootRefreshes.ALWAYS,
 ) {
     fun publishesAfter(position: Int): Boolean {
         return writesThrough && publication.requiresPublicationAfter(position)
@@ -89,5 +90,6 @@ fun analyzeReferences(
     }
 
     val publication = analyzeRootPublication(flow, function, analysis.mayCollect, needs)
-    return References(slots, writesThrough = true, references, rootIndex, publication)
+    val refreshes = analyzeRootRefreshes(table, flow, function, type, rootIndex, references, publication)
+    return References(slots, writesThrough = true, references, rootIndex, publication, refreshes)
 }

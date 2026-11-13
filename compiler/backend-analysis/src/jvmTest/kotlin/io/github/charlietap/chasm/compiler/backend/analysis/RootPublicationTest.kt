@@ -52,9 +52,32 @@ class RootPublicationTest {
         assertEquals(false, publication(function("reads")).afterEntry)
     }
 
+    @Test
+    fun `the root array is fetched again after a call only when a publication follows before the next fetch`() {
+
+        val trailing = function("trailing")
+        val between = function("between")
+        val calls = between.instructions.indices.filter { position -> between.instructions[position] is ControlInstruction.Call }
+        val refreshes = references(between).refreshes
+        val trailingRefreshes = references(trailing).refreshes
+
+        assertEquals(true, trailingRefreshes.afterEntry)
+        assertEquals(false, trailingRefreshes.refreshRequiredAfter(call(trailing)))
+        assertEquals(2, calls.size)
+        assertEquals(true, refreshes.refreshRequiredAfter(calls[0]))
+        assertEquals(true, refreshes.arrayCurrentAt(calls[0] + 1))
+        assertEquals(false, refreshes.refreshRequiredAfter(calls[1]))
+        assertEquals(false, refreshes.arrayCurrentAt(calls[1] + 1))
+    }
+
     private fun publication(function: CirFunction): RootPublication {
         val table = instructionTable(function, declarations)
         return analyzeRootPublication(flowGraph(table, function), function, analysis.mayCollect, needs = null)
+    }
+
+    private fun references(function: CirFunction): References {
+        val facts = frameFacts(function, declarations)
+        return analyzeReferences(instructionTable(function, declarations), function, facts.type, facts.frameSlots, analysis)
     }
 
     private fun assertCopies(

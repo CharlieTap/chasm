@@ -73,6 +73,20 @@ class RootFramesTest {
     }
 
     @Test
+    fun `the root frame array is not fetched again after a call no publication follows`() {
+        listOf("calls_import", "live_across_call", "copies_around_call").forEach { name ->
+
+            val instructions = checkNotNull(methods[name]).instructions.toList()
+            val bridge = instructions.indexOfLast { instruction -> instruction.invokes(BRIDGE_CALL) }
+            val fetches = instructions.indices.filter { index -> instructions[index].invokes(FRAME) }
+
+            assertTrue(bridge >= 0, name)
+            assertEquals(1, fetches.size, name)
+            assertTrue(fetches.single() < bridge, name)
+        }
+    }
+
+    @Test
     fun `a self tail call clears the root frame then republishes its reference parameters`() {
 
         val method = checkNotNull(methods["restarts"])
