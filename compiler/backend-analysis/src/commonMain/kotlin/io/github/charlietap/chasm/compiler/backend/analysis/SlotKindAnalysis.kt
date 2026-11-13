@@ -59,18 +59,6 @@ private fun writeKeySlot(
     key: Long,
 ) = (key and 0xFFFF_FFFFL).toInt()
 
-private class LongList {
-    var values = LongArray(16)
-    var size = 0
-
-    fun add(
-        value: Long,
-    ) {
-        if (size == values.size) values = values.copyOf(size * 2)
-        values[size++] = value
-    }
-}
-
 private class SlotCopy(
     val position: Int,
     val source: Int,
@@ -213,12 +201,12 @@ fun analyzeSlotKinds(
     }
     val accountedWrites = LongList()
     for (index in 0 until narrowWriteCandidates.size) {
-        val key = narrowWriteCandidates.values[index]
+        val key = narrowWriteCandidates[index]
         if (narrow[writeKeySlot(key)]) accountedWrites.add(key)
     }
     copies.forEach { copy -> if (narrow[copy.destination]) accountedWrites.add(writeKey(copy.position, copy.destination)) }
     parameters.indices.forEach { if (narrow[it]) accountedWrites.add(writeKey(SlotKinds.PROLOGUE, it)) }
-    val accounted = accountedWrites.values.copyOf(accountedWrites.size).also { keys -> keys.sort() }
+    val accounted = accountedWrites.toSortedArray()
     return SlotKinds(kinds, accounted, shadows(kinds, written, graph, floatingHome))
 }
 

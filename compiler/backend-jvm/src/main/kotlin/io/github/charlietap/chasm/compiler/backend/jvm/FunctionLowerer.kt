@@ -13,6 +13,7 @@ import io.github.charlietap.chasm.compiler.backend.analysis.analyzeSlotKinds
 import io.github.charlietap.chasm.compiler.backend.analysis.cheapestCut
 import io.github.charlietap.chasm.compiler.backend.analysis.form.access
 import io.github.charlietap.chasm.compiler.backend.analysis.frameFacts
+import io.github.charlietap.chasm.compiler.backend.analysis.instructionTable
 import io.github.charlietap.chasm.compiler.backend.analysis.jumpTargets
 import io.github.charlietap.chasm.compiler.backend.analysis.loopCrossings
 import io.github.charlietap.chasm.compiler.backend.analysis.redundantBoundsChecks
@@ -96,9 +97,17 @@ private class FunctionLowering(
 ) {
     private val maxMethodBytes = module.options.functionMaxMethodBytes[function.index.index] ?: module.options.maxMethodBytes
 
+    private val table by lazy(LazyThreadSafetyMode.NONE) { instructionTable(function, module.declarations) }
+
     private val inlineMemory = inlineMemory(function.instructions.indices)
 
-    private val facts = FunctionFacts(module, function, frame, references, function.redundantBoundsChecks(module.declarations))
+    private val checkedAccesses = if (inlineMemory == null) {
+        BooleanArray(function.instructions.size)
+    } else {
+        function.redundantBoundsChecks(table)
+    }
+
+    private val facts = FunctionFacts(module, function, frame, references, checkedAccesses)
 
     private fun inlineMemory(
         positions: IntRange,

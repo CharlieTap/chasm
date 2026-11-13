@@ -1,16 +1,8 @@
 package io.github.charlietap.chasm.compiler.backend.analysis
 
-import io.github.charlietap.chasm.cir.AdminInstruction
-import io.github.charlietap.chasm.cir.AggregateInstruction
 import io.github.charlietap.chasm.cir.CirFunction
 import io.github.charlietap.chasm.cir.ControlInstruction
 import io.github.charlietap.chasm.cir.Instruction
-import io.github.charlietap.chasm.cir.MemoryInstruction
-import io.github.charlietap.chasm.cir.NumericInstruction
-import io.github.charlietap.chasm.cir.ParametricInstruction
-import io.github.charlietap.chasm.cir.ReferenceInstruction
-import io.github.charlietap.chasm.cir.TableInstruction
-import io.github.charlietap.chasm.cir.VariableInstruction
 
 /**
  * Which writes of a reference slot a frame must publish to its roots: only those a collection may still follow before
@@ -71,65 +63,6 @@ fun Instruction.isSelfTailCall(
     function: CirFunction,
     region: Int,
 ): Boolean = this is ControlInstruction.ReturnCall && this.function == function.index && region < 0
-
-private fun Instruction.fallsThrough(): Boolean = when (this) {
-    is AdminInstruction -> fallsThrough()
-    is ControlInstruction -> fallsThrough()
-    is AggregateInstruction,
-    is MemoryInstruction,
-    is NumericInstruction,
-    is ParametricInstruction,
-    is ReferenceInstruction,
-    is TableInstruction,
-    is VariableInstruction,
-    -> true
-}
-
-private fun AdminInstruction.fallsThrough(): Boolean = when (this) {
-    is AdminInstruction.EndFunction,
-    is AdminInstruction.Jump,
-    is AdminInstruction.JumpCopies,
-    is AdminInstruction.JumpTableS,
-    -> false
-    is AdminInstruction.Checkpoint,
-    is AdminInstruction.CopySlot,
-    is AdminInstruction.CopySlots,
-    is AdminInstruction.CopySlotSequence,
-    is AdminInstruction.JumpIfI,
-    is AdminInstruction.JumpIfS,
-    is AdminInstruction.JumpIfZeroI,
-    is AdminInstruction.JumpIfZeroS,
-    is AdminInstruction.JumpIfCopyI,
-    is AdminInstruction.JumpIfCopyS,
-    is AdminInstruction.JumpIfCondition,
-    is AdminInstruction.JumpIfConditionMismatch,
-    is AdminInstruction.JumpOnNullI,
-    is AdminInstruction.JumpOnNullS,
-    is AdminInstruction.JumpOnNonNullI,
-    is AdminInstruction.JumpOnNonNullS,
-    is AdminInstruction.JumpOnCastI,
-    is AdminInstruction.JumpOnCastS,
-    is AdminInstruction.JumpOnCastFailI,
-    is AdminInstruction.JumpOnCastFailS,
-    -> true
-}
-
-private fun ControlInstruction.fallsThrough(): Boolean = when (this) {
-    is ControlInstruction.FunctionReturn,
-    is ControlInstruction.ReturnCall,
-    is ControlInstruction.ReturnCallIndirectI,
-    is ControlInstruction.ReturnCallIndirectS,
-    is ControlInstruction.ReturnCallRefS,
-    is ControlInstruction.Throw,
-    is ControlInstruction.ThrowRefS,
-    is ControlInstruction.Unreachable,
-    -> false
-    is ControlInstruction.Call,
-    is ControlInstruction.CallIndirectI,
-    is ControlInstruction.CallIndirectS,
-    is ControlInstruction.CallRefS,
-    -> true
-}
 
 private class ReversedEdges(
     private val nodes: Int,

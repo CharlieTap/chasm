@@ -15,7 +15,7 @@ class BoundsChecksTest {
     private val skipped: List<List<Boolean>> = module("bounds").let { module ->
         val declarations = ModuleIndexSpaces(module)
         ModuleCompiler(module).getOrThrow { IllegalStateException(it.toString()) }.functions.map { function ->
-            val redundant = function.redundantBoundsChecks(declarations)
+            val redundant = function.redundantBoundsChecks(instructionTable(function, declarations))
             function.instructions.indices.filter { function.instructions[it] is MemoryInstruction }.map { redundant[it] }
         }
     }
@@ -53,6 +53,31 @@ class BoundsChecksTest {
     @Test
     fun `a load from a copy of a checked address is not checked again`() {
         assertEquals(listOf(false, true), skipped[6])
+    }
+
+    @Test
+    fun `a load in a loop another loop crosses is checked`() {
+        assertEquals(listOf(false, false), skipped[7])
+    }
+
+    @Test
+    fun `a load at a handler entry is checked again`() {
+        assertEquals(listOf(false, false), skipped[8])
+    }
+
+    @Test
+    fun `a loop writing fewer addresses than are checked keeps only the unwritten ones`() {
+        assertEquals(listOf(false, false, true, false), skipped[9])
+    }
+
+    @Test
+    fun `a loop writing more addresses than are checked keeps only the unwritten ones`() {
+        assertEquals(listOf(false, false, true, false, false, false), skipped[10])
+    }
+
+    @Test
+    fun `a load from a memory other than the first is always checked`() {
+        assertEquals(listOf(false, false), skipped[11])
     }
 
     private fun module(

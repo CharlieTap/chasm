@@ -13,6 +13,7 @@ import io.github.charlietap.chasm.cir.TableInstruction
 import io.github.charlietap.chasm.cir.VariableInstruction
 import io.github.charlietap.chasm.compiler.backend.analysis.ModuleIndexSpaces
 import io.github.charlietap.chasm.compiler.backend.analysis.ext.toType
+import io.github.charlietap.chasm.compiler.backend.analysis.form.MemoryAccess
 import io.github.charlietap.chasm.compiler.backend.analysis.form.NumericForm
 import io.github.charlietap.chasm.compiler.backend.analysis.form.Operand
 import io.github.charlietap.chasm.compiler.backend.analysis.form.access
@@ -37,6 +38,13 @@ interface SlotWriteVisitor {
         slot: Int,
         reference: Boolean,
     )
+
+    fun helperResult(
+        slot: Int,
+        reference: Boolean,
+    ) {
+        opaque(slot, reference)
+    }
 
     fun copy(
         source: Operand,
@@ -63,14 +71,7 @@ fun visitSlotWrites(
                 visitor.number(form.high, NumberType.I64)
             }
         }
-        is MemoryInstruction -> {
-            val access = instruction.access()
-            if (access != null) {
-                if (access.isLoad) visitor.number(access.destination, access.operation.type)
-            } else {
-                instruction.helperCall()?.destination?.let { destination -> visitor.opaque(destination, reference = false) }
-            }
-        }
+        is MemoryInstruction -> visitMemoryWrites(instruction, instruction.access(), visitor)
         is ParametricInstruction -> {
             val select = instruction.select()
             visitor.copy(select.first, select.destination)
@@ -83,17 +84,35 @@ fun visitSlotWrites(
         is ReferenceInstruction -> visitReferenceWrites(instruction, visitor)
         is AggregateInstruction -> visitAggregateWrites(instruction, declarations, visitor)
         is TableInstruction -> instruction.helperCall()?.let { call ->
-            call.destination?.let { destination -> visitor.opaque(destination, call.producesReference) }
+            call.destination?.let { destination -> visitor.helperResult(destination, call.producesReference) }
         }
+    }
+}
+
+internal fun visitMemoryWrites(
+    instruction: MemoryInstruction,
+    access: MemoryAccess?,
+    visitor: SlotWriteVisitor,
+) {
+    if (access != null) {
+        if (access.isLoad) {
+            visitor.number(access.destination, access.operation.type)
+        }
+    } else {
+        instruction.helperCall()?.destination?.let { destination -> visitor.helperResult(destination, reference = false) }
     }
 }
 
 private fun SlotWriteVisitor.number(
     slot: Int,
     type: NumberType,
-) = value(slot, ValueType.Number(type))
+) {
+    value(slot, NUMBERS[type.ordinal])
+}
 
-private val I32 = ValueType.Number(NumberType.I32)
+private val NUMBERS: Array<ValueType> = Array(NumberType.entries.size) { index -> ValueType.Number(NumberType.entries[index]) }
+
+private val I32: ValueType = NUMBERS[NumberType.I32.ordinal]
 
 private fun visitAdminWrites(
     instruction: AdminInstruction,
@@ -183,7 +202,7 @@ private fun visitAggregateWrites(
         is AggregateInstruction.ArrayNewDefaultS -> visitor.opaque(instruction.destinationSlot, reference = true)
         is AggregateInstruction.ArrayNewFixedS -> visitor.opaque(instruction.destinationSlot, reference = true)
         else -> instruction.helperCall()?.let { call ->
-            call.destination?.let { destination -> visitor.opaque(destination, call.producesReference) }
+            call.destination?.let { destination -> visitor.helperResult(destination, call.producesReference) }
         }
     }
 }

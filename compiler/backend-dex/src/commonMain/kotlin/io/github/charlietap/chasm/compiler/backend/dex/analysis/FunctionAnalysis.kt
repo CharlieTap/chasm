@@ -21,6 +21,7 @@ import io.github.charlietap.chasm.compiler.backend.analysis.form.arrayCopy
 import io.github.charlietap.chasm.compiler.backend.analysis.form.helperCall
 import io.github.charlietap.chasm.compiler.backend.analysis.frameFacts
 import io.github.charlietap.chasm.compiler.backend.analysis.indirectCallType
+import io.github.charlietap.chasm.compiler.backend.analysis.instructionTable
 import io.github.charlietap.chasm.compiler.backend.analysis.redundantBoundsChecks
 import io.github.charlietap.chasm.compiler.backend.dex.ModuleLowering
 import io.github.charlietap.chasm.compiler.backend.dex.abi.INLINE_MEMORY_INSTRUCTIONS
@@ -91,7 +92,11 @@ internal fun analyzeFunction(
         cachedConstants = cachedConstants(function, if (usesInlineMemory) inlineMemory else null),
         window = analyzeCallWindow(module, function, typedSignatures),
         references = analyzeReferences(function, type, frameSlots, declarations, module.analysis),
-        checkedAccesses = if (usesInlineMemory) function.redundantBoundsChecks(declarations) else BooleanArray(instructions.size),
+        checkedAccesses = if (usesInlineMemory) {
+            function.redundantBoundsChecks(instructionTable(function, declarations))
+        } else {
+            BooleanArray(instructions.size)
+        },
     )
 }
 
