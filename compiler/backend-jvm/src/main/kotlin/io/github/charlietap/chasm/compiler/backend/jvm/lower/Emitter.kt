@@ -2,12 +2,13 @@ package io.github.charlietap.chasm.compiler.backend.jvm.lower
 
 import io.github.charlietap.chasm.compiler.backend.abi.MethodRef
 import io.github.charlietap.chasm.compiler.backend.abi.internalName
+import io.github.charlietap.chasm.compiler.backend.jvm.removeDeadStores
 import org.objectweb.asm.Label
-import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes
+import org.objectweb.asm.tree.MethodNode
 
 internal class Emitter(
-    private val visitor: MethodVisitor,
+    private val visitor: MethodNode,
     private val frameLocals: Array<Any>,
 ) {
 
@@ -32,6 +33,18 @@ internal class Emitter(
             visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null)
         } else {
             visitor.visitFrame(Opcodes.F_SAME1, 0, null, 1, stackItems)
+        }
+    }
+
+    fun placeWithoutFrame(label: Label) {
+        visitor.visitLabel(label)
+    }
+
+    fun fallsThrough(): Boolean {
+        return when (visitor.instructions.last?.opcode) {
+            Opcodes.GOTO, Opcodes.TABLESWITCH, Opcodes.LOOKUPSWITCH, Opcodes.ATHROW -> false
+            in Opcodes.IRETURN..Opcodes.RETURN -> false
+            else -> true
         }
     }
 
@@ -212,6 +225,10 @@ internal class Emitter(
     ) {
         pendingLine = line
         pendingLineStart = start
+    }
+
+    fun removeDeadStores(firstLocalAfterParameters: Int) {
+        removeDeadStores(visitor, frameLocals, firstLocalAfterParameters)
     }
 
     private var pendingLine = 0

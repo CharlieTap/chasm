@@ -156,6 +156,7 @@ private class FunctionLowering(
         val node = methodNode(method.name, method.descriptor)
         val context = LowerContext(facts, slotKinds, locals, Emitter(node, locals.frameTypes))
         context.lowerFunctionBody(frameCost(locals))
+        context.emit.removeDeadStores(locals.firstLocalAfterParameters)
         return Whole(node, locals, context)
     }
 
@@ -244,8 +245,9 @@ private class FunctionLowering(
         val locals = Locals(module.bindingType, method.parameters.drop(3), slotKinds, frame.frameSlots, slots = IntArray(0))
         val dispatcher = methodNode(method.name, method.descriptor)
         val slotFrameCost = (frame.frameSlots * 8 + 31) / 32
-        LowerContext(facts, slotKinds, locals, Emitter(dispatcher, locals.frameTypes))
-            .lowerDispatcher(methods, frameCost(locals) + largestCost + slotFrameCost, dynamic)
+        val context = LowerContext(facts, slotKinds, locals, Emitter(dispatcher, locals.frameTypes))
+        context.lowerDispatcher(methods, frameCost(locals) + largestCost + slotFrameCost, dynamic)
+        context.emit.removeDeadStores(locals.firstLocalAfterParameters)
         if (finish(dispatcher) > MAX_SHORT_BRANCH_METHOD_BYTES) {
             throw Unsupported("function needs ${chunks.size} chunks, more than one dispatcher holds")
         }
@@ -310,8 +312,9 @@ private class FunctionLowering(
         }
         val node = methodNode(CHUNK_PLACEHOLDER, chunkDescriptor(module.bindingType))
         val chunk = Chunk(range.first, range.last + 1, entries, reloads, spills, continuationIds)
-        LowerContext(facts, slotKinds, locals, Emitter(node, locals.frameTypes), chunk)
-            .lowerChunkBody()
+        val context = LowerContext(facts, slotKinds, locals, Emitter(node, locals.frameTypes), chunk)
+        context.lowerChunkBody()
+        context.emit.removeDeadStores(locals.firstLocalAfterParameters)
         val allowance = if (continuationIds == null) PADDING_PER_SWITCH * node.instructions.count { it is TableSwitchInsnNode || it is LookupSwitchInsnNode } else 0
         val length = finish(node) + allowance
         val lowered = if (length <= limit) {

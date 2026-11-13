@@ -44,6 +44,8 @@ internal class Locals(
 
     val size: Int
 
+    val firstLocalAfterParameters: Int
+
     val frameTypes: Array<Any>
 
     val heldSlots: IntArray = slots
@@ -67,6 +69,7 @@ internal class Locals(
         local(internalName(CONTEXT_TYPE), 1)
         local(Opcodes.INTEGER, 1)
         arguments.forEachIndexed { index, descriptor -> argumentLocals[index] = local(frameType(descriptor), descriptorWords(descriptor)) }
+        firstLocalAfterParameters = next
         for (slot in slots) {
             val kind = slotKinds.kind(slot)
             slotLocals[slot] = local(kindFrameType(kind), if (kind == SlotKinds.LONG || kind == SlotKinds.DOUBLE) 2 else 1)

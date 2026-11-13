@@ -99,6 +99,10 @@ internal class LowerContext(
 
     val bodyEnd: Label get() = placement(function.instructions.size)
 
+    fun hasLabel(position: Int): Boolean {
+        return labels[position - firstPosition] != null
+    }
+
     fun markSite(
         position: Int,
         label: Label,

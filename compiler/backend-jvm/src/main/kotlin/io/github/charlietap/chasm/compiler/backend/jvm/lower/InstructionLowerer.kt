@@ -45,8 +45,15 @@ internal fun LowerContext.lowerFunctionBody(
         lowerInstruction(instruction, this)
     }
     publishesWrites = true
-    emit.place(bodyEnd)
-    trapUnreachable()
+
+    val needsEndTrap = emit.fallsThrough() || function.exceptions != null || hasLabel(function.instructions.size)
+    if (needsEndTrap) {
+        emit.place(bodyEnd)
+        trapUnreachable()
+    } else {
+        emit.placeWithoutFrame(bodyEnd)
+    }
+
     lowerExceptionHandling()
     outOfLine.forEach { path -> path() }
 }
