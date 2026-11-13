@@ -85,13 +85,10 @@ private fun compile(
         source = source,
         binary = binary,
         validator = ::WasmModuleValidator,
-        moduleRewriter = { module, types ->
-            ModuleRewriter(
-                module = module,
-                types = types,
-                preserveSource = config.stacktraces || config.storeConfig.meterFuel || config.storeConfig.interruptible,
-            )
-        },
+        moduleRewriter = ModuleRewriter(
+            preserveSource = config.stacktraces || config.storeConfig.meterFuel || config.storeConfig.interruptible,
+            inlineLeaves = false,
+        ),
         moduleCompiler = { module, types -> ModuleCompiler(module, types, recordProvenance = config.stacktraces) },
         uncompilableFunctions = ::UncompilableFunctions,
         declarationsFactory = ::ModuleDeclarationsFactory,
@@ -105,7 +102,7 @@ internal inline fun compile(
     noinline source: ModuleSource,
     binary: ByteArray?,
     crossinline validator: WasmModuleValidator,
-    crossinline moduleRewriter: ModuleRewriter,
+    moduleRewriter: ModuleRewriter,
     crossinline moduleCompiler: ModuleCompiler,
     crossinline uncompilableFunctions: UncompilableFunctions,
     crossinline declarationsFactory: ModuleDeclarationsFactory,
@@ -121,7 +118,7 @@ internal inline fun compile(
         }
         exceededLimit(validated, config.storeConfig.limits)?.let { reason -> return error(Stage.CONFIGURATION, reason) }
         val types = validated.typeResolver()
-        val module = moduleRewriter(validated, types)
+        val module = moduleRewriter.rewrite(validated, types)
         val code = moduleCompiler(module, types).getOrElse { failure ->
             val functions = uncompilableFunctions(module, types)
             val reasons = functions.entries.joinToString { (index, reason) -> "$index ($reason)" }

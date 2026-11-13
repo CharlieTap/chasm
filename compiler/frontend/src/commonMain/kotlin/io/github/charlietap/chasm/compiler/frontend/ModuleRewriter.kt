@@ -3,25 +3,32 @@ package io.github.charlietap.chasm.compiler.frontend
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.declarations.ModuleTypeResolver
 
-typealias ModuleRewriter = (Module, ModuleTypeResolver) -> Module
+class ModuleRewriter internal constructor(
+    private val preserveSource: Boolean,
+    private val inlineLeaves: Boolean,
+    private val indirectCallDevirtualiser: IndirectCallDevirtualiser,
+    private val leafCallInliner: LeafCallInliner,
+) {
+    constructor(
+        preserveSource: Boolean,
+        inlineLeaves: Boolean,
+    ) : this(
+        preserveSource = preserveSource,
+        inlineLeaves = inlineLeaves,
+        indirectCallDevirtualiser = ::IndirectCallDevirtualiser,
+        leafCallInliner = LeafCallInliner(LeafAnalyzer(), FunctionInliner()),
+    )
 
-fun ModuleRewriter(
-    module: Module,
-    types: ModuleTypeResolver,
-    preserveSource: Boolean,
-): Module = ModuleRewriter(
-    module = module,
-    types = types,
-    preserveSource = preserveSource,
-    indirectCallDevirtualiser = ::IndirectCallDevirtualiser,
-)
+    fun rewrite(
+        module: Module,
+        types: ModuleTypeResolver,
+    ): Module {
 
-internal inline fun ModuleRewriter(
-    module: Module,
-    types: ModuleTypeResolver,
-    preserveSource: Boolean,
-    crossinline indirectCallDevirtualiser: IndirectCallDevirtualiser,
-): Module {
-    if (preserveSource) return module
-    return indirectCallDevirtualiser(module, types)
+        if (preserveSource) return module
+
+        val devirtualised = indirectCallDevirtualiser(module, types)
+        if (!inlineLeaves) return devirtualised
+
+        return leafCallInliner.rewrite(devirtualised, types)
+    }
 }

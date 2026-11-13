@@ -86,10 +86,9 @@ internal fun generate(
     val decoded = decodeNamedModule(bytes)
     val types = decoded.typeResolver()
     val module = ModuleRewriter(
-        module = decoded,
-        types = types,
         preserveSource = options.stacktraces || options.meterFuel || options.interruptible,
-    )
+        inlineLeaves = false,
+    ).rewrite(decoded, types)
     val code = ModuleCompiler(module, types).getOrThrow { IllegalStateException(it.toString()) }
     val generated = Generated()
     generated.module = ModuleLowerer(module, code, options, generated, ModuleDeclarationsFactory(module))

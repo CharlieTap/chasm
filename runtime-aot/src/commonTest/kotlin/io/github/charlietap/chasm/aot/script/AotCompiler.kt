@@ -72,10 +72,9 @@ internal object AotCompiler {
     ): CompiledModule {
         val types = module.typeResolver()
         val source = ModuleRewriter(
-            module = module,
-            types = types,
             preserveSource = options.stacktraces || options.meterFuel || options.interruptible,
-        )
+            inlineLeaves = false,
+        ).rewrite(module, types)
         val cir = ModuleCompiler(source, types).fold({ it }) { error -> throw IllegalStateException("cannot compile: $error") }
         val generated = GeneratedCode()
         val result = try {

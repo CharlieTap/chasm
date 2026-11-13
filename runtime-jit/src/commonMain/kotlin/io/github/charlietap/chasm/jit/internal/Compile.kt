@@ -27,13 +27,10 @@ internal fun compile(
         module = module,
         config = config,
         packageNames = packageNames::next,
-        moduleRewriter = { source, types ->
-            ModuleRewriter(
-                module = source,
-                types = types,
-                preserveSource = config.stacktraces || config.meterFuel || config.interruptible,
-            )
-        },
+        moduleRewriter = ModuleRewriter(
+            preserveSource = config.stacktraces || config.meterFuel || config.interruptible,
+            inlineLeaves = true,
+        ),
         moduleCompiler = ::ModuleCompiler,
         uncompilableFunctions = ::UncompilableFunctions,
         moduleLowerer = ::ModuleLowerer,
@@ -44,7 +41,7 @@ internal inline fun compile(
     module: Module,
     config: CompileConfig,
     crossinline packageNames: (ByteArray?, DexOptions) -> String,
-    crossinline moduleRewriter: ModuleRewriter,
+    moduleRewriter: ModuleRewriter,
     crossinline moduleCompiler: ModuleCompiler,
     crossinline uncompilableFunctions: UncompilableFunctions,
     crossinline moduleLowerer: ModuleLowerer,
@@ -59,7 +56,7 @@ internal inline fun compileUnchecked(
     module: Module,
     config: CompileConfig,
     crossinline packageNames: (ByteArray?, DexOptions) -> String,
-    crossinline moduleRewriter: ModuleRewriter,
+    moduleRewriter: ModuleRewriter,
     crossinline moduleCompiler: ModuleCompiler,
     crossinline uncompilableFunctions: UncompilableFunctions,
     crossinline moduleLowerer: ModuleLowerer,
@@ -67,7 +64,7 @@ internal inline fun compileUnchecked(
 ): CompileResult {
     val source = module._module()
     val types = source.typeResolver()
-    val ast = moduleRewriter(source, types)
+    val ast = moduleRewriter.rewrite(source, types)
     val code = moduleCompiler(ast, types).getOrElse { failure ->
         val functions = uncompilableFunctions(ast, types)
         val reasons = functions.entries.joinToString { (index, reason) -> "$index ($reason)" }
