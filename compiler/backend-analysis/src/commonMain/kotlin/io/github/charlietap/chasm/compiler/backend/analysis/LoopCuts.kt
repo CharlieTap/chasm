@@ -1,20 +1,20 @@
 package io.github.charlietap.chasm.compiler.backend.analysis
 
-import io.github.charlietap.chasm.cir.CirFunction
+fun loopCrossings(jumps: JumpTable): IntArray {
 
-fun loopCrossings(
-    function: CirFunction,
-): IntArray {
-    val size = function.instructions.size
+    val size = jumps.start.size - 1
     val changes = IntArray(size + 2)
-    function.instructions.forEachIndexed { source, instruction ->
-        instruction.jumpTargets().forEach { target ->
+
+    for (source in 0 until size) {
+        for (edge in jumps.start[source] until jumps.end(source)) {
+            val target = jumps.targets[edge]
             if (target <= source) {
                 changes[target + 1]++
                 changes[source + 1]--
             }
         }
     }
+
     var running = 0
     return IntArray(size + 1) { position ->
         running += changes[position]

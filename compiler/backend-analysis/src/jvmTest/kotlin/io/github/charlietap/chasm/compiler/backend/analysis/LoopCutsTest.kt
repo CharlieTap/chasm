@@ -12,8 +12,12 @@ import kotlin.test.assertEquals
 
 class LoopCutsTest {
 
-    private val function: CirFunction = ModuleCompiler(module("loops")).getOrThrow { IllegalStateException(it.toString()) }
+    private val loops: Module = module("loops")
+
+    private val function: CirFunction = ModuleCompiler(loops).getOrThrow { IllegalStateException(it.toString()) }
         .functions.single()
+
+    private val jumps: JumpTable = instructionTable(function, ModuleIndexSpaces(loops)).jumps
 
     private val loop: IntRange = function.instructions.withIndex()
         .flatMap { (source, instruction) -> instruction.jumpTargets().filter { it <= source }.map { it..source } }
@@ -21,7 +25,7 @@ class LoopCutsTest {
 
     @Test
     fun `cuts inside a loop cross it and cuts outside do not`() {
-        val crossings = loopCrossings(function)
+        val crossings = loopCrossings(jumps)
 
         (0..function.instructions.size).forEach { position ->
             val inside = position > loop.first && position <= loop.last
@@ -31,14 +35,14 @@ class LoopCutsTest {
 
     @Test
     fun `a chunk ends before a loop it cannot hold rather than inside it`() {
-        val crossings = loopCrossings(function)
+        val crossings = loopCrossings(jumps)
 
         assertEquals(loop.first, cheapestCut(crossings, start = 0, limit = loop.last))
     }
 
     @Test
     fun `a chunk takes the furthest cut that crosses no loop`() {
-        val crossings = loopCrossings(function)
+        val crossings = loopCrossings(jumps)
         val size = function.instructions.size
 
         assertEquals(size, cheapestCut(crossings, start = 0, limit = size))
@@ -47,7 +51,7 @@ class LoopCutsTest {
 
     @Test
     fun `a chunk starting inside a loop ends as far along as it reaches`() {
-        val crossings = loopCrossings(function)
+        val crossings = loopCrossings(jumps)
         val start = loop.first + 1
 
         assertEquals(loop.last, cheapestCut(crossings, start = start, limit = loop.last))

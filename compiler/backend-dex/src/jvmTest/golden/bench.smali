@@ -5,7 +5,7 @@
 
 # direct methods
 .method public static f0([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;II)J
-    .registers 36
+    .registers 30
 
     move-object/from16 v14, p1
 
@@ -19,44 +19,42 @@
 
     const/4 v15, 0x0
 
-    move-wide/from16 v18, v0
+    move/from16 v18, v15
 
-    move/from16 v20, v15
-
-    move-wide/from16 v21, v0
+    move-wide/from16 v19, v0
 
     .line 3
-    :cond_11
-    move/from16 v0, v20
+    :cond_f
+    move/from16 v0, v18
 
     int-to-long v0, v0
 
     const-wide v2, 0xffffffffL
 
-    and-long v25, v0, v2
+    and-long v21, v0, v2
 
     .line 4
     const-wide/16 v2, 0x3
 
-    mul-long v25, v25, v2
+    mul-long v21, v21, v2
 
     .line 5
-    add-long v21, v21, v25
+    add-long v19, v19, v21
 
     .line 6
-    add-int/lit8 v20, v20, 0x1
+    add-int/lit8 v18, v18, 0x1
 
     .line 7
     const/high16 v10, -0x80000000
 
-    add-int v8, v20, v10
+    add-int v8, v18, v10
 
     add-int v9, v17, v10
 
-    if-lt v8, v9, :cond_11
+    if-lt v8, v9, :cond_f
 
     .line 8
-    move-wide/from16 v0, v21
+    move-wide/from16 v0, v19
 
     return-wide v0
 
@@ -66,7 +64,7 @@
 .end method
 
 .method public static f1([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;II)I
-    .registers 33
+    .registers 28
 
     move-object/from16 v14, p1
 
@@ -74,7 +72,7 @@
 
     move-object/from16 v16, p0
 
-    add-int/lit16 v8, v13, 0x11
+    add-int/lit16 v8, v13, 0xf
 
     iget v9, v14, Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;->compiledStackLimit:I
 
@@ -89,23 +87,13 @@
     :cond_11
     move v13, v8
 
-    move-object/from16 v25, v16
+    move-object/from16 v20, v16
 
-    move-object/from16 v26, v14
+    move-object/from16 v21, v14
 
-    move/from16 v27, v13
+    move/from16 v22, v13
 
     move/from16 v17, p3
-
-    const-wide/16 v0, 0x0
-
-    const/4 v15, 0x0
-
-    move-wide/from16 v18, v0
-
-    const/4 v8, 0x0
-
-    move-object/from16 v24, v8
 
     .line 2
     const/high16 v10, -0x80000000
@@ -114,41 +102,41 @@
 
     const v9, -0x7ffffffe
 
-    if-ge v8, v9, :cond_2f
+    if-ge v8, v9, :cond_27
 
     .line 3
-    move/from16 v20, v17
+    move/from16 v18, v17
 
     .line 4
-    goto/16 :goto_41
+    goto/16 :goto_39
 
     .line 5
-    :cond_2f
-    add-int/lit8 v20, v17, -0x1
+    :cond_27
+    add-int/lit8 v18, v17, -0x1
 
     .line 6
-    move/from16 v28, v20
+    move/from16 v23, v18
 
-    invoke-static/range {v25 .. v28}, Lchasm/jit/Code0;->f1([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;II)I
+    invoke-static/range {v20 .. v23}, Lchasm/jit/Code0;->f1([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;II)I
 
-    move-result v20
+    move-result v18
 
     .line 7
-    add-int/lit8 v21, v17, -0x2
+    add-int/lit8 v19, v17, -0x2
 
     .line 8
-    move/from16 v28, v21
+    move/from16 v23, v19
 
-    invoke-static/range {v25 .. v28}, Lchasm/jit/Code0;->f1([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;II)I
+    invoke-static/range {v20 .. v23}, Lchasm/jit/Code0;->f1([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;II)I
 
-    move-result v21
+    move-result v19
 
     .line 9
-    add-int v20, v20, v21
+    add-int v18, v18, v19
 
     .line 10
-    :goto_41
-    move/from16 v8, v20
+    :goto_39
+    move/from16 v8, v18
 
     return v8
 
@@ -158,7 +146,7 @@
 .end method
 
 .method public static f2([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;II)I
-    .registers 37
+    .registers 33
 
     move-object/from16 v14, p1
 
@@ -186,7 +174,7 @@
 
     check-cast v12, Lio/github/charlietap/chasm/runtime/instance/MemoryInstance;
 
-    move-object/from16 v29, v12
+    move-object/from16 v25, v12
 
     move/from16 v19, p3
 
@@ -194,16 +182,14 @@
 
     const/4 v15, 0x0
 
-    move-wide/from16 v20, v0
+    move/from16 v20, v15
+
+    move/from16 v21, v15
 
     move/from16 v22, v15
 
-    move/from16 v23, v15
-
-    move/from16 v24, v15
-
     .line 2
-    move-object/from16 v0, v29
+    move-object/from16 v0, v25
 
     move/from16 v8, v19
 
@@ -214,124 +200,124 @@
     invoke-static {v0, v10, v9, v8}, Lio/github/charlietap/chasm/runtime/compiled/CompiledMemory;->memoryFill(Lio/github/charlietap/chasm/runtime/instance/MemoryInstance;III)V
 
     .line 3
-    const/16 v24, 0x2
+    const/16 v22, 0x2
 
     .line 5
-    :goto_32
-    mul-int v25, v24, v24
+    :goto_30
+    mul-int v23, v22, v22
 
     .line 6
     const/high16 v10, -0x80000000
 
-    add-int v8, v25, v10
+    add-int v8, v23, v10
 
     add-int v9, v19, v10
 
-    if-ge v8, v9, :cond_69
+    if-ge v8, v9, :cond_67
 
     .line 7
-    move/from16 v8, v24
+    move/from16 v8, v22
 
-    if-ltz v8, :cond_8b
+    if-ltz v8, :cond_89
 
     add-int/lit8 v11, v17, -0x1
 
-    if-gt v8, v11, :cond_8b
+    if-gt v8, v11, :cond_89
 
     aget-byte v9, v18, v8
 
     and-int/lit16 v9, v9, 0xff
 
-    move/from16 v25, v9
+    move/from16 v23, v9
 
     .line 8
-    if-eqz v25, :cond_66
+    if-eqz v23, :cond_64
 
     .line 9
-    mul-int v22, v24, v24
+    mul-int v20, v22, v22
 
     .line 11
-    :goto_4e
+    :goto_4c
     const/high16 v10, -0x80000000
 
-    add-int v8, v22, v10
+    add-int v8, v20, v10
 
     add-int v9, v19, v10
 
-    if-ge v8, v9, :cond_64
+    if-ge v8, v9, :cond_62
 
     .line 12
-    move/from16 v8, v22
+    move/from16 v8, v20
 
-    if-ltz v8, :cond_a0
+    if-ltz v8, :cond_9e
 
     add-int/lit8 v11, v17, -0x1
 
-    if-gt v8, v11, :cond_a0
+    if-gt v8, v11, :cond_9e
 
     const/4 v9, 0x0
 
     aput-byte v9, v18, v8
 
     .line 13
-    add-int v22, v22, v24
+    add-int v20, v20, v22
 
     .line 14
-    goto :goto_4e
+    goto :goto_4c
 
     .line 15
-    :cond_64
-    goto/16 :goto_66
+    :cond_62
+    goto/16 :goto_64
 
     .line 16
-    :cond_66
-    :goto_66
-    add-int/lit8 v24, v24, 0x1
+    :cond_64
+    :goto_64
+    add-int/lit8 v22, v22, 0x1
 
     .line 17
-    goto :goto_32
+    goto :goto_30
 
     .line 18
-    :cond_69
-    const/16 v24, 0x2
+    :cond_67
+    const/16 v22, 0x2
 
     .line 20
-    :goto_6b
+    :goto_69
     const/high16 v10, -0x80000000
 
-    add-int v8, v24, v10
+    add-int v8, v22, v10
 
     add-int v9, v19, v10
 
-    if-ge v8, v9, :cond_86
+    if-ge v8, v9, :cond_84
 
     .line 21
-    move/from16 v8, v24
+    move/from16 v8, v22
 
-    if-ltz v8, :cond_b5
+    if-ltz v8, :cond_b3
 
     add-int/lit8 v11, v17, -0x1
 
-    if-gt v8, v11, :cond_b5
+    if-gt v8, v11, :cond_b3
 
     aget-byte v9, v18, v8
 
     and-int/lit16 v9, v9, 0xff
 
-    move/from16 v26, v9
+    move/from16 v24, v9
 
     .line 22
-    add-int v23, v23, v26
+    add-int v21, v21, v24
 
     .line 23
-    add-int/lit8 v24, v24, 0x1
+    add-int/lit8 v22, v22, 0x1
 
     .line 24
-    goto :goto_6b
+    goto :goto_69
 
     .line 25
-    :cond_86
-    move/from16 v8, v23
+    :cond_84
+    move/from16 v8, v21
 
     return v8
 
@@ -340,36 +326,10 @@
     return v8
 
     .line 7
-    :cond_8b
-    move-object/from16 v12, v29
+    :cond_89
+    move-object/from16 v12, v25
 
     const/4 v10, 0x0
-
-    move/from16 v9, v24
-
-    int-to-long v2, v9
-
-    const-wide v4, 0xffffffffL
-
-    and-long/2addr v2, v4
-
-    const-wide/16 v4, 0x0
-
-    add-long/2addr v2, v4
-
-    const/4 v11, 0x1
-
-    invoke-static {v12, v10, v2, v3, v11}, Lio/github/charlietap/chasm/runtime/compiled/CompiledMemory;->memoryAccessOutOfBounds(Lio/github/charlietap/chasm/runtime/instance/MemoryInstance;IJI)Ljava/lang/Void;
-
-    const/4 v8, 0x0
-
-    return v8
-
-    .line 12
-    :cond_a0
-    move-object/from16 v12, v29
-
-    const/4 v10, 0x1
 
     move/from16 v9, v22
 
@@ -391,13 +351,39 @@
 
     return v8
 
+    .line 12
+    :cond_9e
+    move-object/from16 v12, v25
+
+    const/4 v10, 0x1
+
+    move/from16 v9, v20
+
+    int-to-long v2, v9
+
+    const-wide v4, 0xffffffffL
+
+    and-long/2addr v2, v4
+
+    const-wide/16 v4, 0x0
+
+    add-long/2addr v2, v4
+
+    const/4 v11, 0x1
+
+    invoke-static {v12, v10, v2, v3, v11}, Lio/github/charlietap/chasm/runtime/compiled/CompiledMemory;->memoryAccessOutOfBounds(Lio/github/charlietap/chasm/runtime/instance/MemoryInstance;IJI)Ljava/lang/Void;
+
+    const/4 v8, 0x0
+
+    return v8
+
     .line 21
-    :cond_b5
-    move-object/from16 v12, v29
+    :cond_b3
+    move-object/from16 v12, v25
 
     const/4 v10, 0x0
 
-    move/from16 v9, v24
+    move/from16 v9, v22
 
     int-to-long v2, v9
 
@@ -419,7 +405,7 @@
 .end method
 
 .method public static f3([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;II)D
-    .registers 47
+    .registers 45
 
     move-object/from16 v14, p1
 
@@ -447,7 +433,7 @@
 
     check-cast v12, Lio/github/charlietap/chasm/runtime/instance/MemoryInstance;
 
-    move-object/from16 v39, v12
+    move-object/from16 v37, v12
 
     move/from16 v19, p3
 
@@ -455,42 +441,40 @@
 
     const/4 v15, 0x0
 
-    move-wide/from16 v20, v0
+    move/from16 v20, v15
 
-    move/from16 v22, v15
+    move/from16 v21, v15
 
-    move/from16 v23, v15
+    move-wide/from16 v22, v0
 
     move-wide/from16 v24, v0
 
-    move-wide/from16 v26, v0
+    move/from16 v26, v15
+
+    move/from16 v27, v15
 
     move/from16 v28, v15
 
-    move/from16 v29, v15
-
-    move/from16 v30, v15
-
     .line 2
-    mul-int v31, v19, v19
+    mul-int v29, v19, v19
 
     .line 3
-    mul-int/lit8 v29, v31, 0x8
+    mul-int/lit8 v27, v29, 0x8
 
     .line 4
-    mul-int/lit8 v30, v29, 0x2
+    mul-int/lit8 v28, v27, 0x2
 
     .line 5
-    const/16 v28, 0x0
+    const/16 v26, 0x0
 
     .line 7
-    :cond_37
-    shl-int/lit8 v31, v28, 0x3
+    :cond_35
+    shl-int/lit8 v29, v26, 0x3
 
     .line 8
     const/4 v9, 0x7
 
-    move/from16 v8, v28
+    move/from16 v8, v26
 
     int-to-long v0, v8
 
@@ -506,14 +490,10 @@
 
     long-to-int v8, v0
 
-    int-to-long v0, v8
-
-    move-wide/from16 v32, v0
+    move/from16 v30, v8
 
     .line 9
-    move-wide/from16 v0, v32
-
-    long-to-int v8, v0
+    move/from16 v8, v30
 
     int-to-long v2, v8
 
@@ -523,22 +503,22 @@
 
     long-to-double v4, v2
 
-    invoke-static {v4, v5}, Ljava/lang/Double;->doubleToRawLongBits(D)J
-
-    move-result-wide v4
-
-    move-wide/from16 v32, v4
+    move-wide/from16 v31, v4
 
     .line 10
-    move/from16 v8, v31
+    move/from16 v8, v29
 
-    if-ltz v8, :cond_2ef
+    if-ltz v8, :cond_291
 
     add-int/lit8 v11, v17, -0x8
 
-    if-gt v8, v11, :cond_2ef
+    if-gt v8, v11, :cond_291
 
-    move-wide/from16 v2, v32
+    move-wide/from16 v2, v31
+
+    invoke-static {v2, v3}, Ljava/lang/Double;->doubleToRawLongBits(D)J
+
+    move-result-wide v2
 
     long-to-int v9, v2
 
@@ -591,23 +571,15 @@
     aput-byte v10, v18, v11
 
     .line 11
-    shl-int/lit8 v8, v28, 0x3
-
-    int-to-long v0, v8
-
-    move-wide/from16 v32, v0
+    shl-int/lit8 v30, v26, 0x3
 
     .line 12
-    move-wide/from16 v2, v32
-
-    long-to-int v9, v2
-
-    add-int v31, v29, v9
+    add-int v29, v27, v30
 
     .line 13
     const/4 v9, 0x5
 
-    move/from16 v8, v28
+    move/from16 v8, v26
 
     int-to-long v0, v8
 
@@ -623,14 +595,10 @@
 
     long-to-int v8, v0
 
-    int-to-long v0, v8
-
-    move-wide/from16 v32, v0
+    move/from16 v30, v8
 
     .line 14
-    move-wide/from16 v0, v32
-
-    long-to-int v8, v0
+    move/from16 v8, v30
 
     int-to-long v2, v8
 
@@ -640,22 +608,22 @@
 
     long-to-double v4, v2
 
-    invoke-static {v4, v5}, Ljava/lang/Double;->doubleToRawLongBits(D)J
-
-    move-result-wide v4
-
-    move-wide/from16 v32, v4
+    move-wide/from16 v31, v4
 
     .line 15
-    move/from16 v8, v31
+    move/from16 v8, v29
 
-    if-ltz v8, :cond_306
+    if-ltz v8, :cond_2a8
 
     add-int/lit8 v11, v17, -0x8
 
-    if-gt v8, v11, :cond_306
+    if-gt v8, v11, :cond_2a8
 
-    move-wide/from16 v2, v32
+    move-wide/from16 v2, v31
+
+    invoke-static {v2, v3}, Ljava/lang/Double;->doubleToRawLongBits(D)J
+
+    move-result-wide v2
 
     long-to-int v9, v2
 
@@ -708,82 +676,52 @@
     aput-byte v10, v18, v11
 
     .line 16
-    add-int/lit8 v28, v28, 0x1
+    add-int/lit8 v26, v26, 0x1
 
     .line 17
-    mul-int v8, v19, v19
-
-    int-to-long v0, v8
-
-    move-wide/from16 v32, v0
+    mul-int v30, v19, v19
 
     .line 18
     const/high16 v10, -0x80000000
 
-    add-int v8, v28, v10
+    add-int v8, v26, v10
 
-    move-wide/from16 v2, v32
+    add-int v9, v30, v10
 
-    long-to-int v9, v2
-
-    add-int/2addr v9, v10
-
-    if-lt v8, v9, :cond_37
+    if-lt v8, v9, :cond_35
 
     .line 19
-    const/16 v28, 0x0
+    const/16 v26, 0x0
 
     .line 21
-    :cond_10e
-    const/16 v22, 0x0
+    :cond_fd
+    const/16 v20, 0x0
 
     .line 23
-    :cond_110
-    const-wide/16 v24, 0x0
+    :cond_ff
+    const-wide/16 v22, 0x0
 
     .line 24
-    const/16 v23, 0x0
+    const/16 v21, 0x0
 
     .line 26
-    :cond_114
-    mul-int v8, v28, v19
-
-    int-to-long v0, v8
-
-    move-wide/from16 v32, v0
+    :cond_103
+    mul-int v30, v26, v19
 
     .line 27
-    move-wide/from16 v0, v32
-
-    long-to-int v8, v0
-
-    add-int v8, v8, v23
-
-    int-to-long v0, v8
-
-    move-wide/from16 v32, v0
+    add-int v30, v30, v21
 
     .line 28
-    move-wide/from16 v0, v32
-
-    long-to-int v8, v0
-
-    shl-int/lit8 v8, v8, 0x3
-
-    int-to-long v0, v8
-
-    move-wide/from16 v32, v0
+    shl-int/lit8 v30, v30, 0x3
 
     .line 29
-    move-wide/from16 v0, v32
+    move/from16 v8, v30
 
-    long-to-int v8, v0
-
-    if-ltz v8, :cond_31d
+    if-ltz v8, :cond_2bf
 
     add-int/lit8 v11, v17, -0x8
 
-    if-gt v8, v11, :cond_31d
+    if-gt v8, v11, :cond_2bf
 
     aget-byte v9, v18, v8
 
@@ -865,34 +803,30 @@
 
     or-long/2addr v0, v2
 
-    move-wide/from16 v32, v0
+    invoke-static {v0, v1}, Ljava/lang/Double;->longBitsToDouble(J)D
+
+    move-result-wide v31
 
     .line 30
-    mul-int v36, v23, v19
+    mul-int v36, v21, v19
 
     .line 31
-    add-int v36, v36, v22
+    add-int v36, v36, v20
 
     .line 32
     shl-int/lit8 v36, v36, 0x3
 
     .line 33
-    add-int v8, v29, v36
-
-    int-to-long v0, v8
-
-    move-wide/from16 v34, v0
+    add-int v33, v27, v36
 
     .line 34
-    move-wide/from16 v0, v34
+    move/from16 v8, v33
 
-    long-to-int v8, v0
-
-    if-ltz v8, :cond_335
+    if-ltz v8, :cond_2d6
 
     add-int/lit8 v11, v17, -0x8
 
-    if-gt v8, v11, :cond_335
+    if-gt v8, v11, :cond_2d6
 
     aget-byte v9, v18, v8
 
@@ -974,96 +908,50 @@
 
     or-long/2addr v0, v2
 
-    move-wide/from16 v34, v0
-
-    .line 35
-    move-wide/from16 v0, v32
-
     invoke-static {v0, v1}, Ljava/lang/Double;->longBitsToDouble(J)D
 
-    move-result-wide v0
+    move-result-wide v34
 
-    move-wide/from16 v2, v34
-
-    invoke-static {v2, v3}, Ljava/lang/Double;->longBitsToDouble(J)D
-
-    move-result-wide v2
-
-    mul-double/2addr v0, v2
-
-    invoke-static {v0, v1}, Ljava/lang/Double;->doubleToRawLongBits(D)J
-
-    move-result-wide v0
-
-    move-wide/from16 v32, v0
+    .line 35
+    mul-double v31, v31, v34
 
     .line 36
-    move-wide/from16 v2, v32
-
-    invoke-static {v2, v3}, Ljava/lang/Double;->longBitsToDouble(J)D
-
-    move-result-wide v2
-
-    add-double v24, v24, v2
+    add-double v22, v22, v31
 
     .line 37
-    add-int/lit8 v23, v23, 0x1
+    add-int/lit8 v21, v21, 0x1
 
     .line 38
     const/high16 v10, -0x80000000
 
-    add-int v8, v23, v10
+    add-int v8, v21, v10
 
     add-int v9, v19, v10
 
-    if-lt v8, v9, :cond_114
+    if-lt v8, v9, :cond_103
 
     .line 39
-    mul-int v8, v28, v19
-
-    int-to-long v0, v8
-
-    move-wide/from16 v32, v0
+    mul-int v30, v26, v19
 
     .line 40
-    move-wide/from16 v0, v32
-
-    long-to-int v8, v0
-
-    add-int v8, v8, v22
-
-    int-to-long v0, v8
-
-    move-wide/from16 v32, v0
+    add-int v30, v30, v20
 
     .line 41
-    move-wide/from16 v0, v32
-
-    long-to-int v8, v0
-
-    shl-int/lit8 v8, v8, 0x3
-
-    int-to-long v0, v8
-
-    move-wide/from16 v32, v0
+    shl-int/lit8 v30, v30, 0x3
 
     .line 42
-    move-wide/from16 v2, v32
-
-    long-to-int v9, v2
-
-    add-int v31, v30, v9
+    add-int v29, v28, v30
 
     .line 43
-    move/from16 v8, v31
+    move/from16 v8, v29
 
-    if-ltz v8, :cond_34d
+    if-ltz v8, :cond_2ed
 
     add-int/lit8 v11, v17, -0x8
 
-    if-gt v8, v11, :cond_34d
+    if-gt v8, v11, :cond_2ed
 
-    move-wide/from16 v2, v24
+    move-wide/from16 v2, v22
 
     invoke-static {v2, v3}, Ljava/lang/Double;->doubleToRawLongBits(D)J
 
@@ -1120,75 +1008,53 @@
     aput-byte v10, v18, v11
 
     .line 44
-    add-int/lit8 v22, v22, 0x1
+    add-int/lit8 v20, v20, 0x1
 
     .line 45
     const/high16 v10, -0x80000000
 
-    add-int v8, v22, v10
+    add-int v8, v20, v10
 
     add-int v9, v19, v10
 
-    if-lt v8, v9, :cond_110
+    if-lt v8, v9, :cond_ff
 
     .line 46
-    add-int/lit8 v28, v28, 0x1
+    add-int/lit8 v26, v26, 0x1
 
     .line 47
     const/high16 v10, -0x80000000
 
-    add-int v8, v28, v10
+    add-int v8, v26, v10
 
     add-int v9, v19, v10
 
-    if-lt v8, v9, :cond_10e
+    if-lt v8, v9, :cond_fd
 
     .line 48
-    const/16 v28, 0x0
+    const/16 v26, 0x0
 
     .line 50
-    :cond_26d
+    :cond_223
     add-int/lit8 v36, v19, 0x1
 
     .line 51
-    mul-int v8, v28, v36
-
-    int-to-long v0, v8
-
-    move-wide/from16 v34, v0
+    mul-int v33, v26, v36
 
     .line 52
-    move-wide/from16 v0, v34
-
-    long-to-int v8, v0
-
-    shl-int/lit8 v8, v8, 0x3
-
-    int-to-long v0, v8
-
-    move-wide/from16 v34, v0
+    shl-int/lit8 v33, v33, 0x3
 
     .line 53
-    move-wide/from16 v2, v34
-
-    long-to-int v9, v2
-
-    add-int v8, v30, v9
-
-    int-to-long v0, v8
-
-    move-wide/from16 v32, v0
+    add-int v30, v28, v33
 
     .line 54
-    move-wide/from16 v0, v32
+    move/from16 v8, v30
 
-    long-to-int v8, v0
-
-    if-ltz v8, :cond_364
+    if-ltz v8, :cond_304
 
     add-int/lit8 v11, v17, -0x8
 
-    if-gt v8, v11, :cond_364
+    if-gt v8, v11, :cond_304
 
     aget-byte v9, v18, v8
 
@@ -1270,31 +1136,27 @@
 
     or-long/2addr v0, v2
 
-    move-wide/from16 v32, v0
+    invoke-static {v0, v1}, Ljava/lang/Double;->longBitsToDouble(J)D
+
+    move-result-wide v31
 
     .line 55
-    move-wide/from16 v2, v32
-
-    invoke-static {v2, v3}, Ljava/lang/Double;->longBitsToDouble(J)D
-
-    move-result-wide v2
-
-    add-double v26, v26, v2
+    add-double v24, v24, v31
 
     .line 56
-    add-int/lit8 v28, v28, 0x1
+    add-int/lit8 v26, v26, 0x1
 
     .line 57
     const/high16 v10, -0x80000000
 
-    add-int v8, v28, v10
+    add-int v8, v26, v10
 
     add-int v9, v19, v10
 
-    if-lt v8, v9, :cond_26d
+    if-lt v8, v9, :cond_223
 
     .line 58
-    move-wide/from16 v0, v26
+    move-wide/from16 v0, v24
 
     return-wide v0
 
@@ -1303,12 +1165,12 @@
     return-wide v0
 
     .line 10
-    :cond_2ef
-    move-object/from16 v12, v39
+    :cond_291
+    move-object/from16 v12, v37
 
     const/4 v10, 0x1
 
-    move/from16 v9, v31
+    move/from16 v9, v29
 
     int-to-long v2, v9
 
@@ -1329,12 +1191,12 @@
     return-wide v0
 
     .line 15
-    :cond_306
-    move-object/from16 v12, v39
+    :cond_2a8
+    move-object/from16 v12, v37
 
     const/4 v10, 0x1
 
-    move/from16 v9, v31
+    move/from16 v9, v29
 
     int-to-long v2, v9
 
@@ -1355,14 +1217,12 @@
     return-wide v0
 
     .line 29
-    :cond_31d
-    move-object/from16 v12, v39
+    :cond_2bf
+    move-object/from16 v12, v37
 
     const/4 v10, 0x0
 
-    move-wide/from16 v0, v32
-
-    long-to-int v9, v0
+    move/from16 v9, v30
 
     int-to-long v2, v9
 
@@ -1383,14 +1243,12 @@
     return-wide v0
 
     .line 34
-    :cond_335
-    move-object/from16 v12, v39
+    :cond_2d6
+    move-object/from16 v12, v37
 
     const/4 v10, 0x0
 
-    move-wide/from16 v0, v34
-
-    long-to-int v9, v0
+    move/from16 v9, v33
 
     int-to-long v2, v9
 
@@ -1411,12 +1269,12 @@
     return-wide v0
 
     .line 43
-    :cond_34d
-    move-object/from16 v12, v39
+    :cond_2ed
+    move-object/from16 v12, v37
 
     const/4 v10, 0x1
 
-    move/from16 v9, v31
+    move/from16 v9, v29
 
     int-to-long v2, v9
 
@@ -1437,14 +1295,12 @@
     return-wide v0
 
     .line 54
-    :cond_364
-    move-object/from16 v12, v39
+    :cond_304
+    move-object/from16 v12, v37
 
     const/4 v10, 0x0
 
-    move-wide/from16 v0, v32
-
-    long-to-int v9, v0
+    move/from16 v9, v30
 
     int-to-long v2, v9
 
@@ -1466,7 +1322,7 @@
 .end method
 
 .method public static f4([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;II)I
-    .registers 39
+    .registers 35
 
     move-object/from16 v14, p1
 
@@ -1494,7 +1350,7 @@
 
     check-cast v12, Lio/github/charlietap/chasm/runtime/instance/MemoryInstance;
 
-    move-object/from16 v31, v12
+    move-object/from16 v27, v12
 
     move/from16 v19, p3
 
@@ -1502,85 +1358,83 @@
 
     const/4 v15, 0x0
 
-    move-wide/from16 v20, v0
+    move/from16 v20, v15
+
+    move/from16 v21, v15
 
     move/from16 v22, v15
 
-    move/from16 v23, v15
-
-    move/from16 v24, v15
-
     .line 2
-    const/16 v24, -0x1
+    const/16 v22, -0x1
 
     .line 4
-    :cond_29
-    move/from16 v8, v22
+    :cond_27
+    move/from16 v8, v20
 
-    if-ltz v8, :cond_65
+    if-ltz v8, :cond_63
 
     add-int/lit8 v11, v17, -0x1
 
-    if-gt v8, v11, :cond_65
+    if-gt v8, v11, :cond_63
 
     aget-byte v9, v18, v8
 
     and-int/lit16 v9, v9, 0xff
 
-    move/from16 v26, v9
+    move/from16 v24, v9
 
     .line 5
-    xor-int v24, v24, v26
+    xor-int v22, v22, v24
 
     .line 6
-    const/16 v23, 0x0
+    const/16 v21, 0x0
 
     .line 8
-    :cond_3b
-    ushr-int/lit8 v25, v24, 0x1
+    :cond_39
+    ushr-int/lit8 v23, v22, 0x1
 
     .line 9
-    and-int/lit8 v28, v24, 0x1
+    and-int/lit8 v26, v22, 0x1
 
     .line 10
     const/4 v8, 0x0
 
-    sub-int v27, v8, v28
+    sub-int v25, v8, v26
 
     .line 11
     const v8, -0x12477ce0
 
-    and-int v26, v8, v27
+    and-int v24, v8, v25
 
     .line 12
-    xor-int v24, v25, v26
+    xor-int v22, v23, v24
 
     .line 13
-    add-int/lit8 v23, v23, 0x1
+    add-int/lit8 v21, v21, 0x1
 
     .line 14
     const/high16 v10, -0x80000000
 
-    add-int v8, v23, v10
+    add-int v8, v21, v10
 
     const v9, -0x7ffffff8
 
-    if-lt v8, v9, :cond_3b
+    if-lt v8, v9, :cond_39
 
     .line 15
-    add-int/lit8 v22, v22, 0x1
+    add-int/lit8 v20, v20, 0x1
 
     .line 16
     const/high16 v10, -0x80000000
 
-    add-int v8, v22, v10
+    add-int v8, v20, v10
 
     add-int v9, v19, v10
 
-    if-lt v8, v9, :cond_29
+    if-lt v8, v9, :cond_27
 
     .line 17
-    xor-int/lit8 v19, v24, -0x1
+    xor-int/lit8 v19, v22, -0x1
 
     .line 18
     move/from16 v8, v19
@@ -1592,12 +1446,12 @@
     return v8
 
     .line 4
-    :cond_65
-    move-object/from16 v12, v31
+    :cond_63
+    move-object/from16 v12, v27
 
     const/4 v10, 0x0
 
-    move/from16 v9, v22
+    move/from16 v9, v20
 
     int-to-long v2, v9
 

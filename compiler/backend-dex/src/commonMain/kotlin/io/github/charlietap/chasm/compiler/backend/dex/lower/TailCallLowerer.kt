@@ -13,14 +13,17 @@ import io.github.charlietap.chasm.compiler.backend.abi.TAIL_CALL_REF
 import io.github.charlietap.chasm.compiler.backend.analysis.RootPublication
 import io.github.charlietap.chasm.compiler.backend.analysis.form.Operand
 import io.github.charlietap.chasm.compiler.backend.analysis.form.tailCallArguments
-import io.github.charlietap.chasm.compiler.backend.analysis.isSelfTailCall
+import io.github.charlietap.chasm.compiler.backend.dex.analysis.SlotKindFlow
 import io.github.charlietap.dexter.ArrayKind
 
 internal fun LowerContext.lowerTailCall(
     instruction: ControlInstruction,
 ) {
     val arguments = checkNotNull(instruction.tailCallArguments())
-    if (instruction is ControlInstruction.ReturnCall && instruction.isSelfTailCall(function, regionAt(position))) return restart(arguments)
+    if (facts.table.restartsFunction(position)) {
+        restart(arguments)
+        return
+    }
     emit.const(Registers.I0, maxOf(arguments.size, resultCount, 1))
     emit.newArray(Registers.OBJECT, Registers.I0, "[J")
     arguments.forEachIndexed { index, argument ->
@@ -65,7 +68,7 @@ private fun LowerContext.restart(
             if (!references.publishes(RootPublication.ENTRY, slot)) {
                 continue
             }
-            loadWide(Registers.W0, slot)
+            loadEncoded(Registers.W0, slot, kinds.readKindAfterWrites(slot, SlotKindFlow.LONG))
             roots.publish(slot, Registers.W0)
         }
     }
@@ -111,7 +114,7 @@ internal fun LowerContext.resetFrame(
     frame: Int,
 ) {
     if (parameterCount >= frameSlots) return
-    loadObject(Registers.W1, Resource.Longs(analysis.initialValues.copyOfRange(parameterCount, frameSlots)), "[J")
+    loadObject(Registers.W1, Resource.Longs(facts.initialValues.copyOfRange(parameterCount, frameSlots)), "[J")
     emit.const(Registers.I0, 0)
     emit.moveObject(Registers.W1 + 1, frame)
     frameIndex(Registers.I2, parameterCount)

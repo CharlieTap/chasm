@@ -8,6 +8,7 @@ import io.github.charlietap.chasm.compiler.backend.analysis.form.Operand
 import io.github.charlietap.dexter.ArrayKind
 import io.github.charlietap.dexter.BinaryOp
 import io.github.charlietap.dexter.Conversion
+import io.github.charlietap.dexter.Label
 import io.github.charlietap.dexter.LiteralOp
 
 internal fun LowerContext.ret(
@@ -93,16 +94,14 @@ internal fun LowerContext.trap(method: MethodRef) {
     returnUnreachable()
 }
 
-internal fun LowerContext.trapLabel(method: MethodRef): String {
-
+internal fun LowerContext.trapLabel(method: MethodRef): Label {
     if (module.options.stacktraces) {
         return outOfLineTrap(method)
     }
-
     return sharedTrapLabels.getOrPut(method) { outOfLineTrap(method) }
 }
 
-private fun LowerContext.outOfLineTrap(method: MethodRef): String {
+private fun LowerContext.outOfLineTrap(method: MethodRef): Label {
 
     val label = emit.freshLabel()
     val origin = position

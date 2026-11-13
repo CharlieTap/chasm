@@ -22,9 +22,6 @@ internal fun lowerControlInstruction(
         is ControlInstruction.FunctionReturn -> context.ret(instruction.results.operands())
         is ControlInstruction.Throw -> context.lowerThrow(instruction)
         is ControlInstruction.ThrowRefS -> context.lowerThrowRef(instruction)
-        ControlInstruction.Unreachable -> {
-            context.emit.invoke(UNREACHABLE)
-            context.returnUnreachable()
-        }
+        ControlInstruction.Unreachable -> context.trap(UNREACHABLE)
     }
 }

@@ -13,21 +13,12 @@ import io.github.charlietap.chasm.compiler.backend.abi.MEMORY_INSTANCE
 import io.github.charlietap.chasm.compiler.backend.abi.REFERENCE_TYPE_TEST
 import io.github.charlietap.chasm.compiler.backend.abi.Resource
 import io.github.charlietap.chasm.compiler.backend.abi.TABLE_INSTANCE
-import io.github.charlietap.chasm.compiler.backend.analysis.References
-import io.github.charlietap.chasm.compiler.backend.analysis.analyzeReferences
+import io.github.charlietap.chasm.compiler.backend.analysis.InstructionTable
 import io.github.charlietap.chasm.compiler.backend.analysis.form.HelperArgument
-import io.github.charlietap.chasm.compiler.backend.analysis.form.access
 import io.github.charlietap.chasm.compiler.backend.analysis.form.arrayCopy
 import io.github.charlietap.chasm.compiler.backend.analysis.form.helperCall
-import io.github.charlietap.chasm.compiler.backend.analysis.frameFacts
-import io.github.charlietap.chasm.compiler.backend.analysis.indirectCallType
-import io.github.charlietap.chasm.compiler.backend.analysis.instructionTable
-import io.github.charlietap.chasm.compiler.backend.analysis.isLeaf
 import io.github.charlietap.chasm.compiler.backend.analysis.redundantBoundsChecks
 import io.github.charlietap.chasm.compiler.backend.dex.ModuleLowering
-import io.github.charlietap.chasm.compiler.backend.dex.abi.INLINE_MEMORY_INSTRUCTIONS
-import io.github.charlietap.chasm.type.FunctionType
-import io.github.charlietap.chasm.type.ValueType
 
 internal sealed interface CachedConstant {
 
@@ -39,75 +30,52 @@ internal sealed interface CachedConstant {
     class Values : CachedConstant
 }
 
+internal enum class MemoryMode {
+    Helper,
+    ByteArray,
+    Unsafe,
+}
+
 internal class FunctionAnalysis(
-    val type: FunctionType,
-    val frameSlots: Int,
-    val localTypes: Array<ValueType?>,
-    val firstTemporary: Int,
-    val initialValues: LongArray,
-    val usesInlineMemory: Boolean,
-    val unsafeMemory: Boolean,
-    val typedSignatures: Array<String?>,
-    val callsDirectly: Boolean,
-    val isLeaf: Boolean,
+    val facts: FunctionFacts,
+    val memoryMode: MemoryMode,
     val cachedConstants: List<CachedConstant>,
-    val window: CallWindow,
-    val references: References,
     val checkedAccesses: BooleanArray,
-)
+) {
+    val usesInlineMemory = memoryMode != MemoryMode.Helper
+
+    val unsafeMemory = memoryMode == MemoryMode.Unsafe
+
+    val cachedConstantIndex: Map<Resource, Int> = cachedConstants.withIndex()
+        .mapNotNull { (index, constant) -> (constant as? CachedConstant.ObjectResource)?.let { cached -> cached.resource to index } }
+        .toMap()
+
+    val cachedValuesIndex: Int? = cachedConstants.indexOfFirst { constant -> constant is CachedConstant.Values }.takeIf { index -> index >= 0 }
+}
 
 internal fun analyzeFunction(
     module: ModuleLowering,
     function: CirFunction,
-    inlineAccesses: Boolean,
-    split: Boolean = false,
+    facts: FunctionFacts,
+    memoryMode: MemoryMode,
 ): FunctionAnalysis {
-    val declarations = module.declarations
-    val frame = frameFacts(function, declarations)
-    val type = frame.type
-    val frameSlots = frame.frameSlots
-    val instructions = function.instructions
-    val table = instructionTable(function, declarations)
 
-    val inlineMemory = module.inlineMemory.takeIf { inlineAccesses && (split || instructions.size <= INLINE_MEMORY_INSTRUCTIONS) }
-    val usesInlineMemory = inlineMemory != null &&
-        instructions.any { instruction -> (instruction as? MemoryInstruction)?.access()?.memory == inlineMemory }
-    val unsafeMemory = usesInlineMemory && module.options.byteArrayBaseOffset != null
-    val typedSignatures = Array(instructions.size) { position ->
-        instructions[position].indirectCallType(declarations)?.let(module::signatureClass)
-    }
-    val callsDirectly = typedSignatures.any { it != null } || instructions.any { instruction ->
-        when (instruction) {
-            is ControlInstruction.Call -> !declarations.isImported(instruction.function)
-            else -> false
-        }
-    }
+    val usesInlineMemory = memoryMode != MemoryMode.Helper
+
     return FunctionAnalysis(
-        type = type,
-        frameSlots = frameSlots,
-        localTypes = frame.localTypes,
-        firstTemporary = frame.firstTemporary,
-        initialValues = frame.initialValues,
-        usesInlineMemory = usesInlineMemory,
-        unsafeMemory = unsafeMemory,
-        typedSignatures = typedSignatures,
-        callsDirectly = callsDirectly,
-        isLeaf = function.isLeaf(),
-        cachedConstants = cachedConstants(function, if (usesInlineMemory) inlineMemory else null),
-        window = analyzeCallWindow(module, function, typedSignatures),
-        references = analyzeReferences(table, function, type, frameSlots, module.analysis),
-        checkedAccesses = if (usesInlineMemory) {
-            function.redundantBoundsChecks(table)
-        } else {
-            BooleanArray(instructions.size)
-        },
+        facts = facts,
+        memoryMode = memoryMode,
+        cachedConstants = cachedConstants(function, facts.table, module.inlineMemory.takeIf { usesInlineMemory }),
+        checkedAccesses = if (usesInlineMemory) function.redundantBoundsChecks(facts.table) else BooleanArray(function.instructions.size),
     )
 }
 
 private fun cachedConstants(
     function: CirFunction,
+    table: InstructionTable,
     inlineMemory: MemoryIndex?,
 ): List<CachedConstant> {
+
     val uses = LinkedHashMap<Resource, ResourceUse>()
     var valueLoads = 0
 
@@ -118,12 +86,19 @@ private fun cachedConstants(
     ) {
         uses.getOrPut(resource) { ResourceUse(type) }.count += times
     }
-    for (instruction in function.instructions) {
-        when (instruction) {
+
+    for (position in function.instructions.indices) {
+        when (val instruction = function.instructions[position]) {
             is VariableInstruction.GlobalGetS -> use(Resource.Global(instruction.global.index), GLOBAL_INSTANCE)
             is VariableInstruction.GlobalSetI -> use(Resource.Global(instruction.global.index), GLOBAL_INSTANCE)
             is VariableInstruction.GlobalSetS -> use(Resource.Global(instruction.global.index), GLOBAL_INSTANCE)
-            is MemoryInstruction -> instruction.access()?.memory?.takeIf { it != inlineMemory }?.let { use(Resource.Memory(it.index), MEMORY_INSTANCE) }
+            is MemoryInstruction -> {
+                val access = table.accesses.accessIndexAt(position)
+                val memory = if (access >= 0) table.accesses.memories[access] else -1
+                if (memory >= 0 && (inlineMemory == null || memory != inlineMemory.index)) {
+                    use(Resource.Memory(memory), MEMORY_INSTANCE)
+                }
+            }
             is ControlInstruction.CallIndirectI -> {
                 use(Resource.Table(instruction.table.index), TABLE_INSTANCE)
                 valueLoads++
@@ -155,11 +130,14 @@ private fun cachedConstants(
             else -> Unit
         }
     }
-    if (inlineMemory != null && function.instructions.any { it is ControlInstruction }) {
+
+    if (inlineMemory != null && function.instructions.any { instruction -> instruction is ControlInstruction }) {
         use(Resource.Memory(inlineMemory.index), MEMORY_INSTANCE, times = CACHE_THRESHOLD)
     }
+
     val constants = uses.filterValues { use -> use.count >= CACHE_THRESHOLD }
         .map { (resource, use) -> CachedConstant.ObjectResource(resource, use.type) }
+
     return if (valueLoads >= CACHE_THRESHOLD) constants + CachedConstant.Values() else constants
 }
 

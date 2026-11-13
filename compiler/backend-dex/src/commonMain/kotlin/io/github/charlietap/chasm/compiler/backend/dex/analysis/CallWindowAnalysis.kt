@@ -36,19 +36,26 @@ internal fun analyzeCallWindow(
     var directWords = 0
     var temporaries = 0
     instructions.forEachIndexed { position, instruction ->
+
         val call = (instruction as? ControlInstruction)?.callSite(declarations)
-        if (call != null) callBufferWords = maxOf(callBufferWords, call.arguments.size, call.type.results.types.size, 1)
+        val direct = when (instruction) {
+            is ControlInstruction.Call -> !declarations.isImported(instruction.function)
+            else -> typedSignatures[position] != null
+        }
+
+        val bridges = instruction !is ControlInstruction.Call || !direct
+        if (call != null && bridges) {
+            callBufferWords = maxOf(callBufferWords, call.arguments.size, call.type.results.types.size, 1)
+        }
         when (instruction) {
             is AggregateInstruction.StructNewS ->
                 callBufferWords = maxOf(callBufferWords, declarations.structFields(instruction.type).size, 1)
             is AggregateInstruction.ArrayNewFixedS -> callBufferWords = maxOf(callBufferWords, instruction.size, 1)
             else -> Unit
         }
-        val direct = when (instruction) {
-            is ControlInstruction.Call -> !declarations.isImported(instruction.function)
-            else -> typedSignatures[position] != null
-        }
+
         if (direct && call != null) directWords = maxOf(directWords, argumentWords(call.type))
+
         val words = when (instruction) {
             is ControlInstruction.CallIndirectI, is ControlInstruction.CallIndirectS -> BRIDGE_CALL_INDIRECT.words
             is ControlInstruction.ReturnCallIndirectI, is ControlInstruction.ReturnCallIndirectS -> TAIL_CALL_INDIRECT.words
@@ -61,6 +68,7 @@ internal fun analyzeCallWindow(
             else -> if (instruction.isArrayCopy()) ARRAY_COPY.words else instruction.helperCall()?.words ?: 0
         }
         helperWords = maxOf(helperWords, words)
+
         val transfer = when (instruction) {
             is AdminInstruction.CopySlots -> instruction.sourceSlots.size
             is AdminInstruction.JumpCopies -> instruction.operands.size

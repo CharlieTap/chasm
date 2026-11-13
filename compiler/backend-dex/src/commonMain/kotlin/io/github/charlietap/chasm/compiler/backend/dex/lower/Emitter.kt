@@ -2,10 +2,7 @@ package io.github.charlietap.chasm.compiler.backend.dex.lower
 
 import io.github.charlietap.chasm.compiler.backend.abi.MethodRef
 import io.github.charlietap.chasm.compiler.backend.abi.OBJECT_TYPE
-import io.github.charlietap.chasm.compiler.backend.abi.descriptorWords
-import io.github.charlietap.chasm.compiler.backend.dex.abi.DexMethods
-import io.github.charlietap.chasm.compiler.backend.dex.abi.referenceType
-import io.github.charlietap.chasm.compiler.backend.dex.abi.valueType
+import io.github.charlietap.chasm.compiler.backend.dex.abi.DexReferences
 import io.github.charlietap.dexter.ArrayKind
 import io.github.charlietap.dexter.ArrayType
 import io.github.charlietap.dexter.BinaryOp
@@ -14,27 +11,35 @@ import io.github.charlietap.dexter.CodeEmitter
 import io.github.charlietap.dexter.CompareOp
 import io.github.charlietap.dexter.Cond
 import io.github.charlietap.dexter.Conversion
-import io.github.charlietap.dexter.DexField
 import io.github.charlietap.dexter.HandlerLabel
 import io.github.charlietap.dexter.Label
+import io.github.charlietap.dexter.Labels
 import io.github.charlietap.dexter.LiteralOp
 import io.github.charlietap.dexter.Reg
 import io.github.charlietap.dexter.UnaryOp
 
 internal class Emitter(
     private val code: CodeEmitter,
-    private val methods: DexMethods,
+    private val references: DexReferences,
 ) {
 
-    private val labels = HashMap<String, Label>()
-    private val handlers = HashMap<String, HandlerLabel>()
-    private var fresh = 0
+    private val argumentWords = IntArray(MAX_INVOKE_WORDS)
 
-    fun place(
-        name: String,
-    ) = code.bind(label(name))
+    fun place(label: Label) {
+        code.bind(label)
+    }
 
-    fun freshLabel(): String = "l${fresh++}"
+    fun freshLabel(): Label {
+        return code.label()
+    }
+
+    fun labels(count: Int): Labels {
+        return code.labels(count)
+    }
+
+    fun handlerLabel(): HandlerLabel {
+        return code.handlerLabel()
+    }
 
     fun moveWide(
         destination: Int,
@@ -63,7 +68,9 @@ internal class Emitter(
         owner: String,
         name: String,
         type: String,
-    ) = code.getField(Reg(destination), Reg(instance), DexField(ClassType(owner), name, valueType(type)))
+    ) {
+        code.getField(Reg(destination), Reg(instance), references.field(owner, name, type))
+    }
 
     fun putField(
         source: Int,
@@ -71,21 +78,25 @@ internal class Emitter(
         owner: String,
         name: String,
         type: String,
-    ) = code.putField(Reg(source), Reg(instance), DexField(ClassType(owner), name, valueType(type)))
+    ) {
+        code.putField(Reg(source), Reg(instance), references.field(owner, name, type))
+    }
 
     fun checkCast(
         register: Int,
         type: String,
     ) {
         if (type == OBJECT_TYPE) return
-        code.checkCast(Reg(register), referenceType(type))
+        code.checkCast(Reg(register), references.reference(type))
     }
 
     fun newArray(
         destination: Int,
         size: Int,
         type: String,
-    ) = code.newArray(Reg(destination), Reg(size), referenceType(type) as ArrayType)
+    ) {
+        code.newArray(Reg(destination), Reg(size), references.reference(type) as ArrayType)
+    }
 
     fun constWide(
         destination: Int,
@@ -130,6 +141,13 @@ internal class Emitter(
         right: Int,
     ) = code.compare(op, Reg(destination), Reg(left), Reg(right))
 
+    fun arrayLength(
+        destination: Int,
+        array: Int,
+    ) {
+        code.arrayLength(Reg(destination), Reg(array))
+    }
+
     fun arrayGet(
         kind: ArrayKind,
         destination: Int,
@@ -151,101 +169,163 @@ internal class Emitter(
     ) = code.returnValue(Reg(register))
 
     fun beginHandler(
-        name: String,
+        handler: HandlerLabel,
         register: Int,
-    ) = code.bindHandler(handler(name), Reg(register))
+    ) {
+        code.bindHandler(handler, Reg(register))
+    }
 
-    fun gotoLabel(
-        name: String,
-    ) = code.goto(label(name))
+    fun gotoLabel(target: Label) {
+        code.goto(target)
+    }
 
     fun branchZero(
         cond: Cond,
         register: Int,
-        target: String,
-    ) = code.branchZero(cond, Reg(register), label(target))
+        target: Label,
+    ) {
+        code.branchZero(cond, Reg(register), target)
+    }
 
     fun branchCompare(
         cond: Cond,
         left: Int,
         right: Int,
-        target: String,
-    ) = code.branch(cond, Reg(left), Reg(right), label(target))
+        target: Label,
+    ) {
+        code.branch(cond, Reg(left), Reg(right), target)
+    }
 
     fun packedSwitch(
         value: Int,
         firstKey: Int,
-        targets: List<String>,
+        targets: List<Label>,
     ) {
-        val table = code.labelTable(firstKey, targets.size, label(targets.first()))
-        targets.forEachIndexed { index, target -> table[index] = label(target) }
+        val table = code.labelTable(firstKey, targets.size, targets.first())
+        targets.forEachIndexed { index, target -> table[index] = target }
         code.packedSwitch(Reg(value), table)
     }
 
     fun catchRange(
         type: String,
-        start: String,
-        end: String,
-        handler: String,
-    ) = code.catchRange(label(start), label(end), ClassType(type), handler(handler))
+        start: Label,
+        end: Label,
+        handler: HandlerLabel,
+    ) {
+        code.catchRange(start, end, ClassType(type), handler)
+    }
+
+    fun invoke(method: MethodRef) {
+        invokeStatic(method, 0)
+    }
 
     fun invoke(
         method: MethodRef,
-        vararg registers: Int,
+        a: Int,
     ) {
-        val arguments = arguments(method.parameters, registers, 0)
-        val m = methods.of(method)
-        when (arguments.size) {
-            0 -> code.invokeStatic(m)
-            1 -> code.invokeStatic(m, arguments[0])
-            2 -> code.invokeStatic(m, arguments[0], arguments[1])
-            3 -> code.invokeStatic(m, arguments[0], arguments[1], arguments[2])
-            4 -> code.invokeStatic(m, arguments[0], arguments[1], arguments[2], arguments[3])
-            5 -> code.invokeStatic(m, arguments[0], arguments[1], arguments[2], arguments[3], arguments[4])
-            else -> error("$m takes more than five arguments: use invokeRange")
-        }
+        argumentWords[0] = a
+        invokeStatic(method, 1)
+    }
+
+    fun invoke(
+        method: MethodRef,
+        a: Int,
+        b: Int,
+    ) {
+        argumentWords[0] = a
+        argumentWords[1] = b
+        invokeStatic(method, 2)
+    }
+
+    fun invoke(
+        method: MethodRef,
+        a: Int,
+        b: Int,
+        c: Int,
+    ) {
+        argumentWords[0] = a
+        argumentWords[1] = b
+        argumentWords[2] = c
+        invokeStatic(method, 3)
+    }
+
+    fun invoke(
+        method: MethodRef,
+        a: Int,
+        b: Int,
+        c: Int,
+        d: Int,
+    ) {
+        argumentWords[0] = a
+        argumentWords[1] = b
+        argumentWords[2] = c
+        argumentWords[3] = d
+        invokeStatic(method, 4)
+    }
+
+    fun invoke(
+        method: MethodRef,
+        a: Int,
+        b: Int,
+        c: Int,
+        d: Int,
+        e: Int,
+    ) {
+        argumentWords[0] = a
+        argumentWords[1] = b
+        argumentWords[2] = c
+        argumentWords[3] = d
+        argumentWords[4] = e
+        invokeStatic(method, 5)
     }
 
     fun invokeVirtual(
         method: MethodRef,
         receiver: Int,
-        vararg registers: Int,
     ) {
-        val arguments = arguments(method.parameters, registers, 0, Reg(receiver))
-        val m = methods.of(method)
-        when (arguments.size) {
-            1 -> code.invokeVirtual(m, arguments[0])
-            2 -> code.invokeVirtual(m, arguments[0], arguments[1])
-            3 -> code.invokeVirtual(m, arguments[0], arguments[1], arguments[2])
-            4 -> code.invokeVirtual(m, arguments[0], arguments[1], arguments[2], arguments[3])
-            5 -> code.invokeVirtual(m, arguments[0], arguments[1], arguments[2], arguments[3], arguments[4])
-            else -> error("$m takes more than four arguments: use invokeVirtualRange")
-        }
+        invokeVirtual(method, receiver, 0)
+    }
+
+    fun invokeVirtual(
+        method: MethodRef,
+        receiver: Int,
+        a: Int,
+        b: Int,
+    ) {
+        argumentWords[0] = a
+        argumentWords[1] = b
+        invokeVirtual(method, receiver, 2)
     }
 
     fun instanceOf(
         destination: Int,
         register: Int,
         type: String,
-    ) = code.instanceOf(Reg(destination), Reg(register), referenceType(type))
+    ) {
+        code.instanceOf(Reg(destination), Reg(register), references.reference(type))
+    }
 
     fun invokeInterfaceRange(
         method: MethodRef,
         rangeStart: Int,
-    ) = code.invokeInterfaceRange(methods.of(method), Reg(rangeStart))
+    ) {
+        code.invokeInterfaceRange(references.of(method), Reg(rangeStart))
+    }
 
     fun invokeVirtualRange(
         method: MethodRef,
         rangeStart: Int,
-    ) = code.invokeVirtualRange(methods.of(method), Reg(rangeStart))
+    ) {
+        code.invokeVirtualRange(references.of(method), Reg(rangeStart))
+    }
 
     fun invokeRange(
         method: MethodRef,
         rangeStart: Int,
         words: Int,
     ) {
-        check(words == method.words) { "${methods.of(method)} takes ${method.words} words, not $words" }
-        code.invokeStaticRange(methods.of(method), Reg(rangeStart))
+        check(words == method.words) { "${references.of(method)} takes ${method.words} words, not $words" }
+        code.invokeStaticRange(references.of(method), Reg(rangeStart))
     }
 
     fun moveResult(
@@ -264,28 +344,54 @@ internal class Emitter(
         line: Int,
     ) = code.line(line)
 
-    private fun label(
-        name: String,
-    ): Label = labels.getOrPut(name) { code.label() }
+    private fun invokeStatic(
+        method: MethodRef,
+        count: Int,
+    ) {
 
-    private fun handler(
-        name: String,
-    ): HandlerLabel = handlers.getOrPut(name) { code.handlerLabel() }
+        val invocation = references.invocation(method)
+        check(count == invocation.words) { "argument words do not match ${method.parameters}" }
 
-    private fun arguments(
-        parameters: List<String>,
-        words: IntArray,
-        first: Int,
-        receiver: Reg? = null,
-    ): List<Reg> {
-        val arguments = ArrayList<Reg>(parameters.size + 1)
-        if (receiver != null) arguments += receiver
-        var word = first
-        for (parameter in parameters) {
-            arguments += Reg(words[word])
-            word += descriptorWords(parameter)
+        val target = invocation.method
+        val offsets = invocation.offsets
+        when (offsets.size) {
+            0 -> code.invokeStatic(target)
+            1 -> code.invokeStatic(target, argument(offsets, 0))
+            2 -> code.invokeStatic(target, argument(offsets, 0), argument(offsets, 1))
+            3 -> code.invokeStatic(target, argument(offsets, 0), argument(offsets, 1), argument(offsets, 2))
+            4 -> code.invokeStatic(target, argument(offsets, 0), argument(offsets, 1), argument(offsets, 2), argument(offsets, 3))
+            5 -> code.invokeStatic(target, argument(offsets, 0), argument(offsets, 1), argument(offsets, 2), argument(offsets, 3), argument(offsets, 4))
+            else -> error("$target takes more than five arguments: use invokeRange")
         }
-        check(word == words.size) { "argument words do not match $parameters" }
-        return arguments
+    }
+
+    private fun invokeVirtual(
+        method: MethodRef,
+        receiver: Int,
+        count: Int,
+    ) {
+
+        val invocation = references.invocation(method)
+        check(count == invocation.words) { "argument words do not match ${method.parameters}" }
+
+        val target = invocation.method
+        val offsets = invocation.offsets
+        when (offsets.size) {
+            0 -> code.invokeVirtual(target, Reg(receiver))
+            1 -> code.invokeVirtual(target, Reg(receiver), argument(offsets, 0))
+            2 -> code.invokeVirtual(target, Reg(receiver), argument(offsets, 0), argument(offsets, 1))
+            3 -> code.invokeVirtual(target, Reg(receiver), argument(offsets, 0), argument(offsets, 1), argument(offsets, 2))
+            4 -> code.invokeVirtual(target, Reg(receiver), argument(offsets, 0), argument(offsets, 1), argument(offsets, 2), argument(offsets, 3))
+            else -> error("$target takes more than four arguments: use invokeVirtualRange")
+        }
+    }
+
+    private fun argument(
+        offsets: IntArray,
+        index: Int,
+    ): Reg {
+        return Reg(argumentWords[offsets[index]])
     }
 }
+
+private const val MAX_INVOKE_WORDS = 10

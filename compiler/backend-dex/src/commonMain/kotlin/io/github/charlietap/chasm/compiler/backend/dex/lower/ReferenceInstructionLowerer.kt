@@ -11,9 +11,11 @@ import io.github.charlietap.chasm.compiler.backend.abi.REF_CAST
 import io.github.charlietap.chasm.compiler.backend.abi.REF_TEST
 import io.github.charlietap.chasm.compiler.backend.abi.Resource
 import io.github.charlietap.chasm.compiler.backend.analysis.ext.nullReference
+import io.github.charlietap.chasm.compiler.backend.dex.analysis.SlotKindFlow
 import io.github.charlietap.dexter.CompareOp
 import io.github.charlietap.dexter.Cond
 import io.github.charlietap.dexter.Conversion
+import io.github.charlietap.dexter.Label
 import io.github.charlietap.dexter.LiteralOp
 
 internal fun lowerReferenceInstruction(
@@ -54,7 +56,7 @@ internal fun LowerContext.slotHelper(
 internal fun LowerContext.branchOnNull(
     pair: Int,
     isNull: Boolean,
-    target: String,
+    target: Label,
 ) {
     emit.convert(Conversion.LongToInt, Registers.I0, pair)
     emit.literal(LiteralOp.AndInt, Registers.I0, Registers.I0, REFERENCE_TAG_MASK)
@@ -70,7 +72,7 @@ private fun LowerContext.refAsNonNull(
     loadWide(Registers.W0, valueSlot)
     branchOnNull(Registers.W0, isNull = true, trapLabel(NULL_REFERENCE))
 
-    val inPlace = valueSlot == destination && isLong(destination)
+    val inPlace = valueSlot == destination && readsLong(destination) && kinds.writeKind(destination) == SlotKindFlow.LONG
     if (!inPlace) {
         store(destination, Registers.W0)
     } else if (roots.publishes(destination)) {

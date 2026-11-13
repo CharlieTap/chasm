@@ -5,7 +5,7 @@
 
 # direct methods
 .method public static f0([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;III)I
-    .registers 33
+    .registers 27
 
     move-object/from16 v14, p1
 
@@ -16,12 +16,6 @@
     move/from16 v17, p3
 
     move/from16 v18, p4
-
-    const-wide/16 v0, 0x0
-
-    const/4 v15, 0x0
-
-    move-wide/from16 v19, v0
 
     .line 2
     add-int v17, v17, v18
@@ -37,7 +31,7 @@
 .end method
 
 .method public static f1([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;IJD)D
-    .registers 37
+    .registers 35
 
     move-object/from16 v14, p1
 
@@ -47,13 +41,7 @@
 
     move-wide/from16 v17, p3
 
-    move-wide/from16 v19, p5
-
-    const-wide/16 v0, 0x0
-
-    const/4 v15, 0x0
-
-    move-wide/from16 v21, v0
+    move-wide/from16 v21, p5
 
     .line 2
     move-wide/from16 v0, v17
@@ -63,7 +51,7 @@
     move-wide/from16 v23, v4
 
     .line 3
-    mul-double v23, v23, v19
+    mul-double v23, v23, v21
 
     .line 4
     move-wide/from16 v0, v23
@@ -72,18 +60,10 @@
 
     move-result-wide v0
 
-    invoke-static {v0, v1}, Ljava/lang/Double;->doubleToRawLongBits(D)J
-
-    move-result-wide v0
-
-    move-wide/from16 v17, v0
+    move-wide/from16 v19, v0
 
     .line 5
-    move-wide/from16 v0, v17
-
-    invoke-static {v0, v1}, Ljava/lang/Double;->longBitsToDouble(J)D
-
-    move-result-wide v0
+    move-wide/from16 v0, v19
 
     return-wide v0
 
@@ -93,7 +73,7 @@
 .end method
 
 .method public static f2([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;III)I
-    .registers 33
+    .registers 27
 
     move-object/from16 v14, p1
 
@@ -105,16 +85,10 @@
 
     move/from16 v18, p4
 
-    const-wide/16 v0, 0x0
-
-    const/4 v15, 0x0
-
-    move-wide/from16 v19, v0
-
     .line 2
     move/from16 v9, v18
 
-    if-eqz v9, :cond_20
+    if-eqz v9, :cond_1b
 
     move/from16 v8, v17
 
@@ -134,7 +108,7 @@
     return v8
 
     .line 2
-    :cond_20
+    :cond_1b
     invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/CompiledRuntime;->divideByZero()Ljava/lang/Void;
 
     const/4 v8, 0x0
@@ -143,7 +117,7 @@
 .end method
 
 .method public static f3([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;IJJ)I
-    .registers 37
+    .registers 32
 
     move-object/from16 v14, p1
 
@@ -153,18 +127,12 @@
 
     move-wide/from16 v17, p3
 
-    move-wide/from16 v19, p5
-
-    const-wide/16 v0, 0x0
-
-    const/4 v15, 0x0
-
-    move-wide/from16 v21, v0
+    move-wide/from16 v20, p5
 
     .line 2
     move-wide/from16 v0, v17
 
-    move-wide/from16 v2, v19
+    move-wide/from16 v2, v20
 
     const-wide/high16 v4, -0x8000000000000000L
 
@@ -174,24 +142,20 @@
 
     cmp-long v8, v0, v2
 
-    if-ltz v8, :cond_1e
+    if-ltz v8, :cond_19
 
     const/4 v11, 0x0
 
-    goto/16 :goto_1f
+    goto/16 :goto_1a
 
-    :cond_1e
+    :cond_19
     const/4 v11, 0x1
 
-    :goto_1f
-    int-to-long v0, v11
-
-    move-wide/from16 v17, v0
+    :goto_1a
+    move/from16 v19, v11
 
     .line 3
-    move-wide/from16 v0, v17
-
-    long-to-int v8, v0
+    move/from16 v8, v19
 
     return v8
 
@@ -201,7 +165,7 @@
 .end method
 
 .method public static f4([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;IIFF)F
-    .registers 37
+    .registers 30
 
     move-object/from16 v14, p1
 
@@ -211,53 +175,23 @@
 
     move/from16 v17, p3
 
-    move/from16 v18, p4
+    move/from16 v19, p4
 
-    move/from16 v19, p5
-
-    const-wide/16 v0, 0x0
-
-    const/4 v15, 0x0
-
-    move-wide/from16 v20, v0
+    move/from16 v20, p5
 
     .line 2
-    if-eqz v17, :cond_1f
+    if-eqz v17, :cond_12
 
-    move/from16 v0, v18
+    move/from16 v18, v19
 
-    invoke-static {v0}, Ljava/lang/Float;->floatToRawIntBits(F)I
+    goto/16 :goto_14
 
-    move-result v0
-
-    int-to-long v0, v0
-
-    long-to-int v15, v0
-
-    move/from16 v17, v15
-
-    goto/16 :goto_29
-
-    :cond_1f
-    move/from16 v0, v19
-
-    invoke-static {v0}, Ljava/lang/Float;->floatToRawIntBits(F)I
-
-    move-result v0
-
-    int-to-long v0, v0
-
-    long-to-int v15, v0
-
-    move/from16 v17, v15
+    :cond_12
+    move/from16 v18, v20
 
     .line 3
-    :goto_29
-    move/from16 v8, v17
-
-    invoke-static {v8}, Ljava/lang/Float;->intBitsToFloat(I)F
-
-    move-result v8
+    :goto_14
+    move/from16 v8, v18
 
     return v8
 
@@ -267,7 +201,7 @@
 .end method
 
 .method public static f5([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;IF)I
-    .registers 29
+    .registers 26
 
     move-object/from16 v14, p1
 
@@ -275,42 +209,26 @@
 
     move-object/from16 v16, p0
 
-    move/from16 v8, p3
-
-    invoke-static {v8}, Ljava/lang/Float;->floatToRawIntBits(F)I
-
-    move-result v8
-
-    move/from16 v17, v8
-
-    const-wide/16 v0, 0x0
-
-    const/4 v15, 0x0
-
-    move-wide/from16 v18, v0
+    move/from16 v18, p3
 
     .line 2
-    move/from16 v8, v17
-
-    invoke-static {v8}, Ljava/lang/Float;->intBitsToFloat(I)F
-
-    move-result v8
+    move/from16 v8, v18
 
     const/high16 v9, -0x31000000
 
     cmpl-float v11, v8, v9
 
-    if-ltz v11, :cond_2d
+    if-ltz v11, :cond_1e
 
     const/high16 v9, 0x4f000000
 
     cmpg-float v11, v8, v9
 
-    if-gez v11, :cond_2d
+    if-gez v11, :cond_1e
 
     float-to-int v10, v8
 
-    :goto_26
+    :goto_17
     move/from16 v17, v10
 
     .line 3
@@ -323,28 +241,22 @@
     return v8
 
     .line 2
-    :cond_2d
+    :cond_1e
     invoke-static {v8}, Lio/github/charlietap/chasm/runtime/compiled/CompiledNumerics;->i32TruncF32S(F)I
 
     move-result v10
 
-    goto :goto_26
+    goto :goto_17
 .end method
 
 .method public static f6([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;I)V
-    .registers 25
+    .registers 23
 
     move-object/from16 v14, p1
 
     move/from16 v13, p2
 
     move-object/from16 v16, p0
-
-    const-wide/16 v0, 0x0
-
-    const/4 v15, 0x0
-
-    move-wide/from16 v17, v0
 
     .line 2
     invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/CompiledRuntime;->unreachable()Ljava/lang/Void;

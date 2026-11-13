@@ -173,7 +173,7 @@ private class FunctionLowering(
     ): List<GeneratedMethod> {
         val targets = function.jumpTargets()
         val size = function.instructions.size
-        val crossings = loopCrossings(function)
+        val crossings = loopCrossings(table.jumps)
         val live = liveness?.let { slots -> slots::liveCount }
         val resetsSlots = resetsSlots(liveness)
 

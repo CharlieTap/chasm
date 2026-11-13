@@ -6,11 +6,12 @@ import io.github.charlietap.chasm.compiler.backend.analysis.form.form
 import io.github.charlietap.chasm.compiler.backend.analysis.form.negatable
 import io.github.charlietap.dexter.BinaryOp
 import io.github.charlietap.dexter.Cond
+import io.github.charlietap.dexter.Label
 
 internal fun LowerContext.lowerCondition(
     condition: NumericCondition,
     holds: Boolean,
-    target: String,
+    target: Label,
 ) {
     val form = condition.form()
     if (holds || form.negatable) return branchOnCondition(form, target, negated = !holds)
@@ -22,7 +23,7 @@ internal fun LowerContext.lowerCondition(
 
 private fun LowerContext.branchOnCondition(
     condition: ConditionForm,
-    target: String,
+    target: Label,
     negated: Boolean,
 ) {
     when (condition) {

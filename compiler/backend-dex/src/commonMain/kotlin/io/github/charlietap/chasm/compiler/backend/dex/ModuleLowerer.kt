@@ -4,7 +4,6 @@ import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.cir.CirModule
 import io.github.charlietap.chasm.compiler.backend.abi.binaryName
 import io.github.charlietap.chasm.compiler.backend.dex.abi.codeClass
-import io.github.charlietap.chasm.compiler.backend.dex.abi.functionMethod
 import io.github.charlietap.chasm.compiler.backend.dex.abi.installClass
 import io.github.charlietap.chasm.compiler.backend.dex.abi.method
 import io.github.charlietap.chasm.type.FunctionType
@@ -41,7 +40,7 @@ internal inline fun ModuleLowerer(
     throw DexTooLarge(tooLarge.message ?: tooLarge.toString(), tooLarge)
 }
 
-internal inline fun lowerModule(
+private inline fun lowerModule(
     module: Module,
     code: CirModule,
     options: DexOptions,
@@ -56,12 +55,11 @@ internal inline fun lowerModule(
     val dex = lowering.batches.mapIndexed { batch, functions ->
         dexFile(dexter) { file ->
             if (batch == 0) lowering.addSignatureInterfaces(file)
-            val owner = codeClass(lowering.packagePath, batch)
-            val classBuilder = lowering.codeClassBuilder(file, owner)
+            val classBuilder = lowering.codeClassBuilder(file, codeClass(lowering.packagePath, batch))
             for (function in functions) {
                 val index = function.index.index
                 val type = lowering.declarations.functionType(function.type)
-                val method = functionMethod(owner, index, type).method
+                val method = lowering.functionMethod(function.index, type).method
                 val reason = functionLowerer(lowering, function, classBuilder, method)
                 if (reason == null) {
                     compiled.getOrPut(type, ::ArrayList) += LoweredFunction(index, method)

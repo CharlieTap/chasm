@@ -5051,3 +5051,5 @@ sealed class NumericInstruction : Instruction() {
         }
     }
 }
+
+const val NUMERIC_OPCODE_COUNT = 460

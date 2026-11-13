@@ -13,17 +13,15 @@ import io.github.charlietap.chasm.compiler.backend.abi.THROW_REF
 import io.github.charlietap.chasm.compiler.backend.abi.THROW_TAG
 import io.github.charlietap.chasm.compiler.backend.abi.UNWINDING_FIELD
 import io.github.charlietap.chasm.compiler.backend.abi.WASM_EXCEPTION
+import io.github.charlietap.chasm.compiler.backend.dex.analysis.SlotKindFlow
 import io.github.charlietap.dexter.ArrayKind
 import io.github.charlietap.dexter.BinaryOp
 import io.github.charlietap.dexter.Cond
 import io.github.charlietap.dexter.Conversion
+import io.github.charlietap.dexter.Label
 import io.github.charlietap.dexter.LiteralOp
 
 private const val THROWABLE = "Ljava/lang/Throwable;"
-
-private const val PROPAGATE = "propagate"
-
-internal const val CHUNK_END = "chunkEnd"
 
 internal fun LowerContext.lowerThrow(
     instruction: ControlInstruction.Throw,
@@ -79,21 +77,19 @@ internal fun LowerContext.protects(
     position: Int,
 ): Boolean = regionAt(position) >= 0
 
-private fun LowerContext.unwindTarget(): String {
+private fun LowerContext.unwindTarget(): Label {
     val region = regionAt(position)
     return if (region < 0) propagation() else matcher(region)
 }
 
-private fun LowerContext.matcher(
-    region: Int,
-): String {
+private fun LowerContext.matcher(region: Int): Label {
     if (matchers.add(region)) matcherOrder += region
-    return "match$region"
+    return matcherLabels[region]
 }
 
-private fun LowerContext.propagation(): String {
+private fun LowerContext.propagation(): Label {
     propagates = true
-    return PROPAGATE
+    return propagationLabel
 }
 
 internal fun LowerContext.lowerExceptionHandling() {
@@ -104,16 +100,17 @@ internal fun LowerContext.lowerExceptionHandling() {
         val chunk = chunk
         if (chunk == null) region.start.index until region.end.index else maxOf(region.start.index, chunk.start) until minOf(region.end.index, chunk.end)
     }
+    val pads = covered.map { range -> if (range.isEmpty()) null else emit.handlerLabel() }
     for (index in regions.indices.sortedByDescending { index -> depths[index] }) {
         val range = covered[index]
         if (range.isEmpty()) continue
         val end = range.last + 1
-        val endLabel = if (chunk?.end == end) CHUNK_END else label(end)
-        emit.catchRange(THROWABLE, label(range.first), endLabel, "pad$index")
+        val endLabel = if (chunk?.end == end) chunkEndLabel else label(end)
+        emit.catchRange(THROWABLE, label(range.first), endLabel, checkNotNull(pads[index]))
     }
     for (index in regions.indices) {
-        if (covered[index].isEmpty()) continue
-        emit.beginHandler("pad$index", Registers.OBJECT)
+        val pad = pads[index] ?: continue
+        emit.beginHandler(pad, Registers.OBJECT)
         emit.invoke(WASM_EXCEPTION, Registers.OBJECT)
         restoreWindow(binding = true)
         emit.moveWide(Registers.W3, registers.savedStack)
@@ -132,7 +129,7 @@ private fun LowerContext.lowerMatcher(
     region: Int,
 ) {
     val current = checkNotNull(function.exceptions).regions[region]
-    emit.place("match$region")
+    emit.place(matcherLabels[region])
     refreshMemory()
     roots.refresh()
     emit.invoke(PENDING_TAG, Registers.CONTEXT)
@@ -157,9 +154,11 @@ private fun LowerContext.lowerMatcher(
         for (field in 0 until fields) {
             emit.const(Registers.I2, field)
             emit.arrayGet(ArrayKind.Wide, Registers.W0, Registers.OBJECT, Registers.I2)
-            store(slots[field], Registers.W0)
+            storeEncoded(slots[field], kinds.handlerKind(slots[field]), Registers.W0)
         }
-        if (handler.exceptionReference) store(slots.last(), Registers.W1)
+        if (handler.exceptionReference) {
+            storeEncoded(slots.last(), kinds.handlerKind(slots.last()), Registers.W1)
+        }
         emit.gotoLabel(label(handler.target))
         emit.place(next)
     }
@@ -199,7 +198,7 @@ private fun LowerContext.clearDiscardedRoots(
     var zeroed = false
     for (slot in references.slots) {
 
-        if (slot < stackSlots || inPayload?.get(slot) == true || !registers.holds(slot)) {
+        if (slot < stackSlots || inPayload?.get(slot) == true || !registers.holds(slot, SlotKindFlow.LONG)) {
             continue
         }
         if (!zeroed) {
@@ -207,12 +206,12 @@ private fun LowerContext.clearDiscardedRoots(
             zeroed = true
         }
 
-        emit.moveWide(registers.home(slot), Registers.W0)
+        emit.moveWide(registers.home(slot, SlotKindFlow.LONG), Registers.W0)
     }
 }
 
 private fun LowerContext.lowerPropagation() {
-    emit.place(PROPAGATE)
+    emit.place(propagationLabel)
     emit.const(Registers.I0, 1)
     emit.putField(Registers.I0, Registers.CONTEXT, CONTEXT_TYPE, UNWINDING_FIELD, "Z")
     roots.close()

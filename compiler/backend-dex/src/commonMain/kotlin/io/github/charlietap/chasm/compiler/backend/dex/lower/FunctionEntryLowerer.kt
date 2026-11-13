@@ -7,10 +7,10 @@ import io.github.charlietap.chasm.compiler.backend.abi.Resource
 import io.github.charlietap.chasm.compiler.backend.abi.SAVE_STACK
 import io.github.charlietap.chasm.compiler.backend.abi.STACK_LIMIT_FIELD
 import io.github.charlietap.chasm.compiler.backend.abi.UNSAFE_TYPE
+import io.github.charlietap.chasm.compiler.backend.dex.analysis.SlotKindFlow
 import io.github.charlietap.dexter.ArrayKind
 import io.github.charlietap.dexter.BinaryOp
 import io.github.charlietap.dexter.Cond
-import io.github.charlietap.dexter.Conversion
 import io.github.charlietap.dexter.LiteralOp
 
 internal fun LowerContext.lowerPrologue() {
@@ -22,7 +22,7 @@ internal fun LowerContext.lowerPrologue() {
         loadObject(registers.unsafe, Resource.Unsafe, UNSAFE_TYPE)
         emit.constWide(registers.byteArrayBase, checkNotNull(module.options.byteArrayBaseOffset))
     }
-    if (!analysis.isLeaf || frameCost(registers) > MAX_UNCHARGED_LEAF_FRAME_COST) {
+    if (!facts.isLeaf || frameCost(registers) > MAX_UNCHARGED_LEAF_FRAME_COST) {
         chargeStackBudget()
     }
     roots.open()
@@ -39,7 +39,7 @@ internal fun LowerContext.lowerPrologue() {
     }
     receiveParameters()
     initializeLocals()
-    if (analysis.window.callBufferWords > 0) {
+    if (facts.window.callBufferWords > 0) {
         emit.const(Registers.I0, 0)
         emit.moveObject(registers.callBuffer, Registers.I0)
     }
@@ -61,8 +61,7 @@ internal fun LowerContext.chargeStackBudget(
     }
     emit.getField(Registers.I1, Registers.CONTEXT, CONTEXT_TYPE, STACK_LIMIT_FIELD, "I")
     emit.branchCompare(Cond.Le, Registers.I0, Registers.I1, ok)
-    emit.invoke(CALL_STACK_EXHAUSTED)
-    returnUnreachable()
+    trap(CALL_STACK_EXHAUSTED)
     emit.place(ok)
     emit.move(Registers.DEPTH, Registers.I0)
 }
@@ -79,65 +78,77 @@ private fun LowerContext.receiveParameters() {
     }
     for (index in 0 until parameterCount) {
         val parameter = registers.parameter(parameterOffsets[index])
-        val home = registers.home(index)
+        val kind = kinds.writeKind(index)
         when (parameterDescriptors[index]) {
-            "I" -> if (isInt(index)) {
-                checkNarrowWrite(index)
-                emit.move(home, parameter)
+            "I" -> if (kind == SlotKindFlow.INT) {
+                emit.move(registers.home(index, kind), parameter)
             } else {
                 emit.move(Registers.I0, parameter)
                 storeInt(index, Registers.I0)
             }
-            "F" -> if (isFloat(index)) {
-                checkNarrowWrite(index)
-                emit.move(home, parameter)
+            "F" -> if (kind == SlotKindFlow.FLOAT) {
+                emit.move(registers.home(index, kind), parameter)
             } else {
                 emit.move(Registers.I0, parameter)
                 storeFloat(index, Registers.I0)
             }
-            "D" -> if (isDouble(index)) {
-                emit.moveWide(home, parameter)
+            "D" -> if (kind == SlotKindFlow.DOUBLE) {
+                emit.moveWide(registers.home(index, kind), parameter)
             } else {
                 emit.moveWide(Registers.W0, parameter)
                 storeDouble(index, Registers.W0)
             }
-            else -> if ((references.writesThrough && references.isReference[index]) || !isLong(index)) {
+            else -> if ((references.writesThrough && references.isReference[index]) || kind != SlotKindFlow.LONG) {
                 emit.moveWide(Registers.W0, parameter)
                 store(index, Registers.W0)
             } else {
-                emit.moveWide(home, parameter)
+                emit.moveWide(registers.home(index, kind), parameter)
             }
         }
     }
 }
 
 internal fun LowerContext.initializeLocals() {
-    val initial = analysis.initialValues
-    emit.constWide(Registers.W0, 0L)
-    emit.const(Registers.NARROW, 0)
-    val firstTemporary = if (module.analysis.usesExceptions) frameSlots else analysis.firstTemporary
+
+    val initial = facts.initialValues
+    val firstTemporary = if (module.analysis.usesExceptions) frameSlots else facts.firstTemporary
+
+    var zeroed = false
     for (slot in parameterCount until frameSlots) {
-        if (slot >= firstTemporary && !references.isReference[slot]) continue
-        if (isDouble(slot)) {
-            emit.moveWide(registers.home(slot), Registers.W0)
-        } else if (isNarrow(slot)) {
-            if (initial[slot] == 0L) {
-                emit.move(registers.home(slot), Registers.NARROW)
-            } else {
-                emit.const(Registers.I0, initial[slot].toInt())
-                emit.move(registers.home(slot), Registers.I0)
+
+        if ((slot >= firstTemporary && !references.isReference[slot]) || kinds.homeMask(slot) == 0) {
+            continue
+        }
+        if (!zeroed) {
+            emit.constWide(Registers.W0, 0L)
+            emit.const(Registers.NARROW, 0)
+            zeroed = true
+        }
+
+        val value = initial[slot]
+        forEachHome(slot) { kind ->
+            val home = registers.home(slot, kind)
+            val wide = SlotKindFlow.wide(kind)
+            when {
+                !wide && value == 0L -> emit.move(home, Registers.NARROW)
+                !wide -> {
+                    emit.const(Registers.I0, value.toInt())
+                    emit.move(home, Registers.I0)
+                }
+                value == 0L -> emit.moveWide(home, Registers.W0)
+                else -> {
+                    emit.constWide(Registers.W1, value)
+                    emit.moveWide(home, Registers.W1)
+                }
             }
-        } else if (initial[slot] == 0L) {
-            emit.moveWide(registers.home(slot), Registers.W0)
-        } else {
-            emit.constWide(Registers.W1, initial[slot])
-            emit.moveWide(registers.home(slot), Registers.W1)
         }
     }
 }
 
 internal fun LowerContext.openWindow() {
-    if (!analysis.callsDirectly) return
+    if (!facts.callsDirectly) {
+        return
+    }
     emit.moveObject(registers.window, registers.binding)
     emit.moveObject(registers.window + 1, Registers.CONTEXT)
     emit.move(registers.window + 2, Registers.DEPTH)
@@ -146,7 +157,9 @@ internal fun LowerContext.openWindow() {
 internal fun LowerContext.restoreWindow(
     binding: Boolean = false,
 ) {
-    if (!analysis.callsDirectly) return
+    if (!facts.callsDirectly) {
+        return
+    }
     if (binding) emit.moveObject(registers.window, registers.binding)
     emit.moveObject(registers.window + 1, Registers.CONTEXT)
     emit.move(registers.window + 2, Registers.DEPTH)

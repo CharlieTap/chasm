@@ -29,18 +29,21 @@ internal fun LowerContext.lowerConversion(
     destination: Int,
 ) {
     when (conversion) {
-        Conversion.I64ExtendI32S -> return copyToSlot(destination, operand)
+        Conversion.I64ExtendI32S -> {
+            copyToSlot(destination, operand)
+            return
+        }
         Conversion.I64ExtendI32U -> {
             val source = wideSource(operand, Registers.W0)
             emit.constWide(Registers.W1, 0xFFFF_FFFFL)
-            val target = wideTarget(destination)
-            emit.binary(BinaryOp.AndLong, target, source, Registers.W1)
-            return finishWide(destination, target)
+            writeWide(destination) { target -> emit.binary(BinaryOp.AndLong, target, source, Registers.W1) }
+            return
         }
         Conversion.I32WrapI64 -> {
             loadWide(Registers.W0, operand)
             emit.convert(DexConversion.LongToInt, Registers.I0, Registers.W0)
-            return storeInt(destination, Registers.I0)
+            storeInt(destination, Registers.I0)
+            return
         }
         else -> Unit
     }
@@ -51,13 +54,13 @@ internal fun LowerContext.lowerConversion(
         NumberType.F64 -> loadDouble(Registers.W0, operand)
     }
     val narrowOperand = conversion.source == NumberType.I32 || conversion.source == NumberType.F32
-    val source = if (narrowOperand) intArrayOf(Registers.I0) else intArrayOf(Registers.W0, Registers.W0 + 1)
+    val source = if (narrowOperand) Registers.I0 else Registers.W0
     val wideResult = conversion.result == NumberType.I64 || conversion.result == NumberType.F64
     val result = if (wideResult) Registers.W2 else Registers.I2
     val direct = directConversion(conversion)
     val truncation = truncation(conversion)
     when {
-        direct != null -> emit.convert(direct, result, source[0])
+        direct != null -> emit.convert(direct, result, source)
         conversion == Conversion.F32ConvertI32U || conversion == Conversion.F64ConvertI32U -> {
             emit.convert(DexConversion.IntToLong, Registers.W1, Registers.I0)
             emit.constWide(Registers.W3, 0xFFFF_FFFFL)
@@ -65,9 +68,14 @@ internal fun LowerContext.lowerConversion(
             val convert = if (conversion == Conversion.F32ConvertI32U) DexConversion.LongToFloat else DexConversion.LongToDouble
             emit.convert(convert, result, Registers.W1)
         }
-        truncation != null -> truncate(truncation, conversionHelper(conversion), source, result, wideResult)
+        truncation != null -> truncate(truncation, conversionHelper(conversion), source, narrowOperand, result, wideResult)
         else -> {
-            emit.invoke(conversionHelper(conversion), *source)
+            val helper = conversionHelper(conversion)
+            if (narrowOperand) {
+                emit.invoke(helper, source)
+            } else {
+                emit.invoke(helper, source, source + 1)
+            }
             if (wideResult) emit.moveResultWide(result) else emit.moveResult(result)
         }
     }
@@ -103,7 +111,8 @@ private fun truncation(
 private fun LowerContext.truncate(
     truncation: Truncation,
     helper: MethodRef,
-    source: IntArray,
+    source: Int,
+    narrowOperand: Boolean,
     result: Int,
     wideResult: Boolean,
 ) {
@@ -114,17 +123,21 @@ private fun LowerContext.truncate(
     bound(truncation, truncation.high, if (truncation.double) CompareOp.CmpgDouble else CompareOp.CmpgFloat)
     emit.branchZero(Cond.Ge, Registers.I3, trap)
     if (truncation.narrow) {
-        emit.convert(truncation.convert, Registers.W2, source[0])
+        emit.convert(truncation.convert, Registers.W2, source)
         emit.convert(DexConversion.LongToInt, result, Registers.W2)
     } else {
-        emit.convert(truncation.convert, result, source[0])
+        emit.convert(truncation.convert, result, source)
     }
     emit.place(done)
     val origin = position
     outOfLine += {
         emit.place(trap)
         if (module.options.stacktraces) emit.line(line(origin))
-        emit.invoke(helper, *source)
+        if (narrowOperand) {
+            emit.invoke(helper, source)
+        } else {
+            emit.invoke(helper, source, source + 1)
+        }
         if (wideResult) emit.moveResultWide(result) else emit.moveResult(result)
         emit.gotoLabel(done)
     }

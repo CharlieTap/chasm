@@ -5,7 +5,7 @@
 
 # direct methods
 .method public static f0([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;IJJ)[J
-    .registers 41
+    .registers 35
 
     move-object/from16 v14, p1
 
@@ -16,12 +16,6 @@
     move-wide/from16 v17, p3
 
     move-wide/from16 v19, p5
-
-    const-wide/16 v0, 0x0
-
-    const/4 v15, 0x0
-
-    move-wide/from16 v21, v0
 
     .line 2
     move-wide/from16 v0, v17
@@ -50,22 +44,22 @@
 
     add-long/2addr v0, v2
 
-    move-wide/from16 v23, v4
+    move-wide/from16 v21, v4
 
-    move-wide/from16 v25, v0
+    move-wide/from16 v23, v0
 
     .line 3
     const/4 v8, 0x2
 
     new-array v12, v8, [J
 
-    move-wide/from16 v0, v23
+    move-wide/from16 v0, v21
 
     const/4 v10, 0x0
 
     aput-wide v0, v12, v10
 
-    move-wide/from16 v0, v25
+    move-wide/from16 v0, v23
 
     const/4 v10, 0x1
 
@@ -79,7 +73,7 @@
 .end method
 
 .method public static f1([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;IJJ)[J
-    .registers 41
+    .registers 35
 
     move-object/from16 v14, p1
 
@@ -90,12 +84,6 @@
     move-wide/from16 v17, p3
 
     move-wide/from16 v19, p5
-
-    const-wide/16 v0, 0x0
-
-    const/4 v15, 0x0
-
-    move-wide/from16 v21, v0
 
     .line 2
     move-wide/from16 v0, v17
@@ -130,22 +118,22 @@
 
     sub-long/2addr v0, v2
 
-    move-wide/from16 v23, v4
+    move-wide/from16 v21, v4
 
-    move-wide/from16 v25, v0
+    move-wide/from16 v23, v0
 
     .line 3
     const/4 v8, 0x2
 
     new-array v12, v8, [J
 
-    move-wide/from16 v0, v23
+    move-wide/from16 v0, v21
 
     const/4 v10, 0x0
 
     aput-wide v0, v12, v10
 
-    move-wide/from16 v0, v25
+    move-wide/from16 v0, v23
 
     const/4 v10, 0x1
 
@@ -159,7 +147,7 @@
 .end method
 
 .method public static f2([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;IJJ)[J
-    .registers 37
+    .registers 35
 
     move-object/from16 v14, p1
 
@@ -170,12 +158,6 @@
     move-wide/from16 v17, p3
 
     move-wide/from16 v19, p5
-
-    const-wide/16 v0, 0x0
-
-    const/4 v15, 0x0
-
-    move-wide/from16 v21, v0
 
     .line 2
     move-wide/from16 v0, v17
@@ -188,22 +170,22 @@
 
     move-result-wide v0
 
-    move-wide/from16 v23, v4
+    move-wide/from16 v21, v4
 
-    move-wide/from16 v25, v0
+    move-wide/from16 v23, v0
 
     .line 3
     const/4 v8, 0x2
 
     new-array v12, v8, [J
 
-    move-wide/from16 v0, v23
+    move-wide/from16 v0, v21
 
     const/4 v10, 0x0
 
     aput-wide v0, v12, v10
 
-    move-wide/from16 v0, v25
+    move-wide/from16 v0, v23
 
     const/4 v10, 0x1
 
@@ -217,7 +199,7 @@
 .end method
 
 .method public static f3([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;IJJ)[J
-    .registers 37
+    .registers 35
 
     move-object/from16 v14, p1
 
@@ -228,12 +210,6 @@
     move-wide/from16 v17, p3
 
     move-wide/from16 v19, p5
-
-    const-wide/16 v0, 0x0
-
-    const/4 v15, 0x0
-
-    move-wide/from16 v21, v0
 
     .line 2
     move-wide/from16 v0, v17
@@ -246,22 +222,22 @@
 
     move-result-wide v0
 
-    move-wide/from16 v23, v4
+    move-wide/from16 v21, v4
 
-    move-wide/from16 v25, v0
+    move-wide/from16 v23, v0
 
     .line 3
     const/4 v8, 0x2
 
     new-array v12, v8, [J
 
-    move-wide/from16 v0, v23
+    move-wide/from16 v0, v21
 
     const/4 v10, 0x0
 
     aput-wide v0, v12, v10
 
-    move-wide/from16 v0, v25
+    move-wide/from16 v0, v23
 
     const/4 v10, 0x1
 
@@ -275,7 +251,7 @@
 .end method
 
 .method public static f4([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;IJJ)J
-    .registers 45
+    .registers 39
 
     move-object/from16 v14, p1
 
@@ -295,8 +271,6 @@
 
     move-wide/from16 v23, v0
 
-    move-wide/from16 v25, v0
-
     .line 2
     move-wide/from16 v0, v17
 
@@ -308,14 +282,14 @@
 
     move-result-wide v0
 
-    move-wide/from16 v27, v4
+    move-wide/from16 v25, v4
 
-    move-wide/from16 v29, v0
+    move-wide/from16 v27, v0
 
     .line 3
-    move-wide/from16 v19, v29
+    move-wide/from16 v19, v27
 
-    move-wide/from16 v17, v27
+    move-wide/from16 v17, v25
 
     .line 4
     move-wide/from16 v0, v17
@@ -344,12 +318,12 @@
 
     add-long/2addr v0, v2
 
-    move-wide/from16 v27, v4
+    move-wide/from16 v25, v4
 
-    move-wide/from16 v29, v0
+    move-wide/from16 v27, v0
 
     .line 5
-    xor-long v17, v27, v29
+    xor-long v17, v25, v27
 
     .line 6
     move-wide/from16 v0, v17

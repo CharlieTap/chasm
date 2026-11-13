@@ -12,4 +12,12 @@ class InstructionTest {
 
         assertEquals(allInstructions.indices.toList(), opcodes.sorted())
     }
+
+    @Test
+    fun `numeric instructions take the first NUMERIC_OPCODE_COUNT opcodes`() {
+
+        val opcodes = allInstructions.filterIsInstance<NumericInstruction>().map { instruction -> instruction.opcode }
+
+        assertEquals((0 until NUMERIC_OPCODE_COUNT).toList(), opcodes.sorted())
+    }
 }

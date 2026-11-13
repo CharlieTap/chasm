@@ -8,7 +8,6 @@ const val MEMORY_INSTANCE = "Lio/github/charlietap/chasm/runtime/instance/Memory
 const val GLOBAL_INSTANCE = "Lio/github/charlietap/chasm/runtime/instance/GlobalInstance;"
 const val DATA_INSTANCE = "Lio/github/charlietap/chasm/runtime/instance/DataInstance;"
 const val ELEMENT_INSTANCE = "Lio/github/charlietap/chasm/runtime/instance/ElementInstance;"
-const val EXCEPTION_TABLE = "Lio/github/charlietap/chasm/runtime/exception/FunctionExceptionTable;"
 
 val EXCEPTION_CARRIERS = listOf(
     "Lio/github/charlietap/chasm/runtime/exception/InvocationException;",
@@ -144,8 +143,6 @@ val RAISE_UNWINDING = compiledCalls.method("raiseUnwinding", CONTEXT_TYPE, retur
 
 val THROW_TAG = compiledExceptions.method("throwTag", CONTEXT_TYPE, "I", "I", returns = "V")
 val THROW_REF = compiledExceptions.method("throwRef", CONTEXT_TYPE, "J", returns = "V")
-val CATCH_IN = compiledExceptions.method("catchIn", CONTEXT_TYPE, THROWABLE, EXCEPTION_TABLE, "I", "[J", returns = "I")
-val CATCH_PENDING = compiledExceptions.method("catchPending", CONTEXT_TYPE, EXCEPTION_TABLE, "I", "[J", returns = "I")
 val PENDING_TAG = compiledExceptions.method("pendingTag", CONTEXT_TYPE, returns = "I")
 val TAKE_EXCEPTION = compiledExceptions.method("takeException", CONTEXT_TYPE, "[J", "I", returns = "J")
 val WASM_EXCEPTION = compiledExceptions.method("wasmException", THROWABLE, returns = THROWABLE)
@@ -192,9 +189,7 @@ val EXTERN_CONVERT_ANY = compiledOps.method("externConvertAny", "J", returns = "
 
 val I64_MUL_WIDE_HIGH_S = compiledNumerics.method("i64MulWideHighS", "J", "J", returns = "J")
 val I64_MUL_WIDE_HIGH_U = compiledNumerics.method("i64MulWideHighU", "J", "J", returns = "J")
-val F32_COPYSIGN = compiledNumerics.method("f32Copysign", "F", "F", returns = "F")
 val F32_TRUNC = compiledNumerics.method("f32Trunc", "F", returns = "F")
-val F64_COPYSIGN = compiledNumerics.method("f64Copysign", "D", "D", returns = "D")
 val F64_TRUNC = compiledNumerics.method("f64Trunc", "D", returns = "D")
 val I32_TRUNC_F32_S = compiledNumerics.method("i32TruncF32S", "F", returns = "I")
 val I32_TRUNC_F32_U = compiledNumerics.method("i32TruncF32U", "F", returns = "I")

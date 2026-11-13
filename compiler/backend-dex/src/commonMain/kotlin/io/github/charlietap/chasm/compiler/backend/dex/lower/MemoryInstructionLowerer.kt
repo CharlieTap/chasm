@@ -23,11 +23,13 @@ import io.github.charlietap.chasm.compiler.backend.analysis.form.access
 import io.github.charlietap.chasm.compiler.backend.analysis.form.bulk
 import io.github.charlietap.chasm.compiler.backend.analysis.form.helperCall
 import io.github.charlietap.chasm.compiler.backend.analysis.form.slot
+import io.github.charlietap.chasm.compiler.backend.dex.analysis.SlotKindFlow
 import io.github.charlietap.chasm.type.NumberType
 import io.github.charlietap.dexter.ArrayKind
 import io.github.charlietap.dexter.BinaryOp
 import io.github.charlietap.dexter.Cond
 import io.github.charlietap.dexter.Conversion
+import io.github.charlietap.dexter.Label
 import io.github.charlietap.dexter.LiteralOp
 
 internal fun lowerMemoryInstruction(
@@ -188,11 +190,7 @@ private fun LowerContext.checkedAccess(
 
 private fun LowerContext.inlineLoadOrStore(access: MemoryAccess) {
     val value = access.value
-    if (value == null) {
-        inlineLoad(access.operation, access.destination)
-    } else {
-        inlineStore(access.operation.width, value)
-    }
+    if (value == null) inlineLoad(access.operation, access.destination) else inlineStore(access.operation.width, value)
 }
 
 private fun LowerContext.addOffset(
@@ -207,7 +205,7 @@ private fun LowerContext.addOffset(
     }
 }
 
-private fun LowerContext.outOfBounds(access: MemoryAccess): String {
+private fun LowerContext.outOfBounds(access: MemoryAccess): Label {
 
     if (!module.options.stacktraces) {
         return trapLabel(MEMORY_OUT_OF_BOUNDS)
@@ -222,7 +220,7 @@ private fun LowerContext.outOfBounds(access: MemoryAccess): String {
 
         loadMemory(Registers.OBJECT, access.memory)
         emit.const(Registers.I2, if (access.value == null) ACCESS_READ else ACCESS_WRITE)
-        loadInt(Registers.I1, Registers.W0, access.address)
+        at(origin) { loadInt(Registers.I1, Registers.W0, access.address) }
         emit.convert(Conversion.IntToLong, Registers.W1, Registers.I1)
         emit.constWide(Registers.W2, UNSIGNED_MASK)
         emit.binary(BinaryOp.AndLong, Registers.W1, Registers.W1, Registers.W2)
@@ -287,17 +285,16 @@ private fun LowerContext.unsafeLoad(
         emit.invokeVirtualRange(UNSAFE_GET_LONG, registers.unsafe)
         if (operation.type != NumberType.I64) {
             emit.moveResultWide(Registers.W0)
-            return store(destination, Registers.W0)
+            store(destination, Registers.W0)
+        } else {
+            writeWide(destination) { target -> emit.moveResultWide(target) }
         }
-        val target = wideTarget(destination)
-        emit.moveResultWide(target)
-        return finishWide(destination, target)
+        return
     }
     if (width == 4 && operation.type == NumberType.I32) {
         emit.invokeVirtualRange(UNSAFE_GET_INT, registers.unsafe)
-        val target = narrowTarget(destination)
-        emit.moveResult(target)
-        return finishNarrow(destination, target)
+        writeNarrow(destination) { target -> emit.moveResult(target) }
+        return
     }
     if (width == 1) {
         emit.arrayGet(ArrayKind.Byte, Registers.I1, registers.memoryBytes, Registers.I0)
@@ -310,7 +307,10 @@ private fun LowerContext.unsafeLoad(
         width == 2 -> emit.convert(Conversion.IntToChar, Registers.I1, Registers.I1)
         width == 1 && !operation.signed -> emit.literal(LiteralOp.AndInt, Registers.I1, Registers.I1, 0xFF)
     }
-    if (operation.type != NumberType.I64) return storeInt(destination, Registers.I1)
+    if (operation.type != NumberType.I64) {
+        storeInt(destination, Registers.I1)
+        return
+    }
     emit.convert(Conversion.IntToLong, Registers.W0, Registers.I1)
     if (operation == MemoryOperation.I64Load32U) {
         emit.constWide(Registers.W2, 0xFFFF_FFFFL)
@@ -349,32 +349,29 @@ private fun LowerContext.inlineStore(
 ) {
     if (analysis.unsafeMemory && width >= 4) {
         if (width == 4) {
-            if (value is Operand.Slot && isInt(value.slot)) {
-                emit.move(registers.unsafeValue, registers.home(value.slot))
+            if (value is Operand.Slot && readsInt(value.slot)) {
+                emit.move(registers.unsafeValue, registers.home(value.slot, SlotKindFlow.INT))
             } else {
                 loadInt(Registers.I1, Registers.W0, value)
                 emit.move(registers.unsafeValue, Registers.I1)
             }
             unsafeOffset()
-            return emit.invokeVirtualRange(UNSAFE_PUT_INT, registers.unsafe)
+            emit.invokeVirtualRange(UNSAFE_PUT_INT, registers.unsafe)
+            return
         }
-        if (value is Operand.Slot && isLong(value.slot)) {
-            emit.moveWide(registers.unsafeValue, registers.home(value.slot))
+        if (value is Operand.Slot && readsLong(value.slot)) {
+            emit.moveWide(registers.unsafeValue, registers.home(value.slot, SlotKindFlow.LONG))
         } else {
             loadWide(Registers.W2, value)
             emit.moveWide(registers.unsafeValue, Registers.W2)
         }
         unsafeOffset()
-        return emit.invokeVirtualRange(UNSAFE_PUT_LONG, registers.unsafe)
+        emit.invokeVirtualRange(UNSAFE_PUT_LONG, registers.unsafe)
+        return
     }
     if (width < 8) {
-        val source = if (value is Operand.Slot && isInt(value.slot) && registers.home(value.slot) < 256) {
-            registers.home(value.slot)
-        } else {
-            loadInt(Registers.I1, Registers.W1, value)
-            Registers.I1
-        }
-        return disassembleInt(0, width, source)
+        disassembleInt(0, width, narrowSource(value, Registers.I1))
+        return
     }
     loadWide(Registers.W1, value)
     emit.convert(Conversion.LongToInt, Registers.I1, Registers.W1)

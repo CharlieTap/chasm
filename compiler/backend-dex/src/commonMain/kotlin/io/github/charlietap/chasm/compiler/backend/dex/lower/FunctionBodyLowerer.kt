@@ -1,21 +1,52 @@
 package io.github.charlietap.chasm.compiler.backend.dex.lower
 
+import io.github.charlietap.chasm.compiler.backend.abi.UNREACHABLE
+
+internal fun LowerContext.lowerUnreached() {
+    if (kinds.atLeader()) {
+        trap(UNREACHABLE)
+    }
+}
+
 internal fun LowerContext.lowerFunctionBody() {
 
     enterPrologue()
     lowerPrologue()
 
-    function.instructions.forEachIndexed { position, instruction ->
+    lowerPositions(0, function.instructions.size)
+    emit.place(bodyEnd)
+    returnUnreachable()
+
+    lowerOutOfLine()
+}
+
+internal fun LowerContext.lowerPositions(
+    start: Int,
+    end: Int,
+) {
+
+    for (position in start until end) {
+
         emit.place(label(position))
-        enterInstruction(position)
+        val reached = enterInstruction(position)
         if (module.options.stacktraces) emit.line(line(position))
-        lowerInstruction(instruction, this)
+
+        if (reached) {
+            lowerInstruction(function.instructions[position], this)
+        } else {
+            lowerUnreached()
+        }
+
+        kinds.commit()
     }
 
     enterColdCode()
-    emit.place(bodyEnd)
-    returnUnreachable()
+}
+
+internal fun LowerContext.lowerOutOfLine() {
+
     lowerExceptionHandling()
+
     outOfLine.forEach { path ->
         enterColdCode()
         path()

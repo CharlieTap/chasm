@@ -1,5 +1,12 @@
 package io.github.charlietap.chasm.compiler.backend.dex.lower
 
+import io.github.charlietap.chasm.compiler.backend.dex.analysis.SlotKindFlow
+
+internal class MissingHome(
+    slot: Int,
+    kind: Byte,
+) : HomeMismatch("slot $slot has no home of kind $kind")
+
 internal class Registers(
     frameSlots: Int,
     temporaries: Int,
@@ -11,9 +18,9 @@ internal class Registers(
     activation: Boolean,
     savesStack: Boolean,
     callBuffer: Boolean,
-    narrowHomes: BooleanArray? = null,
-    private val held: BooleanArray? = null,
-    private val recording: BooleanArray? = null,
+    private val homes: RegisterHomes? = null,
+    private val held: ByteArray? = null,
+    private val recording: ByteArray? = null,
     chunk: Boolean = false,
     private val constantsUsed: BooleanArray? = null,
 ) {
@@ -42,34 +49,60 @@ internal class Registers(
 
     val byteArrayBase = if (unsafeMemory) unsafe + UNSAFE_WINDOW else UNUSED
 
-    private val homes = if (unsafeMemory) next + UNSAFE_WINDOW + 2 else next
+    private val homeBase = if (unsafeMemory) next + UNSAFE_WINDOW + 2 else next
 
-    private val homeOffsets = IntArray(frameSlots + 1).also { offsets ->
+    private val homeOffsets = IntArray(frameSlots * HOME_KINDS + 1).also { offsets ->
         for (slot in 0 until frameSlots) {
-            val width = when {
-                held != null && !held[slot] -> 0
-                narrowHomes?.get(slot) == true -> 1
-                else -> 2
+
+            val mask = heldMask(slot)
+
+            for (kind in SlotKindFlow.LONG..SlotKindFlow.DOUBLE) {
+                val index = slot * HOME_KINDS + SlotKindFlow.homeIndex(kind.toByte())
+                val width = when {
+                    mask and SlotKindFlow.homeBit(kind.toByte()) == 0 -> 0
+                    SlotKindFlow.wide(kind.toByte()) -> 2
+                    else -> 1
+                }
+                offsets[index + 1] = offsets[index] + width
             }
-            offsets[slot + 1] = offsets[slot] + width
         }
     }
 
     val records: Boolean get() = recording != null
 
+    fun heldMask(slot: Int): Int {
+        val homes = homes
+        val mask = if (homes == null) SlotKindFlow.homeBit(SlotKindFlow.LONG) else homes.mask(slot)
+        return if (held == null) mask else mask and held[slot].toInt()
+    }
+
+    fun holds(slot: Int): Boolean {
+        return heldMask(slot) != 0
+    }
+
     fun holds(
         slot: Int,
-    ): Boolean = held == null || held[slot]
+        kind: Byte,
+    ): Boolean {
+        return heldMask(slot) and SlotKindFlow.homeBit(kind) != 0
+    }
 
     fun home(
         slot: Int,
+        kind: Byte,
     ): Int {
-        recording?.set(slot, true)
-        check(holds(slot)) { "slot $slot is not held" }
-        return homes + homeOffsets[slot]
+
+        if (recording != null) {
+            recording[slot] = (recording[slot].toInt() or SlotKindFlow.homeBit(kind)).toByte()
+        }
+        if (!holds(slot, kind)) {
+            throw MissingHome(slot, kind)
+        }
+
+        return homeBase + homeOffsets[slot * HOME_KINDS + SlotKindFlow.homeIndex(kind)]
     }
 
-    private val temporaryBase = homes + homeOffsets[frameSlots]
+    private val temporaryBase = homeBase + homeOffsets[frameSlots * HOME_KINDS]
 
     fun temporary(
         index: Int,
@@ -129,6 +162,7 @@ internal class Registers(
         const val NARROW = 15
 
         private const val SCRATCH = 16
+        private const val HOME_KINDS = 4
         private const val UNSAFE_WINDOW = 6
         private const val UNUSED = Int.MIN_VALUE / 2
     }

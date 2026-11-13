@@ -2,23 +2,17 @@ package io.github.charlietap.chasm.compiler.backend.dex.lower
 
 import io.github.charlietap.chasm.cir.NumericInstruction
 import io.github.charlietap.chasm.compiler.backend.abi.DIVIDE_BY_ZERO
-import io.github.charlietap.chasm.compiler.backend.abi.DOUBLE_TO_RAW_LONG_BITS
-import io.github.charlietap.chasm.compiler.backend.abi.F32_COPYSIGN
 import io.github.charlietap.chasm.compiler.backend.abi.F32_TRUNC
-import io.github.charlietap.chasm.compiler.backend.abi.F64_COPYSIGN
 import io.github.charlietap.chasm.compiler.backend.abi.F64_TRUNC
-import io.github.charlietap.chasm.compiler.backend.abi.FLOAT_TO_RAW_INT_BITS
 import io.github.charlietap.chasm.compiler.backend.abi.I64_MUL_WIDE_HIGH_S
 import io.github.charlietap.chasm.compiler.backend.abi.I64_MUL_WIDE_HIGH_U
 import io.github.charlietap.chasm.compiler.backend.abi.INTEGER_OVERFLOW
-import io.github.charlietap.chasm.compiler.backend.abi.INT_BITS_TO_FLOAT
 import io.github.charlietap.chasm.compiler.backend.abi.INT_BIT_COUNT
 import io.github.charlietap.chasm.compiler.backend.abi.INT_DIVIDE_UNSIGNED
 import io.github.charlietap.chasm.compiler.backend.abi.INT_LEADING_ZEROS
 import io.github.charlietap.chasm.compiler.backend.abi.INT_ROTATE_LEFT
 import io.github.charlietap.chasm.compiler.backend.abi.INT_ROTATE_RIGHT
 import io.github.charlietap.chasm.compiler.backend.abi.INT_TRAILING_ZEROS
-import io.github.charlietap.chasm.compiler.backend.abi.LONG_BITS_TO_DOUBLE
 import io.github.charlietap.chasm.compiler.backend.abi.LONG_BIT_COUNT
 import io.github.charlietap.chasm.compiler.backend.abi.LONG_DIVIDE_UNSIGNED
 import io.github.charlietap.chasm.compiler.backend.abi.LONG_LEADING_ZEROS
@@ -96,17 +90,18 @@ private fun LowerContext.i32Binary(
     val arithmetic = i32Instruction(operation)
     if (arithmetic != null) {
         val source = narrowSource(left, Registers.I0)
-        val target = narrowTarget(destination)
         val literal = i32Literal(operation)
         val constant = (right as? Operand.Immediate)?.bits?.toInt()
         val fitsLiteral = constant != null && constant in Byte.MIN_VALUE..Byte.MAX_VALUE &&
             !(operation == BinaryOperation.Sub && constant == Byte.MIN_VALUE.toInt())
-        if (literal != null && constant != null && fitsLiteral) {
-            emit.literal(literal, target, source, constant)
-        } else {
-            emit.binary(arithmetic, target, source, narrowSource(right, Registers.I1))
+        writeNarrow(destination) { target ->
+            if (literal != null && constant != null && fitsLiteral) {
+                emit.literal(literal, target, source, constant)
+            } else {
+                emit.binary(arithmetic, target, source, narrowSource(right, Registers.I1))
+            }
         }
-        return finishNarrow(destination, target)
+        return
     }
     when (operation) {
         BinaryOperation.DivS, BinaryOperation.DivU, BinaryOperation.RemS, BinaryOperation.RemU ->
@@ -202,11 +197,10 @@ private fun LowerContext.i64Binary(
         else -> null
     }
     if (arithmetic != null) {
-        val l = wideSource(left, Registers.W0)
-        val r = wideSource(right, Registers.W1)
-        val target = wideTarget(destination)
-        emit.binary(arithmetic, target, l, r)
-        return finishWide(destination, target)
+        val leftRegister = wideSource(left, Registers.W0)
+        val rightRegister = wideSource(right, Registers.W1)
+        writeWide(destination) { target -> emit.binary(arithmetic, target, leftRegister, rightRegister) }
+        return
     }
     val shift = when (operation) {
         BinaryOperation.Shl -> BinaryOp.ShlLong
@@ -216,10 +210,9 @@ private fun LowerContext.i64Binary(
     }
     if (shift != null) {
         loadInt(Registers.I1, Registers.W1, right)
-        val l = wideSource(left, Registers.W0)
-        val target = wideTarget(destination)
-        emit.binary(shift, target, l, Registers.I1)
-        return finishWide(destination, target)
+        val leftRegister = wideSource(left, Registers.W0)
+        writeWide(destination) { target -> emit.binary(shift, target, leftRegister, Registers.I1) }
+        return
     }
     when (operation) {
         BinaryOperation.DivS, BinaryOperation.DivU, BinaryOperation.RemS, BinaryOperation.RemU ->
@@ -283,19 +276,25 @@ private fun LowerContext.f32Binary(
         else -> null
     }
     if (arithmetic != null) {
-        val l = floatSource(left, Registers.I0)
-        val r = floatSource(right, Registers.I1)
-        if (isFloat(destination)) {
-            checkNarrowWrite(destination)
-            return emit.binary(arithmetic, registers.home(destination), l, r)
-        }
-        emit.binary(arithmetic, Registers.I0, l, r)
-        return storeFloat(destination, Registers.I0)
+        val leftRegister = floatSource(left, Registers.I0)
+        val rightRegister = floatSource(right, Registers.I1)
+        writeFloat(destination) { target -> emit.binary(arithmetic, target, leftRegister, rightRegister) }
+        return
+    }
+    if (operation == BinaryOperation.Copysign) {
+        loadInt(Registers.I0, Registers.W0, left)
+        emit.const(Registers.I2, Int.MAX_VALUE)
+        emit.binary(BinaryOp.AndInt, Registers.I0, Registers.I0, Registers.I2)
+        loadInt(Registers.I1, Registers.W1, right)
+        emit.const(Registers.I2, Int.MIN_VALUE)
+        emit.binary(BinaryOp.AndInt, Registers.I1, Registers.I1, Registers.I2)
+        emit.binary(BinaryOp.OrInt, Registers.I0, Registers.I0, Registers.I1)
+        storeInt(destination, Registers.I0)
+        return
     }
     val helper = when (operation) {
         BinaryOperation.Min -> MATH_MIN_FLOAT
         BinaryOperation.Max -> MATH_MAX_FLOAT
-        BinaryOperation.Copysign -> F32_COPYSIGN
         else -> throw Unsupported("f32 $operation")
     }
     loadFloat(Registers.I0, Registers.W0, left)
@@ -310,17 +309,16 @@ private fun LowerContext.f32Unary(
     operand: Operand,
     destination: Int,
 ) {
+    if (operation == UnaryOperation.Abs) {
+        loadInt(Registers.I0, Registers.W0, operand)
+        emit.const(Registers.I1, Int.MAX_VALUE)
+        emit.binary(BinaryOp.AndInt, Registers.I0, Registers.I0, Registers.I1)
+        storeInt(destination, Registers.I0)
+        return
+    }
     loadFloat(Registers.I0, Registers.W0, operand)
     when (operation) {
         UnaryOperation.Neg -> emit.unary(UnaryOp.NegFloat, Registers.I0, Registers.I0)
-        UnaryOperation.Abs -> {
-            emit.invoke(FLOAT_TO_RAW_INT_BITS, Registers.I0)
-            emit.moveResult(Registers.I0)
-            emit.const(Registers.I1, Int.MAX_VALUE)
-            emit.binary(BinaryOp.AndInt, Registers.I0, Registers.I0, Registers.I1)
-            emit.invoke(INT_BITS_TO_FLOAT, Registers.I0)
-            emit.moveResult(Registers.I0)
-        }
         UnaryOperation.Trunc -> {
             emit.invoke(F32_TRUNC, Registers.I0)
             emit.moveResult(Registers.I0)
@@ -349,16 +347,25 @@ private fun LowerContext.f64Binary(
         else -> null
     }
     if (arithmetic != null) {
-        val l = doubleSource(left, Registers.W0)
-        val r = doubleSource(right, Registers.W1)
-        if (isDouble(destination)) return emit.binary(arithmetic, registers.home(destination), l, r)
-        emit.binary(arithmetic, Registers.W0, l, r)
-        return storeDouble(destination, Registers.W0)
+        val leftRegister = doubleSource(left, Registers.W0)
+        val rightRegister = doubleSource(right, Registers.W1)
+        writeDouble(destination) { target -> emit.binary(arithmetic, target, leftRegister, rightRegister) }
+        return
+    }
+    if (operation == BinaryOperation.Copysign) {
+        loadWide(Registers.W0, left)
+        emit.constWide(Registers.W2, Long.MAX_VALUE)
+        emit.binary(BinaryOp.AndLong, Registers.W0, Registers.W0, Registers.W2)
+        loadWide(Registers.W1, right)
+        emit.constWide(Registers.W2, Long.MIN_VALUE)
+        emit.binary(BinaryOp.AndLong, Registers.W1, Registers.W1, Registers.W2)
+        emit.binary(BinaryOp.OrLong, Registers.W0, Registers.W0, Registers.W1)
+        store(destination, Registers.W0)
+        return
     }
     val helper = when (operation) {
         BinaryOperation.Min -> MATH_MIN_DOUBLE
         BinaryOperation.Max -> MATH_MAX_DOUBLE
-        BinaryOperation.Copysign -> F64_COPYSIGN
         else -> throw Unsupported("f64 $operation")
     }
     loadDouble(Registers.W0, left)
@@ -373,17 +380,16 @@ private fun LowerContext.f64Unary(
     operand: Operand,
     destination: Int,
 ) {
+    if (operation == UnaryOperation.Abs) {
+        loadWide(Registers.W0, operand)
+        emit.constWide(Registers.W1, Long.MAX_VALUE)
+        emit.binary(BinaryOp.AndLong, Registers.W0, Registers.W0, Registers.W1)
+        store(destination, Registers.W0)
+        return
+    }
     loadDouble(Registers.W0, operand)
     when (operation) {
         UnaryOperation.Neg -> emit.unary(UnaryOp.NegDouble, Registers.W0, Registers.W0)
-        UnaryOperation.Abs -> {
-            emit.invoke(DOUBLE_TO_RAW_LONG_BITS, Registers.W0, Registers.W0 + 1)
-            emit.moveResultWide(Registers.W0)
-            emit.constWide(Registers.W1, Long.MAX_VALUE)
-            emit.binary(BinaryOp.AndLong, Registers.W0, Registers.W0, Registers.W1)
-            emit.invoke(LONG_BITS_TO_DOUBLE, Registers.W0, Registers.W0 + 1)
-            emit.moveResultWide(Registers.W0)
-        }
         UnaryOperation.Trunc -> {
             emit.invoke(F64_TRUNC, Registers.W0, Registers.W0 + 1)
             emit.moveResultWide(Registers.W0)
@@ -533,9 +539,7 @@ private fun LowerContext.i32SignedDivide(
     destination: Int,
 ) {
     val leftRegister = narrowSource(left, Registers.I0)
-    val target = narrowTarget(destination)
-    emit.binary(operation, target, leftRegister, rightRegister)
-    finishNarrow(destination, target)
+    writeNarrow(destination) { target -> emit.binary(operation, target, leftRegister, rightRegister) }
 }
 
 private fun LowerContext.i64Divide(
@@ -612,9 +616,7 @@ private fun LowerContext.i64SignedDivide(
     destination: Int,
 ) {
     val leftRegister = wideSource(left, Registers.W0)
-    val target = wideTarget(destination)
-    emit.binary(operation, target, leftRegister, rightRegister)
-    finishWide(destination, target)
+    writeWide(destination) { target -> emit.binary(operation, target, leftRegister, rightRegister) }
 }
 
 private const val UNSIGNED_INT_MASK = 0xFFFF_FFFFL

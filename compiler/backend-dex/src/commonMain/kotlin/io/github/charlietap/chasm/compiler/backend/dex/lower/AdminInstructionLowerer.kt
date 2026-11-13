@@ -28,9 +28,7 @@ internal fun lowerAdminInstruction(
         is AdminInstruction.CopySlot -> context.copyToSlot(instruction.destinationSlot, slot(instruction.sourceSlot))
         is AdminInstruction.CopySlots ->
             context.parallelCopy(instruction.sourceSlots.map(::slot), instruction.destinationSlots.asList())
-        is AdminInstruction.CopySlotSequence -> instruction.sourceSlots.indices.forEach { index ->
-            context.copyToSlot(instruction.destinationSlots[index], slot(instruction.sourceSlots[index]))
-        }
+        is AdminInstruction.CopySlotSequence -> context.copySequence(instruction.sourceSlots, instruction.destinationSlots)
         is AdminInstruction.Jump -> context.jump(instruction.target)
         is AdminInstruction.JumpCopies -> {
             context.transfer(instruction.operands.operands(), instruction.operands.destinationSlotBase)
@@ -88,8 +86,8 @@ private fun LowerContext.jumpTable(
     loadInt(Registers.I0, Registers.W0, Operand.Slot(operandSlot))
     val chunk = chunk
     val cases = targets.copyOf(targets.size - 1)
-    val dynamic = chunk != null && (cases.size > LARGE_JUMP_TABLE || cases.count { target -> target !in chunk } > CHUNK_TABLE_EXITS)
-    if (!dynamic) {
+    val direct = chunk == null || (cases.size <= LARGE_JUMP_TABLE && cases.count { target -> target !in chunk } <= CHUNK_TABLE_EXITS)
+    if (direct) {
         if (cases.isNotEmpty()) emit.packedSwitch(Registers.I0, 0, cases.map(::label))
         return emit.gotoLabel(label(targets.last()))
     }
@@ -101,16 +99,18 @@ private fun LowerContext.jumpTable(
         emit.branchCompare(Cond.Lt, Registers.I1, Registers.I3, elsewhere)
         emit.gotoLabel(label(targets.last()))
     } else {
-        emit.packedSwitch(Registers.I0, 0, cases.map { target -> if (target in checkNotNull(chunk)) label(target) else elsewhere })
+        emit.packedSwitch(Registers.I0, 0, cases.map { target -> if (target in chunk) label(target) else elsewhere })
         emit.gotoLabel(label(targets.last()))
     }
+    val origin = position
     outOfLine += {
         emit.place(elsewhere)
-        loadObject(Registers.OBJECT, Resource.Longs(LongArray(cases.size) { index -> cases[index].toLong() }), "[J")
+        at(origin) { spillMixed(chunk) }
+        loadObject(Registers.OBJECT, Resource.Longs(LongArray(cases.size) { index -> chunk.continuation(cases[index]).toLong() }), "[J")
         emit.arrayGet(ArrayKind.Wide, Registers.W0, Registers.OBJECT, Registers.I0)
         emit.convert(Conversion.LongToInt, Registers.I0, Registers.W0)
-        checkNotNull(chunk).leavesAnywhere = true
-        emit.gotoLabel(SPILL)
+        chunk.leavesAnywhere = true
+        emit.gotoLabel(spillLabel)
     }
 }
 

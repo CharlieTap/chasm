@@ -1,42 +1,41 @@
 package io.github.charlietap.chasm.compiler.backend.dex
 
 import io.github.charlietap.chasm.cir.CirFunction
-import io.github.charlietap.chasm.cir.MemoryInstruction
 import io.github.charlietap.chasm.compiler.backend.abi.CONTEXT_TYPE
 import io.github.charlietap.chasm.compiler.backend.abi.MethodRef
 import io.github.charlietap.chasm.compiler.backend.abi.descriptorWords
-import io.github.charlietap.chasm.compiler.backend.analysis.NarrowHomeMismatch
-import io.github.charlietap.chasm.compiler.backend.analysis.SlotKinds
-import io.github.charlietap.chasm.compiler.backend.analysis.SlotWriteVisitor
-import io.github.charlietap.chasm.compiler.backend.analysis.analyzeSlotKinds
-import io.github.charlietap.chasm.compiler.backend.analysis.cheapestCut
-import io.github.charlietap.chasm.compiler.backend.analysis.form.Operand
-import io.github.charlietap.chasm.compiler.backend.analysis.form.access
-import io.github.charlietap.chasm.compiler.backend.analysis.jumpTargets
-import io.github.charlietap.chasm.compiler.backend.analysis.loopCrossings
-import io.github.charlietap.chasm.compiler.backend.analysis.visitSlotWrites
+import io.github.charlietap.chasm.compiler.backend.dex.abi.ART_MAX_COMPILED_REGISTERS
 import io.github.charlietap.chasm.compiler.backend.dex.abi.BINDING_TYPE
+import io.github.charlietap.chasm.compiler.backend.dex.abi.CHUNK_CODE_UNITS
+import io.github.charlietap.chasm.compiler.backend.dex.abi.CHUNK_INSTRUCTIONS
 import io.github.charlietap.chasm.compiler.backend.dex.abi.HUGE_METHOD_CODE_UNITS
 import io.github.charlietap.chasm.compiler.backend.dex.abi.MAX_REGISTERS
 import io.github.charlietap.chasm.compiler.backend.dex.abi.chunkName
 import io.github.charlietap.chasm.compiler.backend.dex.abi.staticParameters
+import io.github.charlietap.chasm.compiler.backend.dex.analysis.DataflowSlotKindAnalyzer
 import io.github.charlietap.chasm.compiler.backend.dex.analysis.FunctionAnalysis
+import io.github.charlietap.chasm.compiler.backend.dex.analysis.MemoryMode
+import io.github.charlietap.chasm.compiler.backend.dex.analysis.SlotKindAnalyzer
+import io.github.charlietap.chasm.compiler.backend.dex.analysis.SlotKindFlow
 import io.github.charlietap.chasm.compiler.backend.dex.analysis.analyzeFunction
+import io.github.charlietap.chasm.compiler.backend.dex.analysis.estimateDexSize
+import io.github.charlietap.chasm.compiler.backend.dex.analysis.functionFacts
 import io.github.charlietap.chasm.compiler.backend.dex.lower.CHUNK_WINDOW_WORDS
-import io.github.charlietap.chasm.compiler.backend.dex.lower.Chunk
 import io.github.charlietap.chasm.compiler.backend.dex.lower.ENTRY_BITS
 import io.github.charlietap.chasm.compiler.backend.dex.lower.Emitter
+import io.github.charlietap.chasm.compiler.backend.dex.lower.HomeMismatch
 import io.github.charlietap.chasm.compiler.backend.dex.lower.LowerContext
+import io.github.charlietap.chasm.compiler.backend.dex.lower.RegisterHomes
 import io.github.charlietap.chasm.compiler.backend.dex.lower.Registers
+import io.github.charlietap.chasm.compiler.backend.dex.lower.SlotKindConflict
 import io.github.charlietap.chasm.compiler.backend.dex.lower.Unsupported
 import io.github.charlietap.chasm.compiler.backend.dex.lower.frameCost
-import io.github.charlietap.chasm.compiler.backend.dex.lower.lowerChunkBody
 import io.github.charlietap.chasm.compiler.backend.dex.lower.lowerDispatcher
 import io.github.charlietap.chasm.compiler.backend.dex.lower.lowerFunctionBody
 import io.github.charlietap.chasm.type.FunctionType
-import io.github.charlietap.chasm.type.ValueType
 import io.github.charlietap.dexter.ClassBuilder
 import io.github.charlietap.dexter.DexMethod
+import io.github.charlietap.dexter.DexterFileFullException
 import io.github.charlietap.dexter.DexterMethodTooLargeException
 import io.github.charlietap.dexter.MemberAccess
 
@@ -48,93 +47,329 @@ internal fun FunctionLowerer(
     code: ClassBuilder,
     method: DexMethod,
 ): String? {
-    if (module.options.splitInstructions != null) return split(module, function, code, method)
-    val inline = attempt(module, function, code, method, inlineAccesses = true)
-    val attempt = if (inline is Attempt.TooLarge && inline.inlinedAccesses) {
-        attempt(module, function, code, method, inlineAccesses = false)
-    } else {
-        inline
-    }
-    return when (attempt) {
-        is Attempt.Lowered -> null
-        is Attempt.Rejected -> attempt.reason
-        is Attempt.TooLarge -> split(module, function, code, method)
-    }
+    return FunctionLowering(
+        module = module,
+        function = function,
+        code = code,
+        method = method,
+        router = EstimateRouter(),
+        slotKindAnalyzer = DataflowSlotKindAnalyzer(),
+        chunkPlanner = ChunkPlanner(),
+        chunkEmitter = ProbingChunkEmitter(module, function, code),
+    ).lower()
 }
 
-private sealed interface Attempt {
+internal class FunctionLowering(
+    private val module: ModuleLowering,
+    private val function: CirFunction,
+    private val code: ClassBuilder,
+    private val method: DexMethod,
+    private val router: FunctionRouter,
+    private val slotKindAnalyzer: SlotKindAnalyzer,
+    private val chunkPlanner: ChunkPlanner,
+    private val chunkEmitter: ChunkEmitter,
+) {
+    private val facts = functionFacts(module, function)
 
-    class Lowered : Attempt
+    fun lower(): String? {
 
-    class TooLarge(
-        val inlinedAccesses: Boolean,
-    ) : Attempt
+        val whole = wholeFunctionAnalysis(module, function, facts)
+        var reusable: RegisterHomes? = null
+        var retained: Attempt.Retained? = null
 
-    class Rejected(
-        val reason: String,
-    ) : Attempt
-}
+        for (strategy in router.route(whole).strategies) {
 
-private fun attempt(
-    module: ModuleLowering,
-    function: CirFunction,
-    code: ClassBuilder,
-    method: DexMethod,
-    inlineAccesses: Boolean,
-): Attempt {
-    val analysis = analyzeFunction(module, function, inlineAccesses)
-    val window = analysis.window
-    val layout = { narrowHomes: BooleanArray? ->
-        Registers(
-            frameSlots = analysis.frameSlots,
-            temporaries = window.temporaries,
-            windowWords = window.windowWords,
-            parameterWords = parameterWords(analysis.type),
-            cachedConstants = analysis.cachedConstants.size,
-            unsafeMemory = analysis.unsafeMemory,
-            inlineMemory = analysis.usesInlineMemory,
-            activation = analysis.references.writesThrough,
-            savesStack = function.exceptions != null,
-            callBuffer = window.callBufferWords > 0,
-            narrowHomes = narrowHomes,
-        )
-    }
-    val wide = layout(null)
-    if (wide.count > MAX_REGISTERS) return Attempt.TooLarge(inlinedAccesses = false)
-    var narrowHomes = true
-    while (true) {
-        val slotKinds = if (narrowHomes) {
-            analyzeSlotKinds(
-                function = function,
-                parameters = analysis.type.params.types,
-                frameSlots = analysis.frameSlots,
-                localTypes = analysis.localTypes,
-                initialValues = analysis.initialValues,
-                references = analysis.references,
-                declarations = module.declarations,
-                floatingHome = { slot -> wide.home(slot) < 256 },
-            )
-        } else {
-            SlotKinds.wide(analysis.frameSlots)
+            val attempt = when (strategy) {
+                LoweringStrategy.WholeInOrder -> wholeInOrder(checkNotNull(whole).analysis)
+                LoweringStrategy.Helper -> attempt(helperAnalysis(), null)
+                LoweringStrategy.Inline -> attempt(checkNotNull(whole).analysis, null)
+                LoweringStrategy.Split -> try {
+                    split(whole, reusable)
+                } catch (exception: DexterFileFullException) {
+                    Attempt.FileFull(exception)
+                }
+            }
+
+            when (attempt) {
+                is Attempt.Lowered -> return null
+                is Attempt.Rejected -> return attempt.reason
+                is Attempt.TooLarge -> reusable = attempt.homes
+                is Attempt.Retained -> {
+                    if (retained == null) {
+                        retained = attempt
+                    }
+                }
+            }
         }
-        val registers = if (narrowHomes) layout(BooleanArray(analysis.frameSlots) { slot -> slotKinds.kind(slot).let { it == SlotKinds.INT || it == SlotKinds.FLOAT } }) else wide
-        val body = code.beginStaticMethod(method, registers.count, MemberAccess.Public)
-        val context = LowerContext(module, function, analysis, registers, slotKinds, Emitter(body, module.methods))
-        try {
-            context.lowerFunctionBody()
-            body.finish(HUGE_METHOD_CODE_UNITS)
+
+        return when (val failure = checkNotNull(retained) { "f${function.index.index}: no split attempt" }) {
+            is Attempt.Refused -> failure.reason
+            is Attempt.FileFull -> throw failure.exception
+        }
+    }
+
+    private fun helperAnalysis(): FunctionAnalysis {
+        return analyzeFunction(module, function, facts, MemoryMode.Helper)
+    }
+
+    private fun wholeInOrder(inline: FunctionAnalysis): Attempt {
+
+        val first = attempt(inline, null)
+        if (first !is Attempt.TooLarge || !first.inlinedAccesses) {
+            return first
+        }
+
+        return attempt(helperAnalysis(), first.homes)
+    }
+
+    private fun attempt(
+        analysis: FunctionAnalysis,
+        reusable: RegisterHomes?,
+    ): Attempt {
+
+        val wide = functionRegisters(function, analysis, null)
+        if (wide.count > MAX_REGISTERS) {
+            return Attempt.TooLarge(inlinedAccesses = false, homes = reusable)
+        }
+
+        val firstTemporary = if (module.analysis.usesExceptions) facts.frameSlots else facts.firstTemporary
+        val initialised = BooleanArray(facts.frameSlots) { slot -> slot < firstTemporary || facts.references.isReference[slot] }
+        val pristine = reusable?.takeIf { homes -> homes.reusableFor(initialised) }
+            ?: RegisterHomes(slotKindAnalyzer.analyze(function, facts, initialised), initialised)
+
+        var current: RegisterHomes? = pristine
+        while (true) {
+
+            val homes = current
+            val registers = if (homes != null) functionRegisters(function, analysis, homes) else wide
+            if (registers.count >= ART_MAX_COMPILED_REGISTERS) {
+                return Attempt.TooLarge(inlinedAccesses = false, homes = pristine)
+            }
+
+            val body = code.beginStaticMethod(method, registers.count, MemberAccess.Public)
+            val context = LowerContext(module, function, analysis, registers, homes, Emitter(body, module.references))
+            try {
+                context.lowerFunctionBody()
+                body.finish(HUGE_METHOD_CODE_UNITS)
+                return Attempt.Lowered()
+            } catch (conflict: SlotKindConflict) {
+                body.abort()
+                pin(checkNotNull(homes), conflict)
+            } catch (mismatch: HomeMismatch) {
+                body.abort()
+                if (homes == null) {
+                    throw mismatch
+                }
+                current = null
+            } catch (unsupported: Unsupported) {
+                body.abort()
+                return Attempt.Rejected(unsupported.message ?: "unsupported")
+            } catch (_: DexterMethodTooLargeException) {
+                return Attempt.TooLarge(inlinedAccesses = analysis.usesInlineMemory, homes = pristine)
+            }
+        }
+    }
+
+    private fun split(
+        whole: WholeFunctionAnalysis?,
+        reusable: RegisterHomes?,
+    ): Attempt {
+
+        val analysis = whole?.analysis ?: analyzeFunction(module, function, facts, facts.memoryMode)
+        if (chunkRegisters(function, analysis, null, null).count > MAX_REGISTERS) {
+            return Attempt.Refused(FRAME_TOO_LARGE)
+        }
+
+        val starts = ArrayList<Int>()
+        val orphans = ArrayList<Int>()
+        val initialised = BooleanArray(facts.frameSlots) { true }
+        val estimate = if (module.options.splitInstructions != null) null else whole?.estimate ?: estimateDexSize(module, function, analysis)
+        val splitFacts = SplitFacts(function, facts, estimate)
+        var current: RegisterHomes? = reusable?.takeIf { homes -> homes.reusableFor(initialised) }
+            ?: RegisterHomes(slotKindAnalyzer.analyze(function, facts, initialised), initialised)
+
+        while (true) {
+
+            val homes = current
+            val chunks = try {
+                splitChunks(analysis, splitFacts, homes, starts, orphans.size)
+            } catch (conflict: SlotKindConflict) {
+                pin(checkNotNull(homes), conflict)
+                orphans += starts
+                starts.clear()
+                continue
+            } catch (mismatch: HomeMismatch) {
+                if (homes == null) {
+                    throw mismatch
+                }
+                current = null
+                orphans += starts
+                starts.clear()
+                continue
+            } catch (unsupported: Unsupported) {
+                return Attempt.Refused(unsupported.message ?: "unsupported")
+            }
+
+            val table = dispatchTable(chunks, splitFacts)
+            val registers = dispatcherRegisters(analysis)
+            val slotFrameCost = (facts.frameSlots * 8 + 31) / 32
+            val cost = frameCost(registers) + chunks.maxOf { chunk -> chunk.cost } + slotFrameCost
+            val body = code.beginStaticMethod(method, registers.count, MemberAccess.Public)
+            try {
+                LowerContext(module, function, analysis, registers, null, Emitter(body, module.references))
+                    .lowerDispatcher(chunks.map { chunk -> chunk.method }, table, cost)
+            } catch (failure: Throwable) {
+                body.abort()
+                throw failure
+            }
+
+            try {
+                body.finish(HUGE_METHOD_CODE_UNITS)
+            } catch (_: DexterMethodTooLargeException) {
+                return Attempt.Refused("function needs ${chunks.size} chunks, more than one dispatcher holds")
+            }
+
+            module.chunkStarts[function.index.index] = (orphans + starts).toIntArray()
+
             return Attempt.Lowered()
-        } catch (mismatch: NarrowHomeMismatch) {
-            body.abort()
-            if (!narrowHomes) throw mismatch
-            narrowHomes = false
-        } catch (unsupported: Unsupported) {
-            body.abort()
-            return Attempt.Rejected(unsupported.message ?: "unsupported")
-        } catch (_: DexterMethodTooLargeException) {
-            return Attempt.TooLarge(inlinedAccesses = analysis.usesInlineMemory)
         }
     }
+
+    private fun splitChunks(
+        analysis: FunctionAnalysis,
+        splitFacts: SplitFacts,
+        homes: RegisterHomes?,
+        starts: MutableList<Int>,
+        orphans: Int,
+    ): List<SplitChunk> {
+
+        val size = function.instructions.size
+        val owner = module.codeClass(function.index)
+        val chunks = ArrayList<SplitChunk>()
+        var window = module.options.splitInstructions
+        var start = 0
+
+        while (start < size) {
+
+            val forced = window
+            var limit = if (forced != null) {
+                minOf(size, start + forced)
+            } else {
+                minOf(checkNotNull(splitFacts.estimate).reach(start, CHUNK_CODE_UNITS), start + CHUNK_INSTRUCTIONS)
+            }
+
+            while (true) {
+
+                val planned = chunkPlanner.plan(function, splitFacts, start, limit)
+                val chunkMethod = MethodRef(owner, chunkName(method.name, orphans + starts.size), CHUNK_PARAMETERS, "I")
+                val chunk = chunkEmitter.emit(analysis, splitFacts, homes, planned, chunkMethod, splitFacts.ranked + starts.size + 1)
+                if (chunk != null) {
+                    starts += start
+                    chunks += chunk
+                    start = planned.end
+                    break
+                }
+
+                if (planned.end - start == 1) {
+                    throw Unsupported("instruction $start too large for a method")
+                }
+
+                limit = start + maxOf(1, (planned.end - start) / 2)
+                if (window != null) {
+                    window = limit - start
+                }
+            }
+        }
+
+        return chunks
+    }
+
+    private fun pin(
+        homes: RegisterHomes,
+        conflict: SlotKindConflict,
+    ) {
+
+        check(conflict.kind != SlotKindFlow.CONFLICT) {
+            "f${function.index.index}: slot ${conflict.slot} is read at ${conflict.position} holding either a narrow or a wide value"
+        }
+        check(homes.pin(conflict.slot) == SlotKindFlow.UNDEFINED) { "f${function.index.index}: slot ${conflict.slot} conflicts after pinning" }
+
+        homes.pinConflict(conflict.slot)
+    }
+
+    private sealed interface Attempt {
+
+        class Lowered : Attempt
+
+        data class TooLarge(
+            val inlinedAccesses: Boolean,
+            val homes: RegisterHomes?,
+        ) : Attempt
+
+        data class Rejected(
+            val reason: String,
+        ) : Attempt
+
+        sealed interface Retained : Attempt
+
+        data class Refused(
+            val reason: String,
+        ) : Retained
+
+        data class FileFull(
+            val exception: DexterFileFullException,
+        ) : Retained
+    }
+}
+
+private fun dispatchTable(
+    chunks: List<SplitChunk>,
+    splitFacts: SplitFacts,
+): LongArray {
+
+    val continuations = splitFacts.continuations
+    val ranked = splitFacts.ranked
+    val table = LongArray(ranked + chunks.size) { -1L }
+
+    chunks.forEachIndexed { index, chunk ->
+
+        chunk.entries.forEachIndexed { local, entry ->
+            val id = continuations[entry]
+            if (id >= 0) {
+                table[id] = (index.toLong() shl ENTRY_BITS) or local.toLong()
+            }
+        }
+
+        if (index > 0) {
+            table[ranked + index] = index.toLong() shl ENTRY_BITS
+        }
+    }
+
+    return table
+}
+
+private fun functionRegisters(
+    function: CirFunction,
+    analysis: FunctionAnalysis,
+    homes: RegisterHomes?,
+): Registers {
+
+    val facts = analysis.facts
+    val window = facts.window
+
+    return Registers(
+        frameSlots = facts.frameSlots,
+        temporaries = window.temporaries,
+        windowWords = window.windowWords,
+        parameterWords = parameterWords(facts.type),
+        cachedConstants = analysis.cachedConstants.size,
+        unsafeMemory = analysis.unsafeMemory,
+        inlineMemory = analysis.usesInlineMemory,
+        activation = facts.references.writesThrough,
+        savesStack = function.exceptions != null,
+        callBuffer = window.callBufferWords > 0,
+        homes = homes,
+    )
 }
 
 private fun parameterWords(
@@ -143,261 +378,20 @@ private fun parameterWords(
 
 private const val FRAME_TOO_LARGE = "frame too large"
 
-private class SplitChunk(
-    val method: MethodRef,
-    val start: Int,
-    val entries: IntArray,
-    val cost: Int,
-)
-
-private fun split(
-    module: ModuleLowering,
-    function: CirFunction,
-    code: ClassBuilder,
-    method: DexMethod,
-): String? {
-    val analysis = analyzeFunction(module, function, inlineAccesses = true, split = true)
-    if (chunkRegisters(function, analysis, null, null).count > MAX_REGISTERS) return FRAME_TOO_LARGE
-    val starts = ArrayList<Int>()
-    var narrowHomes = true
-    while (true) {
-        val slotKinds = if (narrowHomes) splitSlotKinds(module, function, analysis) else SlotKinds.wide(analysis.frameSlots)
-        val chunks = try {
-            splitChunks(module, function, code, method, analysis, slotKinds, starts)
-        } catch (mismatch: NarrowHomeMismatch) {
-            if (!narrowHomes) throw mismatch
-            narrowHomes = false
-            continue
-        } catch (unsupported: Unsupported) {
-            return unsupported.message ?: "unsupported"
-        }
-        val table = chunks.flatMapIndexed { index, chunk ->
-            chunk.entries.mapIndexed { local, entry -> (entry.toLong() shl 32) or ((index.toLong() shl ENTRY_BITS) or local.toLong()) }
-        }.sorted().toLongArray()
-        val registers = dispatcherRegisters(analysis)
-        val cost = frameCost(registers) + chunks.maxOf { it.cost } + (analysis.frameSlots * 8 + 31) / 32
-        val body = code.beginStaticMethod(method, registers.count, MemberAccess.Public)
-        try {
-            LowerContext(module, function, analysis, registers, SlotKinds.wide(analysis.frameSlots), Emitter(body, module.methods))
-                .lowerDispatcher(chunks.map { it.method }, table, cost)
-        } catch (failure: Throwable) {
-            body.abort()
-            throw failure
-        }
-        try {
-            body.finish(HUGE_METHOD_CODE_UNITS)
-        } catch (_: DexterMethodTooLargeException) {
-            return "function needs ${chunks.size} chunks, more than one dispatcher holds"
-        }
-        module.chunkStarts[function.index.index] = starts.toIntArray()
-        return null
-    }
-}
-
-private fun splitSlotKinds(
-    module: ModuleLowering,
-    function: CirFunction,
-    analysis: FunctionAnalysis,
-): SlotKinds {
-    val wide = chunkRegisters(function, analysis, null, null)
-    return analyzeSlotKinds(
-        function = function,
-        parameters = analysis.type.params.types,
-        frameSlots = analysis.frameSlots,
-        localTypes = analysis.localTypes,
-        initialValues = analysis.initialValues,
-        references = analysis.references,
-        declarations = module.declarations,
-        floatingHome = { slot -> wide.home(slot) < 256 },
-    )
-}
-
-private fun splitChunks(
-    module: ModuleLowering,
-    function: CirFunction,
-    code: ClassBuilder,
-    method: DexMethod,
-    analysis: FunctionAnalysis,
-    slotKinds: SlotKinds,
-    starts: MutableList<Int>,
-): List<SplitChunk> {
-    val size = function.instructions.size
-    val crossings = loopCrossings(function)
-    val targets = function.jumpTargets()
-    function.exceptions?.regions?.forEach { region -> region.catches.forEach { handler -> targets[handler.target.index] = true } }
-    val narrow = BooleanArray(analysis.frameSlots) { slot -> slotKinds.kind(slot).let { it == SlotKinds.INT || it == SlotKinds.FLOAT } }
-    val owner = module.codeClass(function.index)
-    val liveness = functionLiveness(module, function, analysis.frameSlots)
-    val live = liveness?.let { slots -> slots::liveCount }
-    val chunks = ArrayList<SplitChunk>()
-    var start = 0
-    val forced = module.options.splitInstructions
-    var window = forced ?: CHUNK_INSTRUCTIONS
-    while (start < size) {
-        var limit = minOf(size, start + window)
-        while (true) {
-            val end = if (limit == size) size else cheapestCut(crossings, start, limit, live)
-            val entries = (start until end).filter { position -> position == start || targets[position] }.toIntArray()
-            val chunk = Chunk(start, end, entries)
-            val chunkMethod = MethodRef(owner, chunkName(method.name, starts.size), CHUNK_PARAMETERS, "I")
-            val used = BooleanArray(analysis.frameSlots)
-            val constants = BooleanArray(analysis.cachedConstants.size)
-            val recording = chunkRegisters(function, analysis, narrow, null, recording = used, constants = constants)
-            val probe = code.beginStaticMethod(module.methods.of(chunkMethod), recording.count, MemberAccess.Public)
-            try {
-                LowerContext(module, function, analysis, recording, slotKinds, Emitter(probe, module.methods), chunk).lowerChunkBody()
-            } finally {
-                probe.abort()
-            }
-            val registers = chunkRegisters(function, analysis, narrow, used)
-            val body = code.beginStaticMethod(module.methods.of(chunkMethod), registers.count, MemberAccess.Public)
-            try {
-                val spills = writtenSlots(module, function, analysis, start, end)
-                if (liveness != null && !chunk.leavesAnywhere) {
-                    val needed = BooleanArray(analysis.frameSlots)
-                    for (target in chunk.exits) {
-                        if (target >= size) continue
-                        for (slot in 0 until analysis.frameSlots) if (liveness.isLive(target, slot)) needed[slot] = true
-                    }
-                    for (slot in 0 until analysis.frameSlots) spills[slot] = spills[slot] && needed[slot]
-                }
-                val usesMemory = analysis.usesInlineMemory && (start until end).any { position ->
-                    (function.instructions[position] as? MemoryInstruction)?.access()?.memory == module.inlineMemory
-                }
-                val protects = function.exceptions?.regions.orEmpty().any { region -> region.start.index < end && region.end.index > start }
-                val reloads = chunkReloads(module, function, analysis, start, end, entries, used, spills, protects)
-                val lowered = Chunk(start, end, entries, spills, constants, usesMemory, protects, reloads)
-                LowerContext(module, function, analysis, registers, slotKinds, Emitter(body, module.methods), lowered)
-                    .lowerChunkBody()
-            } catch (failure: Throwable) {
-                body.abort()
-                throw failure
-            }
-            val fits = try {
-                body.finish(HUGE_METHOD_CODE_UNITS)
-                true
-            } catch (_: DexterMethodTooLargeException) {
-                false
-            }
-            if (fits) {
-                starts += start
-                chunks += SplitChunk(chunkMethod, start, entries, frameCost(registers))
-                if (forced == null) window += window / 4
-                start = end
-                break
-            }
-            if (end - start == 1) throw Unsupported("instruction $start too large for a method")
-            limit = start + maxOf(1, (end - start) / 2)
-            window = limit - start
-        }
-    }
-    return chunks
-}
-
-private fun writtenSlots(
-    module: ModuleLowering,
-    function: CirFunction,
-    analysis: FunctionAnalysis,
-    start: Int,
-    end: Int,
-): BooleanArray {
-    val written = BooleanArray(analysis.frameSlots)
-    val visitor = WrittenSlots(written)
-    for (position in start until end) visitSlotWrites(function.instructions[position], function, module.declarations, visitor)
-    function.exceptions?.regions?.forEach { region ->
-        if (region.start.index >= end || region.end.index <= start) return@forEach
-        region.catches.forEach { handler -> handler.payloadSlots.forEach { slot -> written[slot] = true } }
-        analysis.references.slots.forEach { slot -> written[slot] = true }
-    }
-    return written
-}
-
-private fun chunkReloads(
-    module: ModuleLowering,
-    function: CirFunction,
-    analysis: FunctionAnalysis,
-    start: Int,
-    end: Int,
-    entries: IntArray,
-    held: BooleanArray,
-    spills: BooleanArray,
-    protects: Boolean,
-): BooleanArray {
-    if (protects) return held
-    val slots = analysis.frameSlots
-    val liveness = rangeLiveness(module, function, slots, start, end) { slot -> spills[slot] && held[slot] }
-    return BooleanArray(slots) { slot -> held[slot] && entries.any { entry -> liveness.isLive(entry - start, slot) } }
-}
-
-private class WrittenSlots(
-    private val written: BooleanArray,
-) : SlotWriteVisitor {
-    override fun value(
-        slot: Int,
-        type: ValueType,
-    ) {
-        written[slot] = true
-    }
-
-    override fun opaque(
-        slot: Int,
-        reference: Boolean,
-    ) {
-        written[slot] = true
-    }
-
-    override fun copy(
-        source: Operand,
-        destination: Int,
-    ) {
-        written[destination] = true
-    }
-}
-
-private fun chunkRegisters(
-    function: CirFunction,
-    analysis: FunctionAnalysis,
-    narrowHomes: BooleanArray?,
-    held: BooleanArray?,
-    recording: BooleanArray? = null,
-    constants: BooleanArray? = null,
-): Registers {
-    val window = analysis.window
+private fun dispatcherRegisters(analysis: FunctionAnalysis): Registers {
     return Registers(
-        frameSlots = analysis.frameSlots,
-        temporaries = window.temporaries,
-        windowWords = window.windowWords,
-        parameterWords = 2,
-        cachedConstants = analysis.cachedConstants.size,
-        unsafeMemory = analysis.unsafeMemory,
-        inlineMemory = analysis.usesInlineMemory,
-        activation = analysis.references.writesThrough,
-        savesStack = function.exceptions != null,
-        callBuffer = window.callBufferWords > 0,
-        narrowHomes = narrowHomes,
-        held = held,
-        recording = recording,
+        frameSlots = 0,
+        temporaries = 0,
+        windowWords = CHUNK_WINDOW_WORDS,
+        parameterWords = parameterWords(analysis.facts.type),
+        cachedConstants = 0,
+        unsafeMemory = false,
+        inlineMemory = false,
+        activation = false,
+        savesStack = true,
+        callBuffer = false,
         chunk = true,
-        constantsUsed = constants,
     )
 }
-
-private fun dispatcherRegisters(
-    analysis: FunctionAnalysis,
-): Registers = Registers(
-    frameSlots = 0,
-    temporaries = 0,
-    windowWords = CHUNK_WINDOW_WORDS,
-    parameterWords = parameterWords(analysis.type),
-    cachedConstants = 0,
-    unsafeMemory = false,
-    inlineMemory = false,
-    activation = false,
-    savesStack = true,
-    callBuffer = false,
-    chunk = true,
-)
 
 private val CHUNK_PARAMETERS = listOf(BINDING_TYPE, CONTEXT_TYPE, "I", "I", "I")
-
-private const val CHUNK_INSTRUCTIONS = 600

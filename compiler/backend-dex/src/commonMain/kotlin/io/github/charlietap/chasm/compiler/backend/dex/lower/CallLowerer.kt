@@ -23,18 +23,19 @@ import io.github.charlietap.chasm.compiler.backend.abi.valueDescriptor
 import io.github.charlietap.chasm.compiler.backend.analysis.form.CallSite
 import io.github.charlietap.chasm.compiler.backend.analysis.form.Operand
 import io.github.charlietap.chasm.compiler.backend.analysis.form.callSite
-import io.github.charlietap.chasm.compiler.backend.dex.abi.functionMethod
 import io.github.charlietap.chasm.compiler.backend.dex.abi.typedCall
+import io.github.charlietap.chasm.compiler.backend.dex.analysis.SlotKindFlow
 import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.dexter.ArrayKind
 import io.github.charlietap.dexter.Cond
 import io.github.charlietap.dexter.Conversion
+import io.github.charlietap.dexter.Label
 
 internal fun LowerContext.lowerCall(
     instruction: ControlInstruction,
 ) {
     val call = checkNotNull(instruction.callSite(declarations))
-    val signature = analysis.typedSignatures[position]
+    val signature = facts.typedSignatures[position]
     when {
         instruction is ControlInstruction.Call && !declarations.isImported(instruction.function) -> directCall(instruction.function, call)
         signature != null -> typedIndirectCall(instruction, call, signature)
@@ -48,8 +49,9 @@ private fun LowerContext.directCall(
     callee: FunctionIndex,
     call: CallSite,
 ) {
+
     val words = loadWindow(call.type, call.arguments)
-    val method = functionMethod(module.codeClass(callee), callee.index, call.type)
+    val method = module.functionMethod(callee, call.type)
     emit.invokeRange(method, registers.window, 3 + words)
 
     val analysis = module.analysis
@@ -67,8 +69,10 @@ private fun LowerContext.typedIndirectCall(
     call: CallSite,
     signature: String,
 ) {
+
     val bridge = emit.freshLabel()
     val done = emit.freshLabel()
+
     when (instruction) {
         is ControlInstruction.CallIndirectS -> {
             loadValueInt(Registers.I2, Resource.RuntimeType(instruction.type.index))
@@ -89,25 +93,42 @@ private fun LowerContext.typedIndirectCall(
         else -> throw Unsupported(instruction::class.simpleName ?: "call")
     }
     emit.moveResultObject(Registers.OBJECT)
-    emit.instanceOf(Registers.I0, Registers.OBJECT, signature)
-    emit.branchZero(Cond.Eq, Registers.I0, bridge)
-    emit.checkCast(Registers.OBJECT, signature)
+    conformingTarget(signature, bridge)
+    invokeTypedTarget(call, signature, done)
+
+    emit.place(bridge)
+    bridgeCall(instruction, call)
+    emit.place(done)
+}
+
+private fun LowerContext.invokeTypedTarget(
+    call: CallSite,
+    signature: String,
+    done: Label,
+) {
+
     emit.moveObject(registers.window, Registers.OBJECT)
     loadWindow(call.type, call.arguments)
     emit.move(registers.window + 2, Registers.DEPTH)
-    val returns = returnDescriptor(call.type)
     emit.invokeInterfaceRange(typedCall(signature, call.type), registers.window)
+
     finishCall(
-        returns = returns,
+        returns = returnDescriptor(call.type),
         call = call,
         restoreBinding = true,
         checksUnwinding = module.analysis.usesExceptions,
         checksPendingTailCall = module.analysis.hasTailCalls,
     )
     emit.gotoLabel(done)
-    emit.place(bridge)
-    bridgeCall(instruction, call)
-    emit.place(done)
+}
+
+private fun LowerContext.conformingTarget(
+    signature: String,
+    bridge: Label,
+) {
+    emit.instanceOf(Registers.I3, Registers.OBJECT, signature)
+    emit.branchZero(Cond.Eq, Registers.I3, bridge)
+    emit.checkCast(Registers.OBJECT, signature)
 }
 
 private fun LowerContext.finishCall(
@@ -117,26 +138,40 @@ private fun LowerContext.finishCall(
     checksUnwinding: Boolean,
     checksPendingTailCall: Boolean,
 ) {
+
     val results = call.type.results.types.size
-    val direct = results == 1 && !restoreBinding && !checksUnwinding && !checksPendingTailCall
-    if (direct && returns == "I" && isInt(call.resultBase) && registers.home(call.resultBase) < 256) {
-        val home = narrowTarget(call.resultBase)
-        emit.moveResult(home)
-        roots.refreshAfterCall(position)
-        return
+    if (results == 1 && !restoreBinding && !checksUnwinding && !checksPendingTailCall) {
+
+        val slot = call.resultBase
+        val kind = when (returns) {
+            "I" -> SlotKindFlow.INT
+            "F" -> SlotKindFlow.FLOAT
+            "D" -> SlotKindFlow.DOUBLE
+            else -> SlotKindFlow.LONG
+        }
+        val home = writeTarget(slot, kind)
+
+        if (home >= 0) {
+            if (returns == "J" || returns == "D") {
+                emit.moveResultWide(home)
+            } else {
+                emit.moveResult(home)
+            }
+            roots.refreshAfterCall(position)
+            if (returns == "J") {
+                finishWide(slot, home, home)
+            }
+            return
+        }
     }
-    if (direct && returns == "J" && isLong(call.resultBase) && registers.home(call.resultBase) < 256) {
-        val home = wideTarget(call.resultBase)
-        emit.moveResultWide(home)
-        roots.refreshAfterCall(position)
-        return finishWide(call.resultBase, home)
-    }
+
     when (returns) {
         "V" -> Unit
         "I", "F" -> emit.moveResult(Registers.I1)
         "J", "D" -> emit.moveResultWide(Registers.W0)
         else -> emit.moveResultObject(Registers.OBJECT)
     }
+
     if (restoreBinding) restoreWindow(binding = true)
     if (checksUnwinding) {
         unwindCheck()
@@ -145,6 +180,7 @@ private fun LowerContext.finishCall(
         completePendingTailCall(returns, results)
     }
     roots.refreshAfterCall(position)
+
     when (results) {
         0 -> Unit
         1 -> when (returns) {
@@ -195,7 +231,7 @@ internal fun LowerContext.loadCallBuffer() {
     val ready = emit.freshLabel()
     emit.moveObject(Registers.OBJECT, registers.callBuffer)
     emit.branchZero(Cond.Ne, Registers.OBJECT, ready)
-    emit.const(Registers.I0, analysis.window.callBufferWords)
+    emit.const(Registers.I0, facts.window.callBufferWords)
     emit.newArray(Registers.OBJECT, Registers.I0, "[J")
     emit.moveObject(registers.callBuffer, Registers.OBJECT)
     emit.place(ready)
@@ -226,15 +262,17 @@ internal fun LowerContext.loadWindow(
     return words
 }
 
-private fun LowerContext.loadArgument(
+internal fun LowerContext.loadArgument(
     register: Int,
     argument: Operand,
     descriptor: String,
 ) {
     when (descriptor) {
         "I", "F" -> when {
-            argument is Operand.Slot && (if (descriptor == "I") isInt(argument.slot) else isFloat(argument.slot)) ->
-                emit.move(register, registers.home(argument.slot))
+            argument is Operand.Slot && descriptor == "I" && readsInt(argument.slot) ->
+                emit.move(register, registers.home(argument.slot, SlotKindFlow.INT))
+            argument is Operand.Slot && descriptor == "F" && readsFloat(argument.slot) ->
+                emit.move(register, registers.home(argument.slot, SlotKindFlow.FLOAT))
             argument is Operand.Immediate && register < 256 -> emit.const(register, argument.bits.toInt())
             else -> {
                 if (descriptor == "I") loadInt(Registers.I0, Registers.W0, argument) else loadFloat(Registers.I0, Registers.W0, argument)
@@ -242,7 +280,7 @@ private fun LowerContext.loadArgument(
             }
         }
         "D" -> when {
-            argument is Operand.Slot && isDouble(argument.slot) -> emit.moveWide(register, registers.home(argument.slot))
+            argument is Operand.Slot && readsDouble(argument.slot) -> emit.moveWide(register, registers.home(argument.slot, SlotKindFlow.DOUBLE))
             argument is Operand.Immediate && register < 256 -> emit.constWide(register, argument.bits)
             else -> {
                 loadDouble(Registers.W0, argument)
@@ -250,7 +288,7 @@ private fun LowerContext.loadArgument(
             }
         }
         else -> when {
-            argument is Operand.Slot && isLong(argument.slot) -> emit.moveWide(register, registers.home(argument.slot))
+            argument is Operand.Slot && readsLong(argument.slot) -> emit.moveWide(register, registers.home(argument.slot, SlotKindFlow.LONG))
             argument is Operand.Immediate && register < 256 -> emit.constWide(register, argument.bits)
             else -> {
                 loadWide(Registers.W0, argument)

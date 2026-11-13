@@ -7,6 +7,7 @@ import io.github.charlietap.chasm.compiler.backend.analysis.form.HelperCall
 internal fun LowerContext.lowerHelperCall(
     call: HelperCall,
 ) {
+
     val window = registers.window + 1
     var word = 0
     for (argument in call.arguments) {
@@ -20,22 +21,22 @@ internal fun LowerContext.lowerHelperCall(
                 loadValueInt(Registers.I0, Resource.RuntimeType(argument.type.index))
                 emit.move(window + word, Registers.I0)
             }
-            is HelperArgument.I32 -> {
-                loadInt(Registers.I0, Registers.W0, argument.operand)
-                emit.move(window + word, Registers.I0)
-            }
-            is HelperArgument.Encoded -> {
-                loadWide(Registers.W0, argument.operand)
-                emit.moveWide(window + word, Registers.W0)
-            }
+            is HelperArgument.I32 -> loadArgument(window + word, argument.operand, "I")
+            is HelperArgument.Encoded -> loadArgument(window + word, argument.operand, "J")
         }
         word += argument.words
     }
     emit.invokeRange(call.method, window, word)
+
     val destination = call.destination
-    val target = if (destination == null) Registers.W0 else wideTarget(destination)
-    if (destination != null) emit.moveResultWide(target)
-    restoreWindow()
-    if (destination != null) finishWide(destination, target)
+    if (destination == null) {
+        restoreWindow()
+    } else {
+        writeWide(destination) { target ->
+            emit.moveResultWide(target)
+            restoreWindow()
+        }
+    }
+
     if (call.growsMemory) refreshMemory()
 }

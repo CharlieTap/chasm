@@ -37,38 +37,27 @@ internal fun LowerContext.lowerDispatcher(
     storeParameters()
     resetFrame(Registers.OBJECT)
     loadObject(Registers.OBJECT, Resource.Longs(table), "[J")
+    val loop = emit.freshLabel()
+    val negative = emit.freshLabel()
+    val missing = emit.freshLabel()
+    val leave = emit.freshLabel()
+    val calls = emit.labels(chunks.size)
     emit.const(Registers.NARROW, 0)
-    emit.place(LOOP)
-    emit.branchZero(Cond.Lt, Registers.NARROW, NEGATIVE)
-    emit.const(Registers.I0, 0)
-    emit.const(Registers.I1, table.size - 1)
-    emit.place(SEARCH)
-    emit.branchCompare(Cond.Gt, Registers.I0, Registers.I1, MISSING)
-    emit.binary(BinaryOp.AddInt, Registers.I2, Registers.I0, Registers.I1)
-    emit.literal(LiteralOp.UshrInt, Registers.I2, Registers.I2, 1)
-    emit.arrayGet(ArrayKind.Wide, Registers.W0, Registers.OBJECT, Registers.I2)
-    emit.const(Registers.I3, 32)
-    emit.binary(BinaryOp.ShrLong, Registers.W1, Registers.W0, Registers.I3)
-    emit.convert(Conversion.LongToInt, Registers.I3, Registers.W1)
-    emit.branchCompare(Cond.Eq, Registers.I3, Registers.NARROW, FOUND)
-    emit.branchCompare(Cond.Lt, Registers.I3, Registers.NARROW, HIGHER)
-    emit.literal(LiteralOp.AddInt, Registers.I1, Registers.I2, -1)
-    emit.gotoLabel(SEARCH)
-    emit.place(HIGHER)
-    emit.literal(LiteralOp.AddInt, Registers.I0, Registers.I2, 1)
-    emit.gotoLabel(SEARCH)
-    emit.place(FOUND)
+    emit.place(loop)
+    emit.branchZero(Cond.Lt, Registers.NARROW, negative)
+    emit.const(Registers.I1, table.size)
+    emit.branchCompare(Cond.Ge, Registers.NARROW, Registers.I1, missing)
+    emit.arrayGet(ArrayKind.Wide, Registers.W0, Registers.OBJECT, Registers.NARROW)
     emit.convert(Conversion.LongToInt, Registers.I0, Registers.W0)
     emit.literal(LiteralOp.UshrInt, Registers.I1, Registers.I0, ENTRY_BITS)
     emit.const(Registers.I2, ENTRY_MASK)
     emit.binary(BinaryOp.AndInt, Registers.I3, Registers.I0, Registers.I2)
-    emit.packedSwitch(Registers.I1, 0, chunks.indices.map { index -> "call$index" })
-    emit.place(MISSING)
-    emit.invoke(UNREACHABLE)
-    returnUnreachable()
+    emit.packedSwitch(Registers.I1, 0, chunks.indices.map { index -> calls[index] })
+    emit.place(missing)
+    trap(UNREACHABLE)
     val window = registers.window
     chunks.forEachIndexed { index, chunk ->
-        emit.place("call$index")
+        emit.place(calls[index])
         emit.moveObject(window, registers.binding)
         emit.moveObject(window + 1, Registers.CONTEXT)
         emit.move(window + 2, Registers.DEPTH)
@@ -76,13 +65,13 @@ internal fun LowerContext.lowerDispatcher(
         emit.move(window + 4, Registers.I3)
         emit.invokeRange(chunk, window, CHUNK_WINDOW_WORDS)
         emit.moveResult(Registers.NARROW)
-        emit.gotoLabel(LOOP)
+        emit.gotoLabel(loop)
     }
-    emit.place(NEGATIVE)
+    emit.place(negative)
     emit.const(Registers.I0, Chunk.RETURN)
-    emit.branchCompare(Cond.Ne, Registers.NARROW, Registers.I0, LEAVE)
+    emit.branchCompare(Cond.Ne, Registers.NARROW, Registers.I0, leave)
     returnFromFrame()
-    emit.place(LEAVE)
+    emit.place(leave)
     closeDispatcherFrame()
     returnAnything()
 }
@@ -150,17 +139,3 @@ private fun LowerContext.closeDispatcherFrame() {
 internal const val ENTRY_BITS = 16
 
 internal const val ENTRY_MASK = 0xFFFF
-
-private const val LOOP = "loop"
-
-private const val SEARCH = "search"
-
-private const val HIGHER = "higher"
-
-private const val FOUND = "found"
-
-private const val MISSING = "missing"
-
-private const val NEGATIVE = "negative"
-
-private const val LEAVE = "leave"

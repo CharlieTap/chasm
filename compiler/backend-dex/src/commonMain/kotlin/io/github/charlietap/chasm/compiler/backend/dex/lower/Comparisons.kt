@@ -3,10 +3,12 @@ package io.github.charlietap.chasm.compiler.backend.dex.lower
 import io.github.charlietap.chasm.compiler.backend.analysis.form.Comparison
 import io.github.charlietap.chasm.compiler.backend.analysis.form.Operand
 import io.github.charlietap.chasm.compiler.backend.analysis.form.Ordering
+import io.github.charlietap.chasm.compiler.backend.dex.analysis.SlotKindFlow
 import io.github.charlietap.chasm.type.NumberType
 import io.github.charlietap.dexter.BinaryOp
 import io.github.charlietap.dexter.CompareOp
 import io.github.charlietap.dexter.Cond
+import io.github.charlietap.dexter.Label
 
 internal fun cond(
     ordering: Ordering,
@@ -21,7 +23,7 @@ internal fun cond(
 
 internal inline fun LowerContext.booleanResult(
     destination: Int,
-    branch: (String) -> Unit,
+    branch: (Label) -> Unit,
 ) {
     val taken = emit.freshLabel()
     val end = emit.freshLabel()
@@ -39,7 +41,7 @@ internal fun LowerContext.branchCompare(
     comparison: Comparison,
     left: Operand,
     right: Operand,
-    target: String,
+    target: Label,
     negated: Boolean = false,
 ) {
     val condition = cond(comparison.ordering).let { if (negated) opposite(it) else it }
@@ -78,7 +80,7 @@ private fun LowerContext.branchI32(
     unsigned: Boolean,
     left: Operand,
     right: Operand,
-    target: String,
+    target: Label,
 ) {
     val zeroRight = right is Operand.Immediate && right.bits.toInt() == 0
     val zeroLeft = left is Operand.Immediate && left.bits.toInt() == 0
@@ -121,9 +123,13 @@ internal fun LowerContext.flipSignLongs() {
 internal fun LowerContext.branchOnSlot(
     slot: Int,
     cond: Cond,
-    target: String,
+    target: Label,
 ) {
-    if (isInt(slot) && registers.home(slot) < 256) return emit.branchZero(cond, registers.home(slot), target)
+    val kind = kinds.readKind(slot, SlotKindFlow.INT)
+    if (!SlotKindFlow.wide(kind)) {
+        emit.branchZero(cond, narrowSource(Operand.Slot(slot), Registers.I0), target)
+        return
+    }
     val value = wideSource(Operand.Slot(slot), Registers.W0)
     emit.constWide(Registers.W1, 0L)
     emit.compare(CompareOp.CmpLong, Registers.I0, value, Registers.W1)

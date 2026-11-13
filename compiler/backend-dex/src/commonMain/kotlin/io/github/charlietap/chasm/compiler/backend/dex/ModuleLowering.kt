@@ -5,6 +5,7 @@ import io.github.charlietap.chasm.cir.CirFunction
 import io.github.charlietap.chasm.cir.CirModule
 import io.github.charlietap.chasm.cir.FunctionIndex
 import io.github.charlietap.chasm.cir.MemoryIndex
+import io.github.charlietap.chasm.compiler.backend.abi.MethodRef
 import io.github.charlietap.chasm.compiler.backend.abi.signatureKey
 import io.github.charlietap.chasm.compiler.backend.analysis.ModuleAnalysis
 import io.github.charlietap.chasm.compiler.backend.analysis.ModuleIndexSpaces
@@ -12,12 +13,14 @@ import io.github.charlietap.chasm.compiler.backend.analysis.analyzeModule
 import io.github.charlietap.chasm.compiler.backend.analysis.functionBatches
 import io.github.charlietap.chasm.compiler.backend.dex.abi.BATCH_FUNCTIONS
 import io.github.charlietap.chasm.compiler.backend.dex.abi.BATCH_INSTRUCTIONS
-import io.github.charlietap.chasm.compiler.backend.dex.abi.DexMethods
+import io.github.charlietap.chasm.compiler.backend.dex.abi.DexReferences
 import io.github.charlietap.chasm.compiler.backend.dex.abi.SOURCE_FILE
 import io.github.charlietap.chasm.compiler.backend.dex.abi.codeClass
+import io.github.charlietap.chasm.compiler.backend.dex.abi.functionMethod
 import io.github.charlietap.chasm.compiler.backend.dex.abi.method
 import io.github.charlietap.chasm.compiler.backend.dex.abi.signatureClass
 import io.github.charlietap.chasm.compiler.backend.dex.abi.typedCall
+import io.github.charlietap.chasm.compiler.backend.dex.analysis.CostFamilies
 import io.github.charlietap.chasm.compiler.backend.dex.binding.BindingLayout
 import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.dexter.ClassBuilder
@@ -33,7 +36,7 @@ internal class ModuleLowering(
     val declarations = ModuleIndexSpaces(module)
     val analysis: ModuleAnalysis = analyzeModule(module, code, declarations)
     val layout = BindingLayout()
-    val methods = DexMethods()
+    val references = DexReferences()
     val chunkStarts = HashMap<Int, IntArray>()
     val packagePath = options.packageName.replace('.', '/')
 
@@ -42,6 +45,10 @@ internal class ModuleLowering(
     private val signatures: Map<String, String> = analysis.signatureTypes.keys.withIndex().associate { (index, key) ->
         key to signatureClass(packagePath, index)
     }
+
+    val costFamilies = CostFamilies()
+
+    private val functionMethods = arrayOfNulls<MethodRef>(declarations.functionCount)
 
     val batches: List<List<CirFunction>> = functionBatches(code.functions, BATCH_INSTRUCTIONS, BATCH_FUNCTIONS)
 
@@ -56,6 +63,14 @@ internal class ModuleLowering(
     fun codeClass(
         index: FunctionIndex,
     ): String = codeClass(packagePath, batchOf.getValue(index.index))
+
+    fun functionMethod(
+        index: FunctionIndex,
+        type: FunctionType,
+    ): MethodRef {
+        return functionMethods[index.index]
+            ?: functionMethod(codeClass(index), index.index, type).also { method -> functionMethods[index.index] = method }
+    }
 
     fun codeClassBuilder(
         file: DexFile,
