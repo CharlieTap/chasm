@@ -3,6 +3,9 @@
 package io.github.charlietap.chasm.jit
 
 import io.github.charlietap.chasm.ExperimentalChasmApi
+import io.github.charlietap.chasm.config.GCStrategy
+import io.github.charlietap.chasm.config.GCThreshold
+import io.github.charlietap.chasm.config.StoreConfig
 import io.github.charlietap.chasm.embedding.invoke
 import io.github.charlietap.chasm.embedding.shapes.expect
 import io.github.charlietap.chasm.embedding.store
@@ -33,6 +36,18 @@ class InstanceTest {
         val results = instances.mapIndexed { index, instance -> invoke(store, instance, "loops", listOf(I32(index + 3))).expect("loops") }
 
         assertEquals(listOf(listOf<ExecutionValue>(I32(expected(3))), listOf<ExecutionValue>(I32(expected(4)))), results)
+    }
+
+    @Test
+    fun referencesSwappedAcrossSelfTailCallsSurviveCollections() {
+
+        val store = store(StoreConfig(gcStrategy = GCStrategy.TRADITIONAL, gcThreshold = GCThreshold.KB(64)))
+        val module = module(fixture("restart")).expect("module")
+        val instance = instance(store, module, emptyList()).expect("instance")
+
+        val result = invoke(store, instance, "swap", listOf(I32(3))).expect("swap")
+
+        assertEquals(listOf<ExecutionValue>(I32(21)), result)
     }
 
     private fun expected(

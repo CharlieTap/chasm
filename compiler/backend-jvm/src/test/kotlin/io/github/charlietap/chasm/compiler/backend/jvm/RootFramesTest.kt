@@ -7,10 +7,12 @@ import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.module.Export
 import io.github.charlietap.chasm.cir.CirModule
 import io.github.charlietap.chasm.compiler.backend.abi.BRIDGE_CALL
+import io.github.charlietap.chasm.compiler.backend.abi.CLEAR_ROOTS
 import io.github.charlietap.chasm.compiler.backend.abi.CLOSE_FRAME
 import io.github.charlietap.chasm.compiler.backend.abi.FRAME
 import io.github.charlietap.chasm.compiler.backend.abi.MethodRef
 import io.github.charlietap.chasm.compiler.backend.abi.OPEN_ROOTS
+import io.github.charlietap.chasm.compiler.backend.abi.TAKE_EXCEPTION
 import io.github.charlietap.chasm.compiler.frontend.ModuleCompiler
 import io.github.charlietap.chasm.module.ModuleDeclarationsFactory
 import io.github.charlietap.chasm.runtime.compiled.CHUNK_METHOD_SEPARATOR
@@ -20,6 +22,7 @@ import org.objectweb.asm.Type
 import org.objectweb.asm.tree.AbstractInsnNode
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.FrameNode
+import org.objectweb.asm.tree.IntInsnNode
 import org.objectweb.asm.tree.MethodInsnNode
 import org.objectweb.asm.tree.MethodNode
 import org.objectweb.asm.tree.VarInsnNode
@@ -27,6 +30,7 @@ import org.objectweb.asm.tree.analysis.Analyzer
 import org.objectweb.asm.tree.analysis.SourceInterpreter
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class RootFramesTest {
@@ -69,6 +73,47 @@ class RootFramesTest {
     }
 
     @Test
+    fun `a self tail call clears the root frame then republishes its reference parameters`() {
+
+        val method = checkNotNull(methods["restarts"])
+        val clear = method.instructions.indexOfFirst { instruction -> instruction.invokes(CLEAR_ROOTS) }
+        val sites = publicationSites(method)
+
+        assertTrue(clear >= 0)
+        assertEquals(1, sites.count { site -> site > clear })
+    }
+
+    @Test
+    fun `a catch clears the roots of operands above the handler`() {
+
+        val method = checkNotNull(methods["catches"])
+        val calls = method.instructions.filter { instruction -> instruction is MethodInsnNode }
+        val clear = calls.indexOfFirst { call -> call.invokes(CLEAR_ROOTS) }
+        val take = calls.indexOfFirst { call -> call.invokes(TAKE_EXCEPTION) }
+
+        assertTrue(clear in 0 until take)
+        assertEquals(CLEARED_FIRST to CLEARED_COUNT, clearedRoots(method, method.instructions.indexOf(calls[clear])))
+    }
+
+    @Test
+    fun `a chunked catch does not clear a payload slot at or above its stack height`() {
+
+        val code = compile()
+        val catches = code.functions.single { function -> function.exceptions?.regions.orEmpty().isNotEmpty() }
+        val exceptions = checkNotNull(catches.exceptions)
+        val region = exceptions.regions.single()
+        val handler = region.catches.single().copy(tag = null, payloadSlots = intArrayOf(BOX_SLOT), exceptionReference = true, stackSlots = BOX_SLOT)
+        val overlapping = catches.copy(exceptions = exceptions.copy(regions = listOf(region.copy(catches = listOf(handler)))))
+
+        val chunks = lowerExports(JvmOptions(splitInstructions = 2), code.copy(functions = code.functions.map { function -> if (function === catches) overlapping else function }))
+        val matchers = checkNotNull(chunks["catches"]).filter { method -> method.instructions.any { instruction -> instruction.invokes(TAKE_EXCEPTION) } }
+        val stores = matchers.map { method -> matcherStores(method) }
+
+        assertTrue(stores.isNotEmpty())
+        stores.forEach { (cleared, payload) -> assertFalse(payload in cleared) }
+    }
+
+    @Test
     fun `a chunk publishes a reference written before a call and not one written after the last call`() {
 
         val chunks = lowerExports(JvmOptions(splitInstructions = 2)).mapValues { (_, methods) ->
@@ -82,6 +127,20 @@ class RootFramesTest {
         assertTrue(after.isNotEmpty())
         assertTrue(publications(around) > 0)
         assertEquals(0, publications(after))
+    }
+
+    private fun matcherStores(method: MethodNode): Pair<List<Int>, Int> {
+
+        val instructions = method.instructions.toList()
+        val clear = instructions.indexOfFirst { instruction -> instruction.invokes(CLEAR_ROOTS) }
+        val take = instructions.indexOfFirst { instruction -> instruction.invokes(TAKE_EXCEPTION) }
+        val cleared = (clear until take).filter { index -> instructions[index].opcode == Opcodes.LCONST_0 }.map { index -> (instructions[index + 1] as VarInsnNode).`var` }
+        val payload = instructions[take + 1] as VarInsnNode
+
+        assertTrue(clear in 0 until take)
+        assertEquals(Opcodes.LSTORE, payload.opcode)
+
+        return cleared to payload.`var`
     }
 
     private fun publications(methods: List<MethodNode>): Int {
@@ -115,6 +174,27 @@ class RootFramesTest {
         }
 
         return instructions.indices.filter { index -> instructions[index].opcode == Opcodes.LASTORE && loadsRoots(index, 3) }
+    }
+
+    private fun clearedRoots(
+        method: MethodNode,
+        clear: Int,
+    ): Pair<Int, Int> {
+
+        val frame = checkNotNull(Analyzer(SourceInterpreter()).analyze(OWNER, method)[clear])
+        val start = frame.getStack(frame.stackSize - 2).insns.single()
+        val count = frame.getStack(frame.stackSize - 1).insns.single()
+
+        assertEquals(Opcodes.IADD, start.opcode)
+
+        return constant(start.previous) to constant(count)
+    }
+
+    private fun constant(instruction: AbstractInsnNode): Int {
+        return when (instruction) {
+            is IntInsnNode -> instruction.operand
+            else -> instruction.opcode - Opcodes.ICONST_0
+        }
     }
 
     private fun publicationsAroundCall(name: String): Pair<Int, Int> {
@@ -166,5 +246,8 @@ class RootFramesTest {
 
     private companion object {
         const val OWNER = "RootFrames"
+        const val CLEARED_FIRST = 2
+        const val CLEARED_COUNT = 1
+        const val BOX_SLOT = 0
     }
 }

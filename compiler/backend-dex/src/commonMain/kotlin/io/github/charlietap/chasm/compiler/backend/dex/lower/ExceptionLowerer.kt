@@ -146,6 +146,9 @@ private fun LowerContext.lowerMatcher(
         }
         val slots = handler.payloadSlots
         val fields = if (tag == null) 0 else slots.size - if (handler.exceptionReference) 1 else 0
+        if (references.writesThrough) {
+            clearDiscardedRoots(handler.stackSlots, slots)
+        }
         emit.const(Registers.I1, maxOf(fields, 1))
         emit.newArray(Registers.OBJECT, Registers.I1, "[J")
         emit.const(Registers.I1, fields)
@@ -157,16 +160,55 @@ private fun LowerContext.lowerMatcher(
             store(slots[field], Registers.W0)
         }
         if (handler.exceptionReference) store(slots.last(), Registers.W1)
-        val discarded = references.slots.filter { it >= handler.stackSlots && it !in slots }
-        if (discarded.isNotEmpty()) {
-            emit.constWide(Registers.W0, 0L)
-            discarded.forEach { store(it, Registers.W0) }
-        }
         emit.gotoLabel(label(handler.target))
         emit.place(next)
     }
     val parent = current.parent
     emit.gotoLabel(if (parent == null) propagation() else matcher(parent))
+}
+
+private fun LowerContext.clearDiscardedRoots(
+    stackSlots: Int,
+    payload: IntArray,
+) {
+
+    if (chunk == null) {
+        val slots = references.slots
+        val found = slots.binarySearch(stackSlots)
+        val first = if (found >= 0) found else -found - 1
+        if (first < slots.size) {
+            roots.clear(first, slots.size - first)
+        }
+        return
+    }
+
+    if (stackSlots >= frameSlots) {
+        return
+    }
+    roots.clear(stackSlots, frameSlots - stackSlots)
+    if (registers.records) {
+        return
+    }
+
+    val inPayload = if (payload.any { slot -> slot >= stackSlots }) {
+        BooleanArray(frameSlots).also { members -> payload.forEach { slot -> members[slot] = true } }
+    } else {
+        null
+    }
+
+    var zeroed = false
+    for (slot in references.slots) {
+
+        if (slot < stackSlots || inPayload?.get(slot) == true || !registers.holds(slot)) {
+            continue
+        }
+        if (!zeroed) {
+            emit.constWide(Registers.W0, 0L)
+            zeroed = true
+        }
+
+        emit.moveWide(registers.home(slot), Registers.W0)
+    }
 }
 
 private fun LowerContext.lowerPropagation() {

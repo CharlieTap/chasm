@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.compiler.backend.jvm.lower
 
+import io.github.charlietap.chasm.compiler.backend.abi.CLEAR_ROOTS
 import io.github.charlietap.chasm.compiler.backend.abi.CLOSE_FRAME
 import io.github.charlietap.chasm.compiler.backend.abi.FRAME
 import io.github.charlietap.chasm.compiler.backend.abi.OPEN_ROOTS
@@ -15,11 +16,13 @@ internal class RootFrame(
 ) {
     private var position = RootPublication.COLD_CODE
 
+    private var suppressed = false
+
     var isArrayCurrent = false
         private set
 
     fun publishes(slot: Int): Boolean {
-        return references.publishes(position, slot)
+        return !suppressed && references.publishes(position, slot)
     }
 
     fun enterPrologue() {
@@ -34,6 +37,18 @@ internal class RootFrame(
     fun enterColdCode() {
         position = RootPublication.COLD_CODE
         isArrayCurrent = false
+    }
+
+    inline fun withoutPublication(lower: () -> Unit) {
+
+        val previous = suppressed
+        suppressed = true
+
+        try {
+            lower()
+        } finally {
+            suppressed = previous
+        }
     }
 
     fun open() {
@@ -96,6 +111,20 @@ internal class RootFrame(
         emit.insn(Opcodes.IADD)
         emit.load(Opcodes.LLOAD, locals.slot(slot))
         emit.insn(Opcodes.LASTORE)
+    }
+
+    fun clear(
+        start: Int,
+        size: Int,
+    ) {
+        pushContext()
+        emit.load(Opcodes.ILOAD, locals.rootBase)
+        if (start != 0) {
+            emit.int(start)
+            emit.insn(Opcodes.IADD)
+        }
+        emit.int(size)
+        emit.invokeStatic(CLEAR_ROOTS)
     }
 
     fun close() {

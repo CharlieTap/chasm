@@ -117,6 +117,6 @@ internal fun assertGolden(
 
 private val GOLDEN_DIRECTORY = File(System.getProperty("user.dir"), "src/jvmTest/golden")
 
-private const val MIN_API = 26
+internal const val MIN_API = 26
 
 private object DexFixtures

@@ -132,6 +132,9 @@ private fun LowerContext.emitMatcher(
         }
         val slots = handler.payloadSlots
         val fields = if (tag == null) 0 else slots.size - if (handler.exceptionReference) 1 else 0
+        if (references.writesThrough) {
+            clearDiscardedRoots(handler.stackSlots, slots)
+        }
         emit.int(maxOf(fields, 1))
         emit.newLongArray()
         emit.store(Opcodes.ASTORE, locals.scratchValues)
@@ -151,6 +154,46 @@ private fun LowerContext.emitMatcher(
     }
     val parent = current.parent
     emit.jump(Opcodes.GOTO, if (parent == null) propagation() else matcher(parent))
+}
+
+private fun LowerContext.clearDiscardedRoots(
+    stackSlots: Int,
+    payload: IntArray,
+) {
+
+    if (chunk == null) {
+        val slots = references.slots
+        val found = slots.binarySearch(stackSlots)
+        val first = if (found >= 0) found else -found - 1
+        if (first < slots.size) {
+            roots.clear(first, slots.size - first)
+        }
+        return
+    }
+
+    if (stackSlots >= frame.frameSlots) {
+        return
+    }
+    roots.clear(stackSlots, frame.frameSlots - stackSlots)
+    if (locals.isRecording) {
+        return
+    }
+
+    val inPayload = if (payload.any { slot -> slot >= stackSlots }) {
+        BooleanArray(frame.frameSlots).also { members -> payload.forEach { slot -> members[slot] = true } }
+    } else {
+        null
+    }
+
+    locals.heldSlots.forEach { slot ->
+
+        if (slot < stackSlots || !references.isReference[slot] || inPayload?.get(slot) == true) {
+            return@forEach
+        }
+
+        emit.long(0L)
+        emit.store(Opcodes.LSTORE, locals.slot(slot))
+    }
 }
 
 private fun LowerContext.emitPropagation(

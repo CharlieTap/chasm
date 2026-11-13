@@ -3,11 +3,14 @@
   (type $bytes (array (mut i8)))
   (type $nothing (func))
   (import "env" "collect" (func $collect))
+  (import "env" "live" (func $live (result i64)))
   (table $collectors 1 funcref)
   (elem (table $collectors) (i32.const 0) func $collects_through_host)
   (elem declare func $collects_through_host)
   (tag $escape)
   (tag $other)
+  (tag $boxed (param (ref $box)))
+  (global $one (mut i32) (i32.const 1))
 
   (func $make (param $value i32) (result (ref $box))
     (struct.new $box (local.get $value)))
@@ -144,4 +147,70 @@
       (else (return_call $count_down (i32.sub (local.get $count) (i32.const 1)) (call $make (local.get $count))))))
 
   (func (export "survives_collection_after_a_self_tail_call") (result i32)
-    (return_call $count_down (i32.const 3) (call $make (i32.const 4)))))
+    (return_call $count_down (i32.const 3) (call $make (i32.const 4))))
+
+  (func $keep_down (param $count i32) (param $box (ref $box)) (result i32)
+    (call $collect)
+    (drop (call $make (i32.const 99)))
+    (if (result i32) (i32.eqz (local.get $count))
+      (then (struct.get $box 0 (local.get $box)))
+      (else (return_call $keep_down (i32.sub (local.get $count) (i32.const 1)) (local.get $box)))))
+
+  (func (export "survives_collection_after_an_unchanged_self_tail_call") (result i32)
+    (return_call $keep_down (i32.const 3) (call $make (i32.const 42))))
+
+  (func $swap_down (param $count i32) (param $first (ref $box)) (param $second (ref $box)) (result i32)
+    (call $collect)
+    (drop (call $make (i32.const 99)))
+    (if (result i32) (i32.eqz (local.get $count))
+      (then (i32.add (i32.mul (struct.get $box 0 (local.get $first)) (i32.const 10)) (struct.get $box 0 (local.get $second))))
+      (else (return_call $swap_down (i32.sub (local.get $count) (i32.const 1)) (local.get $second) (local.get $first)))))
+
+  (func (export "survives_collection_after_a_swapping_self_tail_call") (result i32)
+    (return_call $swap_down (i32.const 3) (call $make (i32.const 1)) (call $make (i32.const 2))))
+
+  (func (export "survives_collection_after_catching_a_reference") (result i32)
+    (local $box (ref null $box))
+    (local.set $box
+      (block $caught (result (ref $box))
+        (try_table (catch $boxed $caught)
+          (drop (call $make (i32.const 7)))
+          (throw $boxed (call $make (i32.const 42))))
+        (unreachable)))
+    (call $collect)
+    (drop (call $make (i32.const 99)))
+    (struct.get $box 0 (ref.as_non_null (local.get $box))))
+
+  (func (export "survives_collection_after_an_in_place_select") (result i32)
+    (struct.new $box (i32.const 42))
+    (ref.null $box)
+    (global.get $one)
+    (select (result (ref null $box)))
+    (call $host_collects)
+    (struct.get $box 0))
+
+  (func $drop_on_restart (param $first i32) (result i64)
+    (local $held (ref null $bytes))
+    (if (local.get $first)
+      (then
+        (local.set $held (array.new_default $bytes (i32.const 1048576)))
+        (return_call $drop_on_restart (i32.const 0))))
+    (call $live))
+
+  (func (export "releases_locals_on_a_self_tail_call") (result i64)
+    (call $drop_on_restart (i32.const 1)))
+
+  (func (export "releases_operands_a_catch_discards") (result i64)
+    (block $caught
+      (try_table (catch $escape $caught)
+        (array.new_default $bytes (i32.const 1048576))
+        (throw $escape))
+      (unreachable))
+    (call $live))
+
+  (func (export "holds_an_array_across_live") (result i64)
+    (local $held (ref null $bytes))
+    (local.set $held (array.new_default $bytes (i32.const 1048576)))
+    (call $live)
+    (drop (array.len (local.get $held))))
+)

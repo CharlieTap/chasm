@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.compiler.backend.dex.lower
 
+import io.github.charlietap.chasm.compiler.backend.abi.CLEAR_ROOTS
 import io.github.charlietap.chasm.compiler.backend.abi.CLOSE_FRAME
 import io.github.charlietap.chasm.compiler.backend.abi.FRAME
 import io.github.charlietap.chasm.compiler.backend.abi.OPEN_ROOTS
@@ -18,11 +19,13 @@ internal class RootFrame(
 ) {
     private var position = RootPublication.COLD_CODE
 
+    private var suppressed = false
+
     var isArrayCurrent = false
         private set
 
     fun publishes(slot: Int): Boolean {
-        return references.publishes(position, slot)
+        return !suppressed && references.publishes(position, slot)
     }
 
     fun enterPrologue() {
@@ -37,6 +40,18 @@ internal class RootFrame(
     fun enterColdCode() {
         position = RootPublication.COLD_CODE
         isArrayCurrent = false
+    }
+
+    inline fun withoutPublication(lower: () -> Unit) {
+
+        val previous = suppressed
+        suppressed = true
+
+        try {
+            lower()
+        } finally {
+            suppressed = previous
+        }
     }
 
     fun open() {
@@ -97,6 +112,24 @@ internal class RootFrame(
             emit.binary(BinaryOp.AddInt, registers.activationIndex, registers.activationIndex, registers.activationFp)
         }
         emit.arrayPut(ArrayKind.Wide, pair, registers.activationArray, registers.activationIndex)
+    }
+
+    fun clear(
+        start: Int,
+        size: Int,
+    ) {
+
+        when {
+            start == 0 -> emit.move(Registers.I0, registers.activationFp)
+            start <= Byte.MAX_VALUE -> emit.literal(LiteralOp.AddInt, Registers.I0, registers.activationFp, start)
+            else -> {
+                emit.const(Registers.I0, start)
+                emit.binary(BinaryOp.AddInt, Registers.I0, Registers.I0, registers.activationFp)
+            }
+        }
+
+        emit.const(Registers.I1, size)
+        emit.invoke(CLEAR_ROOTS, Registers.CONTEXT, Registers.I0, Registers.I1)
     }
 
     fun close() {

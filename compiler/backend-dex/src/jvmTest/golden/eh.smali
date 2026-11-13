@@ -920,7 +920,13 @@
 
     long-to-int v9, v4
 
-    if-ne v8, v9, :cond_177
+    if-ne v8, v9, :cond_175
+
+    add-int/lit8 v8, v18, 0x2
+
+    const/4 v9, 0x1
+
+    invoke-static {v14, v8, v9}, Lio/github/charlietap/chasm/runtime/compiled/CompiledCalls;->clearRoots(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;II)V
 
     const/4 v9, 0x1
 
@@ -942,20 +948,12 @@
 
     aput-wide v0, v17, v19
 
-    const-wide/16 v0, 0x0
-
-    move-wide/from16 v28, v0
-
-    add-int/lit8 v19, v18, 0x2
-
-    aput-wide v0, v17, v19
-
     goto/16 :goto_e0
 
-    :cond_177
-    goto/16 :goto_179
+    :cond_175
+    goto/16 :goto_177
 
-    :goto_179
+    :goto_177
     const/4 v8, 0x1
 
     iput-boolean v8, v14, Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;->compiledUnwinding:Z

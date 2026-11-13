@@ -2,7 +2,6 @@ package io.github.charlietap.chasm.compiler.backend.dex.lower
 
 import io.github.charlietap.chasm.cir.ControlInstruction
 import io.github.charlietap.chasm.compiler.backend.abi.ARRAYCOPY
-import io.github.charlietap.chasm.compiler.backend.abi.CLEAR_ROOTS
 import io.github.charlietap.chasm.compiler.backend.abi.FRAME
 import io.github.charlietap.chasm.compiler.backend.abi.FUNCTION_INSTANCE
 import io.github.charlietap.chasm.compiler.backend.abi.MODULE_INSTANCE
@@ -11,6 +10,7 @@ import io.github.charlietap.chasm.compiler.backend.abi.TABLE_INSTANCE
 import io.github.charlietap.chasm.compiler.backend.abi.TAIL_CALL
 import io.github.charlietap.chasm.compiler.backend.abi.TAIL_CALL_INDIRECT
 import io.github.charlietap.chasm.compiler.backend.abi.TAIL_CALL_REF
+import io.github.charlietap.chasm.compiler.backend.analysis.RootPublication
 import io.github.charlietap.chasm.compiler.backend.analysis.form.Operand
 import io.github.charlietap.chasm.compiler.backend.analysis.form.tailCallArguments
 import io.github.charlietap.chasm.compiler.backend.analysis.isSelfTailCall
@@ -52,20 +52,24 @@ internal fun LowerContext.lowerTailCall(
 private fun LowerContext.restart(
     arguments: List<Operand>,
 ) {
+
     if (chunk != null) return chunkRestart(arguments)
-    if (references.writesThrough) {
-        emit.move(Registers.I0, registers.activationFp)
-        emit.const(Registers.I1, references.slots.size)
-        emit.invoke(CLEAR_ROOTS, Registers.CONTEXT, Registers.I0, Registers.I1)
+
+    val republishes = references.publishesAfter(position)
+    if (republishes) {
+        roots.clear(0, references.slots.size)
     }
-    parallelCopy(arguments, arguments.indices.toList())
-    if (references.writesThrough) {
+    roots.withoutPublication { parallelCopy(arguments, arguments.indices.toList()) }
+    if (republishes) {
         for (slot in 0 until parameterCount) {
-            if (!references.isReference[slot]) continue
+            if (!references.publishes(RootPublication.ENTRY, slot)) {
+                continue
+            }
             loadWide(Registers.W0, slot)
             roots.publish(slot, Registers.W0)
         }
     }
+
     initializeLocals()
     emit.gotoLabel(label(0))
 }

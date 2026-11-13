@@ -7,6 +7,7 @@ import io.github.charlietap.chasm.compiler.backend.abi.Resource
 import io.github.charlietap.chasm.compiler.backend.abi.TAIL_CALL
 import io.github.charlietap.chasm.compiler.backend.abi.TAIL_CALL_INDIRECT
 import io.github.charlietap.chasm.compiler.backend.abi.TAIL_CALL_REF
+import io.github.charlietap.chasm.compiler.backend.analysis.RootPublication
 import io.github.charlietap.chasm.compiler.backend.analysis.form.Operand
 import io.github.charlietap.chasm.compiler.backend.analysis.form.tailCallArguments
 import io.github.charlietap.chasm.compiler.backend.analysis.isSelfTailCall
@@ -48,12 +49,25 @@ internal fun LowerContext.lowerTailCall(
 private fun LowerContext.selfTailCall(
     arguments: List<Operand>,
 ) {
+
     val chunk = chunk
     if (chunk != null) {
         chunkSelfTailCall(chunk, arguments)
         return
     }
-    transfer(arguments, 0)
+
+    if (references.publishesAfter(position)) {
+        roots.clear(0, references.slots.size)
+        roots.withoutPublication { transfer(arguments, 0) }
+        for (slot in 0 until parameterCount) {
+            if (references.publishes(RootPublication.ENTRY, slot)) {
+                roots.publish(slot)
+            }
+        }
+    } else {
+        transfer(arguments, 0)
+    }
+
     for (slot in parameterCount until frame.frameSlots) initialize(slot, frame.initialValues[slot])
     emit.jump(Opcodes.GOTO, label(0))
 }
@@ -62,6 +76,7 @@ private fun LowerContext.chunkSelfTailCall(
     chunk: Chunk,
     arguments: List<Operand>,
 ) {
+
     if (!roots.isArrayCurrent) {
         roots.loadArray()
     }
@@ -74,9 +89,11 @@ private fun LowerContext.chunkSelfTailCall(
         pushLong(argument)
         emit.insn(Opcodes.LASTORE)
     }
+
     if (chunk.resetsSlots) {
         resetSlots(locals.rootsArray)
     }
+
     emit.int(0)
     emit.insn(Opcodes.IRETURN)
 }
