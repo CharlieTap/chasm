@@ -49,11 +49,10 @@ internal fun lowerMemoryInstruction(
 
 internal fun LowerContext.refreshMemory() {
     if (!analysis.usesInlineMemory) return
-    val memory = checkNotNull(module.inlineMemory)
-    loadMemory(Registers.OBJECT, memory)
-    emit.getField(Registers.I0, Registers.OBJECT, MEMORY_INSTANCE, MEMORY_BYTE_ARRAY_FIELD, "[B")
+    loadMemory(MEMORY_INSTANCE_REGISTER, checkNotNull(module.inlineMemory))
+    emit.getField(Registers.I0, MEMORY_INSTANCE_REGISTER, MEMORY_INSTANCE, MEMORY_BYTE_ARRAY_FIELD, "[B")
     emit.moveObject(registers.memoryBytes, Registers.I0)
-    emit.invokeVirtual(MEMORY_SIZE, Registers.OBJECT)
+    emit.invokeVirtual(MEMORY_SIZE, MEMORY_INSTANCE_REGISTER)
     emit.moveResult(registers.memorySize)
 }
 
@@ -234,6 +233,8 @@ private fun LowerContext.outOfBounds(access: MemoryAccess): Label {
 
     return label
 }
+
+internal const val MEMORY_INSTANCE_REGISTER = Registers.OBJECT
 
 private const val ACCESS_READ = 0
 

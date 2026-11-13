@@ -168,12 +168,6 @@
 
     move-result v17
 
-    const/4 v9, 0x1
-
-    aget-object v12, v16, v9
-
-    check-cast v12, Lio/github/charlietap/chasm/runtime/instance/MemoryInstance;
-
     move-object/from16 v25, v12
 
     move/from16 v19, p3
@@ -203,7 +197,7 @@
     const/16 v22, 0x2
 
     .line 5
-    :goto_30
+    :goto_2b
     mul-int v23, v22, v22
 
     .line 6
@@ -213,16 +207,16 @@
 
     add-int v9, v19, v10
 
-    if-ge v8, v9, :cond_67
+    if-ge v8, v9, :cond_62
 
     .line 7
     move/from16 v8, v22
 
-    if-ltz v8, :cond_89
+    if-ltz v8, :cond_84
 
     add-int/lit8 v11, v17, -0x1
 
-    if-gt v8, v11, :cond_89
+    if-gt v8, v11, :cond_84
 
     aget-byte v9, v18, v8
 
@@ -231,29 +225,29 @@
     move/from16 v23, v9
 
     .line 8
-    if-eqz v23, :cond_64
+    if-eqz v23, :cond_5f
 
     .line 9
     mul-int v20, v22, v22
 
     .line 11
-    :goto_4c
+    :goto_47
     const/high16 v10, -0x80000000
 
     add-int v8, v20, v10
 
     add-int v9, v19, v10
 
-    if-ge v8, v9, :cond_62
+    if-ge v8, v9, :cond_5d
 
     .line 12
     move/from16 v8, v20
 
-    if-ltz v8, :cond_9e
+    if-ltz v8, :cond_99
 
     add-int/lit8 v11, v17, -0x1
 
-    if-gt v8, v11, :cond_9e
+    if-gt v8, v11, :cond_99
 
     const/4 v9, 0x0
 
@@ -263,42 +257,42 @@
     add-int v20, v20, v22
 
     .line 14
-    goto :goto_4c
+    goto :goto_47
 
     .line 15
-    :cond_62
-    goto/16 :goto_64
+    :cond_5d
+    goto/16 :goto_5f
 
     .line 16
-    :cond_64
-    :goto_64
+    :cond_5f
+    :goto_5f
     add-int/lit8 v22, v22, 0x1
 
     .line 17
-    goto :goto_30
+    goto :goto_2b
 
     .line 18
-    :cond_67
+    :cond_62
     const/16 v22, 0x2
 
     .line 20
-    :goto_69
+    :goto_64
     const/high16 v10, -0x80000000
 
     add-int v8, v22, v10
 
     add-int v9, v19, v10
 
-    if-ge v8, v9, :cond_84
+    if-ge v8, v9, :cond_7f
 
     .line 21
     move/from16 v8, v22
 
-    if-ltz v8, :cond_b3
+    if-ltz v8, :cond_ae
 
     add-int/lit8 v11, v17, -0x1
 
-    if-gt v8, v11, :cond_b3
+    if-gt v8, v11, :cond_ae
 
     aget-byte v9, v18, v8
 
@@ -313,10 +307,10 @@
     add-int/lit8 v22, v22, 0x1
 
     .line 24
-    goto :goto_69
+    goto :goto_64
 
     .line 25
-    :cond_84
+    :cond_7f
     move/from16 v8, v21
 
     return v8
@@ -326,7 +320,7 @@
     return v8
 
     .line 7
-    :cond_89
+    :cond_84
     move-object/from16 v12, v25
 
     const/4 v10, 0x0
@@ -352,7 +346,7 @@
     return v8
 
     .line 12
-    :cond_9e
+    :cond_99
     move-object/from16 v12, v25
 
     const/4 v10, 0x1
@@ -378,7 +372,7 @@
     return v8
 
     .line 21
-    :cond_b3
+    :cond_ae
     move-object/from16 v12, v25
 
     const/4 v10, 0x0
@@ -405,7 +399,7 @@
 .end method
 
 .method public static f3([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;II)D
-    .registers 45
+    .registers 44
 
     move-object/from16 v14, p1
 
@@ -426,14 +420,6 @@
     invoke-virtual {v12}, Lio/github/charlietap/chasm/runtime/instance/MemoryInstance;->getSize()I
 
     move-result v17
-
-    const/4 v9, 0x1
-
-    aget-object v12, v16, v9
-
-    check-cast v12, Lio/github/charlietap/chasm/runtime/instance/MemoryInstance;
-
-    move-object/from16 v37, v12
 
     move/from16 v19, p3
 
@@ -468,7 +454,7 @@
     const/16 v26, 0x0
 
     .line 7
-    :cond_35
+    :cond_2e
     shl-int/lit8 v29, v26, 0x3
 
     .line 8
@@ -508,11 +494,11 @@
     .line 10
     move/from16 v8, v29
 
-    if-ltz v8, :cond_291
+    if-ltz v8, :cond_28a
 
     add-int/lit8 v11, v17, -0x8
 
-    if-gt v8, v11, :cond_291
+    if-gt v8, v11, :cond_28a
 
     move-wide/from16 v2, v31
 
@@ -613,11 +599,11 @@
     .line 15
     move/from16 v8, v29
 
-    if-ltz v8, :cond_2a8
+    if-ltz v8, :cond_2a4
 
     add-int/lit8 v11, v17, -0x8
 
-    if-gt v8, v11, :cond_2a8
+    if-gt v8, v11, :cond_2a4
 
     move-wide/from16 v2, v31
 
@@ -688,24 +674,24 @@
 
     add-int v9, v30, v10
 
-    if-lt v8, v9, :cond_35
+    if-lt v8, v9, :cond_2e
 
     .line 19
     const/16 v26, 0x0
 
     .line 21
-    :cond_fd
+    :cond_f6
     const/16 v20, 0x0
 
     .line 23
-    :cond_ff
+    :cond_f8
     const-wide/16 v22, 0x0
 
     .line 24
     const/16 v21, 0x0
 
     .line 26
-    :cond_103
+    :cond_fc
     mul-int v30, v26, v19
 
     .line 27
@@ -717,11 +703,11 @@
     .line 29
     move/from16 v8, v30
 
-    if-ltz v8, :cond_2bf
+    if-ltz v8, :cond_2be
 
     add-int/lit8 v11, v17, -0x8
 
-    if-gt v8, v11, :cond_2bf
+    if-gt v8, v11, :cond_2be
 
     aget-byte v9, v18, v8
 
@@ -822,11 +808,11 @@
     .line 34
     move/from16 v8, v33
 
-    if-ltz v8, :cond_2d6
+    if-ltz v8, :cond_2d8
 
     add-int/lit8 v11, v17, -0x8
 
-    if-gt v8, v11, :cond_2d6
+    if-gt v8, v11, :cond_2d8
 
     aget-byte v9, v18, v8
 
@@ -928,7 +914,7 @@
 
     add-int v9, v19, v10
 
-    if-lt v8, v9, :cond_103
+    if-lt v8, v9, :cond_fc
 
     .line 39
     mul-int v30, v26, v19
@@ -945,11 +931,11 @@
     .line 43
     move/from16 v8, v29
 
-    if-ltz v8, :cond_2ed
+    if-ltz v8, :cond_2f2
 
     add-int/lit8 v11, v17, -0x8
 
-    if-gt v8, v11, :cond_2ed
+    if-gt v8, v11, :cond_2f2
 
     move-wide/from16 v2, v22
 
@@ -1017,7 +1003,7 @@
 
     add-int v9, v19, v10
 
-    if-lt v8, v9, :cond_ff
+    if-lt v8, v9, :cond_f8
 
     .line 46
     add-int/lit8 v26, v26, 0x1
@@ -1029,13 +1015,13 @@
 
     add-int v9, v19, v10
 
-    if-lt v8, v9, :cond_fd
+    if-lt v8, v9, :cond_f6
 
     .line 48
     const/16 v26, 0x0
 
     .line 50
-    :cond_223
+    :cond_21c
     add-int/lit8 v36, v19, 0x1
 
     .line 51
@@ -1050,11 +1036,11 @@
     .line 54
     move/from16 v8, v30
 
-    if-ltz v8, :cond_304
+    if-ltz v8, :cond_30c
 
     add-int/lit8 v11, v17, -0x8
 
-    if-gt v8, v11, :cond_304
+    if-gt v8, v11, :cond_30c
 
     aget-byte v9, v18, v8
 
@@ -1153,7 +1139,7 @@
 
     add-int v9, v19, v10
 
-    if-lt v8, v9, :cond_223
+    if-lt v8, v9, :cond_21c
 
     .line 58
     move-wide/from16 v0, v24
@@ -1165,8 +1151,12 @@
     return-wide v0
 
     .line 10
-    :cond_291
-    move-object/from16 v12, v37
+    :cond_28a
+    const/4 v9, 0x1
+
+    aget-object v12, v16, v9
+
+    check-cast v12, Lio/github/charlietap/chasm/runtime/instance/MemoryInstance;
 
     const/4 v10, 0x1
 
@@ -1191,8 +1181,12 @@
     return-wide v0
 
     .line 15
-    :cond_2a8
-    move-object/from16 v12, v37
+    :cond_2a4
+    const/4 v9, 0x1
+
+    aget-object v12, v16, v9
+
+    check-cast v12, Lio/github/charlietap/chasm/runtime/instance/MemoryInstance;
 
     const/4 v10, 0x1
 
@@ -1217,8 +1211,12 @@
     return-wide v0
 
     .line 29
-    :cond_2bf
-    move-object/from16 v12, v37
+    :cond_2be
+    const/4 v9, 0x1
+
+    aget-object v12, v16, v9
+
+    check-cast v12, Lio/github/charlietap/chasm/runtime/instance/MemoryInstance;
 
     const/4 v10, 0x0
 
@@ -1243,8 +1241,12 @@
     return-wide v0
 
     .line 34
-    :cond_2d6
-    move-object/from16 v12, v37
+    :cond_2d8
+    const/4 v9, 0x1
+
+    aget-object v12, v16, v9
+
+    check-cast v12, Lio/github/charlietap/chasm/runtime/instance/MemoryInstance;
 
     const/4 v10, 0x0
 
@@ -1269,8 +1271,12 @@
     return-wide v0
 
     .line 43
-    :cond_2ed
-    move-object/from16 v12, v37
+    :cond_2f2
+    const/4 v9, 0x1
+
+    aget-object v12, v16, v9
+
+    check-cast v12, Lio/github/charlietap/chasm/runtime/instance/MemoryInstance;
 
     const/4 v10, 0x1
 
@@ -1295,8 +1301,12 @@
     return-wide v0
 
     .line 54
-    :cond_304
-    move-object/from16 v12, v37
+    :cond_30c
+    const/4 v9, 0x1
+
+    aget-object v12, v16, v9
+
+    check-cast v12, Lio/github/charlietap/chasm/runtime/instance/MemoryInstance;
 
     const/4 v10, 0x0
 
@@ -1322,7 +1332,7 @@
 .end method
 
 .method public static f4([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;II)I
-    .registers 35
+    .registers 34
 
     move-object/from16 v14, p1
 
@@ -1344,14 +1354,6 @@
 
     move-result v17
 
-    const/4 v9, 0x1
-
-    aget-object v12, v16, v9
-
-    check-cast v12, Lio/github/charlietap/chasm/runtime/instance/MemoryInstance;
-
-    move-object/from16 v27, v12
-
     move/from16 v19, p3
 
     const-wide/16 v0, 0x0
@@ -1368,14 +1370,14 @@
     const/16 v22, -0x1
 
     .line 4
-    :cond_27
+    :cond_20
     move/from16 v8, v20
 
-    if-ltz v8, :cond_63
+    if-ltz v8, :cond_5c
 
     add-int/lit8 v11, v17, -0x1
 
-    if-gt v8, v11, :cond_63
+    if-gt v8, v11, :cond_5c
 
     aget-byte v9, v18, v8
 
@@ -1390,7 +1392,7 @@
     const/16 v21, 0x0
 
     .line 8
-    :cond_39
+    :cond_32
     ushr-int/lit8 v23, v22, 0x1
 
     .line 9
@@ -1419,7 +1421,7 @@
 
     const v9, -0x7ffffff8
 
-    if-lt v8, v9, :cond_39
+    if-lt v8, v9, :cond_32
 
     .line 15
     add-int/lit8 v20, v20, 0x1
@@ -1431,7 +1433,7 @@
 
     add-int v9, v19, v10
 
-    if-lt v8, v9, :cond_27
+    if-lt v8, v9, :cond_20
 
     .line 17
     xor-int/lit8 v19, v22, -0x1
@@ -1446,8 +1448,12 @@
     return v8
 
     .line 4
-    :cond_63
-    move-object/from16 v12, v27
+    :cond_5c
+    const/4 v9, 0x1
+
+    aget-object v12, v16, v9
+
+    check-cast v12, Lio/github/charlietap/chasm/runtime/instance/MemoryInstance;
 
     const/4 v10, 0x0
 

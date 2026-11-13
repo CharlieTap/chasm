@@ -5,7 +5,7 @@
 
 # direct methods
 .method public static f0([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;IIJ)J
-    .registers 39
+    .registers 38
 
     move-object/from16 v14, p1
 
@@ -27,14 +27,6 @@
 
     move-result v17
 
-    const/4 v9, 0x1
-
-    aget-object v12, v16, v9
-
-    check-cast v12, Lio/github/charlietap/chasm/runtime/instance/MemoryInstance;
-
-    move-object/from16 v29, v12
-
     move/from16 v21, p3
 
     move-wide/from16 v22, p4
@@ -42,11 +34,11 @@
     .line 2
     move/from16 v8, v21
 
-    if-ltz v8, :cond_cd
+    if-ltz v8, :cond_c6
 
     add-int/lit8 v11, v17, -0xc
 
-    if-gt v8, v11, :cond_cd
+    if-gt v8, v11, :cond_c6
 
     add-int/lit16 v8, v8, 0x4
 
@@ -232,8 +224,12 @@
     return-wide v0
 
     .line 2
-    :cond_cd
-    move-object/from16 v12, v29
+    :cond_c6
+    const/4 v9, 0x1
+
+    aget-object v12, v16, v9
+
+    check-cast v12, Lio/github/charlietap/chasm/runtime/instance/MemoryInstance;
 
     const/4 v10, 0x1
 
@@ -259,7 +255,7 @@
 .end method
 
 .method public static f1([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;III)I
-    .registers 32
+    .registers 31
 
     move-object/from16 v14, p1
 
@@ -281,14 +277,6 @@
 
     move-result v17
 
-    const/4 v9, 0x1
-
-    aget-object v12, v16, v9
-
-    check-cast v12, Lio/github/charlietap/chasm/runtime/instance/MemoryInstance;
-
-    move-object/from16 v23, v12
-
     move/from16 v19, p3
 
     move/from16 v20, p4
@@ -296,11 +284,11 @@
     .line 2
     move/from16 v8, v19
 
-    if-ltz v8, :cond_3d
+    if-ltz v8, :cond_36
 
     add-int/lit8 v11, v17, -0x1
 
-    if-gt v8, v11, :cond_3d
+    if-gt v8, v11, :cond_36
 
     aput-byte v20, v18, v8
 
@@ -333,8 +321,12 @@
     return v8
 
     .line 2
-    :cond_3d
-    move-object/from16 v12, v23
+    :cond_36
+    const/4 v9, 0x1
+
+    aget-object v12, v16, v9
+
+    check-cast v12, Lio/github/charlietap/chasm/runtime/instance/MemoryInstance;
 
     const/4 v10, 0x1
 
@@ -360,7 +352,7 @@
 .end method
 
 .method public static f2([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;IIFD)D
-    .registers 41
+    .registers 40
 
     move-object/from16 v14, p1
 
@@ -382,14 +374,6 @@
 
     move-result v17
 
-    const/4 v9, 0x1
-
-    aget-object v12, v16, v9
-
-    check-cast v12, Lio/github/charlietap/chasm/runtime/instance/MemoryInstance;
-
-    move-object/from16 v30, v12
-
     move/from16 v19, p3
 
     move/from16 v22, p4
@@ -399,11 +383,11 @@
     .line 2
     move/from16 v8, v19
 
-    if-ltz v8, :cond_102
+    if-ltz v8, :cond_fb
 
     add-int/lit8 v11, v17, -0x4
 
-    if-gt v8, v11, :cond_102
+    if-gt v8, v11, :cond_fb
 
     move/from16 v9, v22
 
@@ -434,11 +418,11 @@
     .line 3
     move/from16 v8, v19
 
-    if-ltz v8, :cond_118
+    if-ltz v8, :cond_114
 
     add-int/lit8 v11, v17, -0x10
 
-    if-gt v8, v11, :cond_118
+    if-gt v8, v11, :cond_114
 
     add-int/lit16 v8, v8, 0x8
 
@@ -646,8 +630,12 @@
     return-wide v0
 
     .line 2
-    :cond_102
-    move-object/from16 v12, v30
+    :cond_fb
+    const/4 v9, 0x1
+
+    aget-object v12, v16, v9
+
+    check-cast v12, Lio/github/charlietap/chasm/runtime/instance/MemoryInstance;
 
     const/4 v10, 0x1
 
@@ -672,8 +660,12 @@
     return-wide v0
 
     .line 3
-    :cond_118
-    move-object/from16 v12, v30
+    :cond_114
+    const/4 v9, 0x1
+
+    aget-object v12, v16, v9
+
+    check-cast v12, Lio/github/charlietap/chasm/runtime/instance/MemoryInstance;
 
     const/4 v10, 0x1
 
@@ -780,12 +772,6 @@
 
     move-result v17
 
-    const/4 v9, 0x1
-
-    aget-object v12, v16, v9
-
-    check-cast v12, Lio/github/charlietap/chasm/runtime/instance/MemoryInstance;
-
     move-object/from16 v22, v12
 
     move/from16 v19, p3
@@ -846,11 +832,11 @@
     .line 7
     move/from16 v8, v21
 
-    if-ltz v8, :cond_7a
+    if-ltz v8, :cond_75
 
     add-int/lit8 v11, v17, -0x4
 
-    if-gt v8, v11, :cond_7a
+    if-gt v8, v11, :cond_75
 
     aget-byte v9, v18, v8
 
@@ -896,7 +882,7 @@
     return v8
 
     .line 7
-    :cond_7a
+    :cond_75
     move-object/from16 v12, v22
 
     const/4 v10, 0x0

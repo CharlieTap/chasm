@@ -65,12 +65,13 @@ internal fun analyzeFunction(
     return FunctionAnalysis(
         facts = facts,
         memoryMode = memoryMode,
-        cachedConstants = cachedConstants(function, facts.table, module.inlineMemory.takeIf { usesInlineMemory }),
+        cachedConstants = cachedConstants(module, function, facts.table, module.inlineMemory.takeIf { usesInlineMemory }),
         checkedAccesses = if (usesInlineMemory) function.redundantBoundsChecks(facts.table) else BooleanArray(function.instructions.size),
     )
 }
 
 private fun cachedConstants(
+    module: ModuleLowering,
     function: CirFunction,
     table: InstructionTable,
     inlineMemory: MemoryIndex?,
@@ -131,7 +132,7 @@ private fun cachedConstants(
         }
     }
 
-    if (inlineMemory != null && function.instructions.any { instruction -> instruction is ControlInstruction }) {
+    if (inlineMemory != null && function.reloadsMemory(module, table)) {
         use(Resource.Memory(inlineMemory.index), MEMORY_INSTANCE, times = CACHE_THRESHOLD)
     }
 
@@ -139,6 +140,21 @@ private fun cachedConstants(
         .map { (resource, use) -> CachedConstant.ObjectResource(resource, use.type) }
 
     return if (valueLoads >= CACHE_THRESHOLD) constants + CachedConstant.Values() else constants
+}
+
+private fun CirFunction.reloadsMemory(
+    module: ModuleLowering,
+    table: InstructionTable,
+): Boolean {
+    return exceptions != null || instructions.indices.any { position ->
+        when (val instruction = instructions[position]) {
+            is ControlInstruction.Call ->
+                module.declarations.isImported(instruction.function) || module.analysis.mayGrowMemory[instruction.function.index]
+            is ControlInstruction.CallIndirectI, is ControlInstruction.CallIndirectS, is ControlInstruction.CallRefS -> true
+            is MemoryInstruction -> table.accesses.accessIndexAt(position) < 0
+            else -> false
+        }
+    }
 }
 
 private class ResourceUse(

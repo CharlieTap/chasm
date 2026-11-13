@@ -18,6 +18,11 @@ internal fun LowerContext.lowerPrologue() {
     emit.move(Registers.DEPTH, registers.depthParameter)
     emit.moveObject(registers.binding, registers.bindingParameter)
     refreshMemory()
+    val memory = module.inlineMemory
+    val cachedMemory = if (memory != null && analysis.usesInlineMemory) cachedConstantIndex[Resource.Memory(memory.index)] else null
+    if (cachedMemory != null) {
+        emit.moveObject(registers.cachedConstant(cachedMemory), MEMORY_INSTANCE_REGISTER)
+    }
     if (analysis.unsafeMemory) {
         loadObject(registers.unsafe, Resource.Unsafe, UNSAFE_TYPE)
         emit.constWide(registers.byteArrayBase, checkNotNull(module.options.byteArrayBaseOffset))
@@ -27,6 +32,9 @@ internal fun LowerContext.lowerPrologue() {
     }
     roots.open()
     analysis.cachedConstants.forEachIndexed { index, constant ->
+        if (index == cachedMemory) {
+            return@forEachIndexed
+        }
         loadCachedConstant(constant)
         emit.moveObject(registers.cachedConstant(index), Registers.OBJECT)
     }
