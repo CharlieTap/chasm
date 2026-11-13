@@ -7,7 +7,6 @@ import io.github.charlietap.chasm.compiler.backend.abi.CAST_MATCHES
 import io.github.charlietap.chasm.compiler.backend.abi.FUEL_AND_INTERRUPT_CHECK
 import io.github.charlietap.chasm.compiler.backend.abi.FUEL_CHECK
 import io.github.charlietap.chasm.compiler.backend.abi.INTERRUPT_CHECK
-import io.github.charlietap.chasm.compiler.backend.abi.IS_NULL
 import io.github.charlietap.chasm.compiler.backend.abi.OBJECT_TYPE
 import io.github.charlietap.chasm.compiler.backend.abi.Resource
 import io.github.charlietap.chasm.compiler.backend.analysis.form.Operand
@@ -125,9 +124,7 @@ private fun LowerContext.nullBranch(
     target: InstructionIndex,
 ) {
     loadWide(Registers.W0, reference)
-    emit.invoke(IS_NULL, Registers.W0, Registers.W0 + 1)
-    emit.moveResult(Registers.I0)
-    emit.branchZero(if (isNull) Cond.Ne else Cond.Eq, Registers.I0, label(target))
+    branchOnNull(Registers.W0, isNull, label(target))
 }
 
 private fun LowerContext.castBranch(

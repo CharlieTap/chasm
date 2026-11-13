@@ -172,9 +172,23 @@
     .line 10
     move-wide/from16 v0, v27
 
-    invoke-static {v0, v1}, Lio/github/charlietap/chasm/runtime/compiled/CompiledGc;->refIsNull(J)J
+    long-to-int v8, v0
 
-    move-result-wide v0
+    and-int/lit16 v8, v8, 0xff
+
+    const/4 v9, 0x1
+
+    if-eq v8, v9, :cond_73
+
+    const/4 v11, 0x0
+
+    goto/16 :goto_74
+
+    :cond_73
+    const/4 v11, 0x1
+
+    :goto_74
+    int-to-long v0, v11
 
     move-wide/from16 v27, v0
 
@@ -183,7 +197,7 @@
 
     cmp-long v8, v27, v2
 
-    if-nez v8, :cond_a2
+    if-nez v8, :cond_a9
 
     .line 12
     move-wide/from16 v29, v23
@@ -191,11 +205,13 @@
     .line 13
     move-wide/from16 v0, v29
 
-    invoke-static {v0, v1}, Lio/github/charlietap/chasm/runtime/compiled/CompiledGc;->refAsNonNull(J)J
+    long-to-int v8, v0
 
-    move-result-wide v0
+    and-int/lit16 v8, v8, 0xff
 
-    move-wide/from16 v29, v0
+    const/4 v9, 0x1
+
+    if-eq v8, v9, :cond_b3
 
     .line 14
     move-wide/from16 v0, v29
@@ -221,11 +237,13 @@
     .line 17
     move-wide/from16 v0, v27
 
-    invoke-static {v0, v1}, Lio/github/charlietap/chasm/runtime/compiled/CompiledGc;->refAsNonNull(J)J
+    long-to-int v8, v0
 
-    move-result-wide v0
+    and-int/lit16 v8, v8, 0xff
 
-    move-wide/from16 v27, v0
+    const/4 v9, 0x1
+
+    if-eq v8, v9, :cond_b8
 
     .line 18
     move-wide/from16 v0, v27
@@ -242,7 +260,7 @@
     goto :goto_66
 
     .line 20
-    :cond_a2
+    :cond_a9
     move-wide/from16 v6, v31
 
     invoke-static {v14, v6, v7}, Lio/github/charlietap/chasm/runtime/compiled/CompiledCalls;->closeFrame(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;J)V
@@ -250,6 +268,22 @@
     move/from16 v8, v26
 
     return v8
+
+    const/4 v8, 0x0
+
+    return v8
+
+    .line 13
+    :cond_b3
+    invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/CompiledRuntime;->nullReference()Ljava/lang/Void;
+
+    const/4 v8, 0x0
+
+    return v8
+
+    .line 17
+    :cond_b8
+    invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/CompiledRuntime;->nullReference()Ljava/lang/Void;
 
     const/4 v8, 0x0
 

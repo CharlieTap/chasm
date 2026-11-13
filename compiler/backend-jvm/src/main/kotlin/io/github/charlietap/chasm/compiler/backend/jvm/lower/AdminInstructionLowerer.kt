@@ -7,7 +7,6 @@ import io.github.charlietap.chasm.compiler.backend.abi.CAST_MATCHES
 import io.github.charlietap.chasm.compiler.backend.abi.FUEL_AND_INTERRUPT_CHECK
 import io.github.charlietap.chasm.compiler.backend.abi.FUEL_CHECK
 import io.github.charlietap.chasm.compiler.backend.abi.INTERRUPT_CHECK
-import io.github.charlietap.chasm.compiler.backend.abi.IS_NULL
 import io.github.charlietap.chasm.compiler.backend.abi.Resource
 import io.github.charlietap.chasm.compiler.backend.analysis.form.Operand
 import io.github.charlietap.chasm.compiler.backend.analysis.form.immediate
@@ -52,10 +51,10 @@ internal fun lowerAdminInstruction(
         is AdminInstruction.JumpIfConditionMismatch ->
             context.lowerCondition(instruction.condition, holds = false, context.label(instruction.target))
         is AdminInstruction.JumpTableS -> context.jumpTable(instruction.operandSlot, instruction.targets)
-        is AdminInstruction.JumpOnNullI -> context.nullBranch(immediate(instruction.operand), isNull = true, instruction.target)
-        is AdminInstruction.JumpOnNullS -> context.nullBranch(slot(instruction.operandSlot), isNull = true, instruction.target)
-        is AdminInstruction.JumpOnNonNullI -> context.nullBranch(immediate(instruction.operand), isNull = false, instruction.target)
-        is AdminInstruction.JumpOnNonNullS -> context.nullBranch(slot(instruction.operandSlot), isNull = false, instruction.target)
+        is AdminInstruction.JumpOnNullI -> context.branchOnNull(immediate(instruction.operand), isNull = true, context.label(instruction.target))
+        is AdminInstruction.JumpOnNullS -> context.branchOnNull(slot(instruction.operandSlot), isNull = true, context.label(instruction.target))
+        is AdminInstruction.JumpOnNonNullI -> context.branchOnNull(immediate(instruction.operand), isNull = false, context.label(instruction.target))
+        is AdminInstruction.JumpOnNonNullS -> context.branchOnNull(slot(instruction.operandSlot), isNull = false, context.label(instruction.target))
         is AdminInstruction.JumpOnCastI -> context.castBranch(immediate(instruction.operand), instruction.typeTest, matches = true, instruction.target)
         is AdminInstruction.JumpOnCastS -> context.castBranch(slot(instruction.operandSlot), instruction.typeTest, matches = true, instruction.target)
         is AdminInstruction.JumpOnCastFailI ->
@@ -159,16 +158,6 @@ private const val LARGE_JUMP_TABLE = 1_024
 private const val CHUNK_TABLE_EXITS = 64
 
 private const val TARGET_POSITION_SHIFT = 32
-
-private fun LowerContext.nullBranch(
-    reference: Operand,
-    isNull: Boolean,
-    target: InstructionIndex,
-) {
-    pushLong(reference)
-    emit.invokeStatic(IS_NULL)
-    emit.jump(if (isNull) Opcodes.IFNE else Opcodes.IFEQ, label(target))
-}
 
 private fun LowerContext.castBranch(
     reference: Operand,

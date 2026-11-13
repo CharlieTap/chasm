@@ -1521,11 +1521,13 @@
     :goto_85
     move-wide/from16 v0, v23
 
-    invoke-static {v0, v1}, Lio/github/charlietap/chasm/runtime/compiled/CompiledCalls;->isNull(J)Z
+    long-to-int v8, v0
 
-    move-result v8
+    and-int/lit16 v8, v8, 0xff
 
-    if-nez v8, :cond_a1
+    const/4 v9, 0x1
+
+    if-eq v8, v9, :cond_a1
 
     .line 11
     move-wide/from16 v27, v23
@@ -1533,11 +1535,13 @@
     .line 12
     move-wide/from16 v0, v27
 
-    invoke-static {v0, v1}, Lio/github/charlietap/chasm/runtime/compiled/CompiledGc;->refAsNonNull(J)J
+    long-to-int v8, v0
 
-    move-result-wide v0
+    and-int/lit16 v8, v8, 0xff
 
-    move-wide/from16 v27, v0
+    const/4 v9, 0x1
+
+    if-eq v8, v9, :cond_ad
 
     .line 13
     move-wide/from16 v0, v27
@@ -1565,6 +1569,14 @@
     move/from16 v8, v20
 
     return v8
+
+    const/4 v8, 0x0
+
+    return v8
+
+    .line 12
+    :cond_ad
+    invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/CompiledRuntime;->nullReference()Ljava/lang/Void;
 
     const/4 v8, 0x0
 

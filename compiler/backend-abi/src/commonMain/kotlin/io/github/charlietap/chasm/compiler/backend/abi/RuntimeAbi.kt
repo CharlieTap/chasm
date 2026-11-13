@@ -25,6 +25,9 @@ const val PENDING_TAIL_FIELD = "pendingTailFunction"
 
 const val REFERENCE_TYPE_TEST = OBJECT_TYPE
 
+const val REFERENCE_TAG_MASK = 0xFF
+const val REFERENCE_NULL_TAG = 1
+
 const val MAX_UNCHARGED_LEAF_FRAME_COST = 64
 
 private const val THROWABLE = "Ljava/lang/Throwable;"
@@ -73,6 +76,7 @@ val CALL_STACK_EXHAUSTED = compiledRuntime.method("callStackExhausted", returns 
 val UNREACHABLE = compiledRuntime.method("unreachable", returns = NOTHING)
 val UNPACK_LONGS = compiledRuntime.method("unpackLongs", STRINGS, returns = "[J")
 val DIVIDE_BY_ZERO = compiledRuntime.method("divideByZero", returns = NOTHING)
+val NULL_REFERENCE = compiledRuntime.method("nullReference", returns = NOTHING)
 val INTEGER_OVERFLOW = compiledRuntime.method("integerOverflow", returns = NOTHING)
 val MEMORY_OUT_OF_BOUNDS = compiledRuntime.method("memoryOutOfBounds", returns = NOTHING)
 
@@ -137,7 +141,6 @@ val TAIL_CALL_INDIRECT =
 val TAIL_CALL_REF = compiledCalls.method("tailCallRef", CONTEXT_TYPE, MODULE_INSTANCE, "J", "[J", returns = "V")
 val COMPLETE_TAIL_CALL = compiledCalls.method("completeTailCall", CONTEXT_TYPE, "[J", "I", returns = "V")
 val RAISE_UNWINDING = compiledCalls.method("raiseUnwinding", CONTEXT_TYPE, returns = "V")
-val IS_NULL = compiledCalls.method("isNull", "J", returns = "Z")
 
 val THROW_TAG = compiledExceptions.method("throwTag", CONTEXT_TYPE, "I", "I", returns = "V")
 val THROW_REF = compiledExceptions.method("throwRef", CONTEXT_TYPE, "J", returns = "V")
@@ -161,9 +164,6 @@ val ARRAY_NEW_DEFAULT = compiledGc.method("arrayNewDefault", CONTEXT_TYPE, "I", 
 val REF_CAST_STRUCT_GET = compiledGc.method("refCastStructGet", CONTEXT_TYPE, "J", REFERENCE_TYPE_TEST, "I", returns = "J")
 val REF_CAST = compiledGc.method("refCast", CONTEXT_TYPE, "J", REFERENCE_TYPE_TEST, returns = "J")
 val REF_TEST = compiledGc.method("refTest", CONTEXT_TYPE, "J", REFERENCE_TYPE_TEST, returns = "J")
-val REF_EQ = compiledGc.method("refEq", "J", "J", returns = "J")
-val REF_IS_NULL = compiledGc.method("refIsNull", "J", returns = "J")
-val REF_AS_NON_NULL = compiledGc.method("refAsNonNull", "J", returns = "J")
 val REF_I31 = compiledGc.method("refI31", "I", returns = "J")
 val I31_GET_SIGNED = compiledGc.method("i31GetSigned", "J", returns = "J")
 val I31_GET_UNSIGNED = compiledGc.method("i31GetUnsigned", "J", returns = "J")

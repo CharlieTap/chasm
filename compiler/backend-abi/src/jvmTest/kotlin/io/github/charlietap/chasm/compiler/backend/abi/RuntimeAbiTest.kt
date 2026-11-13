@@ -1,5 +1,7 @@
 package io.github.charlietap.chasm.compiler.backend.abi
 
+import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_MASK
+import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_NULL
 import java.lang.reflect.Modifier
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -64,6 +66,12 @@ class RuntimeAbiTest {
             assertFalse(Modifier.isStatic(field.modifiers), name)
             assertEquals(type, descriptor(field.type), name)
         }
+    }
+
+    @Test
+    fun `compiled code tests for a null reference with the runtime's tag and mask`() {
+        assertEquals(RV_TYPE_MASK, REFERENCE_TAG_MASK.toLong())
+        assertEquals(RV_TYPE_NULL, REFERENCE_NULL_TAG.toLong())
     }
 
     private fun methods(

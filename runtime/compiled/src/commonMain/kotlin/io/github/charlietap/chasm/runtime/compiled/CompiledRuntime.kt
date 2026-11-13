@@ -37,6 +37,10 @@ fun callStackExhausted(): Nothing = throw InvocationException(InvocationError.Ca
 
 fun divideByZero(): Nothing = throw InvocationException(InvocationError.CannotDivideIntegerByZero)
 
+fun nullReference(): Nothing {
+    throw InvocationException(InvocationError.NonNullReferenceExpected)
+}
+
 fun integerOverflow(): Nothing = throw InvocationException(InvocationError.IntegerOverflow)
 
 fun conversionFailed(): Nothing = throw InvocationException(InvocationError.ConvertOperationFailed)

@@ -1,6 +1,8 @@
 package io.github.charlietap.chasm.compiler.backend.jvm.lower
 
 import io.github.charlietap.chasm.cir.NumericCondition
+import io.github.charlietap.chasm.compiler.backend.abi.REFERENCE_NULL_TAG
+import io.github.charlietap.chasm.compiler.backend.abi.REFERENCE_TAG_MASK
 import io.github.charlietap.chasm.compiler.backend.analysis.form.Comparison
 import io.github.charlietap.chasm.compiler.backend.analysis.form.ConditionForm
 import io.github.charlietap.chasm.compiler.backend.analysis.form.Operand
@@ -169,6 +171,18 @@ private fun LowerContext.branchOnCondition(
             emit.jump(if (negated) Opcodes.IFEQ else Opcodes.IFNE, target)
         }
     }
+}
+
+internal fun LowerContext.branchOnNull(
+    reference: Operand,
+    isNull: Boolean,
+    target: Label,
+) {
+    pushInt(reference)
+    emit.int(REFERENCE_TAG_MASK)
+    emit.insn(Opcodes.IAND)
+    emit.int(REFERENCE_NULL_TAG)
+    emit.jump(if (isNull) Opcodes.IF_ICMPEQ else Opcodes.IF_ICMPNE, target)
 }
 
 internal inline fun LowerContext.booleanResult(
