@@ -99,40 +99,66 @@ private fun LowerContext.largeJumpTable(
     operandSlot: Int,
     targets: IntArray,
 ) {
+
     val default = label(targets.last())
     val cases = targets.size - 1
+    val chunk = chunk
+    val distinctTargets = targets.copyOf(cases).distinct()
+    val (targetsInChunk, targetsOutsideChunk) = if (chunk == null) {
+        distinctTargets to emptyList()
+    } else {
+        distinctTargets.partition { position -> position in chunk }
+    }
+    val switchTargets = targetsInChunk + targetsOutsideChunk
+    val switchKeys = HashMap<Int, Int>(switchTargets.size * 2)
+    switchTargets.forEachIndexed { key, position -> switchKeys[position] = key }
+
     pushInt(Operand.Slot(operandSlot))
     emit.store(Opcodes.ISTORE, locals.scratchInt)
     flipped { emit.load(Opcodes.ILOAD, locals.scratchInt) }
     emit.int(cases xor Int.MIN_VALUE)
     emit.jump(Opcodes.IF_ICMPGE, default)
-    pushResource(Resource.Longs(LongArray(cases) { index -> targets[index].toLong() }))
+
+    val caseEntries = LongArray(cases) { index ->
+        val target = targets[index]
+        (target.toLong() shl TARGET_POSITION_SHIFT) or switchKeys.getValue(target).toLong()
+    }
+    pushResource(Resource.Longs(caseEntries))
     emit.load(Opcodes.ILOAD, locals.scratchInt)
     emit.insn(Opcodes.LALOAD)
-    emit.insn(Opcodes.L2I)
-    val positions = targets.copyOf(cases).distinct().sorted()
-    val chunk = chunk
-    if (chunk == null) {
-        return emit.lookupSwitch(default, positions.toIntArray(), Array(positions.size) { index -> label(positions[index]) })
+    if (chunk == null || targetsOutsideChunk.isEmpty()) {
+        emit.insn(Opcodes.L2I)
+        emit.tableSwitch(0, default, Array(targetsInChunk.size) { key -> label(switchTargets[key]) })
+        return
     }
-    val held = positions.filter { it in chunk }.toIntArray()
-    val elsewhere = emit.label()
-    emit.insn(Opcodes.DUP)
-    emit.store(Opcodes.ISTORE, locals.exitPosition)
-    emit.lookupSwitch(elsewhere, held, Array(held.size) { index -> label(held[index]) })
-    emit.place(elsewhere)
+
+    emit.store(Opcodes.LSTORE, locals.scratchLong[0])
+    if (targetsInChunk.isNotEmpty()) {
+        val elsewhere = emit.label()
+        emit.load(Opcodes.LLOAD, locals.scratchLong[0])
+        emit.insn(Opcodes.L2I)
+        emit.tableSwitch(0, elsewhere, Array(targetsInChunk.size) { key -> label(switchTargets[key]) })
+        emit.place(elsewhere)
+    }
+
     emit.int(Chunk.DYNAMIC_EXIT_BASE)
-    emit.load(Opcodes.ILOAD, locals.exitPosition)
+    emit.load(Opcodes.LLOAD, locals.scratchLong[0])
+    emit.int(TARGET_POSITION_SHIFT)
+    emit.insn(Opcodes.LUSHR)
+    emit.insn(Opcodes.L2I)
     emit.insn(Opcodes.ISUB)
     emit.store(Opcodes.ISTORE, locals.exitPosition)
     emit.jump(Opcodes.GOTO, chunk.spill)
+
     chunk.leavesAnywhere = true
-    positions.filterTo(chunk.dynamicExits) { it !in chunk }
+    chunk.dynamicExits += targetsOutsideChunk
 }
 
 private const val LARGE_JUMP_TABLE = 1_024
 
 private const val CHUNK_TABLE_EXITS = 64
+
+private const val TARGET_POSITION_SHIFT = 32
 
 private fun LowerContext.nullBranch(
     reference: Operand,

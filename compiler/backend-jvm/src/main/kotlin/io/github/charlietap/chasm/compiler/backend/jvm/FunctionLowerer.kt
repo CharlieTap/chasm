@@ -95,6 +95,8 @@ private class FunctionLowering(
     private val references: References,
     private val method: MethodRef,
 ) {
+    private val parameterCount = frame.type.params.types.size
+
     private val maxMethodBytes = module.options.functionMaxMethodBytes[function.index.index] ?: module.options.maxMethodBytes
 
     private val table by lazy(LazyThreadSafetyMode.NONE) { instructionTable(function, module.declarations) }
@@ -169,6 +171,7 @@ private class FunctionLowering(
         val size = function.instructions.size
         val crossings = loopCrossings(function)
         val live = liveness?.let { slots -> slots::liveCount }
+        val resetsSlots = resetsSlots(liveness)
 
         fun pack(
             from: Int,
@@ -180,12 +183,12 @@ private class FunctionLowering(
             while (start < until) {
                 var limit = reach(offsets, start, until, budget)
                 while (true) {
-                    val end = cheapestCut(crossings, start, limit, live)
+                    val end = if (limit == until) until else cheapestCut(crossings, start, limit, live)
                     val range = start until end
                     val entries = range.filter { position -> position == range.first || targets[position] }.toIntArray()
-                    val first = chunk(range, entries, slotKinds, liveness, budget)
+                    val first = chunk(range, entries, slotKinds, liveness, resetsSlots, budget)
                     val attempt = if (first.chunk == null && end - start == 1 && budget < maxMethodBytes) {
-                        chunk(range, entries, slotKinds, liveness, maxMethodBytes)
+                        chunk(range, entries, slotKinds, liveness, resetsSlots, maxMethodBytes)
                     } else {
                         first
                     }
@@ -221,7 +224,7 @@ private class FunctionLowering(
             continuationIds = IntArray(size + 1) { position -> if (entered[position]) next++ else -1 }
             val lowered = packed.values.map { (range, _) ->
                 val entries = range.filter { position -> entered[position] }.toIntArray()
-                range to chunk(range, entries, slotKinds, liveness, maxMethodBytes, continuationIds).chunk
+                range to chunk(range, entries, slotKinds, liveness, resetsSlots, maxMethodBytes, continuationIds).chunk
             }
             val outgrown = lowered.filter { (_, chunk) -> chunk == null }.map { (range, _) -> range }
             if (outgrown.isEmpty()) {
@@ -246,7 +249,7 @@ private class FunctionLowering(
         val dispatcher = methodNode(method.name, method.descriptor)
         val slotFrameCost = (frame.frameSlots * 8 + 31) / 32
         val context = LowerContext(facts, slotKinds, locals, Emitter(dispatcher, locals.frameTypes))
-        context.lowerDispatcher(methods, frameCost(locals) + largestCost + slotFrameCost, dynamic)
+        context.lowerDispatcher(methods, frameCost(locals) + largestCost + slotFrameCost, dynamic, resetsSlots)
         context.emit.removeDeadStores(locals.firstLocalAfterParameters)
         if (finish(dispatcher) > MAX_SHORT_BRANCH_METHOD_BYTES) {
             throw Unsupported("function needs ${chunks.size} chunks, more than one dispatcher holds")
@@ -293,11 +296,12 @@ private class FunctionLowering(
         entries: IntArray,
         slotKinds: SlotKinds,
         liveness: SlotLiveness?,
+        resetsSlots: Boolean,
         limit: Int,
         continuationIds: IntArray? = null,
     ): ChunkAttempt {
         val inlineMemory = inlineMemory(range)
-        val recorded = recordings.getOrPut(range) { record(range, entries, slotKinds, liveness != null, inlineMemory) }
+        val recorded = recordings.getOrPut(range) { record(range, entries, slotKinds, liveness != null, inlineMemory, resetsSlots) }
         val used = recorded.used
         val exits = recorded.exits
         val slots = used.indices.filter { used[it] }.toIntArray()
@@ -311,7 +315,7 @@ private class FunctionLowering(
             BooleanArray(frame.frameSlots) { slot -> written[slot] && exits.any { exit -> live.isLive(exit, slot) } }
         }
         val node = methodNode(CHUNK_PLACEHOLDER, chunkDescriptor(module.bindingType))
-        val chunk = Chunk(range.first, range.last + 1, entries, reloads, spills, continuationIds)
+        val chunk = Chunk(range.first, range.last + 1, entries, reloads, spills, continuationIds, resetsSlots)
         val context = LowerContext(facts, slotKinds, locals, Emitter(node, locals.frameTypes), chunk)
         context.lowerChunkBody()
         context.emit.removeDeadStores(locals.firstLocalAfterParameters)
@@ -325,6 +329,11 @@ private class FunctionLowering(
         return ChunkAttempt(lowered, length)
     }
 
+    private fun resetsSlots(liveness: SlotLiveness?): Boolean {
+        return liveness == null || module.analysis.mayCollect[function.index.index] ||
+            (parameterCount until frame.frameSlots).any { slot -> liveness.isLive(0, slot) }
+    }
+
     private val recordings = HashMap<IntRange, Recording>()
 
     private fun record(
@@ -333,11 +342,12 @@ private class FunctionLowering(
         slotKinds: SlotKinds,
         withWrites: Boolean,
         inlineMemory: InlineMemory?,
+        resetsSlots: Boolean,
     ): Recording {
         val used = BooleanArray(frame.frameSlots)
         val recording = Locals(module.bindingType, CHUNK_ARGUMENTS, slotKinds, frame.frameSlots, recording = used, inlineMemory = inlineMemory)
         val node = methodNode("recording", "()V")
-        val chunk = Chunk(range.first, range.last + 1, entries)
+        val chunk = Chunk(range.first, range.last + 1, entries, resetsSlots = resetsSlots)
         LowerContext(facts, slotKinds, recording, Emitter(node, recording.frameTypes), chunk).lowerChunkBody()
         return Recording(
             used = used,
@@ -389,6 +399,7 @@ private fun codeLength(
 ): Int {
     val writer = ClassWriter(ClassWriter.COMPUTE_MAXS)
     writer.visit(CLASS_FILE_VERSION, Opcodes.ACC_PUBLIC, "Probe", null, "java/lang/Object", null)
+    CONSTANT_POOL_PADDING.forEach(writer::newConst)
     node.accept(writer)
     return (end.info as LabelNode).label.offset
 }
@@ -398,6 +409,10 @@ private fun frameCost(
 ): Int = (locals.size * 8 + FRAME_OVERHEAD_BYTES + 31) / 32
 
 private const val FRAME_OVERHEAD_BYTES = 256
+
+private const val SINGLE_BYTE_CONSTANT_INDICES = 256
+
+private val CONSTANT_POOL_PADDING = Array(SINGLE_BYTE_CONSTANT_INDICES) { index -> "$index" }
 
 private class Whole(
     val node: MethodNode,

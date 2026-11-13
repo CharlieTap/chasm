@@ -30,6 +30,7 @@ internal fun LowerContext.lowerDispatcher(
     chunks: List<ChunkMethod>,
     frameCost: Int,
     dynamic: Map<Int, Int>,
+    resetsSlots: Boolean,
 ) {
     initializeScratch()
     emit.long(0L)
@@ -84,7 +85,9 @@ internal fun LowerContext.lowerDispatcher(
             emit.insn(Opcodes.LASTORE)
         }
     }
-    resetSlots(locals.scratchValues)
+    if (resetsSlots) {
+        resetSlots(locals.scratchValues)
+    }
 
     val continuation = locals.exitPosition
     emit.int(0)
@@ -96,9 +99,26 @@ internal fun LowerContext.lowerDispatcher(
     emit.load(Opcodes.ILOAD, continuation)
     emit.jump(Opcodes.IFLT, negative)
     val calls = chunks.map { emit.label() }
-    val targets = chunks.flatMapIndexed { index, chunk -> List(chunk.entryCount) { calls[index] } }
-    emit.load(Opcodes.ILOAD, continuation)
-    emit.tableSwitch(0, unknown, targets.toTypedArray())
+
+    val entries = chunks.sumOf { chunk -> chunk.entryCount }
+    val chunkOfEntry = LongArray(entries)
+    var entry = 0
+    chunks.forEachIndexed { index, chunk -> repeat(chunk.entryCount) { _ -> chunkOfEntry[entry++] = index.toLong() } }
+
+    if (entries > MAX_DIRECT_DISPATCH_ENTRIES) {
+        emit.load(Opcodes.ILOAD, continuation)
+        emit.int(entries)
+        emit.jump(Opcodes.IF_ICMPGE, unknown)
+        pushResource(Resource.Longs(chunkOfEntry))
+        emit.load(Opcodes.ILOAD, continuation)
+        emit.insn(Opcodes.LALOAD)
+        emit.insn(Opcodes.L2I)
+        emit.tableSwitch(0, unknown, calls.toTypedArray())
+    } else {
+        emit.load(Opcodes.ILOAD, continuation)
+        emit.tableSwitch(0, unknown, Array(entries) { index -> calls[chunkOfEntry[index].toInt()] })
+    }
+
     chunks.forEachIndexed { index, chunk ->
         emit.place(calls[index])
         emit.load(Opcodes.ALOAD, Locals.BINDING)
@@ -211,3 +231,5 @@ internal fun chunkName(
     functionName: String,
     index: Int,
 ) = "$functionName$CHUNK_METHOD_SEPARATOR$index"
+
+private const val MAX_DIRECT_DISPATCH_ENTRIES = 512

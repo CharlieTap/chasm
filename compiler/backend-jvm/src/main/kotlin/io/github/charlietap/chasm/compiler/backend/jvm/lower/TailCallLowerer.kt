@@ -49,13 +49,18 @@ internal fun LowerContext.lowerTailCall(
 private fun LowerContext.selfTailCall(
     arguments: List<Operand>,
 ) {
-    if (chunk != null) return chunkSelfTailCall(arguments)
+    val chunk = chunk
+    if (chunk != null) {
+        chunkSelfTailCall(chunk, arguments)
+        return
+    }
     transfer(arguments, 0)
     for (slot in parameterCount until frame.frameSlots) initialize(slot, frame.initialValues[slot])
     emit.jump(Opcodes.GOTO, label(0))
 }
 
 private fun LowerContext.chunkSelfTailCall(
+    chunk: Chunk,
     arguments: List<Operand>,
 ) {
     pushContext()
@@ -69,7 +74,9 @@ private fun LowerContext.chunkSelfTailCall(
         pushLong(argument)
         emit.insn(Opcodes.LASTORE)
     }
-    resetSlots(locals.scratchValues)
+    if (chunk.resetsSlots) {
+        resetSlots(locals.scratchValues)
+    }
     emit.int(0)
     emit.insn(Opcodes.IRETURN)
 }

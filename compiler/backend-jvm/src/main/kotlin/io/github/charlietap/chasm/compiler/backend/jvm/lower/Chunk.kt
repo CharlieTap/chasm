@@ -9,6 +9,7 @@ internal class Chunk(
     val reloads: BooleanArray? = null,
     val spills: BooleanArray? = null,
     val continuationIds: IntArray? = null,
+    val resetsSlots: Boolean,
 ) {
     val exits = LinkedHashMap<Int, Label>()
 
