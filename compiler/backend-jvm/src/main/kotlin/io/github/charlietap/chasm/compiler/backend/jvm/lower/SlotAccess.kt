@@ -277,21 +277,29 @@ private fun LowerContext.copyOwn(
             when (kind) {
                 SlotKinds.INT -> {
                     emit.load(Opcodes.ILOAD, locals.slot(source.slot))
-                    return storeInt(destination)
+                    storeInt(destination)
+                    return
                 }
                 SlotKinds.FLOAT -> {
                     emit.load(Opcodes.FLOAD, locals.slot(source.slot))
-                    return storeFloat(destination)
+                    storeFloat(destination)
+                    return
                 }
                 SlotKinds.DOUBLE -> {
                     emit.load(Opcodes.DLOAD, locals.slot(source.slot))
-                    return storeDouble(destination)
+                    storeDouble(destination)
+                    return
                 }
             }
         }
     }
-    pushLong(source)
-    storeLong(destination)
+    if (locals.kind(destination) == SlotKinds.FLOAT && source is Operand.Immediate) {
+        pushFloat(source)
+        storeFloat(destination)
+        return
+    }
+    pushCopied(destination, source)
+    storeCopied(destination)
 }
 
 internal fun LowerContext.parallelCopy(
@@ -303,8 +311,27 @@ internal fun LowerContext.parallelCopy(
         !(source is Operand.Slot && source.slot == destinations[index])
     }
     if (moves.size == 1) return copyToSlot(destinations[moves[0]], sources[moves[0]])
-    moves.forEach { index -> pushLong(sources[index]) }
-    moves.asReversed().forEach { index -> storeLong(destinations[index]) }
+    moves.forEach { index -> pushCopied(destinations[index], sources[index]) }
+    moves.asReversed().forEach { index -> storeCopied(destinations[index]) }
+}
+
+private fun LowerContext.pushCopied(
+    destination: Int,
+    source: Operand,
+) {
+    if (locals.kind(destination) == SlotKinds.INT) {
+        pushInt(source)
+    } else {
+        pushLong(source)
+    }
+}
+
+private fun LowerContext.storeCopied(destination: Int) {
+    if (locals.kind(destination) == SlotKinds.INT) {
+        storeInt(destination)
+    } else {
+        storeLong(destination)
+    }
 }
 
 internal fun LowerContext.transfer(

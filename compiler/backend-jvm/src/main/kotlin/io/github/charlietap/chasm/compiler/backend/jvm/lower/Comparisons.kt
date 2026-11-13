@@ -37,26 +37,11 @@ internal fun LowerContext.branchCompare(
 ) {
     val ordering = if (negated) comparison.ordering.opposite() else comparison.ordering
     when (type) {
-        NumberType.I32 -> when {
-            comparison.unsigned -> {
-                flipped { pushInt(left) }
-                flipped { pushInt(right) }
-                emit.jump(intBranch(ordering), target)
-            }
-            right == ZERO -> {
-                pushInt(left)
-                emit.jump(zeroBranch(ordering), target)
-            }
-            else -> {
-                pushInt(left)
-                pushInt(right)
-                emit.jump(intBranch(ordering), target)
-            }
-        }
+        NumberType.I32 -> branchI32(ordering, comparison.unsigned, left, right, target)
         NumberType.I64 -> {
             if (comparison.unsigned) {
-                flippedLong { pushLong(left) }
-                flippedLong { pushLong(right) }
+                pushFlippedLong(left)
+                pushFlippedLong(right)
             } else {
                 pushLong(left)
                 pushLong(right)
@@ -79,6 +64,82 @@ internal fun LowerContext.branchCompare(
         }
         else -> throw Unsupported("$type comparisons")
     }
+}
+
+private fun LowerContext.branchI32(
+    ordering: Ordering,
+    unsigned: Boolean,
+    left: Operand,
+    right: Operand,
+    target: Label,
+) {
+
+    val zeroRight = right.isZero()
+    if (zeroRight || left.isZero()) {
+        val against = if (zeroRight) ordering else ordering.swapped()
+        val value = if (zeroRight) left else right
+        branchAgainstZero(against, unsigned, value, target)
+        return
+    }
+
+    if (unsigned) {
+        pushFlipped(left)
+        pushFlipped(right)
+    } else {
+        pushInt(left)
+        pushInt(right)
+    }
+    emit.jump(intBranch(ordering), target)
+}
+
+private fun LowerContext.branchAgainstZero(
+    ordering: Ordering,
+    unsigned: Boolean,
+    value: Operand,
+    target: Label,
+) {
+
+    if (!unsigned) {
+        pushInt(value)
+        emit.jump(zeroBranch(ordering), target)
+        return
+    }
+
+    when (ordering) {
+        Ordering.Less -> Unit
+        Ordering.Greater, Ordering.NotEqual -> {
+            pushInt(value)
+            emit.jump(Opcodes.IFNE, target)
+        }
+        Ordering.LessOrEqual, Ordering.Equal -> {
+            pushInt(value)
+            emit.jump(Opcodes.IFEQ, target)
+        }
+        Ordering.GreaterOrEqual -> {
+            emit.jump(Opcodes.GOTO, target)
+            emit.place(emit.label())
+        }
+    }
+}
+
+private fun LowerContext.pushFlipped(operand: Operand) {
+    if (operand is Operand.Immediate) {
+        emit.int(operand.bits.toInt() xor Int.MIN_VALUE)
+    } else {
+        flipped { pushInt(operand) }
+    }
+}
+
+private fun LowerContext.pushFlippedLong(operand: Operand) {
+    if (operand is Operand.Immediate) {
+        emit.long(operand.bits xor Long.MIN_VALUE)
+    } else {
+        flippedLong { pushLong(operand) }
+    }
+}
+
+private fun Operand.isZero(): Boolean {
+    return this is Operand.Immediate && bits.toInt() == 0
 }
 
 internal fun LowerContext.lowerCondition(
@@ -110,6 +171,25 @@ private fun LowerContext.branchOnCondition(
     }
 }
 
+internal inline fun LowerContext.booleanResult(
+    destination: Int,
+    branch: (holds: Label) -> Unit,
+) {
+
+    val holds = emit.label()
+    val done = emit.label()
+
+    branch(holds)
+    emit.int(0)
+    emit.jump(Opcodes.GOTO, done)
+
+    emit.place(holds)
+    emit.int(1)
+
+    emit.place(done, Opcodes.INTEGER)
+    storeInt(destination)
+}
+
 internal fun LowerContext.branchOnInt(
     operand: Operand,
     zero: Boolean,
@@ -119,8 +199,6 @@ internal fun LowerContext.branchOnInt(
     emit.jump(if (zero) Opcodes.IFEQ else Opcodes.IFNE, target)
 }
 
-private val ZERO: Operand = Operand.Immediate(0)
-
 private fun Ordering.opposite(): Ordering = when (this) {
     Ordering.Equal -> Ordering.NotEqual
     Ordering.NotEqual -> Ordering.Equal
@@ -128,6 +206,16 @@ private fun Ordering.opposite(): Ordering = when (this) {
     Ordering.GreaterOrEqual -> Ordering.Less
     Ordering.Greater -> Ordering.LessOrEqual
     Ordering.LessOrEqual -> Ordering.Greater
+}
+
+private fun Ordering.swapped(): Ordering {
+    return when (this) {
+        Ordering.Less -> Ordering.Greater
+        Ordering.Greater -> Ordering.Less
+        Ordering.LessOrEqual -> Ordering.GreaterOrEqual
+        Ordering.GreaterOrEqual -> Ordering.LessOrEqual
+        Ordering.Equal, Ordering.NotEqual -> this
+    }
 }
 
 private fun intBranch(

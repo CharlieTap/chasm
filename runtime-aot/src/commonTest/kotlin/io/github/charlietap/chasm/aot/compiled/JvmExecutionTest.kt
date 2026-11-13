@@ -34,6 +34,7 @@ class JvmExecutionTest {
         assertEquals(listOf(F64(Math.sqrt(3.0 * 12.0))), fixture.call("mix", I64(3), F64(12.0)))
         assertEquals(listOf(I32(-1 ushr 1)), fixture.call("div_u", I32(-2), I32(1).let { I32(2) }))
         assertEquals(listOf(I32(1)), fixture.call("lt_u", I64(1), I64(-1)))
+        assertEquals(listOf(I32(1)), fixture.call("ge_u_zero", I32(-1)))
         assertEquals(listOf(F32(2f)), fixture.call("pick", I32(0), F32(1f), F32(2f)))
         assertEquals(listOf(I32(-7)), fixture.call("trunc", F32(-7.9f)))
         assertTrap(fixture.invoke("div_u", I32(1), I32(0)))

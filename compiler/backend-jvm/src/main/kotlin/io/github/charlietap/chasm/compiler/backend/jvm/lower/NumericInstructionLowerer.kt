@@ -24,14 +24,10 @@ import io.github.charlietap.chasm.compiler.backend.abi.I64_REM_U
 import io.github.charlietap.chasm.compiler.backend.abi.INT_BITS_TO_FLOAT
 import io.github.charlietap.chasm.compiler.backend.abi.INT_BIT_COUNT
 import io.github.charlietap.chasm.compiler.backend.abi.INT_LEADING_ZEROS
-import io.github.charlietap.chasm.compiler.backend.abi.INT_ROTATE_LEFT
-import io.github.charlietap.chasm.compiler.backend.abi.INT_ROTATE_RIGHT
 import io.github.charlietap.chasm.compiler.backend.abi.INT_TRAILING_ZEROS
 import io.github.charlietap.chasm.compiler.backend.abi.LONG_BITS_TO_DOUBLE
 import io.github.charlietap.chasm.compiler.backend.abi.LONG_BIT_COUNT
 import io.github.charlietap.chasm.compiler.backend.abi.LONG_LEADING_ZEROS
-import io.github.charlietap.chasm.compiler.backend.abi.LONG_ROTATE_LEFT
-import io.github.charlietap.chasm.compiler.backend.abi.LONG_ROTATE_RIGHT
 import io.github.charlietap.chasm.compiler.backend.abi.LONG_TRAILING_ZEROS
 import io.github.charlietap.chasm.compiler.backend.abi.MATH_CEIL
 import io.github.charlietap.chasm.compiler.backend.abi.MATH_FLOOR
@@ -78,12 +74,19 @@ private fun LowerContext.unary(
 ) {
     val type = form.type
     when (form.operation) {
-        UnaryOperation.Abs, UnaryOperation.Neg -> return signBit(form)
+        UnaryOperation.Abs -> {
+            absolute(form)
+            return
+        }
+        UnaryOperation.Neg -> {
+            negate(form)
+            return
+        }
         UnaryOperation.Extend32S -> {
-            pushLong(form.operand)
-            emit.insn(Opcodes.L2I)
+            pushInt(form.operand)
             emit.insn(Opcodes.I2L)
-            return storeLong(form.destination)
+            storeLong(form.destination)
+            return
         }
         else -> Unit
     }
@@ -126,24 +129,37 @@ private fun LowerContext.unary(
     store(type, form.destination)
 }
 
-private fun LowerContext.signBit(
-    form: NumericForm.Unary,
-) {
-    val abs = form.operation == UnaryOperation.Abs
+private fun LowerContext.negate(form: NumericForm.Unary) {
+    when (form.type) {
+        NumberType.F32 -> {
+            pushFloat(form.operand)
+            emit.insn(Opcodes.FNEG)
+            storeFloat(form.destination)
+        }
+        NumberType.F64 -> {
+            pushDouble(form.operand)
+            emit.insn(Opcodes.DNEG)
+            storeDouble(form.destination)
+        }
+        else -> unsupported(form)
+    }
+}
+
+private fun LowerContext.absolute(form: NumericForm.Unary) {
     when (form.type) {
         NumberType.F32 -> {
             pushFloat(form.operand)
             emit.invokeStatic(FLOAT_TO_RAW_INT_BITS)
-            emit.int(if (abs) Int.MAX_VALUE else Int.MIN_VALUE)
-            emit.insn(if (abs) Opcodes.IAND else Opcodes.IXOR)
+            emit.int(Int.MAX_VALUE)
+            emit.insn(Opcodes.IAND)
             emit.invokeStatic(INT_BITS_TO_FLOAT)
             storeFloat(form.destination)
         }
         NumberType.F64 -> {
             pushDouble(form.operand)
             emit.invokeStatic(DOUBLE_TO_RAW_LONG_BITS)
-            emit.long(if (abs) Long.MAX_VALUE else Long.MIN_VALUE)
-            emit.insn(if (abs) Opcodes.LAND else Opcodes.LXOR)
+            emit.long(Long.MAX_VALUE)
+            emit.insn(Opcodes.LAND)
             emit.invokeStatic(LONG_BITS_TO_DOUBLE)
             storeDouble(form.destination)
         }
@@ -178,10 +194,13 @@ private fun LowerContext.binary(
     form: NumericForm.Binary,
 ) {
     val type = form.type
+    if (form.operation == BinaryOperation.Rotl || form.operation == BinaryOperation.Rotr) {
+        rotate(form)
+        return
+    }
     push(type, form.left)
     if (type == NumberType.I64 && form.operation.takesIntCount()) {
-        pushLong(form.right)
-        emit.insn(Opcodes.L2I)
+        pushInt(form.right)
     } else {
         push(type, form.right)
     }
@@ -200,8 +219,6 @@ private fun LowerContext.binary(
             BinaryOperation.Shl -> emit.insn(Opcodes.ISHL)
             BinaryOperation.ShrS -> emit.insn(Opcodes.ISHR)
             BinaryOperation.ShrU -> emit.insn(Opcodes.IUSHR)
-            BinaryOperation.Rotl -> emit.invokeStatic(INT_ROTATE_LEFT)
-            BinaryOperation.Rotr -> emit.invokeStatic(INT_ROTATE_RIGHT)
             else -> unsupported(form)
         }
         NumberType.I64 -> when (form.operation) {
@@ -218,8 +235,6 @@ private fun LowerContext.binary(
             BinaryOperation.Shl -> emit.insn(Opcodes.LSHL)
             BinaryOperation.ShrS -> emit.insn(Opcodes.LSHR)
             BinaryOperation.ShrU -> emit.insn(Opcodes.LUSHR)
-            BinaryOperation.Rotl -> emit.invokeStatic(LONG_ROTATE_LEFT)
-            BinaryOperation.Rotr -> emit.invokeStatic(LONG_ROTATE_RIGHT)
             else -> unsupported(form)
         }
         NumberType.F32 -> when (form.operation) {
@@ -247,21 +262,57 @@ private fun LowerContext.binary(
     store(type, form.destination)
 }
 
-private fun BinaryOperation.takesIntCount() = this == BinaryOperation.Shl || this == BinaryOperation.ShrS ||
-    this == BinaryOperation.ShrU || this == BinaryOperation.Rotl || this == BinaryOperation.Rotr
+private fun LowerContext.rotate(form: NumericForm.Binary) {
 
-private fun LowerContext.compare(
-    form: NumericForm.Compare,
-) {
-    val holds = emit.label()
-    val done = emit.label()
-    branchCompare(form.type, form.comparison, form.left, form.right, holds, negated = false)
-    emit.int(0)
-    emit.jump(Opcodes.GOTO, done)
-    emit.place(holds)
-    emit.int(1)
-    emit.place(done, Opcodes.INTEGER)
-    storeInt(form.destination)
+    val operation = form.operation
+    val type = form.type
+    val wide = type == NumberType.I64
+    val bits = if (wide) Long.SIZE_BITS else Int.SIZE_BITS
+    val first = if (operation == BinaryOperation.Rotl) shiftLeft(wide) else shiftRight(wide)
+    val second = if (operation == BinaryOperation.Rotl) shiftRight(wide) else shiftLeft(wide)
+
+    val count = form.right
+    if (count is Operand.Immediate) {
+        val amount = count.bits.mod(bits)
+        push(type, form.left)
+        if (amount != 0) {
+            emit.int(amount)
+            emit.insn(first)
+            push(type, form.left)
+            emit.int(bits - amount)
+            emit.insn(second)
+            emit.insn(if (wide) Opcodes.LOR else Opcodes.IOR)
+        }
+    } else {
+        push(type, form.left)
+        pushInt(count)
+        emit.insn(first)
+        push(type, form.left)
+        pushInt(count)
+        emit.insn(Opcodes.INEG)
+        emit.insn(second)
+        emit.insn(if (wide) Opcodes.LOR else Opcodes.IOR)
+    }
+
+    store(type, form.destination)
+}
+
+private fun shiftLeft(wide: Boolean): Int {
+    return if (wide) Opcodes.LSHL else Opcodes.ISHL
+}
+
+private fun shiftRight(wide: Boolean): Int {
+    return if (wide) Opcodes.LUSHR else Opcodes.IUSHR
+}
+
+private fun BinaryOperation.takesIntCount(): Boolean {
+    return this == BinaryOperation.Shl || this == BinaryOperation.ShrS || this == BinaryOperation.ShrU
+}
+
+private fun LowerContext.compare(form: NumericForm.Compare) {
+    booleanResult(form.destination) { holds ->
+        branchCompare(form.type, form.comparison, form.left, form.right, holds, negated = false)
+    }
 }
 
 private fun LowerContext.wide(

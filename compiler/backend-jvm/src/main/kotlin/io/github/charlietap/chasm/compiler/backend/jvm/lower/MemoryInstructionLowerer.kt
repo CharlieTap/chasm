@@ -479,10 +479,6 @@ private fun LowerContext.pushNarrow(
     value: Operand,
 ) {
     when (type) {
-        NumberType.I64 -> {
-            pushLong(value)
-            emit.insn(Opcodes.L2I)
-        }
         NumberType.F32 -> {
             pushFloat(value)
             emit.invokeStatic(FLOAT_TO_RAW_INT_BITS)

@@ -21,6 +21,11 @@
     local.get 1
     i64.lt_u)
 
+  (func (export "ge_u_zero") (param i32) (result i32)
+    local.get 0
+    i32.const 0
+    i32.ge_u)
+
   (func (export "pick") (param i32 f32 f32) (result f32)
     local.get 1
     local.get 2
