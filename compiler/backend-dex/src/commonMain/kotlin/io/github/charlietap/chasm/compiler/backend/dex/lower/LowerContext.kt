@@ -68,7 +68,7 @@ internal class LowerContext(
 
     var cachesLoaded = false
 
-    val sharedTraps = HashMap<MethodRef, String>()
+    val sharedTrapLabels = HashMap<MethodRef, String>()
 
     var publishesWrites = true
 

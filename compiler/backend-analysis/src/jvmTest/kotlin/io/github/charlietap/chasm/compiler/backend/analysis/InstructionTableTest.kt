@@ -20,15 +20,15 @@ class InstructionTableTest {
     private val declarations = ModuleIndexSpaces(module)
 
     @Test
-    fun `memory accesses record their position, memory, address slot and reach`() {
+    fun `memory accesses record their position, memory, address slot and end offset`() {
 
         val accesses = table("accesses").accesses
 
         assertContentEquals(intArrayOf(1, 2, 3), accesses.positions)
         assertContentEquals(intArrayOf(0, 1, 0), accesses.memories)
-        assertContentEquals(intArrayOf(0, MemoryAccessTable.IMMEDIATE, 0), accesses.addresses)
-        assertContentEquals(longArrayOf(12, 4, 4), accesses.reach)
-        assertEquals(listOf(-1, 0, 1, 2, -1), (0..4).map(accesses::indexAt))
+        assertContentEquals(intArrayOf(0, MemoryAccessTable.CONSTANT_ADDRESS, 0), accesses.addresses)
+        assertContentEquals(longArrayOf(12, 4, 4), accesses.endOffsets)
+        assertEquals(listOf(-1, 0, 1, 2, -1), (0..4).map(accesses::accessIndexAt))
     }
 
     @Test
@@ -60,9 +60,9 @@ class InstructionTableTest {
         assertEquals(SlotWriteTable.SEQUENTIAL, writes.modes[1])
         assertEquals(listOf(3, 4), writes.slotsAt(1))
         assertEquals(listOf(0, 1), writes.sourcesAt(1))
-        assertEquals(listOf(WriteKinds.UNDEFINED, WriteKinds.UNDEFINED), writes.kindsAt(1))
+        assertEquals(listOf(WriteKinds.COPIED, WriteKinds.COPIED), writes.kindsAt(1))
         assertEquals(listOf(6), writes.slotsAt(2))
-        assertEquals(listOf(SlotWriteTable.TYPED), writes.sourcesAt(2))
+        assertEquals(listOf(SlotWriteTable.NOT_A_COPY), writes.sourcesAt(2))
         assertEquals(listOf(WriteKinds.LONG), writes.kindsAt(2))
         assertEquals(listOf(0), writes.slotsAt(3))
         assertEquals(4, writes.count)
@@ -87,7 +87,7 @@ class InstructionTableTest {
         val function = function("self")
         val table = instructionTable(function, declarations)
 
-        assertEquals(listOf(3), function.instructions.indices.filter(table::restarts))
+        assertEquals(listOf(3), function.instructions.indices.filter(table::restartsFunction))
         assertEquals(listOf(0), table.writes.slotsAt(3))
         assertEquals(listOf(2), table.writes.sourcesAt(3))
     }
@@ -98,7 +98,7 @@ class InstructionTableTest {
         val function = function("guarded")
         val table = instructionTable(function, declarations)
 
-        assertEquals(emptyList(), function.instructions.indices.filter(table::restarts))
+        assertEquals(emptyList(), function.instructions.indices.filter(table::restartsFunction))
         assertEquals(listOf(-1, 0, -1), function.instructions.indices.map(table::innermostRegion))
     }
 

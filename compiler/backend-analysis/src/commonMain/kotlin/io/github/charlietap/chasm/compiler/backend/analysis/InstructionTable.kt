@@ -21,7 +21,7 @@ class InstructionTable internal constructor(
         return regions[position]
     }
 
-    fun restarts(position: Int): Boolean {
+    fun restartsFunction(position: Int): Boolean {
         return function.instructions[position].isSelfTailCall(function, innermostRegion(position))
     }
 }
@@ -46,7 +46,7 @@ class SlotWriteTable internal constructor(
         const val SELECT: Byte = 2
         const val CONDITIONAL: Byte = 3
 
-        const val TYPED = -1
+        const val NOT_A_COPY = -1
     }
 }
 
@@ -66,7 +66,7 @@ class MemoryAccessTable internal constructor(
     val positions: IntArray,
     val memories: IntArray,
     val addresses: IntArray,
-    val reach: LongArray,
+    val endOffsets: LongArray,
 ) {
     val count: Int = positions.size
 
@@ -74,7 +74,7 @@ class MemoryAccessTable internal constructor(
         return start[position + 1]
     }
 
-    fun indexAt(position: Int): Int {
+    fun accessIndexAt(position: Int): Int {
         return if (end(position) > start[position]) start[position] else -1
     }
 
@@ -92,7 +92,7 @@ class MemoryAccessTable internal constructor(
     }
 
     companion object {
-        const val IMMEDIATE = -1
+        const val CONSTANT_ADDRESS = -1
     }
 }
 
@@ -107,9 +107,9 @@ fun instructionTable(
     val writeStart = IntArray(size + 1)
     val targetStart = IntArray(size + 1)
     val accessStart = IntArray(size + 1)
-    val writes = TableWrites(size)
-    val accesses = TableAccesses()
-    val targets = TableTargets()
+    val writes = SlotWriteBuilder(size)
+    val accesses = MemoryAccessBuilder()
+    val targets = JumpTargetBuilder()
 
     for (position in 0 until size) {
 
@@ -158,13 +158,13 @@ fun instructionTable(
             positions = accesses.positions.copyOf(accesses.size),
             memories = accesses.memories.copyOf(accesses.size),
             addresses = accesses.addresses.copyOf(accesses.size),
-            reach = accesses.reach.copyOf(accesses.size),
+            endOffsets = accesses.endOffsets.copyOf(accesses.size),
         ),
         innermostRegions = if (regions.isEmpty()) null else innermostRegions(regions, size),
     )
 }
 
-private class TableWrites(
+private class SlotWriteBuilder(
     instructions: Int,
 ) : SlotWriteVisitor {
     var slots = IntArray(maxOf(16, instructions))
@@ -198,21 +198,21 @@ private class TableWrites(
         slot: Int,
         type: ValueType,
     ) {
-        add(slot, WriteKinds.kindOf(type), SlotWriteTable.TYPED, collectable(type))
+        add(slot, WriteKinds.kindOf(type), SlotWriteTable.NOT_A_COPY, collectable(type))
     }
 
     override fun opaque(
         slot: Int,
         reference: Boolean,
     ) {
-        add(slot, WriteKinds.LONG, SlotWriteTable.TYPED, reference)
+        add(slot, WriteKinds.LONG, SlotWriteTable.NOT_A_COPY, reference)
     }
 
     override fun helperResult(
         slot: Int,
         reference: Boolean,
     ) {
-        add(slot, if (reference) WriteKinds.LONG else WriteKinds.INT, SlotWriteTable.TYPED, reference)
+        add(slot, if (reference) WriteKinds.LONG else WriteKinds.INT, SlotWriteTable.NOT_A_COPY, reference)
     }
 
     override fun copy(
@@ -220,13 +220,13 @@ private class TableWrites(
         destination: Int,
     ) {
         when (source) {
-            is Operand.Slot -> add(destination, WriteKinds.UNDEFINED, source.slot, reference = false)
-            is Operand.Immediate -> add(destination, WriteKinds.immediateKind(source.bits), SlotWriteTable.TYPED, reference = false)
+            is Operand.Slot -> add(destination, WriteKinds.COPIED, source.slot, reference = false)
+            is Operand.Immediate -> add(destination, WriteKinds.constantKind(source.bits), SlotWriteTable.NOT_A_COPY, reference = false)
         }
     }
 }
 
-private class TableTargets {
+private class JumpTargetBuilder {
     var targets = IntArray(16)
     var size = 0
 
@@ -240,11 +240,11 @@ private class TableTargets {
     }
 }
 
-private class TableAccesses {
+private class MemoryAccessBuilder {
     var positions = IntArray(16)
     var memories = IntArray(16)
     var addresses = IntArray(16)
-    var reach = LongArray(16)
+    var endOffsets = LongArray(16)
     var size = 0
 
     fun add(
@@ -256,14 +256,14 @@ private class TableAccesses {
             positions = positions.copyOf(size * 2)
             memories = memories.copyOf(size * 2)
             addresses = addresses.copyOf(size * 2)
-            reach = reach.copyOf(size * 2)
+            endOffsets = endOffsets.copyOf(size * 2)
         }
 
         val address = access.address
         positions[size] = position
         memories[size] = access.memory.index
-        addresses[size] = if (address is Operand.Slot) address.slot else MemoryAccessTable.IMMEDIATE
-        reach[size] = (access.offset.toLong() and 0xFFFF_FFFFL) + access.operation.width
+        addresses[size] = if (address is Operand.Slot) address.slot else MemoryAccessTable.CONSTANT_ADDRESS
+        endOffsets[size] = (access.offset.toLong() and 0xFFFF_FFFFL) + access.operation.width
         size++
     }
 }

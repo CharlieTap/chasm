@@ -191,7 +191,7 @@ private fun LowerContext.binary(
     val type = form.type
     when (form.operation) {
         BinaryOperation.DivS, BinaryOperation.DivU, BinaryOperation.RemS, BinaryOperation.RemU -> {
-            val divisor = form.immediateDivisor()
+            val divisor = form.constantDivisor()
             if (divisor == 0L) {
                 emit.jump(Opcodes.GOTO, trapLabel(DIVIDE_BY_ZERO))
             } else {
@@ -261,7 +261,7 @@ private fun LowerContext.binary(
     store(type, form.destination)
 }
 
-private fun NumericForm.Binary.immediateDivisor(): Long? {
+private fun NumericForm.Binary.constantDivisor(): Long? {
     return (right as? Operand.Immediate)?.bits?.let { bits -> if (type == NumberType.I64) bits else bits.toInt().toLong() }
 }
 
@@ -278,7 +278,7 @@ private fun LowerContext.divide(
         trapOnZeroDivisor(type, form.right)
     }
     if (operation == BinaryOperation.DivS && (divisor == null || divisor == -1L)) {
-        trapOnOverflow(form, divisor)
+        trapOnDivisionOverflow(form, divisor)
     }
     if (!wide && operation == BinaryOperation.RemU) {
         unsignedIntRemainder(form)
@@ -308,7 +308,7 @@ private fun LowerContext.trapOnZeroDivisor(
     emit.jump(Opcodes.IFEQ, trapLabel(DIVIDE_BY_ZERO))
 }
 
-private fun LowerContext.trapOnOverflow(
+private fun LowerContext.trapOnDivisionOverflow(
     form: NumericForm.Binary,
     divisor: Long?,
 ) {
@@ -367,8 +367,8 @@ private fun LowerContext.rotate(form: NumericForm.Binary) {
     val type = form.type
     val wide = type == NumberType.I64
     val bits = if (wide) Long.SIZE_BITS else Int.SIZE_BITS
-    val first = if (operation == BinaryOperation.Rotl) shiftLeft(wide) else shiftRight(wide)
-    val second = if (operation == BinaryOperation.Rotl) shiftRight(wide) else shiftLeft(wide)
+    val first = if (operation == BinaryOperation.Rotl) shiftLeftOpcode(wide) else unsignedShiftRightOpcode(wide)
+    val second = if (operation == BinaryOperation.Rotl) unsignedShiftRightOpcode(wide) else shiftLeftOpcode(wide)
 
     val count = form.right
     if (count is Operand.Immediate) {
@@ -396,11 +396,11 @@ private fun LowerContext.rotate(form: NumericForm.Binary) {
     store(type, form.destination)
 }
 
-private fun shiftLeft(wide: Boolean): Int {
+private fun shiftLeftOpcode(wide: Boolean): Int {
     return if (wide) Opcodes.LSHL else Opcodes.ISHL
 }
 
-private fun shiftRight(wide: Boolean): Int {
+private fun unsignedShiftRightOpcode(wide: Boolean): Int {
     return if (wide) Opcodes.LUSHR else Opcodes.IUSHR
 }
 

@@ -106,12 +106,12 @@ internal fun LowerContext.trapLabel(method: MethodRef): Label {
 
     val shared = !module.options.stacktraces
     if (shared) {
-        sharedTraps[method]?.let { label -> return label }
+        sharedTrapLabels[method]?.let { label -> return label }
     }
 
     val label = emit.label()
     if (shared) {
-        sharedTraps[method] = label
+        sharedTrapLabels[method] = label
     }
 
     val origin = position

@@ -131,7 +131,7 @@ private fun LowerContext.inlineAccess(
     }
     val address = access.address
     if (address is Operand.Immediate) {
-        immediateAccess(access, address)
+        constantAddressAccess(access, address)
         return
     }
     if (analysis.checkedAccesses[position]) {
@@ -154,10 +154,10 @@ private fun LowerContext.inlineAccess(
     }
     emit.branchCompare(Cond.Gt, Registers.I0, Registers.I3, outOfBounds)
     addOffset(access.offset)
-    inlineTransfer(access)
+    inlineLoadOrStore(access)
 }
 
-private fun LowerContext.immediateAccess(
+private fun LowerContext.constantAddressAccess(
     access: MemoryAccess,
     address: Operand.Immediate,
 ) {
@@ -175,7 +175,7 @@ private fun LowerContext.immediateAccess(
         emit.branchCompare(Cond.Gt, Registers.I0, Registers.I3, outOfBounds(access))
     }
 
-    inlineTransfer(access)
+    inlineLoadOrStore(access)
 }
 
 private fun LowerContext.checkedAccess(
@@ -183,10 +183,10 @@ private fun LowerContext.checkedAccess(
 ) {
     loadInt(Registers.I0, Registers.W0, access.address)
     addOffset(access.offset)
-    inlineTransfer(access)
+    inlineLoadOrStore(access)
 }
 
-private fun LowerContext.inlineTransfer(access: MemoryAccess) {
+private fun LowerContext.inlineLoadOrStore(access: MemoryAccess) {
     val value = access.value
     if (value == null) {
         inlineLoad(access.operation, access.destination)

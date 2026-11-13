@@ -478,10 +478,10 @@ private fun LowerContext.i32Divide(
 
     when (operation) {
         BinaryOperation.DivS -> {
-            i32OverflowCheck(left, rightRegister, immediate)
-            i32Signed(BinaryOp.DivInt, left, rightRegister, destination)
+            i32DivisionOverflowCheck(left, rightRegister, immediate)
+            i32SignedDivide(BinaryOp.DivInt, left, rightRegister, destination)
         }
-        BinaryOperation.RemS -> i32Signed(BinaryOp.RemInt, left, rightRegister, destination)
+        BinaryOperation.RemS -> i32SignedDivide(BinaryOp.RemInt, left, rightRegister, destination)
         BinaryOperation.DivU -> {
             loadInt(Registers.I0, Registers.W0, left)
             emit.invoke(INT_DIVIDE_UNSIGNED, Registers.I0, Registers.I1)
@@ -502,7 +502,7 @@ private fun LowerContext.i32Divide(
     }
 }
 
-private fun LowerContext.i32OverflowCheck(
+private fun LowerContext.i32DivisionOverflowCheck(
     left: Operand,
     rightRegister: Int,
     immediate: Operand.Immediate?,
@@ -526,7 +526,7 @@ private fun LowerContext.i32OverflowCheck(
     }
 }
 
-private fun LowerContext.i32Signed(
+private fun LowerContext.i32SignedDivide(
     operation: BinaryOp,
     left: Operand,
     rightRegister: Int,
@@ -566,10 +566,10 @@ private fun LowerContext.i64Divide(
 
     when (operation) {
         BinaryOperation.DivS -> {
-            i64OverflowCheck(left, rightRegister, immediate)
-            i64Signed(BinaryOp.DivLong, left, rightRegister, destination)
+            i64DivisionOverflowCheck(left, rightRegister, immediate)
+            i64SignedDivide(BinaryOp.DivLong, left, rightRegister, destination)
         }
-        BinaryOperation.RemS -> i64Signed(BinaryOp.RemLong, left, rightRegister, destination)
+        BinaryOperation.RemS -> i64SignedDivide(BinaryOp.RemLong, left, rightRegister, destination)
         else -> {
             loadWide(Registers.W0, left)
             val helper = if (operation == BinaryOperation.DivU) LONG_DIVIDE_UNSIGNED else LONG_REMAINDER_UNSIGNED
@@ -580,7 +580,7 @@ private fun LowerContext.i64Divide(
     }
 }
 
-private fun LowerContext.i64OverflowCheck(
+private fun LowerContext.i64DivisionOverflowCheck(
     left: Operand,
     rightRegister: Int,
     immediate: Operand.Immediate?,
@@ -605,7 +605,7 @@ private fun LowerContext.i64OverflowCheck(
     }
 }
 
-private fun LowerContext.i64Signed(
+private fun LowerContext.i64SignedDivide(
     operation: BinaryOp,
     left: Operand,
     rightRegister: Int,

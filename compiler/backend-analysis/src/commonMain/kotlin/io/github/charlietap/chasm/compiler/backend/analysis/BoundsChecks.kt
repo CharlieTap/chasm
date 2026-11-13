@@ -9,7 +9,7 @@ fun CirFunction.redundantBoundsChecks(table: InstructionTable): BooleanArray {
     val accesses = table.accesses
     var checked = 0
     for (index in 0 until accesses.count) {
-        if (accesses.memories[index] == 0 && accesses.addresses[index] != MemoryAccessTable.IMMEDIATE) {
+        if (accesses.memories[index] == 0 && accesses.addresses[index] != MemoryAccessTable.CONSTANT_ADDRESS) {
             checked++
         }
     }
@@ -17,13 +17,13 @@ fun CirFunction.redundantBoundsChecks(table: InstructionTable): BooleanArray {
         return redundant
     }
 
-    val effects = CheckEffects(this, table, checked)
-    val loops = if (effects.backJumps.size > 0) LoopSurvival(effects) else null
-    val handlers = effects.handlers
-    val pending = PendingReach(effects.tracked, size)
-    var current = CheckedReach(effects.tracked)
+    val checkIndex = BoundsCheckIndex(this, table, checked)
+    val loops = if (checkIndex.backJumps.size > 0) LoopWrites(checkIndex) else null
+    val handlers = checkIndex.handlers
+    val pending = ForwardBranchProofs(checkIndex.trackedCount, size)
+    var current = ProvenBounds(checkIndex.trackedCount)
     var reachable = true
-    val jumps = effects.forwardJumps
+    val jumps = checkIndex.forwardJumps
     var access = 0
     var loop = 0
     var handler = 0
@@ -39,27 +39,27 @@ fun CirFunction.redundantBoundsChecks(table: InstructionTable): BooleanArray {
 
         if (loops != null && loop < loops.count && loops.headers[loop] == position) {
             val end = loops.ends[loop]
-            val entered = pending.awaitsBy(end) || (handler < handlers.size && handlers[handler] <= end)
-            if (entered || loops.crossing[loop]) {
+            val entered = pending.hasPendingTargetBy(end) || (handler < handlers.size && handlers[handler] <= end)
+            if (entered || loops.partlyOverlapped[loop]) {
                 current.clear()
             } else {
-                loops.forgetWrites(position, end, current)
+                loops.forgetWrittenSlots(position, end, current)
             }
             loop++
         }
 
-        if (access < effects.accesses && effects.accessPositions[access] == position) {
-            val slot = effects.accessSlots[access]
-            val reach = effects.accessReach[access]
+        if (access < checkIndex.accesses && checkIndex.accessPositions[access] == position) {
+            val slot = checkIndex.accessSlots[access]
+            val endOffset = checkIndex.accessEndOffsets[access]
             access++
-            if (current.has(slot) && reach <= current.reach[slot]) {
+            if (current.has(slot) && endOffset <= current.provenEnd[slot]) {
                 redundant[position] = true
             } else {
-                current.prove(slot, reach)
+                current.prove(slot, endOffset)
             }
         }
 
-        effects.apply(position, current)
+        checkIndex.apply(position, current)
         if (jump < jumps.size && high(jumps[jump]) == position) {
             val empty = current.isEmpty()
             while (jump < jumps.size && high(jumps[jump]) == position) pending.branch(low(jumps[jump++]), current, empty)
@@ -71,40 +71,40 @@ fun CirFunction.redundantBoundsChecks(table: InstructionTable): BooleanArray {
     return redundant
 }
 
-private class CheckedReach(
-    tracked: Int,
+private class ProvenBounds(
+    trackedCount: Int,
 ) {
-    val reach = LongArray(tracked)
-    val valid = LongArray((tracked + 63) ushr 6)
+    val provenEnd = LongArray(trackedCount)
+    val proven = LongArray((trackedCount + 63) ushr 6)
 
     fun has(slot: Int): Boolean {
-        return valid.hasBit(slot)
+        return proven.hasBit(slot)
     }
 
     fun prove(
         slot: Int,
-        reach: Long,
+        endOffset: Long,
     ) {
-        this.reach[slot] = reach
-        valid.setBit(slot)
+        provenEnd[slot] = endOffset
+        proven.setBit(slot)
     }
 
     fun kill(slot: Int) {
-        valid.clearBit(slot)
+        proven.clearBit(slot)
     }
 
     fun clear() {
-        valid.fill(0L)
+        proven.fill(0L)
     }
 
     fun count(): Int {
-        var facts = 0
-        for (word in valid) facts += word.countOneBits()
-        return facts
+        var proofs = 0
+        for (word in proven) proofs += word.countOneBits()
+        return proofs
     }
 
     fun isEmpty(): Boolean {
-        for (word in valid) {
+        for (word in proven) {
             if (word != 0L) {
                 return false
             }
@@ -112,26 +112,26 @@ private class CheckedReach(
         return true
     }
 
-    fun copyFrom(other: CheckedReach) {
-        for (word in valid.indices) {
-            var bits = other.valid[word]
-            valid[word] = bits
+    fun copyFrom(other: ProvenBounds) {
+        for (word in proven.indices) {
+            var bits = other.proven[word]
+            proven[word] = bits
             while (bits != 0L) {
                 val slot = (word shl 6) + bits.countTrailingZeroBits()
-                reach[slot] = other.reach[slot]
+                provenEnd[slot] = other.provenEnd[slot]
                 bits = bits and (bits - 1)
             }
         }
     }
 
-    fun meet(other: CheckedReach) {
-        for (word in valid.indices) {
-            var bits = valid[word] and other.valid[word]
-            valid[word] = bits
+    fun meet(other: ProvenBounds) {
+        for (word in proven.indices) {
+            var bits = proven[word] and other.proven[word]
+            proven[word] = bits
             while (bits != 0L) {
                 val slot = (word shl 6) + bits.countTrailingZeroBits()
-                if (other.reach[slot] < reach[slot]) {
-                    reach[slot] = other.reach[slot]
+                if (other.provenEnd[slot] < provenEnd[slot]) {
+                    provenEnd[slot] = other.provenEnd[slot]
                 }
                 bits = bits and (bits - 1)
             }
@@ -139,8 +139,8 @@ private class CheckedReach(
     }
 
     inline fun forEachSlot(action: (slot: Int) -> Unit) {
-        for (word in valid.indices) {
-            var bits = valid[word]
+        for (word in proven.indices) {
+            var bits = proven[word]
             while (bits != 0L) {
                 action((word shl 6) + bits.countTrailingZeroBits())
                 bits = bits and (bits - 1)
@@ -149,22 +149,22 @@ private class CheckedReach(
     }
 }
 
-private class PendingReach(
-    private val tracked: Int,
+private class ForwardBranchProofs(
+    private val trackedCount: Int,
     size: Int,
 ) {
-    private val empty = CheckedReach(0)
-    private val states = arrayOfNulls<CheckedReach>(size + 1)
+    private val empty = ProvenBounds(0)
+    private val states = arrayOfNulls<ProvenBounds>(size + 1)
     private var targets = IntArray(8)
     private var count = 0
-    private val spare = ArrayList<CheckedReach>()
+    private val spare = ArrayList<ProvenBounds>()
 
     fun arrive(
         position: Int,
-        current: CheckedReach,
+        current: ProvenBounds,
         reachable: Boolean,
         atHandler: Boolean,
-    ): CheckedReach {
+    ): ProvenBounds {
 
         val carried = take(position)
 
@@ -194,13 +194,13 @@ private class PendingReach(
         return current
     }
 
-    fun awaitsBy(position: Int): Boolean {
+    fun hasPendingTargetBy(position: Int): Boolean {
         return count > 0 && targets[0] <= position
     }
 
     fun branch(
         target: Int,
-        current: CheckedReach,
+        current: ProvenBounds,
         currentEmpty: Boolean,
     ) {
         val state = states[target]
@@ -222,22 +222,22 @@ private class PendingReach(
         }
     }
 
-    private fun take(position: Int): CheckedReach? {
+    private fun take(position: Int): ProvenBounds? {
         val state = states[position] ?: return null
         states[position] = null
         popNearest()
         return state
     }
 
-    private fun recycle(state: CheckedReach) {
+    private fun recycle(state: ProvenBounds) {
         if (state !== empty) {
             spare.add(state)
         }
     }
 
-    private fun obtain(): CheckedReach {
+    private fun obtain(): ProvenBounds {
         return if (spare.isEmpty()) {
-            CheckedReach(tracked)
+            ProvenBounds(trackedCount)
         } else {
             spare.removeAt(spare.lastIndex)
         }
@@ -297,110 +297,110 @@ private fun low(packed: Long): Int {
     return packed.toInt()
 }
 
-private class CheckEffects(
+private class BoundsCheckIndex(
     function: CirFunction,
     table: InstructionTable,
     checked: Int,
 ) {
     val size = function.instructions.size
-    val first = IntArray(size + 1)
-    val slots: IntArray
-    val count: Int
+    val writeOffsets = IntArray(size + 1)
+    val writtenSlots: IntArray
+    val writeCount: Int
     val forwardJumps = LongList()
     val backJumps = LongList()
     val handlers = handlerEntries(function)
     val accessPositions = IntArray(checked)
     val accessSlots = IntArray(checked)
-    val accessReach = LongArray(checked)
+    val accessEndOffsets = LongArray(checked)
     val accesses = checked
-    val tracked: Int
-    private val carries = LongList()
-    private val dense: IntArray
-    private var carry = 0
+    val trackedCount: Int
+    private val proofCopies = LongList()
+    private val trackedIndex: IntArray
+    private var proofCopy = 0
 
     init {
 
         collectAccesses(table.accesses)
-        collectJumpsAndCarries(table.jumps, table.writes)
+        collectJumpsAndProofCopies(table.jumps, table.writes)
 
         val writes = table.writes
         var highest = -1
         for (index in 0 until writes.count) highest = maxOf(highest, writes.slots[index])
         for (index in 0 until accesses) highest = maxOf(highest, accessSlots[index])
-        dense = IntArray(highest + 1) { -1 }
-        var tracking = 0
+        trackedIndex = IntArray(highest + 1) { -1 }
+        var nextTracked = 0
         for (index in 0 until accesses) {
             val slot = accessSlots[index]
-            if (dense[slot] < 0) {
-                dense[slot] = tracking++
+            if (trackedIndex[slot] < 0) {
+                trackedIndex[slot] = nextTracked++
             }
-            accessSlots[index] = dense[slot]
+            accessSlots[index] = trackedIndex[slot]
         }
-        for (index in 0 until carries.size) {
-            val destination = writes.slots[writes.start[high(carries[index])]]
-            if (dense[destination] < 0) {
-                dense[destination] = tracking++
+        for (index in 0 until proofCopies.size) {
+            val destination = writes.slots[writes.start[high(proofCopies[index])]]
+            if (trackedIndex[destination] < 0) {
+                trackedIndex[destination] = nextTracked++
             }
         }
-        tracked = tracking
+        trackedCount = nextTracked
 
         var kept = 0
         for (index in 0 until writes.count) {
-            if (dense[writes.slots[index]] >= 0) {
+            if (trackedIndex[writes.slots[index]] >= 0) {
                 kept++
             }
         }
-        slots = IntArray(kept)
+        writtenSlots = IntArray(kept)
         kept = 0
         for (position in 0 until size) {
-            first[position] = kept
+            writeOffsets[position] = kept
             for (index in writes.start[position] until writes.end(position)) {
-                val slot = dense[writes.slots[index]]
+                val slot = trackedIndex[writes.slots[index]]
                 if (slot >= 0) {
-                    slots[kept++] = slot
+                    writtenSlots[kept++] = slot
                 }
             }
         }
-        first[size] = kept
-        count = kept
+        writeOffsets[size] = kept
+        writeCount = kept
     }
 
     fun apply(
         position: Int,
-        facts: CheckedReach,
+        proofs: ProvenBounds,
     ) {
 
         var source = -1
-        if (carry < carries.size && high(carries[carry]) == position) {
-            val slot = low(carries[carry++])
-            if (slot < dense.size) {
-                source = dense[slot]
+        if (proofCopy < proofCopies.size && high(proofCopies[proofCopy]) == position) {
+            val slot = low(proofCopies[proofCopy++])
+            if (slot < trackedIndex.size) {
+                source = trackedIndex[slot]
             }
         }
 
-        val start = first[position]
-        val end = first[position + 1]
-        if (source >= 0 && facts.has(source)) {
-            facts.prove(slots[start], facts.reach[source])
+        val start = writeOffsets[position]
+        val end = writeOffsets[position + 1]
+        if (source >= 0 && proofs.has(source)) {
+            proofs.prove(writtenSlots[start], proofs.provenEnd[source])
         } else {
-            for (index in start until end) facts.kill(slots[index])
+            for (index in start until end) proofs.kill(writtenSlots[index])
         }
     }
 
     private fun collectAccesses(table: MemoryAccessTable) {
         var access = 0
         for (index in 0 until table.count) {
-            if (table.memories[index] != 0 || table.addresses[index] == MemoryAccessTable.IMMEDIATE) {
+            if (table.memories[index] != 0 || table.addresses[index] == MemoryAccessTable.CONSTANT_ADDRESS) {
                 continue
             }
             accessPositions[access] = table.positions[index]
             accessSlots[access] = table.addresses[index]
-            accessReach[access] = table.reach[index]
+            accessEndOffsets[access] = table.endOffsets[index]
             access++
         }
     }
 
-    private fun collectJumpsAndCarries(
+    private fun collectJumpsAndProofCopies(
         jumps: JumpTable,
         writes: SlotWriteTable,
     ) {
@@ -418,8 +418,8 @@ private class CheckEffects(
 
             val write = writes.start[position]
             val jumpFree = jumps.end(position) == jumps.start[position]
-            if (jumpFree && writes.end(position) - write == 1 && writes.sources[write] != SlotWriteTable.TYPED) {
-                carries.add(pack(position, writes.sources[write]))
+            if (jumpFree && writes.end(position) - write == 1 && writes.sources[write] != SlotWriteTable.NOT_A_COPY) {
+                proofCopies.add(pack(position, writes.sources[write]))
             }
         }
 
@@ -447,19 +447,19 @@ private fun handlerEntries(function: CirFunction): IntArray {
     return entries.copyOf(distinct)
 }
 
-private class LoopSurvival(
-    private val effects: CheckEffects,
+private class LoopWrites(
+    private val checkIndex: BoundsCheckIndex,
 ) {
     val headers: IntArray
     val ends: IntArray
     val count: Int
-    val crossing: BooleanArray
-    private var writeFirst = IntArray(0)
-    private var writePositions = IntArray(0)
+    val partlyOverlapped: BooleanArray
+    private var slotWriteOffsets = IntArray(0)
+    private var slotWritePositions = IntArray(0)
 
     init {
 
-        val jumps = effects.backJumps
+        val jumps = checkIndex.backJumps
         var loops = 0
         for (index in 0 until jumps.size) {
             if (index + 1 == jumps.size || high(jumps[index + 1]) != high(jumps[index])) {
@@ -479,31 +479,31 @@ private class LoopSurvival(
             }
         }
 
-        crossing = crossedLoops(headers, ends)
+        partlyOverlapped = partlyOverlappedLoops(headers, ends)
     }
 
-    fun forgetWrites(
+    fun forgetWrittenSlots(
         header: Int,
         end: Int,
-        facts: CheckedReach,
+        proofs: ProvenBounds,
     ) {
 
-        val start = effects.first[header]
-        val stop = effects.first[end + 1]
+        val start = checkIndex.writeOffsets[header]
+        val stop = checkIndex.writeOffsets[end + 1]
         if (start == stop) {
             return
         }
 
         val written = stop - start
-        if (written <= facts.valid.size || written <= facts.count()) {
-            for (index in start until stop) facts.kill(effects.slots[index])
+        if (written <= proofs.proven.size || written <= proofs.count()) {
+            for (index in start until stop) proofs.kill(checkIndex.writtenSlots[index])
         } else {
-            if (writeFirst.isEmpty()) {
-                indexWrites()
+            if (slotWriteOffsets.isEmpty()) {
+                indexWritesBySlot()
             }
-            facts.forEachSlot { slot ->
+            proofs.forEachSlot { slot ->
                 if (writtenWithin(slot, header, end)) {
-                    facts.kill(slot)
+                    proofs.kill(slot)
                 }
             }
         }
@@ -515,55 +515,55 @@ private class LoopSurvival(
         end: Int,
     ): Boolean {
 
-        var low = writeFirst[slot]
-        val high = writeFirst[slot + 1]
+        var low = slotWriteOffsets[slot]
+        val high = slotWriteOffsets[slot + 1]
         var bound = high
         while (low < bound) {
             val middle = (low + bound) ushr 1
-            if (writePositions[middle] < header) {
+            if (slotWritePositions[middle] < header) {
                 low = middle + 1
             } else {
                 bound = middle
             }
         }
 
-        return low < high && writePositions[low] <= end
+        return low < high && slotWritePositions[low] <= end
     }
 
-    private fun indexWrites() {
+    private fun indexWritesBySlot() {
 
-        writeFirst = IntArray(effects.tracked + 1)
-        writePositions = IntArray(effects.count)
-        val slots = effects.slots
+        slotWriteOffsets = IntArray(checkIndex.trackedCount + 1)
+        slotWritePositions = IntArray(checkIndex.writeCount)
+        val writtenSlots = checkIndex.writtenSlots
 
-        for (index in 0 until effects.count) writeFirst[slots[index] + 1]++
-        for (slot in 1..effects.tracked) writeFirst[slot] += writeFirst[slot - 1]
+        for (index in 0 until checkIndex.writeCount) slotWriteOffsets[writtenSlots[index] + 1]++
+        for (slot in 1..checkIndex.trackedCount) slotWriteOffsets[slot] += slotWriteOffsets[slot - 1]
 
-        for (position in 0 until effects.size) {
-            for (index in effects.first[position] until effects.first[position + 1]) {
-                writePositions[writeFirst[slots[index]]++] = position
+        for (position in 0 until checkIndex.size) {
+            for (index in checkIndex.writeOffsets[position] until checkIndex.writeOffsets[position + 1]) {
+                slotWritePositions[slotWriteOffsets[writtenSlots[index]]++] = position
             }
         }
 
-        for (slot in effects.tracked downTo 1) writeFirst[slot] = writeFirst[slot - 1]
-        writeFirst[0] = 0
+        for (slot in checkIndex.trackedCount downTo 1) slotWriteOffsets[slot] = slotWriteOffsets[slot - 1]
+        slotWriteOffsets[0] = 0
     }
 }
 
-private fun crossedLoops(
+private fun partlyOverlappedLoops(
     headers: IntArray,
     ends: IntArray,
 ): BooleanArray {
 
-    val crossed = BooleanArray(headers.size)
+    val overlapped = BooleanArray(headers.size)
     val stack = IntArray(headers.size)
     var depth = 0
 
     for (loop in headers.size - 1 downTo 0) {
         while (depth > 0 && ends[stack[depth - 1]] <= ends[loop]) depth--
-        crossed[loop] = depth > 0 && headers[stack[depth - 1]] <= ends[loop]
+        overlapped[loop] = depth > 0 && headers[stack[depth - 1]] <= ends[loop]
         stack[depth++] = loop
     }
 
-    return crossed
+    return overlapped
 }

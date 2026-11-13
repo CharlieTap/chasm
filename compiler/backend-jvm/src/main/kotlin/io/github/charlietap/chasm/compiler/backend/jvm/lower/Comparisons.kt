@@ -40,8 +40,8 @@ internal fun LowerContext.branchCompare(
         NumberType.I32 -> branchI32(ordering, comparison.unsigned, left, right, target)
         NumberType.I64 -> {
             if (comparison.unsigned) {
-                pushFlippedLong(left)
-                pushFlippedLong(right)
+                pushSignFlippedLong(left)
+                pushSignFlippedLong(right)
             } else {
                 pushLong(left)
                 pushLong(right)
@@ -74,17 +74,17 @@ private fun LowerContext.branchI32(
     target: Label,
 ) {
 
-    val zeroRight = right.isZero()
-    if (zeroRight || left.isZero()) {
+    val zeroRight = right.isConstantZero()
+    if (zeroRight || left.isConstantZero()) {
         val against = if (zeroRight) ordering else ordering.swapped()
         val value = if (zeroRight) left else right
-        branchAgainstZero(against, unsigned, value, target)
+        branchComparedToZero(against, unsigned, value, target)
         return
     }
 
     if (unsigned) {
-        pushFlipped(left)
-        pushFlipped(right)
+        pushSignFlipped(left)
+        pushSignFlipped(right)
     } else {
         pushInt(left)
         pushInt(right)
@@ -92,7 +92,7 @@ private fun LowerContext.branchI32(
     emit.jump(intBranch(ordering), target)
 }
 
-private fun LowerContext.branchAgainstZero(
+private fun LowerContext.branchComparedToZero(
     ordering: Ordering,
     unsigned: Boolean,
     value: Operand,
@@ -122,7 +122,7 @@ private fun LowerContext.branchAgainstZero(
     }
 }
 
-private fun LowerContext.pushFlipped(operand: Operand) {
+private fun LowerContext.pushSignFlipped(operand: Operand) {
     if (operand is Operand.Immediate) {
         emit.int(operand.bits.toInt() xor Int.MIN_VALUE)
     } else {
@@ -130,7 +130,7 @@ private fun LowerContext.pushFlipped(operand: Operand) {
     }
 }
 
-private fun LowerContext.pushFlippedLong(operand: Operand) {
+private fun LowerContext.pushSignFlippedLong(operand: Operand) {
     if (operand is Operand.Immediate) {
         emit.long(operand.bits xor Long.MIN_VALUE)
     } else {
@@ -138,7 +138,7 @@ private fun LowerContext.pushFlippedLong(operand: Operand) {
     }
 }
 
-private fun Operand.isZero(): Boolean {
+private fun Operand.isConstantZero(): Boolean {
     return this is Operand.Immediate && bits.toInt() == 0
 }
 

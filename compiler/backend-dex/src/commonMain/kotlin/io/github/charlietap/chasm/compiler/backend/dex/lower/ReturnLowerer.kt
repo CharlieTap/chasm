@@ -96,13 +96,13 @@ internal fun LowerContext.trap(method: MethodRef) {
 internal fun LowerContext.trapLabel(method: MethodRef): String {
 
     if (module.options.stacktraces) {
-        return deferTrap(method)
+        return outOfLineTrap(method)
     }
 
-    return sharedTraps.getOrPut(method) { deferTrap(method) }
+    return sharedTrapLabels.getOrPut(method) { outOfLineTrap(method) }
 }
 
-private fun LowerContext.deferTrap(method: MethodRef): String {
+private fun LowerContext.outOfLineTrap(method: MethodRef): String {
 
     val label = emit.freshLabel()
     val origin = position

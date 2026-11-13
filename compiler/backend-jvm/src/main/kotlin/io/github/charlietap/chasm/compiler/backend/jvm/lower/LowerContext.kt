@@ -69,7 +69,7 @@ internal class LowerContext(
 
     val outOfLine = ArrayList<() -> Unit>()
 
-    val sharedTraps = HashMap<MethodRef, Label>()
+    val sharedTrapLabels = HashMap<MethodRef, Label>()
 
     val matchers = HashMap<Int, Label>()
     val matcherOrder = ArrayList<Int>()

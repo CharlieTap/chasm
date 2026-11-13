@@ -32,7 +32,7 @@ internal class LeafCallInliner(
         if (analyzed.all { leaf -> leaf == null }) return module
 
         val imported = module.imports.count { import -> import.descriptor is Import.Descriptor.Function }
-        val leaves = Leaves(imported, analyzed)
+        val leaves = LeavesByFunction(imported, analyzed)
         var changed = false
         val functions = module.functions.map { function ->
             val inlined = functionInliner.inline(function, types, leaves)
@@ -44,7 +44,7 @@ internal class LeafCallInliner(
     }
 }
 
-internal class Leaves(
+internal class LeavesByFunction(
     private val imported: Int,
     private val leaves: List<Leaf?>,
 ) {
@@ -55,16 +55,16 @@ internal class Leaves(
 
 internal data class Leaf(
     val parameters: Int,
-    val unwrittenFrom: Int,
+    val firstReadOnlyParameter: Int,
     val localTypes: List<ValueType>,
     val result: ValueType?,
     val body: List<Instruction>,
-    val read: BooleanArray,
-    val written: BooleanArray,
-    val needsDefault: BooleanArray,
-    val exitsBody: Boolean,
+    val readLocals: BooleanArray,
+    val writtenLocals: BooleanArray,
+    val localsNeedingDefault: BooleanArray,
+    val exitsEarly: Boolean,
 ) {
-    val cost: Int = parameters + 2 * needsDefault.count { needed -> needed } + body.size + 2
+    val inlinedSize: Int = parameters + 2 * localsNeedingDefault.count { needed -> needed } + body.size + 2
 }
 
 internal class LeafAnalyzer {
@@ -77,61 +77,61 @@ internal class LeafAnalyzer {
         val type = types.functionType(function.typeIndex)
         val results = type.results.types
         val body = function.body.instructions
-        if (results.size > 1 || body.size > LEAF_INSTRUCTIONS) return null
+        if (results.size > 1 || body.size > MAX_LEAF_INSTRUCTIONS) return null
         if (body.any(Instruction::preventsInlining)) return null
 
         val parameters = type.params.types
-        if (parameters.size + function.locals.size > LEAF_LOCALS) return null
+        if (parameters.size + function.locals.size > MAX_LEAF_LOCALS) return null
         val locals = parameters + function.locals.map(Local::type)
         if (locals.any { value -> value !is ValueType.Number && value !is ValueType.Reference }) return null
 
-        val read = BooleanArray(locals.size)
-        val written = BooleanArray(locals.size)
+        val readLocals = BooleanArray(locals.size)
+        val writtenLocals = BooleanArray(locals.size)
         val initialised = BooleanArray(locals.size) { index -> index < parameters.size }
-        val needsDefault = BooleanArray(locals.size)
-        var exitsBody = false
+        val localsNeedingDefault = BooleanArray(locals.size)
+        var exitsEarly = false
         var depth = 0
-        var straightLine = true
+        var beforeControlFlow = true
 
         for (instruction in body) {
             when (instruction) {
                 is VariableInstruction.LocalGet -> {
                     val index = instruction.localIdx.toInt()
-                    if (!initialised[index]) needsDefault[index] = locals[index].isDefaultable()
-                    read[index] = true
+                    if (!initialised[index]) localsNeedingDefault[index] = locals[index].isDefaultable()
+                    readLocals[index] = true
                 }
                 is VariableInstruction.LocalSet -> {
                     val index = instruction.localIdx.toInt()
-                    written[index] = true
-                    if (straightLine && !read[index]) initialised[index] = true
+                    writtenLocals[index] = true
+                    if (beforeControlFlow && !readLocals[index]) initialised[index] = true
                 }
                 is VariableInstruction.LocalTee -> {
                     val index = instruction.localIdx.toInt()
-                    written[index] = true
-                    if (straightLine && !read[index]) initialised[index] = true
+                    writtenLocals[index] = true
+                    if (beforeControlFlow && !readLocals[index]) initialised[index] = true
                 }
                 is ControlInstruction -> {
-                    straightLine = false
-                    if (instruction.exits(depth)) exitsBody = true
-                    depth += instruction.depthChange()
+                    beforeControlFlow = false
+                    if (instruction.exitsFunction(depth)) exitsEarly = true
+                    depth += instruction.blockDepthChange()
                 }
                 else -> Unit
             }
         }
 
-        var unwrittenFrom = parameters.size
-        while (unwrittenFrom > 0 && !written[unwrittenFrom - 1]) unwrittenFrom--
+        var firstReadOnlyParameter = parameters.size
+        while (firstReadOnlyParameter > 0 && !writtenLocals[firstReadOnlyParameter - 1]) firstReadOnlyParameter--
 
         return Leaf(
             parameters = parameters.size,
-            unwrittenFrom = unwrittenFrom,
+            firstReadOnlyParameter = firstReadOnlyParameter,
             localTypes = locals,
             result = results.singleOrNull(),
             body = body,
-            read = read,
-            written = written,
-            needsDefault = needsDefault,
-            exitsBody = exitsBody,
+            readLocals = readLocals,
+            writtenLocals = writtenLocals,
+            localsNeedingDefault = localsNeedingDefault,
+            exitsEarly = exitsEarly,
         )
     }
 }
@@ -141,7 +141,7 @@ internal class FunctionInliner {
     fun inline(
         function: Function,
         types: ModuleTypeResolver,
-        leaves: Leaves,
+        leaves: LeavesByFunction,
     ): Function {
 
         val body = function.body.instructions
@@ -149,32 +149,32 @@ internal class FunctionInliner {
 
         val locals = function.locals.toMutableList()
         val expander = LeafExpander(OperandCapture(types.functionType(function.typeIndex).params.types.size, locals))
-        var budget = body.size.coerceIn(MIN_INLINED_INSTRUCTIONS, MAX_INLINED_INSTRUCTIONS)
+        var budget = body.size.coerceIn(MIN_INLINING_BUDGET, MAX_INLINING_BUDGET)
         val inlined = ArrayList<Instruction>(minOf(body.size * 2, body.size + budget))
-        var expanded = false
+        var inlinedAny = false
 
         for (instruction in body) {
 
             val callee = (instruction as? ControlInstruction.Call)?.functionIndex?.toInt()
             val leaf = callee?.let(leaves::get)
-            if (leaf == null || leaf.cost > budget) {
+            if (leaf == null || leaf.inlinedSize > budget) {
                 inlined += instruction
                 continue
             }
 
-            budget -= leaf.cost
-            expanded = true
+            budget -= leaf.inlinedSize
+            inlinedAny = true
             expander.expand(leaf, callee, inlined)
         }
 
-        return if (expanded) function.copy(locals = locals, body = Expression(inlined)) else function
+        return if (inlinedAny) function.copy(locals = locals, body = Expression(inlined)) else function
     }
 }
 
 private class LeafExpander(
     private val capture: OperandCapture,
 ) {
-    private val assigned = HashMap<Int, IntArray>()
+    private val calleeLocals = HashMap<Int, IntArray>()
 
     fun expand(
         leaf: Leaf,
@@ -182,13 +182,13 @@ private class LeafExpander(
         into: MutableList<Instruction>,
     ) {
 
-        val indices = assigned.getOrPut(callee) { IntArray(leaf.localTypes.size) { _ -> UNASSIGNED } }
+        val localIndices = calleeLocals.getOrPut(callee) { IntArray(leaf.localTypes.size) { _ -> UNASSIGNED } }
         val arguments = arrayOfNulls<Instruction>(leaf.parameters)
-        var parameter = capture.capture(into, arguments, leaf.unwrittenFrom)
+        var parameter = capture.capture(into, arguments, leaf.firstReadOnlyParameter)
 
         while (parameter >= 0) {
-            into += if (leaf.read[parameter] || leaf.written[parameter]) {
-                VariableInstruction.LocalSet(local(indices, leaf, parameter))
+            into += if (leaf.readLocals[parameter] || leaf.writtenLocals[parameter]) {
+                VariableInstruction.LocalSet(callerLocal(localIndices, leaf, parameter))
             } else {
                 ParametricInstruction.Drop
             }
@@ -196,12 +196,12 @@ private class LeafExpander(
         }
 
         for (index in leaf.parameters until leaf.localTypes.size) {
-            if (!leaf.needsDefault[index]) continue
+            if (!leaf.localsNeedingDefault[index]) continue
             into += defaultValue(leaf.localTypes[index])
-            into += VariableInstruction.LocalSet(local(indices, leaf, index))
+            into += VariableInstruction.LocalSet(callerLocal(localIndices, leaf, index))
         }
 
-        if (leaf.exitsBody) into += ControlInstruction.Block(leaf.result?.let(BlockType::ValType) ?: BlockType.Empty)
+        if (leaf.exitsEarly) into += ControlInstruction.Block(leaf.result?.let(BlockType::ValType) ?: BlockType.Empty)
 
         var depth = 0
         for (instruction in leaf.body) {
@@ -209,29 +209,29 @@ private class LeafExpander(
             into += when (instruction) {
                 is VariableInstruction.LocalGet -> {
                     val index = instruction.localIdx.toInt()
-                    arguments.getOrNull(index) ?: VariableInstruction.LocalGet(local(indices, leaf, index))
+                    arguments.getOrNull(index) ?: VariableInstruction.LocalGet(callerLocal(localIndices, leaf, index))
                 }
-                is VariableInstruction.LocalSet -> VariableInstruction.LocalSet(local(indices, leaf, instruction.localIdx.toInt()))
-                is VariableInstruction.LocalTee -> VariableInstruction.LocalTee(local(indices, leaf, instruction.localIdx.toInt()))
+                is VariableInstruction.LocalSet -> VariableInstruction.LocalSet(callerLocal(localIndices, leaf, instruction.localIdx.toInt()))
+                is VariableInstruction.LocalTee -> VariableInstruction.LocalTee(callerLocal(localIndices, leaf, instruction.localIdx.toInt()))
                 ControlInstruction.Return -> ControlInstruction.Br(Index.LabelIndex(depth.toUInt()))
                 else -> instruction
             }
 
-            depth += instruction.depthChange()
+            depth += instruction.blockDepthChange()
         }
 
-        if (leaf.exitsBody) into += ControlInstruction.End(1)
+        if (leaf.exitsEarly) into += ControlInstruction.End(1)
     }
 
-    private fun local(
-        indices: IntArray,
+    private fun callerLocal(
+        localIndices: IntArray,
         leaf: Leaf,
         index: Int,
     ): Index.LocalIndex {
 
-        if (indices[index] == UNASSIGNED) indices[index] = capture.local(leaf.localTypes[index]).toInt()
+        if (localIndices[index] == UNASSIGNED) localIndices[index] = capture.local(leaf.localTypes[index]).toInt()
 
-        return Index.LocalIndex(indices[index].toUInt())
+        return Index.LocalIndex(localIndices[index].toUInt())
     }
 }
 
@@ -254,7 +254,7 @@ private fun ValueType.isDefaultable(): Boolean {
     return this is ValueType.Number || (this is ValueType.Reference && referenceType is ReferenceType.RefNull)
 }
 
-private fun ControlInstruction.exits(depth: Int): Boolean {
+private fun ControlInstruction.exitsFunction(depth: Int): Boolean {
     return when (this) {
         ControlInstruction.Return -> true
         is ControlInstruction.Br -> labelIndex.idx.toInt() >= depth
@@ -268,7 +268,7 @@ private fun ControlInstruction.exits(depth: Int): Boolean {
     }
 }
 
-private inline fun Instruction.depthChange(): Int {
+private inline fun Instruction.blockDepthChange(): Int {
     return when (this) {
         is ControlInstruction.Block, is ControlInstruction.If -> 1
         is ControlInstruction.End -> -count
@@ -289,12 +289,12 @@ private fun defaultValue(type: ValueType): Instruction {
     }
 }
 
-private const val LEAF_INSTRUCTIONS = 30
+private const val MAX_LEAF_INSTRUCTIONS = 30
 
-private const val LEAF_LOCALS = 16
+private const val MAX_LEAF_LOCALS = 16
 
-private const val MIN_INLINED_INSTRUCTIONS = 256
+private const val MIN_INLINING_BUDGET = 256
 
-private const val MAX_INLINED_INSTRUCTIONS = 4_096
+private const val MAX_INLINING_BUDGET = 4_096
 
 private const val UNASSIGNED = -1

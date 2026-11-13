@@ -298,8 +298,8 @@ private fun LowerContext.copyOwn(
         storeFloat(destination)
         return
     }
-    pushCopied(destination, source)
-    storeCopied(destination)
+    pushCopySource(destination, source)
+    storeCopyDestination(destination)
 }
 
 internal fun LowerContext.parallelCopy(
@@ -311,11 +311,11 @@ internal fun LowerContext.parallelCopy(
         !(source is Operand.Slot && source.slot == destinations[index])
     }
     if (moves.size == 1) return copyToSlot(destinations[moves[0]], sources[moves[0]])
-    moves.forEach { index -> pushCopied(destinations[index], sources[index]) }
-    moves.asReversed().forEach { index -> storeCopied(destinations[index]) }
+    moves.forEach { index -> pushCopySource(destinations[index], sources[index]) }
+    moves.asReversed().forEach { index -> storeCopyDestination(destinations[index]) }
 }
 
-private fun LowerContext.pushCopied(
+private fun LowerContext.pushCopySource(
     destination: Int,
     source: Operand,
 ) {
@@ -326,7 +326,7 @@ private fun LowerContext.pushCopied(
     }
 }
 
-private fun LowerContext.storeCopied(destination: Int) {
+private fun LowerContext.storeCopyDestination(destination: Int) {
     if (locals.kind(destination) == SlotKinds.INT) {
         storeInt(destination)
     } else {

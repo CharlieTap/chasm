@@ -123,7 +123,7 @@ private fun LowerContext.inlineAccess(
 ) {
 
     val memory = checkNotNull(locals.inlineMemory)
-    val boundsCheckedByHelper = memory == InlineMemory.BUFFER && !module.options.stacktraces
+    val helperChecksBounds = memory == InlineMemory.BUFFER && !module.options.stacktraces
     val width = access.operation.width
     val offset = access.offset.toLong() and 0xFFFF_FFFFL
     val reach = offset + width
@@ -156,8 +156,8 @@ private fun LowerContext.inlineAccess(
             emit.insn(Opcodes.IADD)
         }
         emit.store(Opcodes.ISTORE, locals.scratchInt)
-    } else if (boundsCheckedByHelper) {
-        bufferMemoryAccess(access)
+    } else if (helperChecksBounds) {
+        helperBufferAccess(access)
         return
     } else {
         val outOfBounds = outOfBounds(access) { pushUnsignedScratch(offset) }
@@ -186,7 +186,7 @@ private fun LowerContext.inlineAccess(
     }
 }
 
-private fun LowerContext.bufferMemoryAccess(access: MemoryAccess) {
+private fun LowerContext.helperBufferAccess(access: MemoryAccess) {
 
     val operation = access.operation
     emit.load(Opcodes.ALOAD, locals.memoryBuffer)
@@ -207,12 +207,12 @@ private fun LowerContext.bufferMemoryAccess(access: MemoryAccess) {
             4 -> emit.invokeStatic(BUFFER_I32_LOAD)
             else -> emit.invokeStatic(BUFFER_I64_LOAD)
         }
-        extendLoaded(operation)
+        widenLoadedValue(operation)
         store(operation.type, access.destination)
         return
     }
 
-    pushStored(operation, value)
+    pushValueToStore(operation, value)
     emit.invokeStatic(
         when (operation.width) {
             1 -> BUFFER_I32_STORE_8
@@ -229,7 +229,7 @@ private fun LowerContext.inlineLoad(
 ) {
 
     if (locals.inlineMemory == InlineMemory.BUFFER) {
-        bufferGet(operation)
+        bufferLoad(operation)
     } else {
         when (operation.width) {
             1 -> loadByte(0)
@@ -239,11 +239,11 @@ private fun LowerContext.inlineLoad(
         }
     }
 
-    extendLoaded(operation)
+    widenLoadedValue(operation)
     store(operation.type, destination)
 }
 
-private fun LowerContext.bufferGet(operation: MemoryOperation) {
+private fun LowerContext.bufferLoad(operation: MemoryOperation) {
 
     emit.load(Opcodes.ALOAD, locals.memoryBuffer)
     emit.load(Opcodes.ILOAD, locals.scratchInt)
@@ -261,7 +261,7 @@ private fun LowerContext.bufferGet(operation: MemoryOperation) {
     }
 }
 
-private fun LowerContext.extendLoaded(operation: MemoryOperation) {
+private fun LowerContext.widenLoadedValue(operation: MemoryOperation) {
 
     val wide = operation.type == NumberType.I64 || operation.type == NumberType.F64
 
@@ -298,7 +298,7 @@ private fun LowerContext.extendLoaded(operation: MemoryOperation) {
     }
 }
 
-private fun LowerContext.pushStored(
+private fun LowerContext.pushValueToStore(
     operation: MemoryOperation,
     value: Operand,
 ) {
@@ -323,7 +323,7 @@ private fun LowerContext.bufferStore(
 
     emit.load(Opcodes.ALOAD, locals.memoryBuffer)
     emit.load(Opcodes.ILOAD, locals.scratchInt)
-    pushStored(operation, value)
+    pushValueToStore(operation, value)
 
     when (operation.width) {
         1 -> {
@@ -432,7 +432,7 @@ private fun LowerContext.inlineStore(
     value: Operand,
 ) {
 
-    pushStored(operation, value)
+    pushValueToStore(operation, value)
 
     when (operation.width) {
         1 -> {
