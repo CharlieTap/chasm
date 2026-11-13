@@ -20,6 +20,8 @@ class ModuleAnalysis(
     val usesExceptions: Boolean,
     val mayGrowMemory: BooleanArray,
     val mayCollect: BooleanArray,
+    val mayUnwind: BooleanArray,
+    val requestsTailCall: BooleanArray,
     val publishesRegisters: Boolean,
 )
 
@@ -38,12 +40,14 @@ fun analyzeModule(
     val effects = CallEffects(code, declarations)
     return ModuleAnalysis(
         signatureTypes = signatureTypes,
-        hasTailCalls = code.functions.any { function -> function.instructions.any(Instruction::isTailCall) },
+        hasTailCalls = effects.requestsTailCall.any { requests -> requests },
         usesExceptions = code.functions.any { function ->
             function.exceptions != null || function.instructions.any(Instruction::raisesException)
         },
         mayGrowMemory = effects.mayGrowMemory,
         mayCollect = effects.mayCollect,
+        mayUnwind = effects.mayUnwind,
+        requestsTailCall = effects.requestsTailCall,
         publishesRegisters = module.mayHoldCollectableReferences() || code.functions.any(CirFunction::catchesExceptionReference),
     )
 }

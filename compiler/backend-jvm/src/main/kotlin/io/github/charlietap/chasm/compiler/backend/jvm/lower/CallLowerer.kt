@@ -106,7 +106,12 @@ private inline fun LowerContext.indirectCall(
     emit.load(Opcodes.ILOAD, Locals.DEPTH)
     if (takesArgumentArray(call.type)) pushArgumentArray(call.arguments) else pushArguments(call.type, call.arguments)
     emit.invokeVirtual(module.typedCall(signature, call.type))
-    afterCall(call, grows = true)
+    afterCall(
+        call,
+        grows = true,
+        checksUnwinding = module.analysis.usesExceptions,
+        checksPendingTailCall = module.analysis.hasTailCalls,
+    )
     emit.jump(Opcodes.GOTO, done)
     emit.place(runtime, OBJECT_TYPE.removePrefix("L").removeSuffix(";"))
     emit.insn(Opcodes.POP)
@@ -124,16 +129,24 @@ private fun LowerContext.directCall(
     emit.load(Opcodes.ILOAD, Locals.DEPTH)
     if (takesArgumentArray(type)) pushArgumentArray(call.arguments) else pushArguments(type, call.arguments)
     emit.invokeStatic(module.functionMethod(callee))
-    afterCall(call, grows = module.analysis.mayGrowMemory[callee.index])
+    val analysis = module.analysis
+    afterCall(
+        call,
+        grows = analysis.mayGrowMemory[callee.index],
+        checksUnwinding = analysis.usesExceptions && analysis.mayUnwind[callee.index],
+        checksPendingTailCall = analysis.hasTailCalls && analysis.requestsTailCall[callee.index],
+    )
 }
 
 private fun LowerContext.afterCall(
     call: CallSite,
     grows: Boolean,
+    checksUnwinding: Boolean,
+    checksPendingTailCall: Boolean,
 ) {
+
     val type = call.type
-    val analysis = module.analysis
-    if (!analysis.hasTailCalls && !analysis.usesExceptions) {
+    if (!checksPendingTailCall && !checksUnwinding) {
         storeResults(type, call.resultBase)
         if (grows) refreshMemory()
         return
@@ -147,7 +160,7 @@ private fun LowerContext.afterCall(
             emit.store(Opcodes.LSTORE, locals.scratchLong[0])
         }
     }
-    if (analysis.hasTailCalls) {
+    if (checksPendingTailCall) {
         val done = emit.label()
         pushContext()
         emit.getField(CONTEXT_TYPE, PENDING_TAIL_FIELD, FUNCTION_INSTANCE)
@@ -165,9 +178,16 @@ private fun LowerContext.afterCall(
             emit.insn(Opcodes.LALOAD)
             emit.store(Opcodes.LSTORE, locals.scratchLong[0])
         }
+        if (!checksUnwinding) {
+            unwindCheck()
+        }
         emit.place(done)
     }
-    unwindCheck()
+
+    if (checksUnwinding) {
+        unwindCheck()
+    }
+
     when (results) {
         0 -> Unit
         1 -> {

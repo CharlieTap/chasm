@@ -51,7 +51,15 @@ private fun LowerContext.directCall(
     val words = loadWindow(call.type, call.arguments)
     val method = functionMethod(module.codeClass(callee), callee.index, call.type)
     emit.invokeRange(method, registers.window, 3 + words)
-    finishCall(method.returns, call)
+
+    val analysis = module.analysis
+    finishCall(
+        returns = method.returns,
+        call = call,
+        restoreBinding = false,
+        checksUnwinding = analysis.usesExceptions && analysis.mayUnwind[callee.index],
+        checksPendingTailCall = analysis.hasTailCalls && analysis.requestsTailCall[callee.index],
+    )
 }
 
 private fun LowerContext.typedIndirectCall(
@@ -89,7 +97,13 @@ private fun LowerContext.typedIndirectCall(
     emit.move(registers.window + 2, Registers.DEPTH)
     val returns = returnDescriptor(call.type)
     emit.invokeInterfaceRange(typedCall(signature, call.type), registers.window)
-    finishCall(returns, call, restoreBinding = true)
+    finishCall(
+        returns = returns,
+        call = call,
+        restoreBinding = true,
+        checksUnwinding = module.analysis.usesExceptions,
+        checksPendingTailCall = module.analysis.hasTailCalls,
+    )
     emit.gotoLabel(done)
     emit.place(bridge)
     bridgeCall(instruction, call)
@@ -99,10 +113,12 @@ private fun LowerContext.typedIndirectCall(
 private fun LowerContext.finishCall(
     returns: String,
     call: CallSite,
-    restoreBinding: Boolean = false,
+    restoreBinding: Boolean,
+    checksUnwinding: Boolean,
+    checksPendingTailCall: Boolean,
 ) {
     val results = call.type.results.types.size
-    val direct = results == 1 && !restoreBinding && !module.analysis.usesExceptions && !module.analysis.hasTailCalls
+    val direct = results == 1 && !restoreBinding && !checksUnwinding && !checksPendingTailCall
     if (direct && returns == "I" && isInt(call.resultBase) && registers.home(call.resultBase) < 256) {
         val home = narrowTarget(call.resultBase)
         emit.moveResult(home)
@@ -121,8 +137,12 @@ private fun LowerContext.finishCall(
         else -> emit.moveResultObject(Registers.OBJECT)
     }
     if (restoreBinding) restoreWindow(binding = true)
-    if (module.analysis.usesExceptions) unwindCheck()
-    if (module.analysis.hasTailCalls) completePendingTailCall(returns, results)
+    if (checksUnwinding) {
+        unwindCheck()
+    }
+    if (checksPendingTailCall) {
+        completePendingTailCall(returns, results)
+    }
     refreshActivation()
     when (results) {
         0 -> Unit

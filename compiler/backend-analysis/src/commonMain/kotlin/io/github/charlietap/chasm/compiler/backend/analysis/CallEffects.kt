@@ -16,16 +16,25 @@ internal class CallEffects(
 ) {
     val mayGrowMemory = BooleanArray(declarations.functionCount)
     val mayCollect = BooleanArray(declarations.functionCount)
+    val mayUnwind = BooleanArray(declarations.functionCount)
+    val requestsTailCall = BooleanArray(declarations.functionCount)
 
     init {
         mayGrowMemory.fill(true, 0, declarations.importedFunctionCount)
         mayCollect.fill(true, 0, declarations.importedFunctionCount)
+        mayUnwind.fill(true, 0, declarations.importedFunctionCount)
         var callees = IntArray(INITIAL_CALLS)
         var callers = IntArray(INITIAL_CALLS)
         var calls = 0
         for (function in code.functions) {
             val caller = function.index.index
             for (instruction in function.instructions) {
+                if (instruction.isTailCall()) {
+                    requestsTailCall[caller] = true
+                }
+                if (instruction.raisesException()) {
+                    mayUnwind[caller] = true
+                }
                 when (instruction) {
                     is ControlInstruction -> {
                         val callee = instruction.directCallee()
@@ -39,6 +48,7 @@ internal class CallEffects(
                         } else if (instruction.callsUnknownFunction()) {
                             mayGrowMemory[caller] = true
                             mayCollect[caller] = true
+                            mayUnwind[caller] = true
                         } else if (instruction.allocatesGuestObject()) {
                             mayCollect[caller] = true
                         }
@@ -52,6 +62,7 @@ internal class CallEffects(
         val graph = PropagationGraph(declarations.functionCount, callees.copyOf(calls), callers.copyOf(calls))
         graph.spread(mayGrowMemory)
         graph.spread(mayCollect)
+        graph.spread(mayUnwind)
     }
 }
 
