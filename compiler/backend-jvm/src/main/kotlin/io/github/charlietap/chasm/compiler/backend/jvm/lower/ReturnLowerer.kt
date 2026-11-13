@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.compiler.backend.jvm.lower
 import io.github.charlietap.chasm.compiler.backend.abi.FRAME
 import io.github.charlietap.chasm.compiler.backend.abi.MethodRef
 import io.github.charlietap.chasm.compiler.backend.analysis.form.Operand
+import org.objectweb.asm.Label
 import org.objectweb.asm.Opcodes
 
 internal fun LowerContext.ret(
@@ -99,4 +100,26 @@ internal fun LowerContext.trap(
     emit.insn(Opcodes.POP)
     emit.insn(Opcodes.ACONST_NULL)
     emit.insn(Opcodes.ATHROW)
+}
+
+internal fun LowerContext.trapLabel(method: MethodRef): Label {
+
+    val shared = !module.options.stacktraces
+    if (shared) {
+        sharedTraps[method]?.let { label -> return label }
+    }
+
+    val label = emit.label()
+    if (shared) {
+        sharedTraps[method] = label
+    }
+
+    val origin = position
+    outOfLine += {
+        emit.place(label)
+        markSite(origin, label)
+        trap(method)
+    }
+
+    return label
 }

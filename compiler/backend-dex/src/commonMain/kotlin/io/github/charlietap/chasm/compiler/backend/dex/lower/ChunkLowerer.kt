@@ -5,7 +5,6 @@ import io.github.charlietap.chasm.compiler.backend.abi.FLOAT_TO_RAW_INT_BITS
 import io.github.charlietap.chasm.compiler.backend.abi.FRAME
 import io.github.charlietap.chasm.compiler.backend.abi.INT_BITS_TO_FLOAT
 import io.github.charlietap.chasm.compiler.backend.abi.LONG_BITS_TO_DOUBLE
-import io.github.charlietap.chasm.compiler.backend.abi.MEMORY_OUT_OF_BOUNDS
 import io.github.charlietap.chasm.compiler.backend.abi.Resource
 import io.github.charlietap.chasm.compiler.backend.abi.UNREACHABLE
 import io.github.charlietap.chasm.compiler.backend.abi.UNSAFE_TYPE
@@ -35,11 +34,6 @@ internal fun LowerContext.lowerChunkBody() {
         returnUnreachable()
     }
     lowerExceptionHandling()
-    if (outOfBoundsUsed) {
-        emit.place(OUT_OF_BOUNDS)
-        emit.invoke(MEMORY_OUT_OF_BOUNDS)
-        returnUnreachable()
-    }
     outOfLine.forEach { path -> path() }
     lowerExits(chunk)
 }

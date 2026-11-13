@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.compiler.backend.dex.lower
 
 import io.github.charlietap.chasm.cir.CirFunction
 import io.github.charlietap.chasm.cir.InstructionIndex
+import io.github.charlietap.chasm.compiler.backend.abi.MethodRef
 import io.github.charlietap.chasm.compiler.backend.abi.Resource
 import io.github.charlietap.chasm.compiler.backend.abi.descriptorWords
 import io.github.charlietap.chasm.compiler.backend.abi.returnDescriptor
@@ -67,7 +68,7 @@ internal class LowerContext(
 
     var cachesLoaded = false
 
-    var outOfBoundsUsed = false
+    val sharedTraps = HashMap<MethodRef, String>()
 
     var publishesWrites = true
 

@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.compiler.backend.dex.lower
 import io.github.charlietap.chasm.compiler.backend.abi.FRAME
 import io.github.charlietap.chasm.compiler.backend.abi.INT_BITS_TO_FLOAT
 import io.github.charlietap.chasm.compiler.backend.abi.LONG_BITS_TO_DOUBLE
+import io.github.charlietap.chasm.compiler.backend.abi.MethodRef
 import io.github.charlietap.chasm.compiler.backend.analysis.form.Operand
 import io.github.charlietap.dexter.ArrayKind
 import io.github.charlietap.dexter.BinaryOp
@@ -86,6 +87,36 @@ internal fun LowerContext.returnAnything() {
 }
 
 internal fun LowerContext.returnUnreachable() = returnAnything()
+
+internal fun LowerContext.trap(method: MethodRef) {
+    emit.invoke(method)
+    returnUnreachable()
+}
+
+internal fun LowerContext.trapLabel(method: MethodRef): String {
+
+    if (module.options.stacktraces) {
+        return deferTrap(method)
+    }
+
+    return sharedTraps.getOrPut(method) { deferTrap(method) }
+}
+
+private fun LowerContext.deferTrap(method: MethodRef): String {
+
+    val label = emit.freshLabel()
+    val origin = position
+
+    outOfLine += {
+        emit.place(label)
+        if (module.options.stacktraces) {
+            emit.line(line(origin))
+        }
+        trap(method)
+    }
+
+    return label
+}
 
 internal fun LowerContext.returnCode(
     code: Int,

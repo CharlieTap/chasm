@@ -1240,11 +1240,9 @@
     .line 3
     const v8, 0x10004
 
-    if-ltz v8, :cond_80
-
     add-int/lit8 v11, v17, -0x4
 
-    if-gt v8, v11, :cond_80
+    if-gt v8, v11, :cond_7e
 
     const/16 v9, 0x4d
 
@@ -1293,11 +1291,11 @@
 
     invoke-static {v14, v6, v7}, Lio/github/charlietap/chasm/runtime/compiled/CompiledCalls;->closeFrame(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;J)V
 
-    goto/16 :goto_7c
+    goto/16 :goto_7a
 
     return-void
 
-    :goto_7c
+    :goto_7a
     const/4 v8, 0x1
 
     iput-boolean v8, v14, Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;->compiledUnwinding:Z
@@ -1305,7 +1303,7 @@
     return-void
 
     .line 3
-    :cond_80
+    :cond_7e
     move-object/from16 v12, v25
 
     const/4 v10, 0x1
@@ -1409,7 +1407,7 @@
 
     iget-boolean v8, v14, Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;->compiledUnwinding:Z
 
-    if-nez v8, :cond_a2
+    if-nez v8, :cond_a0
 
     move-object/from16 v12, v28
 
@@ -1421,7 +1419,7 @@
 
     move-result v17
     :try_end_51
-    .catch Ljava/lang/Throwable; {:try_start_40 .. :try_end_51} :catch_91
+    .catch Ljava/lang/Throwable; {:try_start_40 .. :try_end_51} :catch_8f
 
     .line 3
     const/4 v8, -0x1
@@ -1445,11 +1443,9 @@
     .line 5
     const v8, 0x10004
 
-    if-ltz v8, :cond_cb
-
     add-int/lit8 v11, v17, -0x4
 
-    if-gt v8, v11, :cond_cb
+    if-gt v8, v11, :cond_c9
 
     aget-byte v9, v18, v8
 
@@ -1501,7 +1497,7 @@
 
     return v8
 
-    :catch_91
+    :catch_8f
     move-exception v12
 
     invoke-static {v12}, Lio/github/charlietap/chasm/runtime/compiled/CompiledExceptions;->wasmException(Ljava/lang/Throwable;)Ljava/lang/Throwable;
@@ -1516,10 +1512,10 @@
 
     invoke-static {v14, v6, v7}, Lio/github/charlietap/chasm/runtime/compiled/CompiledCalls;->closeFrame(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;J)V
 
-    goto/16 :goto_a2
+    goto/16 :goto_a0
 
-    :cond_a2
-    :goto_a2
+    :cond_a0
+    :goto_a0
     move-object/from16 v12, v28
 
     iget-object v8, v12, Lio/github/charlietap/chasm/runtime/instance/MemoryInstance;->byteArray:[B
@@ -1546,7 +1542,7 @@
 
     long-to-int v9, v4
 
-    if-ne v8, v9, :cond_c4
+    if-ne v8, v9, :cond_c2
 
     const/4 v9, 0x1
 
@@ -1560,10 +1556,10 @@
 
     goto :goto_53
 
-    :cond_c4
-    goto/16 :goto_c6
+    :cond_c2
+    goto/16 :goto_c4
 
-    :goto_c6
+    :goto_c4
     const/4 v8, 0x1
 
     iput-boolean v8, v14, Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;->compiledUnwinding:Z
@@ -1573,7 +1569,7 @@
     return v8
 
     .line 5
-    :cond_cb
+    :cond_c9
     move-object/from16 v12, v28
 
     const/4 v10, 0x0

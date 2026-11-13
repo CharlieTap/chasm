@@ -7,6 +7,7 @@ import io.github.charlietap.chasm.compiler.backend.abi.MEMORY_BYTE_ARRAY_FIELD
 import io.github.charlietap.chasm.compiler.backend.abi.MEMORY_COPY
 import io.github.charlietap.chasm.compiler.backend.abi.MEMORY_FILL
 import io.github.charlietap.chasm.compiler.backend.abi.MEMORY_INSTANCE
+import io.github.charlietap.chasm.compiler.backend.abi.MEMORY_OUT_OF_BOUNDS
 import io.github.charlietap.chasm.compiler.backend.abi.MEMORY_SIZE
 import io.github.charlietap.chasm.compiler.backend.abi.Resource
 import io.github.charlietap.chasm.compiler.backend.abi.UNSAFE_GET_INT
@@ -28,8 +29,6 @@ import io.github.charlietap.dexter.BinaryOp
 import io.github.charlietap.dexter.Cond
 import io.github.charlietap.dexter.Conversion
 import io.github.charlietap.dexter.LiteralOp
-
-internal const val OUT_OF_BOUNDS = "outOfBounds"
 
 internal fun lowerMemoryInstruction(
     instruction: MemoryInstruction,
@@ -126,11 +125,25 @@ private fun LowerContext.inlineAccess(
     access: MemoryAccess,
 ) {
     val width = access.operation.width
-    if (access.offset < 0) return emit.gotoLabel(outOfBounds(access))
-    if (analysis.checkedAccesses[position]) return checkedAccess(access)
+    if (access.offset < 0) {
+        emit.gotoLabel(outOfBounds(access))
+        return
+    }
+    val address = access.address
+    if (address is Operand.Immediate) {
+        immediateAccess(access, address)
+        return
+    }
+    if (analysis.checkedAccesses[position]) {
+        checkedAccess(access)
+        return
+    }
     val outOfBounds = outOfBounds(access)
     val reach = access.offset.toLong() + width
-    if (reach > Int.MAX_VALUE) return emit.gotoLabel(outOfBounds)
+    if (reach > Int.MAX_VALUE) {
+        emit.gotoLabel(outOfBounds)
+        return
+    }
     loadInt(Registers.I0, Registers.W0, access.address)
     emit.branchZero(Cond.Lt, Registers.I0, outOfBounds)
     if (reach <= -Byte.MIN_VALUE) {
@@ -141,8 +154,28 @@ private fun LowerContext.inlineAccess(
     }
     emit.branchCompare(Cond.Gt, Registers.I0, Registers.I3, outOfBounds)
     addOffset(access.offset)
-    val value = access.value
-    if (value == null) inlineLoad(access.operation, access.destination) else inlineStore(width, value)
+    inlineTransfer(access)
+}
+
+private fun LowerContext.immediateAccess(
+    access: MemoryAccess,
+    address: Operand.Immediate,
+) {
+
+    val width = access.operation.width
+    val effective = (address.bits and UNSIGNED_MASK) + access.offset
+    if (effective + width > Int.MAX_VALUE) {
+        emit.gotoLabel(outOfBounds(access))
+        return
+    }
+
+    emit.const(Registers.I0, effective.toInt())
+    if (!analysis.checkedAccesses[position] && effective + width > declarations.memoryMinimumBytes(access.memory)) {
+        emit.literal(LiteralOp.AddInt, Registers.I3, registers.memorySize, -width)
+        emit.branchCompare(Cond.Gt, Registers.I0, Registers.I3, outOfBounds(access))
+    }
+
+    inlineTransfer(access)
 }
 
 private fun LowerContext.checkedAccess(
@@ -150,8 +183,16 @@ private fun LowerContext.checkedAccess(
 ) {
     loadInt(Registers.I0, Registers.W0, access.address)
     addOffset(access.offset)
+    inlineTransfer(access)
+}
+
+private fun LowerContext.inlineTransfer(access: MemoryAccess) {
     val value = access.value
-    if (value == null) inlineLoad(access.operation, access.destination) else inlineStore(access.operation.width, value)
+    if (value == null) {
+        inlineLoad(access.operation, access.destination)
+    } else {
+        inlineStore(access.operation.width, value)
+    }
 }
 
 private fun LowerContext.addOffset(
@@ -166,18 +207,19 @@ private fun LowerContext.addOffset(
     }
 }
 
-private fun LowerContext.outOfBounds(
-    access: MemoryAccess,
-): String {
+private fun LowerContext.outOfBounds(access: MemoryAccess): String {
+
     if (!module.options.stacktraces) {
-        outOfBoundsUsed = true
-        return OUT_OF_BOUNDS
+        return trapLabel(MEMORY_OUT_OF_BOUNDS)
     }
+
     val label = emit.freshLabel()
     val origin = position
     outOfLine += {
+
         emit.place(label)
         emit.line(line(origin))
+
         loadMemory(Registers.OBJECT, access.memory)
         emit.const(Registers.I2, if (access.value == null) ACCESS_READ else ACCESS_WRITE)
         loadInt(Registers.I1, Registers.W0, access.address)
@@ -187,9 +229,11 @@ private fun LowerContext.outOfBounds(
         emit.constWide(Registers.W2, access.offset.toLong() and UNSIGNED_MASK)
         emit.binary(BinaryOp.AddLong, Registers.W1, Registers.W1, Registers.W2)
         emit.const(Registers.I3, access.operation.width)
+
         emit.invoke(MEMORY_ACCESS_OUT_OF_BOUNDS, Registers.OBJECT, Registers.I2, Registers.W1, Registers.W1 + 1, Registers.I3)
         returnUnreachable()
     }
+
     return label
 }
 

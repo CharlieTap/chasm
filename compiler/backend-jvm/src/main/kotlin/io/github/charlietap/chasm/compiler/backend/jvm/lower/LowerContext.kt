@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.compiler.backend.jvm.lower
 
 import io.github.charlietap.chasm.cir.CirFunction
 import io.github.charlietap.chasm.cir.InstructionIndex
+import io.github.charlietap.chasm.compiler.backend.abi.MethodRef
 import io.github.charlietap.chasm.compiler.backend.abi.Resource
 import io.github.charlietap.chasm.compiler.backend.abi.returnDescriptor
 import io.github.charlietap.chasm.compiler.backend.abi.takesArgumentArray
@@ -68,7 +69,7 @@ internal class LowerContext(
 
     val outOfLine = ArrayList<() -> Unit>()
 
-    var outOfBoundsLabel: Label? = null
+    val sharedTraps = HashMap<MethodRef, Label>()
 
     val matchers = HashMap<Int, Label>()
     val matcherOrder = ArrayList<Int>()

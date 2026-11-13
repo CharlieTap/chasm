@@ -99,17 +99,25 @@ private fun LowerContext.inlineAccess(
     val offset = access.offset.toLong() and 0xFFFF_FFFFL
     val reach = offset + width
     val address = access.address
-    if (reach > Int.MAX_VALUE) return accessOutOfBounds(access) { pushUnsignedAddress(address, offset) }
-    val shared = if (module.options.stacktraces) null else sharedOutOfBounds()
+    if (reach > Int.MAX_VALUE) {
+        accessOutOfBounds(access) { pushUnsignedAddress(address, offset) }
+        return
+    }
+
     if (address is Operand.Immediate) {
         val effective = (address.bits and 0xFFFF_FFFFL) + offset
-        if (effective + width > Int.MAX_VALUE) return accessOutOfBounds(access) { emit.long(effective) }
-        val outOfBounds = shared ?: siteOutOfBounds(access) { emit.long(effective) }
-        emit.int(effective.toInt())
-        emit.load(Opcodes.ILOAD, locals.memorySize)
-        emit.int(width)
-        emit.insn(Opcodes.ISUB)
-        emit.jump(Opcodes.IF_ICMPGT, outOfBounds)
+        if (effective + width > Int.MAX_VALUE) {
+            accessOutOfBounds(access) { emit.long(effective) }
+            return
+        }
+        if (effective + width > declarations.memoryMinimumBytes(access.memory)) {
+            val outOfBounds = outOfBounds(access) { emit.long(effective) }
+            emit.int(effective.toInt())
+            emit.load(Opcodes.ILOAD, locals.memorySize)
+            emit.int(width)
+            emit.insn(Opcodes.ISUB)
+            emit.jump(Opcodes.IF_ICMPGT, outOfBounds)
+        }
         emit.int(effective.toInt())
         emit.store(Opcodes.ISTORE, locals.scratchInt)
     } else if (checkedAccesses[position]) {
@@ -120,7 +128,7 @@ private fun LowerContext.inlineAccess(
         }
         emit.store(Opcodes.ISTORE, locals.scratchInt)
     } else {
-        val outOfBounds = shared ?: siteOutOfBounds(access) { pushUnsignedScratch(offset) }
+        val outOfBounds = outOfBounds(access) { pushUnsignedScratch(offset) }
         pushInt(address)
         emit.insn(Opcodes.DUP)
         emit.store(Opcodes.ISTORE, locals.scratchInt)
@@ -141,19 +149,15 @@ private fun LowerContext.inlineAccess(
     if (value == null) inlineLoad(access.operation, access.destination) else inlineStore(access.operation, value)
 }
 
-private fun LowerContext.sharedOutOfBounds(): Label = outOfBoundsLabel ?: emit.label().also { label ->
-    outOfBoundsLabel = label
-    outOfLine += {
-        emit.place(label)
-        trap(MEMORY_OUT_OF_BOUNDS)
-    }
-}
-
-// With trap diagnostics each access gets its own cold block, which marks its site and records the access.
-private fun LowerContext.siteOutOfBounds(
+private fun LowerContext.outOfBounds(
     access: MemoryAccess,
     pushAddress: LowerContext.() -> Unit,
 ): Label {
+
+    if (!module.options.stacktraces) {
+        return trapLabel(MEMORY_OUT_OF_BOUNDS)
+    }
+
     val origin = position
     return emit.label().also { label ->
         outOfLine += {

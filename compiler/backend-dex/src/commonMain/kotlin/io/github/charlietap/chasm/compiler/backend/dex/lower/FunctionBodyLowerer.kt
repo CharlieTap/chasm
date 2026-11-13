@@ -1,7 +1,5 @@
 package io.github.charlietap.chasm.compiler.backend.dex.lower
 
-import io.github.charlietap.chasm.compiler.backend.abi.MEMORY_OUT_OF_BOUNDS
-
 internal fun LowerContext.lowerFunctionBody() {
     val publication = references.publication
     publishesWrites = publication.afterEntry
@@ -17,10 +15,5 @@ internal fun LowerContext.lowerFunctionBody() {
     emit.place(bodyEnd)
     returnUnreachable()
     lowerExceptionHandling()
-    if (outOfBoundsUsed) {
-        emit.place(OUT_OF_BOUNDS)
-        emit.invoke(MEMORY_OUT_OF_BOUNDS)
-        returnUnreachable()
-    }
     outOfLine.forEach { path -> path() }
 }

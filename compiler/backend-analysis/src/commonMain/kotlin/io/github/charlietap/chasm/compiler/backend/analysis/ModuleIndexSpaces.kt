@@ -5,6 +5,7 @@ import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.toInt
 import io.github.charlietap.chasm.cir.FunctionIndex
 import io.github.charlietap.chasm.cir.GlobalIndex
+import io.github.charlietap.chasm.cir.MemoryIndex
 import io.github.charlietap.chasm.cir.TagIndex
 import io.github.charlietap.chasm.cir.TypeIndex
 import io.github.charlietap.chasm.compiler.backend.abi.Resource
@@ -41,6 +42,14 @@ class ModuleIndexSpaces(
     val functionCount: Int = functionTypeIndices.size
 
     val memoryCount: Int = module.imports.count { import -> import.descriptor is Import.Descriptor.Memory } + module.memories.size
+
+    private val memoryMinimumPages: List<ULong> = module.imports.mapNotNull { import ->
+        (import.descriptor as? Import.Descriptor.Memory)?.type?.limits?.min
+    } + module.memories.map { memory -> memory.type.limits.min }
+
+    fun memoryMinimumBytes(index: MemoryIndex): Long {
+        return (minOf(memoryMinimumPages[index.index], MAX_PAGES) * PAGE_BYTES).toLong()
+    }
 
     fun isImported(
         index: FunctionIndex,
@@ -101,3 +110,7 @@ class ModuleIndexSpaces(
         is StorageType.Value -> storage.type
     }
 }
+
+private const val MAX_PAGES = 65_536uL
+
+private const val PAGE_BYTES = 65_536uL
