@@ -15,52 +15,28 @@ import io.github.charlietap.chasm.cir.NumericInstruction as CirNumericInstructio
 
 internal class IfChains(
     private val instructions: InstructionCursor,
-    private val elses: IntArray,
-    private val rejected: BooleanArray,
-    private val cases: Array<ProgramTarget?>,
-    private val defaults: Array<ProgramTarget?>,
+    private val tables: IfChainTables,
 ) {
     private var members = IntArray(INITIAL_MEMBERS)
     private var constants = IntArray(INITIAL_MEMBERS)
+    private var elsesRecorded = false
 
-    init {
-        elses.fill(-1, 0, instructions.size)
-        rejected.fill(false, 0, instructions.size)
-        cases.fill(null, 0, instructions.size)
-        defaults.fill(null, 0, instructions.size)
-        var open = IntArray(16)
-        var depth = 0
-        for (position in 0 until instructions.size) {
-            when (val instruction = instructions.at(position)) {
-                is ControlInstruction.If,
-                is ControlInstruction.Block,
-                is ControlInstruction.Loop,
-                is ControlInstruction.TryTable,
-                -> {
-                    if (depth == open.size) open = open.copyOf(depth * 2)
-                    open[depth++] = position
-                }
-                is ControlInstruction.Else -> if (depth > 0) elses[open[depth - 1]] = position
-                is ControlInstruction.End -> depth = maxOf(0, depth - instruction.count)
-                else -> Unit
-            }
-        }
+    fun caseAt(ifIndex: Int): ProgramTarget? {
+        return tables.caseAt(ifIndex)
     }
 
-    fun caseAt(
-        ifIndex: Int,
-    ): ProgramTarget? = cases[ifIndex]
-
-    fun defaultAt(
-        ifIndex: Int,
-    ): ProgramTarget? = defaults[ifIndex]
+    fun defaultAt(ifIndex: Int): ProgramTarget? {
+        return tables.defaultAt(ifIndex)
+    }
 
     fun open(
         ifIndex: Int,
         selector: Int,
         program: ProgramBuilder,
     ): JumpTable? {
-        if (rejected[ifIndex]) return null
+        if (tables.isRejected(ifIndex)) {
+            return null
+        }
         var count = 0
         var dense = 0
         var low = Int.MAX_VALUE
@@ -95,7 +71,7 @@ internal class IfChains(
                 denseLow = low
                 denseHigh = high
             }
-            val otherwise = elses[position]
+            val otherwise = elseOf(position)
             if (otherwise < 0) {
                 settled = count
                 break
@@ -104,7 +80,9 @@ internal class IfChains(
         }
         if (dense == 0) {
             for (start in 1 until settled) {
-                if (!hasDensePrefix(start, count)) rejected[members[start]] = true
+                if (!hasDensePrefix(start, count)) {
+                    tables.reject(members[start])
+                }
             }
             return null
         }
@@ -114,11 +92,50 @@ internal class IfChains(
         val targets = IntArray(denseHigh - base + 2) { default.index }
         for (member in 0 until dense) {
             val case = program.target()
-            cases[members[member]] = case
+            tables.setCase(members[member], case)
             targets[constants[member] - base] = case.index
         }
-        defaults[members[dense - 1]] = default
+        tables.setDefault(members[dense - 1], default)
         return JumpTable(base, targets)
+    }
+
+    private fun elseOf(ifIndex: Int): Int {
+
+        if (!elsesRecorded) {
+            recordElses()
+            elsesRecorded = true
+        }
+
+        return tables.elseAt(ifIndex)
+    }
+
+    private fun recordElses() {
+
+        var open = IntArray(INITIAL_DEPTH)
+        var depth = 0
+        for (position in 0 until instructions.size) {
+            when (val instruction = instructions.at(position)) {
+                is ControlInstruction.If,
+                is ControlInstruction.Block,
+                is ControlInstruction.Loop,
+                is ControlInstruction.TryTable,
+                -> {
+                    if (depth == open.size) {
+                        open = open.copyOf(depth * 2)
+                    }
+                    open[depth++] = position
+                }
+                is ControlInstruction.Else -> {
+                    if (depth > 0) {
+                        tables.setElse(open[depth - 1], position)
+                    }
+                }
+                is ControlInstruction.End -> {
+                    depth = maxOf(0, depth - instruction.count)
+                }
+                else -> Unit
+            }
+        }
     }
 
     private fun chainConstant(
@@ -126,8 +143,12 @@ internal class IfChains(
         selector: Int,
     ): NumericInstruction.I32Const? {
         val get = instructions.at(position - 3) as? VariableInstruction.LocalGet ?: return null
-        if (get.localIdx.toInt() != selector) return null
-        if (instructions.at(position - 1) != NumericInstruction.I32Eq || instructions.at(position) !is ControlInstruction.If) return null
+        if (get.localIdx.toInt() != selector) {
+            return null
+        }
+        if (instructions.at(position - 1) != NumericInstruction.I32Eq || instructions.at(position) !is ControlInstruction.If) {
+            return null
+        }
         return instructions.at(position - 2) as? NumericInstruction.I32Const
     }
 
@@ -141,7 +162,9 @@ internal class IfChains(
             low = minOf(low, constants[member])
             high = maxOf(high, constants[member])
             val size = member - start + 1
-            if (size >= MIN_MEMBERS && isDense(low, high, size)) return true
+            if (size >= MIN_MEMBERS && isDense(low, high, size)) {
+                return true
+            }
         }
         return false
     }
@@ -158,29 +181,112 @@ internal class JumpTable(
     val targets: IntArray,
 )
 
-internal fun FunctionCompilationContext.ifChainCase(
-    ifIndex: Int,
-): ProgramTarget? = ifChains?.caseAt(ifIndex)
+internal class IfChainTables {
 
-internal fun FunctionCompilationContext.ifChainDefault(
-    ifIndex: Int,
-): ProgramTarget? = ifChains?.defaultAt(ifIndex)
+    private var generation = 0
+    private var stamps = IntArray(0)
+    private var elses = IntArray(0)
+    private var rejected = BooleanArray(0)
+    private var cases = arrayOfNulls<ProgramTarget>(0)
+    private var defaults = arrayOfNulls<ProgramTarget>(0)
+
+    fun begin(size: Int) {
+
+        generation++
+        if (size > stamps.size) {
+            val capacity = maxOf(size, stamps.size * 2)
+            stamps = IntArray(capacity)
+            elses = IntArray(capacity)
+            rejected = BooleanArray(capacity)
+            cases = arrayOfNulls(capacity)
+            defaults = arrayOfNulls(capacity)
+        }
+    }
+
+    fun elseAt(position: Int): Int {
+        prepare(position)
+        return elses[position]
+    }
+
+    fun setElse(
+        position: Int,
+        elsePosition: Int,
+    ) {
+        prepare(position)
+        elses[position] = elsePosition
+    }
+
+    fun isRejected(position: Int): Boolean {
+        prepare(position)
+        return rejected[position]
+    }
+
+    fun reject(position: Int) {
+        prepare(position)
+        rejected[position] = true
+    }
+
+    fun caseAt(position: Int): ProgramTarget? {
+        prepare(position)
+        return cases[position]
+    }
+
+    fun setCase(
+        position: Int,
+        target: ProgramTarget,
+    ) {
+        prepare(position)
+        cases[position] = target
+    }
+
+    fun defaultAt(position: Int): ProgramTarget? {
+        prepare(position)
+        return defaults[position]
+    }
+
+    fun setDefault(
+        position: Int,
+        target: ProgramTarget,
+    ) {
+        prepare(position)
+        defaults[position] = target
+    }
+
+    private fun prepare(position: Int) {
+        if (stamps[position] != generation) {
+            stamps[position] = generation
+            elses[position] = NO_ELSE
+            rejected[position] = false
+            cases[position] = null
+            defaults[position] = null
+        }
+    }
+}
+
+internal fun FunctionCompilationContext.ifChainCase(ifIndex: Int): ProgramTarget? {
+    return ifChains?.caseAt(ifIndex)
+}
+
+internal fun FunctionCompilationContext.ifChainDefault(ifIndex: Int): ProgramTarget? {
+    return ifChains?.defaultAt(ifIndex)
+}
 
 internal fun FunctionCompilationContext.beginIfChain(
     ifIndex: Int,
     condition: NumericCondition,
 ): ProgramTarget? {
-    if (condition !is NumericCondition.I32Eq || condition.right !is FusedOperand.I32Const) return null
+    if (condition !is NumericCondition.I32Eq || condition.right !is FusedOperand.I32Const) {
+        return null
+    }
     val get = instructions.at(ifIndex - 3) as? VariableInstruction.LocalGet ?: return null
     val selector = get.localIdx.toInt()
     val slot = layout.localSlot(selector)
-    if ((condition.left as? FusedOperand.FrameSlot)?.offset != slot) return null
+    if ((condition.left as? FusedOperand.FrameSlot)?.offset != slot) {
+        return null
+    }
     val chains = ifChains ?: IfChains(
         instructions = instructions,
-        elses = workspace.chainElses(instructions.size),
-        rejected = workspace.rejectedChains(instructions.size),
-        cases = workspace.chainCases(instructions.size),
-        defaults = workspace.chainDefaults(instructions.size),
+        tables = workspace.ifChainTables.also { tables -> tables.begin(instructions.size) },
     ).also { ifChains = it }
     val table = chains.open(ifIndex, selector, program) ?: return null
     val operand = if (table.base == 0) {
@@ -200,12 +306,18 @@ private fun IntArray.indexOf(
     count: Int,
 ): Int {
     for (index in 0 until count) {
-        if (this[index] == value) return index
+        if (this[index] == value) {
+            return index
+        }
     }
     return -1
 }
 
 private const val INITIAL_MEMBERS = 8
+
+private const val INITIAL_DEPTH = 16
+
+private const val NO_ELSE = -1
 
 private const val MIN_MEMBERS = 4
 

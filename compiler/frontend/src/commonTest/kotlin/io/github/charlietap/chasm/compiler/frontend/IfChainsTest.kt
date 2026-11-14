@@ -132,6 +132,36 @@ class IfChainsTest {
         assertTrue(code.none { instruction -> instruction is AdminInstruction.JumpTableS })
     }
 
+    @Test
+    fun `functions compiled in turn do not see each other's chains`() {
+        val code = compileAll(
+            listOf(
+                chain(0 to 2, 0 to 0, 0 to 3, 0 to 1),
+                chain(0 to 0, 0 to 100, 0 to 200, 0 to 300),
+                chain(*Array(40) { constant -> 0 to constant }),
+            ),
+        )
+
+        assertEquals(1, code[0].count { instruction -> instruction is AdminInstruction.JumpTableS })
+        assertEquals(listOf(0, 100, 200, 300), tests(code[1]))
+        assertTrue(code[1].none { instruction -> instruction is AdminInstruction.JumpTableS })
+        val table = code[2].filterIsInstance<AdminInstruction.JumpTableS>().single()
+        assertEquals((0 until 40).toList(), table.targets.take(40).map { target -> arm(code[2], target) })
+    }
+
+    @Test
+    fun `a chain rejected in one function can still become a table in the next`() {
+        val code = compileAll(
+            listOf(
+                chain(0 to 0, 0 to 100, 0 to 200, 0 to 300, 0 to 400),
+                chain(0 to 1000, 0 to 0, 0 to 1, 0 to 2, 0 to 3),
+            ),
+        )
+
+        assertTrue(code[0].none { instruction -> instruction is AdminInstruction.JumpTableS })
+        assertEquals(1, code[1].count { instruction -> instruction is AdminInstruction.JumpTableS })
+    }
+
     private fun chain(
         vararg tests: Pair<Int, Int>,
         between: Map<Int, List<Instruction>> = emptyMap(),
@@ -156,6 +186,13 @@ class IfChainsTest {
     ): List<CirInstruction> {
         val module = module(definedTypes = listOf(binary), functions = listOf(function(body = body)))
         return ModuleCompiler(module).unwrap().functions[0].instructions.toList()
+    }
+
+    private fun compileAll(
+        bodies: List<Expression>,
+    ): List<List<CirInstruction>> {
+        val module = module(definedTypes = listOf(binary), functions = bodies.map { body -> function(body = body) })
+        return ModuleCompiler(module).unwrap().functions.map { function -> function.instructions.toList() }
     }
 
     private fun arm(
