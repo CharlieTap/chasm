@@ -4,6 +4,8 @@ import io.github.charlietap.chasm.ast.module.Import
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.toInt
+import io.github.charlietap.chasm.compiler.frontend.IndirectCallTargets
+import io.github.charlietap.chasm.compiler.frontend.indirectCallTargets
 import io.github.charlietap.chasm.declarations.ModuleTypeResolver
 import io.github.charlietap.chasm.type.BlockType
 import io.github.charlietap.chasm.type.FunctionType
@@ -19,6 +21,7 @@ internal class CompilerContext(
     val tagTypes: Array<TagType> = emptyArray(),
     val importedFunctionCount: Int = 0,
     private val functionTypeIndices: IntArray = IntArray(0),
+    val indirectCallTargets: IndirectCallTargets? = null,
 ) {
     val emptyBlockType: FunctionType = types.blockType(BlockType.Empty)
 
@@ -38,6 +41,7 @@ internal class CompilerContext(
 internal fun createCompilerContext(
     module: Module,
     types: ModuleTypeResolver,
+    devirtualiseIndirectCalls: Boolean,
 ): CompilerContext {
     val importedGlobals = module.imports.mapNotNull { (it.descriptor as? Import.Descriptor.Global)?.type }
     val importedTables = module.imports.mapNotNull { (it.descriptor as? Import.Descriptor.Table)?.type }
@@ -53,5 +57,6 @@ internal fun createCompilerContext(
             imports = module.imports,
             definedFunctionTypeIndices = IntArray(module.functions.size) { index -> module.functions[index].typeIndex.toInt() },
         ),
+        indirectCallTargets = if (devirtualiseIndirectCalls) indirectCallTargets(module, types) else null,
     )
 }

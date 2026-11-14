@@ -23,7 +23,7 @@ internal inline fun UncompilableFunctions(
     types: ModuleTypeResolver,
     crossinline functionCompiler: FunctionCompiler,
 ): Map<Int, CompilationError> {
-    val context = createCompilerContext(module, types)
+    val context = createCompilerContext(module, types, devirtualiseIndirectCalls = false)
     val workspace = FunctionCompilerWorkspace()
     val failures = LinkedHashMap<Int, CompilationError>()
     module.functions.forEach { function ->

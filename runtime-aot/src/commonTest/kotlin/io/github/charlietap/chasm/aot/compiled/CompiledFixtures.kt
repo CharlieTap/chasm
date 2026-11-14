@@ -10,7 +10,6 @@ import io.github.charlietap.chasm.compiler.backend.jvm.JvmOptions
 import io.github.charlietap.chasm.compiler.backend.jvm.JvmOutput
 import io.github.charlietap.chasm.compiler.backend.jvm.ModuleLowerer
 import io.github.charlietap.chasm.compiler.frontend.ModuleCompiler
-import io.github.charlietap.chasm.compiler.frontend.ModuleRewriter
 import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.config.StoreConfig
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
@@ -83,13 +82,13 @@ internal fun generate(
     bytes: ByteArray,
     options: JvmOptions = JvmOptions(),
 ): Generated {
-    val decoded = decodeNamedModule(bytes)
-    val types = decoded.typeResolver()
-    val module = ModuleRewriter(
-        preserveSource = options.stacktraces || options.meterFuel || options.interruptible,
-        inlineLeaves = false,
-    ).rewrite(decoded, types)
-    val code = ModuleCompiler(module, types).getOrThrow { IllegalStateException(it.toString()) }
+    val module = decodeNamedModule(bytes)
+    val code = ModuleCompiler(
+        module = module,
+        types = module.typeResolver(),
+        recordProvenance = false,
+        devirtualiseIndirectCalls = !options.stacktraces && !options.meterFuel && !options.interruptible,
+    ).getOrThrow { IllegalStateException(it.toString()) }
     val generated = Generated()
     generated.module = ModuleLowerer(module, code, options, generated, ModuleDeclarationsFactory(module))
     return generated

@@ -14,7 +14,6 @@ import io.github.charlietap.chasm.compiler.backend.jvm.MemoryLowering
 import io.github.charlietap.chasm.compiler.backend.jvm.ModuleLowerer
 import io.github.charlietap.chasm.compiler.backend.jvm.UnsupportedFunctions
 import io.github.charlietap.chasm.compiler.frontend.ModuleCompiler
-import io.github.charlietap.chasm.compiler.frontend.ModuleRewriter
 import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.config.StoreConfig
 import io.github.charlietap.chasm.embedding.error.ChasmError
@@ -70,15 +69,15 @@ internal object AotCompiler {
         module: Module,
         options: JvmOptions,
     ): CompiledModule {
-        val types = module.typeResolver()
-        val source = ModuleRewriter(
-            preserveSource = options.stacktraces || options.meterFuel || options.interruptible,
-            inlineLeaves = false,
-        ).rewrite(module, types)
-        val cir = ModuleCompiler(source, types).fold({ it }) { error -> throw IllegalStateException("cannot compile: $error") }
+        val cir = ModuleCompiler(
+            module = module,
+            types = module.typeResolver(),
+            recordProvenance = false,
+            devirtualiseIndirectCalls = !options.stacktraces && !options.meterFuel && !options.interruptible,
+        ).fold({ it }) { error -> throw IllegalStateException("cannot compile: $error") }
         val generated = GeneratedCode()
         val result = try {
-            ModuleLowerer(source, cir, options, generated, ModuleDeclarationsFactory(source))
+            ModuleLowerer(module, cir, options, generated, ModuleDeclarationsFactory(module))
         } catch (unsupported: UnsupportedFunctions) {
             throw IllegalStateException("AOT: ${unsupported.message}")
         }

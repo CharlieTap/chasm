@@ -31,7 +31,14 @@ internal fun compile(
             preserveSource = config.stacktraces || config.meterFuel || config.interruptible,
             inlineLeaves = true,
         ),
-        moduleCompiler = ::ModuleCompiler,
+        moduleCompiler = { ast, types ->
+            ModuleCompiler(
+                module = ast,
+                types = types,
+                recordProvenance = false,
+                devirtualiseIndirectCalls = !config.stacktraces && !config.meterFuel && !config.interruptible,
+            )
+        },
         uncompilableFunctions = ::UncompilableFunctions,
         moduleLowerer = ::ModuleLowerer,
         dexLoader = ::DexLoader,

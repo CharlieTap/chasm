@@ -12,7 +12,7 @@ class DefinedFunctionCompiler(
     private val module: Module,
     types: ModuleTypeResolver = module.typeResolver(),
 ) {
-    private val context = createCompilerContext(module, types)
+    private val context = createCompilerContext(module, types, devirtualiseIndirectCalls = false)
     private val workspace = FunctionCompilerWorkspace()
 
     fun compile(

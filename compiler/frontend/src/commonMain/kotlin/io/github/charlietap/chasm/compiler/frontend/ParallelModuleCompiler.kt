@@ -30,16 +30,22 @@ suspend fun ParallelModuleCompiler(
     module: Module,
     types: ModuleTypeResolver = module.typeResolver(),
     taskExecutor: ParallelTaskExecutor,
-): Result<CirModule, CompilationError> = ParallelModuleCompiler(
-    module = module,
-    types = types,
-    taskExecutor = taskExecutor,
-    mode = CompilationMode.AUTO,
-    availableProcessors = availableParallelProcessors(),
-    policy = compilationParallelism(),
-    functionCompiler = ::FunctionCompiler,
-    moduleCompiler = ::ModuleCompiler,
-)
+    devirtualiseIndirectCalls: Boolean = false,
+): Result<CirModule, CompilationError> {
+    return ParallelModuleCompiler(
+        module = module,
+        types = types,
+        taskExecutor = taskExecutor,
+        mode = CompilationMode.AUTO,
+        availableProcessors = availableParallelProcessors(),
+        policy = compilationParallelism(),
+        devirtualiseIndirectCalls = devirtualiseIndirectCalls,
+        functionCompiler = ::FunctionCompiler,
+        moduleCompiler = { source, resolver ->
+            ModuleCompiler(source, resolver, recordProvenance = false, devirtualiseIndirectCalls = devirtualiseIndirectCalls)
+        },
+    )
+}
 
 internal suspend fun ParallelModuleCompiler(
     module: Module,
@@ -48,6 +54,7 @@ internal suspend fun ParallelModuleCompiler(
     mode: CompilationMode,
     availableProcessors: Int,
     policy: ParallelismPolicy,
+    devirtualiseIndirectCalls: Boolean,
     functionCompiler: FunctionCompiler,
     moduleCompiler: ModuleCompiler,
 ): Result<CirModule, CompilationError> {
@@ -58,9 +65,11 @@ internal suspend fun ParallelModuleCompiler(
     } else {
         selectedWorkers
     }
-    if (workerCount <= 1) return moduleCompiler(module, types)
+    if (workerCount <= 1) {
+        return moduleCompiler(module, types)
+    }
 
-    val context = createCompilerContext(module, types)
+    val context = createCompilerContext(module, types, devirtualiseIndirectCalls)
     val compilation = ParallelCompilation(module.functions, checkNotNull(batches))
     taskExecutor.executeWorkers(workerCount) { compileFunctions(context, compilation, functionCompiler) }
     return when (val failure = compilation.failures.error) {

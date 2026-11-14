@@ -21,7 +21,6 @@ import io.github.charlietap.chasm.compiler.backend.jvm.MemoryLowering
 import io.github.charlietap.chasm.compiler.backend.jvm.ModuleLowerer
 import io.github.charlietap.chasm.compiler.backend.jvm.UnsupportedFunctions
 import io.github.charlietap.chasm.compiler.frontend.ModuleCompiler
-import io.github.charlietap.chasm.compiler.frontend.ModuleRewriter
 import io.github.charlietap.chasm.compiler.frontend.UncompilableFunctions
 import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.config.StoreLimits
@@ -85,11 +84,14 @@ private fun compile(
         source = source,
         binary = binary,
         validator = ::WasmModuleValidator,
-        moduleRewriter = ModuleRewriter(
-            preserveSource = config.stacktraces || config.storeConfig.meterFuel || config.storeConfig.interruptible,
-            inlineLeaves = false,
-        ),
-        moduleCompiler = { module, types -> ModuleCompiler(module, types, recordProvenance = config.stacktraces) },
+        moduleCompiler = { module, types ->
+            ModuleCompiler(
+                module = module,
+                types = types,
+                recordProvenance = config.stacktraces,
+                devirtualiseIndirectCalls = !config.stacktraces && !config.storeConfig.meterFuel && !config.storeConfig.interruptible,
+            )
+        },
         uncompilableFunctions = ::UncompilableFunctions,
         declarationsFactory = ::ModuleDeclarationsFactory,
         trapSitesFactory = ::TrapSitesFactory,
@@ -102,7 +104,6 @@ internal inline fun compile(
     noinline source: ModuleSource,
     binary: ByteArray?,
     crossinline validator: WasmModuleValidator,
-    moduleRewriter: ModuleRewriter,
     crossinline moduleCompiler: ModuleCompiler,
     crossinline uncompilableFunctions: UncompilableFunctions,
     crossinline declarationsFactory: ModuleDeclarationsFactory,
@@ -113,12 +114,11 @@ internal inline fun compile(
     val sink = output.sink()
     val result = try {
         val decoded = decodeForCompilation(config.moduleConfig, source).getOrElse { failure -> return CompileResult.Error(failure) }
-        val validated = validator(config.moduleConfig, decoded).getOrElse { failure ->
+        val module = validator(config.moduleConfig, decoded).getOrElse { failure ->
             return error(Stage.VALIDATION, failure.toString())
         }
-        exceededLimit(validated, config.storeConfig.limits)?.let { reason -> return error(Stage.CONFIGURATION, reason) }
-        val types = validated.typeResolver()
-        val module = moduleRewriter.rewrite(validated, types)
+        exceededLimit(module, config.storeConfig.limits)?.let { reason -> return error(Stage.CONFIGURATION, reason) }
+        val types = module.typeResolver()
         val code = moduleCompiler(module, types).getOrElse { failure ->
             val functions = uncompilableFunctions(module, types)
             val reasons = functions.entries.joinToString { (index, reason) -> "$index ($reason)" }

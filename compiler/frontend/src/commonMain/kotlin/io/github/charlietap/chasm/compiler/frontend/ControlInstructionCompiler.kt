@@ -4,8 +4,10 @@ import io.github.charlietap.chasm.ast.instruction.ControlInstruction
 import io.github.charlietap.chasm.ast.instruction.Instruction
 import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.ast.instruction.VariableInstruction
+import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.toInt
 import io.github.charlietap.chasm.cir.AdminInstruction
+import io.github.charlietap.chasm.cir.FusedOperand
 import io.github.charlietap.chasm.cir.NumericCondition
 import io.github.charlietap.chasm.compiler.frontend.context.BlockContext
 import io.github.charlietap.chasm.compiler.frontend.context.BlockKind
@@ -39,7 +41,9 @@ import io.github.charlietap.chasm.compiler.frontend.instruction.emitThrowRef
 import io.github.charlietap.chasm.compiler.frontend.instruction.emptySlotTransfer
 import io.github.charlietap.chasm.compiler.frontend.instruction.prepareBranchTarget
 import io.github.charlietap.chasm.compiler.frontend.instruction.slotTransferTo
+import io.github.charlietap.chasm.compiler.frontend.operand.OperandSource
 import io.github.charlietap.chasm.compiler.frontend.operand.OperandSourceKind
+import io.github.charlietap.chasm.compiler.frontend.operand.i32Immediate
 import io.github.charlietap.chasm.compiler.frontend.operand.isImmediate
 import io.github.charlietap.chasm.compiler.frontend.operand.sourceSlot
 import io.github.charlietap.chasm.compiler.frontend.program.ProgramTarget
@@ -628,15 +632,79 @@ private fun compileCallIndirect(
     val interfaceSlotCount = maxOf(type.params.types.size, type.results.types.size)
     reserveCallInterface(state, callFrameOffset, interfaceSlotCount)
     val destination = callResultDestination(state, type.results.types)
-    state.emitCallIndirect(
-        elementIndex = elementIndex,
-        operands = operands,
-        type = state.compiler.type(instruction.typeIndex),
-        table = state.compiler.table(instruction.tableIndex),
-        callFrameOffset = callFrameOffset,
-        resultDestinationSlot = destination?.slot,
-    )
+    val call = IndirectCall(instruction, elementIndex, operands, callFrameOffset, destination?.slot)
+    val arms = state.compiler.indirectCallTargets?.at(instruction.tableIndex.toInt(), instruction.typeIndex.toInt())
+    if (arms == null) {
+        emitIndirectCall(state, call)
+    } else {
+        emitDevirtualisedCall(state, call, arms)
+    }
     completeCallResults(state, type.results.types, callFrameOffset, destination)
+}
+
+private data class IndirectCall(
+    val instruction: ControlInstruction.CallIndirect,
+    val elementIndex: OperandSource,
+    val operands: List<OperandSource>,
+    val callFrameOffset: Int,
+    val resultDestinationSlot: Int?,
+)
+
+private fun emitIndirectCall(
+    state: FunctionCompilationContext,
+    call: IndirectCall,
+) {
+    state.emitCallIndirect(
+        elementIndex = call.elementIndex,
+        operands = call.operands,
+        type = state.compiler.type(call.instruction.typeIndex),
+        table = state.compiler.table(call.instruction.tableIndex),
+        callFrameOffset = call.callFrameOffset,
+        resultDestinationSlot = call.resultDestinationSlot,
+    )
+}
+
+private fun emitDevirtualisedCall(
+    state: FunctionCompilationContext,
+    call: IndirectCall,
+    arms: Arms,
+) {
+
+    if (call.elementIndex.sourceKind == OperandSourceKind.I32Immediate) {
+        val arm = arms.indices.indexOf(call.elementIndex.i32Immediate)
+        if (arm >= 0) {
+            emitArmCall(state, call, arms.functions[arm])
+        } else {
+            emitIndirectCall(state, call)
+        }
+        return
+    }
+
+    val done = state.program.target()
+    val selector = FusedOperand.FrameSlot(call.elementIndex.sourceSlot)
+    for (arm in 0 until arms.size) {
+        val next = state.program.target()
+        val matches = NumericCondition.I32Eq(selector, FusedOperand.I32Const(arms.indices[arm]))
+        state.emitBranchIf(matches, next, emptySlotTransfer, branchOnMatch = false)
+        emitArmCall(state, call, arms.functions[arm])
+        state.emitJump(done)
+        state.bind(next)
+    }
+    emitIndirectCall(state, call)
+    state.bind(done)
+}
+
+private fun emitArmCall(
+    state: FunctionCompilationContext,
+    call: IndirectCall,
+    function: Int,
+) {
+    state.emitCall(
+        function = state.compiler.function(Index.FunctionIndex(function.toUInt())),
+        operands = call.operands,
+        callFrameOffset = call.callFrameOffset,
+        resultDestinationSlot = call.resultDestinationSlot,
+    )
 }
 
 private fun compileCallRef(

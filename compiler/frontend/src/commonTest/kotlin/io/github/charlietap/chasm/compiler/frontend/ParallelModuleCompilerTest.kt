@@ -67,6 +67,7 @@ class ParallelModuleCompilerTest {
         mode = CompilationMode.PARALLEL,
         availableProcessors = 2,
         policy = ParallelismPolicy(minimumWork = 0, workPerWorker = 1),
+        devirtualiseIndirectCalls = false,
         functionCompiler = functionCompiler,
         moduleCompiler = { _, _ -> fail("the parallel path compiles the module") },
     )

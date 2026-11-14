@@ -15,28 +15,36 @@ typealias ModuleCompiler = (Module, ModuleTypeResolver) -> Result<CirModule, Com
 fun ModuleCompiler(
     module: Module,
     types: ModuleTypeResolver = module.typeResolver(),
-): Result<CirModule, CompilationError> = ModuleCompiler(
-    module = module,
-    types = types,
-    functionCompiler = ::FunctionCompiler,
-)
+): Result<CirModule, CompilationError> {
+    return ModuleCompiler(
+        module = module,
+        types = types,
+        devirtualiseIndirectCalls = false,
+        functionCompiler = ::FunctionCompiler,
+    )
+}
 
 fun ModuleCompiler(
     module: Module,
     types: ModuleTypeResolver,
     recordProvenance: Boolean,
-): Result<CirModule, CompilationError> = ModuleCompiler(
-    module = module,
-    types = types,
-    functionCompiler = { context, function, workspace -> FunctionCompiler(context, function, workspace, recordProvenance) },
-)
+    devirtualiseIndirectCalls: Boolean = false,
+): Result<CirModule, CompilationError> {
+    return ModuleCompiler(
+        module = module,
+        types = types,
+        devirtualiseIndirectCalls = devirtualiseIndirectCalls,
+        functionCompiler = { context, function, workspace -> FunctionCompiler(context, function, workspace, recordProvenance) },
+    )
+}
 
 internal inline fun ModuleCompiler(
     module: Module,
     types: ModuleTypeResolver,
+    devirtualiseIndirectCalls: Boolean,
     crossinline functionCompiler: FunctionCompiler,
 ): Result<CirModule, CompilationError> = binding {
-    val context = createCompilerContext(module, types)
+    val context = createCompilerContext(module, types, devirtualiseIndirectCalls)
     val workspace = FunctionCompilerWorkspace()
     val functions = arrayOfNulls<CirFunction>(module.functions.size)
     for (index in module.functions.indices) {

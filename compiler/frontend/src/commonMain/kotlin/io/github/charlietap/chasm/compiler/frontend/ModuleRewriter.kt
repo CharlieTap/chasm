@@ -6,7 +6,6 @@ import io.github.charlietap.chasm.declarations.ModuleTypeResolver
 class ModuleRewriter internal constructor(
     private val preserveSource: Boolean,
     private val inlineLeaves: Boolean,
-    private val indirectCallDevirtualiser: IndirectCallDevirtualiser,
     private val leafCallInliner: LeafCallInliner,
 ) {
     constructor(
@@ -15,7 +14,6 @@ class ModuleRewriter internal constructor(
     ) : this(
         preserveSource = preserveSource,
         inlineLeaves = inlineLeaves,
-        indirectCallDevirtualiser = ::IndirectCallDevirtualiser,
         leafCallInliner = LeafCallInliner(LeafAnalyzer(), FunctionInliner()),
     )
 
@@ -24,11 +22,10 @@ class ModuleRewriter internal constructor(
         types: ModuleTypeResolver,
     ): Module {
 
-        if (preserveSource) return module
+        if (preserveSource || !inlineLeaves) {
+            return module
+        }
 
-        val devirtualised = indirectCallDevirtualiser(module, types)
-        if (!inlineLeaves) return devirtualised
-
-        return leafCallInliner.rewrite(devirtualised, types)
+        return leafCallInliner.rewrite(module, types)
     }
 }
