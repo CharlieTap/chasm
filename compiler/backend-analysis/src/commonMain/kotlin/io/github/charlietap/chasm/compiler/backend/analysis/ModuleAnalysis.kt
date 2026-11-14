@@ -6,6 +6,7 @@ import io.github.charlietap.chasm.cir.CirFunction
 import io.github.charlietap.chasm.cir.CirModule
 import io.github.charlietap.chasm.cir.ControlInstruction
 import io.github.charlietap.chasm.cir.Instruction
+import io.github.charlietap.chasm.cir.TypeIndex
 import io.github.charlietap.chasm.compiler.backend.abi.MAX_PARAMETERS
 import io.github.charlietap.chasm.compiler.backend.abi.signatureKey
 import io.github.charlietap.chasm.type.AbstractHeapType
@@ -31,9 +32,15 @@ fun analyzeModule(
     declarations: ModuleIndexSpaces,
 ): ModuleAnalysis {
     val signatureTypes = LinkedHashMap<String, FunctionType>()
+    val seenTypes = BooleanArray(declarations.typeCount)
     for (function in code.functions) {
         for (instruction in function.instructions) {
-            val type = instruction.indirectCallType(declarations)?.takeIf { it.params.types.size <= MAX_PARAMETERS } ?: continue
+            val index = instruction.indirectCallTypeIndex() ?: continue
+            if (seenTypes[index.index]) {
+                continue
+            }
+            seenTypes[index.index] = true
+            val type = declarations.functionType(index).takeIf { it.params.types.size <= MAX_PARAMETERS } ?: continue
             signatureTypes.putIfAbsent(signatureKey(type), type)
         }
     }
@@ -55,13 +62,13 @@ fun analyzeModule(
 private fun CirFunction.catchesExceptionReference(): Boolean =
     exceptions?.regions.orEmpty().any { region -> region.catches.any { handler -> handler.exceptionReference } }
 
-fun Instruction.indirectCallType(
-    declarations: ModuleIndexSpaces,
-): FunctionType? = when (this) {
-    is ControlInstruction.CallIndirectI -> declarations.functionType(type)
-    is ControlInstruction.CallIndirectS -> declarations.functionType(type)
-    is ControlInstruction.CallRefS -> declarations.functionType(type)
-    else -> null
+fun Instruction.indirectCallTypeIndex(): TypeIndex? {
+    return when (this) {
+        is ControlInstruction.CallIndirectI -> type
+        is ControlInstruction.CallIndirectS -> type
+        is ControlInstruction.CallRefS -> type
+        else -> null
+    }
 }
 
 fun Instruction.isTailCall(): Boolean = this is ControlInstruction.ReturnCall ||

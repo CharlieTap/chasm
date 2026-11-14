@@ -3,7 +3,6 @@ package io.github.charlietap.chasm.compiler.backend.dex
 import io.github.charlietap.chasm.cir.CirFunction
 import io.github.charlietap.chasm.compiler.backend.abi.CONTEXT_TYPE
 import io.github.charlietap.chasm.compiler.backend.abi.MethodRef
-import io.github.charlietap.chasm.compiler.backend.abi.argumentWords
 import io.github.charlietap.chasm.compiler.backend.dex.abi.ART_MAX_COMPILED_REGISTERS
 import io.github.charlietap.chasm.compiler.backend.dex.abi.BINDING_TYPE
 import io.github.charlietap.chasm.compiler.backend.dex.abi.CHUNK_CODE_UNITS
@@ -359,7 +358,7 @@ private fun functionRegisters(
         frameSlots = facts.frameSlots,
         temporaries = window.temporaries,
         windowWords = window.windowWords,
-        parameterWords = argumentWords(facts.type),
+        parameterWords = facts.signature.argumentWords,
         cachedConstants = analysis.cachedConstants.size,
         unsafeMemory = analysis.unsafeMemory,
         inlineMemory = analysis.usesInlineMemory,
@@ -377,7 +376,7 @@ private fun dispatcherRegisters(analysis: FunctionAnalysis): Registers {
         frameSlots = 0,
         temporaries = 0,
         windowWords = CHUNK_WINDOW_WORDS,
-        parameterWords = argumentWords(analysis.facts.type),
+        parameterWords = analysis.facts.signature.argumentWords,
         cachedConstants = 0,
         unsafeMemory = false,
         inlineMemory = false,

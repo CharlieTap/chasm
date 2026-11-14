@@ -3,10 +3,9 @@ package io.github.charlietap.chasm.compiler.backend.dex
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.cir.CirModule
 import io.github.charlietap.chasm.compiler.backend.abi.binaryName
-import io.github.charlietap.chasm.compiler.backend.abi.signatureKey
+import io.github.charlietap.chasm.compiler.backend.dex.abi.FunctionSignature
 import io.github.charlietap.chasm.compiler.backend.dex.abi.codeClass
 import io.github.charlietap.chasm.compiler.backend.dex.abi.installClass
-import io.github.charlietap.chasm.compiler.backend.dex.abi.method
 import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.dexter.DexFile
 import io.github.charlietap.dexter.Dexter
@@ -60,10 +59,11 @@ private inline fun lowerModule(
             for (function in functions) {
                 val index = function.index.index
                 val type = lowering.declarations.functionType(function.type)
-                val method = lowering.functionMethod(function.index, type).method
+                val method = lowering.references.of(lowering.functionMethod(function.index, type))
                 val reason = functionLowerer(lowering, function, classBuilder, method)
                 if (reason == null) {
-                    compiled.getOrPut(EntryKey(type)) { EntryCandidates(type) }.functions += LoweredFunction(index, method)
+                    val key = EntryKey(lowering.functionSignature(function.type), type)
+                    compiled.getOrPut(key) { EntryCandidates(type) }.functions += LoweredFunction(index, method)
                 } else {
                     reasons[index] = reason
                 }
@@ -104,8 +104,9 @@ internal data class EntryKey(
     val results: Int,
 ) {
     constructor(
+        signature: FunctionSignature,
         type: FunctionType,
-    ) : this(signatureKey(type), type.params.types.size, type.results.types.size)
+    ) : this(signature.key, type.params.types.size, type.results.types.size)
 }
 
 private fun entryGroups(
@@ -113,9 +114,9 @@ private fun entryGroups(
     lowering: ModuleLowering,
 ): List<EntryGroup> {
     val groups = ArrayList<EntryGroup>()
-    for (candidates in compiled.values) {
+    for ((key, candidates) in compiled) {
         val type = candidates.type
-        val signature = lowering.signatureClass(type)
+        val signature = lowering.signatureClass(key.signature)
         for (members in candidates.functions.chunked(ENTRY_GROUP_SIZE)) {
             groups += EntryGroup(number = groups.size, type = type, signature = signature, members = members)
         }

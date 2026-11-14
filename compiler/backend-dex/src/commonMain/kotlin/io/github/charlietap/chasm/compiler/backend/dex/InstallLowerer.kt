@@ -63,6 +63,7 @@ private fun entriesClass(
     chunks: List<List<Map.Entry<Int, EntryRef>>>,
 ) {
     val builder = file.addClass(ClassType(owner), DexType.Object, access = ClassAccess.PackageFinal)
+    val install = INSTALL.method
     builder.chunk(owner, INSTALL_ENTRIES, 0, MemberAccess.Package) { installation, binding ->
         chunks.indices.forEach { chunk -> invokeStatic(chunkMethod(owner, INSTALL_ENTRIES, chunk + 1), installation, binding) }
     }
@@ -74,7 +75,7 @@ private fun entriesClass(
                 const(NUMBER, entry.id)
                 invokeConstructor(DexConstructor(type, DexType.Object.array(), DexType.Int), OBJECT, binding, NUMBER)
                 const(INDEX, function)
-                invokeVirtual(INSTALL.method, installation, INDEX, OBJECT)
+                invokeVirtual(install, installation, INDEX, OBJECT)
             }
         }
     }

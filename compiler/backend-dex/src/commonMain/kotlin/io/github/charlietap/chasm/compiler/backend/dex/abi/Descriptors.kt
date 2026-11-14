@@ -1,8 +1,10 @@
 package io.github.charlietap.chasm.compiler.backend.dex.abi
 
 import io.github.charlietap.chasm.compiler.backend.abi.MethodRef
+import io.github.charlietap.chasm.compiler.backend.abi.argumentWords
 import io.github.charlietap.chasm.compiler.backend.abi.descriptorWords
 import io.github.charlietap.chasm.compiler.backend.abi.returnDescriptor
+import io.github.charlietap.chasm.compiler.backend.abi.signatureKey
 import io.github.charlietap.chasm.compiler.backend.abi.staticParameters
 import io.github.charlietap.chasm.compiler.backend.abi.takesArgumentArray
 import io.github.charlietap.chasm.compiler.backend.abi.valueDescriptor
@@ -17,15 +19,11 @@ import io.github.charlietap.dexter.ValueType as DexValueType
 internal val MethodRef.method: DexMethod
     get() = DexMethod(referenceType(owner), name, dexType(returns), parameters.map(::valueType))
 
-internal class Invocation(
-    method: MethodRef,
-) {
-    val method: DexMethod = method.method
-
-    val words: Int = method.words
-
-    val offsets: IntArray = descriptorOffsets(method.parameters)
-}
+internal data class Invocation(
+    val method: DexMethod,
+    val words: Int,
+    val offsets: IntArray,
+)
 
 internal class FunctionSignature(
     type: FunctionType,
@@ -37,6 +35,10 @@ internal class FunctionSignature(
     val argumentArray: Boolean = takesArgumentArray(type)
 
     val resultDescriptor: String = returnDescriptor(type)
+
+    val key: String = signatureKey(type)
+
+    val argumentWords: Int = argumentWords(type)
 }
 
 private fun descriptorOffsets(descriptors: List<String>): IntArray {
@@ -61,7 +63,26 @@ internal class DexReferences {
     }
 
     fun invocation(method: MethodRef): Invocation {
-        return methods.getOrPut(method) { Invocation(method) }
+        return methods.getOrPut(method) {
+            val dexMethod = DexMethod(reference(method.owner), method.name, returnType(method.returns), method.parameters.map(::parameterType))
+            Invocation(dexMethod, method.words, descriptorOffsets(method.parameters))
+        }
+    }
+
+    private fun returnType(descriptor: String): DexType {
+        return if (descriptor.length == 1) {
+            dexType(descriptor)
+        } else {
+            reference(descriptor)
+        }
+    }
+
+    private fun parameterType(descriptor: String): DexValueType {
+        return if (descriptor.length == 1) {
+            valueType(descriptor)
+        } else {
+            reference(descriptor)
+        }
     }
 
     fun field(

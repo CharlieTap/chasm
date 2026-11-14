@@ -11,7 +11,6 @@ import io.github.charlietap.chasm.compiler.backend.abi.BRIDGE_CALL_INDIRECT
 import io.github.charlietap.chasm.compiler.backend.abi.BRIDGE_CALL_REF
 import io.github.charlietap.chasm.compiler.backend.abi.STRUCT_SET
 import io.github.charlietap.chasm.compiler.backend.abi.TAIL_CALL_INDIRECT
-import io.github.charlietap.chasm.compiler.backend.abi.argumentWords
 import io.github.charlietap.chasm.compiler.backend.analysis.form.callSite
 import io.github.charlietap.chasm.compiler.backend.analysis.form.helperCall
 import io.github.charlietap.chasm.compiler.backend.dex.ModuleLowering
@@ -52,7 +51,9 @@ internal fun analyzeCallWindow(
             else -> Unit
         }
 
-        if (direct && call != null) directWords = maxOf(directWords, argumentWords(call.type))
+        if (direct && call != null) {
+            directWords = maxOf(directWords, module.functionSignature(call.typeIndex).argumentWords)
+        }
 
         val words = when (instruction) {
             is ControlInstruction.CallIndirectI, is ControlInstruction.CallIndirectS -> BRIDGE_CALL_INDIRECT.words

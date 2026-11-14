@@ -55,6 +55,12 @@ class ModuleIndexSpaces(
         index: FunctionIndex,
     ): Boolean = index.index < importedFunctionCount
 
+    val typeCount: Int = definedTypes.size
+
+    fun functionTypeIndex(index: FunctionIndex): TypeIndex {
+        return TypeIndex(functionTypeIndices[index.index])
+    }
+
     fun functionType(
         index: FunctionIndex,
     ): FunctionType = functionType(TypeIndex(functionTypeIndices[index.index]))

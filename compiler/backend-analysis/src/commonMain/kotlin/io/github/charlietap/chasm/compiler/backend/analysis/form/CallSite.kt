@@ -2,10 +2,12 @@ package io.github.charlietap.chasm.compiler.backend.analysis.form
 
 import io.github.charlietap.chasm.cir.ControlInstruction
 import io.github.charlietap.chasm.cir.OperandTransfer
+import io.github.charlietap.chasm.cir.TypeIndex
 import io.github.charlietap.chasm.compiler.backend.analysis.ModuleIndexSpaces
 import io.github.charlietap.chasm.type.FunctionType
 
 class CallSite(
+    val typeIndex: TypeIndex,
     val type: FunctionType,
     val operands: OperandTransfer,
     val resultBase: Int,
@@ -21,14 +23,16 @@ fun ControlInstruction.callSite(
     declarations: ModuleIndexSpaces,
 ): CallSite? {
     return when (val i = this) {
-        is ControlInstruction.Call ->
-            CallSite(declarations.functionType(i.function), i.operands, i.resultDestinationSlot ?: i.callFrameOffset)
+        is ControlInstruction.Call -> {
+            val type = declarations.functionTypeIndex(i.function)
+            CallSite(type, declarations.functionType(type), i.operands, i.resultDestinationSlot ?: i.callFrameOffset)
+        }
         is ControlInstruction.CallIndirectI ->
-            CallSite(declarations.functionType(i.type), i.operands, i.resultDestinationSlot ?: i.callFrameOffset)
+            CallSite(i.type, declarations.functionType(i.type), i.operands, i.resultDestinationSlot ?: i.callFrameOffset)
         is ControlInstruction.CallIndirectS ->
-            CallSite(declarations.functionType(i.type), i.operands, i.resultDestinationSlot ?: i.callFrameOffset)
+            CallSite(i.type, declarations.functionType(i.type), i.operands, i.resultDestinationSlot ?: i.callFrameOffset)
         is ControlInstruction.CallRefS ->
-            CallSite(declarations.functionType(i.type), i.operands, i.resultDestinationSlot ?: i.callFrameOffset)
+            CallSite(i.type, declarations.functionType(i.type), i.operands, i.resultDestinationSlot ?: i.callFrameOffset)
         else -> null
     }
 }

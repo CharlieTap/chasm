@@ -5,8 +5,8 @@ import io.github.charlietap.chasm.cir.CirFunction
 import io.github.charlietap.chasm.cir.CirModule
 import io.github.charlietap.chasm.cir.FunctionIndex
 import io.github.charlietap.chasm.cir.MemoryIndex
+import io.github.charlietap.chasm.cir.TypeIndex
 import io.github.charlietap.chasm.compiler.backend.abi.MethodRef
-import io.github.charlietap.chasm.compiler.backend.abi.signatureKey
 import io.github.charlietap.chasm.compiler.backend.analysis.ModuleAnalysis
 import io.github.charlietap.chasm.compiler.backend.analysis.ModuleIndexSpaces
 import io.github.charlietap.chasm.compiler.backend.analysis.analyzeModule
@@ -14,10 +14,10 @@ import io.github.charlietap.chasm.compiler.backend.analysis.functionBatches
 import io.github.charlietap.chasm.compiler.backend.dex.abi.BATCH_FUNCTIONS
 import io.github.charlietap.chasm.compiler.backend.dex.abi.BATCH_INSTRUCTIONS
 import io.github.charlietap.chasm.compiler.backend.dex.abi.DexReferences
+import io.github.charlietap.chasm.compiler.backend.dex.abi.FunctionSignature
 import io.github.charlietap.chasm.compiler.backend.dex.abi.SOURCE_FILE
 import io.github.charlietap.chasm.compiler.backend.dex.abi.codeClass
 import io.github.charlietap.chasm.compiler.backend.dex.abi.functionMethod
-import io.github.charlietap.chasm.compiler.backend.dex.abi.method
 import io.github.charlietap.chasm.compiler.backend.dex.abi.signatureClass
 import io.github.charlietap.chasm.compiler.backend.dex.abi.typedCall
 import io.github.charlietap.chasm.compiler.backend.dex.analysis.CostFamilies
@@ -56,9 +56,20 @@ internal class ModuleLowering(
         batches.forEachIndexed { batch, functions -> functions.forEach { function -> put(function.index.index, batch) } }
     }
 
-    fun signatureClass(
-        type: FunctionType,
-    ): String? = signatures[signatureKey(type)]
+    private val functionSignatures = arrayOfNulls<FunctionSignature>(declarations.typeCount)
+
+    fun functionSignature(index: TypeIndex): FunctionSignature {
+        return functionSignatures[index.index]
+            ?: FunctionSignature(declarations.functionType(index)).also { signature -> functionSignatures[index.index] = signature }
+    }
+
+    fun signatureClass(index: TypeIndex): String? {
+        return signatureClass(functionSignature(index).key)
+    }
+
+    fun signatureClass(key: String): String? {
+        return signatures[key]
+    }
 
     fun codeClass(
         index: FunctionIndex,
@@ -83,7 +94,7 @@ internal class ModuleLowering(
         analysis.signatureTypes.forEach { (key, type) ->
             val owner = signatures.getValue(key)
             file.addInterface(ClassType(owner))
-                .addAbstractMethod(typedCall(owner, type).method)
+                .addAbstractMethod(references.of(typedCall(owner, type)))
         }
     }
 }

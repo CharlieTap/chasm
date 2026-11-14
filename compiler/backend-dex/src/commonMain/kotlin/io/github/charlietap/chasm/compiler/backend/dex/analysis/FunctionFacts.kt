@@ -6,7 +6,7 @@ import io.github.charlietap.chasm.compiler.backend.analysis.InstructionTable
 import io.github.charlietap.chasm.compiler.backend.analysis.References
 import io.github.charlietap.chasm.compiler.backend.analysis.analyzeReferences
 import io.github.charlietap.chasm.compiler.backend.analysis.frameFacts
-import io.github.charlietap.chasm.compiler.backend.analysis.indirectCallType
+import io.github.charlietap.chasm.compiler.backend.analysis.indirectCallTypeIndex
 import io.github.charlietap.chasm.compiler.backend.analysis.instructionTable
 import io.github.charlietap.chasm.compiler.backend.analysis.isLeaf
 import io.github.charlietap.chasm.compiler.backend.dex.ModuleLowering
@@ -48,7 +48,7 @@ internal fun functionFacts(
     }
 
     val typedSignatures = Array(instructions.size) { position ->
-        instructions[position].indirectCallType(declarations)?.let(module::signatureClass)
+        instructions[position].indirectCallTypeIndex()?.let(module::signatureClass)
     }
     val callsDirectly = typedSignatures.any { signature -> signature != null } || instructions.any { instruction ->
         when (instruction) {
@@ -69,7 +69,7 @@ internal fun functionFacts(
         callsDirectly = callsDirectly,
         window = analyzeCallWindow(module, function, typedSignatures),
         references = analyzeReferences(table, function, type, frame.frameSlots, module.analysis),
-        signature = FunctionSignature(type),
+        signature = module.functionSignature(function.type),
         isLeaf = function.isLeaf(),
     )
 }
