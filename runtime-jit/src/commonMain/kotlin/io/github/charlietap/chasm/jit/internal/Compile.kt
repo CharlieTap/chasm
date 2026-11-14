@@ -9,7 +9,6 @@ import io.github.charlietap.chasm.compiler.backend.dex.DexOptions
 import io.github.charlietap.chasm.compiler.backend.dex.ModuleLowerer
 import io.github.charlietap.chasm.compiler.backend.dex.UnsupportedFunctions
 import io.github.charlietap.chasm.compiler.frontend.ModuleCompiler
-import io.github.charlietap.chasm.compiler.frontend.ModuleRewriter
 import io.github.charlietap.chasm.compiler.frontend.UncompilableFunctions
 import io.github.charlietap.chasm.embedding.shapes.Module
 import io.github.charlietap.chasm.embedding.shapes._binary
@@ -22,15 +21,11 @@ import java.util.function.Consumer
 internal fun compile(
     module: Module,
     config: CompileConfig,
-): CompileResult =
-    compile(
+): CompileResult {
+    return compile(
         module = module,
         config = config,
         packageNames = packageNames::next,
-        moduleRewriter = ModuleRewriter(
-            preserveSource = config.stacktraces || config.meterFuel || config.interruptible,
-            inlineLeaves = true,
-        ),
         moduleCompiler = { ast, types ->
             ModuleCompiler(
                 module = ast,
@@ -43,35 +38,35 @@ internal fun compile(
         moduleLowerer = ::ModuleLowerer,
         dexLoader = ::DexLoader,
     )
+}
 
 internal inline fun compile(
     module: Module,
     config: CompileConfig,
     crossinline packageNames: (ByteArray?, DexOptions) -> String,
-    moduleRewriter: ModuleRewriter,
     crossinline moduleCompiler: ModuleCompiler,
     crossinline uncompilableFunctions: UncompilableFunctions,
     crossinline moduleLowerer: ModuleLowerer,
     crossinline dexLoader: DexLoader,
-): CompileResult = try {
-    compileUnchecked(module, config, packageNames, moduleRewriter, moduleCompiler, uncompilableFunctions, moduleLowerer, dexLoader)
-} catch (failure: RuntimeException) {
-    error(Stage.GENERATION, failure.message ?: failure.toString())
+): CompileResult {
+    return try {
+        compileUnchecked(module, config, packageNames, moduleCompiler, uncompilableFunctions, moduleLowerer, dexLoader)
+    } catch (failure: RuntimeException) {
+        error(Stage.GENERATION, failure.message ?: failure.toString())
+    }
 }
 
 internal inline fun compileUnchecked(
     module: Module,
     config: CompileConfig,
     crossinline packageNames: (ByteArray?, DexOptions) -> String,
-    moduleRewriter: ModuleRewriter,
     crossinline moduleCompiler: ModuleCompiler,
     crossinline uncompilableFunctions: UncompilableFunctions,
     crossinline moduleLowerer: ModuleLowerer,
     crossinline dexLoader: DexLoader,
 ): CompileResult {
-    val source = module._module()
-    val types = source.typeResolver()
-    val ast = moduleRewriter.rewrite(source, types)
+    val ast = module._module()
+    val types = ast.typeResolver()
     val code = moduleCompiler(ast, types).getOrElse { failure ->
         val functions = uncompilableFunctions(ast, types)
         val reasons = functions.entries.joinToString { (index, reason) -> "$index ($reason)" }
