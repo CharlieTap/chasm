@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.compiler.backend.dex
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.cir.CirModule
 import io.github.charlietap.chasm.compiler.backend.abi.binaryName
+import io.github.charlietap.chasm.compiler.backend.abi.signatureKey
 import io.github.charlietap.chasm.compiler.backend.dex.abi.codeClass
 import io.github.charlietap.chasm.compiler.backend.dex.abi.installClass
 import io.github.charlietap.chasm.compiler.backend.dex.abi.method
@@ -51,7 +52,7 @@ private inline fun lowerModule(
     val lowering = ModuleLowering(module, code, options)
     val dexter = Dexter()
     val reasons = LinkedHashMap<Int, String>()
-    val compiled = LinkedHashMap<FunctionType, MutableList<LoweredFunction>>()
+    val compiled = LinkedHashMap<EntryKey, EntryCandidates>()
     val dex = lowering.batches.mapIndexed { batch, functions ->
         dexFile(dexter) { file ->
             if (batch == 0) lowering.addSignatureInterfaces(file)
@@ -62,7 +63,7 @@ private inline fun lowerModule(
                 val method = lowering.functionMethod(function.index, type).method
                 val reason = functionLowerer(lowering, function, classBuilder, method)
                 if (reason == null) {
-                    compiled.getOrPut(type, ::ArrayList) += LoweredFunction(index, method)
+                    compiled.getOrPut(EntryKey(type)) { EntryCandidates(type) }.functions += LoweredFunction(index, method)
                 } else {
                     reasons[index] = reason
                 }
@@ -92,14 +93,30 @@ internal class EntryRef(
     val id: Int,
 )
 
+internal data class EntryCandidates(
+    val type: FunctionType,
+    val functions: MutableList<LoweredFunction> = ArrayList(),
+)
+
+internal data class EntryKey(
+    val signature: String,
+    val parameters: Int,
+    val results: Int,
+) {
+    constructor(
+        type: FunctionType,
+    ) : this(signatureKey(type), type.params.types.size, type.results.types.size)
+}
+
 private fun entryGroups(
-    compiled: Map<FunctionType, List<LoweredFunction>>,
+    compiled: Map<EntryKey, EntryCandidates>,
     lowering: ModuleLowering,
 ): List<EntryGroup> {
     val groups = ArrayList<EntryGroup>()
-    for ((type, functions) in compiled) {
+    for (candidates in compiled.values) {
+        val type = candidates.type
         val signature = lowering.signatureClass(type)
-        for (members in functions.chunked(ENTRY_GROUP_SIZE)) {
+        for (members in candidates.functions.chunked(ENTRY_GROUP_SIZE)) {
             groups += EntryGroup(number = groups.size, type = type, signature = signature, members = members)
         }
     }
