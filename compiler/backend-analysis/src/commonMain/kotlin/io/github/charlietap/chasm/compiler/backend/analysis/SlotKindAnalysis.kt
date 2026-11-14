@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.compiler.backend.analysis
 
-import io.github.charlietap.chasm.cir.CirFunction
+import io.github.charlietap.chasm.compiler.backend.analysis.form.InstructionForms
 import io.github.charlietap.chasm.compiler.backend.analysis.form.Operand
 import io.github.charlietap.chasm.type.NumberType
 import io.github.charlietap.chasm.type.ValueType
@@ -74,15 +74,15 @@ private const val WRITE_WIDE_CONSTANT = 32
 private const val WRITES_WIDE = WRITE_I64 or WRITE_F64 or WRITE_OTHER or WRITE_WIDE_CONSTANT
 
 fun analyzeSlotKinds(
-    function: CirFunction,
+    forms: InstructionForms,
     parameters: List<ValueType>,
     frameSlots: Int,
     localTypes: Array<ValueType?>,
     initialValues: LongArray,
     references: References,
-    declarations: ModuleIndexSpaces,
     floatingHome: (Int) -> Boolean = { true },
 ): SlotKinds {
+    val function = forms.function
     val written = IntArray(frameSlots)
     val narrowWriteCandidates = LongList()
     val copies = ArrayList<SlotCopy>()
@@ -132,9 +132,9 @@ fun analyzeSlotKinds(
             }
         }
     }
-    function.instructions.forEachIndexed { index, instruction ->
+    for (index in 0 until forms.size) {
         position = index
-        visitSlotWrites(instruction, function, declarations, visitor)
+        visitSlotWrites(index, forms, visitor)
     }
     val copied = BooleanArray(frameSlots).also { flags -> copies.forEach { copy -> flags[copy.destination] = true } }
 

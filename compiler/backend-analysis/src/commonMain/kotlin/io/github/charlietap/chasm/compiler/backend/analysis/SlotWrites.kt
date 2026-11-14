@@ -2,24 +2,17 @@ package io.github.charlietap.chasm.compiler.backend.analysis
 
 import io.github.charlietap.chasm.cir.AdminInstruction
 import io.github.charlietap.chasm.cir.AggregateInstruction
-import io.github.charlietap.chasm.cir.CirFunction
 import io.github.charlietap.chasm.cir.ControlInstruction
-import io.github.charlietap.chasm.cir.Instruction
 import io.github.charlietap.chasm.cir.MemoryInstruction
 import io.github.charlietap.chasm.cir.NumericInstruction
 import io.github.charlietap.chasm.cir.ParametricInstruction
 import io.github.charlietap.chasm.cir.ReferenceInstruction
 import io.github.charlietap.chasm.cir.TableInstruction
 import io.github.charlietap.chasm.cir.VariableInstruction
-import io.github.charlietap.chasm.compiler.backend.analysis.ModuleIndexSpaces
 import io.github.charlietap.chasm.compiler.backend.analysis.ext.toType
-import io.github.charlietap.chasm.compiler.backend.analysis.form.MemoryAccess
+import io.github.charlietap.chasm.compiler.backend.analysis.form.InstructionForms
 import io.github.charlietap.chasm.compiler.backend.analysis.form.NumericForm
 import io.github.charlietap.chasm.compiler.backend.analysis.form.Operand
-import io.github.charlietap.chasm.compiler.backend.analysis.form.access
-import io.github.charlietap.chasm.compiler.backend.analysis.form.callSite
-import io.github.charlietap.chasm.compiler.backend.analysis.form.form
-import io.github.charlietap.chasm.compiler.backend.analysis.form.helperCall
 import io.github.charlietap.chasm.compiler.backend.analysis.form.operands
 import io.github.charlietap.chasm.compiler.backend.analysis.form.select
 import io.github.charlietap.chasm.compiler.backend.analysis.form.slot
@@ -53,13 +46,13 @@ interface SlotWriteVisitor {
 }
 
 fun visitSlotWrites(
-    instruction: Instruction,
-    function: CirFunction,
-    declarations: ModuleIndexSpaces,
+    position: Int,
+    forms: InstructionForms,
     visitor: SlotWriteVisitor,
 ) {
-    when (instruction) {
-        is NumericInstruction -> when (val form = instruction.form()) {
+    val declarations = forms.declarations
+    when (val instruction = forms.instruction(position)) {
+        is NumericInstruction -> when (val form = forms.numeric(position)) {
             is NumericForm.Constant -> visitor.number(form.destination, form.type)
             is NumericForm.BitFieldExtract -> visitor.number(form.destination, form.resultType)
             is NumericForm.Unary -> visitor.number(form.destination, form.resultType)
@@ -71,7 +64,7 @@ fun visitSlotWrites(
                 visitor.number(form.high, NumberType.I64)
             }
         }
-        is MemoryInstruction -> visitMemoryWrites(instruction, instruction.access(), visitor)
+        is MemoryInstruction -> visitMemoryWrites(position, forms, visitor)
         is ParametricInstruction -> {
             val select = instruction.select()
             visitor.copy(select.first, select.destination)
@@ -80,26 +73,27 @@ fun visitSlotWrites(
         is AdminInstruction -> visitAdminWrites(instruction, visitor)
         is VariableInstruction.GlobalGetS -> visitor.value(instruction.destinationSlot, declarations.globalType(instruction.global))
         is VariableInstruction -> Unit
-        is ControlInstruction -> visitControlWrites(instruction, function, declarations, visitor)
+        is ControlInstruction -> visitControlWrites(instruction, position, forms, visitor)
         is ReferenceInstruction -> visitReferenceWrites(instruction, visitor)
-        is AggregateInstruction -> visitAggregateWrites(instruction, declarations, visitor)
-        is TableInstruction -> instruction.helperCall()?.let { call ->
+        is AggregateInstruction -> visitAggregateWrites(instruction, position, forms, visitor)
+        is TableInstruction -> forms.helperCall(position)?.let { call ->
             call.destination?.let { destination -> visitor.helperResult(destination, call.producesReference) }
         }
     }
 }
 
-internal fun visitMemoryWrites(
-    instruction: MemoryInstruction,
-    access: MemoryAccess?,
+private fun visitMemoryWrites(
+    position: Int,
+    forms: InstructionForms,
     visitor: SlotWriteVisitor,
 ) {
+    val access = forms.access(position)
     if (access != null) {
         if (access.isLoad) {
             visitor.number(access.destination, access.operation.type)
         }
     } else {
-        instruction.helperCall()?.destination?.let { destination -> visitor.helperResult(destination, reference = false) }
+        forms.helperCall(position)?.destination?.let { destination -> visitor.helperResult(destination, reference = false) }
     }
 }
 
@@ -137,16 +131,16 @@ private fun visitAdminWrites(
 
 private fun visitControlWrites(
     instruction: ControlInstruction,
-    function: CirFunction,
-    declarations: ModuleIndexSpaces,
+    position: Int,
+    forms: InstructionForms,
     visitor: SlotWriteVisitor,
 ) {
-    val call = instruction.callSite(declarations)
+    val call = forms.callSite(position)
     if (call != null) {
         call.type.results.types.forEachIndexed { index, type -> visitor.value(call.resultBase + index, type) }
         return
     }
-    if (instruction is ControlInstruction.ReturnCall && instruction.function == function.index) {
+    if (instruction is ControlInstruction.ReturnCall && instruction.function == forms.function.index) {
         instruction.operands.wasm.operands().forEachIndexed { index, source -> visitor.copy(source, index) }
     }
 }
@@ -169,9 +163,11 @@ private fun visitReferenceWrites(
 
 private fun visitAggregateWrites(
     instruction: AggregateInstruction,
-    declarations: ModuleIndexSpaces,
+    position: Int,
+    forms: InstructionForms,
     visitor: SlotWriteVisitor,
 ) {
+    val declarations = forms.declarations
     when (instruction) {
         is AggregateInstruction.StructGetS ->
             visitor.value(instruction.destinationSlot, declarations.structFieldType(instruction.type, instruction.fieldIndex))
@@ -201,7 +197,7 @@ private fun visitAggregateWrites(
         is AggregateInstruction.ArrayNewDefaultI -> visitor.opaque(instruction.destinationSlot, reference = true)
         is AggregateInstruction.ArrayNewDefaultS -> visitor.opaque(instruction.destinationSlot, reference = true)
         is AggregateInstruction.ArrayNewFixedS -> visitor.opaque(instruction.destinationSlot, reference = true)
-        else -> instruction.helperCall()?.let { call ->
+        else -> forms.helperCall(position)?.let { call ->
             call.destination?.let { destination -> visitor.helperResult(destination, call.producesReference) }
         }
     }

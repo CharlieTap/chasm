@@ -163,18 +163,30 @@ private const val TWO_63 = 9.223372036854775808E18
 
 private fun directConversion(
     conversion: Conversion,
-): DexConversion? = when (conversion) {
-    Conversion.I32TruncSatF32S -> DexConversion.FloatToInt
-    Conversion.I32TruncSatF64S -> DexConversion.DoubleToInt
-    Conversion.I64TruncSatF32S -> DexConversion.FloatToLong
-    Conversion.I64TruncSatF64S -> DexConversion.DoubleToLong
-    Conversion.F32ConvertI32S -> DexConversion.IntToFloat
-    Conversion.F32ConvertI64S -> DexConversion.LongToFloat
-    Conversion.F64ConvertI32S -> DexConversion.IntToDouble
-    Conversion.F64ConvertI64S -> DexConversion.LongToDouble
-    Conversion.F64PromoteF32 -> DexConversion.FloatToDouble
-    Conversion.F32DemoteF64 -> DexConversion.DoubleToFloat
-    else -> null
+): DexConversion? {
+    return directConversions[conversion.ordinal]
+}
+
+private val directConversions: Array<DexConversion?> = Array(Conversion.entries.size) { ordinal ->
+    directConversionFor(Conversion.entries[ordinal])
+}
+
+private fun directConversionFor(
+    conversion: Conversion,
+): DexConversion? {
+    return when (conversion) {
+        Conversion.I32TruncSatF32S -> DexConversion.FloatToInt
+        Conversion.I32TruncSatF64S -> DexConversion.DoubleToInt
+        Conversion.I64TruncSatF32S -> DexConversion.FloatToLong
+        Conversion.I64TruncSatF64S -> DexConversion.DoubleToLong
+        Conversion.F32ConvertI32S -> DexConversion.IntToFloat
+        Conversion.F32ConvertI64S -> DexConversion.LongToFloat
+        Conversion.F64ConvertI32S -> DexConversion.IntToDouble
+        Conversion.F64ConvertI64S -> DexConversion.LongToDouble
+        Conversion.F64PromoteF32 -> DexConversion.FloatToDouble
+        Conversion.F32DemoteF64 -> DexConversion.DoubleToFloat
+        else -> null
+    }
 }
 
 private fun conversionHelper(

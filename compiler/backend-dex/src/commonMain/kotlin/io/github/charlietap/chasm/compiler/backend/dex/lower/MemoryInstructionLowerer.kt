@@ -19,9 +19,7 @@ import io.github.charlietap.chasm.compiler.backend.analysis.form.BulkMemory
 import io.github.charlietap.chasm.compiler.backend.analysis.form.MemoryAccess
 import io.github.charlietap.chasm.compiler.backend.analysis.form.MemoryOperation
 import io.github.charlietap.chasm.compiler.backend.analysis.form.Operand
-import io.github.charlietap.chasm.compiler.backend.analysis.form.access
 import io.github.charlietap.chasm.compiler.backend.analysis.form.bulk
-import io.github.charlietap.chasm.compiler.backend.analysis.form.helperCall
 import io.github.charlietap.chasm.compiler.backend.analysis.form.slot
 import io.github.charlietap.chasm.compiler.backend.dex.analysis.SlotKindFlow
 import io.github.charlietap.chasm.type.NumberType
@@ -36,14 +34,16 @@ internal fun lowerMemoryInstruction(
     instruction: MemoryInstruction,
     context: LowerContext,
 ) {
-    val access = instruction.access()
-    if (access != null) return context.memoryAccess(access)
+    val access = context.forms.access(context.position)
+    if (access != null) {
+        return context.memoryAccess(access)
+    }
     when (val bulk = instruction.bulk()) {
         is BulkMemory.Copy -> return context.memoryCopy(bulk.source, bulk.destination, bulk.count, bulk.sourceOffset, bulk.destinationOffset)
         is BulkMemory.Fill -> return context.memoryFill(bulk.memory, bulk.count, bulk.value, bulk.offset)
         null -> Unit
     }
-    val call = instruction.helperCall() ?: throw Unsupported(instruction::class.simpleName ?: "memory instruction")
+    val call = context.forms.helperCall(context.position) ?: throw Unsupported(instruction::class.simpleName ?: "memory instruction")
     context.lowerHelperCall(call)
 }
 

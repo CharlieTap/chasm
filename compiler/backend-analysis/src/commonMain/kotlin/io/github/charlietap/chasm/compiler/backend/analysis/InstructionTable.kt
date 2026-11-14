@@ -1,23 +1,21 @@
 package io.github.charlietap.chasm.compiler.backend.analysis
 
 import io.github.charlietap.chasm.cir.AdminInstruction
-import io.github.charlietap.chasm.cir.CirFunction
 import io.github.charlietap.chasm.cir.MemoryInstruction
 import io.github.charlietap.chasm.cir.ParametricInstruction
+import io.github.charlietap.chasm.compiler.backend.analysis.form.InstructionForms
 import io.github.charlietap.chasm.compiler.backend.analysis.form.MemoryAccess
 import io.github.charlietap.chasm.compiler.backend.analysis.form.Operand
-import io.github.charlietap.chasm.compiler.backend.analysis.form.access
 import io.github.charlietap.chasm.type.ValueType
 
 class InstructionTable internal constructor(
-    private val function: CirFunction,
-    private val declarations: ModuleIndexSpaces,
+    val forms: InstructionForms,
     val writes: SlotWriteTable,
     val jumps: JumpTable,
     val accesses: MemoryAccessTable,
     private val innermostRegions: IntArray?,
 ) {
-    val reads: SlotReadTable by lazy(LazyThreadSafetyMode.NONE) { slotReadTable(function, declarations) }
+    val reads: SlotReadTable by lazy(LazyThreadSafetyMode.NONE) { slotReadTable(forms) }
 
     fun innermostRegion(position: Int): Int {
         val regions = innermostRegions ?: return -1
@@ -25,7 +23,7 @@ class InstructionTable internal constructor(
     }
 
     fun restartsFunction(position: Int): Boolean {
-        return function.instructions[position].isSelfTailCall(function, innermostRegion(position))
+        return forms.instruction(position).isSelfTailCall(forms.function, innermostRegion(position))
     }
 }
 
@@ -111,10 +109,10 @@ class SlotReadTable internal constructor(
 }
 
 fun instructionTable(
-    function: CirFunction,
-    declarations: ModuleIndexSpaces,
+    forms: InstructionForms,
 ): InstructionTable {
 
+    val function = forms.function
     val instructions = function.instructions
     val size = instructions.size
     val modes = ByteArray(size)
@@ -134,14 +132,12 @@ fun instructionTable(
         accessStart[position] = accesses.size
 
         if (instruction is MemoryInstruction) {
-            val access = instruction.access()
+            val access = forms.access(position)
             if (access != null) {
                 accesses.add(position, access)
             }
-            visitMemoryWrites(instruction, access, writes)
-        } else {
-            visitSlotWrites(instruction, function, declarations, writes)
         }
+        visitSlotWrites(position, forms, writes)
 
         modes[position] = when (instruction) {
             is AdminInstruction.CopySlotSequence -> SlotWriteTable.SEQUENTIAL
@@ -166,8 +162,7 @@ fun instructionTable(
 
     val regions = function.exceptions?.regions.orEmpty()
     return InstructionTable(
-        function = function,
-        declarations = declarations,
+        forms = forms,
         writes = SlotWriteTable(modes, writeStart, writes.slots, writes.sources, writes.kinds, writes.references),
         jumps = JumpTable(targetStart, targets.targets, fallsThrough),
         accesses = MemoryAccessTable(
@@ -286,19 +281,17 @@ private class MemoryAccessBuilder {
 }
 
 private fun slotReadTable(
-    function: CirFunction,
-    declarations: ModuleIndexSpaces,
+    forms: InstructionForms,
 ): SlotReadTable {
 
-    val instructions = function.instructions
-    val size = instructions.size
+    val size = forms.size
     val start = IntArray(size + 1)
     val reads = SlotReadBuilder(size)
     var unknown: BooleanArray? = null
 
     for (position in 0 until size) {
         start[position] = reads.size
-        if (!visitSlotReads(instructions[position], declarations, reads)) {
+        if (!visitSlotReads(position, forms, reads)) {
             reads.size = start[position]
             val flags = unknown ?: BooleanArray(size)
             flags[position] = true

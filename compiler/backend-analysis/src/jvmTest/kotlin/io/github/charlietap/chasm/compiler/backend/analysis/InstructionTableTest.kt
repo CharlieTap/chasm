@@ -5,6 +5,7 @@ import io.github.charlietap.chasm.ast.module.Export
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.cir.CirFunction
 import io.github.charlietap.chasm.cir.CirModule
+import io.github.charlietap.chasm.compiler.backend.analysis.form.InstructionForms
 import io.github.charlietap.chasm.compiler.frontend.ModuleCompiler
 import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
@@ -85,7 +86,7 @@ class InstructionTableTest {
     fun `a self tail call outside a try region restarts the function and copies its arguments to the parameters`() {
 
         val function = function("self")
-        val table = instructionTable(function, declarations)
+        val table = instructionTable(InstructionForms(function, declarations))
 
         assertEquals(listOf(3), function.instructions.indices.filter(table::restartsFunction))
         assertEquals(listOf(0), table.writes.slotsAt(3))
@@ -96,7 +97,7 @@ class InstructionTableTest {
     fun `a self tail call inside a try region does not restart the function`() {
 
         val function = function("guarded")
-        val table = instructionTable(function, declarations)
+        val table = instructionTable(InstructionForms(function, declarations))
 
         assertEquals(emptyList(), function.instructions.indices.filter(table::restartsFunction))
         assertEquals(listOf(-1, 0, -1), function.instructions.indices.map(table::innermostRegion))
@@ -133,7 +134,7 @@ class InstructionTableTest {
     }
 
     private fun table(name: String): InstructionTable {
-        return instructionTable(function(name), declarations)
+        return instructionTable(InstructionForms(function(name), declarations))
     }
 
     private fun function(name: String): CirFunction {

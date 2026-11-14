@@ -5,6 +5,7 @@ import io.github.charlietap.chasm.cir.ControlInstruction
 import io.github.charlietap.chasm.compiler.backend.analysis.InstructionTable
 import io.github.charlietap.chasm.compiler.backend.analysis.References
 import io.github.charlietap.chasm.compiler.backend.analysis.analyzeReferences
+import io.github.charlietap.chasm.compiler.backend.analysis.form.InstructionForms
 import io.github.charlietap.chasm.compiler.backend.analysis.frameFacts
 import io.github.charlietap.chasm.compiler.backend.analysis.indirectCallTypeIndex
 import io.github.charlietap.chasm.compiler.backend.analysis.instructionTable
@@ -36,10 +37,11 @@ internal fun functionFacts(
 ): FunctionFacts {
 
     val declarations = module.declarations
-    val frame = frameFacts(function, declarations)
+    val forms = InstructionForms(function, declarations)
+    val frame = frameFacts(forms)
     val type = frame.type
     val instructions = function.instructions
-    val table = instructionTable(function, declarations)
+    val table = instructionTable(forms)
     val inlineMemory = module.inlineMemory
     val memoryMode = when {
         inlineMemory == null || !table.accesses.usesMemory(0, instructions.size, inlineMemory.index) -> MemoryMode.Helper
@@ -67,7 +69,7 @@ internal fun functionFacts(
         memoryMode = memoryMode,
         typedSignatures = typedSignatures,
         callsDirectly = callsDirectly,
-        window = analyzeCallWindow(module, function, typedSignatures),
+        window = analyzeCallWindow(module, forms, typedSignatures),
         references = analyzeReferences(table, function, type, frame.frameSlots, module.analysis),
         signature = module.functionSignature(function.type),
         isLeaf = function.isLeaf(),

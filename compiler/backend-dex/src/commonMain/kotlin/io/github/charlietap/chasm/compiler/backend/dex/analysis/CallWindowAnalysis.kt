@@ -2,7 +2,6 @@ package io.github.charlietap.chasm.compiler.backend.dex.analysis
 
 import io.github.charlietap.chasm.cir.AdminInstruction
 import io.github.charlietap.chasm.cir.AggregateInstruction
-import io.github.charlietap.chasm.cir.CirFunction
 import io.github.charlietap.chasm.cir.ControlInstruction
 import io.github.charlietap.chasm.compiler.backend.abi.ARRAY_COPY
 import io.github.charlietap.chasm.compiler.backend.abi.ARRAY_NEW_FIXED
@@ -11,8 +10,7 @@ import io.github.charlietap.chasm.compiler.backend.abi.BRIDGE_CALL_INDIRECT
 import io.github.charlietap.chasm.compiler.backend.abi.BRIDGE_CALL_REF
 import io.github.charlietap.chasm.compiler.backend.abi.STRUCT_SET
 import io.github.charlietap.chasm.compiler.backend.abi.TAIL_CALL_INDIRECT
-import io.github.charlietap.chasm.compiler.backend.analysis.form.callSite
-import io.github.charlietap.chasm.compiler.backend.analysis.form.helperCall
+import io.github.charlietap.chasm.compiler.backend.analysis.form.InstructionForms
 import io.github.charlietap.chasm.compiler.backend.dex.ModuleLowering
 
 internal class CallWindow(
@@ -23,18 +21,18 @@ internal class CallWindow(
 
 internal fun analyzeCallWindow(
     module: ModuleLowering,
-    function: CirFunction,
+    forms: InstructionForms,
     typedSignatures: Array<String?>,
 ): CallWindow {
     val declarations = module.declarations
-    val instructions = function.instructions
+    val instructions = forms.function.instructions
     var callBufferWords = 0
     var helperWords = 0
     var directWords = 0
     var temporaries = 0
     instructions.forEachIndexed { position, instruction ->
 
-        val call = (instruction as? ControlInstruction)?.callSite(declarations)
+        val call = forms.callSite(position)
         val direct = when (instruction) {
             is ControlInstruction.Call -> !declarations.isImported(instruction.function)
             else -> typedSignatures[position] != null
@@ -64,7 +62,7 @@ internal fun analyzeCallWindow(
             is AggregateInstruction.ArraySetSi, is AggregateInstruction.ArraySetSs,
             -> ARRAY_SET.words
             is AggregateInstruction.ArrayNewFixedS -> ARRAY_NEW_FIXED.words
-            else -> if (instruction.isArrayCopy()) ARRAY_COPY.words else instruction.helperCall()?.words ?: 0
+            else -> if (instruction.isArrayCopy()) ARRAY_COPY.words else forms.helperCall(position)?.words ?: 0
         }
         helperWords = maxOf(helperWords, words)
 

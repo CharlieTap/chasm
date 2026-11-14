@@ -24,7 +24,6 @@ import io.github.charlietap.chasm.compiler.backend.abi.STRUCT_SET
 import io.github.charlietap.chasm.compiler.backend.analysis.form.ArrayCopy
 import io.github.charlietap.chasm.compiler.backend.analysis.form.Operand
 import io.github.charlietap.chasm.compiler.backend.analysis.form.arrayCopy
-import io.github.charlietap.chasm.compiler.backend.analysis.form.helperCall
 import io.github.charlietap.chasm.compiler.backend.analysis.form.immediate
 import io.github.charlietap.chasm.compiler.backend.analysis.form.slot
 import io.github.charlietap.dexter.ArrayKind
@@ -84,7 +83,7 @@ internal fun lowerAggregateInstruction(
         is AggregateInstruction.I31GetSignedS -> context.slotHelper(I31_GET_SIGNED, i.valueSlot, i.destinationSlot)
         is AggregateInstruction.I31GetUnsignedS -> context.slotHelper(I31_GET_UNSIGNED, i.valueSlot, i.destinationSlot)
         else -> {
-            val call = i.helperCall() ?: throw Unsupported(i::class.simpleName ?: "aggregate instruction")
+            val call = context.forms.helperCall(context.position) ?: throw Unsupported(i::class.simpleName ?: "aggregate instruction")
             context.lowerHelperCall(call)
         }
     }

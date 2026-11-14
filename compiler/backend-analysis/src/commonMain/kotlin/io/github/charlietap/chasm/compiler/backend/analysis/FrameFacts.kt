@@ -1,10 +1,8 @@
 package io.github.charlietap.chasm.compiler.backend.analysis
 
-import io.github.charlietap.chasm.cir.CirFunction
-import io.github.charlietap.chasm.cir.ControlInstruction
 import io.github.charlietap.chasm.compiler.backend.analysis.ext.localInitialValue
 import io.github.charlietap.chasm.compiler.backend.analysis.ext.toType
-import io.github.charlietap.chasm.compiler.backend.analysis.form.callSite
+import io.github.charlietap.chasm.compiler.backend.analysis.form.InstructionForms
 import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.chasm.type.ValueType
 
@@ -17,12 +15,12 @@ class FrameFacts(
 )
 
 fun frameFacts(
-    function: CirFunction,
-    declarations: ModuleIndexSpaces,
+    forms: InstructionForms,
 ): FrameFacts {
-    val type = declarations.functionType(function.type)
+    val function = forms.function
+    val type = forms.declarations.functionType(function.type)
     val frame = function.frame
-    val frameSlots = maxOf(frame.frameSlots, resultSlotsNeeded(function, declarations))
+    val frameSlots = maxOf(frame.frameSlots, resultSlotsNeeded(forms))
     val firstLocal = frame.activationHeaderSlot + 1
     val localTypes = arrayOfNulls<ValueType>(frameSlots)
     frame.locals.forEachIndexed { index, local -> localTypes[firstLocal + index] = local.toType() }
@@ -32,12 +30,11 @@ fun frameFacts(
 }
 
 private fun resultSlotsNeeded(
-    function: CirFunction,
-    declarations: ModuleIndexSpaces,
+    forms: InstructionForms,
 ): Int {
     var needed = 0
-    for (instruction in function.instructions) {
-        val call = (instruction as? ControlInstruction)?.callSite(declarations) ?: continue
+    for (position in 0 until forms.size) {
+        val call = forms.callSite(position) ?: continue
         needed = maxOf(needed, call.resultBase + call.type.results.types.size)
     }
     return needed

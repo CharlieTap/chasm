@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.compiler.backend.analysis
 import com.github.michaelbull.result.getOrThrow
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.cir.CirFunction
+import io.github.charlietap.chasm.compiler.backend.analysis.form.InstructionForms
 import io.github.charlietap.chasm.compiler.frontend.ModuleCompiler
 import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
@@ -17,7 +18,7 @@ class LoopCutsTest {
     private val function: CirFunction = ModuleCompiler(loops).getOrThrow { IllegalStateException(it.toString()) }
         .functions.single()
 
-    private val jumps: JumpTable = instructionTable(function, ModuleIndexSpaces(loops)).jumps
+    private val jumps: JumpTable = instructionTable(InstructionForms(function, ModuleIndexSpaces(loops))).jumps
 
     private val loop: IntRange = function.instructions.withIndex()
         .flatMap { (source, instruction) -> instruction.jumpTargets().filter { it <= source }.map { it..source } }

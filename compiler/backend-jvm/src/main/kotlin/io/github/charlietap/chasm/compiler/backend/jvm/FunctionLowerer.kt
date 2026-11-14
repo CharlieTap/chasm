@@ -1,7 +1,6 @@
 package io.github.charlietap.chasm.compiler.backend.jvm
 
 import io.github.charlietap.chasm.cir.CirFunction
-import io.github.charlietap.chasm.cir.MemoryInstruction
 import io.github.charlietap.chasm.compiler.backend.abi.MethodRef
 import io.github.charlietap.chasm.compiler.backend.abi.Resource
 import io.github.charlietap.chasm.compiler.backend.analysis.NarrowHomeMismatch
@@ -10,7 +9,7 @@ import io.github.charlietap.chasm.compiler.backend.analysis.SlotKinds
 import io.github.charlietap.chasm.compiler.backend.analysis.analyzeReferences
 import io.github.charlietap.chasm.compiler.backend.analysis.analyzeSlotKinds
 import io.github.charlietap.chasm.compiler.backend.analysis.cheapestCut
-import io.github.charlietap.chasm.compiler.backend.analysis.form.access
+import io.github.charlietap.chasm.compiler.backend.analysis.form.InstructionForms
 import io.github.charlietap.chasm.compiler.backend.analysis.frameFacts
 import io.github.charlietap.chasm.compiler.backend.analysis.instructionTable
 import io.github.charlietap.chasm.compiler.backend.analysis.jumpTargets
@@ -91,11 +90,13 @@ private class FunctionLowering(
     private val function: CirFunction,
     private val method: MethodRef,
 ) {
-    private val frame = frameFacts(function, module.declarations)
+    private val forms = InstructionForms(function, module.declarations)
+
+    private val frame = frameFacts(forms)
 
     private val parameterCount = frame.type.params.types.size
 
-    private val table by lazy(LazyThreadSafetyMode.NONE) { instructionTable(function, module.declarations) }
+    private val table by lazy(LazyThreadSafetyMode.NONE) { instructionTable(forms) }
 
     private val references = if (module.analysis.publishesRegisters) {
         analyzeReferences(table, function, frame.type, frame.frameSlots, module.analysis)
@@ -117,8 +118,10 @@ private class FunctionLowering(
 
     private fun inlineMemory(
         positions: IntRange,
-    ) = module.inlineMemory?.takeIf {
-        positions.any { position -> (function.instructions[position] as? MemoryInstruction)?.access()?.memory?.index == 0 }
+    ): InlineMemory? {
+        return module.inlineMemory?.takeIf {
+            positions.any { position -> forms.access(position)?.memory?.index == 0 }
+        }
     }
 
     val resources: List<Resource> get() = facts.resources
@@ -129,13 +132,12 @@ private class FunctionLowering(
         recordings.clear()
         val slotKinds = if (narrowSlots) {
             analyzeSlotKinds(
-                function = function,
+                forms = forms,
                 parameters = frame.type.params.types,
                 frameSlots = frame.frameSlots,
                 localTypes = frame.localTypes,
                 initialValues = frame.initialValues,
                 references = references,
-                declarations = module.declarations,
             )
         } else {
             SlotKinds.wide(frame.frameSlots)

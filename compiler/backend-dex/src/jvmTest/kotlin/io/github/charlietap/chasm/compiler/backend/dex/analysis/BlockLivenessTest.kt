@@ -8,6 +8,7 @@ import io.github.charlietap.chasm.compiler.backend.analysis.ModuleIndexSpaces
 import io.github.charlietap.chasm.compiler.backend.analysis.SlotReadVisitor
 import io.github.charlietap.chasm.compiler.backend.analysis.SlotWriteVisitor
 import io.github.charlietap.chasm.compiler.backend.analysis.fallsThrough
+import io.github.charlietap.chasm.compiler.backend.analysis.form.InstructionForms
 import io.github.charlietap.chasm.compiler.backend.analysis.form.Operand
 import io.github.charlietap.chasm.compiler.backend.analysis.frameFacts
 import io.github.charlietap.chasm.compiler.backend.analysis.hasBit
@@ -43,15 +44,16 @@ class BlockLivenessTest {
 
             for (function in code.functions) {
 
-                val slots = frameFacts(function, declarations).frameSlots
-                val graph = livenessGraph(instructionTable(function, declarations), function, slots)
+                val forms = InstructionForms(function, declarations)
+                val slots = frameFacts(forms).frameSlots
+                val graph = livenessGraph(instructionTable(forms), function, slots)
                 val size = function.instructions.size
                 val everything = LongArray(graph.words).also { bits -> for (slot in 0 until slots) bits.setBit(slot) }
 
                 for ((start, end) in ranges(size)) {
                     for (exit in listOf(LongArray(graph.words), everything)) {
 
-                        val expected = fixpoint(function, declarations, slots, start, end, exit)
+                        val expected = fixpoint(forms, slots, start, end, exit)
                         val liveness = graph.solve(start, end, exit)
 
                         for (position in start until end) {
@@ -113,8 +115,9 @@ class BlockLivenessTest {
 
     private fun liveIn(function: CirFunction): List<List<Int>> {
 
-        val slots = frameFacts(function, livenessDeclarations).frameSlots
-        val graph = livenessGraph(instructionTable(function, livenessDeclarations), function, slots)
+        val forms = InstructionForms(function, livenessDeclarations)
+        val slots = frameFacts(forms).frameSlots
+        val graph = livenessGraph(instructionTable(forms), function, slots)
         val liveness = graph.solve(0, function.instructions.size, LongArray(graph.words))
 
         return function.instructions.indices.map { position -> liveness.liveAt(position, slots) }
@@ -147,8 +150,7 @@ class BlockLivenessTest {
     }
 
     private fun fixpoint(
-        function: CirFunction,
-        declarations: ModuleIndexSpaces,
+        forms: InstructionForms,
         slots: Int,
         start: Int,
         end: Int,
@@ -161,9 +163,9 @@ class BlockLivenessTest {
         val kills = Array(count) { LongArray(words) }
         for (index in 0 until count) {
 
-            val instruction = function.instructions[start + index]
+            val instruction = forms.instruction(start + index)
             val read = reads[index]
-            val modelled = visitSlotReads(instruction, declarations, Bits(read))
+            val modelled = visitSlotReads(start + index, forms, Bits(read))
             if (!modelled) {
                 read.fill(0L)
                 for (slot in 0 until slots) read.setBit(slot)
@@ -171,7 +173,7 @@ class BlockLivenessTest {
 
             val conditional = instruction is AdminInstruction.JumpIfCopyI || instruction is AdminInstruction.JumpIfCopyS
             if (!conditional) {
-                visitSlotWrites(instruction, function, declarations, Bits(kills[index]))
+                visitSlotWrites(start + index, forms, Bits(kills[index]))
             }
         }
 
@@ -181,7 +183,7 @@ class BlockLivenessTest {
             changed = false
             for (index in count - 1 downTo 0) {
 
-                val instruction = function.instructions[start + index]
+                val instruction = forms.instruction(start + index)
                 val out = LongArray(words)
                 val successor = { target: Int ->
                     val source = if (target in start until end) liveIn[target - start] else exit

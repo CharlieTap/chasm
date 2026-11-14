@@ -9,6 +9,7 @@ import io.github.charlietap.chasm.cir.CirModule
 import io.github.charlietap.chasm.cir.Frame
 import io.github.charlietap.chasm.cir.FunctionIndex
 import io.github.charlietap.chasm.cir.TypeIndex
+import io.github.charlietap.chasm.compiler.backend.analysis.form.InstructionForms
 import io.github.charlietap.chasm.compiler.frontend.ModuleCompiler
 import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
@@ -97,7 +98,7 @@ class RootNeedsTest {
     fun `without root needs a publishing position publishes every root and entry always publishes`() {
 
         val function = function("roots")
-        val table = instructionTable(function, declarations)
+        val table = instructionTable(InstructionForms(function, declarations))
         val publication = analyzeRootPublication(flowGraph(table, function), function, analysis.mayCollect, needs = null)
 
         assertEquals(listOf(true, true, true, true, true), (0 until 5).map { root -> publication.requiresPublication(1, root) })
@@ -121,7 +122,7 @@ class RootNeedsTest {
         function: CirFunction,
         rootCount: Int,
     ): RootNeeds? {
-        val table = instructionTable(function, declarations)
+        val table = instructionTable(InstructionForms(function, declarations))
         return analyzeRootNeeds(
             table = table,
             graph = flowGraph(table, function),
@@ -156,7 +157,7 @@ class RootNeedsTest {
         function: CirFunction,
         position: Int,
     ): List<Int> {
-        val writes = instructionTable(function, declarations).writes
+        val writes = instructionTable(InstructionForms(function, declarations)).writes
         return (writes.start[position] until writes.end(position)).map { index -> writes.slots[index] }
     }
 
@@ -164,7 +165,7 @@ class RootNeedsTest {
         function: CirFunction,
         references: References,
     ): RootNeeds {
-        val table = instructionTable(function, declarations)
+        val table = instructionTable(InstructionForms(function, declarations))
         return checkNotNull(
             analyzeRootNeeds(
                 table = table,
@@ -179,8 +180,9 @@ class RootNeedsTest {
     }
 
     private fun references(function: CirFunction): References {
-        val facts = frameFacts(function, declarations)
-        return analyzeReferences(instructionTable(function, declarations), function, facts.type, facts.frameSlots, analysis)
+        val forms = InstructionForms(function, declarations)
+        val facts = frameFacts(forms)
+        return analyzeReferences(instructionTable(forms), function, facts.type, facts.frameSlots, analysis)
     }
 
     private fun function(name: String): CirFunction {

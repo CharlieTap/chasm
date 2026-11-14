@@ -19,32 +19,66 @@ sealed interface Operand {
 
 fun slot(
     slot: Int,
-): Operand = Operand.Slot(slot)
+): Operand {
+    return if (slot in 0 until SHARED_SLOTS) {
+        sharedSlots[slot]
+    } else {
+        Operand.Slot(slot)
+    }
+}
 
 fun immediate(
     value: Int,
-): Operand = Operand.Immediate(value.toLong())
+): Operand {
+    return immediate(value.toLong())
+}
 
 fun immediate(
     value: Long,
-): Operand = Operand.Immediate(value)
+): Operand {
+    return if (value in SHARED_IMMEDIATE_LOW..SHARED_IMMEDIATE_HIGH) {
+        sharedImmediates[(value - SHARED_IMMEDIATE_LOW).toInt()]
+    } else {
+        Operand.Immediate(value)
+    }
+}
 
 fun immediate(
     value: Float,
-): Operand = Operand.Immediate(value.toRawBits().toLong())
+): Operand {
+    return immediate(value.toRawBits().toLong())
+}
 
 fun immediate(
     value: Double,
-): Operand = Operand.Immediate(value.toRawBits())
-
-fun OperandTransfer.operands(): List<Operand> = List(size) { index ->
-    if (immediates[index]) Operand.Immediate(values[index]) else Operand.Slot(values[index].toInt())
+): Operand {
+    return immediate(value.toRawBits())
 }
 
-fun FusedOperand.operand(): Operand = when (this) {
-    is FusedOperand.FrameSlot -> Operand.Slot(offset)
-    is FusedOperand.I32Const -> immediate(const)
-    is FusedOperand.I64Const -> immediate(const)
-    is FusedOperand.F32Const -> immediate(const)
-    is FusedOperand.F64Const -> immediate(const)
+fun OperandTransfer.operands(): List<Operand> {
+    return List(size) { index ->
+        if (immediates[index]) immediate(values[index]) else slot(values[index].toInt())
+    }
+}
+
+fun FusedOperand.operand(): Operand {
+    return when (this) {
+        is FusedOperand.FrameSlot -> slot(offset)
+        is FusedOperand.I32Const -> immediate(const)
+        is FusedOperand.I64Const -> immediate(const)
+        is FusedOperand.F32Const -> immediate(const)
+        is FusedOperand.F64Const -> immediate(const)
+    }
+}
+
+private const val SHARED_SLOTS = 4_096
+
+private const val SHARED_IMMEDIATE_LOW = -256L
+
+private const val SHARED_IMMEDIATE_HIGH = 4_095L
+
+private val sharedSlots: Array<Operand> = Array(SHARED_SLOTS) { slot -> Operand.Slot(slot) }
+
+private val sharedImmediates: Array<Operand> = Array((SHARED_IMMEDIATE_HIGH - SHARED_IMMEDIATE_LOW + 1).toInt()) { index ->
+    Operand.Immediate(SHARED_IMMEDIATE_LOW + index)
 }

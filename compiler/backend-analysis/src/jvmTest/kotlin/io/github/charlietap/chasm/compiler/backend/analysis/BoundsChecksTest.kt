@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.compiler.backend.analysis
 import com.github.michaelbull.result.getOrThrow
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.cir.MemoryInstruction
+import io.github.charlietap.chasm.compiler.backend.analysis.form.InstructionForms
 import io.github.charlietap.chasm.compiler.frontend.ModuleCompiler
 import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
@@ -15,7 +16,7 @@ class BoundsChecksTest {
     private val skipped: List<List<Boolean>> = module("bounds").let { module ->
         val declarations = ModuleIndexSpaces(module)
         ModuleCompiler(module).getOrThrow { IllegalStateException(it.toString()) }.functions.map { function ->
-            val redundant = function.redundantBoundsChecks(instructionTable(function, declarations))
+            val redundant = function.redundantBoundsChecks(instructionTable(InstructionForms(function, declarations)))
             function.instructions.indices.filter { function.instructions[it] is MemoryInstruction }.map { redundant[it] }
         }
     }

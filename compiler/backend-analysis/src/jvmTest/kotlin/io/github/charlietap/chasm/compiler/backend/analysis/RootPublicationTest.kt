@@ -7,6 +7,7 @@ import io.github.charlietap.chasm.cir.AdminInstruction
 import io.github.charlietap.chasm.cir.CirFunction
 import io.github.charlietap.chasm.cir.CirModule
 import io.github.charlietap.chasm.cir.ControlInstruction
+import io.github.charlietap.chasm.compiler.backend.analysis.form.InstructionForms
 import io.github.charlietap.chasm.compiler.frontend.ModuleCompiler
 import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
@@ -71,13 +72,14 @@ class RootPublicationTest {
     }
 
     private fun publication(function: CirFunction): RootPublication {
-        val table = instructionTable(function, declarations)
+        val table = instructionTable(InstructionForms(function, declarations))
         return analyzeRootPublication(flowGraph(table, function), function, analysis.mayCollect, needs = null)
     }
 
     private fun references(function: CirFunction): References {
-        val facts = frameFacts(function, declarations)
-        return analyzeReferences(instructionTable(function, declarations), function, facts.type, facts.frameSlots, analysis)
+        val forms = InstructionForms(function, declarations)
+        val facts = frameFacts(forms)
+        return analyzeReferences(instructionTable(forms), function, facts.type, facts.frameSlots, analysis)
     }
 
     private fun assertCopies(

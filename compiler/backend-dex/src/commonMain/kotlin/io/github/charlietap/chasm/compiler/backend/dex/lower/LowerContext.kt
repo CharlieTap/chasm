@@ -6,6 +6,7 @@ import io.github.charlietap.chasm.compiler.backend.abi.MethodRef
 import io.github.charlietap.chasm.compiler.backend.abi.Resource
 import io.github.charlietap.chasm.compiler.backend.analysis.ModuleIndexSpaces
 import io.github.charlietap.chasm.compiler.backend.analysis.References
+import io.github.charlietap.chasm.compiler.backend.analysis.form.InstructionForms
 import io.github.charlietap.chasm.compiler.backend.dex.ModuleLowering
 import io.github.charlietap.chasm.compiler.backend.dex.analysis.FunctionAnalysis
 import io.github.charlietap.chasm.compiler.backend.dex.analysis.FunctionFacts
@@ -28,6 +29,7 @@ internal class LowerContext(
 ) {
     val declarations: ModuleIndexSpaces get() = module.declarations
     val facts: FunctionFacts get() = analysis.facts
+    val forms: InstructionForms get() = facts.table.forms
     val type: FunctionType get() = facts.type
     val references: References get() = facts.references
     val frameSlots: Int get() = facts.frameSlots

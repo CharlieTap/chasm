@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.compiler.backend.dex.lower
 
-import io.github.charlietap.chasm.cir.NumericInstruction
 import io.github.charlietap.chasm.compiler.backend.abi.DIVIDE_BY_ZERO
 import io.github.charlietap.chasm.compiler.backend.abi.F32_TRUNC
 import io.github.charlietap.chasm.compiler.backend.abi.F64_TRUNC
@@ -34,7 +33,7 @@ import io.github.charlietap.chasm.compiler.backend.analysis.form.NumericForm
 import io.github.charlietap.chasm.compiler.backend.analysis.form.Operand
 import io.github.charlietap.chasm.compiler.backend.analysis.form.UnaryOperation
 import io.github.charlietap.chasm.compiler.backend.analysis.form.WideOperation
-import io.github.charlietap.chasm.compiler.backend.analysis.form.form
+import io.github.charlietap.chasm.compiler.backend.analysis.form.immediate
 import io.github.charlietap.chasm.type.NumberType
 import io.github.charlietap.dexter.BinaryOp
 import io.github.charlietap.dexter.CompareOp
@@ -44,11 +43,10 @@ import io.github.charlietap.dexter.LiteralOp
 import io.github.charlietap.dexter.UnaryOp
 
 internal fun lowerNumericInstruction(
-    instruction: NumericInstruction,
     context: LowerContext,
 ) {
-    when (val form = instruction.form()) {
-        is NumericForm.Constant -> context.copyToSlot(form.destination, Operand.Immediate(form.bits))
+    when (val form = context.forms.numeric(context.position)) {
+        is NumericForm.Constant -> context.copyToSlot(form.destination, immediate(form.bits))
         is NumericForm.BitFieldExtract -> context.bitFieldExtract(form)
         is NumericForm.Unary -> when (form.type) {
             NumberType.I32 -> context.i32Unary(form.operation, form.operand, form.destination)
@@ -127,32 +125,56 @@ private fun LowerContext.i32Rotate(
 
 private fun i32Instruction(
     operation: BinaryOperation,
-): BinaryOp? = when (operation) {
-    BinaryOperation.Add -> BinaryOp.AddInt
-    BinaryOperation.Sub -> BinaryOp.SubInt
-    BinaryOperation.Mul -> BinaryOp.MulInt
-    BinaryOperation.And -> BinaryOp.AndInt
-    BinaryOperation.Or -> BinaryOp.OrInt
-    BinaryOperation.Xor -> BinaryOp.XorInt
-    BinaryOperation.Shl -> BinaryOp.ShlInt
-    BinaryOperation.ShrS -> BinaryOp.ShrInt
-    BinaryOperation.ShrU -> BinaryOp.UshrInt
-    else -> null
+): BinaryOp? {
+    return i32Instructions[operation.ordinal]
 }
 
 private fun i32Literal(
     operation: BinaryOperation,
-): LiteralOp? = when (operation) {
-    BinaryOperation.Add -> LiteralOp.AddInt
-    BinaryOperation.Sub -> LiteralOp.SubInt
-    BinaryOperation.Mul -> LiteralOp.MulInt
-    BinaryOperation.And -> LiteralOp.AndInt
-    BinaryOperation.Or -> LiteralOp.OrInt
-    BinaryOperation.Xor -> LiteralOp.XorInt
-    BinaryOperation.Shl -> LiteralOp.ShlInt
-    BinaryOperation.ShrS -> LiteralOp.ShrInt
-    BinaryOperation.ShrU -> LiteralOp.UshrInt
-    else -> null
+): LiteralOp? {
+    return i32Literals[operation.ordinal]
+}
+
+private val i32Instructions: Array<BinaryOp?> = Array(BinaryOperation.entries.size) { ordinal ->
+    i32InstructionFor(BinaryOperation.entries[ordinal])
+}
+
+private val i32Literals: Array<LiteralOp?> = Array(BinaryOperation.entries.size) { ordinal ->
+    i32LiteralFor(BinaryOperation.entries[ordinal])
+}
+
+private fun i32InstructionFor(
+    operation: BinaryOperation,
+): BinaryOp? {
+    return when (operation) {
+        BinaryOperation.Add -> BinaryOp.AddInt
+        BinaryOperation.Sub -> BinaryOp.SubInt
+        BinaryOperation.Mul -> BinaryOp.MulInt
+        BinaryOperation.And -> BinaryOp.AndInt
+        BinaryOperation.Or -> BinaryOp.OrInt
+        BinaryOperation.Xor -> BinaryOp.XorInt
+        BinaryOperation.Shl -> BinaryOp.ShlInt
+        BinaryOperation.ShrS -> BinaryOp.ShrInt
+        BinaryOperation.ShrU -> BinaryOp.UshrInt
+        else -> null
+    }
+}
+
+private fun i32LiteralFor(
+    operation: BinaryOperation,
+): LiteralOp? {
+    return when (operation) {
+        BinaryOperation.Add -> LiteralOp.AddInt
+        BinaryOperation.Sub -> LiteralOp.SubInt
+        BinaryOperation.Mul -> LiteralOp.MulInt
+        BinaryOperation.And -> LiteralOp.AndInt
+        BinaryOperation.Or -> LiteralOp.OrInt
+        BinaryOperation.Xor -> LiteralOp.XorInt
+        BinaryOperation.Shl -> LiteralOp.ShlInt
+        BinaryOperation.ShrS -> LiteralOp.ShrInt
+        BinaryOperation.ShrU -> LiteralOp.UshrInt
+        else -> null
+    }
 }
 
 private fun LowerContext.i32Unary(

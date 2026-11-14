@@ -3,7 +3,6 @@ package io.github.charlietap.chasm.compiler.backend.analysis
 import io.github.charlietap.chasm.cir.AdminInstruction
 import io.github.charlietap.chasm.cir.AggregateInstruction
 import io.github.charlietap.chasm.cir.ControlInstruction
-import io.github.charlietap.chasm.cir.Instruction
 import io.github.charlietap.chasm.cir.MemoryInstruction
 import io.github.charlietap.chasm.cir.NumericInstruction
 import io.github.charlietap.chasm.cir.OperandTransfer
@@ -15,12 +14,11 @@ import io.github.charlietap.chasm.compiler.backend.analysis.form.BulkMemory
 import io.github.charlietap.chasm.compiler.backend.analysis.form.ConditionForm
 import io.github.charlietap.chasm.compiler.backend.analysis.form.HelperArgument
 import io.github.charlietap.chasm.compiler.backend.analysis.form.HelperCall
+import io.github.charlietap.chasm.compiler.backend.analysis.form.InstructionForms
 import io.github.charlietap.chasm.compiler.backend.analysis.form.NumericForm
 import io.github.charlietap.chasm.compiler.backend.analysis.form.Operand
-import io.github.charlietap.chasm.compiler.backend.analysis.form.access
 import io.github.charlietap.chasm.compiler.backend.analysis.form.bulk
 import io.github.charlietap.chasm.compiler.backend.analysis.form.form
-import io.github.charlietap.chasm.compiler.backend.analysis.form.helperCall
 import io.github.charlietap.chasm.compiler.backend.analysis.form.operandTransfer
 import io.github.charlietap.chasm.compiler.backend.analysis.form.select
 
@@ -32,39 +30,45 @@ interface SlotReadVisitor {
 }
 
 fun visitSlotReads(
-    instruction: Instruction,
-    declarations: ModuleIndexSpaces,
+    position: Int,
+    forms: InstructionForms,
     visitor: SlotReadVisitor,
-): Boolean = when (instruction) {
-    is NumericInstruction -> {
-        visitNumericReads(instruction.form(), visitor)
-        true
-    }
-    is MemoryInstruction -> visitMemoryReads(instruction, visitor)
-    is ParametricInstruction -> {
-        val select = instruction.select()
-        visitor.operand(select.condition)
-        visitor.operand(select.first)
-        visitor.operand(select.second)
-        true
-    }
-    is AdminInstruction -> {
-        visitAdminReads(instruction, visitor)
-        true
-    }
-    is VariableInstruction -> {
-        if (instruction is VariableInstruction.GlobalSetS) visitor.read(instruction.sourceSlot)
-        true
-    }
-    is ControlInstruction -> {
-        visitControlReads(instruction, declarations, visitor)
-        true
-    }
-    is TableInstruction -> instruction.helperCall()?.let { call -> visitor.helper(call) } ?: false
-    is AggregateInstruction -> instruction.helperCall()?.let { call -> visitor.helper(call) } ?: visitAggregateReads(instruction, declarations, visitor)
-    is ReferenceInstruction -> {
-        visitReferenceReads(instruction, visitor)
-        true
+): Boolean {
+    val declarations = forms.declarations
+    return when (val instruction = forms.instruction(position)) {
+        is NumericInstruction -> {
+            visitNumericReads(forms.numeric(position), visitor)
+            true
+        }
+        is MemoryInstruction -> visitMemoryReads(instruction, position, forms, visitor)
+        is ParametricInstruction -> {
+            val select = instruction.select()
+            visitor.operand(select.condition)
+            visitor.operand(select.first)
+            visitor.operand(select.second)
+            true
+        }
+        is AdminInstruction -> {
+            visitAdminReads(instruction, visitor)
+            true
+        }
+        is VariableInstruction -> {
+            if (instruction is VariableInstruction.GlobalSetS) {
+                visitor.read(instruction.sourceSlot)
+            }
+            true
+        }
+        is ControlInstruction -> {
+            visitControlReads(instruction, declarations, visitor)
+            true
+        }
+        is TableInstruction -> forms.helperCall(position)?.let { call -> visitor.helper(call) } ?: false
+        is AggregateInstruction -> forms.helperCall(position)?.let { call -> visitor.helper(call) }
+            ?: visitAggregateReads(instruction, declarations, visitor)
+        is ReferenceInstruction -> {
+            visitReferenceReads(instruction, visitor)
+            true
+        }
     }
 }
 
@@ -244,9 +248,11 @@ private fun visitNumericReads(
 
 private fun visitMemoryReads(
     instruction: MemoryInstruction,
+    position: Int,
+    forms: InstructionForms,
     visitor: SlotReadVisitor,
 ): Boolean {
-    val access = instruction.access()
+    val access = forms.access(position)
     if (access != null) {
         visitor.operand(access.address)
         access.value?.let(visitor::operand)
@@ -267,7 +273,7 @@ private fun visitMemoryReads(
         }
         null -> Unit
     }
-    return instruction.helperCall()?.let { call -> visitor.helper(call) } ?: false
+    return forms.helperCall(position)?.let { call -> visitor.helper(call) } ?: false
 }
 
 private fun visitAdminReads(

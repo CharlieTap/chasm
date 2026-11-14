@@ -16,7 +16,6 @@ import io.github.charlietap.chasm.compiler.backend.abi.TABLE_INSTANCE
 import io.github.charlietap.chasm.compiler.backend.analysis.InstructionTable
 import io.github.charlietap.chasm.compiler.backend.analysis.form.HelperArgument
 import io.github.charlietap.chasm.compiler.backend.analysis.form.arrayCopy
-import io.github.charlietap.chasm.compiler.backend.analysis.form.helperCall
 import io.github.charlietap.chasm.compiler.backend.analysis.redundantBoundsChecks
 import io.github.charlietap.chasm.compiler.backend.dex.ModuleLowering
 
@@ -127,7 +126,7 @@ private fun cachedConstants(
             is AggregateInstruction.ArrayNewDefaultS,
             is AggregateInstruction.ArrayNewFixedS,
             -> valueLoads++
-            is AggregateInstruction -> valueLoads += instruction.helperCall()?.arguments?.count { it is HelperArgument.RuntimeType } ?: 0
+            is AggregateInstruction -> valueLoads += table.forms.helperCall(position)?.arguments?.count { it is HelperArgument.RuntimeType } ?: 0
             else -> Unit
         }
     }
