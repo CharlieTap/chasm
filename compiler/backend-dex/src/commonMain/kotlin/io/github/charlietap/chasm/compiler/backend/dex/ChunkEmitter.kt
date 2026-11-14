@@ -69,7 +69,7 @@ internal class ProbingChunkEmitter(
         }
 
         val registers = chunkRegisters(function, analysis, homes, usedKinds)
-        val body = code.beginStaticMethod(dexMethod, registers.count, MemberAccess.Public)
+        val body = code.beginStaticMethod(dexMethod, registers.count, MemberAccess.Public, HUGE_METHOD_CODE_UNITS)
         try {
 
             val protects = function.exceptions?.regions.orEmpty().any { region -> region.start.index < end && region.end.index > start }
@@ -95,17 +95,15 @@ internal class ProbingChunkEmitter(
 
             val lowered = Chunk(start, end, entries, continuations, next, spills, constants, usesMemory, protects, reloads, mixed)
             LowerContext(module, function, analysis, registers, homes, Emitter(body, module.references), lowered).lowerChunkBody()
+            body.finish()
+        } catch (_: DexterMethodTooLargeException) {
+            return null
         } catch (failure: Throwable) {
             body.abort()
             throw failure
         }
 
-        return try {
-            body.finish(HUGE_METHOD_CODE_UNITS)
-            SplitChunk(method, entries, frameCost(registers))
-        } catch (_: DexterMethodTooLargeException) {
-            null
-        }
+        return SplitChunk(method, entries, frameCost(registers))
     }
 
     private fun writtenSlots(

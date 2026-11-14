@@ -143,11 +143,11 @@ internal class FunctionLowering(
                 return Attempt.TooLarge(inlinedAccesses = false, homes = pristine)
             }
 
-            val body = code.beginStaticMethod(method, registers.count, MemberAccess.Public)
+            val body = code.beginStaticMethod(method, registers.count, MemberAccess.Public, HUGE_METHOD_CODE_UNITS)
             val context = LowerContext(module, function, analysis, registers, homes, Emitter(body, module.references))
             try {
                 context.lowerFunctionBody()
-                body.finish(HUGE_METHOD_CODE_UNITS)
+                body.finish()
                 return Attempt.Lowered()
             } catch (conflict: SlotKindConflict) {
                 body.abort()
@@ -211,19 +211,16 @@ internal class FunctionLowering(
             val registers = dispatcherRegisters(analysis)
             val slotFrameCost = (facts.frameSlots * 8 + 31) / 32
             val cost = frameCost(registers) + chunks.maxOf { chunk -> chunk.cost } + slotFrameCost
-            val body = code.beginStaticMethod(method, registers.count, MemberAccess.Public)
+            val body = code.beginStaticMethod(method, registers.count, MemberAccess.Public, HUGE_METHOD_CODE_UNITS)
             try {
                 LowerContext(module, function, analysis, registers, null, Emitter(body, module.references))
                     .lowerDispatcher(chunks.map { chunk -> chunk.method }, table, cost)
+                body.finish()
+            } catch (_: DexterMethodTooLargeException) {
+                return Attempt.Refused("function needs ${chunks.size} chunks, more than one dispatcher holds")
             } catch (failure: Throwable) {
                 body.abort()
                 throw failure
-            }
-
-            try {
-                body.finish(HUGE_METHOD_CODE_UNITS)
-            } catch (_: DexterMethodTooLargeException) {
-                return Attempt.Refused("function needs ${chunks.size} chunks, more than one dispatcher holds")
             }
 
             module.chunkStarts[function.index.index] = (orphans + starts).toIntArray()
