@@ -18,12 +18,14 @@ fun CirFunction.redundantBoundsChecks(table: InstructionTable): BooleanArray {
     }
 
     val checkIndex = BoundsCheckIndex(this, table, checked)
-    val loops = if (checkIndex.backJumps.size > 0) LoopWrites(checkIndex) else null
+    val loopEnds = checkIndex.loopEnds
+    val loops = if (loopEnds != null) LoopWrites(checkIndex, loopEnds) else null
     val handlers = checkIndex.handlers
     val pending = ForwardBranchProofs(checkIndex.trackedCount, size)
     var current = ProvenBounds(checkIndex.trackedCount)
     var reachable = true
     val jumps = checkIndex.forwardJumps
+    val fallsThrough = table.jumps.fallsThrough
     var access = 0
     var loop = 0
     var handler = 0
@@ -65,7 +67,7 @@ fun CirFunction.redundantBoundsChecks(table: InstructionTable): BooleanArray {
             while (jump < jumps.size && high(jumps[jump]) == position) pending.branch(low(jumps[jump++]), current, empty)
         }
 
-        reachable = instructions[position].fallsThrough()
+        reachable = fallsThrough[position]
     }
 
     return redundant
@@ -307,7 +309,8 @@ private class BoundsCheckIndex(
     val writtenSlots: IntArray
     val writeCount: Int
     val forwardJumps = LongList()
-    val backJumps = LongList()
+    var loopEnds: IntArray? = null
+        private set
     val handlers = handlerEntries(function)
     val accessPositions = IntArray(checked)
     val accessSlots = IntArray(checked)
@@ -410,7 +413,8 @@ private class BoundsCheckIndex(
             for (edge in jumps.start[position] until jumps.end(position)) {
                 val target = jumps.targets[edge]
                 if (target <= position) {
-                    backJumps.add(pack(target, position))
+                    val ends = loopEnds ?: IntArray(size) { NO_LOOP }.also { ends -> loopEnds = ends }
+                    ends[target] = position
                 } else {
                     forwardJumps.add(pack(position, target))
                 }
@@ -422,10 +426,10 @@ private class BoundsCheckIndex(
                 proofCopies.add(pack(position, writes.sources[write]))
             }
         }
-
-        backJumps.sort()
     }
 }
+
+private const val NO_LOOP = -1
 
 private fun handlerEntries(function: CirFunction): IntArray {
 
@@ -449,6 +453,7 @@ private fun handlerEntries(function: CirFunction): IntArray {
 
 private class LoopWrites(
     private val checkIndex: BoundsCheckIndex,
+    loopEnds: IntArray,
 ) {
     val headers: IntArray
     val ends: IntArray
@@ -459,10 +464,9 @@ private class LoopWrites(
 
     init {
 
-        val jumps = checkIndex.backJumps
         var loops = 0
-        for (index in 0 until jumps.size) {
-            if (index + 1 == jumps.size || high(jumps[index + 1]) != high(jumps[index])) {
+        for (end in loopEnds) {
+            if (end != NO_LOOP) {
                 loops++
             }
         }
@@ -471,11 +475,10 @@ private class LoopWrites(
         ends = IntArray(loops)
         count = loops
         loops = 0
-        for (index in 0 until jumps.size) {
-            val packed = jumps[index]
-            if (index + 1 == jumps.size || high(jumps[index + 1]) != high(packed)) {
-                headers[loops] = high(packed)
-                ends[loops++] = low(packed)
+        for (header in loopEnds.indices) {
+            if (loopEnds[header] != NO_LOOP) {
+                headers[loops] = header
+                ends[loops++] = loopEnds[header]
             }
         }
 

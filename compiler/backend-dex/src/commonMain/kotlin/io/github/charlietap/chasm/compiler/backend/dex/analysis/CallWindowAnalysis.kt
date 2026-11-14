@@ -11,12 +11,10 @@ import io.github.charlietap.chasm.compiler.backend.abi.BRIDGE_CALL_INDIRECT
 import io.github.charlietap.chasm.compiler.backend.abi.BRIDGE_CALL_REF
 import io.github.charlietap.chasm.compiler.backend.abi.STRUCT_SET
 import io.github.charlietap.chasm.compiler.backend.abi.TAIL_CALL_INDIRECT
-import io.github.charlietap.chasm.compiler.backend.abi.descriptorWords
+import io.github.charlietap.chasm.compiler.backend.abi.argumentWords
 import io.github.charlietap.chasm.compiler.backend.analysis.form.callSite
 import io.github.charlietap.chasm.compiler.backend.analysis.form.helperCall
 import io.github.charlietap.chasm.compiler.backend.dex.ModuleLowering
-import io.github.charlietap.chasm.compiler.backend.dex.abi.staticParameters
-import io.github.charlietap.chasm.type.FunctionType
 
 internal class CallWindow(
     val callBufferWords: Int,
@@ -45,7 +43,7 @@ internal fun analyzeCallWindow(
 
         val bridges = instruction !is ControlInstruction.Call || !direct
         if (call != null && bridges) {
-            callBufferWords = maxOf(callBufferWords, call.arguments.size, call.type.results.types.size, 1)
+            callBufferWords = maxOf(callBufferWords, call.operands.values.size, call.type.results.types.size, 1)
         }
         when (instruction) {
             is AggregateInstruction.StructNewS ->
@@ -80,7 +78,3 @@ internal fun analyzeCallWindow(
     val windowWords = maxOf(3 + directWords, if (helperWords > 0) 1 + helperWords else 0)
     return CallWindow(callBufferWords, windowWords, temporaries)
 }
-
-private fun argumentWords(
-    type: FunctionType,
-): Int = staticParameters(type).drop(3).sumOf(::descriptorWords)

@@ -52,6 +52,20 @@ fun takesArgumentArray(
     type: FunctionType,
 ): Boolean = type.params.types.size > MAX_PARAMETERS
 
+fun argumentWords(type: FunctionType): Int {
+
+    if (takesArgumentArray(type)) {
+        return descriptorWords(ARGUMENTS)
+    }
+
+    val parameters = type.params.types
+    var words = 0
+    for (index in parameters.indices) {
+        words += descriptorWords(valueDescriptor(parameters[index]))
+    }
+    return words
+}
+
 fun staticParameters(
     type: FunctionType,
     binding: String,

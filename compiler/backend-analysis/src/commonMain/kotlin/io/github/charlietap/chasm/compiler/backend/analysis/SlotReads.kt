@@ -6,6 +6,7 @@ import io.github.charlietap.chasm.cir.ControlInstruction
 import io.github.charlietap.chasm.cir.Instruction
 import io.github.charlietap.chasm.cir.MemoryInstruction
 import io.github.charlietap.chasm.cir.NumericInstruction
+import io.github.charlietap.chasm.cir.OperandTransfer
 import io.github.charlietap.chasm.cir.ParametricInstruction
 import io.github.charlietap.chasm.cir.ReferenceInstruction
 import io.github.charlietap.chasm.cir.TableInstruction
@@ -18,12 +19,10 @@ import io.github.charlietap.chasm.compiler.backend.analysis.form.NumericForm
 import io.github.charlietap.chasm.compiler.backend.analysis.form.Operand
 import io.github.charlietap.chasm.compiler.backend.analysis.form.access
 import io.github.charlietap.chasm.compiler.backend.analysis.form.bulk
-import io.github.charlietap.chasm.compiler.backend.analysis.form.callSite
 import io.github.charlietap.chasm.compiler.backend.analysis.form.form
 import io.github.charlietap.chasm.compiler.backend.analysis.form.helperCall
-import io.github.charlietap.chasm.compiler.backend.analysis.form.operands
+import io.github.charlietap.chasm.compiler.backend.analysis.form.operandTransfer
 import io.github.charlietap.chasm.compiler.backend.analysis.form.select
-import io.github.charlietap.chasm.compiler.backend.analysis.form.tailCallArguments
 
 interface SlotReadVisitor {
 
@@ -201,6 +200,14 @@ private fun SlotReadVisitor.operand(
     if (operand is Operand.Slot) read(operand.slot)
 }
 
+private fun SlotReadVisitor.transfer(operands: OperandTransfer) {
+    for (index in operands.values.indices) {
+        if (!operands.immediates[index]) {
+            read(operands.values[index].toInt())
+        }
+    }
+}
+
 private fun SlotReadVisitor.helper(
     call: HelperCall,
 ): Boolean {
@@ -274,7 +281,7 @@ private fun visitAdminReads(
         is AdminInstruction.CopySlotSequence -> instruction.sourceSlots.forEach(visitor::read)
         is AdminInstruction.Checkpoint -> Unit
         is AdminInstruction.Jump -> Unit
-        is AdminInstruction.JumpCopies -> instruction.operands.operands().forEach(visitor::operand)
+        is AdminInstruction.JumpCopies -> visitor.transfer(instruction.operands)
         is AdminInstruction.JumpIfI -> Unit
         is AdminInstruction.JumpIfS -> visitor.read(instruction.operandSlot)
         is AdminInstruction.JumpIfZeroI -> Unit
@@ -318,14 +325,15 @@ private fun visitControlReads(
     declarations: ModuleIndexSpaces,
     visitor: SlotReadVisitor,
 ) {
-    instruction.callSite(declarations)?.arguments?.forEach(visitor::operand)
-    instruction.tailCallArguments()?.forEach(visitor::operand)
+    val operands = instruction.operandTransfer()
+    if (operands != null) {
+        visitor.transfer(operands)
+    }
     when (instruction) {
         is ControlInstruction.CallIndirectS -> visitor.read(instruction.elementIndexSlot)
         is ControlInstruction.ReturnCallIndirectS -> visitor.read(instruction.elementIndexSlot)
         is ControlInstruction.CallRefS -> visitor.read(instruction.functionSlot)
         is ControlInstruction.ReturnCallRefS -> visitor.read(instruction.functionSlot)
-        is ControlInstruction.FunctionReturn -> instruction.results.operands().forEach(visitor::operand)
         is ControlInstruction.Throw -> {
             val fields = declarations.tagFieldCount(instruction.exceptionTag)
             for (slot in instruction.firstPayloadSlot until instruction.firstPayloadSlot + fields) visitor.read(slot)

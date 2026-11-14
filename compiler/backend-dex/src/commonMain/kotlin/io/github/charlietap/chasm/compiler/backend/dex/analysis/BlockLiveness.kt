@@ -5,7 +5,6 @@ import io.github.charlietap.chasm.cir.CirFunction
 import io.github.charlietap.chasm.compiler.backend.analysis.InstructionTable
 import io.github.charlietap.chasm.compiler.backend.analysis.SlotWriteTable
 import io.github.charlietap.chasm.compiler.backend.analysis.clearBit
-import io.github.charlietap.chasm.compiler.backend.analysis.fallsThrough
 import io.github.charlietap.chasm.compiler.backend.analysis.hasBit
 import io.github.charlietap.chasm.compiler.backend.analysis.orInto
 import io.github.charlietap.chasm.compiler.backend.analysis.setBit
@@ -233,9 +232,8 @@ internal fun livenessGraph(
     for (edge in 0 until jumps.count) isLeader[jumps.targets[edge]] = true
     function.exceptions?.regions?.forEach { region -> region.catches.forEach { handler -> isLeader[handler.target.index] = true } }
     for (position in 0 until size) {
-        val instruction = instructions[position]
         val jumping = jumps.end(position) > jumps.start[position]
-        if (position + 1 < size && (!instruction.fallsThrough() || jumping)) {
+        if (position + 1 < size && (!jumps.fallsThrough[position] || jumping)) {
             isLeader[position + 1] = true
         }
     }
@@ -267,7 +265,7 @@ internal fun livenessGraph(
             successors = successors.copyOf(maxOf(successors.size * 2, edges + targets + 2))
         }
 
-        if (instruction.fallsThrough()) {
+        if (jumps.fallsThrough[last]) {
             successors[edges++] = if (last + 1 < size) blockAt[last + 1] else EXIT
         }
         for (edge in jumps.start[last] until jumps.end(last)) {

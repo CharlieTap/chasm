@@ -56,6 +56,7 @@ class SlotWriteTable internal constructor(
 class JumpTable internal constructor(
     val start: IntArray,
     val targets: IntArray,
+    val fallsThrough: BooleanArray,
 ) {
     val count: Int = start[start.size - 1]
 
@@ -120,6 +121,7 @@ fun instructionTable(
     val writeStart = IntArray(size + 1)
     val targetStart = IntArray(size + 1)
     val accessStart = IntArray(size + 1)
+    val fallsThrough = BooleanArray(size)
     val writes = SlotWriteBuilder(size)
     val accesses = MemoryAccessBuilder()
     val targets = JumpTargetBuilder()
@@ -156,6 +158,7 @@ fun instructionTable(
                 targets.add(target)
             }
         }
+        fallsThrough[position] = instruction.fallsThrough()
     }
     writeStart[size] = writes.size
     targetStart[size] = targets.size
@@ -166,7 +169,7 @@ fun instructionTable(
         function = function,
         declarations = declarations,
         writes = SlotWriteTable(modes, writeStart, writes.slots, writes.sources, writes.kinds, writes.references),
-        jumps = JumpTable(targetStart, targets.targets),
+        jumps = JumpTable(targetStart, targets.targets, fallsThrough),
         accesses = MemoryAccessTable(
             start = accessStart,
             positions = accesses.positions.copyOf(accesses.size),

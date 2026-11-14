@@ -57,6 +57,10 @@ fun analyzeReferences(
         }
     }
 
+    if (references.none { reference -> reference }) {
+        return References(IntArray(0), writesThrough = false, references, IntArray(frameSlots))
+    }
+
     val sources = IntArray(copies)
     val destinations = IntArray(copies)
     copies = 0

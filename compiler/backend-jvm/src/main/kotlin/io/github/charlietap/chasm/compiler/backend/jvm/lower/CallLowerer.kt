@@ -104,7 +104,11 @@ private inline fun LowerContext.indirectCall(
     emit.type(Opcodes.CHECKCAST, signature)
     pushContext()
     emit.load(Opcodes.ILOAD, Locals.DEPTH)
-    if (takesArgumentArray(call.type)) pushArgumentArray(call.arguments) else pushArguments(call.type, call.arguments)
+    if (takesArgumentArray(call.type)) {
+        pushArgumentArray(call.arguments())
+    } else {
+        pushArguments(call.type, call.arguments())
+    }
     emit.invokeVirtual(module.typedCall(signature, call.type))
     afterCall(
         call,
@@ -127,7 +131,11 @@ private fun LowerContext.directCall(
     emit.load(Opcodes.ALOAD, Locals.BINDING)
     pushContext()
     emit.load(Opcodes.ILOAD, Locals.DEPTH)
-    if (takesArgumentArray(type)) pushArgumentArray(call.arguments) else pushArguments(type, call.arguments)
+    if (takesArgumentArray(type)) {
+        pushArgumentArray(call.arguments())
+    } else {
+        pushArguments(type, call.arguments())
+    }
     emit.invokeStatic(module.functionMethod(callee))
     val analysis = module.analysis
     afterCall(
@@ -208,7 +216,7 @@ private inline fun LowerContext.runtimeCall(
     call: CallSite,
     target: () -> MethodRef,
 ) {
-    packArguments(call.type, call.arguments)
+    packArguments(call.type, call.arguments())
     pushContext()
     pushResource(Resource.Instance)
     val method = target()

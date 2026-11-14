@@ -1,27 +1,51 @@
 package io.github.charlietap.chasm.compiler.backend.analysis.form
 
 import io.github.charlietap.chasm.cir.ControlInstruction
+import io.github.charlietap.chasm.cir.OperandTransfer
 import io.github.charlietap.chasm.compiler.backend.analysis.ModuleIndexSpaces
 import io.github.charlietap.chasm.type.FunctionType
 
 class CallSite(
     val type: FunctionType,
-    val arguments: List<Operand>,
+    val operands: OperandTransfer,
     val resultBase: Int,
-)
+) {
+    private var arguments: List<Operand>? = null
+
+    fun arguments(): List<Operand> {
+        return arguments ?: operands.operands().also { built -> arguments = built }
+    }
+}
 
 fun ControlInstruction.callSite(
     declarations: ModuleIndexSpaces,
-): CallSite? = when (val i = this) {
-    is ControlInstruction.Call ->
-        CallSite(declarations.functionType(i.function), i.operands.operands(), i.resultDestinationSlot ?: i.callFrameOffset)
-    is ControlInstruction.CallIndirectI ->
-        CallSite(declarations.functionType(i.type), i.operands.operands(), i.resultDestinationSlot ?: i.callFrameOffset)
-    is ControlInstruction.CallIndirectS ->
-        CallSite(declarations.functionType(i.type), i.operands.operands(), i.resultDestinationSlot ?: i.callFrameOffset)
-    is ControlInstruction.CallRefS ->
-        CallSite(declarations.functionType(i.type), i.operands.operands(), i.resultDestinationSlot ?: i.callFrameOffset)
-    else -> null
+): CallSite? {
+    return when (val i = this) {
+        is ControlInstruction.Call ->
+            CallSite(declarations.functionType(i.function), i.operands, i.resultDestinationSlot ?: i.callFrameOffset)
+        is ControlInstruction.CallIndirectI ->
+            CallSite(declarations.functionType(i.type), i.operands, i.resultDestinationSlot ?: i.callFrameOffset)
+        is ControlInstruction.CallIndirectS ->
+            CallSite(declarations.functionType(i.type), i.operands, i.resultDestinationSlot ?: i.callFrameOffset)
+        is ControlInstruction.CallRefS ->
+            CallSite(declarations.functionType(i.type), i.operands, i.resultDestinationSlot ?: i.callFrameOffset)
+        else -> null
+    }
+}
+
+fun ControlInstruction.operandTransfer(): OperandTransfer? {
+    return when (val instruction = this) {
+        is ControlInstruction.Call -> instruction.operands
+        is ControlInstruction.CallIndirectI -> instruction.operands
+        is ControlInstruction.CallIndirectS -> instruction.operands
+        is ControlInstruction.CallRefS -> instruction.operands
+        is ControlInstruction.ReturnCall -> instruction.operands.wasm
+        is ControlInstruction.ReturnCallIndirectI -> instruction.operands.wasm
+        is ControlInstruction.ReturnCallIndirectS -> instruction.operands.wasm
+        is ControlInstruction.ReturnCallRefS -> instruction.operands.wasm
+        is ControlInstruction.FunctionReturn -> instruction.results
+        else -> null
+    }
 }
 
 fun ControlInstruction.tailCallArguments(): List<Operand>? = when (val i = this) {

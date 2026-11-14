@@ -50,7 +50,7 @@ private fun LowerContext.directCall(
     call: CallSite,
 ) {
 
-    val words = loadWindow(call.type, call.arguments)
+    val words = loadWindow(call.type, call.arguments())
     val method = module.functionMethod(callee, call.type)
     emit.invokeRange(method, registers.window, 3 + words)
 
@@ -108,7 +108,7 @@ private fun LowerContext.invokeTypedTarget(
 ) {
 
     emit.moveObject(registers.window, Registers.OBJECT)
-    loadWindow(call.type, call.arguments)
+    loadWindow(call.type, call.arguments())
     emit.move(registers.window + 2, Registers.DEPTH)
     emit.invokeInterfaceRange(typedCall(signature, call.type), registers.window)
 
@@ -303,7 +303,7 @@ private fun LowerContext.bridgeCall(
     call: CallSite,
 ) {
     loadCallBuffer()
-    call.arguments.forEachIndexed { index, argument ->
+    call.arguments().forEachIndexed { index, argument ->
         loadWide(Registers.W0, argument)
         emit.const(Registers.I2, index)
         emit.arrayPut(ArrayKind.Wide, Registers.W0, Registers.OBJECT, Registers.I2)

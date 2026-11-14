@@ -62,7 +62,7 @@ private inline fun forEachFlowEdge(
 
     for (position in 0 until positions) {
 
-        if (instructions[position].fallsThrough() && position + 1 < positions) {
+        if (jumps.fallsThrough[position] && position + 1 < positions) {
             action(position, position + 1)
         }
         for (edge in jumps.start[position] until jumps.end(position)) {

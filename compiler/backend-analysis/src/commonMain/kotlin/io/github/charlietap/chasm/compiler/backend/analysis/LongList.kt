@@ -19,10 +19,6 @@ internal class LongList {
         return values[index]
     }
 
-    fun sort() {
-        values.sort(0, size)
-    }
-
     fun toSortedArray(): LongArray {
         return values.copyOf(size).also { sorted -> sorted.sort() }
     }

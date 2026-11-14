@@ -7,7 +7,6 @@ import io.github.charlietap.chasm.compiler.backend.analysis.InstructionTable
 import io.github.charlietap.chasm.compiler.backend.analysis.SlotReadTable
 import io.github.charlietap.chasm.compiler.backend.analysis.SlotWriteTable
 import io.github.charlietap.chasm.compiler.backend.analysis.WriteKinds
-import io.github.charlietap.chasm.compiler.backend.analysis.fallsThrough
 import io.github.charlietap.chasm.type.ValueType
 
 internal class SlotKindFlow(
@@ -106,7 +105,7 @@ internal class SlotKindFlow(
         state: ByteArray,
     ) {
 
-        if (modes[position] == SlotWriteTable.CONDITIONAL) {
+        if (tracked.isEmpty() || modes[position] == SlotWriteTable.CONDITIONAL) {
             return
         }
 
@@ -137,14 +136,13 @@ internal class SlotKindFlow(
         slot: Int,
     ): Byte {
 
-        var kind = NONE
-        for (index in writes.start[position] until writes.end(position)) {
+        for (index in writes.end(position) - 1 downTo writes.start[position]) {
             if (writeSlots[index] == slot) {
-                kind = writeKinds[index]
+                return writeKinds[index]
             }
         }
 
-        return kind
+        return NONE
     }
 
     companion object {
@@ -336,7 +334,7 @@ private fun basicBlocks(
     isLeader[0] = true
     for (position in 0 until size) {
         for (edge in jumps.start[position] until jumps.end(position)) isLeader[jumps.targets[edge]] = true
-        if (jumps.end(position) > jumps.start[position] || !instructions[position].fallsThrough()) {
+        if (jumps.end(position) > jumps.start[position] || !jumps.fallsThrough[position]) {
             isLeader[position + 1] = true
         }
     }
@@ -602,7 +600,7 @@ private class SlotKindDataflow(
                 if (taken != false) {
                     for (edge in jumps.start[last] until jumps.end(last)) flowInto(jumps.targets[edge], state)
                 }
-                if (taken != true && instruction.fallsThrough()) {
+                if (taken != true && jumps.fallsThrough[last]) {
                     flowInto(last + 1, state)
                 }
             }

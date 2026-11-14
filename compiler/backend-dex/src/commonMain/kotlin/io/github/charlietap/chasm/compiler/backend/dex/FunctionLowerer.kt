@@ -3,7 +3,7 @@ package io.github.charlietap.chasm.compiler.backend.dex
 import io.github.charlietap.chasm.cir.CirFunction
 import io.github.charlietap.chasm.compiler.backend.abi.CONTEXT_TYPE
 import io.github.charlietap.chasm.compiler.backend.abi.MethodRef
-import io.github.charlietap.chasm.compiler.backend.abi.descriptorWords
+import io.github.charlietap.chasm.compiler.backend.abi.argumentWords
 import io.github.charlietap.chasm.compiler.backend.dex.abi.ART_MAX_COMPILED_REGISTERS
 import io.github.charlietap.chasm.compiler.backend.dex.abi.BINDING_TYPE
 import io.github.charlietap.chasm.compiler.backend.dex.abi.CHUNK_CODE_UNITS
@@ -11,7 +11,6 @@ import io.github.charlietap.chasm.compiler.backend.dex.abi.CHUNK_INSTRUCTIONS
 import io.github.charlietap.chasm.compiler.backend.dex.abi.HUGE_METHOD_CODE_UNITS
 import io.github.charlietap.chasm.compiler.backend.dex.abi.MAX_REGISTERS
 import io.github.charlietap.chasm.compiler.backend.dex.abi.chunkName
-import io.github.charlietap.chasm.compiler.backend.dex.abi.staticParameters
 import io.github.charlietap.chasm.compiler.backend.dex.analysis.DataflowSlotKindAnalyzer
 import io.github.charlietap.chasm.compiler.backend.dex.analysis.FunctionAnalysis
 import io.github.charlietap.chasm.compiler.backend.dex.analysis.MemoryMode
@@ -32,7 +31,6 @@ import io.github.charlietap.chasm.compiler.backend.dex.lower.Unsupported
 import io.github.charlietap.chasm.compiler.backend.dex.lower.frameCost
 import io.github.charlietap.chasm.compiler.backend.dex.lower.lowerDispatcher
 import io.github.charlietap.chasm.compiler.backend.dex.lower.lowerFunctionBody
-import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.dexter.ClassBuilder
 import io.github.charlietap.dexter.DexMethod
 import io.github.charlietap.dexter.DexterFileFullException
@@ -361,7 +359,7 @@ private fun functionRegisters(
         frameSlots = facts.frameSlots,
         temporaries = window.temporaries,
         windowWords = window.windowWords,
-        parameterWords = parameterWords(facts.type),
+        parameterWords = argumentWords(facts.type),
         cachedConstants = analysis.cachedConstants.size,
         unsafeMemory = analysis.unsafeMemory,
         inlineMemory = analysis.usesInlineMemory,
@@ -372,10 +370,6 @@ private fun functionRegisters(
     )
 }
 
-private fun parameterWords(
-    type: FunctionType,
-): Int = staticParameters(type).drop(3).sumOf(::descriptorWords)
-
 private const val FRAME_TOO_LARGE = "frame too large"
 
 private fun dispatcherRegisters(analysis: FunctionAnalysis): Registers {
@@ -383,7 +377,7 @@ private fun dispatcherRegisters(analysis: FunctionAnalysis): Registers {
         frameSlots = 0,
         temporaries = 0,
         windowWords = CHUNK_WINDOW_WORDS,
-        parameterWords = parameterWords(analysis.facts.type),
+        parameterWords = argumentWords(analysis.facts.type),
         cachedConstants = 0,
         unsafeMemory = false,
         inlineMemory = false,

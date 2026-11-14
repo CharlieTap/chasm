@@ -83,4 +83,16 @@
         (br $again)))
     (local.get $sum))
   (func (export "other") (param $p i32) (result i32)
-    (i32.add (i32.load $other offset=8 (local.get $p)) (i32.load $other offset=4 (local.get $p)))))
+    (i32.add (i32.load $other offset=8 (local.get $p)) (i32.load $other offset=4 (local.get $p))))
+  (func (export "rejoined") (param $p i32) (param $n i32) (result i32)
+    (local $sum i32)
+    (local.set $sum (i32.load offset=8 (local.get $p)))
+    (block $done
+      (loop $again
+        (local.set $sum (i32.add (local.get $sum) (i32.load offset=4 (local.get $p))))
+        (local.set $n (i32.sub (local.get $n) (i32.const 1)))
+        (br_if $again (i32.and (local.get $n) (i32.const 1)))
+        (br_if $done (i32.eqz (local.get $n)))
+        (local.set $p (i32.add (local.get $p) (i32.const 4)))
+        (br $again)))
+    (local.get $sum)))

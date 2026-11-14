@@ -80,6 +80,11 @@ class BoundsChecksTest {
         assertEquals(listOf(false, false), skipped[11])
     }
 
+    @Test
+    fun `a load in a loop is checked when the path to a later back edge writes its address`() {
+        assertEquals(listOf(false, false), skipped[12])
+    }
+
     private fun module(
         name: String,
     ): Module {

@@ -34,7 +34,11 @@ fun frameFacts(
 private fun resultSlotsNeeded(
     function: CirFunction,
     declarations: ModuleIndexSpaces,
-): Int = function.instructions.maxOfOrNull { instruction ->
-    val call = (instruction as? ControlInstruction)?.callSite(declarations) ?: return@maxOfOrNull 0
-    call.resultBase + call.type.results.types.size
-} ?: 0
+): Int {
+    var needed = 0
+    for (instruction in function.instructions) {
+        val call = (instruction as? ControlInstruction)?.callSite(declarations) ?: continue
+        needed = maxOf(needed, call.resultBase + call.type.results.types.size)
+    }
+    return needed
+}
