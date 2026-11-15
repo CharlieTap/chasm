@@ -67,9 +67,12 @@ kotlin {
                 api(projects.embeddingModule)
                 api(projects.embeddingRuntime)
                 api(projects.stream)
+                api(libs.kotlinx.coroutines.core)
 
                 implementation(projects.ast)
                 implementation(projects.decoder)
+                implementation(projects.libs.parallelCoroutines)
+                implementation(projects.module)
                 implementation(projects.runtimeJit)
                 implementation(projects.validator)
                 implementation(libs.result)

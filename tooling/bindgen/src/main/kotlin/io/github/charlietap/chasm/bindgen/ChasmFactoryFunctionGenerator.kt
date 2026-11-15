@@ -30,7 +30,7 @@ internal class ChasmFactoryFunctionGenerator {
 
         return FunSpec.builder(interfaceName.replaceFirstChar { character -> character.lowercaseChar() }).apply {
             addModifiers(visibilityModifier)
-            if (config.generateSuspendingFactories) addModifiers(KModifier.SUSPEND)
+            if (source.suspending) addModifiers(KModifier.SUSPEND)
             addParameters(source.inputs)
             if (linksWasiPreview1) {
                 addParameter("wasiHost", WASI_EMBEDDER_HOST_CLASS_NAME)
@@ -74,6 +74,7 @@ internal class ChasmFactoryFunctionGenerator {
                 instanceFactory = CHASM_SUSPEND_INSTANCE_FACTORY_CLASS_NAME,
                 module = CHASM_SUSPENDING_MODULE,
                 instance = CHASM_SUSPENDING_INSTANCE,
+                suspending = true,
             )
         } else {
             DecodedModule(
@@ -82,6 +83,7 @@ internal class ChasmFactoryFunctionGenerator {
                 instanceFactory = CHASM_INSTANCE_FACTORY_CLASS_NAME,
                 module = CHASM_MODULE,
                 instance = CHASM_INSTANCE,
+                suspending = false,
             )
         }
         is ExecutionTier.Jit -> DecodedModule(
@@ -90,12 +92,16 @@ internal class ChasmFactoryFunctionGenerator {
             instanceFactory = CHASM_JIT_INSTANCE_FACTORY_TYPE,
             module = CHASM_JIT_MODULE,
             instance = CHASM_JIT_INSTANCE,
+            suspending = true,
+            moduleArguments = ", validate = true",
         )
         is ExecutionTier.Aot -> CompiledModule(config, tier)
     }
 }
 
 private interface ModuleSource {
+    val suspending: Boolean
+
     val inputs: List<ParameterSpec>
 
     val factories: List<ParameterSpec>
@@ -111,6 +117,8 @@ private class DecodedModule(
     instanceFactory: TypeName,
     private val module: MemberName,
     private val instance: MemberName,
+    override val suspending: Boolean,
+    private val moduleArguments: String = "",
 ) : ModuleSource {
 
     override val inputs = listOf(ParameterSpec("binary", BYTE_ARRAY))
@@ -127,8 +135,9 @@ private class DecodedModule(
             addStatement("%M(store, %LL).%M(%S)", CHASM_ADD_FUEL, cpu.fuel.units, CHASM_EXPECT, "Failed to add fuel")
         }
         addStatement(
-            "val module = moduleFactory?.invoke(binary) ?: %M(binary).%M(%S)",
+            "val module = moduleFactory?.invoke(binary) ?: %M(binary%L).%M(%S)",
             module,
+            moduleArguments,
             CHASM_EXPECT,
             "Failed to decode binary",
         )
@@ -175,6 +184,8 @@ private class CompiledModule(
     private val config: CodegenConfig,
     private val tier: ExecutionTier.Aot,
 ) : ModuleSource {
+
+    override val suspending = false
 
     override val inputs = emptyList<ParameterSpec>()
 
@@ -258,7 +269,7 @@ internal const val CHASM_ADD_FUEL_ALIAS = "chasmAddFuel"
 internal const val CHASM_REMAINING_FUEL_ALIAS = "chasmRemainingFuel"
 internal const val CHASM_INTERRUPT_ALIAS = "chasmInterrupt"
 
-private val CHASM_JIT_MODULE_FACTORY_TYPE = LambdaTypeName.get(null, BYTE_ARRAY, returnType = CHASM_MODULE_CLASS_NAME)
+private val CHASM_JIT_MODULE_FACTORY_TYPE = LambdaTypeName.get(null, BYTE_ARRAY, returnType = CHASM_MODULE_CLASS_NAME).copy(suspending = true)
 private val CHASM_JIT_INSTANCE_FACTORY_TYPE = LambdaTypeName.get(
     null,
     CHASM_STORE_CLASS_NAME,

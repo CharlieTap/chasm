@@ -11,6 +11,7 @@ import io.github.charlietap.chasm.embedding.shapes.expect
 import io.github.charlietap.chasm.embedding.store
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.runtime.value.NumberValue.I32
+import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -19,7 +20,7 @@ class InstanceTest {
     @Test
     fun aModuleRunsOnTheDevice() {
         val store = store()
-        val module = module(fixture("loops")).expect("module")
+        val module = runBlocking { module(fixture("loops"), validate = true) }.expect("module")
         val instance = instance(store, module, emptyList()).expect("instance")
 
         val result = invoke(store, instance, "loops", listOf(I32(10))).expect("loops")
@@ -30,7 +31,7 @@ class InstanceTest {
     @Test
     fun theSameModuleInstantiatedTwiceRunsAsTwoInstances() {
         val store = store()
-        val module = module(fixture("loops")).expect("module")
+        val module = runBlocking { module(fixture("loops"), validate = true) }.expect("module")
         val instances = List(2) { instance(store, module, emptyList()).expect("instance") }
 
         val results = instances.mapIndexed { index, instance -> invoke(store, instance, "loops", listOf(I32(index + 3))).expect("loops") }
@@ -42,7 +43,7 @@ class InstanceTest {
     fun referencesSwappedAcrossSelfTailCallsSurviveCollections() {
 
         val store = store(StoreConfig(gcStrategy = GCStrategy.TRADITIONAL, gcThreshold = GCThreshold.KB(64)))
-        val module = module(fixture("restart")).expect("module")
+        val module = runBlocking { module(fixture("restart"), validate = true) }.expect("module")
         val instance = instance(store, module, emptyList()).expect("instance")
 
         val result = invoke(store, instance, "swap", listOf(I32(3))).expect("swap")

@@ -7,6 +7,7 @@ import io.github.charlietap.chasm.embedding.shapes.expect
 import io.github.charlietap.chasm.embedding.shapes.flatMap
 import io.github.charlietap.chasm.jit.instance
 import io.github.charlietap.chasm.jit.module
+import kotlinx.coroutines.runBlocking
 
 typealias HostModuleResolver = (Store) -> Instance
 
@@ -14,7 +15,7 @@ fun HostModuleResolver(store: Store): Instance {
 
     val hostModuleFile = Resource(FILE_HOST_MODULE)
 
-    return module(hostModuleFile.readBytes())
+    return runBlocking { module(hostModuleFile.readBytes(), validate = false) }
         .flatMap { module ->
             instance(store, module, emptyList())
         }.expect("Failed to instantiate script host module")

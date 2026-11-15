@@ -9,14 +9,20 @@ import io.github.charlietap.chasm.ExperimentalChasmApi
 import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.decoder.ModuleDecoder
+import io.github.charlietap.chasm.decoder.ParallelWasmModuleDecoder
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
 import io.github.charlietap.chasm.decoder.error.ModuleDecoderError
 import io.github.charlietap.chasm.embedding.error.ChasmError.DecodeError
+import io.github.charlietap.chasm.embedding.error.ChasmError.ModuleError
+import io.github.charlietap.chasm.embedding.error.ChasmError.ValidationError
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Error
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Success
 import io.github.charlietap.chasm.embedding.shapes.Module
 import io.github.charlietap.chasm.embedding.shapes._module
+import io.github.charlietap.chasm.module.ModuleFactoryError
+import io.github.charlietap.chasm.module.WasmModuleFactory
+import io.github.charlietap.chasm.parallel.coroutines.DefaultCoroutineParallelTaskExecutor
 import io.github.charlietap.chasm.stream.SourceReader
 
 @ExperimentalChasmApi
@@ -32,15 +38,27 @@ fun module(
 }
 
 @ExperimentalChasmApi
-fun module(
+suspend fun module(
     bytes: ByteArray,
     config: ModuleConfig = ModuleConfig(),
-): ChasmResult<Module, DecodeError> {
-    return module(
-        source = bytes,
-        config = config,
-        decoder = ::WasmModuleDecoder,
-    )
+    validate: Boolean,
+): ChasmResult<Module, ModuleError> {
+    if (!validate) {
+        return ParallelWasmModuleDecoder(config, bytes, DefaultCoroutineParallelTaskExecutor)
+            .mapError(ModuleDecoderError::toString)
+            .mapError(::DecodeError)
+            .map { internal -> _module(config, internal, bytes) }
+            .fold(::Success, ::Error)
+    }
+
+    return WasmModuleFactory(config, bytes, DefaultCoroutineParallelTaskExecutor)
+        .mapError { error ->
+            when (error) {
+                is ModuleFactoryError.Malformed -> DecodeError(error.error.toString())
+                is ModuleFactoryError.Invalid -> ValidationError(error.error.toString())
+            }
+        }.map { internal -> _module(config, internal, bytes, validated = true) }
+        .fold(::Success, ::Error)
 }
 
 internal fun <Source> module(

@@ -27,10 +27,10 @@ import io.github.charlietap.chasm.embedding.addFuel as chasmAddFuel
 import io.github.charlietap.chasm.embedding.interrupt as chasmInterrupt
 import io.github.charlietap.chasm.embedding.remainingFuel as chasmRemainingFuel
 
-public fun jitStoreSettingsConstruction(
+public suspend fun jitStoreSettingsConstruction(
   binary: ByteArray,
   imports: List<CodegenImport> = emptyList(),
-  moduleFactory: ((ByteArray) -> Module)? = null,
+  moduleFactory: (suspend (ByteArray) -> Module)? = null,
   instanceFactory: ((
     Store,
     Module,
@@ -39,7 +39,7 @@ public fun jitStoreSettingsConstruction(
 ): JitStoreSettingsConstruction {
   val store = store(StoreConfig(meterFuel = true, interruptible = true, gcStrategy = GCStrategy.TRADITIONAL, limits = StoreLimits(gcHeapBytes = 1_048_576L, memoryPages = 16, tableElements = 1_048_576, trapOnGrowFailure = true, stackBytes = 16_777_216L)))
   chasmAddFuel(store, 1_000L).`expect`("Failed to add fuel")
-  val module = moduleFactory?.invoke(binary) ?: module(binary).`expect`("Failed to decode binary")
+  val module = moduleFactory?.invoke(binary) ?: module(binary, validate = true).`expect`("Failed to decode binary")
   val allocatedImports = allocateImports(store, imports)
   val instance = instanceFactory?.invoke(store, module, allocatedImports) ?: instance(store, module, allocatedImports, RuntimeConfig(debugInfo = true)).`expect`("Failed to instantiate module")
   return JitStoreSettingsConstructionImpl(store = store, instance = instance)

@@ -5,13 +5,13 @@ import io.github.charlietap.chasm.embedding.shapes.fold
 import io.github.charlietap.chasm.embedding.shapes.map
 import io.github.charlietap.chasm.jit.instance
 import io.github.charlietap.chasm.jit.module
-import io.github.charlietap.chasm.jit.validate
 import io.github.charlietap.chasm.script.ScriptContext
 import io.github.charlietap.chasm.script.decoder.BinaryDecoder
 import io.github.charlietap.chasm.script.decoder.BinaryValidator
 import io.github.charlietap.chasm.script.ext.readBytesFromPath
 import io.github.charlietap.sweet.lib.SemanticPhase
 import io.github.charlietap.sweet.lib.command.ModuleCommand
+import kotlinx.coroutines.runBlocking
 
 typealias ModuleCommandRunner = (ScriptContext, ModuleCommand) -> CommandResult
 
@@ -31,10 +31,8 @@ fun ModuleCommandRunner(
 
         SemanticPhase.VALIDATION -> BinaryValidator(bytes, context.config.moduleConfig)
 
-        SemanticPhase.EXECUTION -> module(bytes, context.config.moduleConfig)
+        SemanticPhase.EXECUTION -> runBlocking { module(bytes, context.config.moduleConfig, validate = true) }
             .flatMap { module ->
-                validate(module)
-            }.flatMap { module ->
                 instance(context.store, module, context.imports, context.config.runtimeConfig)
             }.map { instance ->
                 context.instances[null] = instance

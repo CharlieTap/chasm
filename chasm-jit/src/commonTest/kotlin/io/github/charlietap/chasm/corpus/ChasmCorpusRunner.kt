@@ -15,6 +15,7 @@ import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.config.Config
 import io.github.charlietap.chasm.config.GCStrategy
 import io.github.charlietap.chasm.config.RuntimeConfig
+import io.github.charlietap.chasm.embedding.error.ChasmError.ValidationError
 import io.github.charlietap.chasm.embedding.function
 import io.github.charlietap.chasm.embedding.global
 import io.github.charlietap.chasm.embedding.global.readGlobal
@@ -39,7 +40,6 @@ import io.github.charlietap.chasm.host.HostStack
 import io.github.charlietap.chasm.jit.instance
 import io.github.charlietap.chasm.jit.module
 import io.github.charlietap.chasm.jit.onLargeStack
-import io.github.charlietap.chasm.jit.validate
 import io.github.charlietap.chasm.runtime.ext.toExecutionValue
 import io.github.charlietap.chasm.runtime.ext.toLongFromBoxed
 import io.github.charlietap.chasm.runtime.instance.ExternalValue
@@ -122,23 +122,19 @@ class ChasmCorpusRunner(
         val modulePath = "$corpusRoot/${fixture.version ?: "1.0"}/${fixture.path}"
         val bytes = readBytes(modulePath)
         timings.binarySizeBytes = bytes.size.toLong()
-        val decoded = when (
+        val validated = when (
             val result = timings.decode {
-                module(bytes, config.moduleConfig)
+                module(bytes, config.moduleConfig, validate = phase != CorpusPhase.DECODING)
             }
         ) {
             is ChasmResult.Success -> result.result
-            is ChasmResult.Error -> return failure(fixture, "decode", "failed to decode wasm", result.error.toString())
+            is ChasmResult.Error -> return when (val error = result.error) {
+                is ValidationError -> failure(fixture, "validate", "failed to validate wasm", error.toString())
+                else -> failure(fixture, "decode", "failed to decode wasm", error.toString())
+            }
         }
 
-        if (phase == CorpusPhase.DECODING) return CorpusResult.Success
-
-        val validated = when (val result = timings.validate { validate(decoded) }) {
-            is ChasmResult.Success -> result.result
-            is ChasmResult.Error -> return failure(fixture, "validate", "failed to validate wasm", result.error.toString())
-        }
-
-        if (phase == CorpusPhase.VALIDATION) return CorpusResult.Success
+        if (phase == CorpusPhase.DECODING || phase == CorpusPhase.VALIDATION) return CorpusResult.Success
 
         if (fixture.tests.isEmpty()) {
             val setup = timings.instantiate {
@@ -920,13 +916,10 @@ class ChasmCorpusRunner(
         var moduleBuildCount: Int = 0
 
         private var decodeNanos: Long = 0
-        private var validateNanos: Long = 0
         private var instantiateNanos: Long = 0
         private var executeNanos: Long = 0
 
         suspend fun <T> decode(block: suspend () -> T): T = measureSuspending(block) { elapsed -> decodeNanos += elapsed }
-
-        suspend fun <T> validate(block: suspend () -> T): T = measureSuspending(block) { elapsed -> validateNanos += elapsed }
 
         suspend fun <T> instantiate(block: suspend () -> T): T = measureSuspending(block) { elapsed -> instantiateNanos += elapsed }
 
@@ -935,7 +928,7 @@ class ChasmCorpusRunner(
         fun snapshot(totalNanos: Long) = CorpusTimings(
             totalNanos = totalNanos,
             decodeNanos = decodeNanos,
-            validateNanos = validateNanos,
+            validateNanos = 0,
             instantiateNanos = instantiateNanos,
             executeNanos = executeNanos,
         )

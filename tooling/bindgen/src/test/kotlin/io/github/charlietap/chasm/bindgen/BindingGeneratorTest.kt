@@ -91,7 +91,6 @@ class BindingGeneratorTest {
             CodegenConfig(runtime = CodegenRuntime.PORTABLE_VM, interrupts = true),
             CodegenConfig(runtime = CodegenRuntime.PORTABLE_VM, stacktraces = true),
             CodegenConfig(runtime = CodegenRuntime.PORTABLE_VM, gcStrategy = GCStrategy.TRADITIONAL),
-            CodegenConfig(runtime = CodegenRuntime.CHASM, executionTier = ExecutionTier.Jit(), generateSuspendingFactories = true),
             CodegenConfig(
                 runtime = CodegenRuntime.CHASM,
                 executionTier = ExecutionTier.Aot("com.example.aot.WasmModule"),

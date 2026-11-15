@@ -3,17 +3,19 @@ package io.github.charlietap.chasm.script.decoder
 import io.github.charlietap.chasm.config.ComponentConfig
 import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.embedding.error.ChasmError.DecodeError
+import io.github.charlietap.chasm.embedding.error.ChasmError.ModuleError
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.jit.module
+import kotlinx.coroutines.runBlocking
 
-internal typealias BinaryDecoder = (ByteArray, ModuleConfig) -> ChasmResult<Any, DecodeError>
-internal typealias CoreBinaryDecoder = (ByteArray, ModuleConfig) -> ChasmResult<Any, DecodeError>
-internal typealias ComponentBinaryDecoder = (ByteArray, ComponentConfig) -> ChasmResult<Any, DecodeError>
+internal typealias BinaryDecoder = (ByteArray, ModuleConfig) -> ChasmResult<Any, ModuleError>
+internal typealias CoreBinaryDecoder = (ByteArray, ModuleConfig) -> ChasmResult<Any, ModuleError>
+internal typealias ComponentBinaryDecoder = (ByteArray, ComponentConfig) -> ChasmResult<Any, ModuleError>
 
 internal fun BinaryDecoder(
     bytes: ByteArray,
     moduleConfig: ModuleConfig,
-): ChasmResult<Any, DecodeError> {
+): ChasmResult<Any, ModuleError> {
     return BinaryDecoder(
         bytes,
         moduleConfig,
@@ -29,7 +31,7 @@ internal fun BinaryDecoder(
     layerDecoder: WasmLayerDecoder,
     coreBinaryDecoder: CoreBinaryDecoder,
     componentBinaryDecoder: ComponentBinaryDecoder,
-): ChasmResult<Any, DecodeError> {
+): ChasmResult<Any, ModuleError> {
     return when (layerDecoder(bytes)) {
         WasmLayer.Core -> coreBinaryDecoder(bytes, moduleConfig)
         WasmLayer.Component -> componentBinaryDecoder(bytes, ComponentConfig(moduleConfig))
@@ -40,9 +42,9 @@ internal fun BinaryDecoder(
 private fun CoreBinaryDecoder(
     bytes: ByteArray,
     config: ModuleConfig,
-): ChasmResult<Any, DecodeError> = module(bytes, config)
+): ChasmResult<Any, ModuleError> = runBlocking { module(bytes, config, validate = false) }
 
 private fun ComponentBinaryDecoder(
     bytes: ByteArray,
     config: ComponentConfig,
-): ChasmResult<Any, DecodeError> = ChasmResult.Error(DecodeError("components are not supported by the JIT"))
+): ChasmResult<Any, ModuleError> = ChasmResult.Error(DecodeError("components are not supported by the JIT"))

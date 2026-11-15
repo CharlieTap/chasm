@@ -56,9 +56,9 @@ private class KotlinPoetBindingGenerator(
             "cpu, memory, interrupts, stacktraces and gcStrategy require CodegenRuntime.CHASM because they " +
                 "configure Chasm's store."
         }
-        require(tier is ExecutionTier.Interpreter || !config.generateSuspendingFactories) {
-            "generateSuspendingFactories requires ExecutionTier.Interpreter because the JIT and compiled code " +
-                "have no suspending entry points."
+        require(tier !is ExecutionTier.Aot || !config.generateSuspendingFactories) {
+            "generateSuspendingFactories is not supported by ExecutionTier.Aot because compiled code has no " +
+                "suspending entry points."
         }
         if (tier is ExecutionTier.Aot) {
             require(QUALIFIED_CLASS_NAME.matches(tier.compiledModule)) {

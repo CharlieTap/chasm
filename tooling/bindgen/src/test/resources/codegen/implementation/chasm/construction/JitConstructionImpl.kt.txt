@@ -17,10 +17,10 @@ import kotlin.ByteArray
 import kotlin.OptIn
 import kotlin.collections.List
 
-public fun jitConstruction(
+public suspend fun jitConstruction(
   binary: ByteArray,
   imports: List<CodegenImport> = emptyList(),
-  moduleFactory: ((ByteArray) -> Module)? = null,
+  moduleFactory: (suspend (ByteArray) -> Module)? = null,
   instanceFactory: ((
     Store,
     Module,
@@ -28,7 +28,7 @@ public fun jitConstruction(
   ) -> Instance)? = null,
 ): JitConstruction {
   val store = store()
-  val module = moduleFactory?.invoke(binary) ?: module(binary).`expect`("Failed to decode binary")
+  val module = moduleFactory?.invoke(binary) ?: module(binary, validate = true).`expect`("Failed to decode binary")
   val allocatedImports = allocateImports(store, imports)
   val instance = instanceFactory?.invoke(store, module, allocatedImports) ?: instance(store, module, allocatedImports).`expect`("Failed to instantiate module")
   return JitConstructionImpl(store = store, instance = instance)
