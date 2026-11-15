@@ -2,13 +2,13 @@ package io.github.charlietap.chasm.coroutines
 
 import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.config.RuntimeConfig
-import io.github.charlietap.chasm.coroutines.internal.DefaultCoroutineParallelTaskExecutor
 import io.github.charlietap.chasm.embedding.error.ChasmError
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.Instance
 import io.github.charlietap.chasm.embedding.shapes.Module
 import io.github.charlietap.chasm.embedding.shapes.Store
+import io.github.charlietap.chasm.parallel.coroutines.DefaultCoroutineParallelTaskExecutor
 import io.github.charlietap.chasm.embedding.internal._instance as internalInstance
 
 /**

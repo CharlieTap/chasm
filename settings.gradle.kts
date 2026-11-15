@@ -76,6 +76,7 @@ include(":libs:sse2")
 include(":libs:stack")
 include(":libs:benchmark")
 include(":libs:parallel")
+include(":libs:parallel-coroutines")
 include(":libs:mmap")
 
 include(":memory")

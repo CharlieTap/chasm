@@ -20,7 +20,7 @@ kotlin {
             dependencies {
                 api(projects.chasm)
                 api(libs.kotlinx.coroutines.core)
-                implementation(projects.libs.parallel)
+                implementation(projects.libs.parallelCoroutines)
             }
         }
 

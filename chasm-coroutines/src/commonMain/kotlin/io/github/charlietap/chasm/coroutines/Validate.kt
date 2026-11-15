@@ -1,10 +1,10 @@
 package io.github.charlietap.chasm.coroutines
 
 import io.github.charlietap.chasm.InternalChasmApi
-import io.github.charlietap.chasm.coroutines.internal.DefaultCoroutineParallelTaskExecutor
 import io.github.charlietap.chasm.embedding.error.ChasmError.ValidationError
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Module
+import io.github.charlietap.chasm.parallel.coroutines.DefaultCoroutineParallelTaskExecutor
 import io.github.charlietap.chasm.embedding.internal._validate as internalValidate
 
 /**
