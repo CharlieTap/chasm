@@ -2,7 +2,7 @@ package io.github.charlietap.chasm.compiler.backend.analysis
 
 fun loopCrossings(jumps: JumpTable): IntArray {
 
-    val size = jumps.start.size - 1
+    val size = jumps.size
     val changes = IntArray(size + 2)
 
     for (source in 0 until size) {

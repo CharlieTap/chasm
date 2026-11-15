@@ -59,7 +59,7 @@ internal fun lowerAggregateInstruction(
         is AggregateInstruction.StructNewS -> context.structNew(i.type, i.firstFieldSlot, i.destinationSlot)
         is AggregateInstruction.StructNewDefaultS -> {
             context.loadValueInt(Registers.I3, Resource.RuntimeType(i.type.index))
-            context.loadObject(Registers.W1, context.declarations.structDefaults(i.type), "[J")
+            context.loadLongs(Registers.W1, context.declarations.structDefaultValues(i.type))
             context.emit.invoke(STRUCT_NEW_DEFAULT, Registers.CONTEXT, Registers.I3, Registers.W1)
             context.emit.moveResultWide(Registers.W0)
             context.store(i.destinationSlot, Registers.W0)

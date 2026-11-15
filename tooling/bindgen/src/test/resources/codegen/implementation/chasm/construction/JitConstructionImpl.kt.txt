@@ -21,7 +21,7 @@ public suspend fun jitConstruction(
   binary: ByteArray,
   imports: List<CodegenImport> = emptyList(),
   moduleFactory: (suspend (ByteArray) -> Module)? = null,
-  instanceFactory: ((
+  instanceFactory: (suspend (
     Store,
     Module,
     List<Import>,

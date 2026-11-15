@@ -114,7 +114,7 @@ internal fun LowerContext.resetFrame(
     frame: Int,
 ) {
     if (parameterCount >= frameSlots) return
-    loadObject(Registers.W1, Resource.Longs(facts.initialValues.copyOfRange(parameterCount, frameSlots)), "[J")
+    loadLongs(Registers.W1, facts.initialValues.copyOfRange(parameterCount, frameSlots))
     emit.const(Registers.I0, 0)
     emit.moveObject(Registers.W1 + 1, frame)
     frameIndex(Registers.I2, parameterCount)

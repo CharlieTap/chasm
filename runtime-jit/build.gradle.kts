@@ -40,10 +40,13 @@ kotlin {
                 implementation(projects.compiler.frontend)
                 implementation(projects.decoder)
                 implementation(projects.executor.instantiator)
+                implementation(projects.libs.parallel)
+                implementation(projects.libs.parallelCoroutines)
                 implementation(projects.module)
                 implementation(projects.moduleDeclarations)
                 implementation(projects.runtime.compiled)
                 implementation(projects.runtime.core)
+                implementation(libs.kotlinx.coroutines.core)
                 implementation(libs.result)
             }
         }

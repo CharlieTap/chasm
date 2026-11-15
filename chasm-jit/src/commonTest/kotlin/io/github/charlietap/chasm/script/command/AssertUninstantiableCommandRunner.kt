@@ -21,7 +21,7 @@ fun AssertUninstantiableCommandRunner(
 
     return runBlocking { module(bytes, context.config.moduleConfig, validate = true) }
         .flatMap { module ->
-            instance(context.store, module, context.imports, context.config.runtimeConfig)
+            runBlocking { instance(context.store, module, context.imports, context.config.runtimeConfig) }
         }.fold({
             CommandResult.Failure(command, "instantiation succeeded when it shouldn't")
         }) {

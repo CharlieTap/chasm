@@ -2,7 +2,54 @@ package io.github.charlietap.chasm.compiler.backend.analysis
 
 import io.github.charlietap.chasm.cir.CirFunction
 
-fun CirFunction.redundantBoundsChecks(table: InstructionTable): BooleanArray {
+class BoundsCheckStorage {
+    internal var writeOffsets = IntArray(0)
+    internal var writtenSlots = IntArray(0)
+    internal val forwardJumps = LongList()
+    internal val proofCopies = LongList()
+    internal var accessPositions = IntArray(0)
+    internal var accessSlots = IntArray(0)
+    internal var accessEndOffsets = LongArray(0)
+    internal var trackedIndex = IntArray(0)
+    internal var loopEnds = IntArray(0)
+    internal var states = arrayOfNulls<ProvenBounds>(0)
+
+    internal fun ints(
+        current: IntArray,
+        size: Int,
+    ): IntArray {
+        return if (fitsCapacity(current.size, size)) current else IntArray(size)
+    }
+
+    internal fun longs(
+        current: LongArray,
+        size: Int,
+    ): LongArray {
+        return if (fitsCapacity(current.size, size)) current else LongArray(size)
+    }
+
+    internal fun states(size: Int): Array<ProvenBounds?> {
+        if (!fitsCapacity(states.size, size)) states = arrayOfNulls(size) else states.fill(null, 0, size)
+        return states
+    }
+
+    private fun fitsCapacity(
+        capacity: Int,
+        size: Int,
+    ): Boolean {
+        return capacity >= size && capacity <= maxOf(size * RETAINED_GROWTH, RETAINED_CAPACITY)
+    }
+
+    private companion object {
+        const val RETAINED_GROWTH = 4
+        const val RETAINED_CAPACITY = 16_384
+    }
+}
+
+fun CirFunction.redundantBoundsChecks(
+    table: InstructionTable,
+    storage: BoundsCheckStorage = BoundsCheckStorage(),
+): BooleanArray {
 
     val size = instructions.size
     val redundant = BooleanArray(size)
@@ -17,11 +64,11 @@ fun CirFunction.redundantBoundsChecks(table: InstructionTable): BooleanArray {
         return redundant
     }
 
-    val checkIndex = BoundsCheckIndex(this, table, checked)
+    val checkIndex = BoundsCheckIndex(this, table, checked, storage)
     val loopEnds = checkIndex.loopEnds
     val loops = if (loopEnds != null) LoopWrites(checkIndex, loopEnds) else null
     val handlers = checkIndex.handlers
-    val pending = ForwardBranchProofs(checkIndex.trackedCount, size)
+    val pending = ForwardBranchProofs(checkIndex.trackedCount, storage.states(size + 1))
     var current = ProvenBounds(checkIndex.trackedCount)
     var reachable = true
     val jumps = checkIndex.forwardJumps
@@ -73,7 +120,7 @@ fun CirFunction.redundantBoundsChecks(table: InstructionTable): BooleanArray {
     return redundant
 }
 
-private class ProvenBounds(
+internal class ProvenBounds(
     trackedCount: Int,
 ) {
     val provenEnd = LongArray(trackedCount)
@@ -153,10 +200,9 @@ private class ProvenBounds(
 
 private class ForwardBranchProofs(
     private val trackedCount: Int,
-    size: Int,
+    private val states: Array<ProvenBounds?>,
 ) {
     private val empty = ProvenBounds(0)
-    private val states = arrayOfNulls<ProvenBounds>(size + 1)
     private var targets = IntArray(8)
     private var count = 0
     private val spare = ArrayList<ProvenBounds>()
@@ -303,22 +349,24 @@ private class BoundsCheckIndex(
     function: CirFunction,
     table: InstructionTable,
     checked: Int,
+    private val storage: BoundsCheckStorage,
 ) {
     val size = function.instructions.size
-    val writeOffsets = IntArray(size + 1)
+    val writeOffsets = storage.ints(storage.writeOffsets, size + 1).also { reused -> storage.writeOffsets = reused }
     val writtenSlots: IntArray
     val writeCount: Int
-    val forwardJumps = LongList()
+    val forwardJumps = storage.forwardJumps.also(LongList::clear)
     var loopEnds: IntArray? = null
         private set
     val handlers = handlerEntries(function)
-    val accessPositions = IntArray(checked)
-    val accessSlots = IntArray(checked)
-    val accessEndOffsets = LongArray(checked)
+    val accessPositions = storage.ints(storage.accessPositions, checked).also { reused -> storage.accessPositions = reused }
+    val accessSlots = storage.ints(storage.accessSlots, checked).also { reused -> storage.accessSlots = reused }
+    val accessEndOffsets = storage.longs(storage.accessEndOffsets, checked).also { reused -> storage.accessEndOffsets = reused }
     val accesses = checked
     val trackedCount: Int
-    private val proofCopies = LongList()
+    private val proofCopies = storage.proofCopies.also(LongList::clear)
     private val trackedIndex: IntArray
+    private val trackedSize: Int
     private var proofCopy = 0
 
     init {
@@ -330,7 +378,9 @@ private class BoundsCheckIndex(
         var highest = -1
         for (index in 0 until writes.count) highest = maxOf(highest, writes.slots[index])
         for (index in 0 until accesses) highest = maxOf(highest, accessSlots[index])
-        trackedIndex = IntArray(highest + 1) { -1 }
+        trackedSize = highest + 1
+        trackedIndex = storage.ints(storage.trackedIndex, trackedSize).also { reused -> storage.trackedIndex = reused }
+        trackedIndex.fill(-1, 0, trackedSize)
         var nextTracked = 0
         for (index in 0 until accesses) {
             val slot = accessSlots[index]
@@ -353,7 +403,7 @@ private class BoundsCheckIndex(
                 kept++
             }
         }
-        writtenSlots = IntArray(kept)
+        writtenSlots = storage.ints(storage.writtenSlots, kept).also { reused -> storage.writtenSlots = reused }
         kept = 0
         for (position in 0 until size) {
             writeOffsets[position] = kept
@@ -376,7 +426,7 @@ private class BoundsCheckIndex(
         var source = -1
         if (proofCopy < proofCopies.size && high(proofCopies[proofCopy]) == position) {
             val slot = low(proofCopies[proofCopy++])
-            if (slot < trackedIndex.size) {
+            if (slot < trackedSize) {
                 source = trackedIndex[slot]
             }
         }
@@ -413,7 +463,11 @@ private class BoundsCheckIndex(
             for (edge in jumps.start[position] until jumps.end(position)) {
                 val target = jumps.targets[edge]
                 if (target <= position) {
-                    val ends = loopEnds ?: IntArray(size) { NO_LOOP }.also { ends -> loopEnds = ends }
+                    val ends = loopEnds ?: storage.ints(storage.loopEnds, size).also { reused ->
+                        reused.fill(NO_LOOP, 0, size)
+                        storage.loopEnds = reused
+                        loopEnds = reused
+                    }
                     ends[target] = position
                 } else {
                     forwardJumps.add(pack(position, target))
@@ -465,8 +519,8 @@ private class LoopWrites(
     init {
 
         var loops = 0
-        for (end in loopEnds) {
-            if (end != NO_LOOP) {
+        for (header in 0 until checkIndex.size) {
+            if (loopEnds[header] != NO_LOOP) {
                 loops++
             }
         }
@@ -475,7 +529,7 @@ private class LoopWrites(
         ends = IntArray(loops)
         count = loops
         loops = 0
-        for (header in loopEnds.indices) {
+        for (header in 0 until checkIndex.size) {
             if (loopEnds[header] != NO_LOOP) {
                 headers[loops] = header
                 ends[loops++] = loopEnds[header]

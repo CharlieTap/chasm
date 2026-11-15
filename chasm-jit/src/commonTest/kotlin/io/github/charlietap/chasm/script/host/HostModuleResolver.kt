@@ -17,7 +17,7 @@ fun HostModuleResolver(store: Store): Instance {
 
     return runBlocking { module(hostModuleFile.readBytes(), validate = false) }
         .flatMap { module ->
-            instance(store, module, emptyList())
+            runBlocking { instance(store, module, emptyList()) }
         }.expect("Failed to instantiate script host module")
 }
 

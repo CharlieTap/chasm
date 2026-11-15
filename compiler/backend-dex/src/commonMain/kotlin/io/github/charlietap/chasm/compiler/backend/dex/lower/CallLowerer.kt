@@ -50,8 +50,8 @@ private fun LowerContext.directCall(
 ) {
 
     val words = loadWindow(call.type, call.arguments())
-    val method = module.functionMethod(callee, call.type)
-    emit.invokeRange(method, registers.window, 3 + words)
+    val method = module.functionMethod(callee)
+    emit.invokeRange(module.functionInvocation(callee), registers.window, 3 + words)
 
     val analysis = module.analysis
     finishCall(

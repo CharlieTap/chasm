@@ -154,7 +154,7 @@
 
     move-object/from16 v16, p0
 
-    const/4 v9, 0x1
+    const/4 v9, 0x3
 
     aget-object v12, v16, v9
 
@@ -407,7 +407,7 @@
 
     move-object/from16 v16, p0
 
-    const/4 v9, 0x1
+    const/4 v9, 0x3
 
     aget-object v12, v16, v9
 
@@ -1152,7 +1152,7 @@
 
     .line 10
     :cond_28a
-    const/4 v9, 0x1
+    const/4 v9, 0x3
 
     aget-object v12, v16, v9
 
@@ -1182,7 +1182,7 @@
 
     .line 15
     :cond_2a4
-    const/4 v9, 0x1
+    const/4 v9, 0x3
 
     aget-object v12, v16, v9
 
@@ -1212,7 +1212,7 @@
 
     .line 29
     :cond_2be
-    const/4 v9, 0x1
+    const/4 v9, 0x3
 
     aget-object v12, v16, v9
 
@@ -1242,7 +1242,7 @@
 
     .line 34
     :cond_2d8
-    const/4 v9, 0x1
+    const/4 v9, 0x3
 
     aget-object v12, v16, v9
 
@@ -1272,7 +1272,7 @@
 
     .line 43
     :cond_2f2
-    const/4 v9, 0x1
+    const/4 v9, 0x3
 
     aget-object v12, v16, v9
 
@@ -1302,7 +1302,7 @@
 
     .line 54
     :cond_30c
-    const/4 v9, 0x1
+    const/4 v9, 0x3
 
     aget-object v12, v16, v9
 
@@ -1340,7 +1340,7 @@
 
     move-object/from16 v16, p0
 
-    const/4 v9, 0x1
+    const/4 v9, 0x3
 
     aget-object v12, v16, v9
 
@@ -1449,7 +1449,7 @@
 
     .line 4
     :cond_5c
-    const/4 v9, 0x1
+    const/4 v9, 0x3
 
     aget-object v12, v16, v9
 
@@ -1870,7 +1870,7 @@
 
     move-result-object v4
 
-    const/4 v2, 0x1
+    const/4 v2, 0x3
 
     aput-object v4, p1, v2
 
@@ -1884,7 +1884,7 @@
 
     check-cast p1, Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;
 
-    const/4 v0, 0x2
+    const/4 v0, 0x4
 
     new-array v1, v0, [Ljava/lang/Object;
 

@@ -20,7 +20,7 @@ fun AssertUnlinkableCommandRunner(
 
     return runBlocking { module(bytes, context.config.moduleConfig, validate = true) }
         .flatMap { module ->
-            instance(context.store, module, context.imports, context.config.runtimeConfig)
+            runBlocking { instance(context.store, module, context.imports, context.config.runtimeConfig) }
         }.fold({ _ ->
             CommandResult.Failure(command, "unlinkable module was instantiated when it should have failed")
         }) {

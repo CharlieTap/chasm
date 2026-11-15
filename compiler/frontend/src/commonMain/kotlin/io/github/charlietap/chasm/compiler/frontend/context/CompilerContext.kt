@@ -43,6 +43,14 @@ internal fun createCompilerContext(
     types: ModuleTypeResolver,
     devirtualiseIndirectCalls: Boolean,
 ): CompilerContext {
+    return createCompilerContext(module, types, if (devirtualiseIndirectCalls) indirectCallTargets(module, types) else null)
+}
+
+internal fun createCompilerContext(
+    module: Module,
+    types: ModuleTypeResolver,
+    indirectCallTargets: IndirectCallTargets?,
+): CompilerContext {
     val importedGlobals = module.imports.mapNotNull { (it.descriptor as? Import.Descriptor.Global)?.type }
     val importedTables = module.imports.mapNotNull { (it.descriptor as? Import.Descriptor.Table)?.type }
     val importedTags = module.imports.mapNotNull { (it.descriptor as? Import.Descriptor.Tag)?.type }
@@ -57,6 +65,6 @@ internal fun createCompilerContext(
             imports = module.imports,
             definedFunctionTypeIndices = IntArray(module.functions.size) { index -> module.functions[index].typeIndex.toInt() },
         ),
-        indirectCallTargets = if (devirtualiseIndirectCalls) indirectCallTargets(module, types) else null,
+        indirectCallTargets = indirectCallTargets,
     )
 }

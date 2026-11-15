@@ -4,6 +4,7 @@ import io.github.charlietap.chasm.embedding.shapes.fold
 import io.github.charlietap.chasm.jit.instance
 import io.github.charlietap.chasm.script.ScriptContext
 import io.github.charlietap.sweet.lib.command.ModuleInstanceCommand
+import kotlinx.coroutines.runBlocking
 
 typealias ModuleInstanceCommandRunner = (ScriptContext, ModuleInstanceCommand) -> CommandResult
 
@@ -13,7 +14,7 @@ fun ModuleInstanceCommandRunner(
 ): CommandResult {
 
     val module = context.modules[command.module] ?: return CommandResult.Failure(command, "Failed to lookup module in context")
-    val result = instance(context.store, module, context.imports, context.config.runtimeConfig)
+    val result = runBlocking { instance(context.store, module, context.imports, context.config.runtimeConfig) }
 
     return result.fold(
         { instance ->

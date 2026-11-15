@@ -311,7 +311,7 @@ class FunctionRoutesTest {
 
         val file = Dexter().beginFile()
         val builder = lowering.codeClassBuilder(file, lowering.codeClass(function.index))
-        block(builder, lowering.functionMethod(function.index, lowering.declarations.functionType(function.type)).method)
+        block(builder, lowering.functionMethod(function.index).method)
 
         return file.finish()
     }

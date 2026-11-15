@@ -43,7 +43,7 @@ class JitEngine : Engine {
     ): ChasmResult<Instance, ChasmError> =
         runBlocking { module(bytes, validate = true) }
             .flatMap { module ->
-                instance(store, module, imports, config)
+                runBlocking { instance(store, module, imports, config) }
             }
 
     override fun invoke(

@@ -14,9 +14,11 @@ import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.jit.internal._instance
 
 @ExperimentalChasmApi
-fun instance(
+suspend fun instance(
     store: Store,
     module: Module,
     imports: List<Import>,
     config: RuntimeConfig = RuntimeConfig(),
-): ChasmResult<Instance, ChasmError.ExecutionError> = _instance(store, module, imports, config)
+): ChasmResult<Instance, ChasmError.ExecutionError> {
+    return _instance(store, module, imports, config)
+}

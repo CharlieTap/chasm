@@ -15,11 +15,20 @@ internal class LongList {
         values[size++] = value
     }
 
+    fun clear() {
+        if (values.size > RETAINED_CAPACITY) values = LongArray(16)
+        size = 0
+    }
+
     operator fun get(index: Int): Long {
         return values[index]
     }
 
     fun toSortedArray(): LongArray {
         return values.copyOf(size).also { sorted -> sorted.sort() }
+    }
+
+    private companion object {
+        const val RETAINED_CAPACITY = 16_384
     }
 }

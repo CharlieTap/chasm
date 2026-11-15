@@ -36,7 +36,7 @@ internal fun LowerContext.lowerDispatcher(
     emit.moveResultObject(Registers.OBJECT)
     storeParameters()
     resetFrame(Registers.OBJECT)
-    loadObject(Registers.OBJECT, Resource.Longs(table), "[J")
+    loadLongs(Registers.OBJECT, table)
     val loop = emit.freshLabel()
     val negative = emit.freshLabel()
     val missing = emit.freshLabel()

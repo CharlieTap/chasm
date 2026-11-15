@@ -24,43 +24,81 @@ class ModuleAnalysis(
     val mayUnwind: BooleanArray,
     val requestsTailCall: BooleanArray,
     val publishesRegisters: Boolean,
+    val bridgedFunctions: FunctionCensus,
+    val referencedFunctions: FunctionCensus,
 )
+
+class FunctionCensus(
+    included: BooleanArray,
+) {
+
+    private val ordinals = IntArray(included.size) { NOT_INCLUDED }
+
+    val count: Int
+
+    init {
+        var next = 0
+        for (function in included.indices) {
+            if (included[function]) ordinals[function] = next++
+        }
+        count = next
+    }
+
+    fun ordinal(function: Int): Int {
+        return ordinals[function]
+    }
+
+    companion object {
+        const val NOT_INCLUDED = -1
+    }
+}
 
 fun analyzeModule(
     module: Module,
     code: CirModule,
     declarations: ModuleIndexSpaces,
 ): ModuleAnalysis {
+    return analyzeModule(module, code, declarations, code.functions.map { function -> functionSummary(function, declarations) })
+}
+
+fun analyzeModule(
+    module: Module,
+    code: CirModule,
+    declarations: ModuleIndexSpaces,
+    summaries: List<FunctionSummary>,
+): ModuleAnalysis {
+
     val signatureTypes = LinkedHashMap<String, FunctionType>()
     val seenTypes = BooleanArray(declarations.typeCount)
-    for (function in code.functions) {
-        for (instruction in function.instructions) {
-            val index = instruction.indirectCallTypeIndex() ?: continue
-            if (seenTypes[index.index]) {
+    val bridged = BooleanArray(declarations.functionCount)
+    val referenced = BooleanArray(declarations.functionCount)
+    for (summary in summaries) {
+        for (function in summary.bridgedFunctions) bridged[function] = true
+        for (function in summary.referencedFunctions) referenced[function] = true
+        for (typeIndex in summary.indirectCallTypes) {
+            if (seenTypes[typeIndex]) {
                 continue
             }
-            seenTypes[index.index] = true
-            val type = declarations.functionType(index).takeIf { it.params.types.size <= MAX_PARAMETERS } ?: continue
+            seenTypes[typeIndex] = true
+            val type = declarations.functionType(TypeIndex(typeIndex)).takeIf { it.params.types.size <= MAX_PARAMETERS } ?: continue
             signatureTypes.putIfAbsent(signatureKey(type), type)
         }
     }
-    val effects = CallEffects(code, declarations)
+
+    val effects = CallEffects(code, declarations, summaries)
     return ModuleAnalysis(
         signatureTypes = signatureTypes,
         hasTailCalls = effects.requestsTailCall.any { requests -> requests },
-        usesExceptions = code.functions.any { function ->
-            function.exceptions != null || function.instructions.any(Instruction::raisesException)
-        },
+        usesExceptions = summaries.any(FunctionSummary::usesExceptions),
         mayGrowMemory = effects.mayGrowMemory,
         mayCollect = effects.mayCollect,
         mayUnwind = effects.mayUnwind,
         requestsTailCall = effects.requestsTailCall,
-        publishesRegisters = module.mayHoldCollectableReferences() || code.functions.any(CirFunction::catchesExceptionReference),
+        publishesRegisters = module.mayHoldCollectableReferences() || summaries.any(FunctionSummary::catchesExceptionReference),
+        bridgedFunctions = FunctionCensus(bridged),
+        referencedFunctions = FunctionCensus(referenced),
     )
 }
-
-private fun CirFunction.catchesExceptionReference(): Boolean =
-    exceptions?.regions.orEmpty().any { region -> region.catches.any { handler -> handler.exceptionReference } }
 
 fun Instruction.indirectCallTypeIndex(): TypeIndex? {
     return when (this) {

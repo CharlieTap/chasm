@@ -276,4 +276,4 @@ private val CHASM_JIT_INSTANCE_FACTORY_TYPE = LambdaTypeName.get(
     CHASM_MODULE_CLASS_NAME,
     List::class.asClassName().parameterizedBy(CHASM_IMPORT_CLASS_NAME),
     returnType = CHASM_INSTANCE_CLASS_NAME,
-)
+).copy(suspending = true)

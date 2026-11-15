@@ -1,11 +1,14 @@
 package io.github.charlietap.chasm.compiler.backend.dex
 
 import io.github.charlietap.chasm.ast.module.Module
+import io.github.charlietap.chasm.cir.CirFunction
 import io.github.charlietap.chasm.cir.CirModule
 import io.github.charlietap.chasm.compiler.backend.abi.binaryName
 import io.github.charlietap.chasm.compiler.backend.dex.abi.FunctionSignature
 import io.github.charlietap.chasm.compiler.backend.dex.abi.codeClass
 import io.github.charlietap.chasm.compiler.backend.dex.abi.installClass
+import io.github.charlietap.chasm.compiler.backend.dex.binding.BoundResources
+import io.github.charlietap.chasm.compiler.backend.dex.binding.boundResources
 import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.dexter.DexFile
 import io.github.charlietap.dexter.Dexter
@@ -27,65 +30,130 @@ fun ModuleLowerer(
         installLowerer = ::InstallLowerer,
     )
 
-internal inline fun ModuleLowerer(
+internal fun ModuleLowerer(
     module: Module,
     code: CirModule,
     options: DexOptions,
-    crossinline functionLowerer: FunctionLowerer,
-    crossinline entryLowerer: EntryLowerer,
-    crossinline installLowerer: InstallLowerer,
-): DexModule = try {
-    lowerModule(module, code, options, functionLowerer, entryLowerer, installLowerer)
-} catch (tooLarge: DexterException) {
-    throw DexTooLarge(tooLarge.message ?: tooLarge.toString(), tooLarge)
+    functionLowerer: FunctionLowerer,
+    entryLowerer: EntryLowerer,
+    installLowerer: InstallLowerer,
+): DexModule {
+    return try {
+        lowerModule(module, code, options, functionLowerer, entryLowerer, installLowerer)
+    } catch (tooLarge: DexterException) {
+        throw DexTooLarge(tooLarge.message ?: tooLarge.toString(), tooLarge)
+    }
 }
 
-private inline fun lowerModule(
+private fun lowerModule(
     module: Module,
     code: CirModule,
     options: DexOptions,
-    crossinline functionLowerer: FunctionLowerer,
-    crossinline entryLowerer: EntryLowerer,
-    crossinline installLowerer: InstallLowerer,
+    functionLowerer: FunctionLowerer,
+    entryLowerer: EntryLowerer,
+    installLowerer: InstallLowerer,
 ): DexModule {
+
     val lowering = ModuleLowering(module, code, options)
+    val lowered = LoweredFunctions(lowering.plan.functionCount)
     val dexter = Dexter()
-    val reasons = LinkedHashMap<Int, String>()
-    val compiled = LinkedHashMap<EntryKey, EntryCandidates>()
-    val dex = lowering.batches.mapIndexed { batch, functions ->
-        dexFile(dexter) { file ->
-            if (batch == 0) lowering.addSignatureInterfaces(file)
-            val classBuilder = lowering.codeClassBuilder(file, codeClass(lowering.packagePath, batch))
-            for (function in functions) {
-                val index = function.index.index
-                val type = lowering.declarations.functionType(function.type)
-                val method = lowering.references.of(lowering.functionMethod(function.index, type))
-                val reason = functionLowerer(lowering, function, classBuilder, method)
-                if (reason == null) {
-                    val key = EntryKey(lowering.functionSignature(function.type), type)
-                    compiled.getOrPut(key) { EntryCandidates(type) }.functions += LoweredFunction(index, method)
-                } else {
-                    reasons[index] = reason
-                }
-            }
-        }
+    val dex = lowering.batches.indices.map { batch ->
+        dexFile(dexter) { file -> lowerBatch(lowering, batch, file, lowered, functionLowerer) }
     }
+
+    val bound = boundResources(listOf(lowering.usedObjects), listOf(lowering.usedValues))
+
+    return finishModule(lowering.plan, dexter, dex, lowered, lowering.chunkStarts, bound, entryLowerer, installLowerer)
+}
+
+internal fun lowerBatch(
+    lowering: ModuleLowering,
+    batch: Int,
+    file: DexFile,
+    lowered: LoweredFunctions,
+    functionLowerer: FunctionLowerer,
+) {
+
+    if (batch == 0) lowering.addSignatureInterfaces(file)
+    val owner = codeClass(lowering.packagePath, batch)
+    val classBuilder = lowering.codeClassBuilder(file, owner)
+    lowering.constants.begin(owner)
+
+    for (function in lowering.batches[batch]) {
+        val method = lowering.functionInvocation(function.index).method
+        val reason = functionLowerer(lowering, function, classBuilder, method)
+        lowered.record(function.index.index, reason)
+    }
+
+    lowering.constants.declare(classBuilder)
+}
+
+internal fun finishModule(
+    plan: ModulePlan,
+    dexter: Dexter,
+    dex: List<ByteArray>,
+    lowered: LoweredFunctions,
+    chunkStarts: Array<IntArray?>,
+    bound: BoundResources,
+    entryLowerer: EntryLowerer,
+    installLowerer: InstallLowerer,
+): DexModule {
+
+    val reasons = lowered.reasons(plan.functions)
     if (reasons.isNotEmpty()) throw UnsupportedFunctions(reasons)
-    val groups = entryGroups(compiled, lowering)
-    val entries = HashMap<Int, EntryRef>()
-    val entryDex = groups.chunkedBy(ENTRY_FUNCTIONS_PER_FILE).map { files ->
+
+    val compiled = LinkedHashMap<EntryKey, EntryCandidates>()
+    for (function in plan.functions) {
+        val type = plan.declarations.functionType(function.type)
+        val key = EntryKey(plan.functionSignature(function.type), type)
+        val method = plan.functionInvocation(function.index).method
+        compiled.getOrPut(key) { EntryCandidates(type) }.functions += LoweredFunction(function.index.index, method)
+    }
+
+    val entries = arrayOfNulls<EntryRef>(plan.functionCount)
+    val entryDex = entryGroups(compiled, plan).chunkedBy(ENTRY_FUNCTIONS_PER_FILE).map { files ->
         dexFile(dexter) { file ->
             for (group in files) {
-                val descriptor = entryLowerer(file, group, lowering.packagePath)
+                val descriptor = entryLowerer(file, group, plan.packagePath)
                 group.members.forEachIndexed { id, member -> entries[member.index] = EntryRef(descriptor, id) }
             }
         }
     }
+
     val ordered = LinkedHashMap<Int, EntryRef>()
-    entries.keys.sorted().forEach { function -> ordered[function] = entries.getValue(function) }
-    val installer = installClass(lowering.packagePath)
-    val install = installLowerer(dexter, installer, lowering.layout, ordered)
-    return DexModule(dex + entryDex + install, binaryName(installer), lowering.inlineMemory != null, lowering.chunkStarts)
+    entries.forEachIndexed { function, entry -> if (entry != null) ordered[function] = entry }
+    val installer = installClass(plan.packagePath)
+    val install = installLowerer(dexter, installer, bound, ordered)
+
+    val splitStarts = HashMap<Int, IntArray>()
+    chunkStarts.forEachIndexed { function, starts -> if (starts != null) splitStarts[function] = starts }
+
+    return DexModule(dex + entryDex + install, binaryName(installer), plan.inlineMemory != null, splitStarts)
+}
+
+internal class LoweredFunctions(
+    functionCount: Int,
+) {
+
+    private val reasons = arrayOfNulls<String>(functionCount)
+
+    fun record(
+        function: Int,
+        reason: String?,
+    ) {
+        reasons[function] = reason
+    }
+
+    fun reasons(functions: List<CirFunction>): Map<Int, String> {
+
+        val unsupported = LinkedHashMap<Int, String>()
+        for (function in functions) {
+            val index = function.index.index
+            reasons[index]?.let { reason -> unsupported[index] = reason }
+        }
+
+        return unsupported
+    }
 }
 
 internal class EntryRef(
@@ -111,12 +179,12 @@ internal data class EntryKey(
 
 private fun entryGroups(
     compiled: Map<EntryKey, EntryCandidates>,
-    lowering: ModuleLowering,
+    plan: ModulePlan,
 ): List<EntryGroup> {
     val groups = ArrayList<EntryGroup>()
     for ((key, candidates) in compiled) {
         val type = candidates.type
-        val signature = lowering.signatureClass(key.signature)
+        val signature = plan.signatureClass(key.signature)
         for (members in candidates.functions.chunked(ENTRY_GROUP_SIZE)) {
             groups += EntryGroup(number = groups.size, type = type, signature = signature, members = members)
         }

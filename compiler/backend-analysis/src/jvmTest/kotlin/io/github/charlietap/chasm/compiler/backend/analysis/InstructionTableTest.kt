@@ -25,10 +25,11 @@ class InstructionTableTest {
 
         val accesses = table("accesses").accesses
 
-        assertContentEquals(intArrayOf(1, 2, 3), accesses.positions)
-        assertContentEquals(intArrayOf(0, 1, 0), accesses.memories)
-        assertContentEquals(intArrayOf(0, MemoryAccessTable.CONSTANT_ADDRESS, 0), accesses.addresses)
-        assertContentEquals(longArrayOf(12, 4, 4), accesses.endOffsets)
+        assertEquals(3, accesses.count)
+        assertContentEquals(intArrayOf(1, 2, 3), accesses.positions.copyOf(accesses.count))
+        assertContentEquals(intArrayOf(0, 1, 0), accesses.memories.copyOf(accesses.count))
+        assertContentEquals(intArrayOf(0, MemoryAccessTable.CONSTANT_ADDRESS, 0), accesses.addresses.copyOf(accesses.count))
+        assertContentEquals(longArrayOf(12, 4, 4), accesses.endOffsets.copyOf(accesses.count))
         assertEquals(listOf(-1, 0, 1, 2, -1), (0..4).map(accesses::accessIndexAt))
     }
 

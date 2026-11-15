@@ -61,14 +61,16 @@ internal class ProbingChunkEmitter(
         val usedKinds = ByteArray(frameSlots)
         val constants = BooleanArray(analysis.cachedConstants.size)
         val recording = chunkRegisters(function, analysis, homes, null, recording = usedKinds, constants = constants)
+        module.constants.beginMethod()
         val probe = code.beginStaticMethod(dexMethod, recording.count, MemberAccess.Public)
         try {
-            LowerContext(module, function, analysis, recording, homes, Emitter(probe, module.references), chunk).lowerChunkBody()
+            LowerContext(module, function, analysis, recording, homes, Emitter(probe, module.references, recording = true), chunk).lowerChunkBody()
         } finally {
             probe.abort()
         }
 
         val registers = chunkRegisters(function, analysis, homes, usedKinds)
+        module.constants.beginMethod()
         val body = code.beginStaticMethod(dexMethod, registers.count, MemberAccess.Public, HUGE_METHOD_CODE_UNITS)
         try {
 
@@ -96,6 +98,7 @@ internal class ProbingChunkEmitter(
             val lowered = Chunk(start, end, entries, continuations, next, spills, constants, usesMemory, protects, reloads, mixed)
             LowerContext(module, function, analysis, registers, homes, Emitter(body, module.references), lowered).lowerChunkBody()
             body.finish()
+            module.constants.finishMethod()
         } catch (_: DexterMethodTooLargeException) {
             return null
         } catch (failure: Throwable) {

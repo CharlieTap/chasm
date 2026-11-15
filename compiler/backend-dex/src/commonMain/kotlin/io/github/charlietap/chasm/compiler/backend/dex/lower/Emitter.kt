@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.compiler.backend.dex.lower
 import io.github.charlietap.chasm.compiler.backend.abi.MethodRef
 import io.github.charlietap.chasm.compiler.backend.abi.OBJECT_TYPE
 import io.github.charlietap.chasm.compiler.backend.dex.abi.DexReferences
+import io.github.charlietap.chasm.compiler.backend.dex.abi.Invocation
 import io.github.charlietap.dexter.ArrayKind
 import io.github.charlietap.dexter.ArrayType
 import io.github.charlietap.dexter.BinaryOp
@@ -11,6 +12,7 @@ import io.github.charlietap.dexter.CodeEmitter
 import io.github.charlietap.dexter.CompareOp
 import io.github.charlietap.dexter.Cond
 import io.github.charlietap.dexter.Conversion
+import io.github.charlietap.dexter.DexField
 import io.github.charlietap.dexter.HandlerLabel
 import io.github.charlietap.dexter.Label
 import io.github.charlietap.dexter.Labels
@@ -21,11 +23,13 @@ import io.github.charlietap.dexter.UnaryOp
 internal class Emitter(
     private val code: CodeEmitter,
     private val references: DexReferences,
+    private val recording: Boolean = false,
 ) {
 
     private val argumentWords = IntArray(MAX_INVOKE_WORDS)
 
     fun place(label: Label) {
+        if (recording) return
         code.bind(label)
     }
 
@@ -45,6 +49,7 @@ internal class Emitter(
         destination: Int,
         source: Int,
     ) {
+        if (recording) return
         if (destination != source) code.moveWide(Reg(destination), Reg(source))
     }
 
@@ -52,6 +57,7 @@ internal class Emitter(
         destination: Int,
         source: Int,
     ) {
+        if (recording) return
         if (destination != source) code.moveObject(Reg(destination), Reg(source))
     }
 
@@ -59,6 +65,7 @@ internal class Emitter(
         destination: Int,
         source: Int,
     ) {
+        if (recording) return
         if (destination != source) code.move(Reg(destination), Reg(source))
     }
 
@@ -69,6 +76,7 @@ internal class Emitter(
         name: String,
         type: String,
     ) {
+        if (recording) return
         code.getField(Reg(destination), Reg(instance), references.field(owner, name, type))
     }
 
@@ -79,14 +87,23 @@ internal class Emitter(
         name: String,
         type: String,
     ) {
+        if (recording) return
         code.putField(Reg(source), Reg(instance), references.field(owner, name, type))
+    }
+
+    fun getStatic(
+        destination: Int,
+        field: DexField,
+    ) {
+        if (recording) return
+        code.getStatic(Reg(destination), field)
     }
 
     fun checkCast(
         register: Int,
         type: String,
     ) {
-        if (type == OBJECT_TYPE) return
+        if (recording || type == OBJECT_TYPE) return
         code.checkCast(Reg(register), references.reference(type))
     }
 
@@ -95,56 +112,79 @@ internal class Emitter(
         size: Int,
         type: String,
     ) {
+        if (recording) return
         code.newArray(Reg(destination), Reg(size), references.reference(type) as ArrayType)
     }
 
     fun constWide(
         destination: Int,
         value: Long,
-    ) = code.constWide(Reg(destination), value)
+    ) {
+        if (recording) return
+        code.constWide(Reg(destination), value)
+    }
 
     fun const(
         destination: Int,
         value: Int,
-    ) = code.const(Reg(destination), value)
+    ) {
+        if (recording) return
+        code.const(Reg(destination), value)
+    }
 
     fun unary(
         op: UnaryOp,
         destination: Int,
         source: Int,
-    ) = code.unary(op, Reg(destination), Reg(source))
+    ) {
+        if (recording) return
+        code.unary(op, Reg(destination), Reg(source))
+    }
 
     fun convert(
         op: Conversion,
         destination: Int,
         source: Int,
-    ) = code.convert(op, Reg(destination), Reg(source))
+    ) {
+        if (recording) return
+        code.convert(op, Reg(destination), Reg(source))
+    }
 
     fun binary(
         op: BinaryOp,
         destination: Int,
         left: Int,
         right: Int,
-    ) = code.binary(op, Reg(destination), Reg(left), Reg(right))
+    ) {
+        if (recording) return
+        code.binary(op, Reg(destination), Reg(left), Reg(right))
+    }
 
     fun literal(
         op: LiteralOp,
         destination: Int,
         source: Int,
         literal: Int,
-    ) = code.binary(op, Reg(destination), Reg(source), literal)
+    ) {
+        if (recording) return
+        code.binary(op, Reg(destination), Reg(source), literal)
+    }
 
     fun compare(
         op: CompareOp,
         destination: Int,
         left: Int,
         right: Int,
-    ) = code.compare(op, Reg(destination), Reg(left), Reg(right))
+    ) {
+        if (recording) return
+        code.compare(op, Reg(destination), Reg(left), Reg(right))
+    }
 
     fun arrayLength(
         destination: Int,
         array: Int,
     ) {
+        if (recording) return
         code.arrayLength(Reg(destination), Reg(array))
     }
 
@@ -153,29 +193,41 @@ internal class Emitter(
         destination: Int,
         array: Int,
         index: Int,
-    ) = code.arrayGet(kind, Reg(destination), Reg(array), Reg(index))
+    ) {
+        if (recording) return
+        code.arrayGet(kind, Reg(destination), Reg(array), Reg(index))
+    }
 
     fun arrayPut(
         kind: ArrayKind,
         source: Int,
         array: Int,
         index: Int,
-    ) = code.arrayPut(kind, Reg(source), Reg(array), Reg(index))
+    ) {
+        if (recording) return
+        code.arrayPut(kind, Reg(source), Reg(array), Reg(index))
+    }
 
-    fun returnVoid() = code.returnVoid()
+    fun returnVoid() {
+        if (recording) return
+        code.returnVoid()
+    }
 
-    fun returnValue(
-        register: Int,
-    ) = code.returnValue(Reg(register))
+    fun returnValue(register: Int) {
+        if (recording) return
+        code.returnValue(Reg(register))
+    }
 
     fun beginHandler(
         handler: HandlerLabel,
         register: Int,
     ) {
+        if (recording) return
         code.bindHandler(handler, Reg(register))
     }
 
     fun gotoLabel(target: Label) {
+        if (recording) return
         code.goto(target)
     }
 
@@ -184,6 +236,7 @@ internal class Emitter(
         register: Int,
         target: Label,
     ) {
+        if (recording) return
         code.branchZero(cond, Reg(register), target)
     }
 
@@ -193,6 +246,7 @@ internal class Emitter(
         right: Int,
         target: Label,
     ) {
+        if (recording) return
         code.branch(cond, Reg(left), Reg(right), target)
     }
 
@@ -201,6 +255,7 @@ internal class Emitter(
         firstKey: Int,
         targets: List<Label>,
     ) {
+        if (recording) return
         val table = code.labelTable(firstKey, targets.size, targets.first())
         targets.forEachIndexed { index, target -> table[index] = target }
         code.packedSwitch(Reg(value), table)
@@ -212,6 +267,7 @@ internal class Emitter(
         end: Label,
         handler: HandlerLabel,
     ) {
+        if (recording) return
         code.catchRange(start, end, ClassType(type), handler)
     }
 
@@ -302,6 +358,7 @@ internal class Emitter(
         register: Int,
         type: String,
     ) {
+        if (recording) return
         code.instanceOf(Reg(destination), Reg(register), references.reference(type))
     }
 
@@ -309,6 +366,7 @@ internal class Emitter(
         method: MethodRef,
         rangeStart: Int,
     ) {
+        if (recording) return
         code.invokeInterfaceRange(references.of(method), Reg(rangeStart))
     }
 
@@ -316,6 +374,7 @@ internal class Emitter(
         method: MethodRef,
         rangeStart: Int,
     ) {
+        if (recording) return
         code.invokeVirtualRange(references.of(method), Reg(rangeStart))
     }
 
@@ -325,24 +384,39 @@ internal class Emitter(
         words: Int,
     ) {
         check(words == method.words) { "${references.of(method)} takes ${method.words} words, not $words" }
+        if (recording) return
         code.invokeStaticRange(references.of(method), Reg(rangeStart))
     }
 
-    fun moveResult(
-        register: Int,
-    ) = code.moveResult(Reg(register))
+    fun invokeRange(
+        invocation: Invocation,
+        rangeStart: Int,
+        words: Int,
+    ) {
+        check(words == invocation.words) { "${invocation.method} takes ${invocation.words} words, not $words" }
+        if (recording) return
+        code.invokeStaticRange(invocation.method, Reg(rangeStart))
+    }
 
-    fun moveResultWide(
-        register: Int,
-    ) = code.moveResult(Reg(register))
+    fun moveResult(register: Int) {
+        if (recording) return
+        code.moveResult(Reg(register))
+    }
 
-    fun moveResultObject(
-        register: Int,
-    ) = code.moveResult(Reg(register))
+    fun moveResultWide(register: Int) {
+        if (recording) return
+        code.moveResult(Reg(register))
+    }
 
-    fun line(
-        line: Int,
-    ) = code.line(line)
+    fun moveResultObject(register: Int) {
+        if (recording) return
+        code.moveResult(Reg(register))
+    }
+
+    fun line(line: Int) {
+        if (recording) return
+        code.line(line)
+    }
 
     private fun invokeStatic(
         method: MethodRef,
@@ -351,6 +425,7 @@ internal class Emitter(
 
         val invocation = references.invocation(method)
         check(count == invocation.words) { "argument words do not match ${method.parameters}" }
+        if (recording) return
 
         val target = invocation.method
         val offsets = invocation.offsets
@@ -373,6 +448,7 @@ internal class Emitter(
 
         val invocation = references.invocation(method)
         check(count == invocation.words) { "argument words do not match ${method.parameters}" }
+        if (recording) return
 
         val target = invocation.method
         val offsets = invocation.offsets

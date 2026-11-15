@@ -56,6 +56,7 @@ internal class DexSizeEstimate(
     val inline: Int,
     val helper: Int,
     private val prefix: LongArray,
+    private val instructions: Int,
 ) {
     fun reach(
         start: Int,
@@ -64,7 +65,7 @@ internal class DexSizeEstimate(
 
         val limit = prefix[start] + budget.toLong() * WEIGHT_SCALE
         var low = start + 1
-        var high = prefix.size - 1
+        var high = instructions
 
         while (low < high) {
             val middle = (low + high + 1) ushr 1
@@ -86,7 +87,8 @@ internal fun estimateDexSize(
 ): DexSizeEstimate {
 
     val instructions = function.instructions
-    val prefix = LongArray(instructions.size + 1)
+    val prefix = module.workspace.estimatePrefix(instructions.size + 1)
+    prefix[0] = 0L
     var helper = 0L
     for (position in instructions.indices) {
 
@@ -104,7 +106,7 @@ internal fun estimateDexSize(
     val inline = prefix[instructions.size] + INLINE_FRAME_SLOT * frameSlots + INLINE_CONSTANT
     val helperTotal = helper + HELPER_FRAME_SLOT * frameSlots + HELPER_CONSTANT
 
-    return DexSizeEstimate(estimatedUnits(inline), estimatedUnits(helperTotal), prefix)
+    return DexSizeEstimate(estimatedUnits(inline), estimatedUnits(helperTotal), prefix, instructions.size)
 }
 
 private fun estimatedUnits(weighted: Long): Int {

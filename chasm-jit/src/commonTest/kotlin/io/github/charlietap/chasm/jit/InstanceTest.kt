@@ -21,7 +21,7 @@ class InstanceTest {
     fun aModuleRunsOnTheDevice() {
         val store = store()
         val module = runBlocking { module(fixture("loops"), validate = true) }.expect("module")
-        val instance = instance(store, module, emptyList()).expect("instance")
+        val instance = runBlocking { instance(store, module, emptyList()) }.expect("instance")
 
         val result = invoke(store, instance, "loops", listOf(I32(10))).expect("loops")
 
@@ -32,7 +32,7 @@ class InstanceTest {
     fun theSameModuleInstantiatedTwiceRunsAsTwoInstances() {
         val store = store()
         val module = runBlocking { module(fixture("loops"), validate = true) }.expect("module")
-        val instances = List(2) { instance(store, module, emptyList()).expect("instance") }
+        val instances = List(2) { runBlocking { instance(store, module, emptyList()) }.expect("instance") }
 
         val results = instances.mapIndexed { index, instance -> invoke(store, instance, "loops", listOf(I32(index + 3))).expect("loops") }
 
@@ -44,7 +44,7 @@ class InstanceTest {
 
         val store = store(StoreConfig(gcStrategy = GCStrategy.TRADITIONAL, gcThreshold = GCThreshold.KB(64)))
         val module = runBlocking { module(fixture("restart"), validate = true) }.expect("module")
-        val instance = instance(store, module, emptyList()).expect("instance")
+        val instance = runBlocking { instance(store, module, emptyList()) }.expect("instance")
 
         val result = invoke(store, instance, "swap", listOf(I32(3))).expect("swap")
 

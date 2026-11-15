@@ -69,8 +69,10 @@ internal suspend fun ParallelModuleCompiler(
         return moduleCompiler(module, types)
     }
 
-    val context = createCompilerContext(module, types, devirtualiseIndirectCalls)
-    val compilation = ParallelCompilation(module.functions, checkNotNull(batches))
+    val functionBatches = checkNotNull(batches)
+    val targets = if (devirtualiseIndirectCalls) parallelIndirectCallTargets(module, types, taskExecutor, workerCount, functionBatches) else null
+    val context = createCompilerContext(module, types, targets)
+    val compilation = ParallelCompilation(module.functions, functionBatches)
     taskExecutor.executeWorkers(workerCount) { compileFunctions(context, compilation, functionCompiler) }
     return when (val failure = compilation.failures.error) {
         null -> {
@@ -80,6 +82,25 @@ internal suspend fun ParallelModuleCompiler(
         is FunctionFailure.Returned -> Err(failure.error)
         is FunctionFailure.Thrown -> throw failure.exception
     }
+}
+
+private suspend fun parallelIndirectCallTargets(
+    module: Module,
+    types: ModuleTypeResolver,
+    taskExecutor: ParallelTaskExecutor,
+    workerCount: Int,
+    batches: WorkBatches,
+): IndirectCallTargets? {
+
+    val tableCount = indirectCallTables(module) ?: return null
+    val cursor = WorkCursor(batches.count)
+    val scans = taskExecutor.executeWorkers(workerCount) {
+        val scan = IndirectCallScan(tableCount)
+        claimEach(cursor) { batch -> scan.scan(module, batches.start(batch), batches.end(batch)) }
+        scan
+    }
+
+    return indirectCallTargets(module, types, scans)
 }
 
 private class ParallelCompilation(

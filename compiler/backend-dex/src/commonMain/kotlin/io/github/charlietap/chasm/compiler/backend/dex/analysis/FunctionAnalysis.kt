@@ -65,7 +65,11 @@ internal fun analyzeFunction(
         facts = facts,
         memoryMode = memoryMode,
         cachedConstants = cachedConstants(module, function, facts.table, module.inlineMemory.takeIf { usesInlineMemory }),
-        checkedAccesses = if (usesInlineMemory) function.redundantBoundsChecks(facts.table) else BooleanArray(function.instructions.size),
+        checkedAccesses = if (usesInlineMemory) {
+            function.redundantBoundsChecks(facts.table, module.workspace.boundsChecks)
+        } else {
+            module.workspace.noRedundantChecks(function.instructions.size)
+        },
     )
 }
 

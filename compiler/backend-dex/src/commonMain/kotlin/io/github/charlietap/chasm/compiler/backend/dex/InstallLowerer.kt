@@ -14,6 +14,7 @@ import io.github.charlietap.chasm.compiler.backend.abi.installationIndex
 import io.github.charlietap.chasm.compiler.backend.dex.abi.BINDING_TYPE
 import io.github.charlietap.chasm.compiler.backend.dex.abi.method
 import io.github.charlietap.chasm.compiler.backend.dex.binding.BindingLayout
+import io.github.charlietap.chasm.compiler.backend.dex.binding.BoundResources
 import io.github.charlietap.dexter.ArrayKind
 import io.github.charlietap.dexter.ClassAccess
 import io.github.charlietap.dexter.ClassBuilder
@@ -27,12 +28,12 @@ import io.github.charlietap.dexter.Dexter
 import io.github.charlietap.dexter.MemberAccess
 import io.github.charlietap.dexter.Reg
 
-internal typealias InstallLowerer = (Dexter, String, BindingLayout, Map<Int, EntryRef>) -> List<ByteArray>
+internal typealias InstallLowerer = (Dexter, String, BoundResources, Map<Int, EntryRef>) -> List<ByteArray>
 
 internal fun InstallLowerer(
     dexter: Dexter,
     installer: String,
-    layout: BindingLayout,
+    bound: BoundResources,
     entries: Map<Int, EntryRef>,
 ): List<ByteArray> {
     val groups = entries.entries.chunked(INSTALLS_PER_FILE)
@@ -40,7 +41,7 @@ internal fun InstallLowerer(
     val files = groups.mapIndexed { group, installs ->
         dexFile(dexter) { file -> entriesClass(file, groupClasses[group], installs.chunked(INSTALLS_PER_METHOD)) }
     }
-    return files + dexFile(dexter) { file -> installerClass(file, installer, layout, groupClasses) }
+    return files + dexFile(dexter) { file -> installerClass(file, installer, bound, groupClasses) }
 }
 
 private inline fun dexFile(
@@ -84,13 +85,13 @@ private fun entriesClass(
 private fun installerClass(
     file: DexFile,
     installer: String,
-    layout: BindingLayout,
+    bound: BoundResources,
     groupClasses: List<String>,
 ) {
     val owner = ClassType(installer)
     val builder = file.addClass(owner, DexType.Object, CONSUMER)
-    val objects = layout.objects.chunked(RESOURCES_PER_METHOD)
-    val values = layout.values.chunked(RESOURCES_PER_METHOD)
+    val objects = bound.objects.chunked(RESOURCES_PER_METHOD)
+    val values = bound.values.chunked(RESOURCES_PER_METHOD)
 
     builder.beginConstructor(DexConstructor(owner), registerCount = 1).apply {
         invokeConstructor(OBJECT_CONSTRUCTOR, self)
@@ -102,11 +103,11 @@ private fun installerClass(
     builder.beginInstanceMethod(accept, registerCount = 5).apply {
         val installation = parameter(0)
         checkCast(installation, ClassType(CODE_INSTALLATION))
-        const(SIZE, layout.objects.size + 1)
+        const(SIZE, bound.objectCount)
         newArray(BINDING, SIZE, DexType.Object.array())
-        const(SIZE, layout.values.size)
+        const(SIZE, bound.valueCount)
         newArray(VALUES, SIZE, DexType.Long.array())
-        const(SIZE, 0)
+        const(SIZE, BindingLayout.VALUES_SLOT)
         arrayPut(ArrayKind.Object, VALUES, BINDING, SIZE)
         objects.indices.forEach { chunk -> invokeStatic(chunkMethod(installer, "bindObjects", chunk), installation, BINDING) }
         values.indices.forEach { chunk -> invokeStatic(chunkMethod(installer, "bindValues", chunk), installation, BINDING) }
@@ -115,33 +116,27 @@ private fun installerClass(
         finish()
     }
 
-    var slot = 1
-    objects.forEachIndexed { chunk, resources ->
-        val first = slot
+    objects.forEachIndexed { chunk, bindings ->
         builder.chunk(installer, "bindObjects", chunk) { installation, binding ->
-            resources.forEachIndexed { offset, resource ->
-                loadObject(resource, installation)
-                const(INDEX, first + offset)
+            bindings.forEach { bound ->
+                loadObject(bound.resource, installation)
+                const(INDEX, bound.slot)
                 arrayPut(ArrayKind.Object, OBJECT, binding, INDEX)
             }
         }
-        slot += resources.size
     }
 
-    var value = 0
-    values.forEachIndexed { chunk, resources ->
-        val first = value
+    values.forEachIndexed { chunk, bindings ->
         builder.chunk(installer, "bindValues", chunk) { installation, binding ->
-            const(INDEX, 0)
+            const(INDEX, BindingLayout.VALUES_SLOT)
             arrayGet(ArrayKind.Object, VALUES_ARRAY, binding, INDEX)
             checkCast(VALUES_ARRAY, DexType.Long.array())
-            resources.forEachIndexed { offset, resource ->
-                loadValue(resource, installation)
-                const(INDEX, first + offset)
+            bindings.forEach { bound ->
+                loadValue(bound.resource, installation)
+                const(INDEX, bound.slot)
                 arrayPut(ArrayKind.Wide, WIDE, VALUES_ARRAY, INDEX)
             }
         }
-        value += resources.size
     }
 }
 
@@ -172,12 +167,6 @@ private fun CodeEmitter.loadObject(
     when (resource) {
         Resource.Instance -> invokeVirtual(INSTALLATION_INSTANCE.method, installation)
         Resource.Unsafe -> invokeStatic(UNSAFE_INSTANCE.method)
-        is Resource.Longs -> {
-            const(INDEX, resource.values.size)
-            newArray(OBJECT, INDEX, DexType.Long.array())
-            if (resource.values.isNotEmpty()) fillArrayData(OBJECT, resource.values)
-            return
-        }
         is Resource.TypeTest -> {
             const(INDEX, if (resource.type.nullable) 1 else 0)
             const(NUMBER, heapTypeNumber(resource.type.heapType))

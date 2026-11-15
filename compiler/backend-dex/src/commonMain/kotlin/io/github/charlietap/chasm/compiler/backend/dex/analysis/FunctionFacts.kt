@@ -37,11 +37,11 @@ internal fun functionFacts(
 ): FunctionFacts {
 
     val declarations = module.declarations
-    val forms = InstructionForms(function, declarations)
+    val forms = InstructionForms(function, declarations, module.workspace.forms)
     val frame = frameFacts(forms)
     val type = frame.type
     val instructions = function.instructions
-    val table = instructionTable(forms)
+    val table = instructionTable(forms, module.workspace.table)
     val inlineMemory = module.inlineMemory
     val memoryMode = when {
         inlineMemory == null || !table.accesses.usesMemory(0, instructions.size, inlineMemory.index) -> MemoryMode.Helper
@@ -49,10 +49,14 @@ internal fun functionFacts(
         else -> MemoryMode.ByteArray
     }
 
-    val typedSignatures = Array(instructions.size) { position ->
-        instructions[position].indirectCallTypeIndex()?.let(module::signatureClass)
+    val typedSignatures = module.workspace.typedSignatures(instructions.size)
+    var callsIndirectlyTyped = false
+    for (position in instructions.indices) {
+        val signature = instructions[position].indirectCallTypeIndex()?.let(module::signatureClass)
+        typedSignatures[position] = signature
+        if (signature != null) callsIndirectlyTyped = true
     }
-    val callsDirectly = typedSignatures.any { signature -> signature != null } || instructions.any { instruction ->
+    val callsDirectly = callsIndirectlyTyped || instructions.any { instruction ->
         when (instruction) {
             is ControlInstruction.Call -> !declarations.isImported(instruction.function)
             else -> false

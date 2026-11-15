@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.compiler.backend.dex.lower
 
 import io.github.charlietap.chasm.compiler.backend.abi.Resource
 import io.github.charlietap.chasm.compiler.backend.dex.analysis.CachedConstant
+import io.github.charlietap.chasm.compiler.backend.dex.binding.BindingLayout
 import io.github.charlietap.dexter.ArrayKind
 import io.github.charlietap.dexter.Conversion
 
@@ -12,9 +13,16 @@ internal fun LowerContext.loadObject(
 ) {
     val cached = cachedConstantIndex[resource]
     if (cached != null && cachesLoaded) return emit.moveObject(register, registers.useCachedConstant(cached))
-    emit.const(Registers.I1, module.layout.objectSlot(resource))
+    emit.const(Registers.I1, module.objectSlot(resource))
     emit.arrayGet(ArrayKind.Object, register, registers.binding, Registers.I1)
     emit.checkCast(register, type)
+}
+
+internal fun LowerContext.loadLongs(
+    register: Int,
+    values: LongArray,
+) {
+    emit.getStatic(register, module.constants.field(module.codeClass(function.index), values))
 }
 
 internal fun LowerContext.loadCachedConstant(
@@ -27,7 +35,7 @@ internal fun LowerContext.loadCachedConstant(
 }
 
 private fun LowerContext.loadValues() {
-    emit.const(Registers.I1, 0)
+    emit.const(Registers.I1, BindingLayout.VALUES_SLOT)
     emit.arrayGet(ArrayKind.Object, Registers.OBJECT, registers.binding, Registers.I1)
     emit.checkCast(Registers.OBJECT, "[J")
 }
@@ -38,7 +46,7 @@ internal fun LowerContext.loadValue(
 ) {
     val cached = cachedValuesIndex
     if (cached != null && cachesLoaded) emit.moveObject(Registers.OBJECT, registers.useCachedConstant(cached)) else loadValues()
-    emit.const(Registers.I1, module.layout.valueSlot(resource))
+    emit.const(Registers.I1, module.valueSlot(resource))
     emit.arrayGet(ArrayKind.Wide, pair, Registers.OBJECT, Registers.I1)
 }
 

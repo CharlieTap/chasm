@@ -43,6 +43,16 @@ class ModuleIndexSpaces(
 
     val memoryCount: Int = module.imports.count { import -> import.descriptor is Import.Descriptor.Memory } + module.memories.size
 
+    val tableCount: Int = module.imports.count { import -> import.descriptor is Import.Descriptor.Table } + module.tables.size
+
+    val globalCount: Int = globalTypes.size
+
+    val tagCount: Int = tagTypes.size
+
+    val elementCount: Int = module.elementSegments.size
+
+    val dataCount: Int = module.dataSegments.size
+
     private val memoryMinimumPages: List<ULong> = module.imports.mapNotNull { import ->
         (import.descriptor as? Import.Descriptor.Memory)?.type?.limits?.min
     } + module.memories.map { memory -> memory.type.limits.min }
@@ -64,6 +74,10 @@ class ModuleIndexSpaces(
     fun functionType(
         index: FunctionIndex,
     ): FunctionType = functionType(TypeIndex(functionTypeIndices[index.index]))
+
+    fun isFunctionType(index: TypeIndex): Boolean {
+        return definedTypes[index.index].functionType() != null
+    }
 
     fun functionType(
         index: TypeIndex,
@@ -95,6 +109,11 @@ class ModuleIndexSpaces(
     ).also { defaults -> structDefaultResources[index.index] = defaults }
 
     private val structDefaultResources = arrayOfNulls<Resource.Longs>(definedTypes.size)
+
+    fun structDefaultValues(index: TypeIndex): LongArray {
+        val fields = structFields(index)
+        return LongArray(fields.size) { field -> fields[field].requireDefault() }
+    }
 
     fun arrayElement(
         index: TypeIndex,

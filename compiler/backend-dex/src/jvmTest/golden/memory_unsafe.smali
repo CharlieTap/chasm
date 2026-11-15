@@ -13,7 +13,7 @@
 
     move-object/from16 v16, p0
 
-    const/4 v9, 0x1
+    const/4 v9, 0x3
 
     aget-object v12, v16, v9
 
@@ -111,7 +111,7 @@
 
     .line 2
     :cond_5b
-    const/4 v9, 0x1
+    const/4 v9, 0x3
 
     aget-object v12, v16, v9
 
@@ -149,7 +149,7 @@
 
     move-object/from16 v16, p0
 
-    const/4 v9, 0x1
+    const/4 v9, 0x3
 
     aget-object v12, v16, v9
 
@@ -216,7 +216,7 @@
 
     .line 2
     :cond_3d
-    const/4 v9, 0x1
+    const/4 v9, 0x3
 
     aget-object v12, v16, v9
 
@@ -254,7 +254,7 @@
 
     move-object/from16 v16, p0
 
-    const/4 v9, 0x1
+    const/4 v9, 0x3
 
     aget-object v12, v16, v9
 
@@ -383,7 +383,7 @@
 
     .line 2
     :cond_77
-    const/4 v9, 0x1
+    const/4 v9, 0x3
 
     aget-object v12, v16, v9
 
@@ -413,7 +413,7 @@
 
     .line 3
     :cond_90
-    const/4 v9, 0x1
+    const/4 v9, 0x3
 
     aget-object v12, v16, v9
 
@@ -456,7 +456,7 @@
     .line 2
     move-object/from16 v20, v14
 
-    const/4 v9, 0x1
+    const/4 v9, 0x3
 
     aget-object v2, v16, v9
 
@@ -475,7 +475,7 @@
     move/from16 v18, v15
 
     .line 3
-    const/4 v9, 0x1
+    const/4 v9, 0x3
 
     aget-object v2, v16, v9
 
@@ -510,7 +510,7 @@
 
     move-object/from16 v16, p0
 
-    const/4 v9, 0x1
+    const/4 v9, 0x3
 
     aget-object v12, v16, v9
 
@@ -570,7 +570,7 @@
 
     move-object/from16 v31, v2
 
-    const/4 v9, 0x3
+    const/4 v9, 0x6
 
     aget-object v2, v16, v9
 
@@ -652,7 +652,7 @@
     move-object/from16 v16, p0
 
     .line 2
-    const/4 v9, 0x3
+    const/4 v9, 0x6
 
     aget-object v2, v16, v9
 
@@ -1433,16 +1433,6 @@
 .method private static bindObjects0(Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;[Ljava/lang/Object;)V
     .registers 8
 
-    const/4 v2, 0x0
-
-    invoke-virtual {p0, v2}, Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;->memory(I)Lio/github/charlietap/chasm/runtime/instance/MemoryInstance;
-
-    move-result-object v4
-
-    const/4 v2, 0x1
-
-    aput-object v4, p1, v2
-
     invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/CompiledMemory;->unsafe()Ljava/lang/Object;
 
     move-result-object v4
@@ -1453,7 +1443,7 @@
 
     const/4 v2, 0x0
 
-    invoke-virtual {p0, v2}, Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;->data(I)Lio/github/charlietap/chasm/runtime/instance/DataInstance;
+    invoke-virtual {p0, v2}, Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;->memory(I)Lio/github/charlietap/chasm/runtime/instance/MemoryInstance;
 
     move-result-object v4
 
@@ -1481,6 +1471,16 @@
 
     aput-object v4, p1, v2
 
+    const/4 v2, 0x0
+
+    invoke-virtual {p0, v2}, Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;->data(I)Lio/github/charlietap/chasm/runtime/instance/DataInstance;
+
+    move-result-object v4
+
+    const/4 v2, 0x6
+
+    aput-object v4, p1, v2
+
     return-void
 .end method
 
@@ -1491,7 +1491,7 @@
 
     check-cast p1, Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;
 
-    const/4 v0, 0x6
+    const/4 v0, 0x7
 
     new-array v1, v0, [Ljava/lang/Object;
 

@@ -146,7 +146,7 @@
     move-object/from16 v24, v8
 
     .line 2
-    const/4 v9, 0x1
+    const/4 v9, 0x3
 
     aget-object v2, v16, v9
 
@@ -165,7 +165,7 @@
     move/from16 v27, v13
 
     .line 3
-    const/4 v9, 0x1
+    const/4 v9, 0x3
 
     aget-object v2, v16, v9
 
@@ -191,7 +191,7 @@
     .line 5
     move-object/from16 v26, v14
 
-    const/4 v9, 0x1
+    const/4 v9, 0x3
 
     aget-object v2, v16, v9
 
@@ -216,7 +216,7 @@
     move/from16 v20, v15
 
     .line 6
-    const/4 v9, 0x1
+    const/4 v9, 0x3
 
     aget-object v2, v16, v9
 
@@ -249,7 +249,7 @@
 
     long-to-int v10, v4
 
-    const/4 v9, 0x1
+    const/4 v9, 0x3
 
     aget-object v2, v16, v9
 
@@ -331,7 +331,7 @@
 
     move/from16 v29, v8
 
-    const/4 v9, 0x2
+    const/4 v9, 0x1
 
     aget-object v2, v16, v9
 
@@ -339,7 +339,7 @@
 
     move-object/from16 v27, v2
 
-    const/4 v9, 0x1
+    const/4 v9, 0x3
 
     aget-object v2, v16, v9
 
@@ -679,7 +679,7 @@
 
     long-to-int v10, v4
 
-    const/4 v9, 0x1
+    const/4 v9, 0x3
 
     aget-object v2, v16, v9
 
@@ -765,7 +765,7 @@
 
     move/from16 v26, v8
 
-    const/4 v9, 0x2
+    const/4 v9, 0x1
 
     aget-object v2, v16, v9
 
@@ -773,7 +773,7 @@
 
     move-object/from16 v24, v2
 
-    const/4 v9, 0x1
+    const/4 v9, 0x3
 
     aget-object v2, v16, v9
 
@@ -1853,9 +1853,7 @@
 .method private static bindObjects0(Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;[Ljava/lang/Object;)V
     .registers 8
 
-    const/4 v2, 0x0
-
-    invoke-virtual {p0, v2}, Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;->table(I)Lio/github/charlietap/chasm/runtime/instance/TableInstance;
+    invoke-virtual {p0}, Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;->getInstance()Lio/github/charlietap/chasm/runtime/instance/ModuleInstance;
 
     move-result-object v4
 
@@ -1863,11 +1861,13 @@
 
     aput-object v4, p1, v2
 
-    invoke-virtual {p0}, Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;->getInstance()Lio/github/charlietap/chasm/runtime/instance/ModuleInstance;
+    const/4 v2, 0x0
+
+    invoke-virtual {p0, v2}, Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;->table(I)Lio/github/charlietap/chasm/runtime/instance/TableInstance;
 
     move-result-object v4
 
-    const/4 v2, 0x2
+    const/4 v2, 0x3
 
     aput-object v4, p1, v2
 
@@ -1905,7 +1905,7 @@
 
     check-cast p1, Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;
 
-    const/4 v0, 0x3
+    const/4 v0, 0x4
 
     new-array v1, v0, [Ljava/lang/Object;
 

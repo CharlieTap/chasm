@@ -33,30 +33,68 @@ internal class IndirectCallTargets(
     }
 }
 
+internal class IndirectCallScan(
+    tableCount: Int,
+) {
+    val called = BooleanArray(tableCount)
+    val opened = BooleanArray(tableCount)
+    val sites = HashSet<Long>()
+
+    fun scan(
+        module: Module,
+        from: Int,
+        until: Int,
+    ) {
+        for (function in from until until) {
+            for (instruction in module.functions[function].body.instructions) {
+                when (instruction) {
+                    is ControlInstruction.CallIndirect -> {
+                        val table = instruction.tableIndex.toInt()
+                        called[table] = true
+                        sites += siteKey(table, instruction.typeIndex.toInt())
+                    }
+                    is TableInstruction.TableSet -> opened[instruction.tableIdx.toInt()] = true
+                    is TableInstruction.TableGrow -> opened[instruction.tableIdx.toInt()] = true
+                    is TableInstruction.TableFill -> opened[instruction.tableIdx.toInt()] = true
+                    is TableInstruction.TableInit -> opened[instruction.tableIdx.toInt()] = true
+                    is TableInstruction.TableCopy -> opened[instruction.destTableIdx.toInt()] = true
+                    else -> Unit
+                }
+            }
+        }
+    }
+}
+
+internal fun indirectCallTables(module: Module): Int? {
+    return initiallyOpenTables(module)?.size
+}
+
 internal fun indirectCallTargets(
     module: Module,
     types: ModuleTypeResolver,
 ): IndirectCallTargets? {
 
+    val tableCount = indirectCallTables(module) ?: return null
+    val scan = IndirectCallScan(tableCount).also { scan -> scan.scan(module, 0, module.functions.size) }
+
+    return indirectCallTargets(module, types, listOf(scan))
+}
+
+internal fun indirectCallTargets(
+    module: Module,
+    types: ModuleTypeResolver,
+    scans: List<IndirectCallScan>,
+): IndirectCallTargets? {
+
     val open = initiallyOpenTables(module) ?: return null
     val called = BooleanArray(open.size)
     val sites = HashSet<Long>()
-    for (function in module.functions) {
-        for (instruction in function.body.instructions) {
-            when (instruction) {
-                is ControlInstruction.CallIndirect -> {
-                    val table = instruction.tableIndex.toInt()
-                    called[table] = true
-                    sites += siteKey(table, instruction.typeIndex.toInt())
-                }
-                is TableInstruction.TableSet -> open[instruction.tableIdx.toInt()] = true
-                is TableInstruction.TableGrow -> open[instruction.tableIdx.toInt()] = true
-                is TableInstruction.TableFill -> open[instruction.tableIdx.toInt()] = true
-                is TableInstruction.TableInit -> open[instruction.tableIdx.toInt()] = true
-                is TableInstruction.TableCopy -> open[instruction.destTableIdx.toInt()] = true
-                else -> Unit
-            }
+    for (scan in scans) {
+        for (table in open.indices) {
+            if (scan.called[table]) called[table] = true
+            if (scan.opened[table]) open[table] = true
         }
+        sites += scan.sites
     }
     for (table in open.indices) {
         if (!called[table]) {

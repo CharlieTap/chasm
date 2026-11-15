@@ -22,13 +22,13 @@ import io.github.charlietap.chasm.runtime.compiled.ModuleCompiledFrames
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 
 @InternalChasmApi
-fun _instance(
+suspend fun _instance(
     store: Store,
     module: Module,
     imports: List<Import>,
     config: RuntimeConfig,
-): ChasmResult<Instance, ChasmError.ExecutionError> =
-    instance(
+): ChasmResult<Instance, ChasmError.ExecutionError> {
+    return instance(
         store = store,
         module = module,
         imports = imports,
@@ -36,13 +36,14 @@ fun _instance(
         compiler = ::compile,
         instantiator = ::ModuleInstantiator,
     )
+}
 
-internal inline fun instance(
+internal suspend inline fun instance(
     store: Store,
     module: Module,
     imports: List<Import>,
     config: RuntimeConfig,
-    crossinline compiler: (Module, CompileConfig) -> CompileResult,
+    crossinline compiler: suspend (Module, CompileConfig) -> CompileResult,
     crossinline instantiator: ModuleInstantiator,
 ): ChasmResult<Instance, ChasmError.ExecutionError> {
     val storeConfig = store.store.config

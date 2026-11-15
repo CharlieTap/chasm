@@ -7,92 +7,94 @@ import io.github.charlietap.chasm.cir.FunctionIndex
 import io.github.charlietap.chasm.cir.MemoryIndex
 import io.github.charlietap.chasm.cir.TypeIndex
 import io.github.charlietap.chasm.compiler.backend.abi.MethodRef
+import io.github.charlietap.chasm.compiler.backend.abi.Resource
 import io.github.charlietap.chasm.compiler.backend.analysis.ModuleAnalysis
 import io.github.charlietap.chasm.compiler.backend.analysis.ModuleIndexSpaces
-import io.github.charlietap.chasm.compiler.backend.analysis.analyzeModule
-import io.github.charlietap.chasm.compiler.backend.analysis.functionBatches
-import io.github.charlietap.chasm.compiler.backend.dex.abi.BATCH_FUNCTIONS
-import io.github.charlietap.chasm.compiler.backend.dex.abi.BATCH_INSTRUCTIONS
 import io.github.charlietap.chasm.compiler.backend.dex.abi.DexReferences
 import io.github.charlietap.chasm.compiler.backend.dex.abi.FunctionSignature
+import io.github.charlietap.chasm.compiler.backend.dex.abi.Invocation
 import io.github.charlietap.chasm.compiler.backend.dex.abi.SOURCE_FILE
-import io.github.charlietap.chasm.compiler.backend.dex.abi.codeClass
-import io.github.charlietap.chasm.compiler.backend.dex.abi.functionMethod
-import io.github.charlietap.chasm.compiler.backend.dex.abi.signatureClass
 import io.github.charlietap.chasm.compiler.backend.dex.abi.typedCall
 import io.github.charlietap.chasm.compiler.backend.dex.analysis.CostFamilies
+import io.github.charlietap.chasm.compiler.backend.dex.binding.BatchConstants
 import io.github.charlietap.chasm.compiler.backend.dex.binding.BindingLayout
-import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.dexter.ClassBuilder
 import io.github.charlietap.dexter.ClassType
 import io.github.charlietap.dexter.DexFile
 import io.github.charlietap.dexter.DexType
 
 internal class ModuleLowering(
-    module: Module,
-    code: CirModule,
-    val options: DexOptions,
+    val plan: ModulePlan,
+    val chunkStarts: Array<IntArray?> = arrayOfNulls(plan.functionCount),
 ) {
-    val declarations = ModuleIndexSpaces(module)
-    val analysis: ModuleAnalysis = analyzeModule(module, code, declarations)
-    val layout = BindingLayout()
+
+    constructor(
+        module: Module,
+        code: CirModule,
+        options: DexOptions,
+    ) : this(ModulePlan(module, code, options))
+
+    val options: DexOptions get() = plan.options
+    val declarations: ModuleIndexSpaces get() = plan.declarations
+    val analysis: ModuleAnalysis get() = plan.analysis
+    val layout: BindingLayout get() = plan.layout
+    val packagePath: String get() = plan.packagePath
+    val inlineMemory: MemoryIndex? get() = plan.inlineMemory
+    val batches: List<List<CirFunction>> get() = plan.batches
+
     val references = DexReferences()
-    val chunkStarts = HashMap<Int, IntArray>()
-    val packagePath = options.packageName.replace('.', '/')
-
-    val inlineMemory: MemoryIndex? = MemoryIndex(0).takeIf { options.inlineMemory && declarations.memoryCount == 1 }
-
-    private val signatures: Map<String, String> = analysis.signatureTypes.keys.withIndex().associate { (index, key) ->
-        key to signatureClass(packagePath, index)
-    }
-
     val costFamilies = CostFamilies()
+    val constants = BatchConstants()
+    val workspace = LoweringWorkspace()
+    val usedObjects = arrayOfNulls<Resource>(plan.layout.objectCount)
+    val usedValues = arrayOfNulls<Resource>(plan.layout.valueCount)
 
-    private val functionMethods = arrayOfNulls<MethodRef>(declarations.functionCount)
-
-    val batches: List<List<CirFunction>> = functionBatches(code.functions, BATCH_INSTRUCTIONS, BATCH_FUNCTIONS)
-
-    private val batchOf = HashMap<Int, Int>().apply {
-        batches.forEachIndexed { batch, functions -> functions.forEach { function -> put(function.index.index, batch) } }
+    fun objectSlot(resource: Resource): Int {
+        val slot = plan.layout.objectSlot(resource)
+        if (usedObjects[slot] == null) usedObjects[slot] = resource
+        return slot
     }
 
-    private val functionSignatures = arrayOfNulls<FunctionSignature>(declarations.typeCount)
+    fun valueSlot(resource: Resource): Int {
+        val slot = plan.layout.valueSlot(resource)
+        if (usedValues[slot] == null) usedValues[slot] = resource
+        return slot
+    }
 
     fun functionSignature(index: TypeIndex): FunctionSignature {
-        return functionSignatures[index.index]
-            ?: FunctionSignature(declarations.functionType(index)).also { signature -> functionSignatures[index.index] = signature }
+        return plan.functionSignature(index)
     }
 
     fun signatureClass(index: TypeIndex): String? {
-        return signatureClass(functionSignature(index).key)
+        return plan.signatureClass(plan.functionSignature(index).key)
     }
 
     fun signatureClass(key: String): String? {
-        return signatures[key]
+        return plan.signatureClass(key)
     }
 
-    fun codeClass(
-        index: FunctionIndex,
-    ): String = codeClass(packagePath, batchOf.getValue(index.index))
+    fun codeClass(index: FunctionIndex): String {
+        return plan.codeClass(index)
+    }
 
-    fun functionMethod(
-        index: FunctionIndex,
-        type: FunctionType,
-    ): MethodRef {
-        return functionMethods[index.index]
-            ?: functionMethod(codeClass(index), index.index, type).also { method -> functionMethods[index.index] = method }
+    fun functionMethod(index: FunctionIndex): MethodRef {
+        return plan.functionMethod(index)
+    }
+
+    fun functionInvocation(index: FunctionIndex): Invocation {
+        return plan.functionInvocation(index)
     }
 
     fun codeClassBuilder(
         file: DexFile,
         owner: String,
-    ): ClassBuilder = file.addClass(ClassType(owner), DexType.Object, sourceFile = if (options.stacktraces) SOURCE_FILE else null)
+    ): ClassBuilder {
+        return file.addClass(ClassType(owner), DexType.Object, sourceFile = if (options.stacktraces) SOURCE_FILE else null)
+    }
 
-    fun addSignatureInterfaces(
-        file: DexFile,
-    ) {
+    fun addSignatureInterfaces(file: DexFile) {
         analysis.signatureTypes.forEach { (key, type) ->
-            val owner = signatures.getValue(key)
+            val owner = checkNotNull(plan.signatureClass(key))
             file.addInterface(ClassType(owner))
                 .addAbstractMethod(references.of(typedCall(owner, type)))
         }

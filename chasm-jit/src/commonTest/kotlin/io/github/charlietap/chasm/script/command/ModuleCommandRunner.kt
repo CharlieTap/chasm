@@ -33,7 +33,7 @@ fun ModuleCommandRunner(
 
         SemanticPhase.EXECUTION -> runBlocking { module(bytes, context.config.moduleConfig, validate = true) }
             .flatMap { module ->
-                instance(context.store, module, context.imports, context.config.runtimeConfig)
+                runBlocking { instance(context.store, module, context.imports, context.config.runtimeConfig) }
             }.map { instance ->
                 context.instances[null] = instance
                 command.name?.let {

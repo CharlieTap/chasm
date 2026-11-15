@@ -106,7 +106,7 @@ private fun LowerContext.jumpTable(
     outOfLine += {
         emit.place(elsewhere)
         at(origin) { spillMixed(chunk) }
-        loadObject(Registers.OBJECT, Resource.Longs(LongArray(cases.size) { index -> chunk.continuation(cases[index]).toLong() }), "[J")
+        loadLongs(Registers.OBJECT, LongArray(cases.size) { index -> chunk.continuation(cases[index]).toLong() })
         emit.arrayGet(ArrayKind.Wide, Registers.W0, Registers.OBJECT, Registers.I0)
         emit.convert(Conversion.LongToInt, Registers.I0, Registers.W0)
         chunk.leavesAnywhere = true

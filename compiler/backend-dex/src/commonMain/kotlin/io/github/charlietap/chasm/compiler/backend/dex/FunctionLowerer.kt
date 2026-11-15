@@ -143,11 +143,13 @@ internal class FunctionLowering(
                 return Attempt.TooLarge(inlinedAccesses = false, homes = pristine)
             }
 
+            module.constants.beginMethod()
             val body = code.beginStaticMethod(method, registers.count, MemberAccess.Public, HUGE_METHOD_CODE_UNITS)
             val context = LowerContext(module, function, analysis, registers, homes, Emitter(body, module.references))
             try {
                 context.lowerFunctionBody()
                 body.finish()
+                module.constants.finishMethod()
                 return Attempt.Lowered()
             } catch (conflict: SlotKindConflict) {
                 body.abort()
@@ -211,11 +213,13 @@ internal class FunctionLowering(
             val registers = dispatcherRegisters(analysis)
             val slotFrameCost = (facts.frameSlots * 8 + 31) / 32
             val cost = frameCost(registers) + chunks.maxOf { chunk -> chunk.cost } + slotFrameCost
+            module.constants.beginMethod()
             val body = code.beginStaticMethod(method, registers.count, MemberAccess.Public, HUGE_METHOD_CODE_UNITS)
             try {
                 LowerContext(module, function, analysis, registers, null, Emitter(body, module.references))
                     .lowerDispatcher(chunks.map { chunk -> chunk.method }, table, cost)
                 body.finish()
+                module.constants.finishMethod()
             } catch (_: DexterMethodTooLargeException) {
                 return Attempt.Refused("function needs ${chunks.size} chunks, more than one dispatcher holds")
             } catch (failure: Throwable) {

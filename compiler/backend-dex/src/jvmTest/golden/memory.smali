@@ -13,7 +13,7 @@
 
     move-object/from16 v16, p0
 
-    const/4 v9, 0x1
+    const/4 v9, 0x3
 
     aget-object v12, v16, v9
 
@@ -225,7 +225,7 @@
 
     .line 2
     :cond_c6
-    const/4 v9, 0x1
+    const/4 v9, 0x3
 
     aget-object v12, v16, v9
 
@@ -263,7 +263,7 @@
 
     move-object/from16 v16, p0
 
-    const/4 v9, 0x1
+    const/4 v9, 0x3
 
     aget-object v12, v16, v9
 
@@ -322,7 +322,7 @@
 
     .line 2
     :cond_36
-    const/4 v9, 0x1
+    const/4 v9, 0x3
 
     aget-object v12, v16, v9
 
@@ -360,7 +360,7 @@
 
     move-object/from16 v16, p0
 
-    const/4 v9, 0x1
+    const/4 v9, 0x3
 
     aget-object v12, v16, v9
 
@@ -631,7 +631,7 @@
 
     .line 2
     :cond_fb
-    const/4 v9, 0x1
+    const/4 v9, 0x3
 
     aget-object v12, v16, v9
 
@@ -661,7 +661,7 @@
 
     .line 3
     :cond_114
-    const/4 v9, 0x1
+    const/4 v9, 0x3
 
     aget-object v12, v16, v9
 
@@ -704,7 +704,7 @@
     .line 2
     move-object/from16 v20, v14
 
-    const/4 v9, 0x1
+    const/4 v9, 0x3
 
     aget-object v2, v16, v9
 
@@ -723,7 +723,7 @@
     move/from16 v18, v15
 
     .line 3
-    const/4 v9, 0x1
+    const/4 v9, 0x3
 
     aget-object v2, v16, v9
 
@@ -758,7 +758,7 @@
 
     move-object/from16 v16, p0
 
-    const/4 v9, 0x1
+    const/4 v9, 0x3
 
     aget-object v12, v16, v9
 
@@ -810,7 +810,7 @@
 
     move-object/from16 v24, v2
 
-    const/4 v9, 0x2
+    const/4 v9, 0x6
 
     aget-object v2, v16, v9
 
@@ -918,7 +918,7 @@
     move-object/from16 v16, p0
 
     .line 2
-    const/4 v9, 0x2
+    const/4 v9, 0x6
 
     aget-object v2, v16, v9
 
@@ -943,7 +943,7 @@
 
     move-object/from16 v16, p0
 
-    const/4 v9, 0x3
+    const/4 v9, 0x4
 
     aget-object v12, v16, v9
 
@@ -951,7 +951,7 @@
 
     move-object/from16 v24, v12
 
-    const/4 v9, 0x4
+    const/4 v9, 0x5
 
     aget-object v12, v16, v9
 
@@ -1705,7 +1705,27 @@
 
     move-result-object v4
 
+    const/4 v2, 0x3
+
+    aput-object v4, p1, v2
+
+    const/4 v2, 0x0
+
+    invoke-virtual {p0, v2}, Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;->global(I)Lio/github/charlietap/chasm/runtime/instance/GlobalInstance;
+
+    move-result-object v4
+
+    const/4 v2, 0x4
+
+    aput-object v4, p1, v2
+
     const/4 v2, 0x1
+
+    invoke-virtual {p0, v2}, Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;->global(I)Lio/github/charlietap/chasm/runtime/instance/GlobalInstance;
+
+    move-result-object v4
+
+    const/4 v2, 0x5
 
     aput-object v4, p1, v2
 
@@ -1715,27 +1735,7 @@
 
     move-result-object v4
 
-    const/4 v2, 0x2
-
-    aput-object v4, p1, v2
-
-    const/4 v2, 0x0
-
-    invoke-virtual {p0, v2}, Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;->global(I)Lio/github/charlietap/chasm/runtime/instance/GlobalInstance;
-
-    move-result-object v4
-
-    const/4 v2, 0x3
-
-    aput-object v4, p1, v2
-
-    const/4 v2, 0x1
-
-    invoke-virtual {p0, v2}, Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;->global(I)Lio/github/charlietap/chasm/runtime/instance/GlobalInstance;
-
-    move-result-object v4
-
-    const/4 v2, 0x4
+    const/4 v2, 0x6
 
     aput-object v4, p1, v2
 
@@ -1749,7 +1749,7 @@
 
     check-cast p1, Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;
 
-    const/4 v0, 0x5
+    const/4 v0, 0x7
 
     new-array v1, v0, [Ljava/lang/Object;
 

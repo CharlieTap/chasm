@@ -9,13 +9,17 @@ internal class PackageNames {
     private val loaded = HashMap<String, Int>()
     private var unnamed = 0
 
-    @Synchronized
     fun next(
         bytes: ByteArray?,
         options: DexOptions,
     ): String {
-        if (bytes == null) return UNNAMED_PREFIX + ++unnamed
-        val name = PACKAGE_PREFIX + digest(bytes, options)
+        val name = bytes?.let { binary -> PACKAGE_PREFIX + digest(binary, options) }
+        return occurrence(name)
+    }
+
+    @Synchronized
+    private fun occurrence(name: String?): String {
+        if (name == null) return UNNAMED_PREFIX + ++unnamed
         val previous = loaded[name]
         if (previous == null && loaded.size >= MAX_NAMES) return UNNAMED_PREFIX + ++unnamed
         val occurrence = (previous ?: 0) + 1
