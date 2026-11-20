@@ -11,6 +11,8 @@ internal fun loweringParallelism(): ParallelismPolicy {
     }
 }
 
-private val ANDROID = ParallelismPolicy(minimumWork = 32_000, workPerWorker = 16_000, maximumWorkers = 6)
+internal const val ANDROID_MINIMUM_PARALLEL_WORK = 32_000L
+
+private val ANDROID = ParallelismPolicy(minimumWork = ANDROID_MINIMUM_PARALLEL_WORK, workPerWorker = 16_000, maximumWorkers = 6)
 
 private val JVM = ParallelismPolicy(minimumWork = 16_000, workPerWorker = 8_000)

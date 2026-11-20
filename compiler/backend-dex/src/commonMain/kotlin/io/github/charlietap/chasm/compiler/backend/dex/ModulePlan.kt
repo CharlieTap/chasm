@@ -83,7 +83,13 @@ internal class ModulePlan(
         return checkNotNull(functionInvocations[index.index]) { "function ${index.index} has no method" }
     }
 
+    fun batchWork(batch: Int): Int {
+        return batches[batch].sumOf { function -> function.instructions.size + FUNCTION_WORK }
+    }
+
     private companion object {
         const val NO_BATCH = -1
     }
 }
+
+internal const val FUNCTION_WORK = 64

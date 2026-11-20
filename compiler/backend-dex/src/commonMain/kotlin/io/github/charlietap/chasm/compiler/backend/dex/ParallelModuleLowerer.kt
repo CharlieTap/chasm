@@ -15,8 +15,10 @@ import io.github.charlietap.chasm.parallel.availableParallelProcessors
 import io.github.charlietap.chasm.parallel.claimEach
 import io.github.charlietap.chasm.parallel.selectWorkerCount
 import io.github.charlietap.chasm.parallel.workBatches
+import io.github.charlietap.dexter.DexFile
 import io.github.charlietap.dexter.Dexter
 import io.github.charlietap.dexter.DexterException
+import io.github.charlietap.dexter.DexterFileFullException
 import kotlin.coroutines.cancellation.CancellationException
 
 typealias ParallelModuleLowerer = suspend (Module, CirModule, DexOptions, ParallelTaskExecutor) -> DexModule
@@ -33,7 +35,7 @@ suspend fun ParallelModuleLowerer(
         options = options,
         taskExecutor = taskExecutor,
         workers = { work, largest, items -> selectWorkerCount(work, largest, items, loweringParallelism(), availableParallelProcessors()) },
-        claimOrder = ::largestBatchesFirst,
+        claimOrder = ::largestFilesFirst,
         functionLowerer = ::FunctionLowerer,
         entryLowerer = ::EntryLowerer,
         installLowerer = ::InstallLowerer,
@@ -48,7 +50,7 @@ internal suspend fun ParallelModuleLowerer(
     options: DexOptions,
     taskExecutor: ParallelTaskExecutor,
     workers: WorkerSelection,
-    claimOrder: (ModulePlan) -> IntArray,
+    claimOrder: (ModulePlan, DexLayout) -> IntArray,
     functionLowerer: FunctionLowerer,
     entryLowerer: EntryLowerer,
     installLowerer: InstallLowerer,
@@ -57,22 +59,44 @@ internal suspend fun ParallelModuleLowerer(
     val declarations = ModuleIndexSpaces(module)
     val summaries = summarizeFunctions(code, declarations, taskExecutor, workers)
     val plan = ModulePlan(module, code, options, declarations, analyzeModule(module, code, declarations, summaries))
-    val lowering = ParallelLowering(plan, claimOrder(plan))
-    val tasks = List<ParallelTaskScope.() -> ModuleLowering>(loweringWorkers(plan, workers)) { { lowerBatches(lowering, functionLowerer) } }
+    return try {
+        lowerFiles(plan, partitionedLayout(plan), taskExecutor, workers, claimOrder, functionLowerer, entryLowerer, installLowerer)
+    } catch (tooLarge: DexTooLarge) {
+        if (tooLarge.cause !is DexterFileFullException) throw tooLarge
+        lowerFiles(plan, filePerBatchLayout(plan), taskExecutor, workers, claimOrder, functionLowerer, entryLowerer, installLowerer)
+    }
+}
+
+private suspend fun lowerFiles(
+    plan: ModulePlan,
+    layout: DexLayout,
+    taskExecutor: ParallelTaskExecutor,
+    workers: WorkerSelection,
+    claimOrder: (ModulePlan, DexLayout) -> IntArray,
+    functionLowerer: FunctionLowerer,
+    entryLowerer: EntryLowerer,
+    installLowerer: InstallLowerer,
+): DexModule {
+
+    val lowering = ParallelLowering(plan, layout, claimOrder(plan, layout))
+    val tasks = List<ParallelTaskScope.() -> ModuleLowering>(loweringWorkers(plan, layout, workers)) { { lowerClaimedFiles(lowering, functionLowerer) } }
     val lowerings = taskExecutor.execute(tasks)
 
     when (val failure = lowering.failures.error) {
         null -> Unit
-        is DexterException -> throw DexTooLarge(failure.message ?: failure.toString(), failure)
-        else -> throw failure
+        else -> {
+            lowering.codeAndEntryFile?.abort()
+            if (failure is DexterException) throw DexTooLarge(failure.message ?: failure.toString(), failure)
+            throw failure
+        }
     }
 
     return try {
         val bound = boundResources(lowerings.map(ModuleLowering::usedObjects), lowerings.map(ModuleLowering::usedValues))
-
-        @Suppress("UNCHECKED_CAST")
-        val dex = (lowering.dex as Array<ByteArray>).asList()
-        finishModule(plan, Dexter(), dex, lowering.lowered, lowering.chunkStarts, bound, entryLowerer, installLowerer)
+        val codeDex = layout.files.indices.mapNotNull { file ->
+            if (layout.holdsEntries(file)) null else checkNotNull(lowering.codeDex[file]) { "dex file $file was not lowered" }
+        }
+        finishModule(plan, codeDex, lowering.codeAndEntryFile, lowering.lowered, lowering.chunkStarts, bound, entryLowerer, installLowerer)
     } catch (tooLarge: DexterException) {
         throw DexTooLarge(tooLarge.message ?: tooLarge.toString(), tooLarge)
     }
@@ -80,16 +104,18 @@ internal suspend fun ParallelModuleLowerer(
 
 private class ParallelLowering(
     val plan: ModulePlan,
+    val layout: DexLayout,
     val order: IntArray,
 ) {
     val cursor = WorkCursor(order.size)
-    val dex = arrayOfNulls<ByteArray>(plan.batches.size)
+    val codeDex = arrayOfNulls<ByteArray>(layout.files.size)
+    var codeAndEntryFile: DexFile? = null
     val lowered = LoweredFunctions(plan.functionCount)
     val chunkStarts = arrayOfNulls<IntArray>(plan.functionCount)
     val failures = EarliestFailure<Throwable>()
 }
 
-private fun ParallelTaskScope.lowerBatches(
+private fun ParallelTaskScope.lowerClaimedFiles(
     lowering: ParallelLowering,
     functionLowerer: FunctionLowerer,
 ): ModuleLowering {
@@ -98,17 +124,22 @@ private fun ParallelTaskScope.lowerBatches(
     val dexter = Dexter()
 
     claimEach(lowering.cursor) { claimed ->
-        val batch = lowering.order[claimed]
-        if (lowering.failures.isBeyond(batch)) return@claimEach
-        val file = dexter.beginFile()
+        val file = lowering.order[claimed]
+        val batches = lowering.layout.files[file]
+        if (lowering.failures.isBeyond(batches.first)) return@claimEach
+        val dex = lowering.layout.beginFile(file, dexter)
+        var batch = batches.first
         try {
-            lowerBatch(worker, batch, file, lowering.lowered, functionLowerer)
-            lowering.dex[batch] = file.finish()
+            while (batch <= batches.last) {
+                lowerBatch(worker, batch, dex, lowering.lowered, functionLowerer)
+                batch++
+            }
+            if (lowering.layout.holdsEntries(file)) lowering.codeAndEntryFile = dex else lowering.codeDex[file] = dex.finish()
         } catch (cancelled: CancellationException) {
-            file.abort()
+            dex.abort()
             throw cancelled
         } catch (failure: Throwable) {
-            file.abort()
+            dex.abort()
             lowering.failures.report(batch, failure)
         }
     }
@@ -116,26 +147,35 @@ private fun ParallelTaskScope.lowerBatches(
     return worker
 }
 
-internal fun largestBatchesFirst(plan: ModulePlan): IntArray {
-    val work = IntArray(plan.batches.size) { batch -> batchWork(plan, batch) }
-    return plan.batches.indices.sortedByDescending { batch -> work[batch] }.toIntArray()
+internal fun largestFilesFirst(
+    plan: ModulePlan,
+    layout: DexLayout,
+): IntArray {
+    val work = LongArray(layout.files.size) { file -> fileWork(plan, layout.files[file]) }
+    return layout.files.indices.sortedByDescending { file -> work[file] }.toIntArray()
 }
 
 private fun loweringWorkers(
     plan: ModulePlan,
+    layout: DexLayout,
     workers: WorkerSelection,
 ): Int {
 
     var total = 0L
     var largest = 0L
-    for (batch in plan.batches.indices) {
-        val work = batchWork(plan, batch).toLong()
+    for (batches in layout.files) {
+        val work = fileWork(plan, batches)
         total += work
         largest = maxOf(largest, work)
     }
 
-    return workers(total, largest, plan.batches.size)
+    return workers(total, largest, layout.files.size)
 }
+
+private fun fileWork(
+    plan: ModulePlan,
+    batches: IntRange,
+): Long = batches.sumOf { batch -> plan.batchWork(batch).toLong() }
 
 private suspend fun summarizeFunctions(
     code: CirModule,
@@ -170,14 +210,5 @@ private suspend fun summarizeFunctions(
     @Suppress("UNCHECKED_CAST")
     return (summaries as Array<FunctionSummary>).asList()
 }
-
-private fun batchWork(
-    plan: ModulePlan,
-    batch: Int,
-): Int {
-    return plan.batches[batch].sumOf { function -> function.instructions.size + FUNCTION_WORK }
-}
-
-private const val FUNCTION_WORK = 64
 
 private const val SUMMARY_BATCH_WORK = 16_000

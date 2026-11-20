@@ -1,17 +1,15 @@
-@file:OptIn(InternalChasmApi::class)
-
 package io.github.charlietap.chasm.compiler.backend.dex
 
+import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcodes
 import com.android.tools.smali.dexlib2.dexbacked.DexBackedDexFile
 import com.github.michaelbull.result.getOrThrow
-import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.compiler.backend.abi.binaryName
 import io.github.charlietap.chasm.compiler.frontend.ModuleCompiler
-import io.github.charlietap.chasm.runtime.compiled.CODE_CLASS_PREFIX
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertTrue
 
 class ModuleLowererTest {
 
@@ -28,6 +26,7 @@ class ModuleLowererTest {
                 module = module,
                 code = code,
                 options = DexOptions(),
+                layout = ::partitionedLayout,
                 functionLowerer = { _, function, _, _ ->
                     attempted += function.index.index
                     "unsupported".takeIf { function.index.index % 2 == 0 }
@@ -47,13 +46,36 @@ class ModuleLowererTest {
     }
 
     @Test
-    fun `code classes name every function body class once`() {
+    fun `classes to initialize name every generated class except interfaces once`() {
         val generated = generate(decodeModule(fixture("calls")))
-        val bodies = generated.dex
-            .flatMap { bytes -> DexBackedDexFile(Opcodes.forApi(MIN_API), bytes).classes.map { classDef -> binaryName(classDef.type) } }
-            .filter { name -> name.substringAfterLast('.').startsWith(CODE_CLASS_PREFIX) }
+        val classes = generated.dex
+            .flatMap { bytes -> DexBackedDexFile(Opcodes.forApi(MIN_API), bytes).classes }
+            .filterNot { classDef -> AccessFlags.INTERFACE.isSet(classDef.accessFlags) }
+            .map { classDef -> binaryName(classDef.type) }
 
-        assertEquals(bodies.sorted(), generated.codeClasses.sorted())
-        assertEquals(generated.codeClasses.distinct(), generated.codeClasses)
+        assertEquals(classes.sorted(), generated.classesToInitialize.sorted())
+        assertEquals(generated.classesToInitialize.distinct(), generated.classesToInitialize)
+    }
+
+    @Test
+    fun `entries and the installer leave code files when a module spans several files`() {
+        val module = decodeModule(fixture("calls"))
+        val code = ModuleCompiler(module).getOrThrow { IllegalStateException(it.toString()) }
+        val generated = ModuleLowerer(
+            module = module,
+            code = code,
+            options = DexOptions(stacktraces = true),
+            layout = ::filePerBatchLayout,
+            functionLowerer = ::FunctionLowerer,
+            entryLowerer = ::EntryLowerer,
+            installLowerer = ::InstallLowerer,
+        )
+        val files = generated.dex.map { bytes -> DexBackedDexFile(Opcodes.forApi(MIN_API), bytes).classes.map { classDef -> binaryName(classDef.type) } }
+        val codeFiles = files.filter { classes -> classes.any { name -> name.substringAfterLast('.').startsWith("Code") } }
+
+        assertTrue(files.size > 1)
+        assertEquals(files.flatten().distinct(), files.flatten())
+        assertTrue(codeFiles.flatten().none { name -> name.substringAfterLast('.').startsWith("Entry") || name.substringAfterLast('.').startsWith("Install") })
+        assertEquals(generate(module).classesToInitialize.sorted(), generated.classesToInitialize.sorted())
     }
 }

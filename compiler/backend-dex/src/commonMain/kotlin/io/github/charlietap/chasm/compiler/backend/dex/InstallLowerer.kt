@@ -24,38 +24,22 @@ import io.github.charlietap.dexter.Conversion
 import io.github.charlietap.dexter.DexConstructor
 import io.github.charlietap.dexter.DexFile
 import io.github.charlietap.dexter.DexType
-import io.github.charlietap.dexter.Dexter
 import io.github.charlietap.dexter.MemberAccess
 import io.github.charlietap.dexter.Reg
 
-internal typealias InstallLowerer = (Dexter, String, BoundResources, Map<Int, EntryRef>) -> List<ByteArray>
+internal typealias InstallLowerer = (DexFile, String, BoundResources, Map<Int, EntryRef>) -> List<String>
 
 internal fun InstallLowerer(
-    dexter: Dexter,
+    file: DexFile,
     installer: String,
     bound: BoundResources,
     entries: Map<Int, EntryRef>,
-): List<ByteArray> {
-    val groups = entries.entries.chunked(INSTALLS_PER_FILE)
+): List<String> {
+    val groups = entries.entries.chunked(INSTALLS_PER_CLASS)
     val groupClasses = groups.indices.map { group -> installer.removeSuffix(";") + "Entries$group;" }
-    val files = groups.mapIndexed { group, installs ->
-        dexFile(dexter) { file -> entriesClass(file, groupClasses[group], installs.chunked(INSTALLS_PER_METHOD)) }
-    }
-    return files + dexFile(dexter) { file -> installerClass(file, installer, bound, groupClasses) }
-}
-
-private inline fun dexFile(
-    dexter: Dexter,
-    write: (DexFile) -> Unit,
-): ByteArray {
-    val file = dexter.beginFile()
-    return try {
-        write(file)
-        file.finish()
-    } catch (failure: Throwable) {
-        file.abort()
-        throw failure
-    }
+    groups.forEachIndexed { group, installs -> entriesClass(file, groupClasses[group], installs.chunked(INSTALLS_PER_METHOD)) }
+    installerClass(file, installer, bound, groupClasses)
+    return groupClasses
 }
 
 private fun entriesClass(
@@ -215,6 +199,6 @@ private const val RESOURCES_PER_METHOD = 200
 
 private const val INSTALLS_PER_METHOD = 400
 
-private const val INSTALLS_PER_FILE = 8_000
+private const val INSTALLS_PER_CLASS = 8_000
 
 private const val INSTALL_ENTRIES = "installEntries"

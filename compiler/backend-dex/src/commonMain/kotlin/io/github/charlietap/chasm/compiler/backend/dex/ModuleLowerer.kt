@@ -13,6 +13,7 @@ import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.dexter.DexFile
 import io.github.charlietap.dexter.Dexter
 import io.github.charlietap.dexter.DexterException
+import io.github.charlietap.dexter.DexterFileFullException
 
 typealias ModuleLowerer = (Module, CirModule, DexOptions) -> DexModule
 
@@ -25,6 +26,7 @@ fun ModuleLowerer(
         module = module,
         code = code,
         options = options,
+        layout = ::partitionedLayout,
         functionLowerer = ::FunctionLowerer,
         entryLowerer = ::EntryLowerer,
         installLowerer = ::InstallLowerer,
@@ -34,36 +36,50 @@ internal fun ModuleLowerer(
     module: Module,
     code: CirModule,
     options: DexOptions,
+    layout: (ModulePlan) -> DexLayout,
     functionLowerer: FunctionLowerer,
     entryLowerer: EntryLowerer,
     installLowerer: InstallLowerer,
 ): DexModule {
+    val plan = ModulePlan(module, code, options)
     return try {
-        lowerModule(module, code, options, functionLowerer, entryLowerer, installLowerer)
+        try {
+            lowerFiles(plan, layout(plan), functionLowerer, entryLowerer, installLowerer)
+        } catch (_: DexterFileFullException) {
+            lowerFiles(plan, filePerBatchLayout(plan), functionLowerer, entryLowerer, installLowerer)
+        }
     } catch (tooLarge: DexterException) {
         throw DexTooLarge(tooLarge.message ?: tooLarge.toString(), tooLarge)
     }
 }
 
-private fun lowerModule(
-    module: Module,
-    code: CirModule,
-    options: DexOptions,
+private fun lowerFiles(
+    plan: ModulePlan,
+    layout: DexLayout,
     functionLowerer: FunctionLowerer,
     entryLowerer: EntryLowerer,
     installLowerer: InstallLowerer,
 ): DexModule {
 
-    val lowering = ModuleLowering(module, code, options)
-    val lowered = LoweredFunctions(lowering.plan.functionCount)
+    val lowering = ModuleLowering(plan)
+    val lowered = LoweredFunctions(plan.functionCount)
     val dexter = Dexter()
-    val dex = lowering.batches.indices.map { batch ->
-        dexFile(dexter) { file -> lowerBatch(lowering, batch, file, lowered, functionLowerer) }
+    val codeDex = ArrayList<ByteArray>(layout.files.size)
+    var codeAndEntryFile: DexFile? = null
+    layout.files.forEachIndexed { index, batches ->
+        val file = layout.beginFile(index, dexter)
+        try {
+            for (batch in batches) lowerBatch(lowering, batch, file, lowered, functionLowerer)
+        } catch (failure: Throwable) {
+            file.abort()
+            throw failure
+        }
+        if (layout.holdsEntries(index)) codeAndEntryFile = file else codeDex += file.finish()
     }
 
     val bound = boundResources(listOf(lowering.usedObjects), listOf(lowering.usedValues))
 
-    return finishModule(lowering.plan, dexter, dex, lowered, lowering.chunkStarts, bound, entryLowerer, installLowerer)
+    return finishModule(plan, codeDex, codeAndEntryFile, lowered, lowering.chunkStarts, bound, entryLowerer, installLowerer)
 }
 
 internal fun lowerBatch(
@@ -90,8 +106,8 @@ internal fun lowerBatch(
 
 internal fun finishModule(
     plan: ModulePlan,
-    dexter: Dexter,
-    dex: List<ByteArray>,
+    codeDex: List<ByteArray>,
+    codeAndEntryFile: DexFile?,
     lowered: LoweredFunctions,
     chunkStarts: Array<IntArray?>,
     bound: BoundResources,
@@ -100,7 +116,27 @@ internal fun finishModule(
 ): DexModule {
 
     val reasons = lowered.reasons(plan.functions)
-    if (reasons.isNotEmpty()) throw UnsupportedFunctions(reasons)
+    if (reasons.isNotEmpty()) {
+        codeAndEntryFile?.abort()
+        throw UnsupportedFunctions(reasons)
+    }
+    return try {
+        finishFiles(plan, codeDex, codeAndEntryFile, chunkStarts, bound, entryLowerer, installLowerer)
+    } catch (failure: Throwable) {
+        codeAndEntryFile?.abort()
+        throw failure
+    }
+}
+
+private fun finishFiles(
+    plan: ModulePlan,
+    codeDex: List<ByteArray>,
+    codeAndEntryFile: DexFile?,
+    chunkStarts: Array<IntArray?>,
+    bound: BoundResources,
+    entryLowerer: EntryLowerer,
+    installLowerer: InstallLowerer,
+): DexModule {
 
     val compiled = LinkedHashMap<EntryKey, EntryCandidates>()
     for (function in plan.functions) {
@@ -111,29 +147,37 @@ internal fun finishModule(
     }
 
     val entries = arrayOfNulls<EntryRef>(plan.functionCount)
-    val entryDex = entryGroups(compiled, plan).chunkedBy(ENTRY_FUNCTIONS_PER_FILE).map { files ->
-        dexFile(dexter) { file ->
-            for (group in files) {
-                val descriptor = entryLowerer(file, group, plan.packagePath)
-                group.members.forEachIndexed { id, member -> entries[member.index] = EntryRef(descriptor, id) }
-            }
+    val entryClasses = LinkedHashSet<String>()
+    val groups = entryGroups(compiled, plan)
+    val dexter = Dexter()
+    val dex = ArrayList(codeDex)
+    val entryFiles = if (codeAndEntryFile != null) listOf(groups) else groups.chunkedBy(ENTRY_FUNCTIONS_PER_FILE)
+    for (members in entryFiles) {
+        val file = codeAndEntryFile ?: dexter.beginFile()
+        for (group in members) {
+            val descriptor = entryLowerer(file, group, plan.packagePath)
+            entryClasses += descriptor
+            group.members.forEachIndexed { id, member -> entries[member.index] = EntryRef(descriptor, id) }
         }
+        if (codeAndEntryFile == null) dex += file.finish()
     }
 
     val ordered = LinkedHashMap<Int, EntryRef>()
     entries.forEachIndexed { function, entry -> if (entry != null) ordered[function] = entry }
     val installer = installClass(plan.packagePath)
-    val install = installLowerer(dexter, installer, bound, ordered)
+    val installFile = codeAndEntryFile ?: dexter.beginFile()
+    val installEntries = installLowerer(installFile, installer, bound, ordered)
+    dex += installFile.finish()
 
     val splitStarts = HashMap<Int, IntArray>()
     chunkStarts.forEachIndexed { function, starts -> if (starts != null) splitStarts[function] = starts }
 
     return DexModule(
-        dex = dex + entryDex + install,
+        dex = dex,
         installer = binaryName(installer),
         inlineMemory = plan.inlineMemory != null,
         chunkStarts = splitStarts,
-        codeClasses = plan.batches.indices.map { batch -> binaryName(codeClass(plan.packagePath, batch)) },
+        classesToInitialize = (plan.batches.indices.map { batch -> codeClass(plan.packagePath, batch) } + entryClasses + installEntries + installer).map(::binaryName),
     )
 }
 
@@ -215,20 +259,6 @@ private fun List<EntryGroup>.chunkedBy(
     }
     if (current.isNotEmpty()) chunks += current
     return chunks
-}
-
-private inline fun dexFile(
-    dexter: Dexter,
-    write: (DexFile) -> Unit,
-): ByteArray {
-    val file = dexter.beginFile()
-    return try {
-        write(file)
-        file.finish()
-    } catch (failure: Throwable) {
-        file.abort()
-        throw failure
-    }
 }
 
 internal const val ENTRY_GROUP_SIZE = 64

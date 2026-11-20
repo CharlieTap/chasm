@@ -107,7 +107,7 @@ internal suspend inline fun compileUnchecked(
 
     val installer = try {
         val loader = dexLoader(dex.dex, CodeInstallation::class.java.classLoader!!)
-        codeClassInitializer(loader, dex.codeClasses, executor)
+        codeClassInitializer(loader, dex.classesToInitialize, executor)
         @Suppress("UNCHECKED_CAST")
         loader.loadClass(dex.installer).getDeclaredConstructor().newInstance() as Consumer<CodeInstallation>
     } catch (failure: ReflectiveOperationException) {
