@@ -5,10 +5,10 @@ import io.github.charlietap.chasm.cir.FunctionIndex
 import io.github.charlietap.chasm.compiler.backend.abi.BRIDGE_CALL
 import io.github.charlietap.chasm.compiler.backend.abi.BRIDGE_CALL_INDIRECT
 import io.github.charlietap.chasm.compiler.backend.abi.BRIDGE_CALL_REF
+import io.github.charlietap.chasm.compiler.backend.abi.CACHED_INDIRECT_TARGET
 import io.github.charlietap.chasm.compiler.backend.abi.COMPLETE_TAIL_CALL
 import io.github.charlietap.chasm.compiler.backend.abi.CONTEXT_TYPE
 import io.github.charlietap.chasm.compiler.backend.abi.FUNCTION_INSTANCE
-import io.github.charlietap.chasm.compiler.backend.abi.INDIRECT_TARGET
 import io.github.charlietap.chasm.compiler.backend.abi.INT_BITS_TO_FLOAT
 import io.github.charlietap.chasm.compiler.backend.abi.LONG_BITS_TO_DOUBLE
 import io.github.charlietap.chasm.compiler.backend.abi.MODULE_INSTANCE
@@ -77,13 +77,13 @@ private fun LowerContext.typedIndirectCall(
             loadValueInt(Registers.I2, Resource.RuntimeType(instruction.type.index))
             loadObject(Registers.W1, Resource.Table(instruction.table.index), TABLE_INSTANCE)
             loadInt(Registers.I0, Registers.W0, Operand.Slot(instruction.elementIndexSlot))
-            emit.invoke(INDIRECT_TARGET, Registers.CONTEXT, Registers.W1, Registers.I2, Registers.I0)
+            emit.invoke(CACHED_INDIRECT_TARGET, Registers.CONTEXT, Registers.W1, Registers.I2, Registers.I0)
         }
         is ControlInstruction.CallIndirectI -> {
             loadValueInt(Registers.I2, Resource.RuntimeType(instruction.type.index))
             loadObject(Registers.W1, Resource.Table(instruction.table.index), TABLE_INSTANCE)
             emit.const(Registers.I0, instruction.elementIndex)
-            emit.invoke(INDIRECT_TARGET, Registers.CONTEXT, Registers.W1, Registers.I2, Registers.I0)
+            emit.invoke(CACHED_INDIRECT_TARGET, Registers.CONTEXT, Registers.W1, Registers.I2, Registers.I0)
         }
         is ControlInstruction.CallRefS -> {
             loadWide(Registers.W2, instruction.functionSlot)

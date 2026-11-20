@@ -133,6 +133,7 @@ val BRIDGE_CALL_INDIRECT =
     compiledCalls.method("callIndirect", CONTEXT_TYPE, MODULE_INSTANCE, TABLE_INSTANCE, "I", "I", "[J", "I", returns = "V")
 val BRIDGE_CALL_REF = compiledCalls.method("callRef", CONTEXT_TYPE, MODULE_INSTANCE, "J", "[J", "I", returns = "V")
 val INDIRECT_TARGET = compiledCalls.method("indirectTarget", CONTEXT_TYPE, TABLE_INSTANCE, "I", "I", returns = OBJECT_TYPE)
+val CACHED_INDIRECT_TARGET = compiledCalls.method("cachedIndirectTarget", CONTEXT_TYPE, TABLE_INSTANCE, "I", "I", returns = OBJECT_TYPE)
 val REF_TARGET = compiledCalls.method("refTarget", CONTEXT_TYPE, "J", returns = OBJECT_TYPE)
 val TAIL_CALL = compiledCalls.method("tailCall", CONTEXT_TYPE, MODULE_INSTANCE, FUNCTION_INSTANCE, "[J", returns = "V")
 val TAIL_CALL_INDIRECT =

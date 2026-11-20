@@ -4,6 +4,7 @@ import io.github.charlietap.chasm.host.HostReference
 import io.github.charlietap.chasm.host.HostTable
 import io.github.charlietap.chasm.host.UnsafeHostApi
 import io.github.charlietap.chasm.type.TableType
+import kotlin.jvm.JvmField
 
 @OptIn(UnsafeHostApi::class)
 data class TableInstance(
@@ -11,6 +12,9 @@ data class TableInstance(
     var elements: LongArray,
     val maximumElements: Int = declaredMaximumElements(type),
 ) : HostTable {
+
+    @JvmField
+    var indirectCallTargets: Array<IndirectCallTarget?> = emptyArray()
 
     override val size: Int
         get() = elements.size

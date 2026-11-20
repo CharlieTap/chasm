@@ -257,7 +257,7 @@
 
     const/4 v8, 0x3
 
-    invoke-static {v14, v2, v10, v8}, Lio/github/charlietap/chasm/runtime/compiled/CompiledCalls;->indirectTarget(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;Lio/github/charlietap/chasm/runtime/instance/TableInstance;II)Ljava/lang/Object;
+    invoke-static {v14, v2, v10, v8}, Lio/github/charlietap/chasm/runtime/compiled/CompiledCalls;->cachedIndirectTarget(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;Lio/github/charlietap/chasm/runtime/instance/TableInstance;II)Ljava/lang/Object;
 
     move-result-object v12
 
@@ -687,7 +687,7 @@
 
     move/from16 v8, v17
 
-    invoke-static {v14, v2, v10, v8}, Lio/github/charlietap/chasm/runtime/compiled/CompiledCalls;->indirectTarget(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;Lio/github/charlietap/chasm/runtime/instance/TableInstance;II)Ljava/lang/Object;
+    invoke-static {v14, v2, v10, v8}, Lio/github/charlietap/chasm/runtime/compiled/CompiledCalls;->cachedIndirectTarget(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;Lio/github/charlietap/chasm/runtime/instance/TableInstance;II)Ljava/lang/Object;
 
     move-result-object v12
 
