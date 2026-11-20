@@ -5,6 +5,7 @@ class DexModule(
     val installer: String,
     val inlineMemory: Boolean,
     val chunkStarts: Map<Int, IntArray> = emptyMap(),
+    val codeClasses: List<String>,
 )
 
 class UnsupportedFunctions(

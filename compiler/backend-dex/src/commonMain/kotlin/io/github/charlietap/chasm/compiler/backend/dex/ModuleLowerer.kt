@@ -128,7 +128,13 @@ internal fun finishModule(
     val splitStarts = HashMap<Int, IntArray>()
     chunkStarts.forEachIndexed { function, starts -> if (starts != null) splitStarts[function] = starts }
 
-    return DexModule(dex + entryDex + install, binaryName(installer), plan.inlineMemory != null, splitStarts)
+    return DexModule(
+        dex = dex + entryDex + install,
+        installer = binaryName(installer),
+        inlineMemory = plan.inlineMemory != null,
+        chunkStarts = splitStarts,
+        codeClasses = plan.batches.indices.map { batch -> binaryName(codeClass(plan.packagePath, batch)) },
+    )
 }
 
 internal class LoweredFunctions(

@@ -42,6 +42,7 @@ internal suspend fun compile(
         uncompilableFunctions = ::UncompilableFunctions,
         moduleLowerer = ::ParallelModuleLowerer,
         dexLoader = ::DexLoader,
+        codeClassInitializer = ::CodeClassInitializer,
     )
 }
 
@@ -54,9 +55,10 @@ internal suspend inline fun compile(
     crossinline uncompilableFunctions: UncompilableFunctions,
     crossinline moduleLowerer: ParallelModuleLowerer,
     crossinline dexLoader: DexLoader,
+    crossinline codeClassInitializer: CodeClassInitializer,
 ): CompileResult {
     return try {
-        compileUnchecked(module, config, executor, packageNames, moduleCompiler, uncompilableFunctions, moduleLowerer, dexLoader)
+        compileUnchecked(module, config, executor, packageNames, moduleCompiler, uncompilableFunctions, moduleLowerer, dexLoader, codeClassInitializer)
     } catch (cancelled: CancellationException) {
         throw cancelled
     } catch (failure: RuntimeException) {
@@ -73,6 +75,7 @@ internal suspend inline fun compileUnchecked(
     crossinline uncompilableFunctions: UncompilableFunctions,
     crossinline moduleLowerer: ParallelModuleLowerer,
     crossinline dexLoader: DexLoader,
+    crossinline codeClassInitializer: CodeClassInitializer,
 ): CompileResult {
 
     coroutineContext.ensureActive()
@@ -104,6 +107,7 @@ internal suspend inline fun compileUnchecked(
 
     val installer = try {
         val loader = dexLoader(dex.dex, CodeInstallation::class.java.classLoader!!)
+        codeClassInitializer(loader, dex.codeClasses, executor)
         @Suppress("UNCHECKED_CAST")
         loader.loadClass(dex.installer).getDeclaredConstructor().newInstance() as Consumer<CodeInstallation>
     } catch (failure: ReflectiveOperationException) {
