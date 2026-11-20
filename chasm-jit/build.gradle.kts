@@ -1,5 +1,8 @@
+import com.android.build.api.artifact.SingleArtifact
+import io.github.charlietap.chasm.gradle.task.DeviceInstrumentationCheckTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
+import java.time.Duration
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
@@ -53,6 +56,7 @@ kotlin {
             sourceSetTreeName = "test"
         }.configure {
             instrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+            instrumentationRunnerArguments["notClass"] = "io.github.charlietap.chasm.jit.JitTieringTest"
         }
     }
 
@@ -102,6 +106,24 @@ kotlin {
                 implementation(libs.kotlin.junit)
                 implementation(libs.androidx.test.junit)
                 implementation(libs.androidx.test.runner)
+            }
+        }
+    }
+}
+
+androidComponents {
+    onVariants { variant ->
+        variant.deviceTests.values.forEach { deviceTest ->
+            tasks.register<DeviceInstrumentationCheckTask>("checkJitTiering") {
+                group = "verification"
+                description = "Checks on a Samsung S24 that ART JIT-compiles the generated code"
+                adbExecutable = sdkComponents.adb
+                timeout = Duration.ofMinutes(10)
+                testApkDirectory = deviceTest.artifacts.get(SingleArtifact.APK)
+                testApplicationId = deviceTest.applicationId
+                instrumentationRunner = deviceTest.instrumentationRunner
+                testClass = "io.github.charlietap.chasm.jit.JitTieringTest"
+                deviceModel = "SM-S721B"
             }
         }
     }
