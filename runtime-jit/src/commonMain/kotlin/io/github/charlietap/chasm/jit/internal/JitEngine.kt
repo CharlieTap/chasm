@@ -38,6 +38,8 @@ import io.github.charlietap.chasm.reference.ExceptionReference
 import io.github.charlietap.chasm.reference.StructReference
 import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.runtime.compiled.gc.ManagedObjects
+import io.github.charlietap.chasm.runtime.compiled.gc.ReferenceGlobal
+import io.github.charlietap.chasm.runtime.compiled.gc.ReferenceTable
 import io.github.charlietap.chasm.runtime.exception.HostRaisedWasmException
 import io.github.charlietap.chasm.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.runtime.instance.GlobalInstance
@@ -83,12 +85,12 @@ internal class JitEngine(
 
     private val runtime = classic.store
 
-    private val bridge = managedBridge(runtime).also { bridge -> bridge.engine = this }
+    private val managedStore = managedStore(runtime).also { created -> created.engine = this }
 
     private val objects: ManagedObjects
         get() {
             live()
-            return bridge.objects
+            return managedStore.objects
         }
 
     private val values = LaneValues()
@@ -97,13 +99,14 @@ internal class JitEngine(
 
     private val resources = JitHostResources(store)
 
-    private val instantiator = JitInstantiator(classic, bridge, this)
+    private val instantiator = JitInstantiator(classic, managedStore, this)
 
     override fun dropStore() {
 
         live()
 
         classicDropStore(classic).orThrow()
+        managedStore.drop()
     }
 
     override fun dropInstance(instance: Instance) {
@@ -178,15 +181,17 @@ internal class JitEngine(
 
         val reference = type.valueType as? ValueType.Reference
         if (reference == null) {
-            return Global(this, externalValue(classicGlobal(classic, type, values.number(type.valueType, value))))
+            val address = (externalValue(classicGlobal(classic, type, values.number(type.valueType, value))) as ExternalValue.Global).address
+            return globalAt(address)
         }
 
         val initial = values.reference(value)
 
-        require(bridge.checks.check(reference.referenceType, null).accepts(initial)) { "the value does not match the global's type" }
+        require(managedStore.checks.check(reference.referenceType, null).accepts(initial)) { "the value does not match the global's type" }
 
-        val global = Global(this, externalValue(classicGlobal(classic, type, NULL_REFERENCE)))
-        objects.globals.unsafeWriteGlobalReference(globalInstance(global), initial)
+        val address = (externalValue(classicGlobal(classic, type, NULL_REFERENCE)) as ExternalValue.Global).address
+        val global = globalAt(address)
+        managedStore.objects.globals.unsafeWriteGlobalReference(referenceGlobal(global), initial)
 
         return global
     }
@@ -198,10 +203,11 @@ internal class JitEngine(
 
         live()
 
-        val table = Table(this, externalValue(classicTable(classic, type, NULL_REFERENCE)))
-        val instance = tableInstance(table)
+        val address = (externalValue(classicTable(classic, type, NULL_REFERENCE)) as ExternalValue.Table).address
+        val table = tableAt(address)
+        val storage = referenceTable(table)
 
-        objects.tables.fillTable(instance, 0, initial, objects.tables.sizeTable(instance))
+        managedStore.objects.tables.fillTable(storage, 0, initial, managedStore.objects.tables.sizeTable(storage))
 
         return table
     }
@@ -223,7 +229,7 @@ internal class JitEngine(
 
         val classicImports = imports.map { import ->
             require(import.value.engine === this) { "the import ${import.moduleName}.${import.entityName} belongs to a different store" }
-            ClassicImport(import.moduleName, import.entityName, importable(classic, import.value.payload as ExternalValue))
+            ClassicImport(import.moduleName, import.entityName, importable(classic, externalValueOf(import.value.payload)))
         }
 
         return when (val result = instantiator.instantiate(module.payload as ClassicModule, classicImports, config)) {
@@ -265,7 +271,7 @@ internal class JitEngine(
             return ChasmResult.Success(cached)
         }
 
-        return when (val prepared = ObjectCall.prepare(classic, jit.embedding, name, bridge)) {
+        return when (val prepared = ObjectCall.prepare(classic, jit.embedding, name, managedStore)) {
             is ChasmResult.Success -> {
                 val function = PreparedFunction(prepared.result.type, this, prepared.result)
                 ChasmResult.Success(jit.prepared.putIfAbsent(name, function) ?: function)
@@ -486,36 +492,36 @@ internal class JitEngine(
     }
 
     override fun readGlobal(global: Global): Long {
-        return objects.globals.readGlobal(globalInstance(global))
+        return managedStore.objects.globals.readGlobal(globalInstance(global))
     }
 
     override fun readGlobalReference(global: Global): Any? {
-        return objects.globals.readGlobalReference(globalInstance(global))
+        return managedStore.objects.globals.readGlobalReference(referenceGlobal(global))
     }
 
     override fun writeGlobal(
         global: Global,
         value: Long,
     ) {
-        objects.globals.writeGlobal(globalInstance(global), value)
+        managedStore.objects.globals.writeGlobal(globalInstance(global), value)
     }
 
     override fun writeGlobalReference(
         global: Global,
         value: Any?,
     ) {
-        objects.globals.writeGlobalReference(globalInstance(global), value)
+        managedStore.objects.globals.writeGlobalReference(referenceGlobal(global), value)
     }
 
     override fun unsafeWriteGlobalReference(
         global: Global,
         value: Any?,
     ) {
-        objects.globals.unsafeWriteGlobalReference(globalInstance(global), value)
+        managedStore.objects.globals.unsafeWriteGlobalReference(referenceGlobal(global), value)
     }
 
     override fun sizeTable(table: Table): Int {
-        return objects.tables.sizeTable(tableInstance(table))
+        return managedStore.objects.tables.sizeTable(referenceTable(table))
     }
 
     override fun growTable(
@@ -523,14 +529,14 @@ internal class JitEngine(
         elementsToAdd: Int,
         initial: Any?,
     ): Int {
-        return objects.tables.growTable(tableInstance(table), elementsToAdd, initial)
+        return managedStore.objects.tables.growTable(referenceTable(table), elementsToAdd, initial)
     }
 
     override fun readTable(
         table: Table,
         index: Int,
     ): Any? {
-        return objects.tables.readTable(tableInstance(table), index)
+        return managedStore.objects.tables.readTable(referenceTable(table), index)
     }
 
     override fun writeTable(
@@ -538,7 +544,7 @@ internal class JitEngine(
         index: Int,
         value: Any?,
     ) {
-        objects.tables.writeTable(tableInstance(table), index, value)
+        managedStore.objects.tables.writeTable(referenceTable(table), index, value)
     }
 
     override fun readTable(
@@ -548,7 +554,7 @@ internal class JitEngine(
         elementsToRead: Int,
         bufferIndex: Int,
     ): Array<Any?> {
-        return objects.tables.readTable(tableInstance(table), buffer, elementIndex, elementsToRead, bufferIndex)
+        return managedStore.objects.tables.readTable(referenceTable(table), buffer, elementIndex, elementsToRead, bufferIndex)
     }
 
     override fun writeTable(
@@ -558,7 +564,7 @@ internal class JitEngine(
         bufferIndex: Int,
         elementsToWrite: Int,
     ) {
-        objects.tables.writeTable(tableInstance(table), elementIndex, buffer, bufferIndex, elementsToWrite)
+        managedStore.objects.tables.writeTable(referenceTable(table), elementIndex, buffer, bufferIndex, elementsToWrite)
     }
 
     override fun fillTable(
@@ -567,7 +573,7 @@ internal class JitEngine(
         value: Any?,
         elementsToFill: Int,
     ) {
-        objects.tables.fillTable(tableInstance(table), elementIndex, value, elementsToFill)
+        managedStore.objects.tables.fillTable(referenceTable(table), elementIndex, value, elementsToFill)
     }
 
     override fun copyTable(
@@ -577,7 +583,7 @@ internal class JitEngine(
         destinationElementIndex: Int,
         elementsToCopy: Int,
     ) {
-        objects.tables.copyTable(tableInstance(source), sourceElementIndex, tableInstance(destination), destinationElementIndex, elementsToCopy)
+        managedStore.objects.tables.copyTable(referenceTable(source), sourceElementIndex, referenceTable(destination), destinationElementIndex, elementsToCopy)
     }
 
     override fun unsafeWriteTable(
@@ -585,11 +591,11 @@ internal class JitEngine(
         index: Int,
         value: Any?,
     ) {
-        objects.tables.unsafeWriteTable(tableInstance(table), index, value)
+        managedStore.objects.tables.unsafeWriteTable(referenceTable(table), index, value)
     }
 
     override fun unsafeBorrowElements(table: Table): Array<Any?> {
-        return objects.tables.borrowElements(tableInstance(table))
+        return managedStore.objects.tables.borrowElements(referenceTable(table))
     }
 
     override fun structType(struct: StructReference): HostGcType {
@@ -848,20 +854,17 @@ internal class JitEngine(
 
     override fun raisePending(): Nothing {
 
-        check(runtime.heap.hasPending) { "no exception is pending" }
+        check(managedStore.pending.hasPending) { "no exception is pending" }
 
         throw HostRaisedWasmException.instance
     }
 
     override fun takePending(): ExceptionReference {
-
-        check(runtime.heap.hasPending) { "no exception is pending" }
-
-        return bridge.take()
+        return managedStore.pending.take()
     }
 
     override fun hasPending(): Boolean {
-        return runtime.heap.hasPending
+        return managedStore.pending.hasPending
     }
 
     override fun installed(
@@ -888,11 +891,18 @@ internal class JitEngine(
     }
 
     override fun tableAt(address: Address.Table): Table {
-        return Table(this, ExternalValue.Table(address))
+        return Table(this, JitTable(address, managedStore.referenceTable(runtime.tables[address.address])))
     }
 
     override fun globalAt(address: Address.Global): Global {
-        return Global(this, ExternalValue.Global(address))
+
+        val instance = runtime.globals[address.address]
+        val payload = when (instance.type.valueType) {
+            is ValueType.Reference -> ReferenceJitGlobal(address, managedStore.referenceGlobal(instance))
+            else -> NumberJitGlobal(address, instance)
+        }
+
+        return Global(this, payload)
     }
 
     override fun tagAt(address: Address.Tag): Tag {
@@ -903,8 +913,8 @@ internal class JitEngine(
         return when (value) {
             is ExternalValue.Function -> Function(this, value)
             is ExternalValue.Memory -> Memory(this, value)
-            is ExternalValue.Global -> Global(this, value)
-            is ExternalValue.Table -> Table(this, value)
+            is ExternalValue.Global -> globalAt(value.address)
+            is ExternalValue.Table -> tableAt(value.address)
             is ExternalValue.Tag -> Tag(this, value)
         }
     }
@@ -935,20 +945,52 @@ internal class JitEngine(
         return memoryInstance(memory).data
     }
 
-    private fun tableInstance(table: Table): TableInstance {
+    private fun referenceTable(table: Table): ReferenceTable {
+
+        val storage = jitTable(table).storage
+        check(!storage.released) { "the table's instance has been dropped" }
+
+        return storage
+    }
+
+    private fun jitTable(table: Table): JitTable {
 
         require(table.engine === this) { "the table belongs to a different store" }
         live()
 
-        return runtime.tables[(table.payload as ExternalValue.Table).address.address]
+        return table.payload as JitTable
+    }
+
+    private fun referenceGlobal(global: Global): ReferenceGlobal {
+
+        val payload = jitGlobal(global)
+        require(payload is ReferenceJitGlobal) { "the global holds a number" }
+        check(!payload.storage.released) { "the global's instance has been dropped" }
+
+        return payload.storage
     }
 
     private fun globalInstance(global: Global): GlobalInstance {
+        return when (val payload = jitGlobal(global)) {
+            is NumberJitGlobal -> payload.instance
+            is ReferenceJitGlobal -> payload.storage.instance
+        }
+    }
+
+    private fun jitGlobal(global: Global): JitGlobal {
 
         require(global.engine === this) { "the global belongs to a different store" }
         live()
 
-        return runtime.globals[(global.payload as ExternalValue.Global).address.address]
+        return global.payload as JitGlobal
+    }
+
+    private fun externalValueOf(payload: Any): ExternalValue {
+        return when (payload) {
+            is JitTable -> ExternalValue.Table(payload.address)
+            is JitGlobal -> ExternalValue.Global(payload.address)
+            else -> payload as ExternalValue
+        }
     }
 
     private fun tagAddress(tag: Tag): Address.Tag {

@@ -86,7 +86,7 @@ internal fun wrapInstantiationResult(
 fun holdsManagedReferences(
     store: Store,
 ): Boolean {
-    return store.store.referenceBridge != null
+    return store.store.referenceStorage != null
 }
 
 @InternalChasmApi

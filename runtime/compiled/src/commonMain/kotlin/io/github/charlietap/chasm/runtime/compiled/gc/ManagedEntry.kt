@@ -2,7 +2,6 @@ package io.github.charlietap.chasm.runtime.compiled.gc
 
 import io.github.charlietap.chasm.executor.invoker.thread.traceableTrap
 import io.github.charlietap.chasm.runtime.error.InvocationError
-import io.github.charlietap.chasm.runtime.exception.HostRaisedWasmException
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
@@ -12,12 +11,10 @@ fun enterObjects(
     function: FunctionInstance,
     words: LongArray,
     references: Array<Any?>,
+    pending: PendingExceptions,
 ): InvocationError? {
 
     val store = context.store
-    store.heap.clearPendingException()
-    if (store.compiledCallDepth == 0) store.referenceBridge?.releaseEscaped()
-
     val interrupt = store.interrupt
     val depth = interrupt.depth
     if (interrupt.enabled) {
@@ -28,15 +25,9 @@ fun enterObjects(
     return try {
         context.compiledCallDepth = store.compiledCallDepth
         callObjects(context, context.instance, function, words, references, context.compiledCallDepth)
-        if (context.compiledUnwinding) publishThrown(context) else null
+        if (context.compiledUnwinding) holdThrown(context, pending) else null
     } catch (exception: InvocationException) {
-        when {
-            exception.error == InvocationError.ThrownException -> publishThrown(context)
-            context.config.debugInfo -> traceableTrap(store, context.vstack, exception, entryIp(function))
-            else -> exception.error
-        }
-    } catch (_: HostRaisedWasmException) {
-        InvocationError.ThrownException
+        if (context.config.debugInfo) traceableTrap(store, context.vstack, exception, entryIp(function)) else exception.error
     } catch (_: ClassCastException) {
         InvocationError.FailedToCastReference
     } finally {
@@ -44,15 +35,14 @@ fun enterObjects(
     }
 }
 
-private fun publishThrown(
+private fun holdThrown(
     context: ExecutionContext,
+    pending: PendingExceptions,
 ): InvocationError {
 
-    val exception = context.managedException
-    if (exception != null) {
-        context.store.referenceBridge?.let { bridge -> context.heap.setPendingException(bridge.toHostResult(exception, false)) }
+    if (context.managedException == null) {
+        context.managedException = pending.take()
     }
-    context.managedException = null
     context.compiledUnwinding = false
 
     return InvocationError.ThrownException

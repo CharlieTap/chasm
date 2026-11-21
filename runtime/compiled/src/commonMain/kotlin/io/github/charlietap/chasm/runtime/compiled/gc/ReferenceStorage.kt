@@ -4,17 +4,13 @@ import io.github.charlietap.chasm.runtime.instance.GlobalInstance
 import io.github.charlietap.chasm.runtime.instance.TableInstance
 import kotlin.jvm.JvmField
 
-interface ReferenceStorage {
-
-    fun referenceGlobal(global: GlobalInstance): ReferenceGlobal
-
-    fun referenceTable(table: TableInstance): ReferenceTable
-}
-
 class ReferenceGlobal(
     @JvmField var value: Any?,
+    @JvmField val instance: GlobalInstance,
 ) {
     @JvmField var check: ReferenceCheck? = null
+
+    @JvmField var released = false
 }
 
 class ReferenceTable(
@@ -22,6 +18,8 @@ class ReferenceTable(
     @JvmField val instance: TableInstance,
 ) {
     @JvmField var check: ReferenceCheck? = null
+
+    @JvmField var released = false
 }
 
 class ReferenceSegment(

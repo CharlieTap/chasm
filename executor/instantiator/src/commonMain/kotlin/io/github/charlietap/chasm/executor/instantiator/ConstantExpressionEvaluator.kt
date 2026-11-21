@@ -62,7 +62,7 @@ internal fun ConstantExpressionEvaluator(
     stack: ValueStack,
 ): Result<Long, InvocationError> {
 
-    val managed = store.referenceBridge != null
+    val managed = store.referenceStorage != null
     for (instruction in expression.instructions) {
         when (instruction) {
             is ConstantInstruction.I32Const -> stack.pushI32(instruction.value)

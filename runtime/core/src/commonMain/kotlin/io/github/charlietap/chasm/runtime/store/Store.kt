@@ -11,7 +11,7 @@ import io.github.charlietap.chasm.runtime.instance.GlobalInstance
 import io.github.charlietap.chasm.runtime.instance.MemoryInstance
 import io.github.charlietap.chasm.runtime.instance.TableInstance
 import io.github.charlietap.chasm.runtime.program.Program
-import io.github.charlietap.chasm.runtime.reference.ReferenceBridge
+import io.github.charlietap.chasm.runtime.reference.ReferenceStorage
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import kotlin.jvm.JvmField
 
@@ -36,7 +36,7 @@ class Store(
     var interpreter: NestedInterpreter? = null
 
     @JvmField
-    var referenceBridge: ReferenceBridge? = null
+    var referenceStorage: ReferenceStorage? = null
 
     @JvmField
     val allocation: AllocationMeter = AllocationMeter()

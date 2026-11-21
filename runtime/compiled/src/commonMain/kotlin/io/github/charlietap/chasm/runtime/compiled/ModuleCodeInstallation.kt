@@ -7,7 +7,7 @@ import com.github.michaelbull.result.Result
 import io.github.charlietap.chasm.executor.invoker.compiled.CompiledFunctionInstallation
 import io.github.charlietap.chasm.executor.invoker.compiled.installCompiledFunctions
 import io.github.charlietap.chasm.runtime.address.Address
-import io.github.charlietap.chasm.runtime.compiled.gc.ManagedReferenceBridge
+import io.github.charlietap.chasm.runtime.compiled.gc.ManagedStore
 import io.github.charlietap.chasm.runtime.error.InstantiationError
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
@@ -89,15 +89,15 @@ private class Installation(
 
     override fun referenceGlobal(
         index: Int,
-    ): Any = bridge().referenceGlobal(global(index))
+    ): Any = managedStore().referenceGlobal(global(index))
 
     override fun referenceTable(
         index: Int,
-    ): Any = bridge().referenceTable(table(index))
+    ): Any = managedStore().referenceTable(table(index))
 
     override fun referenceSegment(
         index: Int,
-    ): Any = bridge().referenceSegment(element(index))
+    ): Any = managedStore().referenceSegment(element(index))
 
     override fun runtimeType(
         index: Int,
@@ -112,7 +112,7 @@ private class Installation(
     ): Long = ReferenceValue.Function(Address.Function(instance.functionAddresses[index].address)).toLong()
 
     override fun managedFunction(index: Int): Any {
-        return bridge().functions.at(instance.functionAddresses[index].address)
+        return managedStore().functions.at(instance.functionAddresses[index].address)
     }
 
     override fun typeTest(
@@ -134,13 +134,13 @@ private class Installation(
         entries[defined] = entry
     }
 
-    private fun bridge(): ManagedReferenceBridge = checkNotNull(store.referenceBridge as? ManagedReferenceBridge) { "store has no managed references" }
+    private fun managedStore(): ManagedStore = checkNotNull(store.referenceStorage as? ManagedStore) { "store has no managed references" }
 
     fun missing(): Int? = entries.indexOfFirst { it == null }.takeIf { it >= 0 }?.plus(importedFunctions)
 
     fun publishManagedEntries() {
 
-        val functions = (store.referenceBridge as? ManagedReferenceBridge)?.functions ?: return
+        val functions = (store.referenceStorage as? ManagedStore)?.functions ?: return
 
         entries.forEachIndexed { defined, entry ->
             val address = instance.functionAddresses[defined + importedFunctions].address

@@ -1,22 +1,19 @@
 package io.github.charlietap.chasm.runtime.compiled.gc
 
-import io.github.charlietap.chasm.runtime.instance.TableInstance
-
 class TableOperations(
-    private val storage: ReferenceStorage,
     private val checks: ReferenceChecks,
 ) {
 
-    fun sizeTable(table: TableInstance): Int {
-        return storage.referenceTable(table).elements.size
+    fun sizeTable(table: ReferenceTable): Int {
+        return table.elements.size
     }
 
     fun readTable(
-        table: TableInstance,
+        table: ReferenceTable,
         index: Int,
     ): Any? {
 
-        val elements = storage.referenceTable(table).elements
+        val elements = table.elements
 
         checkIndex(index, elements.size)
 
@@ -24,14 +21,14 @@ class TableOperations(
     }
 
     fun readTable(
-        table: TableInstance,
+        table: ReferenceTable,
         buffer: Array<Any?>,
         elementIndex: Int,
         count: Int,
         bufferIndex: Int,
     ): Array<Any?> {
 
-        val elements = storage.referenceTable(table).elements
+        val elements = table.elements
 
         checkRange(elementIndex, count, elements.size)
         checkRange(bufferIndex, count, buffer.size)
@@ -42,106 +39,97 @@ class TableOperations(
     }
 
     fun writeTable(
-        table: TableInstance,
+        table: ReferenceTable,
         index: Int,
         value: Any?,
     ) {
 
-        val reference = storage.referenceTable(table)
+        checkIndex(index, table.elements.size)
+        require(check(table).accepts(value)) { "the value does not match the table's element type" }
 
-        checkIndex(index, reference.elements.size)
-        require(check(reference).accepts(value)) { "the value does not match the table's element type" }
-
-        reference.elements[index] = value
+        table.elements[index] = value
     }
 
     fun writeTable(
-        table: TableInstance,
+        table: ReferenceTable,
         elementIndex: Int,
         buffer: Array<Any?>,
         bufferIndex: Int,
         count: Int,
     ) {
 
-        val reference = storage.referenceTable(table)
-        val check = check(reference)
+        val check = check(table)
 
-        checkRange(elementIndex, count, reference.elements.size)
+        checkRange(elementIndex, count, table.elements.size)
         checkRange(bufferIndex, count, buffer.size)
         for (index in bufferIndex until bufferIndex + count) {
             require(check.accepts(buffer[index])) { "element $index does not match the table's element type" }
         }
 
-        System.arraycopy(buffer, bufferIndex, reference.elements, elementIndex, count)
+        System.arraycopy(buffer, bufferIndex, table.elements, elementIndex, count)
     }
 
     fun unsafeWriteTable(
-        table: TableInstance,
+        table: ReferenceTable,
         index: Int,
         value: Any?,
     ) {
-        storage.referenceTable(table).elements[index] = value
+        table.elements[index] = value
     }
 
     fun growTable(
-        table: TableInstance,
+        table: ReferenceTable,
         count: Int,
         initial: Any?,
     ): Int {
 
-        val reference = storage.referenceTable(table)
-
         require(count >= 0) { "negative growth $count" }
-        require(check(reference).accepts(initial)) { "the value does not match the table's element type" }
+        require(check(table).accepts(initial)) { "the value does not match the table's element type" }
 
-        return tableGrow(reference, count, initial)
+        return tableGrow(table, count, initial)
     }
 
     fun fillTable(
-        table: TableInstance,
+        table: ReferenceTable,
         index: Int,
         value: Any?,
         count: Int,
     ) {
 
-        val reference = storage.referenceTable(table)
+        checkRange(index, count, table.elements.size)
+        require(check(table).accepts(value)) { "the value does not match the table's element type" }
 
-        checkRange(index, count, reference.elements.size)
-        require(check(reference).accepts(value)) { "the value does not match the table's element type" }
-
-        reference.elements.fill(value, index, index + count)
+        table.elements.fill(value, index, index + count)
     }
 
     fun copyTable(
-        source: TableInstance,
+        source: ReferenceTable,
         sourceIndex: Int,
-        destination: TableInstance,
+        destination: ReferenceTable,
         destinationIndex: Int,
         count: Int,
     ) {
 
-        val sourceReference = storage.referenceTable(source)
-        val destinationReference = storage.referenceTable(destination)
-        val sourceElements = sourceReference.elements
+        val sourceElements = source.elements
 
         checkRange(sourceIndex, count, sourceElements.size)
-        checkRange(destinationIndex, count, destinationReference.elements.size)
+        checkRange(destinationIndex, count, destination.elements.size)
 
-        if (source !== destination && source.type.referenceType != destination.type.referenceType) {
-            val check = check(destinationReference)
+        if (source !== destination && source.instance.type.referenceType != destination.instance.type.referenceType) {
+            val check = check(destination)
             for (index in sourceIndex until sourceIndex + count) {
                 require(check.accepts(sourceElements[index])) { "element $index does not match the destination table" }
             }
         }
 
-        System.arraycopy(sourceElements, sourceIndex, destinationReference.elements, destinationIndex, count)
+        System.arraycopy(sourceElements, sourceIndex, destination.elements, destinationIndex, count)
     }
 
-    fun borrowElements(table: TableInstance): Array<Any?> {
-        return storage.referenceTable(table).elements
+    fun borrowElements(table: ReferenceTable): Array<Any?> {
+        return table.elements
     }
 
-    private fun check(reference: ReferenceTable): ReferenceCheck {
-        return reference.check ?: checks.check(reference.instance.type.referenceType, null).also { check -> reference.check = check }
+    private fun check(table: ReferenceTable): ReferenceCheck {
+        return table.check ?: checks.check(table.instance.type.referenceType, null).also { check -> table.check = check }
     }
 }

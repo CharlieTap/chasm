@@ -194,7 +194,7 @@ fun pendingExceptionTag(
     context: ExecutionContext,
 ): Int {
 
-    val pending = context.managedException ?: checkNotNull(context.store.referenceBridge).fromHost(context.heap.takePendingExceptionReference())
+    val pending = context.managedException ?: (context.store.referenceStorage as ManagedStore).pending.take()
     context.managedException = pending
 
     return (pending as WasmException).tag
@@ -359,7 +359,7 @@ private fun callObjectLane(
     store.compiledCallDepth = depth + INTERPRETED_CALL_COST
     try {
         function.call(values, references, 0, 0, caller, context)
-        function.checkResults((store.referenceBridge as ManagedReferenceBridge).checks, references)
+        function.checkResults((store.referenceStorage as ManagedStore).checks, references)
     } catch (exception: HostFunctionException) {
         throw InvocationException(InvocationError.HostFunctionError(exception.reason))
     } finally {

@@ -22,14 +22,14 @@ import io.github.charlietap.chasm.reference.ExceptionReference
 import io.github.charlietap.chasm.runtime.compiled.CodeInstallation
 import io.github.charlietap.chasm.runtime.compiled.ModuleCodeInstallation
 import io.github.charlietap.chasm.runtime.compiled.ModuleCompiledFrames
-import io.github.charlietap.chasm.runtime.compiled.gc.ManagedReferenceBridge
+import io.github.charlietap.chasm.runtime.compiled.gc.ManagedStore
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.type.DefinedType
 
 internal class JitInstantiator(
     private val store: Store,
-    private val bridge: ManagedReferenceBridge,
+    private val managedStore: ManagedStore,
     private val handles: JitHandles,
 ) {
 
@@ -52,7 +52,7 @@ internal class JitInstantiator(
         }
 
         return try {
-            instantiateCompiled(store, imports, config, trapSource, bridge::take) { effectiveConfig, runtime, runtimeImports ->
+            instantiateCompiled(store, imports, config, trapSource, managedStore.pending::take) { effectiveConfig, runtime, runtimeImports ->
                 ModuleInstantiator(
                     config = effectiveConfig,
                     store = runtime,
@@ -90,7 +90,7 @@ internal class JitInstantiator(
     ) {
         definedTypes.forEachIndexed { index, definedType ->
             val shape = shapeTypes.getOrNull(index)?.let(shapes::loadClass)
-            bridge.register(instance.runtimeTypes[index].value, definedType, shape)
+            managedStore.register(instance.runtimeTypes[index].value, definedType, shape)
         }
     }
 }

@@ -5,7 +5,6 @@ import io.github.charlietap.chasm.type.Mutability
 import io.github.charlietap.chasm.type.ValueType
 
 class GlobalOperations(
-    private val storage: ReferenceStorage,
     private val checks: ReferenceChecks,
 ) {
 
@@ -27,32 +26,29 @@ class GlobalOperations(
         global.value = value
     }
 
-    fun readGlobalReference(global: GlobalInstance): Any? {
-
-        require(global.type.valueType is ValueType.Reference) { "the global holds a number" }
-
-        return storage.referenceGlobal(global).value
+    fun readGlobalReference(global: ReferenceGlobal): Any? {
+        return global.value
     }
 
     fun writeGlobalReference(
-        global: GlobalInstance,
+        global: ReferenceGlobal,
         value: Any?,
     ) {
 
-        val type = requireNotNull(global.type.valueType as? ValueType.Reference) { "the global holds a number" }
-        val reference = storage.referenceGlobal(global)
-        val check = reference.check ?: checks.check(type.referenceType, null).also { check -> reference.check = check }
+        require(global.instance.type.mutability == Mutability.Var) { "the global is immutable" }
+        require(check(global).accepts(value)) { "the value does not match the global's type" }
 
-        require(global.type.mutability == Mutability.Var) { "the global is immutable" }
-        require(check.accepts(value)) { "the value does not match the global's type" }
-
-        reference.value = value
+        global.value = value
     }
 
     fun unsafeWriteGlobalReference(
-        global: GlobalInstance,
+        global: ReferenceGlobal,
         value: Any?,
     ) {
-        storage.referenceGlobal(global).value = value
+        global.value = value
+    }
+
+    private fun check(global: ReferenceGlobal): ReferenceCheck {
+        return global.check ?: checks.check((global.instance.type.valueType as ValueType.Reference).referenceType, null).also { check -> global.check = check }
     }
 }

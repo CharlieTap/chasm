@@ -4,7 +4,7 @@ import io.github.charlietap.chasm.runtime.instance.ElementInstance
 import io.github.charlietap.chasm.runtime.instance.GlobalInstance
 import io.github.charlietap.chasm.runtime.instance.TableInstance
 
-interface ReferenceBridge {
+interface ReferenceStorage {
 
     fun initializeTable(
         table: TableInstance,
@@ -20,13 +20,4 @@ interface ReferenceBridge {
     fun release(table: TableInstance)
 
     fun release(element: ElementInstance)
-
-    fun toHostResult(
-        value: Any?,
-        extern: Boolean,
-    ): Long
-
-    fun fromHost(encoded: Long): Any?
-
-    fun releaseEscaped()
 }

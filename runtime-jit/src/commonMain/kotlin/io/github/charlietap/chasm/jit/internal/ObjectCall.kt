@@ -11,10 +11,11 @@ import io.github.charlietap.chasm.embedding.shapes.Instance
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.host.HostGcType
 import io.github.charlietap.chasm.reference.ExceptionReference
-import io.github.charlietap.chasm.runtime.compiled.gc.ManagedReferenceBridge
+import io.github.charlietap.chasm.runtime.compiled.gc.ManagedStore
 import io.github.charlietap.chasm.runtime.compiled.gc.PendingExceptions
 import io.github.charlietap.chasm.runtime.compiled.gc.ReferenceCheck
 import io.github.charlietap.chasm.runtime.compiled.gc.enterObjects
+import io.github.charlietap.chasm.runtime.compiled.gc.takeException
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.stack.ValueStack
@@ -30,7 +31,7 @@ internal class ObjectCall(
     private val exported: ExportedFunction,
     private val referenceParameters: IntArray,
     private val parameterChecks: Array<ReferenceCheck>,
-    private val exceptions: PendingExceptions,
+    private val pending: PendingExceptions,
 ) {
 
     val type: FunctionType = exported.function.functionType
@@ -97,12 +98,15 @@ internal class ObjectCall(
         val context = idle.getAndSet(null) ?: try {
             context()
         } catch (exception: InvocationException) {
-            return failure(exception.error)
+            return trapped(exception.error)
         }
 
-        val error = enterObjects(context, exported.function, stack, references)
+        val error = enterObjects(context, exported.function, stack, references, pending)
+        if (error == RuntimeInvocationError.ThrownException) {
+            return ChasmResult.Error(ExecutionError.Thrown(takeException(context)))
+        }
         if (error != null) {
-            return failure(error)
+            return trapped(error)
         }
 
         idle.set(context)
@@ -113,12 +117,8 @@ internal class ObjectCall(
         return ExecutionContext(ValueStack(slots + 1, exported.store.maxStackSlots), exported.store, exported.instance, exported.config)
     }
 
-    private fun failure(error: RuntimeInvocationError): ChasmResult<Unit, InvocationError<ExceptionReference>> {
-        return if (error == RuntimeInvocationError.ThrownException) {
-            ChasmResult.Error(ExecutionError.Thrown(exceptions.take()))
-        } else {
-            ChasmResult.Error(ExecutionError.Trapped(exportedTrap(store, error)))
-        }
+    private fun trapped(error: RuntimeInvocationError): ChasmResult<Unit, InvocationError<ExceptionReference>> {
+        return ChasmResult.Error(ExecutionError.Trapped(exportedTrap(store, error)))
     }
 
     companion object {
@@ -129,7 +129,7 @@ internal class ObjectCall(
             store: Store,
             instance: Instance,
             name: String,
-            bridge: ManagedReferenceBridge,
+            managedStore: ManagedStore,
         ): ChasmResult<ObjectCall, ExecutionError.Rejected> {
 
             val exported = when (val lookup = exportedFunction(store, instance, name)) {
@@ -137,20 +137,20 @@ internal class ObjectCall(
                 is ChasmResult.Error -> return ChasmResult.Error(ExecutionError.Rejected(lookup.error.error))
             }
 
-            val owner = bridge.definedType(HostGcType(exported.function.rtt.value))
+            val owner = managedStore.definedType(HostGcType(exported.function.rtt.value))
             val parameters = exported.function.functionType.params.types
             val referenceParameters = parameters.indices.filter { index -> parameters[index] is ValueType.Reference }.toIntArray()
             val parameterChecks = Array(referenceParameters.size) { position ->
-                bridge.checks.check((parameters[referenceParameters[position]] as ValueType.Reference).referenceType, owner)
+                managedStore.checks.check((parameters[referenceParameters[position]] as ValueType.Reference).referenceType, owner)
             }
 
-            return ChasmResult.Success(ObjectCall(store, instance, exported, referenceParameters, parameterChecks, bridge))
+            return ChasmResult.Success(ObjectCall(store, instance, exported, referenceParameters, parameterChecks, managedStore.pending))
         }
     }
 }
 
-internal fun managedBridge(store: RuntimeStore): ManagedReferenceBridge {
+internal fun managedStore(store: RuntimeStore): ManagedStore {
     synchronized(store) {
-        return store.referenceBridge as? ManagedReferenceBridge ?: ManagedReferenceBridge(store).also { bridge -> store.referenceBridge = bridge }
+        return store.referenceStorage as? ManagedStore ?: ManagedStore(store).also { managedStore -> store.referenceStorage = managedStore }
     }
 }

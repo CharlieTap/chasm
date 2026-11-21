@@ -14,7 +14,7 @@ class WasmException(
     ReferenceOwner {
 
     override fun owner(): Any {
-        val bridge = checkNotNull(store.referenceBridge as ManagedReferenceBridge?) { "the store of this exception has been dropped" }
-        return bridge.engine
+        val managedStore = checkNotNull(store.referenceStorage as ManagedStore?) { "the store of this exception has been dropped" }
+        return managedStore.engine
     }
 }

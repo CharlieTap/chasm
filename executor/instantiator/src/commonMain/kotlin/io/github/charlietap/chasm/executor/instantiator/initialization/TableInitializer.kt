@@ -34,7 +34,7 @@ internal inline fun TableInitializer(
 ): Result<Unit, ModuleTrapError> = binding {
 
     val store = context.store
-    val bridge = store.referenceBridge
+    val bridge = store.referenceStorage
     val segments = context.module.elementSegments
 
     segments.forEachIndexed { segmentIndex, segment ->

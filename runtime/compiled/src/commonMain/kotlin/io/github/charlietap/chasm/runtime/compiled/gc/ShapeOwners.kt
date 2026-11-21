@@ -7,19 +7,19 @@ class ShapeOwners private constructor() {
 
     companion object {
 
-        private val owners = ConcurrentHashMap<ClassLoader, WeakReference<ManagedReferenceBridge>>()
+        private val owners = ConcurrentHashMap<ClassLoader, WeakReference<ManagedStore>>()
 
         fun register(
             loader: ClassLoader,
-            bridge: ManagedReferenceBridge,
+            managedStore: ManagedStore,
         ) {
             owners.values.removeIf { owner -> owner.get() == null }
-            owners[loader] = WeakReference(bridge)
+            owners[loader] = WeakReference(managedStore)
         }
 
         fun owner(shape: Class<*>): Any {
-            val bridge = owners[shape.classLoader]?.get()
-            return checkNotNull(bridge) { "the store of this ${shape.simpleName} is no longer alive" }.engine
+            val managedStore = owners[shape.classLoader]?.get()
+            return checkNotNull(managedStore) { "the store of this ${shape.simpleName} is no longer alive" }.engine
         }
     }
 }
