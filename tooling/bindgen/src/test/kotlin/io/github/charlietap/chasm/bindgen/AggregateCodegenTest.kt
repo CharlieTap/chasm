@@ -40,6 +40,16 @@ class AggregateCodegenTest {
         runtimes = listOf(CodegenRuntime.CHASM),
     )
 
+    @Test
+    fun `generates complete test service run by the JIT`() {
+        assertGenerates(
+            category = "aggregate",
+            wasmInterface = testService("JitTestService"),
+            config = codegenConfig(executionTier = ExecutionTier.Jit()),
+            runtimes = listOf(CodegenRuntime.CHASM),
+        )
+    }
+
     private fun testService(
         interfaceName: String,
     ): WasmInterface {

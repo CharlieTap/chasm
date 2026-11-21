@@ -1,0 +1,94 @@
+@file:OptIn(ExperimentalChasmApi::class)
+
+package com.test
+
+import io.github.charlietap.chasm.ExperimentalChasmApi
+import io.github.charlietap.chasm.embedding.compiled.Import
+import io.github.charlietap.chasm.embedding.compiled.Instance
+import io.github.charlietap.chasm.embedding.compiled.Memory
+import io.github.charlietap.chasm.embedding.compiled.Module
+import io.github.charlietap.chasm.embedding.compiled.PreparedFunction
+import io.github.charlietap.chasm.embedding.compiled.Store
+import io.github.charlietap.chasm.embedding.compiled.`value`.ExecutionValue
+import io.github.charlietap.chasm.embedding.compiled.`value`.NumberValue
+import io.github.charlietap.chasm.embedding.compiled.codegen.CodegenImport
+import io.github.charlietap.chasm.embedding.compiled.codegen.Wasm32Allocator
+import io.github.charlietap.chasm.embedding.compiled.codegen.allocateImports
+import io.github.charlietap.chasm.embedding.compiled.exports
+import io.github.charlietap.chasm.embedding.compiled.instance
+import io.github.charlietap.chasm.embedding.compiled.invoke
+import io.github.charlietap.chasm.embedding.compiled.prepareFunction
+import io.github.charlietap.chasm.embedding.compiled.readUtf8String
+import io.github.charlietap.chasm.embedding.compiled.writeBytes
+import io.github.charlietap.chasm.embedding.shapes.`expect`
+import io.github.charlietap.chasm.jit.module
+import io.github.charlietap.chasm.jit.store
+import kotlin.ByteArray
+import kotlin.Double
+import kotlin.Float
+import kotlin.Int
+import kotlin.Long
+import kotlin.OptIn
+import kotlin.String
+import kotlin.collections.List
+import kotlin.collections.MutableList
+
+public suspend fun jitScalarAndStringParams(
+  binary: ByteArray,
+  imports: List<CodegenImport> = emptyList(),
+  moduleFactory: (suspend (ByteArray) -> Module)? = null,
+  instanceFactory: (suspend (
+    Store,
+    Module,
+    List<Import>,
+  ) -> Instance)? = null,
+): JitScalarAndStringParams {
+  val store = store()
+  val module = moduleFactory?.invoke(binary) ?: module(binary, validate = true).`expect`("Failed to decode binary")
+  val allocatedImports = allocateImports(store, imports)
+  val instance = instanceFactory?.invoke(store, module, allocatedImports) ?: instance(store, module, allocatedImports).`expect`("Failed to instantiate module")
+  return JitScalarAndStringParamsImpl(store = store, instance = instance)
+}
+
+private class JitScalarAndStringParamsImpl(
+  private val store: Store,
+  private val instance: Instance,
+) : JitScalarAndStringParams {
+  private val invokePreparedFunction: PreparedFunction =
+      prepareFunction(store, instance, "invoke").`expect`("Failed to prepare function invoke")
+
+  private val functionInputBuffer: MutableList<ExecutionValue> =
+      MutableList<ExecutionValue>(6) { NumberValue.I32(0) }
+
+  private val functionInputBuffer6: MutableList<ExecutionValue> = functionInputBuffer
+
+  private val _memory: Memory =
+      exports(instance).memory("memory") ?: error("Failed to find memory export with name memory")
+
+  private val allocator: Wasm32Allocator = Wasm32Allocator(instance, store, "alloc", "free")
+
+  override fun invoke(
+    p0: Int,
+    p1: Long,
+    p2: Float,
+    p3: Double,
+    `value`: String,
+  ): String {
+    val valueBytes = value.encodeToByteArray()
+    val valueAlloc = allocator.alloc(valueBytes.size)
+    writeBytes(_memory, valueAlloc, valueBytes)
+    functionInputBuffer[0] = NumberValue.I32(p0)
+    functionInputBuffer[1] = NumberValue.I64(p1)
+    functionInputBuffer[2] = NumberValue.F32(p2)
+    functionInputBuffer[3] = NumberValue.F64(p3)
+    functionInputBuffer[4] = NumberValue.I32(valueAlloc)
+    functionInputBuffer[5] = NumberValue.I32(valueBytes.size)
+    val args = functionInputBuffer6
+    val values = invokePreparedFunction.invoke(args).`expect`("Failed to invoke function invoke")
+    val pointer = (values[0] as NumberValue.I32).value
+    val length = (values[1] as NumberValue.I32).value
+    val result = readUtf8String(_memory, pointer, length)
+    allocator.free(valueAlloc)
+    return result
+  }
+}

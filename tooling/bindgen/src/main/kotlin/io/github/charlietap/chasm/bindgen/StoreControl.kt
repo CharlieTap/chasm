@@ -3,7 +3,6 @@ package io.github.charlietap.chasm.bindgen
 import com.squareup.kotlinpoet.BOOLEAN
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.LONG
-import com.squareup.kotlinpoet.MemberName
 import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.UNIT
@@ -12,8 +11,7 @@ internal class StoreControl(
     val name: String,
     val parameters: List<ParameterSpec>,
     val returnType: TypeName,
-    val function: MemberName,
-    val alias: String,
+    val function: StoreFunction,
     val failure: String,
 ) {
     fun signature(): FunSpec.Builder = FunSpec.builder(name)
@@ -29,8 +27,7 @@ internal val CodegenConfig.storeControls: List<StoreControl>
                     name = "addFuel",
                     parameters = listOf(ParameterSpec("units", LONG)),
                     returnType = UNIT,
-                    function = CHASM_ADD_FUEL,
-                    alias = CHASM_ADD_FUEL_ALIAS,
+                    function = StoreFunction.AddFuel,
                     failure = "Failed to add fuel",
                 ),
             )
@@ -39,8 +36,7 @@ internal val CodegenConfig.storeControls: List<StoreControl>
                     name = "remainingFuel",
                     parameters = emptyList(),
                     returnType = LONG,
-                    function = CHASM_REMAINING_FUEL,
-                    alias = CHASM_REMAINING_FUEL_ALIAS,
+                    function = StoreFunction.RemainingFuel,
                     failure = "Failed to read fuel",
                 ),
             )
@@ -51,8 +47,7 @@ internal val CodegenConfig.storeControls: List<StoreControl>
                     name = "interrupt",
                     parameters = emptyList(),
                     returnType = BOOLEAN,
-                    function = CHASM_INTERRUPT,
-                    alias = CHASM_INTERRUPT_ALIAS,
+                    function = StoreFunction.Interrupt,
                     failure = "Failed to interrupt",
                 ),
             )

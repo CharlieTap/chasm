@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.bindgen
 
 import io.github.charlietap.chasm.bindgen.fixture.aggregateType
+import io.github.charlietap.chasm.bindgen.fixture.codegenConfig
 import io.github.charlietap.chasm.bindgen.fixture.doubleScalarType
 import io.github.charlietap.chasm.bindgen.fixture.field
 import io.github.charlietap.chasm.bindgen.fixture.floatScalarType
@@ -224,6 +225,64 @@ class FunctionCodegenTest {
         ),
     )
 
+    @Test
+    fun `generates JIT string parameters`() {
+        assertGenerates(
+            category = "function",
+            wasmInterface = wasmInterface(
+                interfaceName = "JitStringParams",
+                packageName = PACKAGE_NAME,
+                allocator = ExportedAllocator("alloc", "free"),
+                memories = listOf(memoryBinding("memory", "memory", exposed = false)),
+                functions = listOf(
+                    stringParameterFunction("pointerAndLength", StringEncodingStrategy.POINTER_AND_LENGTH),
+                    stringParameterFunction("nullTerminated", StringEncodingStrategy.NULL_TERMINATED),
+                    stringParameterFunction("lengthPrefixed", StringEncodingStrategy.LENGTH_PREFIXED),
+                    stringParameterFunction("packed", StringEncodingStrategy.PACKED_POINTER_AND_LENGTH),
+                    stringParameterFunction("freed", StringEncodingStrategy.POINTER_AND_LENGTH, freeAfterCall = true),
+                ),
+            ),
+            config = codegenConfig(executionTier = ExecutionTier.Jit()),
+            runtimes = listOf(CodegenRuntime.CHASM),
+        )
+    }
+
+    @Test
+    fun `generates JIT scalar parameters with a freed string parameter and a string return`() {
+
+        val mixedParameterFunction = function(
+            name = "invoke",
+            params = listOf(
+                functionParameter("p0", integerScalarType()),
+                functionParameter("p1", longScalarType()),
+                functionParameter("p2", floatScalarType()),
+                functionParameter("p3", doubleScalarType()),
+                functionParameter(
+                    name = "value",
+                    type = stringScalarType(),
+                    stringAllocationStrategy = StringAllocationStrategy(freeAfterCall = true),
+                    stringEncodingStrategy = StringEncodingStrategy.POINTER_AND_LENGTH,
+                ),
+            ),
+            returns = functionReturn(stringScalarType(), StringEncodingStrategy.POINTER_AND_LENGTH),
+            resultTypes = listOf(i32ValueType(), i32ValueType()),
+            implementation = functionProxy("invoke"),
+        )
+
+        assertGenerates(
+            category = "function",
+            wasmInterface = wasmInterface(
+                interfaceName = "JitScalarAndStringParams",
+                packageName = PACKAGE_NAME,
+                allocator = ExportedAllocator("alloc", "free"),
+                memories = listOf(memoryBinding("memory", "memory", exposed = false)),
+                functions = listOf(mixedParameterFunction),
+            ),
+            config = codegenConfig(executionTier = ExecutionTier.Jit()),
+            runtimes = listOf(CodegenRuntime.CHASM),
+        )
+    }
+
     private fun assertStringParameter(
         scenario: String,
         encoding: StringEncodingStrategy,
@@ -235,22 +294,28 @@ class FunctionCodegenTest {
             packageName = PACKAGE_NAME,
             allocator = ExportedAllocator("alloc", "free"),
             memories = listOf(memoryBinding("memory", "memory", exposed = false)),
-            functions = listOf(
-                function(
-                    name = "invoke",
-                    params = listOf(
-                        functionParameter(
-                            name = "value",
-                            type = stringScalarType(),
-                            stringAllocationStrategy = StringAllocationStrategy(freeAfterCall),
-                            stringEncodingStrategy = encoding,
-                        ),
-                    ),
-                    implementation = functionProxy("invoke"),
-                ),
-            ),
+            functions = listOf(stringParameterFunction("invoke", encoding, freeAfterCall)),
         ),
     )
+
+    private fun stringParameterFunction(
+        name: String,
+        encoding: StringEncodingStrategy,
+        freeAfterCall: Boolean = false,
+    ): Function {
+        return function(
+            name = name,
+            params = listOf(
+                functionParameter(
+                    name = "value",
+                    type = stringScalarType(),
+                    stringAllocationStrategy = StringAllocationStrategy(freeAfterCall),
+                    stringEncodingStrategy = encoding,
+                ),
+            ),
+            implementation = functionProxy(name),
+        )
+    }
 
     private fun assertStringReturn(
         scenario: String,

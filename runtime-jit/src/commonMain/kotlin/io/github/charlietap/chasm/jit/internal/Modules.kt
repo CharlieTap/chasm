@@ -17,7 +17,7 @@ fun _compiledModule(classic: ClassicModule): Module {
 
     return Module(
         imports = info.imports.map { import -> ModuleImport(import.moduleName, import.entityName, externalType(import.type)) },
-        exports = info.exports.map { export -> ModuleExport(export.name, externalType(export.type)) },
+        exports = info.exports.map { export -> ModuleExport(export.name, export.index, externalType(export.type)) },
         payload = classic,
     )
 }

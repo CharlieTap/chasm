@@ -51,7 +51,6 @@ kotlin {
 
         named("androidDeviceTest") {
             dependencies {
-                implementation(projects.chasmJit)
                 implementation(libs.kotlin.junit)
                 implementation(libs.androidx.test.junit)
                 implementation(libs.androidx.test.runner)

@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.embedding.compiled
 
 import io.github.charlietap.chasm.InternalChasmApi
+import io.github.charlietap.chasm.host.ModuleIndex
 import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.chasm.type.GlobalType
 import io.github.charlietap.chasm.type.MemoryType
@@ -23,6 +24,7 @@ data class ModuleImport(
 
 data class ModuleExport(
     val name: String,
+    val index: ModuleIndex,
     val type: ExternalType,
 )
 

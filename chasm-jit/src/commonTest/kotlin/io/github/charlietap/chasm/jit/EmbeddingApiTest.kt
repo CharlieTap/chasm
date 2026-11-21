@@ -85,6 +85,7 @@ import io.github.charlietap.chasm.embedding.error.ExecutionError
 import io.github.charlietap.chasm.embedding.error.TrapReason
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.expect
+import io.github.charlietap.chasm.host.ModuleIndex
 import io.github.charlietap.chasm.reference.ExceptionReference
 import io.github.charlietap.chasm.reference.FunctionReference
 import io.github.charlietap.chasm.reference.I31Reference
@@ -305,6 +306,19 @@ class EmbeddingApiTest {
         val unvalidated = runBlocking { module(resourceBytes("modules/embedding_api.wasm"), validate = false) }.expect("module")
 
         validate(unvalidated).expect("validate")
+    }
+
+    @Test
+    fun moduleExportsCarryTheirIndexInTheModule() {
+
+        val module = runBlocking { module(resourceBytes("modules/embedding_api.wasm")) }.expect("module")
+        val indices = module.exports.associate { export -> export.name to export.index }
+
+        assertEquals(ModuleIndex.MemoryIndex(1), indices["memory"])
+        assertEquals(ModuleIndex.TableIndex(1), indices["table"])
+        assertEquals(ModuleIndex.GlobalIndex(1), indices["counter"])
+        assertEquals(ModuleIndex.TagIndex(1), indices["failed"])
+        assertEquals(ModuleIndex.FunctionIndex(5), indices["inc"])
     }
 
     private lateinit var sharedGlobal: Global

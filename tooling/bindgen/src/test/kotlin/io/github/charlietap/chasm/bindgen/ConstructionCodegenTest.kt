@@ -95,6 +95,32 @@ class ConstructionCodegenTest {
     )
 
     @Test
+    fun `generates JIT initializers`() {
+        assertGenerates(
+            category = "construction",
+            wasmInterface = wasmInterface(
+                interfaceName = "JitInitializers",
+                packageName = "com.test",
+                initializers = linkedSetOf("initialize", "start"),
+            ),
+            config = codegenConfig(executionTier = ExecutionTier.Jit()),
+            runtimes = listOf(CodegenRuntime.CHASM),
+        )
+    }
+
+    @Test
+    fun `generates JIT internal visibility`() {
+        assertConstruction(
+            scenario = "JitInternalVisibility",
+            interfaceVisibility = InterfaceVisibility.INTERNAL,
+            factoryVisibility = FactoryVisibility.INTERNAL,
+            implementationVisibility = ImplementationVisibility.INTERNAL,
+            config = codegenConfig(executionTier = ExecutionTier.Jit()),
+            runtimes = listOf(CodegenRuntime.CHASM),
+        )
+    }
+
+    @Test
     fun `generates internal visibility`() = assertGenerates(
         category = "construction",
         wasmInterface = wasmInterface(

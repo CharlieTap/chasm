@@ -81,6 +81,10 @@ private class KotlinPoetBindingGenerator(
             "WasiLinking.AUTOMATIC is not supported for ExecutionTier.Aot yet. Use WasiLinking.DISABLED and " +
                 "pass the module's WASI imports."
         }
+        require(tier !is ExecutionTier.Jit || !wasmInterface.linksWasiPreview1) {
+            "WasiLinking.AUTOMATIC is not supported for ExecutionTier.Jit yet. Use WasiLinking.DISABLED and " +
+                "pass the module's WASI imports."
+        }
         val controls = config.storeControls.map { control -> control.name }
         val clashes = wasmInterface.functions.map { function -> function.name }.filter { name -> name in controls }
         require(clashes.isEmpty()) {

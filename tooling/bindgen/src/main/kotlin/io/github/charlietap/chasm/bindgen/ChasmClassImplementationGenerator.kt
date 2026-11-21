@@ -8,7 +8,6 @@ import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.INT
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.LONG
-import com.squareup.kotlinpoet.MemberName
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.STRING
@@ -24,66 +23,75 @@ internal class ChasmClassImplementationGenerator {
         interfaceName: String,
         visibility: ImplementationVisibility,
         wasmInterface: WasmInterface,
-        controls: List<StoreControl> = emptyList(),
-    ): TypeSpec = TypeSpec.classBuilder(interfaceName + "Impl").apply {
-        addModifiers(visibility.modifier())
-        addSuperinterface(ClassName(packageName, interfaceName))
-        addConstructor()
-        addRuntimeProperties(wasmInterface)
-        addBindings(packageName, interfaceName, wasmInterface)
+        controls: List<StoreControl>,
+        api: EmbeddingApi,
+    ): TypeSpec {
+        return TypeSpec.classBuilder(interfaceName + "Impl").apply {
 
-        if (wasmInterface.initializers.isNotEmpty()) {
-            addInitializerBlock(initializerBlock(wasmInterface.initializers))
-        }
-        if (wasmInterface.memories.any { memory -> memory.exposed }) {
-            addType(memoryImplementation(packageName, interfaceName))
-        }
-        wasmInterface.functions.forEach { function ->
-            addFunction(functionImplementation(packageName, function))
-        }
-        controls.forEach { control -> addFunction(storeControlImplementation(control)) }
-    }.build()
+            addModifiers(visibility.modifier())
+            addSuperinterface(ClassName(packageName, interfaceName))
+            addConstructor(api)
+            addRuntimeProperties(wasmInterface, api)
+            addBindings(packageName, interfaceName, wasmInterface, api)
+
+            if (wasmInterface.initializers.isNotEmpty()) {
+                addInitializerBlock(initializerBlock(wasmInterface.initializers, api))
+            }
+            if (wasmInterface.memories.any { memory -> memory.exposed }) {
+                addType(memoryImplementation(packageName, interfaceName, api))
+            }
+            wasmInterface.functions.forEach { function ->
+                addFunction(functionImplementation(packageName, function, api))
+            }
+            controls.forEach { control -> addFunction(storeControlImplementation(control, api)) }
+        }.build()
+    }
 
     private fun storeControlImplementation(
         control: StoreControl,
+        api: EmbeddingApi,
     ): FunSpec {
         val arguments = listOf(CodeBlock.of("store")) + control.parameters.map { parameter -> CodeBlock.of("%N", parameter) }
+        val call = CodeBlock.of("%N(%L)", control.function.alias, arguments.joinToCode())
         return control.signature()
             .addModifiers(KModifier.OVERRIDE)
-            .addStatement("return %N(%L).%M(%S)", control.alias, arguments.joinToCode(), CHASM_EXPECT, control.failure)
+            .addStatement("return %L", api.storeControlCall(call, control.failure))
             .build()
     }
 
-    private fun TypeSpec.Builder.addConstructor() {
+    private fun TypeSpec.Builder.addConstructor(api: EmbeddingApi) {
         primaryConstructor(
             FunSpec.constructorBuilder()
-                .addParameter("store", CHASM_STORE_CLASS_NAME)
-                .addParameter("instance", CHASM_INSTANCE_CLASS_NAME)
+                .addParameter("store", api.store)
+                .addParameter("instance", api.instance)
                 .build(),
         )
         addProperty(
-            PropertySpec.builder("store", CHASM_STORE_CLASS_NAME)
+            PropertySpec.builder("store", api.store)
                 .addModifiers(KModifier.PRIVATE)
                 .initializer("store")
                 .build(),
         )
         addProperty(
-            PropertySpec.builder("instance", CHASM_INSTANCE_CLASS_NAME)
+            PropertySpec.builder("instance", api.instance)
                 .addModifiers(KModifier.PRIVATE)
                 .initializer("instance")
                 .build(),
         )
     }
 
-    private fun TypeSpec.Builder.addRuntimeProperties(wasmInterface: WasmInterface) {
+    private fun TypeSpec.Builder.addRuntimeProperties(
+        wasmInterface: WasmInterface,
+        api: EmbeddingApi,
+    ) {
         wasmInterface.functions.forEach { function ->
             val proxy = function.implementation as FunctionProxy
             addProperty(
-                PropertySpec.builder(preparedFunctionPropertyName(function), CHASM_PREPARED_FUNCTION_CLASS_NAME)
+                PropertySpec.builder(preparedFunctionPropertyName(function), api.preparedFunction)
                     .addModifiers(KModifier.PRIVATE)
                     .initializer(
                         "%M(store, instance, %S).%M(%S)",
-                        CHASM_PREPARE_FUNCTION,
+                        api.prepareFunction,
                         proxy.name,
                         CHASM_EXPECT,
                         "Failed to prepare function ${proxy.name}",
@@ -95,11 +103,12 @@ internal class ChasmClassImplementationGenerator {
             .filter { count -> count > 0 }
             .distinct()
             .sorted()
+        val executionValues = MUTABLE_LIST.parameterizedBy(api.executionValue)
         inputCounts.maxOrNull()?.let { maximumInputCount ->
             addProperty(
-                PropertySpec.builder(FUNCTION_INPUT_BUFFER_NAME, CHASM_EXECUTION_VALUE_MUTABLE_LIST)
+                PropertySpec.builder(FUNCTION_INPUT_BUFFER_NAME, executionValues)
                     .addModifiers(KModifier.PRIVATE)
-                    .initializer("MutableList<%T>(%L) { %T(0) }", CHASM_EXECUTION_VALUE_CLASS_NAME, maximumInputCount, CHASM_I32_VALUE_CLASS_NAME)
+                    .initializer("MutableList<%T>(%L) { %T(0) }", api.executionValue, maximumInputCount, api.numberValue(Scalar.Integer))
                     .build(),
             )
             inputCounts.forEach { inputCount ->
@@ -109,7 +118,7 @@ internal class ChasmClassImplementationGenerator {
                     CodeBlock.of("%L.subList(0, %L)", FUNCTION_INPUT_BUFFER_NAME, inputCount)
                 }
                 addProperty(
-                    PropertySpec.builder(functionInputBufferName(inputCount), CHASM_EXECUTION_VALUE_MUTABLE_LIST)
+                    PropertySpec.builder(functionInputBufferName(inputCount), executionValues)
                         .addModifiers(KModifier.PRIVATE)
                         .initializer(initializer)
                         .build(),
@@ -122,18 +131,19 @@ internal class ChasmClassImplementationGenerator {
         packageName: String,
         interfaceName: String,
         wasmInterface: WasmInterface,
+        api: EmbeddingApi,
     ) {
         wasmInterface.memories.forEach { memory ->
-            addProperty(importableProperty(memory.backingName, memory.source, CHASM_MEMORY_CLASS_NAME, "memory"))
+            addProperty(importableProperty(memory.backingName, memory.source, api.memory, "memory", "memory", api))
         }
 
         wasmInterface.allocator?.let { allocator ->
             addProperty(
-                PropertySpec.builder("allocator", CHASM_WASM32_ALLOCATOR_CLASS_NAME)
+                PropertySpec.builder("allocator", api.allocator)
                     .addModifiers(KModifier.PRIVATE)
                     .initializer(
                         "%T(instance, store, %S, %S)",
-                        CHASM_WASM32_ALLOCATOR_CLASS_NAME,
+                        api.allocator,
                         allocator.allocationFunction,
                         allocator.deallocationFunction,
                     ).build(),
@@ -142,15 +152,17 @@ internal class ChasmClassImplementationGenerator {
 
         wasmInterface.properties.forEach { property ->
             val proxy = property.implementation as GlobalProxy
-            addProperty(importableProperty("_${property.name}", proxy.name, CHASM_GLOBAL_CLASS_NAME, "global"))
-            addProperty(globalProperty(property, proxy))
+            addProperty(importableProperty("_${property.name}", proxy.name, api.global, "global", "global", api))
+            addProperty(globalProperty(property, proxy, api))
         }
 
         wasmInterface.memories.filter { memory -> memory.exposed }.forEach { memory ->
+            val arguments = api.memoryAccessParameters.map { parameter -> CodeBlock.of("%N", parameter) } +
+                CodeBlock.of("%N", memory.backingName)
             addProperty(
                 PropertySpec.builder(memory.name, ClassName(packageName, interfaceName, "Memory"))
                     .addModifiers(KModifier.OVERRIDE)
-                    .initializer("%T(store, %N)", ClassName(packageName, interfaceName + "Impl", "MemoryImpl"), memory.backingName)
+                    .initializer("%T(%L)", ClassName(packageName, interfaceName + "Impl", "MemoryImpl"), arguments.joinToCode())
                     .build(),
             )
         }
@@ -161,76 +173,80 @@ internal class ChasmClassImplementationGenerator {
         exportName: String,
         type: ClassName,
         kind: String,
-    ): PropertySpec = PropertySpec.builder(propertyName, type)
-        .addModifiers(KModifier.PRIVATE)
-        .initializer(
-            "(instance.exports.firstOrNull { export -> export.name == %S }?.value as? %T)" +
-                " ?: error(%S)",
-            exportName,
-            type,
-            "Failed to find $kind export with name $exportName",
-        ).build()
+        exportsAccessor: String,
+        api: EmbeddingApi,
+    ): PropertySpec {
+        return PropertySpec.builder(propertyName, type)
+            .addModifiers(KModifier.PRIVATE)
+            .initializer(api.exportLookup(kind, exportsAccessor, exportName, type))
+            .build()
+    }
 
     private fun globalProperty(
         property: Property,
         proxy: GlobalProxy,
-    ): PropertySpec = PropertySpec.builder(property.name, property.type.asTypeName()).apply {
-        addModifiers(KModifier.OVERRIDE)
-        mutable(property.const.not())
-        getter(
-            FunSpec.getterBuilder()
-                .addStatement(
-                    "return (%M(store, %N).%M(%S) as %T).value",
-                    CHASM_READ_GLOBAL,
-                    "_${property.name}",
-                    CHASM_EXPECT,
-                    "Failed to read global ${proxy.name}",
-                    property.type.chasmValueClass(),
-                ).build(),
-        )
-        if (!property.const) {
-            setter(
-                FunSpec.setterBuilder()
-                    .addParameter("newValue", property.type.asTypeName())
-                    .addStatement(
-                        "%M(store, %N, %T(newValue)).%M(%S)",
-                        CHASM_WRITE_GLOBAL,
-                        "_${property.name}",
-                        property.type.chasmValueClass(),
-                        CHASM_EXPECT,
-                        "Failed to write global ${proxy.name}",
-                    ).build(),
-            )
-        }
-    }.build()
+        api: EmbeddingApi,
+    ): PropertySpec {
+        return PropertySpec.builder(property.name, property.type.asTypeName()).apply {
 
-    private fun initializerBlock(initializers: Set<String>): CodeBlock = CodeBlock.builder().apply {
-        initializers.forEach { name ->
-            addStatement(
-                "%M(store, instance, %S).%M(%S)",
-                CHASM_INVOKE,
-                name,
-                CHASM_EXPECT,
-                "Initializer function $name failed",
+            addModifiers(KModifier.OVERRIDE)
+            mutable(property.const.not())
+            getter(
+                FunSpec.getterBuilder()
+                    .addStatement("return %L", api.globalRead("_${property.name}", property.type, "Failed to read global ${proxy.name}"))
+                    .build(),
             )
-        }
-    }.build()
+
+            if (!property.const) {
+                setter(
+                    FunSpec.setterBuilder()
+                        .addParameter("newValue", property.type.asTypeName())
+                        .addStatement("%L", api.globalWrite("_${property.name}", property.type, "newValue", "Failed to write global ${proxy.name}"))
+                        .build(),
+                )
+            }
+        }.build()
+    }
+
+    private fun initializerBlock(
+        initializers: Set<String>,
+        api: EmbeddingApi,
+    ): CodeBlock {
+        return CodeBlock.builder().apply {
+            initializers.forEach { name ->
+                addStatement(
+                    "%M(store, instance, %S).%M(%S)",
+                    api.invoke,
+                    name,
+                    CHASM_EXPECT,
+                    "Initializer function $name failed",
+                )
+            }
+        }.build()
+    }
 
     private fun functionImplementation(
         packageName: String,
         function: Function,
-    ): FunSpec = FunSpec.builder(function.name).apply {
-        addModifiers(KModifier.OVERRIDE)
-        val returnType = functionReturnType(packageName, function)
-        returns(returnType)
-        function.params.forEach { param -> addParameter(param.name, param.type.asTypeName()) }
+        api: EmbeddingApi,
+    ): FunSpec {
+        return FunSpec.builder(function.name).apply {
 
-        val allocationsToFree = writeStringParameters(function)
-        writeArguments(function)
-        writeReturn(function, returnType, allocationsToFree)
-    }.build()
+            addModifiers(KModifier.OVERRIDE)
+            val returnType = functionReturnType(packageName, function)
+            returns(returnType)
+            function.params.forEach { param -> addParameter(param.name, param.type.asTypeName()) }
 
-    private fun FunSpec.Builder.writeStringParameters(function: Function): List<String> {
+            val allocationsToFree = writeStringParameters(function, api)
+            writeArguments(function, api)
+            writeReturn(function, returnType, allocationsToFree, api)
+        }.build()
+    }
+
+    private fun FunSpec.Builder.writeStringParameters(
+        function: Function,
+        api: EmbeddingApi,
+    ): List<String> {
         val allocationsToFree = mutableListOf<String>()
         function.params.filter { param -> param.type == Scalar.String }.forEach { param ->
             val bytes = param.name + "Bytes"
@@ -241,40 +257,33 @@ internal class ChasmClassImplementationGenerator {
                 StringEncodingStrategy.PACKED_POINTER_AND_LENGTH,
                 -> {
                     addStatement("val %L = allocator.alloc(%L.size)", allocation, bytes)
-                    writeBytes(allocation, bytes)
+                    writeBytes(allocation, bytes, api)
                 }
                 StringEncodingStrategy.NULL_TERMINATED -> {
                     addStatement("val %L = allocator.alloc(%L.size + 1)", allocation, bytes)
-                    writeBytes(allocation, bytes)
+                    writeBytes(allocation, bytes, api)
                     addStatement(
-                        "%M(store, %L, %L + %L.size, byteArrayOf(0)).%M(%S)",
-                        CHASM_WRITE_BYTES,
-                        DEFAULT_MEMORY_BACKING_NAME,
-                        allocation,
-                        bytes,
-                        CHASM_EXPECT,
-                        "Failed to write null terminator",
+                        "%L",
+                        api.writeNullTerminator(DEFAULT_MEMORY_BACKING_NAME, CodeBlock.of("%L + %L.size", allocation, bytes)),
                     )
                 }
                 StringEncodingStrategy.LENGTH_PREFIXED -> {
                     addStatement("val %L = allocator.alloc(%L.size + 4)", allocation, bytes)
                     addStatement(
-                        "%M(store, %L, %L, %L.size).%M(%S)",
-                        CHASM_WRITE_INT,
-                        DEFAULT_MEMORY_BACKING_NAME,
-                        allocation,
-                        bytes,
-                        CHASM_EXPECT,
-                        "Failed to write string length",
+                        "%L",
+                        api.accessorCall(
+                            api.writeInt,
+                            CodeBlock.of("%L, %L, %L.size", DEFAULT_MEMORY_BACKING_NAME, allocation, bytes),
+                            "Failed to write string length",
+                        ),
                     )
                     addStatement(
-                        "%M(store, %L, %L + 4, %L).%M(%S)",
-                        CHASM_WRITE_BYTES,
-                        DEFAULT_MEMORY_BACKING_NAME,
-                        allocation,
-                        bytes,
-                        CHASM_EXPECT,
-                        "Failed to write string",
+                        "%L",
+                        api.accessorCall(
+                            api.writeBytes,
+                            CodeBlock.of("%L, %L + 4, %L", DEFAULT_MEMORY_BACKING_NAME, allocation, bytes),
+                            "Failed to write string",
+                        ),
                     )
                 }
             }
@@ -283,24 +292,31 @@ internal class ChasmClassImplementationGenerator {
         return allocationsToFree
     }
 
-    private fun FunSpec.Builder.writeBytes(allocation: String, bytes: String) {
+    private fun FunSpec.Builder.writeBytes(
+        allocation: String,
+        bytes: String,
+        api: EmbeddingApi,
+    ) {
         addStatement(
-            "%M(store, %L, %L, %L).%M(%S)",
-            CHASM_WRITE_BYTES,
-            DEFAULT_MEMORY_BACKING_NAME,
-            allocation,
-            bytes,
-            CHASM_EXPECT,
-            "Failed to write string",
+            "%L",
+            api.accessorCall(
+                api.writeBytes,
+                CodeBlock.of("%L, %L, %L", DEFAULT_MEMORY_BACKING_NAME, allocation, bytes),
+                "Failed to write string",
+            ),
         )
     }
 
-    private fun FunSpec.Builder.writeArguments(function: Function) {
+    private fun FunSpec.Builder.writeArguments(
+        function: Function,
+        api: EmbeddingApi,
+    ) {
         if (function.params.isEmpty()) {
-            addStatement("val args = emptyList<%T>()", CHASM_EXECUTION_VALUE_CLASS_NAME)
+            addStatement("val args = emptyList<%T>()", api.executionValue)
             return
         }
 
+        val i32 = api.numberValue(Scalar.Integer)
         var inputIndex = 0
         function.params.forEach { param ->
             if (param.type == Scalar.String) {
@@ -308,25 +324,25 @@ internal class ChasmClassImplementationGenerator {
                 val allocation = param.name + "Alloc"
                 when (requireNotNull(param.stringEncodingStrategy)) {
                     StringEncodingStrategy.POINTER_AND_LENGTH -> {
-                        setArgument(inputIndex++, CHASM_I32_VALUE_CLASS_NAME, allocation)
-                        setArgument(inputIndex++, CHASM_I32_VALUE_CLASS_NAME, "$bytes.size")
+                        setArgument(inputIndex++, i32, allocation)
+                        setArgument(inputIndex++, i32, "$bytes.size")
                     }
                     StringEncodingStrategy.NULL_TERMINATED,
                     StringEncodingStrategy.LENGTH_PREFIXED,
-                    -> setArgument(inputIndex++, CHASM_I32_VALUE_CLASS_NAME, allocation)
+                    -> setArgument(inputIndex++, i32, allocation)
                     StringEncodingStrategy.PACKED_POINTER_AND_LENGTH -> {
                         addStatement(
                             "%L[%L] = %T((%L.toLong() shl 32) or (%L.size.toLong() and 0xFFFFFFFFL))",
                             FUNCTION_INPUT_BUFFER_NAME,
                             inputIndex++,
-                            CHASM_I64_VALUE_CLASS_NAME,
+                            api.numberValue(Scalar.Long),
                             allocation,
                             bytes,
                         )
                     }
                 }
             } else {
-                setArgument(inputIndex++, param.type.chasmValueClass(), param.name)
+                setArgument(inputIndex++, api.numberValue(param.type), param.name)
             }
         }
         addStatement("val args = %L", functionInputBufferName(function.inputCount))
@@ -340,10 +356,11 @@ internal class ChasmClassImplementationGenerator {
         function: Function,
         returnType: TypeName,
         allocationsToFree: List<String>,
+        api: EmbeddingApi,
     ) {
         addStatement(
-            "val values = %L(args).%M(%S)",
-            preparedFunctionPropertyName(function),
+            "val values = %L.%M(%S)",
+            api.preparedFunctionCall(preparedFunctionPropertyName(function), "args"),
             CHASM_EXPECT,
             "Failed to invoke function ${function.name}",
         )
@@ -353,13 +370,13 @@ internal class ChasmClassImplementationGenerator {
             Scalar.Float,
             Scalar.Double,
             -> {
-                addStatement("val result = (values.first() as %T).value", type.chasmValueClass())
+                addStatement("val result = (values.first() as %T).value", api.numberValue(type))
                 free(allocationsToFree)
                 addStatement("return result")
             }
             Scalar.Unit -> free(allocationsToFree)
             Scalar.String -> {
-                writeStringReturn(function)
+                writeStringReturn(function, api)
                 free(allocationsToFree)
                 addStatement("return result")
             }
@@ -370,7 +387,7 @@ internal class ChasmClassImplementationGenerator {
                         .indent()
                         .apply {
                             type.generated.fields.forEachIndexed { index, field ->
-                                add("r%L = (values[%L] as %T).value,\n", index, index, field.type.chasmValueClass())
+                                add("r%L = (values[%L] as %T).value,\n", index, index, api.numberValue(field.type))
                             }
                         }.unindent()
                         .add(")\n")
@@ -382,56 +399,48 @@ internal class ChasmClassImplementationGenerator {
         }
     }
 
-    private fun FunSpec.Builder.writeStringReturn(function: Function) {
+    private fun FunSpec.Builder.writeStringReturn(
+        function: Function,
+        api: EmbeddingApi,
+    ) {
+
+        val i32 = api.numberValue(Scalar.Integer)
+        val failure = "Failed to read string result for ${function.name}"
+
         when (requireNotNull(function.returns.stringEncodingStrategy)) {
             StringEncodingStrategy.POINTER_AND_LENGTH -> {
-                addStatement("val pointer = (values[0] as %T).value", CHASM_I32_VALUE_CLASS_NAME)
-                addStatement("val length = (values[1] as %T).value", CHASM_I32_VALUE_CLASS_NAME)
+                addStatement("val pointer = (values[0] as %T).value", i32)
+                addStatement("val length = (values[1] as %T).value", i32)
                 addStatement(
-                    "val result = %M(store, %L, pointer, length).%M(%S)",
-                    CHASM_READ_STRING,
-                    DEFAULT_MEMORY_BACKING_NAME,
-                    CHASM_EXPECT,
-                    "Failed to read string result for ${function.name}",
+                    "val result = %L",
+                    api.accessorCall(api.readUtf8String, CodeBlock.of("%L, pointer, length", DEFAULT_MEMORY_BACKING_NAME), failure),
                 )
             }
             StringEncodingStrategy.NULL_TERMINATED -> {
-                addStatement("val pointer = (values[0] as %T).value", CHASM_I32_VALUE_CLASS_NAME)
+                addStatement("val pointer = (values[0] as %T).value", i32)
                 addStatement(
-                    "val result = %M(store, %L, pointer).%M(%S)",
-                    CHASM_READ_NULL_STRING,
-                    DEFAULT_MEMORY_BACKING_NAME,
-                    CHASM_EXPECT,
-                    "Failed to read string result for ${function.name}",
+                    "val result = %L",
+                    api.accessorCall(api.readNullTerminatedUtf8String, CodeBlock.of("%L, pointer", DEFAULT_MEMORY_BACKING_NAME), failure),
                 )
             }
             StringEncodingStrategy.LENGTH_PREFIXED -> {
-                addStatement("val pointer = (values[0] as %T).value", CHASM_I32_VALUE_CLASS_NAME)
+                addStatement("val pointer = (values[0] as %T).value", i32)
                 addStatement(
-                    "val length = %M(store, %L, pointer).%M(%S)",
-                    CHASM_READ_INT,
-                    DEFAULT_MEMORY_BACKING_NAME,
-                    CHASM_EXPECT,
-                    "Failed to read string length",
+                    "val length = %L",
+                    api.accessorCall(api.readInt, CodeBlock.of("%L, pointer", DEFAULT_MEMORY_BACKING_NAME), "Failed to read string length"),
                 )
                 addStatement(
-                    "val result = %M(store, %L, pointer + 4, length).%M(%S)",
-                    CHASM_READ_STRING,
-                    DEFAULT_MEMORY_BACKING_NAME,
-                    CHASM_EXPECT,
-                    "Failed to read string result for ${function.name}",
+                    "val result = %L",
+                    api.accessorCall(api.readUtf8String, CodeBlock.of("%L, pointer + 4, length", DEFAULT_MEMORY_BACKING_NAME), failure),
                 )
             }
             StringEncodingStrategy.PACKED_POINTER_AND_LENGTH -> {
-                addStatement("val packed = (values[0] as %T).value", CHASM_I64_VALUE_CLASS_NAME)
+                addStatement("val packed = (values[0] as %T).value", api.numberValue(Scalar.Long))
                 addStatement("val pointer = (packed ushr 32).toInt()")
                 addStatement("val length = packed.toInt()")
                 addStatement(
-                    "val result = %M(store, %L, pointer, length).%M(%S)",
-                    CHASM_READ_STRING,
-                    DEFAULT_MEMORY_BACKING_NAME,
-                    CHASM_EXPECT,
-                    "Failed to read string result for ${function.name}",
+                    "val result = %L",
+                    api.accessorCall(api.readUtf8String, CodeBlock.of("%L, pointer, length", DEFAULT_MEMORY_BACKING_NAME), failure),
                 )
             }
         }
@@ -444,44 +453,59 @@ internal class ChasmClassImplementationGenerator {
     private fun memoryImplementation(
         packageName: String,
         interfaceName: String,
-    ): TypeSpec = TypeSpec.classBuilder("MemoryImpl")
-        .addModifiers(KModifier.PRIVATE)
-        .primaryConstructor(
-            FunSpec.constructorBuilder()
-                .addParameter("store", CHASM_STORE_CLASS_NAME)
-                .addParameter("memory", CHASM_MEMORY_CLASS_NAME)
-                .build(),
-        ).addSuperinterface(ClassName(packageName, interfaceName, "Memory"))
-        .addProperty(PropertySpec.builder("store", CHASM_STORE_CLASS_NAME).addModifiers(KModifier.PRIVATE).initializer("store").build())
-        .addProperty(PropertySpec.builder("memory", CHASM_MEMORY_CLASS_NAME).addModifiers(KModifier.PRIVATE).initializer("memory").build())
-        .addFunction(
-            FunSpec.builder("read")
-                .addModifiers(KModifier.OVERRIDE)
-                .addParameter("buffer", ByteArray::class)
-                .addParameter("memoryPointer", INT)
-                .addParameter("bufferPointer", INT)
-                .addParameter("bytesToRead", INT)
-                .returns(ByteArray::class)
-                .addStatement(
-                    "return %M(store, memory, buffer, memoryPointer, bytesToRead, bufferPointer).%M(%S)",
-                    CHASM_READ_BYTES,
-                    CHASM_EXPECT,
-                    "Failed to read memory",
-                ).build(),
-        ).addFunction(
-            FunSpec.builder("write")
-                .addModifiers(KModifier.OVERRIDE)
-                .addParameter("pointer", INT)
-                .addParameter("buffer", ByteArray::class)
-                .addParameter("bufferPointer", INT)
-                .addParameter("bytesToWrite", INT)
-                .addStatement(
-                    "%M(store, memory, pointer, buffer, bufferPointer, bytesToWrite).%M(%S)",
-                    CHASM_WRITE_BYTES,
-                    CHASM_EXPECT,
-                    "Failed to write memory",
-                ).build(),
-        ).build()
+        api: EmbeddingApi,
+    ): TypeSpec {
+        return TypeSpec.classBuilder("MemoryImpl").apply {
+
+            addModifiers(KModifier.PRIVATE)
+            primaryConstructor(
+                FunSpec.constructorBuilder()
+                    .addParameters(api.memoryAccessParameters)
+                    .addParameter("memory", api.memory)
+                    .build(),
+            )
+            addSuperinterface(ClassName(packageName, interfaceName, "Memory"))
+
+            api.memoryAccessParameters.forEach { parameter ->
+                addProperty(PropertySpec.builder(parameter.name, parameter.type).addModifiers(KModifier.PRIVATE).initializer("%N", parameter).build())
+            }
+            addProperty(PropertySpec.builder("memory", api.memory).addModifiers(KModifier.PRIVATE).initializer("memory").build())
+
+            addFunction(
+                FunSpec.builder("read")
+                    .addModifiers(KModifier.OVERRIDE)
+                    .addParameter("buffer", ByteArray::class)
+                    .addParameter("memoryPointer", INT)
+                    .addParameter("bufferPointer", INT)
+                    .addParameter("bytesToRead", INT)
+                    .returns(ByteArray::class)
+                    .addStatement(
+                        "return %L",
+                        api.accessorCall(
+                            api.readBytes,
+                            CodeBlock.of("memory, buffer, memoryPointer, bytesToRead, bufferPointer"),
+                            "Failed to read memory",
+                        ),
+                    ).build(),
+            )
+            addFunction(
+                FunSpec.builder("write")
+                    .addModifiers(KModifier.OVERRIDE)
+                    .addParameter("pointer", INT)
+                    .addParameter("buffer", ByteArray::class)
+                    .addParameter("bufferPointer", INT)
+                    .addParameter("bytesToWrite", INT)
+                    .addStatement(
+                        "%L",
+                        api.accessorCall(
+                            api.writeBytes,
+                            CodeBlock.of("memory, pointer, buffer, bufferPointer, bytesToWrite"),
+                            "Failed to write memory",
+                        ),
+                    ).build(),
+            )
+        }.build()
+    }
 
     private fun functionReturnType(packageName: String, function: Function): TypeName = when (val type = function.returns.type) {
         Scalar.Integer -> INT
@@ -494,18 +518,6 @@ internal class ChasmClassImplementationGenerator {
         else -> error("Unsupported return type: $type")
     }
 
-    private fun Type.chasmValueClass(): ClassName = when (this) {
-        Scalar.Integer -> CHASM_I32_VALUE_CLASS_NAME
-        Scalar.Long -> CHASM_I64_VALUE_CLASS_NAME
-        Scalar.Float -> CHASM_F32_VALUE_CLASS_NAME
-        Scalar.Double -> CHASM_F64_VALUE_CLASS_NAME
-        Scalar.String,
-        Scalar.Unit,
-        is Aggregate,
-        -> error("Cannot convert $this to a Chasm execution value")
-        else -> error("Unknown type: $this")
-    }
-
     private fun ImplementationVisibility.modifier(): KModifier = when (this) {
         ImplementationVisibility.INTERNAL -> KModifier.INTERNAL
         ImplementationVisibility.PUBLIC -> KModifier.PUBLIC
@@ -513,18 +525,4 @@ internal class ChasmClassImplementationGenerator {
     }
 }
 
-private val CHASM_EXECUTION_VALUE_MUTABLE_LIST =
-    ClassName("kotlin.collections", "MutableList").parameterizedBy(CHASM_EXECUTION_VALUE_CLASS_NAME)
-private val CHASM_WASM32_ALLOCATOR_CLASS_NAME =
-    ClassName("io.github.charlietap.chasm.embedding.shapes", "Wasm32Allocator")
-
-private val CHASM_PREPARE_FUNCTION = MemberName("io.github.charlietap.chasm.embedding", "prepareFunction")
-private val CHASM_INVOKE = MemberName("io.github.charlietap.chasm.embedding", "invoke")
-private val CHASM_READ_GLOBAL = MemberName("io.github.charlietap.chasm.embedding.global", "readGlobal")
-private val CHASM_WRITE_GLOBAL = MemberName("io.github.charlietap.chasm.embedding.global", "writeGlobal")
-private val CHASM_READ_BYTES = MemberName("io.github.charlietap.chasm.embedding.memory", "readBytes")
-private val CHASM_WRITE_BYTES = MemberName("io.github.charlietap.chasm.embedding.memory", "writeBytes")
-private val CHASM_READ_INT = MemberName("io.github.charlietap.chasm.embedding.memory", "readInt")
-private val CHASM_WRITE_INT = MemberName("io.github.charlietap.chasm.embedding.memory", "writeInt")
-private val CHASM_READ_STRING = MemberName("io.github.charlietap.chasm.embedding.memory", "readUtf8String")
-private val CHASM_READ_NULL_STRING = MemberName("io.github.charlietap.chasm.embedding.memory", "readNullTerminatedUtf8String")
+private val MUTABLE_LIST = ClassName("kotlin.collections", "MutableList")

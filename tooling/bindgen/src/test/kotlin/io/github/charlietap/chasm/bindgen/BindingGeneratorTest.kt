@@ -39,16 +39,18 @@ class BindingGeneratorTest {
     }
 
     @Test
-    fun `AOT cannot link WASI imports automatically yet`() {
-        val config = CodegenConfig(
-            runtime = CodegenRuntime.CHASM,
-            wasi = WasiLinking.AUTOMATIC,
-            executionTier = ExecutionTier.Aot("com.example.aot.WasmModule"),
-        )
+    fun `compiled tiers cannot link WASI imports automatically yet`() {
+
+        val tiers = listOf(ExecutionTier.Jit(), ExecutionTier.Aot("com.example.aot.WasmModule"))
         val info = moduleInfo(imports = listOf(importDefinition(moduleName = "wasi_snapshot_preview1", entityName = "fd_write")))
 
-        assertFailsWith<IllegalArgumentException> {
-            BindingGenerator().generate(info, BindingOptions(interfaceName = "Service", packageName = "com.example", config = config))
+        tiers.forEach { tier ->
+
+            val config = CodegenConfig(runtime = CodegenRuntime.CHASM, wasi = WasiLinking.AUTOMATIC, executionTier = tier)
+
+            assertFailsWith<IllegalArgumentException>(tier::class.simpleName) {
+                BindingGenerator().generate(info, BindingOptions(interfaceName = "Service", packageName = "com.example", config = config))
+            }
         }
     }
 

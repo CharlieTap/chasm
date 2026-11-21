@@ -1,0 +1,15 @@
+package com.test
+
+import kotlin.String
+
+public interface JitStringParams {
+  public fun pointerAndLength(`value`: String)
+
+  public fun nullTerminated(`value`: String)
+
+  public fun lengthPrefixed(`value`: String)
+
+  public fun packed(`value`: String)
+
+  public fun freed(`value`: String)
+}

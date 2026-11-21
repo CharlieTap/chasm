@@ -3,16 +3,16 @@
 package com.test
 
 import io.github.charlietap.chasm.ExperimentalChasmApi
-import io.github.charlietap.chasm.embedding.codegen.CodegenImport
-import io.github.charlietap.chasm.embedding.codegen.allocateImports
-import io.github.charlietap.chasm.embedding.shapes.Import
-import io.github.charlietap.chasm.embedding.shapes.Instance
-import io.github.charlietap.chasm.embedding.shapes.Module
-import io.github.charlietap.chasm.embedding.shapes.Store
+import io.github.charlietap.chasm.embedding.compiled.Import
+import io.github.charlietap.chasm.embedding.compiled.Instance
+import io.github.charlietap.chasm.embedding.compiled.Module
+import io.github.charlietap.chasm.embedding.compiled.Store
+import io.github.charlietap.chasm.embedding.compiled.codegen.CodegenImport
+import io.github.charlietap.chasm.embedding.compiled.codegen.allocateImports
+import io.github.charlietap.chasm.embedding.compiled.instance
 import io.github.charlietap.chasm.embedding.shapes.`expect`
-import io.github.charlietap.chasm.embedding.store
-import io.github.charlietap.chasm.jit.instance
 import io.github.charlietap.chasm.jit.module
+import io.github.charlietap.chasm.jit.store
 import kotlin.ByteArray
 import kotlin.OptIn
 import kotlin.collections.List

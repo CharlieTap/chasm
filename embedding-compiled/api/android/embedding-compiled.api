@@ -370,12 +370,14 @@ public final class io/github/charlietap/chasm/embedding/compiled/Module {
 }
 
 public final class io/github/charlietap/chasm/embedding/compiled/ModuleExport {
-	public fun <init> (Ljava/lang/String;Lio/github/charlietap/chasm/embedding/compiled/ExternalType;)V
+	public fun <init> (Ljava/lang/String;Lio/github/charlietap/chasm/host/ModuleIndex;Lio/github/charlietap/chasm/embedding/compiled/ExternalType;)V
 	public final fun component1 ()Ljava/lang/String;
-	public final fun component2 ()Lio/github/charlietap/chasm/embedding/compiled/ExternalType;
-	public final fun copy (Ljava/lang/String;Lio/github/charlietap/chasm/embedding/compiled/ExternalType;)Lio/github/charlietap/chasm/embedding/compiled/ModuleExport;
-	public static synthetic fun copy$default (Lio/github/charlietap/chasm/embedding/compiled/ModuleExport;Ljava/lang/String;Lio/github/charlietap/chasm/embedding/compiled/ExternalType;ILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/compiled/ModuleExport;
+	public final fun component2 ()Lio/github/charlietap/chasm/host/ModuleIndex;
+	public final fun component3 ()Lio/github/charlietap/chasm/embedding/compiled/ExternalType;
+	public final fun copy (Ljava/lang/String;Lio/github/charlietap/chasm/host/ModuleIndex;Lio/github/charlietap/chasm/embedding/compiled/ExternalType;)Lio/github/charlietap/chasm/embedding/compiled/ModuleExport;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/embedding/compiled/ModuleExport;Ljava/lang/String;Lio/github/charlietap/chasm/host/ModuleIndex;Lio/github/charlietap/chasm/embedding/compiled/ExternalType;ILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/compiled/ModuleExport;
 	public fun equals (Ljava/lang/Object;)Z
+	public final fun getIndex ()Lio/github/charlietap/chasm/host/ModuleIndex;
 	public final fun getName ()Ljava/lang/String;
 	public final fun getType ()Lio/github/charlietap/chasm/embedding/compiled/ExternalType;
 	public fun hashCode ()I
@@ -468,6 +470,45 @@ public final class io/github/charlietap/chasm/embedding/compiled/TableCallsKt {
 
 public final class io/github/charlietap/chasm/embedding/compiled/Tag : io/github/charlietap/chasm/embedding/compiled/Importable {
 	public fun <init> (Lio/github/charlietap/chasm/embedding/compiled/CompiledEngine;Ljava/lang/Object;)V
+}
+
+public abstract interface class io/github/charlietap/chasm/embedding/compiled/codegen/Allocator {
+	public abstract fun alloc (Ljava/lang/Object;)Ljava/lang/Object;
+	public abstract fun free (Ljava/lang/Object;)V
+}
+
+public abstract interface class io/github/charlietap/chasm/embedding/compiled/codegen/CodegenImport {
+	public abstract fun getEntityName ()Ljava/lang/String;
+	public abstract fun getModuleName ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/embedding/compiled/codegen/CodegenImportKt {
+	public static final fun allocateImports (Lio/github/charlietap/chasm/embedding/compiled/Store;Ljava/util/List;)Ljava/util/List;
+}
+
+public final class io/github/charlietap/chasm/embedding/compiled/codegen/FunctionImport : io/github/charlietap/chasm/embedding/compiled/codegen/CodegenImport {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Lio/github/charlietap/chasm/type/FunctionType;Lio/github/charlietap/chasm/embedding/compiled/host/HostFunction;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Lio/github/charlietap/chasm/type/FunctionType;
+	public final fun component4 ()Lio/github/charlietap/chasm/embedding/compiled/host/HostFunction;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Lio/github/charlietap/chasm/type/FunctionType;Lio/github/charlietap/chasm/embedding/compiled/host/HostFunction;)Lio/github/charlietap/chasm/embedding/compiled/codegen/FunctionImport;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/embedding/compiled/codegen/FunctionImport;Ljava/lang/String;Ljava/lang/String;Lio/github/charlietap/chasm/type/FunctionType;Lio/github/charlietap/chasm/embedding/compiled/host/HostFunction;ILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/compiled/codegen/FunctionImport;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getEntityName ()Ljava/lang/String;
+	public final fun getFunction ()Lio/github/charlietap/chasm/embedding/compiled/host/HostFunction;
+	public fun getModuleName ()Ljava/lang/String;
+	public final fun getType ()Lio/github/charlietap/chasm/type/FunctionType;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/embedding/compiled/codegen/Wasm32Allocator : io/github/charlietap/chasm/embedding/compiled/codegen/Allocator {
+	public fun <init> (Lio/github/charlietap/chasm/embedding/compiled/Instance;Lio/github/charlietap/chasm/embedding/compiled/Store;Ljava/lang/String;Ljava/lang/String;)V
+	public fun alloc (I)Ljava/lang/Integer;
+	public synthetic fun alloc (Ljava/lang/Object;)Ljava/lang/Object;
+	public fun free (I)V
+	public synthetic fun free (Ljava/lang/Object;)V
 }
 
 public final class io/github/charlietap/chasm/embedding/compiled/host/HostExceptionsKt {
