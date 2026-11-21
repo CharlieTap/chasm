@@ -1,21 +1,25 @@
 package io.github.charlietap.chasm.jit
 
+import io.github.charlietap.chasm.embedding.compiled.Import
+import io.github.charlietap.chasm.embedding.compiled.Instance
+import io.github.charlietap.chasm.embedding.compiled.Store
+import io.github.charlietap.chasm.embedding.compiled.exports
+import io.github.charlietap.chasm.embedding.compiled.function
+import io.github.charlietap.chasm.embedding.compiled.host.HostFunction
+import io.github.charlietap.chasm.embedding.compiled.host.createException
+import io.github.charlietap.chasm.embedding.compiled.host.raise
+import io.github.charlietap.chasm.embedding.compiled.host.readI32
+import io.github.charlietap.chasm.embedding.compiled.host.withTag
+import io.github.charlietap.chasm.embedding.compiled.instance
+import io.github.charlietap.chasm.embedding.compiled.invoke
+import io.github.charlietap.chasm.embedding.compiled.readPayload
+import io.github.charlietap.chasm.embedding.compiled.value.NumberValue.I32
 import io.github.charlietap.chasm.embedding.dsl.FunctionTypeBuilder
-import io.github.charlietap.chasm.embedding.dsl.functionImport
-import io.github.charlietap.chasm.embedding.invoke
+import io.github.charlietap.chasm.embedding.error.ExecutionError
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
-import io.github.charlietap.chasm.embedding.shapes.Import
-import io.github.charlietap.chasm.embedding.shapes.Instance
-import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.shapes.expect
-import io.github.charlietap.chasm.embedding.store
-import io.github.charlietap.chasm.host.HostFunction
 import io.github.charlietap.chasm.host.HostFunctionException
-import io.github.charlietap.chasm.host.ModuleIndex
-import io.github.charlietap.chasm.host.readI32
-import io.github.charlietap.chasm.host.withExceptions
-import io.github.charlietap.chasm.host.withTag
-import io.github.charlietap.chasm.runtime.value.NumberValue.I32
+import io.github.charlietap.chasm.reference.ExceptionReference
 import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -62,7 +66,7 @@ class HostExceptionsTest {
 
         val trapped = invoke(store, instance, "trap_is_not_caught", emptyList())
 
-        assertIs<ChasmResult.Error<*>>(trapped)
+        assertIs<ExecutionError.Trapped>(assertIs<ChasmResult.Error<*>>(trapped).error)
         assertEquals(31, call("catch_here", 3))
     }
 
@@ -71,7 +75,8 @@ class HostExceptionsTest {
 
         val uncaught = invoke(store, instance, "uncaught_reaches_the_host", listOf(I32(3)))
 
-        assertIs<ChasmResult.Error<*>>(uncaught)
+        val thrown = assertIs<ExecutionError.Thrown<*>>(assertIs<ChasmResult.Error<*>>(uncaught).error)
+        assertEquals(3 * PAYLOAD_SCALE, readPayload(thrown.exception as ExceptionReference, 0))
         assertEquals(32, call("catch_above", 3))
     }
 
@@ -86,8 +91,9 @@ class HostExceptionsTest {
     private fun instantiate(store: Store): Instance {
 
         val tags = instance(store, "host_exceptions_tags", emptyList())
-        val boom = Import("tags", "boom", tags.exports.first { export -> export.name == "boom" }.value)
+        val boom = Import("tags", "boom", checkNotNull(exports(tags).tag("boom")))
         val relay = instance(store, "host_exceptions_relay", listOf(boom, import(store, "raise", raise) { params { i32() } }))
+        val relayExports = exports(relay)
 
         return instance(
             store,
@@ -102,8 +108,8 @@ class HostExceptionsTest {
                     }
                 },
                 import(store, "fail", fail) {},
-                Import("relay", "relay", relay.exports.first { export -> export.name == "relay" }.value),
-                Import("relay", "chunked_relay", relay.exports.first { export -> export.name == "chunked_relay" }.value),
+                Import("relay", "relay", checkNotNull(relayExports.function("relay"))),
+                Import("relay", "chunked_relay", checkNotNull(relayExports.function("chunked_relay"))),
             ),
         )
     }
@@ -122,30 +128,23 @@ class HostExceptionsTest {
     private fun import(
         store: Store,
         name: String,
-        function: HostFunction,
+        hostFunction: HostFunction,
         signature: FunctionTypeBuilder.() -> Unit,
     ): Import {
-        return functionImport(store) {
-            moduleName = "host"
-            entityName = name
-            type(signature)
-            reference(function)
-        }
+        return Import("host", name, function(store, FunctionTypeBuilder().apply(signature).build(), hostFunction))
     }
 
     private val raise = HostFunction { parameters, _ ->
-        val payload = longArrayOf(parameters.readI32(0) * PAYLOAD_SCALE)
-        withTag(ModuleIndex.TagIndex(0)) {
-            val tag = this
-            withExceptions { raise(create(tag, payload, 0)) }
+        val words = longArrayOf(parameters.readI32(0) * PAYLOAD_SCALE)
+        withTag(0) {
+            raise(createException(words, arrayOfNulls(1)))
         }
     }
 
     private val raiseReference = HostFunction { parameters, _ ->
-        val payload = longArrayOf(parameters.readI32(1) * PAYLOAD_SCALE)
-        withTag(ModuleIndex.TagIndex(0)) {
-            val tag = this
-            withExceptions { raise(create(tag, payload, 0)) }
+        val words = longArrayOf(parameters.readI32(1) * PAYLOAD_SCALE)
+        withTag(0) {
+            raise(createException(words, arrayOfNulls(1)))
         }
     }
 

@@ -68,14 +68,15 @@ kotlin {
             dependencies {
                 api(projects.config)
                 api(projects.embeddingApi)
-                api(projects.embeddingModule)
-                api(projects.embeddingRuntime)
+                api(projects.embeddingCompiled)
                 api(projects.runtime.compiledApi)
                 api(projects.stream)
                 api(libs.kotlinx.coroutines.core)
 
                 implementation(projects.ast)
                 implementation(projects.decoder)
+                implementation(projects.embeddingModule)
+                implementation(projects.embeddingRuntime)
                 implementation(projects.libs.parallelCoroutines)
                 implementation(projects.module)
                 implementation(projects.runtimeJit)

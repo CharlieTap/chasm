@@ -19,4 +19,6 @@ data class ModuleInstance(
 ) : HostModuleInstance {
     // Set before compiled code can run, so a trap can name the frames it ran.
     var compiledFrames: CompiledFrames? = null
+
+    var compiledInstance: Any? = null
 }

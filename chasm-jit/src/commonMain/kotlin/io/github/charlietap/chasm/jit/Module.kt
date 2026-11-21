@@ -12,14 +12,13 @@ import io.github.charlietap.chasm.decoder.ModuleDecoder
 import io.github.charlietap.chasm.decoder.ParallelWasmModuleDecoder
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
 import io.github.charlietap.chasm.decoder.error.ModuleDecoderError
-import io.github.charlietap.chasm.embedding.error.ChasmError.DecodeError
-import io.github.charlietap.chasm.embedding.error.ChasmError.ModuleError
-import io.github.charlietap.chasm.embedding.error.ChasmError.ValidationError
+import io.github.charlietap.chasm.embedding.compiled.Module
+import io.github.charlietap.chasm.embedding.error.ModuleError
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Error
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Success
-import io.github.charlietap.chasm.embedding.shapes.Module
 import io.github.charlietap.chasm.embedding.shapes._module
+import io.github.charlietap.chasm.jit.internal._compiledModule
 import io.github.charlietap.chasm.module.ModuleFactoryError
 import io.github.charlietap.chasm.module.WasmModuleFactory
 import io.github.charlietap.chasm.parallel.coroutines.DefaultCoroutineParallelTaskExecutor
@@ -29,7 +28,7 @@ import io.github.charlietap.chasm.stream.SourceReader
 fun module(
     sourceReader: SourceReader,
     config: ModuleConfig = ModuleConfig(),
-): ChasmResult<Module, DecodeError> {
+): ChasmResult<Module, ModuleError.Malformed> {
     return module(
         source = sourceReader,
         config = config,
@@ -41,23 +40,23 @@ fun module(
 suspend fun module(
     bytes: ByteArray,
     config: ModuleConfig = ModuleConfig(),
-    validate: Boolean,
+    validate: Boolean = true,
 ): ChasmResult<Module, ModuleError> {
+
     if (!validate) {
         return ParallelWasmModuleDecoder(config, bytes, DefaultCoroutineParallelTaskExecutor)
-            .mapError(ModuleDecoderError::toString)
-            .mapError(::DecodeError)
-            .map { internal -> _module(config, internal, bytes) }
+            .mapError { error -> ModuleError.Malformed(error.toString()) }
+            .map { internal -> _compiledModule(_module(config, internal, bytes)) }
             .fold(::Success, ::Error)
     }
 
     return WasmModuleFactory(config, bytes, DefaultCoroutineParallelTaskExecutor)
         .mapError { error ->
             when (error) {
-                is ModuleFactoryError.Malformed -> DecodeError(error.error.toString())
-                is ModuleFactoryError.Invalid -> ValidationError(error.error.toString())
+                is ModuleFactoryError.Malformed -> ModuleError.Malformed(error.error.toString())
+                is ModuleFactoryError.Invalid -> ModuleError.Invalid(error.error.toString())
             }
-        }.map { internal -> _module(config, internal, bytes, validated = true) }
+        }.map { internal -> _compiledModule(_module(config, internal, bytes, validated = true)) }
         .fold(::Success, ::Error)
 }
 
@@ -65,15 +64,10 @@ internal fun <Source> module(
     source: Source,
     config: ModuleConfig,
     decoder: ModuleDecoder<Source>,
-): ChasmResult<Module, DecodeError> {
+): ChasmResult<Module, ModuleError.Malformed> {
     return decoder(config, source)
         .mapError(ModuleDecoderError::toString)
-        .mapError(::DecodeError)
-        .map { internal ->
-            _module(
-                config = config,
-                module = internal,
-                binary = source as? ByteArray,
-            )
-        }.fold(::Success, ::Error)
+        .mapError(ModuleError::Malformed)
+        .map { internal -> _compiledModule(_module(config = config, module = internal, binary = source as? ByteArray)) }
+        .fold(::Success, ::Error)
 }

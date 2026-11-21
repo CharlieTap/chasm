@@ -1,8 +1,3 @@
-public final class io/github/charlietap/chasm/jit/InstanceKt {
-	public static final fun instance (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Module;Ljava/util/List;Lio/github/charlietap/chasm/config/RuntimeConfig;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static synthetic fun instance$default (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Module;Ljava/util/List;Lio/github/charlietap/chasm/config/RuntimeConfig;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
-}
-
 public final class io/github/charlietap/chasm/jit/ModuleKt {
 	public static final fun module (Lio/github/charlietap/chasm/stream/SourceReader;Lio/github/charlietap/chasm/config/ModuleConfig;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 	public static final fun module ([BLio/github/charlietap/chasm/config/ModuleConfig;ZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -10,87 +5,12 @@ public final class io/github/charlietap/chasm/jit/ModuleKt {
 	public static synthetic fun module$default ([BLio/github/charlietap/chasm/config/ModuleConfig;ZLkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 }
 
-public final class io/github/charlietap/chasm/jit/PreparedCall {
-	public final fun call-TUhoVVc ([J[Ljava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
-	public final fun getSlots ()I
-	public final fun getType ()Lio/github/charlietap/chasm/type/FunctionType;
-	public final fun unsafeCall-TUhoVVc ([J[Ljava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
-}
-
-public final class io/github/charlietap/chasm/jit/PreparedCallKt {
-	public static final fun prepareCall (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Instance;Ljava/lang/String;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
-}
-
-public abstract interface class io/github/charlietap/chasm/jit/ReferenceHostFunction {
-	public abstract fun invoke-caLMe0M ([J[Ljava/lang/Object;Lio/github/charlietap/chasm/host/HostModuleInstance;Lio/github/charlietap/chasm/host/HostResources;II)V
-}
-
-public final class io/github/charlietap/chasm/jit/ReferenceHostFunctionKt {
-	public static final fun referenceFunction (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/type/FunctionType;Lio/github/charlietap/chasm/jit/ReferenceHostFunction;)Lio/github/charlietap/chasm/embedding/shapes/Function;
-}
-
-public final class io/github/charlietap/chasm/jit/ReferenceSlots {
-	public static final synthetic fun box-impl ([Ljava/lang/Object;)Lio/github/charlietap/chasm/jit/ReferenceSlots;
-	public static fun constructor-impl (I)[Ljava/lang/Object;
-	public fun equals (Ljava/lang/Object;)Z
-	public static fun equals-impl ([Ljava/lang/Object;Ljava/lang/Object;)Z
-	public static final fun equals-impl0 ([Ljava/lang/Object;[Ljava/lang/Object;)Z
-	public static final fun get-7dCc7w8 ([Ljava/lang/Object;I)Ljava/lang/Object;
-	public static final fun getSize-impl ([Ljava/lang/Object;)I
-	public fun hashCode ()I
-	public static fun hashCode-impl ([Ljava/lang/Object;)I
-	public static final fun set-SJo7Iww ([Ljava/lang/Object;ILjava/lang/Object;)V
-	public fun toString ()Ljava/lang/String;
-	public static fun toString-impl ([Ljava/lang/Object;)Ljava/lang/String;
-	public final synthetic fun unbox-impl ()[Ljava/lang/Object;
-}
-
-public final class io/github/charlietap/chasm/jit/ReferenceSlotsKt {
-	public static final fun readReference-UUGrNMc ([Ljava/lang/Object;II)Ljava/lang/Object;
-	public static final fun writeReference-Zs8DJgk ([Ljava/lang/Object;IILjava/lang/Object;)V
+public final class io/github/charlietap/chasm/jit/StoreKt {
+	public static final fun store ()Lio/github/charlietap/chasm/embedding/compiled/Store;
+	public static final fun store (Lio/github/charlietap/chasm/config/StoreConfig;)Lio/github/charlietap/chasm/embedding/compiled/Store;
 }
 
 public final class io/github/charlietap/chasm/jit/ValidateKt {
-	public static final fun validate (Lio/github/charlietap/chasm/embedding/shapes/Module;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
-}
-
-public final class io/github/charlietap/chasm/jit/WasmReference {
-	public static final field Companion Lio/github/charlietap/chasm/jit/WasmReference$Companion;
-	public static final synthetic fun box-impl (Ljava/lang/Object;)Lio/github/charlietap/chasm/jit/WasmReference;
-	public fun equals (Ljava/lang/Object;)Z
-	public static fun equals-impl (Ljava/lang/Object;Ljava/lang/Object;)Z
-	public static final fun equals-impl0 (Ljava/lang/Object;Ljava/lang/Object;)Z
-	public static final fun getKind-impl (Ljava/lang/Object;)Lio/github/charlietap/chasm/jit/WasmReferenceKind;
-	public fun hashCode ()I
-	public static fun hashCode-impl (Ljava/lang/Object;)I
-	public static final fun isNull-impl (Ljava/lang/Object;)Z
-	public fun toString ()Ljava/lang/String;
-	public static fun toString-impl (Ljava/lang/Object;)Ljava/lang/String;
-	public final synthetic fun unbox-impl ()Ljava/lang/Object;
-}
-
-public final class io/github/charlietap/chasm/jit/WasmReference$Companion {
-	public final fun getNull-PktNSJc ()Ljava/lang/Object;
-}
-
-public final class io/github/charlietap/chasm/jit/WasmReferenceKind : java/lang/Enum {
-	public static final field Array Lio/github/charlietap/chasm/jit/WasmReferenceKind;
-	public static final field Exception Lio/github/charlietap/chasm/jit/WasmReferenceKind;
-	public static final field Function Lio/github/charlietap/chasm/jit/WasmReferenceKind;
-	public static final field HostValue Lio/github/charlietap/chasm/jit/WasmReferenceKind;
-	public static final field I31 Lio/github/charlietap/chasm/jit/WasmReferenceKind;
-	public static final field Null Lio/github/charlietap/chasm/jit/WasmReferenceKind;
-	public static final field Struct Lio/github/charlietap/chasm/jit/WasmReferenceKind;
-	public static fun getEntries ()Lkotlin/enums/EnumEntries;
-	public static fun valueOf (Ljava/lang/String;)Lio/github/charlietap/chasm/jit/WasmReferenceKind;
-	public static fun values ()[Lio/github/charlietap/chasm/jit/WasmReferenceKind;
-}
-
-public final class io/github/charlietap/chasm/jit/WasmReferenceKt {
-	public static final fun externReference (Ljava/lang/Object;)Ljava/lang/Object;
-	public static final fun functionReference (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Function;)Ljava/lang/Object;
-	public static final fun hostValue-SJo7Iww (Lio/github/charlietap/chasm/embedding/shapes/Store;Ljava/lang/Object;)Ljava/lang/Object;
-	public static final fun referenceValue-lik5OWw (Lio/github/charlietap/chasm/embedding/shapes/Store;Ljava/lang/Object;Z)Lio/github/charlietap/chasm/runtime/value/ReferenceValue;
-	public static final fun wasmReference (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/runtime/value/ReferenceValue;)Ljava/lang/Object;
+	public static final fun validate (Lio/github/charlietap/chasm/embedding/compiled/Module;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 }
 

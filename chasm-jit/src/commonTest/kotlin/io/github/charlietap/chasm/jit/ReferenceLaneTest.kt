@@ -1,48 +1,53 @@
-@file:OptIn(ExperimentalChasmApi::class)
-
 package io.github.charlietap.chasm.jit
 
-import io.github.charlietap.chasm.ExperimentalChasmApi
+import io.github.charlietap.chasm.embedding.compiled.Import
+import io.github.charlietap.chasm.embedding.compiled.Instance
+import io.github.charlietap.chasm.embedding.compiled.PreparedFunction
+import io.github.charlietap.chasm.embedding.compiled.Store
+import io.github.charlietap.chasm.embedding.compiled.function
+import io.github.charlietap.chasm.embedding.compiled.host.HostFunction
+import io.github.charlietap.chasm.embedding.compiled.host.readF64
+import io.github.charlietap.chasm.embedding.compiled.host.readI32
+import io.github.charlietap.chasm.embedding.compiled.host.readReference
+import io.github.charlietap.chasm.embedding.compiled.host.writeI32
+import io.github.charlietap.chasm.embedding.compiled.host.writeReference
+import io.github.charlietap.chasm.embedding.compiled.instance
+import io.github.charlietap.chasm.embedding.compiled.invoke
+import io.github.charlietap.chasm.embedding.compiled.invokeUnboxed
+import io.github.charlietap.chasm.embedding.compiled.prepareFunction
+import io.github.charlietap.chasm.embedding.compiled.value.NumberValue.F64
+import io.github.charlietap.chasm.embedding.compiled.value.NumberValue.I32
+import io.github.charlietap.chasm.embedding.compiled.value.ReferenceValue
 import io.github.charlietap.chasm.embedding.dsl.FunctionTypeBuilder
-import io.github.charlietap.chasm.embedding.extern.createExternRef
-import io.github.charlietap.chasm.embedding.invoke
+import io.github.charlietap.chasm.embedding.error.ExecutionError
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
-import io.github.charlietap.chasm.embedding.shapes.Import
-import io.github.charlietap.chasm.embedding.shapes.Instance
-import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.shapes.expect
-import io.github.charlietap.chasm.embedding.store
-import io.github.charlietap.chasm.host.readF64
-import io.github.charlietap.chasm.host.readI32
-import io.github.charlietap.chasm.host.writeI32
-import io.github.charlietap.chasm.runtime.value.NumberValue.F64
-import io.github.charlietap.chasm.runtime.value.NumberValue.I32
-import io.github.charlietap.chasm.runtime.value.ReferenceValue
+import io.github.charlietap.chasm.reference.StructReference
 import io.github.charlietap.chasm.type.FunctionType
 import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
+import kotlin.test.assertNull
 import kotlin.test.assertSame
-import kotlin.test.assertTrue
 
 class ReferenceLaneTest {
 
     private val store = store()
-    private var kindSeen = WasmReferenceKind.Null
-    private var reentry: PreparedCall? = null
+    private var echoed: Any? = null
+    private var reentry: PreparedFunction? = null
     private val instance by lazy { instantiate() }
 
     @Test
     fun guestStructsCrossHostFunctionsByIdentity() {
 
         val call = prepare("echo_same")
-        val stack = LongArray(call.slots)
+        val words = LongArray(call.slots)
 
-        call.call(stack, ReferenceSlots(call.slots)).expect("echo_same")
+        call.invokeUnboxed(words, arrayOfNulls(call.slots)).expect("echo_same")
 
-        assertEquals(1, stack[0].toInt())
-        assertEquals(WasmReferenceKind.Struct, kindSeen)
+        assertEquals(1, words[0].toInt())
+        assertIs<StructReference>(echoed)
     }
 
     @Test
@@ -51,53 +56,52 @@ class ReferenceLaneTest {
         val value = Any()
         val park = prepare("park")
         val parked = prepare("parked")
-        val references = ReferenceSlots(1)
-        references[0] = externReference(value)
+        val references = arrayOfNulls<Any>(1)
+        references[0] = value
 
-        park.call(LongArray(1), references).expect("park")
-        references[0] = WasmReference.Null
+        park.invokeUnboxed(LongArray(1), references).expect("park")
+        references[0] = null
         System.gc()
-        parked.call(LongArray(1), references).expect("parked")
+        parked.invokeUnboxed(LongArray(1), references).expect("parked")
 
-        assertEquals(WasmReferenceKind.HostValue, references[0].kind)
-        assertSame(value, hostValue(store, references[0]))
+        assertSame(value, references[0])
     }
 
     @Test
     fun numbersAndReferencesShareSlotPositions() {
 
         val call = prepare("mix")
-        val stack = LongArray(call.slots)
-        val references = ReferenceSlots(call.slots)
-        stack[0] = 7L
-        references[1] = externReference("value")
-        stack[2] = 2.5.toRawBits()
+        val words = LongArray(call.slots)
+        val references = arrayOfNulls<Any>(call.slots)
+        words[0] = 7L
+        references[1] = "value"
+        words[2] = 2.5.toRawBits()
 
-        call.call(stack, references).expect("mix")
+        call.invokeUnboxed(words, references).expect("mix")
 
-        assertEquals("7:2.5:value", hostValue(store, references[0]))
+        assertEquals("7:2.5:value", references[0])
     }
 
     @Test
     fun nullReferencesPassThrough() {
 
         val call = prepare("identity")
-        val references = ReferenceSlots(1)
+        val references = arrayOfNulls<Any>(1)
 
-        call.call(LongArray(1), references).expect("identity")
+        call.invokeUnboxed(LongArray(1), references).expect("identity")
 
-        assertTrue(references[0].isNull)
+        assertNull(references[0])
     }
 
     @Test
     fun numericCallsTakeNoReferenceSlots() {
 
         val call = prepare("add")
-        val stack = longArrayOf(40L, 2L)
+        val words = longArrayOf(40L, 2L)
 
-        call.call(stack, ReferenceSlots(0)).expect("add")
+        call.invokeUnboxed(words, arrayOfNulls(0)).expect("add")
 
-        assertEquals(42, stack[0].toInt())
+        assertEquals(42, words[0].toInt())
     }
 
     @Test
@@ -106,40 +110,37 @@ class ReferenceLaneTest {
         reentry = prepare("identity")
         val call = prepare("reenter")
         val value = Any()
-        val references = ReferenceSlots(1)
-        references[0] = externReference(value)
+        val references = arrayOfNulls<Any>(1)
+        references[0] = value
 
-        call.call(LongArray(1), references).expect("reenter")
+        call.invokeUnboxed(LongArray(1), references).expect("reenter")
 
-        assertSame(value, hostValue(store, references[0]))
+        assertSame(value, references[0])
     }
 
     @Test
     fun trapsAndExceptionsFailOnlyTheirCall() {
 
-        val trap = prepare("trap").call(LongArray(0), ReferenceSlots(0))
-        val thrown = prepare("throw").call(LongArray(0), ReferenceSlots(0))
-        val stack = longArrayOf(1L, 2L)
-        prepare("add").call(stack, ReferenceSlots(0)).expect("add")
+        val trap = prepare("trap").invokeUnboxed(LongArray(0), arrayOfNulls(0))
+        val thrown = prepare("throw").invokeUnboxed(LongArray(0), arrayOfNulls(0))
+        val words = longArrayOf(1L, 2L)
+        prepare("add").invokeUnboxed(words, arrayOfNulls(0)).expect("add")
 
-        assertIs<ChasmResult.Error<*>>(trap)
-        assertIs<ChasmResult.Error<*>>(thrown)
-        assertEquals(3, stack[0].toInt())
+        assertIs<ExecutionError.Trapped>(assertIs<ChasmResult.Error<*>>(trap).error)
+        assertIs<ExecutionError.Thrown<*>>(assertIs<ChasmResult.Error<*>>(thrown).error)
+        assertEquals(3, words[0].toInt())
     }
 
     @Test
-    fun referenceFunctionsStillAnswerTheEmbeddingApi() {
+    fun exportedHostFunctionsAnswerBoxedCalls() {
 
-        val extern = createExternRef(store, "value").expect("extern").asValue().expect("value")
+        val result = invoke(store, instance, "mix_import", listOf(I32(3), ReferenceValue.Extern("value"), F64(0.5))).expect("mix_import")
 
-        val result = invoke(store, instance, "mix_import", listOf(I32(3), extern, F64(0.5))).expect("mix_import")
-
-        val reference = wasmReference(store, result.single() as ReferenceValue)
-        assertEquals("3:0.5:value", hostValue(store, reference))
+        assertEquals("3:0.5:value", assertIs<ReferenceValue.Extern>(result.single()).value)
     }
 
-    private fun prepare(name: String): PreparedCall {
-        return prepareCall(store, instance, name).expect(name)
+    private fun prepare(name: String): PreparedFunction {
+        return prepareFunction(store, instance, name).expect(name)
     }
 
     private fun instantiate(): Instance {
@@ -154,7 +155,7 @@ class ReferenceLaneTest {
             Import(
                 "host",
                 "echo",
-                referenceFunction(
+                function(
                     store,
                     functionType {
                         params { structref() }
@@ -166,7 +167,7 @@ class ReferenceLaneTest {
             Import(
                 "host",
                 "mix",
-                referenceFunction(
+                function(
                     store,
                     functionType {
                         params {
@@ -182,7 +183,7 @@ class ReferenceLaneTest {
             Import(
                 "host",
                 "add",
-                referenceFunction(
+                function(
                     store,
                     functionType {
                         params {
@@ -197,7 +198,7 @@ class ReferenceLaneTest {
             Import(
                 "host",
                 "reenter",
-                referenceFunction(
+                function(
                     store,
                     functionType {
                         params { externref() }
@@ -209,25 +210,25 @@ class ReferenceLaneTest {
         )
     }
 
-    private val echo = ReferenceHostFunction { parameters, results ->
+    private val echo = HostFunction { parameters, results ->
         val reference = parameters.readReference(0)
-        kindSeen = reference.kind
+        echoed = reference
         results.writeReference(0, reference)
     }
 
-    private val mix = ReferenceHostFunction { parameters, results ->
-        val label = "${parameters.readI32(0)}:${parameters.readF64(2)}:${hostValue(store, parameters.readReference(1))}"
-        results.writeReference(0, externReference(label))
+    private val mix = HostFunction { parameters, results ->
+        val label = "${parameters.readI32(0)}:${parameters.readF64(2)}:${parameters.readReference(1)}"
+        results.writeReference(0, label)
     }
 
-    private val add = ReferenceHostFunction { parameters, results ->
+    private val add = HostFunction { parameters, results ->
         results.writeI32(0, parameters.readI32(0) + parameters.readI32(1))
     }
 
-    private val reenter = ReferenceHostFunction { parameters, results ->
-        val references = ReferenceSlots(1)
+    private val reenter = HostFunction { parameters, results ->
+        val references = arrayOfNulls<Any>(1)
         references[0] = parameters.readReference(0)
-        checkNotNull(reentry).call(LongArray(1), references).expect("identity")
+        checkNotNull(reentry).invokeUnboxed(LongArray(1), references).expect("identity")
         results.writeReference(0, references[0])
     }
 }

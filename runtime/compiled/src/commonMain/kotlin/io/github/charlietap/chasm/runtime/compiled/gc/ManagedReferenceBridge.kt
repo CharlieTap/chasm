@@ -59,6 +59,8 @@ class ManagedReferenceBridge(
     private val definedTypes = ConcurrentHashMap<Int, DefinedType>()
     private var raisedException: Any? = null
 
+    lateinit var engine: Any
+
     val functions = ManagedFunctions(store)
 
     val checks = StoreReferenceChecks(this, functions, store)

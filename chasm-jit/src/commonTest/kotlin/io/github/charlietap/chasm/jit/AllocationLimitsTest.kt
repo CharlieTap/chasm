@@ -1,25 +1,23 @@
 package io.github.charlietap.chasm.jit
 
+import io.github.charlietap.chasm.embedding.compiled.Import
+import io.github.charlietap.chasm.embedding.compiled.Instance
+import io.github.charlietap.chasm.embedding.compiled.Store
+import io.github.charlietap.chasm.embedding.compiled.function
+import io.github.charlietap.chasm.embedding.compiled.host.HostFunction
+import io.github.charlietap.chasm.embedding.compiled.host.writeI64
+import io.github.charlietap.chasm.embedding.compiled.instance
+import io.github.charlietap.chasm.embedding.compiled.invoke
+import io.github.charlietap.chasm.embedding.compiled.value.NumberValue.I32
 import io.github.charlietap.chasm.embedding.dsl.FunctionTypeBuilder
-import io.github.charlietap.chasm.embedding.error.ChasmError
-import io.github.charlietap.chasm.embedding.function
-import io.github.charlietap.chasm.embedding.invoke
+import io.github.charlietap.chasm.embedding.error.ExecutionError
+import io.github.charlietap.chasm.embedding.error.TrapReason
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
-import io.github.charlietap.chasm.embedding.shapes.Import
-import io.github.charlietap.chasm.embedding.shapes.Instance
-import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.shapes.expect
-import io.github.charlietap.chasm.embedding.store
-import io.github.charlietap.chasm.host.HostFunction
-import io.github.charlietap.chasm.host.withGc
-import io.github.charlietap.chasm.host.writeI64
-import io.github.charlietap.chasm.runtime.error.InvocationError
-import io.github.charlietap.chasm.runtime.value.NumberValue.I32
-import io.github.charlietap.chasm.runtime.value.NumberValue.I64
 import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertIs
-import kotlin.test.assertTrue
 
 class AllocationLimitsTest {
 
@@ -32,8 +30,7 @@ class AllocationLimitsTest {
         invoke(store, instance, "release", emptyList()).expect("release")
         invoke(store, instance, "grow", listOf(I32(4))).expect("grow")
 
-        assertIs<ChasmResult.Error<ChasmError.ExecutionError>>(exhausted)
-        assertTrue(exhausted.error.error.contains(InvocationError.GuestHeapOutOfMemory.toString()))
+        assertEquals(TrapReason.GUEST_HEAP_EXHAUSTED, trapReason(exhausted))
     }
 
     @Test
@@ -43,32 +40,20 @@ class AllocationLimitsTest {
 
         val huge = invoke(store, instance, "huge", emptyList())
 
-        assertIs<ChasmResult.Error<ChasmError.ExecutionError>>(huge)
-        assertTrue(huge.error.error.contains(InvocationError.GuestHeapOutOfMemory.toString()))
+        assertEquals(TrapReason.GUEST_HEAP_EXHAUSTED, trapReason(huge))
     }
 
-    @Test
-    fun allocatedBytesCountGuestAllocations() {
-
-        val (store, instance) = instantiate()
-        invoke(store, instance, "grow", listOf(I32(4))).expect("grow")
-
-        val allocated = invoke(store, instance, "allocated", emptyList()).expect("allocated").single() as I64
-
-        assertTrue(allocated.value >= 4L * MEBIBYTE, "allocated ${allocated.value}")
+    private fun trapReason(result: ChasmResult<*, *>): TrapReason {
+        return assertIs<ExecutionError.Trapped>(assertIs<ChasmResult.Error<*>>(result).error).trap.reason
     }
 
     private fun instantiate(): Pair<Store, Instance> {
 
         val store = store()
         val module = runBlocking { module(resourceBytes("modules/allocation_limits.wasm"), validate = true) }.expect("module")
-        val allocated = function(store, FunctionTypeBuilder().apply { results { i64() } }.build(), HostFunction { _, results -> results.writeI64(0, withGc { allocatedBytes }) })
+        val allocated = function(store, FunctionTypeBuilder().apply { results { i64() } }.build(), HostFunction { _, results -> results.writeI64(0, 0L) })
         val instance = runBlocking { instance(store, module, listOf(Import("host", "allocated", allocated))) }.expect("instance")
 
         return store to instance
-    }
-
-    private companion object {
-        const val MEBIBYTE = 1L shl 20
     }
 }

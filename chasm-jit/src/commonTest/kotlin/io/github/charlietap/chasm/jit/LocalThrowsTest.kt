@@ -1,15 +1,16 @@
 package io.github.charlietap.chasm.jit
 
-import io.github.charlietap.chasm.embedding.invoke
+import io.github.charlietap.chasm.embedding.compiled.Import
+import io.github.charlietap.chasm.embedding.compiled.Instance
+import io.github.charlietap.chasm.embedding.compiled.Store
+import io.github.charlietap.chasm.embedding.compiled.exports
+import io.github.charlietap.chasm.embedding.compiled.instance
+import io.github.charlietap.chasm.embedding.compiled.invoke
+import io.github.charlietap.chasm.embedding.compiled.value.ExecutionValue
+import io.github.charlietap.chasm.embedding.compiled.value.NumberValue.I32
+import io.github.charlietap.chasm.embedding.compiled.value.NumberValue.I64
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
-import io.github.charlietap.chasm.embedding.shapes.Import
-import io.github.charlietap.chasm.embedding.shapes.Instance
-import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.shapes.expect
-import io.github.charlietap.chasm.embedding.store
-import io.github.charlietap.chasm.runtime.value.ExecutionValue
-import io.github.charlietap.chasm.runtime.value.NumberValue.I32
-import io.github.charlietap.chasm.runtime.value.NumberValue.I64
 import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -84,8 +85,8 @@ class LocalThrowsTest {
     private fun instantiate(store: Store): Instance {
 
         val tags = instance(store, "host_exceptions_tags", emptyList())
-        val boom = tags.exports.first { export -> export.name == "boom" }.value
-        val spare = tags.exports.first { export -> export.name == "spare" }.value
+        val boom = checkNotNull(exports(tags).tag("boom"))
+        val spare = checkNotNull(exports(tags).tag("spare"))
 
         return instance(store, "local_throws", listOf(Import("tags", "boom", boom), Import("tags", "boom", boom), Import("tags", "spare", spare)))
     }

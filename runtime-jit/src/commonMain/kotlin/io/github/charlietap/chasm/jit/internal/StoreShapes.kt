@@ -1,12 +1,16 @@
 package io.github.charlietap.chasm.jit.internal
 
 import dalvik.system.InMemoryDexClassLoader
+import io.github.charlietap.chasm.runtime.compiled.gc.ManagedReferenceBridge
+import io.github.charlietap.chasm.runtime.compiled.gc.ShapeOwners
 import io.github.charlietap.chasm.runtime.store.Store
+import java.lang.ref.WeakReference
 import java.nio.ByteBuffer
 import java.util.WeakHashMap
 
 internal class StoreShapes(
     root: ClassLoader,
+    private val bridge: WeakReference<ManagedReferenceBridge>,
 ) {
 
     private val defined = HashSet<String>()
@@ -29,6 +33,7 @@ internal class StoreShapes(
         }
 
         val loader = InMemoryDexClassLoader((listOf(shapes) + code).map(ByteBuffer::wrap).toTypedArray(), newest)
+        ShapeOwners.register(loader, checkNotNull(bridge.get()))
         newest = loader
         defined.addAll(classNames)
 
@@ -48,7 +53,7 @@ internal class StoreShapes(
             store: Store,
             root: ClassLoader,
         ): StoreShapes {
-            return stores.getOrPut(store) { StoreShapes(root) }
+            return stores.getOrPut(store) { StoreShapes(root, WeakReference(managedBridge(store))) }
         }
     }
 }

@@ -4,6 +4,7 @@ package io.github.charlietap.chasm.embedding.diagnostic
 
 import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.embedding.error.ChasmError
+import io.github.charlietap.chasm.embedding.error.ExecutionError
 import io.github.charlietap.chasm.embedding.error.Trap
 import io.github.charlietap.chasm.embedding.error.TrapReason
 import io.github.charlietap.chasm.embedding.error.WasmFrame
@@ -16,6 +17,8 @@ import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
+import io.github.charlietap.chasm.embedding.error.InstantiationError as CompiledInstantiationError
+import io.github.charlietap.chasm.runtime.error.InstantiationError as RuntimeInstantiationError
 
 /**
  * A failure while resolving yields the error without a trap, never a
@@ -43,6 +46,39 @@ internal fun executionTrap(
     }
 
     return reportedTrap(store, error, message, null) ?: Trap(reasonOf(error.error), message, null, null)
+}
+
+internal fun <E> instantiationError(
+    store: Store,
+    error: ModuleTrapError,
+    instantiation: Instantiation,
+    thrown: () -> E,
+): CompiledInstantiationError<E> {
+
+    val cause = if (error is InvocationError.Trapped) error.error else error
+
+    return when (cause) {
+        is RuntimeInstantiationError.MissingImports, is RuntimeInstantiationError.UnexpectedImport -> ExecutionError.Unlinkable(error.toString())
+        is RuntimeInstantiationError.MemoryLimitExceeded -> ExecutionError.Trapped(Trap(TrapReason.MEMORY_LIMIT_EXCEEDED, error.toString(), null, null))
+        is RuntimeInstantiationError.TableLimitExceeded -> ExecutionError.Trapped(Trap(TrapReason.TABLE_LIMIT_EXCEEDED, error.toString(), null, null))
+        is RuntimeInstantiationError -> ExecutionError.Unsupported(error.toString())
+        InvocationError.ThrownException -> ExecutionError.Thrown(thrown())
+        is InvocationError -> ExecutionError.Trapped(invocationTrap(store, error as InvocationError, instantiation))
+    }
+}
+
+private fun invocationTrap(
+    store: Store,
+    error: InvocationError,
+    instantiation: Instantiation,
+): Trap {
+
+    val message = error.toString()
+    if (error !is InvocationError.Trapped) {
+        return Trap(reasonOf(error), message, null, null)
+    }
+
+    return reportedTrap(store, error, message, instantiation) ?: Trap(reasonOf(error.error), message, null, null)
 }
 
 private fun reportedTrap(

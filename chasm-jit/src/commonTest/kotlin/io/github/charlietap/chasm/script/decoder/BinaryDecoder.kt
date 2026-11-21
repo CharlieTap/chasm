@@ -2,8 +2,7 @@ package io.github.charlietap.chasm.script.decoder
 
 import io.github.charlietap.chasm.config.ComponentConfig
 import io.github.charlietap.chasm.config.ModuleConfig
-import io.github.charlietap.chasm.embedding.error.ChasmError.DecodeError
-import io.github.charlietap.chasm.embedding.error.ChasmError.ModuleError
+import io.github.charlietap.chasm.embedding.error.ModuleError
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.jit.module
 import kotlinx.coroutines.runBlocking
@@ -35,7 +34,7 @@ internal fun BinaryDecoder(
     return when (layerDecoder(bytes)) {
         WasmLayer.Core -> coreBinaryDecoder(bytes, moduleConfig)
         WasmLayer.Component -> componentBinaryDecoder(bytes, ComponentConfig(moduleConfig))
-        null -> ChasmResult.Error(DecodeError("invalid or unsupported WebAssembly binary layer"))
+        null -> ChasmResult.Error(ModuleError.Malformed("invalid or unsupported WebAssembly binary layer"))
     }
 }
 
@@ -47,4 +46,4 @@ private fun CoreBinaryDecoder(
 private fun ComponentBinaryDecoder(
     bytes: ByteArray,
     config: ComponentConfig,
-): ChasmResult<Any, ModuleError> = ChasmResult.Error(DecodeError("components are not supported by the JIT"))
+): ChasmResult<Any, ModuleError> = ChasmResult.Error(ModuleError.Malformed("components are not supported by the JIT"))

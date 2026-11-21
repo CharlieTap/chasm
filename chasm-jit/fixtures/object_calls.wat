@@ -43,6 +43,14 @@
   (func $inc (export "inc") (type $unary) (i32.add (local.get 0) (i32.const 1)))
   (func $double (export "double") (type $unary) (i32.mul (local.get 0) (i32.const 2)))
   (func $triple (export "triple") (type $held) (i32.mul (local.get 0) (i32.const 3)))
+  (elem declare func $inc $double $triple)
+
+  (func (export "function") (param i32) (result funcref)
+    (if (result funcref) (i32.eqz (local.get 0))
+      (then (ref.func $inc))
+      (else (if (result funcref) (i32.eq (local.get 0) (i32.const 1))
+        (then (ref.func $double))
+        (else (ref.func $triple))))))
 
   (func (export "point") (param i32) (result (ref $point))
     (struct.new $point

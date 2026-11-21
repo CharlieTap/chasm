@@ -1,11 +1,11 @@
 package io.github.charlietap.chasm.script
 
 import io.github.charlietap.chasm.config.Config
-import io.github.charlietap.chasm.embedding.exports
-import io.github.charlietap.chasm.embedding.shapes.Import
-import io.github.charlietap.chasm.embedding.shapes.Instance
-import io.github.charlietap.chasm.embedding.shapes.Module
-import io.github.charlietap.chasm.embedding.shapes.Store
+import io.github.charlietap.chasm.embedding.compiled.Import
+import io.github.charlietap.chasm.embedding.compiled.Instance
+import io.github.charlietap.chasm.embedding.compiled.Module
+import io.github.charlietap.chasm.embedding.compiled.Store
+import io.github.charlietap.chasm.embedding.compiled.exports
 import io.github.charlietap.sweet.lib.SemanticPhase
 
 data class ScriptContext(
@@ -15,6 +15,7 @@ data class ScriptContext(
     val store: Store,
     val modules: MutableMap<String?, Module>,
     val instances: MutableMap<String?, Instance>,
+    val instanceModules: MutableMap<Instance, Module> = mutableMapOf(),
     val imports: MutableList<Import> = [],
 ) {
 
@@ -23,7 +24,7 @@ data class ScriptContext(
     fun registerImports(moduleName: String, instance: Instance) {
 
         val exports = exports(instance)
-        val imports = exports.map { export ->
+        val imports = exports.all.map { export ->
             Import(
                 moduleName,
                 export.name,

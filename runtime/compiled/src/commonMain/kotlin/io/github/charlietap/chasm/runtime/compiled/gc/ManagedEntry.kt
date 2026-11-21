@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.runtime.compiled.gc
 
+import io.github.charlietap.chasm.executor.invoker.thread.traceableTrap
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.HostRaisedWasmException
 import io.github.charlietap.chasm.runtime.exception.InvocationException
@@ -29,7 +30,11 @@ fun enterObjects(
         callObjects(context, context.instance, function, words, references, context.compiledCallDepth)
         if (context.compiledUnwinding) publishThrown(context) else null
     } catch (exception: InvocationException) {
-        if (exception.error == InvocationError.ThrownException) publishThrown(context) else exception.error
+        when {
+            exception.error == InvocationError.ThrownException -> publishThrown(context)
+            context.config.debugInfo -> traceableTrap(store, context.vstack, exception, entryIp(function))
+            else -> exception.error
+        }
     } catch (_: HostRaisedWasmException) {
         InvocationError.ThrownException
     } catch (_: ClassCastException) {
@@ -51,4 +56,8 @@ private fun publishThrown(
     context.compiledUnwinding = false
 
     return InvocationError.ThrownException
+}
+
+private fun entryIp(function: FunctionInstance): Int {
+    return (function as? FunctionInstance.WasmFunction)?.callStrategy?.entryIp ?: -1
 }

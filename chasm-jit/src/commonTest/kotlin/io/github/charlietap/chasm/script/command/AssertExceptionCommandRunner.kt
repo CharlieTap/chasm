@@ -1,7 +1,6 @@
 package io.github.charlietap.chasm.script.command
 
-import io.github.charlietap.chasm.embedding.error.ChasmError
-import io.github.charlietap.chasm.runtime.error.InvocationError
+import io.github.charlietap.chasm.embedding.error.ExecutionError
 import io.github.charlietap.chasm.script.ScriptContext
 import io.github.charlietap.chasm.script.action.ActionResult
 import io.github.charlietap.chasm.script.action.ActionRunner
@@ -29,7 +28,7 @@ private fun AssertExceptionCommandRunner(
             CommandResult.Failure(command, "expected exception but action succeeded")
         }
         is ActionResult.Failure -> {
-            if (result.error is ChasmError.ExecutionError && result.error.error == InvocationError.ThrownException.toString()) {
+            if (result.error is ExecutionError.Thrown) {
                 CommandResult.Success
             } else {
                 CommandResult.Failure(command, "expected trap but encountered error ${result.error} with reason ${result.reason}")

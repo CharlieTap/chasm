@@ -16,6 +16,7 @@ class Instance internal constructor(
         exports(this)
     }
 
-    internal val exportsByName: Map<String, ExternalValue> =
+    internal val exportsByName: Map<String, ExternalValue> by lazy {
         instance.exports.associateBy({ export -> export.name.name }, { export -> export.value })
+    }
 }

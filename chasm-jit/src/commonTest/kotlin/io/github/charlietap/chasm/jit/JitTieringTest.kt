@@ -3,16 +3,16 @@
 package io.github.charlietap.chasm.jit
 
 import io.github.charlietap.chasm.ExperimentalChasmApi
-import io.github.charlietap.chasm.embedding.function
-import io.github.charlietap.chasm.embedding.invoke
-import io.github.charlietap.chasm.embedding.memory.growMemory
-import io.github.charlietap.chasm.embedding.memory.readBytes
-import io.github.charlietap.chasm.embedding.memory.writeBytes
-import io.github.charlietap.chasm.embedding.shapes.Import
-import io.github.charlietap.chasm.embedding.shapes.Memory
+import io.github.charlietap.chasm.embedding.compiled.Import
+import io.github.charlietap.chasm.embedding.compiled.exports
+import io.github.charlietap.chasm.embedding.compiled.function
+import io.github.charlietap.chasm.embedding.compiled.growMemory
+import io.github.charlietap.chasm.embedding.compiled.instance
+import io.github.charlietap.chasm.embedding.compiled.invoke
+import io.github.charlietap.chasm.embedding.compiled.readBytes
+import io.github.charlietap.chasm.embedding.compiled.value.NumberValue.I32
+import io.github.charlietap.chasm.embedding.compiled.writeBytes
 import io.github.charlietap.chasm.embedding.shapes.expect
-import io.github.charlietap.chasm.embedding.store
-import io.github.charlietap.chasm.runtime.value.NumberValue.I32
 import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.chasm.type.NumberType
 import io.github.charlietap.chasm.type.ResultType
@@ -45,10 +45,10 @@ class JitTieringTest {
         val module = runBlocking { module(resourceBytes(LUNABOY_WASM), validate = true) }.expect("module")
         val printChar = function(store, FunctionType(ResultType(listOf(ValueType.Number(NumberType.I32))), ResultType(emptyList()))) { _, _ -> }
         val instance = runBlocking { instance(store, module, listOf(Import("spectest", "print_char", printChar))) }.expect("instance")
-        val memory = instance.exports.first { export -> export.name == "moonbit.memory" }.value as Memory
+        val memory = checkNotNull(exports(instance).memory("moonbit.memory"))
         val rom = fixtureRom()
-        growMemory(store, memory, 1).expect("memory")
-        writeBytes(store, memory, 0, rom).expect("rom")
+        growMemory(memory, 1)
+        writeBytes(memory, 0, rom)
         invoke(store, instance, "init_extern", listOf(I32(rom.size))).expect("init")
 
         val frameMicros = List(FRAME_COUNT) {
@@ -57,7 +57,7 @@ class JitTieringTest {
             (System.nanoTime() - start) / 1_000
         }
 
-        val renderedPixel = readBytes(store, memory, ByteArray(4), RENDERED_BLACK_PIXEL_OFFSET, 4).expect("pixel")
+        val renderedPixel = readBytes(memory, ByteArray(4), RENDERED_BLACK_PIXEL_OFFSET, 4)
         assertContentEquals(BLACK_PIXEL, renderedPixel)
 
         return frameMicros

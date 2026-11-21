@@ -266,6 +266,13 @@ public final class io/github/charlietap/chasm/embedding/global/WriteGlobalKt {
 	public static final fun writeGlobal (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Global;Lio/github/charlietap/chasm/runtime/value/ExecutionValue;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 }
 
+public final class io/github/charlietap/chasm/embedding/internal/CompiledInstantiationKt {
+	public static final fun embeddingInstance (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/config/RuntimeConfig;Lio/github/charlietap/chasm/runtime/instance/ModuleInstance;)Lio/github/charlietap/chasm/embedding/shapes/Instance;
+	public static final fun externalValue (Lio/github/charlietap/chasm/embedding/shapes/Importable;)Lio/github/charlietap/chasm/runtime/instance/ExternalValue;
+	public static final fun importable (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/runtime/instance/ExternalValue;)Lio/github/charlietap/chasm/embedding/shapes/Importable;
+	public static final fun instantiateCompiled (Lio/github/charlietap/chasm/embedding/shapes/Store;Ljava/util/List;Lio/github/charlietap/chasm/config/RuntimeConfig;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function3;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+}
+
 public final class io/github/charlietap/chasm/embedding/internal/ExportedFunction {
 	public synthetic fun <init> (Lio/github/charlietap/chasm/runtime/store/Store;Lio/github/charlietap/chasm/runtime/instance/ModuleInstance;Lio/github/charlietap/chasm/config/RuntimeConfig;ILio/github/charlietap/chasm/runtime/instance/FunctionInstance;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun getAddress-gqeEzcE ()I

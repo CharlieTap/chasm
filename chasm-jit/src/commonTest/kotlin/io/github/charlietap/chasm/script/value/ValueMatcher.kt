@@ -1,9 +1,8 @@
 package io.github.charlietap.chasm.script.value
 
-import io.github.charlietap.chasm.runtime.value.ExecutionValue
-import io.github.charlietap.chasm.runtime.value.NumberValue
-import io.github.charlietap.chasm.runtime.value.ReferenceValue
-import io.github.charlietap.chasm.runtime.value.VectorValue
+import io.github.charlietap.chasm.embedding.compiled.value.ExecutionValue
+import io.github.charlietap.chasm.embedding.compiled.value.NumberValue
+import io.github.charlietap.chasm.embedding.compiled.value.ReferenceValue
 import io.github.charlietap.chasm.type.AbstractHeapType
 
 typealias ValueMatcher = (ExecutionValue, ExecutionValue) -> Boolean
@@ -14,7 +13,6 @@ fun ValueMatcher(
 ): Boolean = when {
     first is NumberValue.F32 && second is NumberValue.F32 -> compareFloats(first.value, second.value)
     first is NumberValue.F64 && second is NumberValue.F64 -> compareDoubles(first.value, second.value)
-    first is VectorValue.V128 && second is VectorValue.V128 -> first.v128.contentEquals(second.v128)
     first is ReferenceValue.Null -> {
         when (first.heapType) {
             is AbstractHeapType.Any ->
@@ -51,6 +49,13 @@ fun ValueMatcher(
             is AbstractHeapType.None ->
                 second == ReferenceValue.Null(AbstractHeapType.Any) ||
                     second == ReferenceValue.Null(AbstractHeapType.None)
+            is AbstractHeapType.Exception ->
+                second == ReferenceValue.Null(AbstractHeapType.Exception) ||
+                    second == ReferenceValue.Null(AbstractHeapType.NoException) ||
+                    second is ReferenceValue.Exception
+            is AbstractHeapType.NoException ->
+                second == ReferenceValue.Null(AbstractHeapType.Exception) ||
+                    second == ReferenceValue.Null(AbstractHeapType.NoException)
             is AbstractHeapType.Struct ->
                 second == ReferenceValue.Null(AbstractHeapType.Struct) ||
                     second is ReferenceValue.Struct

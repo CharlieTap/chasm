@@ -1,9 +1,9 @@
 package io.github.charlietap.chasm.script.command
 
+import io.github.charlietap.chasm.embedding.compiled.instance
 import io.github.charlietap.chasm.embedding.shapes.flatMap
 import io.github.charlietap.chasm.embedding.shapes.fold
 import io.github.charlietap.chasm.embedding.shapes.map
-import io.github.charlietap.chasm.jit.instance
 import io.github.charlietap.chasm.jit.module
 import io.github.charlietap.chasm.script.ScriptContext
 import io.github.charlietap.chasm.script.decoder.BinaryDecoder
@@ -34,11 +34,13 @@ fun ModuleCommandRunner(
         SemanticPhase.EXECUTION -> runBlocking { module(bytes, context.config.moduleConfig, validate = true) }
             .flatMap { module ->
                 runBlocking { instance(context.store, module, context.imports, context.config.runtimeConfig) }
-            }.map { instance ->
-                context.instances[null] = instance
-                command.name?.let {
-                    context.instances[command.name] = instance
-                }
+                    .map { instance ->
+                        context.instances[null] = instance
+                        command.name?.let {
+                            context.instances[command.name] = instance
+                        }
+                        context.instanceModules[instance] = module
+                    }
             }
     }
 

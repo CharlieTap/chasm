@@ -1,14 +1,13 @@
 package io.github.charlietap.chasm.jit
 
-import io.github.charlietap.chasm.embedding.extern.createExternRef
-import io.github.charlietap.chasm.embedding.invoke
-import io.github.charlietap.chasm.embedding.shapes.Instance
-import io.github.charlietap.chasm.embedding.shapes.Store
+import io.github.charlietap.chasm.embedding.compiled.Instance
+import io.github.charlietap.chasm.embedding.compiled.Store
+import io.github.charlietap.chasm.embedding.compiled.instance
+import io.github.charlietap.chasm.embedding.compiled.invoke
+import io.github.charlietap.chasm.embedding.compiled.value.NumberValue.I32
+import io.github.charlietap.chasm.embedding.compiled.value.NumberValue.I64
+import io.github.charlietap.chasm.embedding.compiled.value.ReferenceValue
 import io.github.charlietap.chasm.embedding.shapes.expect
-import io.github.charlietap.chasm.embedding.store
-import io.github.charlietap.chasm.runtime.value.ExecutionValue
-import io.github.charlietap.chasm.runtime.value.NumberValue.I32
-import io.github.charlietap.chasm.runtime.value.NumberValue.I64
 import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -19,8 +18,8 @@ class MultiReferencesTest {
     fun severalResultsCarryReferencesThroughCalls() {
 
         val (store, instance) = instantiate()
-        val first = extern(store, "first")
-        val second = extern(store, "second")
+        val first = ReferenceValue.Extern("first")
+        val second = ReferenceValue.Extern("second")
 
         val result = invoke(store, instance, "swap", listOf(first, second)).expect("swap")
 
@@ -31,8 +30,8 @@ class MultiReferencesTest {
     fun severalResultsCarryReferencesThroughTailCalls() {
 
         val (store, instance) = instantiate()
-        val first = extern(store, "first")
-        val second = extern(store, "second")
+        val first = ReferenceValue.Extern("first")
+        val second = ReferenceValue.Extern("second")
 
         val result = invoke(store, instance, "tail_swap", listOf(first, second)).expect("tail_swap")
 
@@ -43,7 +42,7 @@ class MultiReferencesTest {
     fun argumentArraysCarryReferences() {
 
         val (store, instance) = instantiate()
-        val value = extern(store, "wide")
+        val value = ReferenceValue.Extern("wide")
 
         val result = invoke(store, instance, "wide", listOf(value)).expect("wide")
 
@@ -57,13 +56,6 @@ class MultiReferencesTest {
         val instance = runBlocking { instance(store, module, emptyList()) }.expect("instance")
 
         return store to instance
-    }
-
-    private fun extern(
-        store: Store,
-        value: Any,
-    ): ExecutionValue {
-        return createExternRef(store, value).expect("extern").asValue().expect("value")
     }
 
     private companion object {

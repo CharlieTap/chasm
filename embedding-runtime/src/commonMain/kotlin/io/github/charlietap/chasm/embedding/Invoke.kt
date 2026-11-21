@@ -40,15 +40,15 @@ fun invoke(
     args: List<ExecutionValue> = [],
 ): ChasmResult<List<ExecutionValue>, ChasmError.ExecutionError> {
 
+    if (instance.instance.deallocated) {
+        return Error(ChasmError.ExecutionError(InvocationError.InvocationOfADeinstantiatedInstance.toString()))
+    }
+
     val extern = instance.exportsByName[name]
 
     val address = (extern as? ExternalValue.Function)?.address ?: return Error(
         ChasmError.ExecutionError(InvocationError.FunctionNotFound(name).toString()),
     )
-
-    if (instance.instance.deallocated) {
-        return Error(ChasmError.ExecutionError(InvocationError.InvocationOfADeinstantiatedInstance.toString()))
-    }
 
     return invokeExported(
         store = store,
@@ -82,15 +82,15 @@ internal fun invoke(
     invoker: FunctionInvoker,
 ): ChasmResult<List<ExecutionValue>, ChasmError.ExecutionError> {
 
+    if (instance.instance.deallocated) {
+        return Error(ChasmError.ExecutionError(InvocationError.InvocationOfADeinstantiatedInstance.toString()))
+    }
+
     val extern = instance.exportsByName[name]
 
     val address = (extern as? ExternalValue.Function)?.address ?: return Error(
         ChasmError.ExecutionError(InvocationError.FunctionNotFound(name).toString()),
     )
-
-    if (instance.instance.deallocated) {
-        return Error(ChasmError.ExecutionError(InvocationError.InvocationOfADeinstantiatedInstance.toString()))
-    }
 
     return invokeExported(
         store = store,

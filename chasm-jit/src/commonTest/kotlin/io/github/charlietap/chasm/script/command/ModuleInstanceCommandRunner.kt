@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.script.command
 
+import io.github.charlietap.chasm.embedding.compiled.instance
 import io.github.charlietap.chasm.embedding.shapes.fold
-import io.github.charlietap.chasm.jit.instance
 import io.github.charlietap.chasm.script.ScriptContext
 import io.github.charlietap.sweet.lib.command.ModuleInstanceCommand
 import kotlinx.coroutines.runBlocking
@@ -20,6 +20,7 @@ fun ModuleInstanceCommandRunner(
         { instance ->
             context.instances[null] = instance
             context.instances[command.instance] = instance
+            context.instanceModules[instance] = module
             CommandResult.Success
         },
     ) {

@@ -27,6 +27,10 @@ kotlin {
     @OptIn(ExperimentalAbiValidation::class)
     abiValidation()
 
+    compilerOptions {
+        optIn.add("io.github.charlietap.chasm.InternalChasmApi")
+    }
+
     sourceSets {
         commonMain {
             dependencies {
@@ -45,6 +49,7 @@ kotlin {
                 implementation(projects.module)
                 implementation(projects.moduleDeclarations)
                 implementation(projects.runtime.compiled)
+                api(projects.embeddingCompiled)
                 implementation(projects.runtime.core)
                 implementation(libs.kotlinx.coroutines.core)
                 implementation(libs.result)

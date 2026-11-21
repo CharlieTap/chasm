@@ -92,5 +92,23 @@ fun traceableTrap(
     return InvocationError.Trapped(error, TrapSnapshot(store, vstack, exception.faultIp, exception))
 }
 
+@InternalChasmApi
+fun traceableTrap(
+    store: Store,
+    vstack: ValueStack,
+    exception: InvocationException,
+    entryIp: Int,
+): InvocationError {
+
+    val error = exception.error
+    val faultIp = if (exception.faultIp == InvocationException.UNKNOWN_FAULT_IP) entryIp else exception.faultIp
+
+    if (error == InvocationError.ThrownException || faultIp < 0) {
+        return error
+    }
+
+    return InvocationError.Trapped(error, TrapSnapshot(store, vstack, faultIp, exception))
+}
+
 @PublishedApi
 internal const val ROOT_FP = 0

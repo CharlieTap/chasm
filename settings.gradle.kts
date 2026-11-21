@@ -60,6 +60,7 @@ include(":config")
 include(":decoder")
 
 include(":embedding-api")
+include(":embedding-compiled")
 include(":embedding-module")
 include(":embedding-runtime")
 

@@ -1,25 +1,32 @@
 package io.github.charlietap.chasm.jit
 
 import io.github.charlietap.chasm.config.RuntimeConfig
+import io.github.charlietap.chasm.embedding.compiled.Import
+import io.github.charlietap.chasm.embedding.compiled.Instance
+import io.github.charlietap.chasm.embedding.compiled.PreparedFunction
+import io.github.charlietap.chasm.embedding.compiled.Store
+import io.github.charlietap.chasm.embedding.compiled.exports
+import io.github.charlietap.chasm.embedding.compiled.function
+import io.github.charlietap.chasm.embedding.compiled.host.HostFunction
+import io.github.charlietap.chasm.embedding.compiled.host.readI32
+import io.github.charlietap.chasm.embedding.compiled.host.writeI32
+import io.github.charlietap.chasm.embedding.compiled.instance
+import io.github.charlietap.chasm.embedding.compiled.invoke
+import io.github.charlietap.chasm.embedding.compiled.invokeUnboxed
+import io.github.charlietap.chasm.embedding.compiled.prepareFunction
+import io.github.charlietap.chasm.embedding.compiled.value.NumberValue.I32
 import io.github.charlietap.chasm.embedding.dsl.FunctionTypeBuilder
-import io.github.charlietap.chasm.embedding.error.ChasmError
-import io.github.charlietap.chasm.embedding.exports
-import io.github.charlietap.chasm.embedding.invoke
+import io.github.charlietap.chasm.embedding.error.ExecutionError
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
-import io.github.charlietap.chasm.embedding.shapes.Import
-import io.github.charlietap.chasm.embedding.shapes.Instance
-import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.shapes.expect
-import io.github.charlietap.chasm.embedding.store
-import io.github.charlietap.chasm.host.readI32
-import io.github.charlietap.chasm.host.writeI32
-import io.github.charlietap.chasm.runtime.value.NumberValue.I32
+import io.github.charlietap.chasm.reference.FunctionReference
 import io.github.charlietap.chasm.type.FunctionType
 import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
-import kotlin.test.assertNotEquals
+import kotlin.test.assertNotSame
+import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
 class FunctionReferenceTest {
@@ -34,10 +41,10 @@ class FunctionReferenceTest {
         val fromExporter = reference(exporter, "double_ref")
         val fromImporter = reference(importer, "double_ref")
 
-        assertEquals(WasmReferenceKind.Function, fromExporter.kind)
-        assertEquals(fromExporter, fromImporter)
-        assertEquals(fromExporter, reference(exporter, "double_ref"))
-        assertNotEquals(fromExporter, reference(importer, "quad_ref"))
+        assertIs<FunctionReference>(fromExporter)
+        assertSame(fromExporter, fromImporter)
+        assertSame(fromExporter, reference(exporter, "double_ref"))
+        assertNotSame(fromExporter, reference(importer, "quad_ref"))
     }
 
     @Test
@@ -51,7 +58,7 @@ class FunctionReferenceTest {
     @Test
     fun callIndirectReachesFunctionsFromAnElementSegment() {
 
-        prepare(importer, "init").call(LongArray(0), ReferenceSlots(0)).expect("init")
+        prepare(importer, "init").invokeUnboxed(LongArray(0), arrayOfNulls(0)).expect("init")
 
         assertEquals(14, callIndirect(0, 7))
         assertEquals(21, callIndirect(1, 7))
@@ -75,16 +82,16 @@ class FunctionReferenceTest {
 
         val otherStore = store()
         val otherExporter = instantiate(otherStore, "modules/function_exporter.wasm", emptyList())
-        val foreignCall = prepareCall(otherStore, otherExporter, "double_ref").expect("double_ref")
-        val foreignReferences = ReferenceSlots(foreignCall.slots)
-        foreignCall.call(LongArray(foreignCall.slots), foreignReferences).expect("double_ref")
+        val foreignCall = prepareFunction(otherStore, otherExporter, "double_ref").expect("double_ref")
+        val foreignReferences = arrayOfNulls<Any>(foreignCall.slots)
+        foreignCall.invokeUnboxed(LongArray(foreignCall.slots), foreignReferences).expect("double_ref")
         val foreign = foreignReferences[0]
 
         val call = prepare(importer, "call_ref")
-        val references = ReferenceSlots(call.slots)
+        val references = arrayOfNulls<Any>(call.slots)
         references[0] = foreign
 
-        val result = call.call(LongArray(call.slots), references)
+        val result = call.invokeUnboxed(LongArray(call.slots), references)
 
         assertIs<ChasmResult.Error<*>>(result)
     }
@@ -107,18 +114,18 @@ class FunctionReferenceTest {
         pass("save", double)
         pass("hold", double)
 
-        assertEquals(double, reference(importer, "saved"))
-        assertEquals(double, reference(importer, "held"))
+        assertSame(double, reference(importer, "saved"))
+        assertSame(double, reference(importer, "held"))
     }
 
     @Test
     fun functionReferencesAreRejectedAsExternReferences() {
 
         val call = prepare(importer, "extern_identity")
-        val references = ReferenceSlots(call.slots)
+        val references = arrayOfNulls<Any>(call.slots)
         references[0] = reference(exporter, "double_ref")
 
-        val result = call.call(LongArray(call.slots), references)
+        val result = call.invokeUnboxed(LongArray(call.slots), references)
 
         assertIs<ChasmResult.Error<*>>(result)
     }
@@ -131,50 +138,50 @@ class FunctionReferenceTest {
         val debugImporter = instantiate(debugStore, "modules/function_importer.wasm", imports(debugStore, debugExporter), RuntimeConfig(debugInfo = true))
         val result = invoke(debugStore, debugImporter, "call_boom", listOf(I32(1)))
 
-        val error = assertIs<ChasmResult.Error<ChasmError.ExecutionError>>(result).error
-        val frames = checkNotNull(error.trap).frames
+        val error = assertIs<ChasmResult.Error<*>>(result).error
+        val frames = checkNotNull(assertIs<ExecutionError.Trapped>(error).trap.stackTrace).frames
         assertTrue(frames.any { frame -> frame.functionName == "boom" }, frames.toString())
     }
 
     private fun reference(
         instance: Instance,
         name: String,
-    ): WasmReference {
+    ): Any? {
 
         val call = prepare(instance, name)
-        val references = ReferenceSlots(call.slots)
+        val references = arrayOfNulls<Any>(call.slots)
 
-        call.call(LongArray(call.slots), references).expect(name)
+        call.invokeUnboxed(LongArray(call.slots), references).expect(name)
 
         return references[0]
     }
 
     private fun pass(
         name: String,
-        function: WasmReference,
+        function: Any?,
     ) {
 
         val call = prepare(importer, name)
-        val references = ReferenceSlots(call.slots)
+        val references = arrayOfNulls<Any>(call.slots)
         references[0] = function
 
-        call.call(LongArray(call.slots), references).expect(name)
+        call.invokeUnboxed(LongArray(call.slots), references).expect(name)
     }
 
     private fun callRef(
-        function: WasmReference,
+        function: Any?,
         argument: Int,
     ): Int {
 
         val call = prepare(importer, "call_ref")
-        val stack = LongArray(call.slots)
-        val references = ReferenceSlots(call.slots)
+        val words = LongArray(call.slots)
+        val references = arrayOfNulls<Any>(call.slots)
         references[0] = function
-        stack[1] = argument.toLong()
+        words[1] = argument.toLong()
 
-        call.call(stack, references).expect("call_ref")
+        call.invokeUnboxed(words, references).expect("call_ref")
 
-        return stack[0].toInt()
+        return words[0].toInt()
     }
 
     private fun callIndirect(
@@ -183,33 +190,33 @@ class FunctionReferenceTest {
     ): Int {
 
         val call = prepare(importer, "call_indirect")
-        val stack = longArrayOf(index.toLong(), argument.toLong())
+        val words = longArrayOf(index.toLong(), argument.toLong())
 
-        call.call(stack, ReferenceSlots(call.slots)).expect("call_indirect")
+        call.invokeUnboxed(words, arrayOfNulls(call.slots)).expect("call_indirect")
 
-        return stack[0].toInt()
+        return words[0].toInt()
     }
 
     private fun test(
         name: String,
-        function: WasmReference,
+        function: Any?,
     ): Int {
 
         val call = prepare(importer, name)
-        val stack = LongArray(call.slots)
-        val references = ReferenceSlots(call.slots)
+        val words = LongArray(call.slots)
+        val references = arrayOfNulls<Any>(call.slots)
         references[0] = function
 
-        call.call(stack, references).expect(name)
+        call.invokeUnboxed(words, references).expect(name)
 
-        return stack[0].toInt()
+        return words[0].toInt()
     }
 
     private fun prepare(
         instance: Instance,
         name: String,
-    ): PreparedCall {
-        return prepareCall(store, instance, name).expect(name)
+    ): PreparedFunction {
+        return prepareFunction(store, instance, name).expect(name)
     }
 
     private fun instantiate(
@@ -229,7 +236,7 @@ class FunctionReferenceTest {
         exporter: Instance,
     ): List<Import> {
 
-        val double = exports(exporter).first { export -> export.name == "double" }.value
+        val double = checkNotNull(exports(exporter).function("double"))
         val signature = functionType {
             params { i32() }
             results { i32() }
@@ -237,11 +244,11 @@ class FunctionReferenceTest {
 
         return listOf(
             Import("a", "double", double),
-            Import("host", "triple", referenceFunction(store, signature, triple)),
+            Import("host", "triple", function(store, signature, triple)),
         )
     }
 
-    private val triple = ReferenceHostFunction { parameters, results ->
+    private val triple = HostFunction { parameters, results ->
         results.writeI32(0, parameters.readI32(0) * 3)
     }
 }
