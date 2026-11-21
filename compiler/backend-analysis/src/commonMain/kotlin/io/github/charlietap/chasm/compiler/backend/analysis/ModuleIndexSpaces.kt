@@ -39,6 +39,8 @@ class ModuleIndexSpaces(
 
     val importedFunctionCount: Int = module.imports.count { import -> import.descriptor is Import.Descriptor.Function }
 
+    private val importedTagCount: Int = module.imports.count { import -> import.descriptor is Import.Descriptor.Tag }
+
     val functionCount: Int = functionTypeIndices.size
 
     val memoryCount: Int = module.imports.count { import -> import.descriptor is Import.Descriptor.Memory } + module.memories.size
@@ -87,6 +89,14 @@ class ModuleIndexSpaces(
     fun globalType(
         index: GlobalIndex,
     ): ValueType = globalTypes[index.index]
+
+    fun isImported(
+        index: TagIndex,
+    ): Boolean = index.index < importedTagCount
+
+    fun tagFieldTypes(
+        index: TagIndex,
+    ): List<ValueType> = tagTypes[index.index].params.types
 
     fun tagFieldCount(
         index: TagIndex,

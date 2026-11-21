@@ -6,9 +6,12 @@ import io.github.charlietap.chasm.cir.CirModule
 import io.github.charlietap.chasm.compiler.backend.abi.binaryName
 import io.github.charlietap.chasm.compiler.backend.dex.abi.FunctionSignature
 import io.github.charlietap.chasm.compiler.backend.dex.abi.codeClass
+import io.github.charlietap.chasm.compiler.backend.dex.abi.constantsClass
 import io.github.charlietap.chasm.compiler.backend.dex.abi.installClass
 import io.github.charlietap.chasm.compiler.backend.dex.binding.BoundResources
 import io.github.charlietap.chasm.compiler.backend.dex.binding.boundResources
+import io.github.charlietap.chasm.compiler.backend.dex.gc.ConstantsWriter
+import io.github.charlietap.chasm.compiler.backend.dex.gc.ShapeWriter
 import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.dexter.DexFile
 import io.github.charlietap.dexter.Dexter
@@ -167,17 +170,34 @@ private fun finishFiles(
     val installer = installClass(plan.packagePath)
     val installFile = codeAndEntryFile ?: dexter.beginFile()
     val installEntries = installLowerer(installFile, installer, bound, ordered)
+    val constantsWriter = ConstantsWriter(plan.module, plan.gc)
+    val constants = if (constantsWriter.needed) constantsClass(plan.packagePath) else null
+    if (constants != null) constantsWriter.write(installFile, constants)
     dex += installFile.finish()
 
     val splitStarts = HashMap<Int, IntArray>()
     chunkStarts.forEachIndexed { function, starts -> if (starts != null) splitStarts[function] = starts }
+
+    val gc = plan.gc
+    val shapeClasses = (gc.structs.map { shape -> shape.className } + gc.arrays.map { shape -> shape.className }).map(::binaryName)
+    val shapeDex = if (shapeClasses.isEmpty()) {
+        null
+    } else {
+        val file = dexter.beginFile()
+        ShapeWriter().write(file, gc)
+        file.finish()
+    }
 
     return DexModule(
         dex = dex,
         installer = binaryName(installer),
         inlineMemory = plan.inlineMemory != null,
         chunkStarts = splitStarts,
-        classesToInitialize = (plan.batches.indices.map { batch -> codeClass(plan.packagePath, batch) } + entryClasses + installEntries + installer).map(::binaryName),
+        classesToInitialize = (plan.batches.indices.map { batch -> codeClass(plan.packagePath, batch) } + entryClasses + installEntries + installer + listOfNotNull(constants)).map(::binaryName),
+        shapeDex = shapeDex,
+        shapeClasses = shapeClasses,
+        shapeTypes = List(gc.typeCount) { index -> gc.className(index)?.let(::binaryName) },
+        constants = constants?.let(::binaryName),
     )
 }
 
@@ -220,11 +240,17 @@ internal data class EntryKey(
     val signature: String,
     val parameters: Int,
     val results: Int,
+    val externResults: List<Boolean>,
 ) {
     constructor(
         signature: FunctionSignature,
         type: FunctionType,
-    ) : this(signature.key, type.params.types.size, type.results.types.size)
+    ) : this(
+        signature.key,
+        type.params.types.size,
+        type.results.types.size,
+        type.results.types.map(::isExternReference),
+    )
 }
 
 private fun entryGroups(
@@ -236,7 +262,7 @@ private fun entryGroups(
         val type = candidates.type
         val signature = plan.signatureClass(key.signature)
         for (members in candidates.functions.chunked(ENTRY_GROUP_SIZE)) {
-            groups += EntryGroup(number = groups.size, type = type, signature = signature, members = members)
+            groups += EntryGroup(number = groups.size, type = type, signature = signature, members = members, reference = plan.referenceDescriptor)
         }
     }
     return groups

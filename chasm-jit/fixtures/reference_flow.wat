@@ -1,0 +1,243 @@
+(module
+  (rec
+    (type $base (sub (struct (field i32))))
+    (type $left (sub $base (struct (field i32) (field i32))))
+    (type $right (sub $base (struct (field i32) (field f64)))))
+  (type $vtable (sub (struct (field i32))))
+  (type $vtable2 (sub $vtable (struct (field i32) (field i32))))
+  (type $object (sub (struct (field (ref $vtable)))))
+  (type $object2 (sub $object (struct (field (ref $vtable2)))))
+  (type $holder (struct (field (mut (ref null none)))))
+  (type $slot (struct (field (mut (ref null $left)))))
+  (type $nulls (array (mut (ref null none))))
+  (type $bases (sub (array (ref null $base))))
+  (type $lefts (sub $bases (array (ref null $left))))
+  (type $node (struct (field i32) (field (ref null $node))))
+  (type $make_left (func (result (ref $left))))
+  (type $three (func (result (ref $left) (ref $right) i32)))
+  (tag $boom (param (ref $left) i32))
+  (tag $nothing (param (ref null none)))
+  (global $none (mut (ref null none)) (ref.null none))
+  (global $kept (mut (ref null $left)) (ref.null $left))
+  (table $bases_table 4 (ref null $base))
+  (table $none_table 2 (ref null none))
+  (table $makers 1 funcref)
+  (elem (table $makers) (i32.const 0) func $new_left)
+
+  (func $new_left (type $make_left)
+    (struct.new $left (i32.const 3) (i32.const 4)))
+
+  (func $none_result (result (ref null none))
+    (ref.null none))
+
+  (func $store_none (param $value (ref null none)) (result i32)
+    (local $slot (ref $slot))
+    (local.set $slot (struct.new $slot (struct.new $left (i32.const 1) (i32.const 2))))
+    (struct.set $slot 0 (local.get $slot) (local.get $value))
+    (ref.is_null (struct.get $slot 0 (local.get $slot))))
+
+  (func (export "covariant_read") (result i32)
+    (local $object (ref $object2))
+    (local.set $object (struct.new $object2 (struct.new $vtable2 (i32.const 7) (i32.const 9))))
+    (i32.add
+      (struct.get $vtable2 1 (struct.get $object2 0 (local.get $object)))
+      (struct.get $vtable 0 (struct.get $object2 0 (local.get $object)))))
+
+  (func (export "null_only_definitions") (result i32)
+    (local $slot (ref $slot))
+    (local $count i32)
+    (local.set $slot (struct.new $slot (struct.new $left (i32.const 1) (i32.const 2))))
+    (struct.set $slot 0 (local.get $slot) (struct.get $holder 0 (struct.new $holder (ref.null none))))
+    (local.set $count (i32.add (local.get $count) (ref.is_null (struct.get $slot 0 (local.get $slot)))))
+    (struct.set $slot 0 (local.get $slot) (struct.new $left (i32.const 1) (i32.const 2)))
+    (struct.set $slot 0 (local.get $slot) (global.get $none))
+    (local.set $count (i32.add (local.get $count) (ref.is_null (struct.get $slot 0 (local.get $slot)))))
+    (struct.set $slot 0 (local.get $slot) (struct.new $left (i32.const 1) (i32.const 2)))
+    (struct.set $slot 0 (local.get $slot) (call $none_result))
+    (local.set $count (i32.add (local.get $count) (ref.is_null (struct.get $slot 0 (local.get $slot)))))
+    (struct.set $slot 0 (local.get $slot) (struct.new $left (i32.const 1) (i32.const 2)))
+    (struct.set $slot 0 (local.get $slot) (table.get $none_table (i32.const 1)))
+    (local.set $count (i32.add (local.get $count) (ref.is_null (struct.get $slot 0 (local.get $slot)))))
+    (struct.set $slot 0 (local.get $slot) (struct.new $left (i32.const 1) (i32.const 2)))
+    (struct.set $slot 0 (local.get $slot) (array.get $nulls (array.new_default $nulls (i32.const 2)) (i32.const 1)))
+    (local.set $count (i32.add (local.get $count) (ref.is_null (struct.get $slot 0 (local.get $slot)))))
+    (struct.set $slot 0 (local.get $slot) (struct.new $left (i32.const 1) (i32.const 2)))
+    (struct.set $slot 0 (local.get $slot) (ref.cast (ref null none) (ref.null any)))
+    (local.set $count (i32.add (local.get $count) (ref.is_null (struct.get $slot 0 (local.get $slot)))))
+    (local.set $count (i32.add (local.get $count) (call $store_none (ref.null none))))
+    (local.get $count))
+
+  (func $any_null (result anyref)
+    (ref.null any))
+
+  (func (export "null_only_branch") (result i32)
+    (local $slot (ref $slot))
+    (local $value anyref)
+    (local.set $value (call $any_null))
+    (local.set $slot (struct.new $slot (struct.new $left (i32.const 1) (i32.const 2))))
+    (struct.set $slot 0 (local.get $slot)
+      (block $only_null (result (ref null none))
+        (br_on_cast $only_null anyref (ref null none) (local.get $value))
+        (drop)
+        (return (i32.const -1))))
+    (ref.is_null (struct.get $slot 0 (local.get $slot))))
+
+  (func (export "null_only_payload") (result i32)
+    (local $slot (ref $slot))
+    (local.set $slot (struct.new $slot (struct.new $left (i32.const 1) (i32.const 2))))
+    (struct.set $slot 0 (local.get $slot)
+      (block $caught (result (ref null none))
+        (try_table (catch $nothing $caught)
+          (throw $nothing (ref.null none)))
+        (return (i32.const -1))))
+    (ref.is_null (struct.get $slot 0 (local.get $slot))))
+
+  (func $classify (param $value anyref) (result i32)
+    (block $is_left (result (ref $left))
+      (block $is_right (result (ref $right))
+        (local.get $value)
+        (br_on_cast $is_left anyref (ref $left))
+        (br_on_cast $is_right anyref (ref $right))
+        (drop)
+        (return (i32.const -1)))
+      (struct.get $right 0)
+      (i32.const 100)
+      (i32.add)
+      (return))
+    (struct.get $left 1))
+
+  (func $unless_left (param $value anyref) (result i32)
+    (block $not_left (result anyref)
+      (local.get $value)
+      (br_on_cast_fail $not_left anyref (ref $left))
+      (return (struct.get $left 1)))
+    (drop)
+    (i32.const -1))
+
+  (func (export "cast_branches") (result i32)
+    (i32.add
+      (i32.add
+        (call $classify (struct.new $left (i32.const 1) (i32.const 20)))
+        (call $classify (struct.new $right (i32.const 5) (f64.const 1))))
+      (i32.add
+        (call $unless_left (struct.new $left (i32.const 1) (i32.const 300)))
+        (call $unless_left (ref.i31 (i32.const 9))))))
+
+  (func (export "sibling_casts") (param $value anyref) (result i32)
+    (if (result i32) (ref.test (ref $right) (local.get $value))
+      (then (i32.const -1))
+      (else
+        (i32.add
+          (struct.get $left 1 (ref.cast (ref $left) (local.get $value)))
+          (struct.get $base 0 (ref.cast (ref $base) (local.get $value)))))))
+
+  (func (export "make_left") (result anyref)
+    (struct.new $left (i32.const 11) (i32.const 22)))
+
+  (func (export "make_right") (result anyref)
+    (struct.new $right (i32.const 11) (f64.const 2)))
+
+  (func (export "join") (param $pick i32) (result i32)
+    (local $joined (ref null $base))
+    (local.set $joined
+      (if (result (ref $base)) (local.get $pick)
+        (then (struct.new $left (i32.const 40) (i32.const 0)))
+        (else (struct.new $right (i32.const 50) (f64.const 0)))))
+    (if (i32.eq (local.get $pick) (i32.const 2))
+      (then (local.set $joined (global.get $none))))
+    (if (result i32) (ref.is_null (local.get $joined))
+      (then (i32.const 0))
+      (else (struct.get $base 0 (local.get $joined)))))
+
+  (func (export "loop_variable") (result i32)
+    (local $list (ref null $node))
+    (local $index i32)
+    (local $sum i32)
+    (loop $build
+      (local.set $list (struct.new $node (local.get $index) (local.get $list)))
+      (local.set $index (i32.add (local.get $index) (i32.const 1)))
+      (br_if $build (i32.lt_u (local.get $index) (i32.const 10))))
+    (block $done
+      (loop $walk
+        (br_if $done (ref.is_null (local.get $list)))
+        (local.set $sum (i32.add (local.get $sum) (struct.get $node 0 (local.get $list))))
+        (local.set $list (struct.get $node 1 (local.get $list)))
+        (br $walk)))
+    (local.get $sum))
+
+  (func $pass (param $value (ref null $left)) (param $unused (ref null $right)) (result (ref null $left))
+    (local.get $value))
+
+  (func (export "pass_through") (result i32)
+    (struct.get $left 1 (call $pass (struct.new $left (i32.const 0) (i32.const 13)) (ref.null $right))))
+
+  (func $three_values (type $three)
+    (struct.new $left (i32.const 1) (i32.const 2))
+    (struct.new $right (i32.const 30) (f64.const 0))
+    (i32.const 400))
+
+  (func (export "multi_values") (result i32)
+    (local $left (ref null $left))
+    (local $right (ref null $right))
+    (local $number i32)
+    (call $three_values)
+    (local.set $number)
+    (local.set $right)
+    (local.set $left)
+    (i32.add (local.get $number) (i32.add (struct.get $left 1 (local.get $left)) (struct.get $right 0 (local.get $right)))))
+
+  (func $count_down (param $left (ref $left)) (param $count i32) (result i32)
+    (if (result i32) (i32.eqz (local.get $count))
+      (then (struct.get $left 1 (local.get $left)))
+      (else
+        (return_call $count_down
+          (struct.new $left (i32.const 0) (i32.add (struct.get $left 1 (local.get $left)) (i32.const 1)))
+          (i32.sub (local.get $count) (i32.const 1))))))
+
+  (func $bounce (param $left (ref $left)) (param $count i32) (result i32)
+    (return_call $count_down (local.get $left) (local.get $count)))
+
+  (func (export "tail_references") (result i32)
+    (call $bounce (struct.new $left (i32.const 0) (i32.const 5)) (i32.const 1000)))
+
+  (func (export "exception_payload") (result i32)
+    (block $caught (result (ref $left) i32)
+      (try_table (catch $boom $caught)
+        (throw $boom (struct.new $left (i32.const 0) (i32.const 60)) (i32.const 7)))
+      (return (i32.const -1)))
+    (drop)
+    (struct.get $left 1))
+
+  (func (export "globals_and_tables") (result i32)
+    (global.set $kept (struct.new $left (i32.const 0) (i32.const 70)))
+    (table.set $bases_table (i32.const 2) (struct.new $left (i32.const 8) (i32.const 0)))
+    (i32.add
+      (i32.add
+        (struct.get $left 1 (global.get $kept))
+        (struct.get $base 0 (table.get $bases_table (i32.const 2))))
+      (struct.get $left 0 (call_indirect $makers (type $make_left) (i32.const 0)))))
+
+  (func (export "covariant_array") (result i32)
+    (local $lefts (ref $lefts))
+    (local.set $lefts (array.new_fixed $lefts 2 (struct.new $left (i32.const 0) (i32.const 80)) (ref.null $left)))
+    (i32.add
+      (struct.get $left 1 (array.get $lefts (local.get $lefts) (i32.const 0)))
+      (ref.is_null (array.get $lefts (local.get $lefts) (i32.const 1)))))
+
+  (func (export "conversions") (result i32)
+    (struct.get $left 1
+      (ref.cast (ref $left)
+        (any.convert_extern (extern.convert_any (struct.new $left (i32.const 0) (i32.const 90)))))))
+
+  (func (export "i31_paths") (param $value i32) (result i32)
+    (local $either eqref)
+    (local.set $either
+      (if (result eqref) (i32.lt_s (local.get $value) (i32.const 0))
+        (then (struct.new $left (i32.const 0) (i32.const 0)))
+        (else (ref.i31 (local.get $value)))))
+    (block $is_i31 (result (ref i31))
+      (br_on_cast $is_i31 eqref (ref i31) (local.get $either))
+      (drop)
+      (return (i32.const -1)))
+    (i31.get_s))
+)

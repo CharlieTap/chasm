@@ -53,6 +53,7 @@ internal fun dropStore(
     store.tables.clear()
 
     store.heap.drop()
+    store.referenceBridge = null
 
     return Success(Unit)
 }

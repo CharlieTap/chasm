@@ -16,6 +16,9 @@ val INSTALLATION_GLOBAL = installationAccessor("global", GLOBAL_INSTANCE)
 val INSTALLATION_FUNCTION = installationAccessor("function", FUNCTION_INSTANCE)
 val INSTALLATION_ELEMENT = installationAccessor("element", ELEMENT_INSTANCE)
 val INSTALLATION_DATA = installationAccessor("data", DATA_INSTANCE)
+val INSTALLATION_REFERENCE_GLOBAL = installationAccessor("referenceGlobal", OBJECT_TYPE)
+val INSTALLATION_REFERENCE_TABLE = installationAccessor("referenceTable", OBJECT_TYPE)
+val INSTALLATION_REFERENCE_SEGMENT = installationAccessor("referenceSegment", OBJECT_TYPE)
 val INSTALLATION_RUNTIME_TYPE = installationAccessor("runtimeType", "I")
 val INSTALLATION_TAG_ADDRESS = installationAccessor("tagAddress", "I")
 val INSTALLATION_FUNCTION_REFERENCE = installationAccessor("functionReference", "J")
@@ -33,6 +36,10 @@ fun installationAccessor(
     is Resource.RuntimeType -> INSTALLATION_RUNTIME_TYPE
     is Resource.TagAddress -> INSTALLATION_TAG_ADDRESS
     is Resource.FunctionReference -> INSTALLATION_FUNCTION_REFERENCE
+    is Resource.FunctionObject -> INSTALLATION_FUNCTION
+    is Resource.ReferenceGlobal -> INSTALLATION_REFERENCE_GLOBAL
+    is Resource.ReferenceTable -> INSTALLATION_REFERENCE_TABLE
+    is Resource.ReferenceSegment -> INSTALLATION_REFERENCE_SEGMENT
     else -> null
 }
 
@@ -48,6 +55,10 @@ fun installationIndex(
     is Resource.RuntimeType -> resource.typeIndex
     is Resource.TagAddress -> resource.index
     is Resource.FunctionReference -> resource.index
+    is Resource.FunctionObject -> resource.index
+    is Resource.ReferenceGlobal -> resource.index
+    is Resource.ReferenceTable -> resource.index
+    is Resource.ReferenceSegment -> resource.index
     else -> error("$resource is not read by index from the installation")
 }
 

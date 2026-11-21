@@ -22,7 +22,13 @@ internal class BindingLayout(
     private val data = elements + declarations.elementCount
     private val typeTests = data + declarations.dataCount
 
-    val objectCount = typeTests + (declarations.typeCount + ABSTRACT_HEAP_TYPES) * 2
+    private val functionObjects = typeTests + (declarations.typeCount + ABSTRACT_HEAP_TYPES) * 2
+
+    private val referenceGlobals = functionObjects + referencedFunctions.count
+    private val referenceTables = referenceGlobals + declarations.globalCount
+    private val referenceSegments = referenceTables + declarations.tableCount
+
+    val objectCount = referenceSegments + declarations.elementCount
 
     private val runtimeTypes = 0
     private val functionReferences = runtimeTypes + declarations.typeCount
@@ -41,8 +47,12 @@ internal class BindingLayout(
             is Resource.Data -> ranged(data, resource.index, typeTests, resource)
             is Resource.TypeTest -> {
                 val index = (heapTypeNumber(resource.type.heapType) + ABSTRACT_HEAP_TYPES) * 2 + if (resource.type.nullable) 1 else 0
-                ranged(typeTests, index, objectCount, resource)
+                ranged(typeTests, index, functionObjects, resource)
             }
+            is Resource.FunctionObject -> functionObjects + censusOrdinal(referencedFunctions, resource.index, resource)
+            is Resource.ReferenceGlobal -> ranged(referenceGlobals, resource.index, referenceTables, resource)
+            is Resource.ReferenceTable -> ranged(referenceTables, resource.index, referenceSegments, resource)
+            is Resource.ReferenceSegment -> ranged(referenceSegments, resource.index, objectCount, resource)
             is Resource.Function -> functions + censusOrdinal(bridgedFunctions, resource.index, resource)
             else -> throw IllegalArgumentException("$resource has no binding object slot")
         }

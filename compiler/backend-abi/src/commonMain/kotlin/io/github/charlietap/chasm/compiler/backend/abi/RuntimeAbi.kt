@@ -133,7 +133,6 @@ val BRIDGE_CALL_INDIRECT =
     compiledCalls.method("callIndirect", CONTEXT_TYPE, MODULE_INSTANCE, TABLE_INSTANCE, "I", "I", "[J", "I", returns = "V")
 val BRIDGE_CALL_REF = compiledCalls.method("callRef", CONTEXT_TYPE, MODULE_INSTANCE, "J", "[J", "I", returns = "V")
 val INDIRECT_TARGET = compiledCalls.method("indirectTarget", CONTEXT_TYPE, TABLE_INSTANCE, "I", "I", returns = OBJECT_TYPE)
-val CACHED_INDIRECT_TARGET = compiledCalls.method("cachedIndirectTarget", CONTEXT_TYPE, TABLE_INSTANCE, "I", "I", returns = OBJECT_TYPE)
 val REF_TARGET = compiledCalls.method("refTarget", CONTEXT_TYPE, "J", returns = OBJECT_TYPE)
 val TAIL_CALL = compiledCalls.method("tailCall", CONTEXT_TYPE, MODULE_INSTANCE, FUNCTION_INSTANCE, "[J", returns = "V")
 val TAIL_CALL_INDIRECT =
@@ -236,3 +235,82 @@ val MATH_FLOOR = javaMath.method("floor", "D", returns = "D")
 val MATH_RINT = javaMath.method("rint", "D", returns = "D")
 val MATH_SQRT = javaMath.method("sqrt", "D", returns = "D")
 val ARRAYCOPY = javaSystem.method("arraycopy", OBJECT_TYPE, "I", OBJECT_TYPE, "I", "I", returns = "V")
+
+const val WASM_EQ = "Lio/github/charlietap/chasm/runtime/compiled/gc/WasmEq;"
+const val WASM_STRUCT = "Lio/github/charlietap/chasm/runtime/compiled/gc/WasmStruct;"
+const val WASM_ARRAY = "Lio/github/charlietap/chasm/runtime/compiled/gc/WasmArray;"
+const val WASM_I31 = "Lio/github/charlietap/chasm/runtime/compiled/gc/WasmI31;"
+const val WASM_ARRAY_LENGTH = "length"
+
+private val managedOps = Owner("Lio/github/charlietap/chasm/runtime/compiled/gc/ManagedOps;")
+
+val CAST_FAILED = managedOps.method("castFailed", returns = NOTHING)
+val ARRAY_OUT_OF_BOUNDS = managedOps.method("arrayOutOfBounds", returns = NOTHING)
+val GUEST_HEAP_EXHAUSTED = managedOps.method("guestHeapExhausted", returns = NOTHING)
+val REFILL_ALLOCATION = managedOps.method("refillAllocation", CONTEXT_TYPE, "I", returns = "V")
+val CHECK_ARRAY_LENGTH = managedOps.method("checkArrayLength", "I", "I", returns = "I")
+const val ALLOCATION_METER = "Lio/github/charlietap/chasm/runtime/execution/AllocationMeter;"
+const val ALLOCATION_FIELD = "allocation"
+const val ALLOCATION_REMAINING_FIELD = "remaining"
+val SAME_I31 = managedOps.method("sameI31", OBJECT_TYPE, OBJECT_TYPE, returns = "Z")
+val FUNCTION_MATCHES = managedOps.method("functionMatches", CONTEXT_TYPE, OBJECT_TYPE, "I", returns = "Z")
+val REFERENCE_TARGET = managedOps.method("referenceTarget", OBJECT_TYPE, returns = OBJECT_TYPE)
+val CALL_REFERENCE = managedOps.method("callReference", CONTEXT_TYPE, MODULE_INSTANCE, OBJECT_TYPE, "[J", "I", returns = "V")
+val CALL_IMPORT = managedOps.method("callImport", CONTEXT_TYPE, MODULE_INSTANCE, FUNCTION_INSTANCE, "[J", "I", returns = "V")
+
+private val managedArrays = Owner("Lio/github/charlietap/chasm/runtime/compiled/gc/ManagedArrays;")
+val ARRAY_LENGTH = managedArrays.method("arrayLength", WASM_ARRAY, returns = "I")
+
+val COPY_ARRAY = managedArrays.method("copyArray", OBJECT_TYPE, "I", OBJECT_TYPE, "I", "I", returns = "V")
+val FILL_INTS = managedArrays.method("fillInts", OBJECT_TYPE, "I", "I", "I", returns = "V")
+val FILL_LONGS = managedArrays.method("fillLongs", OBJECT_TYPE, "I", "J", "I", returns = "V")
+val FILL_FLOATS = managedArrays.method("fillFloats", OBJECT_TYPE, "I", "F", "I", returns = "V")
+val FILL_DOUBLES = managedArrays.method("fillDoubles", OBJECT_TYPE, "I", "D", "I", returns = "V")
+val FILL_BYTES = managedArrays.method("fillBytes", OBJECT_TYPE, "I", "I", "I", returns = "V")
+val FILL_CHARS = managedArrays.method("fillChars", OBJECT_TYPE, "I", "I", "I", returns = "V")
+val FILL_OBJECTS = managedArrays.method("fillObjects", OBJECT_TYPE, "I", OBJECT_TYPE, "I", returns = "V")
+const val WASM_ARRAY_STORAGE = "storage"
+const val REFERENCE_GLOBAL = "Lio/github/charlietap/chasm/runtime/compiled/gc/ReferenceGlobal;"
+const val REFERENCE_TABLE = "Lio/github/charlietap/chasm/runtime/compiled/gc/ReferenceTable;"
+const val REFERENCE_SEGMENT = "Lio/github/charlietap/chasm/runtime/compiled/gc/ReferenceSegment;"
+const val REFERENCE_GLOBAL_VALUE = "value"
+const val REFERENCE_STORAGE_ELEMENTS = "elements"
+const val WASM_EXCEPTION_TYPE = "Lio/github/charlietap/chasm/runtime/compiled/gc/WasmException;"
+const val WASM_EXCEPTION_WORDS = "words"
+const val WASM_EXCEPTION_REFERENCES = "references"
+val THROW_EXCEPTION = managedOps.method("throwException", CONTEXT_TYPE, "I", "[J", "[Ljava/lang/Object;", returns = "V")
+val CREATE_EXCEPTION = managedOps.method("createException", CONTEXT_TYPE, "I", "[J", "[Ljava/lang/Object;", returns = WASM_EXCEPTION_TYPE)
+val RETHROW_EXCEPTION = managedOps.method("rethrowException", CONTEXT_TYPE, OBJECT_TYPE, returns = "V")
+val PENDING_EXCEPTION_TAG = managedOps.method("pendingExceptionTag", CONTEXT_TYPE, returns = "I")
+val TAKE_MANAGED_EXCEPTION = managedOps.method("takeException", CONTEXT_TYPE, returns = WASM_EXCEPTION_TYPE)
+val CALL_OBJECTS = managedOps.method("callObjects", CONTEXT_TYPE, MODULE_INSTANCE, FUNCTION_INSTANCE, "[J", "[Ljava/lang/Object;", "I", returns = "V")
+val CALL_INDIRECT_OBJECTS = managedOps.method("callIndirectObjects", CONTEXT_TYPE, MODULE_INSTANCE, REFERENCE_TABLE, "I", "I", "[J", "[Ljava/lang/Object;", "I", returns = "V")
+val RESULT_REFERENCES = managedOps.method("resultReferences", CONTEXT_TYPE, "I", returns = "[Ljava/lang/Object;")
+val CALL_REFERENCE_OBJECTS = managedOps.method("callReferenceObjects", CONTEXT_TYPE, MODULE_INSTANCE, OBJECT_TYPE, "[J", "[Ljava/lang/Object;", "I", returns = "V")
+val CHECK_DATA_RANGE = managedArrays.method("checkDataRange", DATA_INSTANCE, "I", "I", "I", returns = "V")
+val CHECK_ELEMENT_RANGE = managedArrays.method("checkElementRange", REFERENCE_SEGMENT, "I", "I", returns = "V")
+val COPY_DATA = managedArrays.method("copyData", DATA_INSTANCE, "I", OBJECT_TYPE, "I", "I", returns = "V")
+val COPY_ELEMENTS = managedArrays.method("copyElements", REFERENCE_SEGMENT, "I", "[Ljava/lang/Object;", "I", "I", returns = "V")
+val INIT_ARRAY_DATA = managedArrays.method("initArrayData", OBJECT_TYPE, "I", DATA_INSTANCE, "I", "I", "I", returns = "V")
+val INIT_ARRAY_ELEMENTS = managedArrays.method("initArrayElements", OBJECT_TYPE, "I", REFERENCE_SEGMENT, "I", "I", returns = "V")
+val REQUEST_TAIL_OBJECTS = managedOps.method("requestTailObjects", CONTEXT_TYPE, MODULE_INSTANCE, FUNCTION_INSTANCE, "[J", "[Ljava/lang/Object;", returns = "V")
+val REQUEST_TAIL_INDIRECT_OBJECTS = managedOps.method("requestTailIndirectObjects", CONTEXT_TYPE, MODULE_INSTANCE, REFERENCE_TABLE, "I", "I", "[J", "[Ljava/lang/Object;", returns = "V")
+val REQUEST_TAIL_REFERENCE_OBJECTS = managedOps.method("requestTailReferenceObjects", CONTEXT_TYPE, MODULE_INSTANCE, OBJECT_TYPE, "[J", "[Ljava/lang/Object;", returns = "V")
+val COMPLETE_TAIL_OBJECTS = managedOps.method("completeTailObjects", CONTEXT_TYPE, "[J", "[Ljava/lang/Object;", "I", returns = "V")
+
+private val managedTables = Owner("Lio/github/charlietap/chasm/runtime/compiled/gc/ManagedTables;")
+
+val MANAGED_TABLE_GET = managedTables.method("tableGet", REFERENCE_TABLE, "I", returns = OBJECT_TYPE)
+val MANAGED_TABLE_SET = managedTables.method("tableSet", REFERENCE_TABLE, "I", OBJECT_TYPE, returns = "V")
+val MANAGED_TABLE_SIZE = managedTables.method("tableSize", REFERENCE_TABLE, returns = "I")
+val MANAGED_TABLE_GROW = managedTables.method("tableGrow", REFERENCE_TABLE, "I", OBJECT_TYPE, returns = "I")
+val MANAGED_TABLE_FILL = managedTables.method("tableFill", REFERENCE_TABLE, "I", OBJECT_TYPE, "I", returns = "V")
+val MANAGED_TABLE_COPY = managedTables.method("tableCopy", REFERENCE_TABLE, REFERENCE_TABLE, "I", "I", "I", returns = "V")
+val MANAGED_TABLE_INIT = managedTables.method("tableInit", REFERENCE_TABLE, REFERENCE_SEGMENT, "I", "I", "I", returns = "V")
+val MANAGED_ELEMENT_DROP = managedTables.method("elementDrop", REFERENCE_SEGMENT, returns = "V")
+val MANAGED_INDIRECT_ENTRY = managedTables.method("indirectEntry", CONTEXT_TYPE, REFERENCE_TABLE, "I", "I", returns = OBJECT_TYPE)
+
+private val managedValues = Owner("Lio/github/charlietap/chasm/runtime/compiled/gc/ManagedValues;")
+
+val REFERENCE_FROM_HOST = managedValues.method("referenceFromHost", CONTEXT_TYPE, "J", returns = OBJECT_TYPE)
+val REFERENCE_TO_HOST = managedValues.method("referenceToHost", CONTEXT_TYPE, OBJECT_TYPE, "Z", returns = "J")

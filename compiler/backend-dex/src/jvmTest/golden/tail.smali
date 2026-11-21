@@ -114,7 +114,7 @@
     const-wide/16 v19, 0x1
 
     .line 4
-    goto/16 :goto_45
+    goto/16 :goto_46
 
     .line 5
     :cond_1f
@@ -125,25 +125,27 @@
     .line 6
     const/4 v8, 0x3
 
-    new-array v12, v8, [J
+    new-array v10, v8, [J
+
+    const/4 v11, 0x0
+
+    const/4 v9, 0x0
 
     move-wide/from16 v0, v19
 
-    const/4 v10, 0x0
+    aput-wide v0, v10, v9
 
-    aput-wide v0, v12, v10
+    const/4 v9, 0x1
 
     const-wide/16 v0, 0x7
 
-    const/4 v10, 0x1
+    aput-wide v0, v10, v9
 
-    aput-wide v0, v12, v10
+    const/4 v9, 0x2
 
     const-wide/16 v0, 0x3
 
-    const/4 v10, 0x2
-
-    aput-wide v0, v12, v10
+    aput-wide v0, v10, v9
 
     const/4 v9, 0x1
 
@@ -157,14 +159,14 @@
 
     check-cast v3, Lio/github/charlietap/chasm/runtime/instance/FunctionInstance;
 
-    invoke-static {v14, v2, v3, v12}, Lio/github/charlietap/chasm/runtime/compiled/CompiledCalls;->tailCall(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;Lio/github/charlietap/chasm/runtime/instance/ModuleInstance;Lio/github/charlietap/chasm/runtime/instance/FunctionInstance;[J)V
+    invoke-static {v14, v2, v3, v10, v11}, Lio/github/charlietap/chasm/runtime/compiled/gc/ManagedOps;->requestTailObjects(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;Lio/github/charlietap/chasm/runtime/instance/ModuleInstance;Lio/github/charlietap/chasm/runtime/instance/FunctionInstance;[J[Ljava/lang/Object;)V
 
     const-wide/16 v0, 0x0
 
     return-wide v0
 
     .line 7
-    :goto_45
+    :goto_46
     move-wide/from16 v0, v19
 
     return-wide v0
@@ -215,7 +217,7 @@
     const-wide/16 v22, 0x2
 
     .line 4
-    goto/16 :goto_3f
+    goto/16 :goto_40
 
     .line 5
     :cond_23
@@ -226,13 +228,15 @@
     .line 6
     const/4 v8, 0x1
 
-    new-array v12, v8, [J
+    new-array v10, v8, [J
+
+    const/4 v11, 0x0
+
+    const/4 v9, 0x0
 
     move-wide/from16 v0, v22
 
-    const/4 v10, 0x0
-
-    aput-wide v0, v12, v10
+    aput-wide v0, v10, v9
 
     const/4 v9, 0x1
 
@@ -246,14 +250,14 @@
 
     check-cast v3, Lio/github/charlietap/chasm/runtime/instance/FunctionInstance;
 
-    invoke-static {v14, v2, v3, v12}, Lio/github/charlietap/chasm/runtime/compiled/CompiledCalls;->tailCall(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;Lio/github/charlietap/chasm/runtime/instance/ModuleInstance;Lio/github/charlietap/chasm/runtime/instance/FunctionInstance;[J)V
+    invoke-static {v14, v2, v3, v10, v11}, Lio/github/charlietap/chasm/runtime/compiled/gc/ManagedOps;->requestTailObjects(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;Lio/github/charlietap/chasm/runtime/instance/ModuleInstance;Lio/github/charlietap/chasm/runtime/instance/FunctionInstance;[J[Ljava/lang/Object;)V
 
     const-wide/16 v0, 0x0
 
     return-wide v0
 
     .line 7
-    :goto_3f
+    :goto_40
     move-wide/from16 v0, v22
 
     return-wide v0
@@ -264,6 +268,134 @@
 .end method
 
 .method public static f3([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;IJJ)J
+    .registers 41
+
+    move-object/from16 v14, p1
+
+    move/from16 v13, p2
+
+    move-object/from16 v16, p0
+
+    add-int/lit16 v8, v13, 0x13
+
+    iget v9, v14, Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;->compiledStackLimit:I
+
+    if-le v8, v9, :cond_12
+
+    invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/CompiledRuntime;->callStackExhausted()Ljava/lang/Void;
+
+    const-wide/16 v0, 0x0
+
+    return-wide v0
+
+    :cond_12
+    move v13, v8
+
+    move-wide/from16 v17, p3
+
+    move-wide/from16 v19, p5
+
+    .line 2
+    const-wide/16 v2, 0x0
+
+    cmp-long v8, v17, v2
+
+    if-nez v8, :cond_21
+
+    .line 3
+    move-wide/from16 v21, v19
+
+    .line 4
+    goto/16 :goto_60
+
+    .line 5
+    :cond_21
+    const-wide/16 v2, 0x1
+
+    sub-long v21, v17, v2
+
+    .line 6
+    const-wide/16 v2, 0x2
+
+    add-long v23, v19, v2
+
+    .line 7
+    const/4 v8, 0x2
+
+    new-array v10, v8, [J
+
+    const/4 v11, 0x0
+
+    const/4 v9, 0x0
+
+    move-wide/from16 v0, v21
+
+    aput-wide v0, v10, v9
+
+    const/4 v9, 0x1
+
+    move-wide/from16 v0, v23
+
+    aput-wide v0, v10, v9
+
+    move-object/from16 v26, v14
+
+    move-object/from16 v31, v10
+
+    move-object/from16 v32, v11
+
+    const/4 v9, 0x0
+
+    aget-object v12, v16, v9
+
+    check-cast v12, [J
+
+    const/4 v9, 0x0
+
+    aget-wide v4, v12, v9
+
+    long-to-int v8, v4
+
+    move/from16 v29, v8
+
+    const/4 v9, 0x1
+
+    aget-object v2, v16, v9
+
+    check-cast v2, Lio/github/charlietap/chasm/runtime/instance/ModuleInstance;
+
+    move-object/from16 v27, v2
+
+    const/16 v9, 0x2f
+
+    aget-object v2, v16, v9
+
+    check-cast v2, Lio/github/charlietap/chasm/runtime/compiled/gc/ReferenceTable;
+
+    move-object/from16 v28, v2
+
+    const/4 v8, 0x1
+
+    move/from16 v30, v8
+
+    invoke-static/range {v26 .. v32}, Lio/github/charlietap/chasm/runtime/compiled/gc/ManagedOps;->requestTailIndirectObjects(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;Lio/github/charlietap/chasm/runtime/instance/ModuleInstance;Lio/github/charlietap/chasm/runtime/compiled/gc/ReferenceTable;II[J[Ljava/lang/Object;)V
+
+    const-wide/16 v0, 0x0
+
+    return-wide v0
+
+    .line 8
+    :goto_60
+    move-wide/from16 v0, v21
+
+    return-wide v0
+
+    const-wide/16 v0, 0x0
+
+    return-wide v0
+.end method
+
+.method public static f4([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;IJJ)J
     .registers 39
 
     move-object/from16 v14, p1
@@ -311,149 +443,29 @@
     sub-long v21, v17, v2
 
     .line 6
-    const-wide/16 v2, 0x2
-
-    add-long v23, v19, v2
-
-    .line 7
     const/4 v8, 0x2
 
-    new-array v12, v8, [J
+    new-array v10, v8, [J
+
+    const/4 v11, 0x0
+
+    const/4 v9, 0x0
 
     move-wide/from16 v0, v21
 
-    const/4 v10, 0x0
-
-    aput-wide v0, v12, v10
-
-    move-wide/from16 v0, v23
-
-    const/4 v10, 0x1
-
-    aput-wide v0, v12, v10
-
-    move-object/from16 v31, v12
-
-    move-object/from16 v26, v14
-
-    const/4 v9, 0x0
-
-    aget-object v12, v16, v9
-
-    check-cast v12, [J
-
-    const/4 v9, 0x0
-
-    aget-wide v4, v12, v9
-
-    long-to-int v8, v4
-
-    move/from16 v29, v8
+    aput-wide v0, v10, v9
 
     const/4 v9, 0x1
 
-    aget-object v2, v16, v9
-
-    check-cast v2, Lio/github/charlietap/chasm/runtime/instance/ModuleInstance;
-
-    move-object/from16 v27, v2
-
-    const/4 v9, 0x3
-
-    aget-object v2, v16, v9
-
-    check-cast v2, Lio/github/charlietap/chasm/runtime/instance/TableInstance;
-
-    move-object/from16 v28, v2
-
-    const/4 v8, 0x1
-
-    move/from16 v30, v8
-
-    invoke-static/range {v26 .. v31}, Lio/github/charlietap/chasm/runtime/compiled/CompiledCalls;->tailCallIndirect(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;Lio/github/charlietap/chasm/runtime/instance/ModuleInstance;Lio/github/charlietap/chasm/runtime/instance/TableInstance;II[J)V
-
-    const-wide/16 v0, 0x0
-
-    return-wide v0
-
-    .line 8
-    :goto_5c
-    move-wide/from16 v0, v21
-
-    return-wide v0
-
-    const-wide/16 v0, 0x0
-
-    return-wide v0
-.end method
-
-.method public static f4([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;IJJ)J
-    .registers 37
-
-    move-object/from16 v14, p1
-
-    move/from16 v13, p2
-
-    move-object/from16 v16, p0
-
-    add-int/lit16 v8, v13, 0x12
-
-    iget v9, v14, Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;->compiledStackLimit:I
-
-    if-le v8, v9, :cond_12
-
-    invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/CompiledRuntime;->callStackExhausted()Ljava/lang/Void;
-
-    const-wide/16 v0, 0x0
-
-    return-wide v0
-
-    :cond_12
-    move v13, v8
-
-    move-wide/from16 v17, p3
-
-    move-wide/from16 v19, p5
-
-    .line 2
-    const-wide/16 v2, 0x0
-
-    cmp-long v8, v17, v2
-
-    if-nez v8, :cond_21
-
-    .line 3
-    move-wide/from16 v21, v19
-
-    .line 4
-    goto/16 :goto_58
-
-    .line 5
-    :cond_21
-    const-wide/16 v2, 0x1
-
-    sub-long v21, v17, v2
-
-    .line 6
-    const/4 v8, 0x2
-
-    new-array v12, v8, [J
-
-    move-wide/from16 v0, v21
-
-    const/4 v10, 0x0
-
-    aput-wide v0, v12, v10
-
     move-wide/from16 v0, v19
 
-    const/4 v10, 0x1
-
-    aput-wide v0, v12, v10
-
-    move-object/from16 v29, v12
+    aput-wide v0, v10, v9
 
     move-object/from16 v24, v14
+
+    move-object/from16 v29, v10
+
+    move-object/from16 v30, v11
 
     const/4 v9, 0x0
 
@@ -477,11 +489,11 @@
 
     move-object/from16 v25, v2
 
-    const/4 v9, 0x3
+    const/16 v9, 0x2f
 
     aget-object v2, v16, v9
 
-    check-cast v2, Lio/github/charlietap/chasm/runtime/instance/TableInstance;
+    check-cast v2, Lio/github/charlietap/chasm/runtime/compiled/gc/ReferenceTable;
 
     move-object/from16 v26, v2
 
@@ -489,14 +501,14 @@
 
     move/from16 v28, v8
 
-    invoke-static/range {v24 .. v29}, Lio/github/charlietap/chasm/runtime/compiled/CompiledCalls;->tailCallIndirect(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;Lio/github/charlietap/chasm/runtime/instance/ModuleInstance;Lio/github/charlietap/chasm/runtime/instance/TableInstance;II[J)V
+    invoke-static/range {v24 .. v30}, Lio/github/charlietap/chasm/runtime/compiled/gc/ManagedOps;->requestTailIndirectObjects(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;Lio/github/charlietap/chasm/runtime/instance/ModuleInstance;Lio/github/charlietap/chasm/runtime/compiled/gc/ReferenceTable;II[J[Ljava/lang/Object;)V
 
     const-wide/16 v0, 0x0
 
     return-wide v0
 
     .line 7
-    :goto_58
+    :goto_5c
     move-wide/from16 v0, v21
 
     return-wide v0
@@ -549,26 +561,28 @@
 
     iget-object v8, v14, Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;->pendingTailFunction:Lio/github/charlietap/chasm/runtime/instance/FunctionInstance;
 
-    if-eqz v8, :cond_37
+    if-eqz v8, :cond_38
 
     const/4 v8, 0x1
 
-    new-array v12, v8, [J
+    new-array v10, v8, [J
 
-    invoke-static {v14, v12, v13}, Lio/github/charlietap/chasm/runtime/compiled/CompiledCalls;->completeTailCall(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;[JI)V
+    const/4 v11, 0x0
+
+    invoke-static {v14, v10, v11, v13}, Lio/github/charlietap/chasm/runtime/compiled/gc/ManagedOps;->completeTailObjects(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;[J[Ljava/lang/Object;I)V
 
     iget-boolean v8, v14, Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;->compiledUnwinding:Z
 
-    if-eqz v8, :cond_34
+    if-eqz v8, :cond_35
 
     invoke-static {v14}, Lio/github/charlietap/chasm/runtime/compiled/CompiledCalls;->raiseUnwinding(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;)V
 
-    :cond_34
-    const/4 v10, 0x0
+    :cond_35
+    const/4 v8, 0x0
 
-    aget-wide v0, v12, v10
+    aget-wide v0, v10, v8
 
-    :cond_37
+    :cond_38
     move-wide/from16 v19, v0
 
     .line 3
@@ -652,26 +666,28 @@
 
     .line 2
     :goto_16
-    if-nez v17, :cond_35
+    if-nez v17, :cond_36
 
     .line 3
     const/4 v8, 0x2
 
-    new-array v12, v8, [J
+    new-array v10, v8, [J
+
+    const/4 v11, 0x0
+
+    const/4 v9, 0x0
 
     move/from16 v0, v18
 
     int-to-long v0, v0
 
-    const/4 v10, 0x0
+    aput-wide v0, v10, v9
 
-    aput-wide v0, v12, v10
+    const/4 v9, 0x1
 
     const-wide/16 v0, 0x9
 
-    const/4 v10, 0x1
-
-    aput-wide v0, v12, v10
+    aput-wide v0, v10, v9
 
     const/4 v9, 0x1
 
@@ -685,14 +701,14 @@
 
     check-cast v3, Lio/github/charlietap/chasm/runtime/instance/FunctionInstance;
 
-    invoke-static {v14, v2, v3, v12}, Lio/github/charlietap/chasm/runtime/compiled/CompiledCalls;->tailCall(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;Lio/github/charlietap/chasm/runtime/instance/ModuleInstance;Lio/github/charlietap/chasm/runtime/instance/FunctionInstance;[J)V
+    invoke-static {v14, v2, v3, v10, v11}, Lio/github/charlietap/chasm/runtime/compiled/gc/ManagedOps;->requestTailObjects(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;Lio/github/charlietap/chasm/runtime/instance/ModuleInstance;Lio/github/charlietap/chasm/runtime/instance/FunctionInstance;[J[Ljava/lang/Object;)V
 
     const/4 v8, 0x0
 
     return-object v8
 
     .line 4
-    :cond_35
+    :cond_36
     add-int/lit8 v19, v17, -0x1
 
     .line 5
@@ -757,21 +773,26 @@
 
     iget-object v8, v14, Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;->pendingTailFunction:Lio/github/charlietap/chasm/runtime/instance/FunctionInstance;
 
-    if-eqz v8, :cond_33
+    if-eqz v8, :cond_35
 
     const/4 v8, 0x2
 
-    new-array v12, v8, [J
+    new-array v10, v8, [J
 
-    invoke-static {v14, v12, v13}, Lio/github/charlietap/chasm/runtime/compiled/CompiledCalls;->completeTailCall(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;[JI)V
+    const/4 v11, 0x0
+
+    invoke-static {v14, v10, v11, v13}, Lio/github/charlietap/chasm/runtime/compiled/gc/ManagedOps;->completeTailObjects(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;[J[Ljava/lang/Object;I)V
 
     iget-boolean v8, v14, Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;->compiledUnwinding:Z
 
-    if-eqz v8, :cond_33
+    if-eqz v8, :cond_34
 
     invoke-static {v14}, Lio/github/charlietap/chasm/runtime/compiled/CompiledCalls;->raiseUnwinding(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;)V
 
-    :cond_33
+    :cond_34
+    move-object v12, v10
+
+    :cond_35
     const/4 v10, 0x0
 
     aget-wide v0, v12, v10
@@ -842,26 +863,28 @@
 
     iget-object v8, v14, Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;->pendingTailFunction:Lio/github/charlietap/chasm/runtime/instance/FunctionInstance;
 
-    if-eqz v8, :cond_35
+    if-eqz v8, :cond_36
 
     const/4 v8, 0x1
 
-    new-array v12, v8, [J
+    new-array v10, v8, [J
 
-    invoke-static {v14, v12, v13}, Lio/github/charlietap/chasm/runtime/compiled/CompiledCalls;->completeTailCall(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;[JI)V
+    const/4 v11, 0x0
+
+    invoke-static {v14, v10, v11, v13}, Lio/github/charlietap/chasm/runtime/compiled/gc/ManagedOps;->completeTailObjects(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;[J[Ljava/lang/Object;I)V
 
     iget-boolean v8, v14, Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;->compiledUnwinding:Z
 
-    if-eqz v8, :cond_32
+    if-eqz v8, :cond_33
 
     invoke-static {v14}, Lio/github/charlietap/chasm/runtime/compiled/CompiledCalls;->raiseUnwinding(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;)V
 
-    :cond_32
-    const/4 v10, 0x0
+    :cond_33
+    const/4 v8, 0x0
 
-    aget-wide v0, v12, v10
+    aget-wide v0, v10, v8
 
-    :cond_35
+    :cond_36
     move-wide/from16 v19, v0
 
     .line 3
@@ -916,7 +939,7 @@
 
     aget-wide v10, p2, v3
 
-    packed-switch v4, :pswitch_data_30
+    packed-switch v4, :pswitch_data_34
 
     invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/CompiledRuntime;->unreachable()Ljava/lang/Void;
 
@@ -950,6 +973,7 @@
     aput-wide v0, p2, v3
     :try_end_2a
     .catch Ljava/lang/StackOverflowError; {:try_start_0 .. :try_end_2a} :catch_2b
+    .catch Ljava/lang/OutOfMemoryError; {:try_start_0 .. :try_end_2a} :catch_2f
 
     return-void
 
@@ -958,9 +982,14 @@
 
     return-void
 
+    :catch_2f
+    invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/gc/ManagedOps;->guestHeapExhausted()Ljava/lang/Void;
+
+    return-void
+
     nop
 
-    :pswitch_data_30
+    :pswitch_data_34
     .packed-switch 0x0
         :pswitch_15
         :pswitch_1b
@@ -992,7 +1021,7 @@
 
     aget-wide v10, p2, v3
 
-    packed-switch v4, :pswitch_data_38
+    packed-switch v4, :pswitch_data_3c
 
     invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/CompiledRuntime;->unreachable()Ljava/lang/Void;
 
@@ -1028,6 +1057,7 @@
     aput-wide v0, v5, p3
     :try_end_32
     .catch Ljava/lang/StackOverflowError; {:try_start_0 .. :try_end_32} :catch_33
+    .catch Ljava/lang/OutOfMemoryError; {:try_start_0 .. :try_end_32} :catch_37
 
     return-void
 
@@ -1036,9 +1066,14 @@
 
     return-void
 
+    :catch_37
+    invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/gc/ManagedOps;->guestHeapExhausted()Ljava/lang/Void;
+
+    return-void
+
     nop
 
-    :pswitch_data_38
+    :pswitch_data_3c
     .packed-switch 0x0
         :pswitch_1a
         :pswitch_20
@@ -1079,7 +1114,7 @@
 
     aget-wide v8, p2, v3
 
-    packed-switch v4, :pswitch_data_2c
+    packed-switch v4, :pswitch_data_30
 
     invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/CompiledRuntime;->unreachable()Ljava/lang/Void;
 
@@ -1113,6 +1148,7 @@
     aput-wide v0, p2, v3
     :try_end_27
     .catch Ljava/lang/StackOverflowError; {:try_start_0 .. :try_end_27} :catch_28
+    .catch Ljava/lang/OutOfMemoryError; {:try_start_0 .. :try_end_27} :catch_2c
 
     return-void
 
@@ -1121,7 +1157,12 @@
 
     return-void
 
-    :pswitch_data_2c
+    :catch_2c
+    invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/gc/ManagedOps;->guestHeapExhausted()Ljava/lang/Void;
+
+    return-void
+
+    :pswitch_data_30
     .packed-switch 0x0
         :pswitch_12
         :pswitch_18
@@ -1149,7 +1190,7 @@
 
     aget-wide v8, p2, v3
 
-    packed-switch v4, :pswitch_data_34
+    packed-switch v4, :pswitch_data_38
 
     invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/CompiledRuntime;->unreachable()Ljava/lang/Void;
 
@@ -1185,6 +1226,7 @@
     aput-wide v0, v5, p3
     :try_end_2e
     .catch Ljava/lang/StackOverflowError; {:try_start_0 .. :try_end_2e} :catch_2f
+    .catch Ljava/lang/OutOfMemoryError; {:try_start_0 .. :try_end_2e} :catch_33
 
     return-void
 
@@ -1193,9 +1235,14 @@
 
     return-void
 
+    :catch_33
+    invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/gc/ManagedOps;->guestHeapExhausted()Ljava/lang/Void;
+
+    return-void
+
     nop
 
-    :pswitch_data_34
+    :pswitch_data_38
     .packed-switch 0x0
         :pswitch_16
         :pswitch_1c
@@ -1255,11 +1302,17 @@
     aput-wide v0, p2, v3
     :try_end_18
     .catch Ljava/lang/StackOverflowError; {:try_start_0 .. :try_end_18} :catch_19
+    .catch Ljava/lang/OutOfMemoryError; {:try_start_0 .. :try_end_18} :catch_1d
 
     return-void
 
     :catch_19
     invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/CompiledRuntime;->callStackExhausted()Ljava/lang/Void;
+
+    return-void
+
+    :catch_1d
+    invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/gc/ManagedOps;->guestHeapExhausted()Ljava/lang/Void;
 
     return-void
 .end method
@@ -1305,11 +1358,17 @@
     aput-wide v0, v5, p3
     :try_end_20
     .catch Ljava/lang/StackOverflowError; {:try_start_0 .. :try_end_20} :catch_21
+    .catch Ljava/lang/OutOfMemoryError; {:try_start_0 .. :try_end_20} :catch_25
 
     return-void
 
     :catch_21
     invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/CompiledRuntime;->callStackExhausted()Ljava/lang/Void;
+
+    return-void
+
+    :catch_25
+    invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/gc/ManagedOps;->guestHeapExhausted()Ljava/lang/Void;
 
     return-void
 .end method
@@ -1359,7 +1418,7 @@
 
     move v9, v2
 
-    packed-switch v4, :pswitch_data_36
+    packed-switch v4, :pswitch_data_3a
 
     invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/CompiledRuntime;->unreachable()Ljava/lang/Void;
 
@@ -1396,6 +1455,7 @@
     aput-wide v0, p2, v3
     :try_end_31
     .catch Ljava/lang/StackOverflowError; {:try_start_0 .. :try_end_31} :catch_32
+    .catch Ljava/lang/OutOfMemoryError; {:try_start_0 .. :try_end_31} :catch_36
 
     :cond_31
     return-void
@@ -1405,7 +1465,12 @@
 
     return-void
 
-    :pswitch_data_36
+    :catch_36
+    invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/gc/ManagedOps;->guestHeapExhausted()Ljava/lang/Void;
+
+    return-void
+
+    :pswitch_data_3a
     .packed-switch 0x0
         :pswitch_19
         :pswitch_1f
@@ -1444,7 +1509,7 @@
 
     move v9, v2
 
-    packed-switch v4, :pswitch_data_46
+    packed-switch v4, :pswitch_data_4a
 
     invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/CompiledRuntime;->unreachable()Ljava/lang/Void;
 
@@ -1493,6 +1558,7 @@
     aput-wide v0, v5, v3
     :try_end_40
     .catch Ljava/lang/StackOverflowError; {:try_start_0 .. :try_end_40} :catch_41
+    .catch Ljava/lang/OutOfMemoryError; {:try_start_0 .. :try_end_40} :catch_45
 
     :cond_40
     return-void
@@ -1502,9 +1568,14 @@
 
     return-void
 
+    :catch_45
+    invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/gc/ManagedOps;->guestHeapExhausted()Ljava/lang/Void;
+
+    return-void
+
     nop
 
-    :pswitch_data_46
+    :pswitch_data_4a
     .packed-switch 0x0
         :pswitch_1e
         :pswitch_24
@@ -1557,11 +1628,17 @@
     aput-wide v0, p2, v3
     :try_end_12
     .catch Ljava/lang/StackOverflowError; {:try_start_0 .. :try_end_12} :catch_13
+    .catch Ljava/lang/OutOfMemoryError; {:try_start_0 .. :try_end_12} :catch_17
 
     return-void
 
     :catch_13
     invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/CompiledRuntime;->callStackExhausted()Ljava/lang/Void;
+
+    return-void
+
+    :catch_17
+    invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/gc/ManagedOps;->guestHeapExhausted()Ljava/lang/Void;
 
     return-void
 .end method
@@ -1601,11 +1678,17 @@
     aput-wide v0, v5, p3
     :try_end_19
     .catch Ljava/lang/StackOverflowError; {:try_start_0 .. :try_end_19} :catch_1a
+    .catch Ljava/lang/OutOfMemoryError; {:try_start_0 .. :try_end_19} :catch_1e
 
     return-void
 
     :catch_1a
     invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/CompiledRuntime;->callStackExhausted()Ljava/lang/Void;
+
+    return-void
+
+    :catch_1e
+    invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/gc/ManagedOps;->guestHeapExhausted()Ljava/lang/Void;
 
     return-void
 .end method
@@ -1637,16 +1720,6 @@
 
     aput-object v4, p1, v2
 
-    const/4 v2, 0x0
-
-    invoke-virtual {p0, v2}, Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;->table(I)Lio/github/charlietap/chasm/runtime/instance/TableInstance;
-
-    move-result-object v4
-
-    const/4 v2, 0x3
-
-    aput-object v4, p1, v2
-
     const/4 v2, 0x1
 
     invoke-virtual {p0, v2}, Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;->function(I)Lio/github/charlietap/chasm/runtime/instance/FunctionInstance;
@@ -1674,6 +1747,16 @@
     move-result-object v4
 
     const/4 v2, 0x7
+
+    aput-object v4, p1, v2
+
+    const/4 v2, 0x0
+
+    invoke-virtual {p0, v2}, Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;->referenceTable(I)Ljava/lang/Object;
+
+    move-result-object v4
+
+    const/16 v2, 0x2f
 
     aput-object v4, p1, v2
 
@@ -1711,7 +1794,7 @@
 
     check-cast p1, Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;
 
-    const/16 v0, 0x8
+    const/16 v0, 0x30
 
     new-array v1, v0, [Ljava/lang/Object;
 

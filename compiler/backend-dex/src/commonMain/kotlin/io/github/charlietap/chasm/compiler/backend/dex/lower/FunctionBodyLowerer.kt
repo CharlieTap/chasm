@@ -39,16 +39,11 @@ internal fun LowerContext.lowerPositions(
 
         kinds.commit()
     }
-
-    enterColdCode()
 }
 
 internal fun LowerContext.lowerOutOfLine() {
 
     lowerExceptionHandling()
 
-    outOfLine.forEach { path ->
-        enterColdCode()
-        path()
-    }
+    outOfLine.forEach { path -> path() }
 }

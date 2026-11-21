@@ -7,8 +7,10 @@ import com.github.michaelbull.result.Result
 import io.github.charlietap.chasm.executor.invoker.compiled.CompiledFunctionInstallation
 import io.github.charlietap.chasm.executor.invoker.compiled.installCompiledFunctions
 import io.github.charlietap.chasm.runtime.address.Address
+import io.github.charlietap.chasm.runtime.compiled.gc.ManagedReferenceBridge
 import io.github.charlietap.chasm.runtime.error.InstantiationError
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
+import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.ext.toLong
 import io.github.charlietap.chasm.runtime.function.CompiledFunction
 import io.github.charlietap.chasm.runtime.instance.DataInstance
@@ -41,6 +43,8 @@ fun ModuleCodeInstallation(
         return Err(InstantiationError.CompiledCodeRejected(failure.message ?: "compiled code does not fit the module"))
     } catch (failure: IndexOutOfBoundsException) {
         return Err(InstantiationError.CompiledCodeRejected(failure.message ?: "compiled code does not fit the module"))
+    } catch (failure: InvocationException) {
+        return Err(failure.error)
     }
     val missing = installation.missing()
     if (missing != null) return Err(InstantiationError.CompiledCodeRejected("no code for function $missing"))
@@ -82,6 +86,18 @@ private class Installation(
         index: Int,
     ): DataInstance = store.data[instance.dataAddresses[index].address]
 
+    override fun referenceGlobal(
+        index: Int,
+    ): Any = bridge().referenceGlobal(global(index))
+
+    override fun referenceTable(
+        index: Int,
+    ): Any = bridge().referenceTable(table(index))
+
+    override fun referenceSegment(
+        index: Int,
+    ): Any = bridge().referenceSegment(element(index))
+
     override fun runtimeType(
         index: Int,
     ): Int = runtimeTypes[index].value
@@ -112,6 +128,8 @@ private class Installation(
         require(entries[defined] == null) { "function $index installed twice" }
         entries[defined] = entry
     }
+
+    private fun bridge(): ManagedReferenceBridge = checkNotNull(store.referenceBridge as? ManagedReferenceBridge) { "store has no managed references" }
 
     fun missing(): Int? = entries.indexOfFirst { it == null }.takeIf { it >= 0 }?.plus(importedFunctions)
 

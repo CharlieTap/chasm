@@ -38,8 +38,9 @@ internal fun internalWriteTable(
     elementIndex: Int,
     value: ReferenceValue,
 ): Result<Unit, ModuleTrapError> = runCatching {
-    val table = store.table(table)
-    table.elements[elementIndex] = value.toLongFromBoxed()
+    val instance = store.table(table)
+    val host = store.store.referenceBridge?.table(instance) ?: instance
+    host.writeRaw(elementIndex, value.toLongFromBoxed())
 }.mapError { e ->
     when (e) {
         is InvocationException -> e.error

@@ -11,7 +11,6 @@ import io.github.charlietap.chasm.runtime.ext.isNullableReference
 import io.github.charlietap.chasm.runtime.ext.toFunctionAddress
 import io.github.charlietap.chasm.runtime.function.CompiledFunction
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
-import io.github.charlietap.chasm.runtime.instance.IndirectCallTarget
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.instance.TableInstance
 import io.github.charlietap.chasm.runtime.type.RTT
@@ -57,24 +56,6 @@ fun indirectTarget(
     type: Int,
     elementIndex: Int,
 ): Any? = resolveIndirectFunction(context, table, RTT(type), elementIndex).compiledCode()
-
-fun cachedIndirectTarget(
-    context: ExecutionContext,
-    table: TableInstance,
-    type: Int,
-    elementIndex: Int,
-): Any? {
-    val cached = table.indirectCallTargets
-    val elements = table.elements
-    if (elementIndex >= 0 && elementIndex < cached.size && elementIndex < elements.size) {
-        val entry = cached[elementIndex]
-        if (entry != null && entry.type == type && entry.reference == elements[elementIndex]) return entry.target
-    }
-    val target = resolveIndirectFunction(context, table, RTT(type), elementIndex).compiledCode() ?: return null
-    val targets = if (elementIndex < cached.size) cached else cached.copyOf(table.elements.size).also { grown -> table.indirectCallTargets = grown }
-    targets[elementIndex] = IndirectCallTarget(table.elements[elementIndex], type, target)
-    return target
-}
 
 fun refTarget(
     context: ExecutionContext,

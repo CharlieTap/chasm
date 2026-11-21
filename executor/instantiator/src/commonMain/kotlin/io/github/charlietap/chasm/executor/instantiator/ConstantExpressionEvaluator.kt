@@ -62,6 +62,7 @@ internal fun ConstantExpressionEvaluator(
     stack: ValueStack,
 ): Result<Long, InvocationError> {
 
+    val managed = store.referenceBridge != null
     for (instruction in expression.instructions) {
         when (instruction) {
             is ConstantInstruction.I32Const -> stack.pushI32(instruction.value)
@@ -117,9 +118,15 @@ internal fun ConstantExpressionEvaluator(
                 val typeIndex = instruction.typeIndex.toInt()
                 val rtt = instance.runtimeTypes[typeIndex]
                 val structType = DefinedTypeExpander(types.definedType(instruction.typeIndex)).asStructType()
-                store.heap.allocateStructFromStack(rtt, structType.fields.size, stack)
+                if (managed) {
+                    replaceWithPlaceholder(stack, structType.fields.size)
+                } else {
+                    store.heap.allocateStructFromStack(rtt, structType.fields.size, stack)
+                }
             }
-            is ConstantInstruction.StructNewDefault -> {
+            is ConstantInstruction.StructNewDefault -> if (managed) {
+                replaceWithPlaceholder(stack, 0)
+            } else {
                 val typeIndex = instruction.typeIndex.toInt()
                 val rtt = instance.runtimeTypes[typeIndex]
                 val structType = DefinedTypeExpander(types.definedType(instruction.typeIndex)).asStructType()
@@ -128,14 +135,18 @@ internal fun ConstantExpressionEvaluator(
                 }
                 stack.push(store.heap.allocateStruct(rtt, fields))
             }
-            is ConstantInstruction.ArrayNew -> {
+            is ConstantInstruction.ArrayNew -> if (managed) {
+                replaceWithPlaceholder(stack, 2)
+            } else {
                 val typeIndex = instruction.typeIndex.toInt()
                 val rtt = instance.runtimeTypes[typeIndex]
                 val size = stack.popI32()
                 val value = stack.pop()
                 stack.push(store.heap.allocateArrayFilled(rtt, size, value))
             }
-            is ConstantInstruction.ArrayNewDefault -> {
+            is ConstantInstruction.ArrayNewDefault -> if (managed) {
+                replaceWithPlaceholder(stack, 1)
+            } else {
                 val typeIndex = instruction.typeIndex.toInt()
                 val rtt = instance.runtimeTypes[typeIndex]
                 val arrayType = DefinedTypeExpander(types.definedType(instruction.typeIndex)).asArrayType()
@@ -143,7 +154,9 @@ internal fun ConstantExpressionEvaluator(
                 val defaultValue = arrayType.fieldType.default()
                 stack.push(store.heap.allocateArrayFilled(rtt, size, defaultValue))
             }
-            is ConstantInstruction.ArrayNewFixed -> {
+            is ConstantInstruction.ArrayNewFixed -> if (managed) {
+                replaceWithPlaceholder(stack, instruction.size.toInt())
+            } else {
                 val typeIndex = instruction.typeIndex.toInt()
                 val rtt = instance.runtimeTypes[typeIndex]
                 store.heap.allocateArrayFromStack(rtt, instruction.size.toInt(), stack)
@@ -188,4 +201,12 @@ internal fun ConstantExpressionEvaluator(
     } else {
         Err(InvocationError.MissingStackValue)
     }
+}
+
+private fun replaceWithPlaceholder(
+    stack: ValueStack,
+    operands: Int,
+) {
+    repeat(operands) { stack.pop() }
+    stack.push((HeapTypeEncoder(AbstractHeapType.Any).toLong() shl RV_SHIFT_BITS) or RV_TYPE_NULL)
 }

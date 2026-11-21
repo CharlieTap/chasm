@@ -3,11 +3,13 @@ package io.github.charlietap.chasm.compiler.backend.dex.lower
 import io.github.charlietap.chasm.compiler.backend.abi.CALL_STACK_EXHAUSTED
 import io.github.charlietap.chasm.compiler.backend.abi.CONTEXT_TYPE
 import io.github.charlietap.chasm.compiler.backend.abi.MAX_UNCHARGED_LEAF_FRAME_COST
+import io.github.charlietap.chasm.compiler.backend.abi.OBJECT_TYPE
 import io.github.charlietap.chasm.compiler.backend.abi.Resource
-import io.github.charlietap.chasm.compiler.backend.abi.SAVE_STACK
 import io.github.charlietap.chasm.compiler.backend.abi.STACK_LIMIT_FIELD
 import io.github.charlietap.chasm.compiler.backend.abi.UNSAFE_TYPE
+import io.github.charlietap.chasm.compiler.backend.abi.takesReferenceArray
 import io.github.charlietap.chasm.compiler.backend.dex.analysis.SlotKindFlow
+import io.github.charlietap.chasm.type.ValueType
 import io.github.charlietap.dexter.ArrayKind
 import io.github.charlietap.dexter.BinaryOp
 import io.github.charlietap.dexter.Cond
@@ -30,7 +32,6 @@ internal fun LowerContext.lowerPrologue() {
     if (!facts.isLeaf || frameCost(registers) > MAX_UNCHARGED_LEAF_FRAME_COST) {
         chargeStackBudget()
     }
-    roots.open()
     analysis.cachedConstants.forEachIndexed { index, constant ->
         if (index == cachedMemory) {
             return@forEachIndexed
@@ -40,11 +41,6 @@ internal fun LowerContext.lowerPrologue() {
     }
     cachesLoaded = true
     openWindow()
-    if (function.exceptions != null) {
-        emit.invoke(SAVE_STACK, Registers.CONTEXT)
-        emit.moveResultWide(Registers.W0)
-        emit.moveWide(registers.savedStack, Registers.W0)
-    }
     receiveParameters()
     initializeLocals()
     if (facts.window.callBufferWords > 0) {
@@ -76,11 +72,20 @@ internal fun LowerContext.chargeStackBudget(
 
 private fun LowerContext.receiveParameters() {
     if (argumentArray) {
+        val types = facts.type.params.types
+        val referenceArray = takesReferenceArray(facts.type, module.referenceDescriptor)
         for (index in 0 until parameterCount) {
-            emit.moveObject(Registers.OBJECT, registers.parameter(0))
-            emit.const(Registers.I2, index)
-            emit.arrayGet(ArrayKind.Wide, Registers.W0, Registers.OBJECT, Registers.I2)
-            store(index, Registers.W0)
+            if (referenceArray && types[index] is ValueType.Reference) {
+                emit.moveObject(Registers.SECOND_OBJECT, registers.parameter(1))
+                emit.const(Registers.I1, index)
+                emit.arrayGet(ArrayKind.Object, Registers.OBJECT, Registers.SECOND_OBJECT, Registers.I1)
+                storeReference(index, Registers.OBJECT)
+            } else {
+                emit.moveObject(Registers.OBJECT, registers.parameter(0))
+                emit.const(Registers.I2, index)
+                emit.arrayGet(ArrayKind.Wide, Registers.W0, Registers.OBJECT, Registers.I2)
+                store(index, Registers.W0)
+            }
         }
         return
     }
@@ -106,7 +111,8 @@ private fun LowerContext.receiveParameters() {
                 emit.moveWide(Registers.W0, parameter)
                 storeDouble(index, Registers.W0)
             }
-            else -> if ((references.writesThrough && references.isReference[index]) || kind != SlotKindFlow.LONG) {
+            OBJECT_TYPE -> emit.moveObject(registers.home(index, kinds.readKind(index, SlotKindFlow.OBJECT)), parameter)
+            else -> if (kind != SlotKindFlow.LONG) {
                 emit.moveWide(Registers.W0, parameter)
                 store(index, Registers.W0)
             } else {
@@ -124,7 +130,7 @@ internal fun LowerContext.initializeLocals() {
     var zeroed = false
     for (slot in parameterCount until frameSlots) {
 
-        if ((slot >= firstTemporary && !references.isReference[slot]) || kinds.homeMask(slot) == 0) {
+        if (slot >= firstTemporary || kinds.homeMask(slot) == 0) {
             continue
         }
         if (!zeroed) {
@@ -138,6 +144,7 @@ internal fun LowerContext.initializeLocals() {
             val home = registers.home(slot, kind)
             val wide = SlotKindFlow.wide(kind)
             when {
+                kind == SlotKindFlow.OBJECT -> emit.moveObject(home, Registers.NARROW)
                 !wide && value == 0L -> emit.move(home, Registers.NARROW)
                 !wide -> {
                     emit.const(Registers.I0, value.toInt())

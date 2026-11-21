@@ -27,18 +27,19 @@ internal data class Invocation(
 
 internal class FunctionSignature(
     type: FunctionType,
+    reference: String,
 ) {
-    val parameterDescriptors: List<String> = type.params.types.map(::valueDescriptor)
+    val parameterDescriptors: List<String> = type.params.types.map { parameter -> valueDescriptor(parameter, reference) }
 
     val parameterOffsets: IntArray = descriptorOffsets(parameterDescriptors)
 
     val argumentArray: Boolean = takesArgumentArray(type)
 
-    val resultDescriptor: String = returnDescriptor(type)
+    val resultDescriptor: String = returnDescriptor(type, reference)
 
-    val key: String = signatureKey(type)
+    val key: String = signatureKey(type, reference)
 
-    val argumentWords: Int = argumentWords(type)
+    val argumentWords: Int = argumentWords(type, reference)
 }
 
 private fun descriptorOffsets(descriptors: List<String>): IntArray {
@@ -132,11 +133,13 @@ internal fun referenceType(
 
 internal const val BINDING_TYPE = "[Ljava/lang/Object;"
 
-internal fun staticParameters(
+internal fun bindingParameters(
     type: FunctionType,
-): List<String> = staticParameters(type, BINDING_TYPE)
+    reference: String,
+): List<String> = staticParameters(type, BINDING_TYPE, reference)
 
 internal fun typedCall(
     signature: String,
     type: FunctionType,
-): MethodRef = MethodRef(signature, TYPED_CALL, staticParameters(type).drop(1), returnDescriptor(type))
+    reference: String,
+): MethodRef = MethodRef(signature, TYPED_CALL, bindingParameters(type, reference).drop(1), returnDescriptor(type, reference))

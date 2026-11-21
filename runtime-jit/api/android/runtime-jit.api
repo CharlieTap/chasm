@@ -2,3 +2,31 @@ public final class io/github/charlietap/chasm/jit/internal/InstanceKt {
 	public static final fun _instance (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Module;Ljava/util/List;Lio/github/charlietap/chasm/config/RuntimeConfig;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
+public abstract interface class io/github/charlietap/chasm/jit/internal/ObjectLaneCallback {
+	public abstract fun call ([J[Ljava/lang/Object;IILio/github/charlietap/chasm/host/HostModuleInstance;Lio/github/charlietap/chasm/host/HostResources;)V
+}
+
+public final class io/github/charlietap/chasm/jit/internal/ObjectLaneKt {
+	public static final field REFERENCE_ARRAY I
+	public static final field REFERENCE_EXCEPTION I
+	public static final field REFERENCE_FUNCTION I
+	public static final field REFERENCE_HOST_VALUE I
+	public static final field REFERENCE_I31 I
+	public static final field REFERENCE_NULL I
+	public static final field REFERENCE_STRUCT I
+	public static final fun _externReference (Ljava/lang/Object;)Ljava/lang/Object;
+	public static final fun _functionReference (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Function;)Ljava/lang/Object;
+	public static final fun _hostValue (Lio/github/charlietap/chasm/embedding/shapes/Store;Ljava/lang/Object;)Ljava/lang/Object;
+	public static final fun _objectLaneFunction (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/type/FunctionType;Lio/github/charlietap/chasm/jit/internal/ObjectLaneCallback;)Lio/github/charlietap/chasm/embedding/shapes/Function;
+	public static final fun _prepareObjectCall (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Instance;Ljava/lang/String;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+	public static final fun _referenceKind (Ljava/lang/Object;)I
+	public static final fun _referenceValue (Lio/github/charlietap/chasm/embedding/shapes/Store;Ljava/lang/Object;Z)Lio/github/charlietap/chasm/runtime/value/ReferenceValue;
+	public static final fun _wasmReference (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/runtime/value/ReferenceValue;)Ljava/lang/Object;
+}
+
+public final class io/github/charlietap/chasm/jit/internal/_PreparedObjectCall {
+	public final fun call ([J[Ljava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+	public final fun getSlots ()I
+	public final fun getType ()Lio/github/charlietap/chasm/type/FunctionType;
+}
+

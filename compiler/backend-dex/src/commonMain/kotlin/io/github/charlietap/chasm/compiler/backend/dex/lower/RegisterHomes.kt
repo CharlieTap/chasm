@@ -27,7 +27,7 @@ internal class RegisterHomes(
 
         val kind = SlotKindFlow.pinnedKind(homes[slot].toInt())
         pinned[slot] = kind
-        homes[slot] = SlotKindFlow.homeBit(kind).toByte()
+        homes[slot] = (SlotKindFlow.homeBit(kind) or (homes[slot].toInt() and SlotKindFlow.homeBit(SlotKindFlow.OBJECT))).toByte()
 
         pins = pinned
         masks = homes

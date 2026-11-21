@@ -20,6 +20,7 @@ import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.transform.ImportableMapper
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
+import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.instance.Import as RuntimeImport
 import io.github.charlietap.chasm.runtime.store.Store as RuntimeStore
@@ -80,3 +81,20 @@ internal fun wrapInstantiationResult(
                 store = store.store,
             )
         }.fold(::Success, ::Error)
+
+@InternalChasmApi
+fun holdsManagedReferences(
+    store: Store,
+): Boolean {
+    return store.store.referenceBridge != null
+}
+
+@InternalChasmApi
+fun holdsWasmFunctions(
+    store: Store,
+): Boolean {
+    return store.store.functions.any { function -> function is FunctionInstance.WasmFunction }
+}
+
+@InternalChasmApi
+const val MIXED_STORE_ERROR = "a store cannot hold chasm-jit instances alongside interpreter or AOT instances"

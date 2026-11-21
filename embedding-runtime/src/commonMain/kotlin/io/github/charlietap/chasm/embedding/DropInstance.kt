@@ -38,6 +38,7 @@ fun dropInstance(
     instance.elemAddresses.forEach { address ->
         store.element(address).let { element ->
             element.elements = longArrayOf()
+            store.referenceBridge?.release(element)
         }
     }
     instance.elemAddresses.clear()
@@ -48,6 +49,7 @@ fun dropInstance(
 
     instance.globalAddresses.forEach { address ->
         store.global(address).value = 0L
+        store.referenceBridge?.release(store.global(address))
     }
     instance.globalAddresses.clear()
 
@@ -56,6 +58,7 @@ fun dropInstance(
     instance.tableAddresses.forEach { address ->
         store.table(address).let { table ->
             table.elements = longArrayOf()
+            store.referenceBridge?.release(table)
         }
     }
     instance.tableAddresses.clear()

@@ -36,7 +36,7 @@ internal inline fun forEachKind(
     homes: Int,
     action: (Byte) -> Unit,
 ) {
-    for (kind in NARROW_FIRST) {
+    for (kind in EVERY_HOME) {
         if (homes and SlotKindFlow.homeBit(kind) != 0) {
             action(kind)
         }
@@ -64,6 +64,66 @@ internal fun anyHome(
 private val NARROW_FIRST = byteArrayOf(SlotKindFlow.INT, SlotKindFlow.FLOAT, SlotKindFlow.LONG, SlotKindFlow.DOUBLE)
 
 private val WIDE_FIRST = byteArrayOf(SlotKindFlow.LONG, SlotKindFlow.DOUBLE, SlotKindFlow.INT, SlotKindFlow.FLOAT)
+
+private val EVERY_HOME = byteArrayOf(SlotKindFlow.INT, SlotKindFlow.FLOAT, SlotKindFlow.LONG, SlotKindFlow.DOUBLE, SlotKindFlow.OBJECT)
+
+internal fun LowerContext.loadReference(
+    register: Int,
+    operand: Operand,
+) {
+    when (operand) {
+        is Operand.Slot -> loadReference(register, operand.slot)
+        is Operand.Immediate -> emit.const(register, 0)
+    }
+}
+
+internal fun LowerContext.loadReference(
+    register: Int,
+    slot: Int,
+) {
+    emit.moveObject(register, registers.home(slot, kinds.readKind(slot, SlotKindFlow.OBJECT)))
+}
+
+internal fun LowerContext.referenceSource(
+    operand: Operand,
+    scratch: Int,
+): Int {
+
+    if (operand is Operand.Slot) {
+        val home = registers.home(operand.slot, kinds.readKind(operand.slot, SlotKindFlow.OBJECT))
+        if (home < 16) {
+            return home
+        }
+    }
+
+    loadReference(scratch, operand)
+    return scratch
+}
+
+internal fun LowerContext.storeReference(
+    slot: Int,
+    register: Int,
+) {
+    when (val kind = kinds.writeKind(slot)) {
+        SlotKindFlow.UNDEFINED -> Unit
+        SlotKindFlow.OBJECT -> emit.moveObject(registers.home(slot, kind), register)
+        else -> throw Unsupported("slot $slot is written with a reference but holds kind $kind at $position")
+    }
+}
+
+internal inline fun LowerContext.writeReference(
+    slot: Int,
+    crossinline emission: (Int) -> Unit,
+) {
+
+    val home = if (kinds.writeKind(slot) == SlotKindFlow.OBJECT) registers.home(slot, SlotKindFlow.OBJECT) else -1
+    val target = if (home in 0 until 16) home else Registers.OBJECT
+    emission(target)
+
+    if (target != home) {
+        storeReference(slot, target)
+    }
+}
 
 private fun LowerContext.moveResultTo(home: Int) {
     if (home < 256) {
@@ -108,6 +168,10 @@ internal fun LowerContext.loadEncoded(
     slot: Int,
     kind: Byte,
 ) {
+    if (kind == SlotKindFlow.OBJECT) {
+        throw Unsupported("slot $slot holds a reference where a number is read by ${function.instructions.getOrNull(position)?.let { it::class.simpleName }}")
+    }
+
     val home = registers.home(slot, kind)
     when (kind) {
         SlotKindFlow.INT -> {
@@ -143,12 +207,7 @@ internal fun LowerContext.storeEncoded(
 ) {
     when {
         kind == SlotKindFlow.UNDEFINED -> Unit
-        SlotKindFlow.definite(kind) -> {
-            decodeInto(slot, kind, pair)
-            if (kind == SlotKindFlow.LONG && roots.publishes(slot)) {
-                roots.publish(slot, pair)
-            }
-        }
+        SlotKindFlow.definite(kind) -> decodeInto(slot, kind, pair)
         else -> forEachHome(slot) { homeKind -> storeEncoded(slot, homeKind, pair) }
     }
 }
@@ -158,6 +217,10 @@ internal fun LowerContext.decodeInto(
     kind: Byte,
     pair: Int,
 ) {
+    if (kind == SlotKindFlow.OBJECT) {
+        throw Unsupported("slot $slot holds a reference where a number is written by ${function.instructions.getOrNull(position)?.let { it::class.simpleName }}")
+    }
+
     val home = registers.home(slot, kind)
     when (kind) {
         SlotKindFlow.INT -> {
@@ -263,8 +326,6 @@ internal fun LowerContext.finishWide(
 ) {
     if (home < 0) {
         store(slot, register)
-    } else if (roots.publishes(slot)) {
-        roots.publish(slot, register)
     }
 }
 
@@ -335,7 +396,23 @@ internal fun LowerContext.copyToSlot(
     when {
         kind == SlotKindFlow.UNDEFINED -> Unit
         SlotKindFlow.definite(kind) -> copyAs(destination, kind, source)
-        else -> forEachHome(destination) { homeKind -> copyAs(destination, homeKind, source) }
+        else -> forEachHome(destination) { homeKind -> if (fills(source, homeKind)) copyAs(destination, homeKind, source) }
+    }
+}
+
+private fun LowerContext.fills(
+    source: Operand,
+    homeKind: Byte,
+): Boolean {
+
+    if (source !is Operand.Slot) {
+        return true
+    }
+
+    val state = kinds.state(source.slot)
+    return when {
+        homeKind == SlotKindFlow.OBJECT -> registers.holds(source.slot, SlotKindFlow.OBJECT) && (!SlotKindFlow.definite(state) || state == SlotKindFlow.OBJECT)
+        else -> state != SlotKindFlow.OBJECT && kinds.homeMask(source.slot) != SlotKindFlow.homeBit(SlotKindFlow.OBJECT)
     }
 }
 
@@ -345,6 +422,10 @@ private fun LowerContext.copyAs(
     source: Operand,
 ) {
     val target = registers.home(destination, kind)
+    if (kind == SlotKindFlow.OBJECT) {
+        return copyReference(target, source)
+    }
+
     when (source) {
         is Operand.Immediate -> {
 
@@ -361,9 +442,6 @@ private fun LowerContext.copyAs(
             val register = if (target < 256) target else Registers.W0
             emit.constWide(register, source.bits)
             emit.moveWide(target, register)
-            if (kind == SlotKindFlow.LONG && roots.publishes(destination)) {
-                roots.publish(destination, register)
-            }
         }
         is Operand.Slot -> {
 
@@ -381,14 +459,21 @@ private fun LowerContext.copyAs(
             }
 
             emit.moveWide(target, origin)
-            if (kind == SlotKindFlow.LONG && roots.publishes(destination)) {
-                if (target < 256) {
-                    roots.publish(destination, target)
-                } else {
-                    emit.moveWide(Registers.W0, target)
-                    roots.publish(destination, Registers.W0)
-                }
-            }
+        }
+    }
+}
+
+private fun LowerContext.copyReference(
+    target: Int,
+    source: Operand,
+) {
+    when (source) {
+        is Operand.Slot -> emit.moveObject(target, registers.home(source.slot, kinds.readKind(source.slot, SlotKindFlow.OBJECT)))
+        is Operand.Immediate -> if (target < 256) {
+            emit.const(target, 0)
+        } else {
+            emit.const(Registers.OBJECT, 0)
+            emit.moveObject(target, Registers.OBJECT)
         }
     }
 }
@@ -532,7 +617,9 @@ internal fun LowerContext.parallelCopy(
 
         if (canCopyDirectly(source.slot, kind)) {
             val home = registers.home(source.slot, kind)
-            if (SlotKindFlow.wide(kind)) {
+            if (kind == SlotKindFlow.OBJECT) {
+                emit.moveObject(register, home)
+            } else if (SlotKindFlow.wide(kind)) {
                 emit.moveWide(register, home)
             } else {
                 emit.move(register, home)
@@ -559,15 +646,14 @@ internal fun LowerContext.parallelCopy(
         }
 
         val home = registers.home(destination, kind)
+        if (kind == SlotKindFlow.OBJECT) {
+            return@forEachIndexed emit.moveObject(home, register)
+        }
         if (!SlotKindFlow.wide(kind)) {
             return@forEachIndexed emit.move(home, register)
         }
 
         emit.moveWide(home, register)
-        if (kind == SlotKindFlow.LONG && roots.publishes(destination)) {
-            emit.moveWide(Registers.W0, register)
-            roots.publish(destination, Registers.W0)
-        }
     }
 }
 

@@ -34,6 +34,7 @@ internal inline fun TableInitializer(
 ): Result<Unit, ModuleTrapError> = binding {
 
     val store = context.store
+    val bridge = store.referenceBridge
     val segments = context.module.elementSegments
 
     segments.forEachIndexed { segmentIndex, segment ->
@@ -46,7 +47,11 @@ internal inline fun TableInitializer(
         val elementsToInit = segment.initExpressions.size
 
         try {
-            elementInstance.elements.copyInto(tableInstance.elements, offset, 0, elementsToInit)
+            if (bridge != null) {
+                bridge.initializeTable(tableInstance, elementInstance, offset, elementsToInit)
+            } else {
+                elementInstance.elements.copyInto(tableInstance.elements, offset, 0, elementsToInit)
+            }
         } catch (_: IndexOutOfBoundsException) {
             Err(InvocationError.TableOperationOutOfBounds).bind<Unit>()
         } catch (_: IllegalArgumentException) {
@@ -54,6 +59,7 @@ internal inline fun TableInitializer(
         }
 
         elementInstance.elements = longArrayOf()
+        bridge?.dropElement(elementInstance)
     }
 
     segments.forEachIndexed { segmentIndex, segment ->
@@ -61,5 +67,6 @@ internal inline fun TableInitializer(
         val elementAddress = instance.elementAddress(segmentIndex).bind()
         val elementInstance = store.element(elementAddress)
         elementInstance.elements = longArrayOf()
+        bridge?.dropElement(elementInstance)
     }
 }

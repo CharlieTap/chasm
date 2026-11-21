@@ -57,8 +57,9 @@ fun analyzeModule(
     module: Module,
     code: CirModule,
     declarations: ModuleIndexSpaces,
+    referenceDescriptor: String = "J",
 ): ModuleAnalysis {
-    return analyzeModule(module, code, declarations, code.functions.map { function -> functionSummary(function, declarations) })
+    return analyzeModule(module, code, declarations, code.functions.map { function -> functionSummary(function, declarations) }, referenceDescriptor)
 }
 
 fun analyzeModule(
@@ -66,6 +67,7 @@ fun analyzeModule(
     code: CirModule,
     declarations: ModuleIndexSpaces,
     summaries: List<FunctionSummary>,
+    referenceDescriptor: String = "J",
 ): ModuleAnalysis {
 
     val signatureTypes = LinkedHashMap<String, FunctionType>()
@@ -81,7 +83,7 @@ fun analyzeModule(
             }
             seenTypes[typeIndex] = true
             val type = declarations.functionType(TypeIndex(typeIndex)).takeIf { it.params.types.size <= MAX_PARAMETERS } ?: continue
-            signatureTypes.putIfAbsent(signatureKey(type), type)
+            signatureTypes.putIfAbsent(signatureKey(type, referenceDescriptor), type)
         }
     }
 

@@ -34,8 +34,9 @@ internal fun internalWriteGlobal(
     global: Global,
     value: ExecutionValue,
 ): Result<Unit, ModuleTrapError> = runCatching {
-    val global = store.global(global)
-    global.value = value.toLongFromBoxed()
+    val instance = store.global(global)
+    val host = store.store.referenceBridge?.global(instance) ?: instance
+    host.rawValue = value.toLongFromBoxed()
 }.mapError { e ->
     when (e) {
         is InvocationException -> e.error

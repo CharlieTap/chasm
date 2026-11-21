@@ -16,6 +16,8 @@ import io.github.charlietap.chasm.runtime.instance.TableInstance
 import io.github.charlietap.chasm.runtime.program.EXIT_IP
 import io.github.charlietap.chasm.runtime.stack.activationHeader
 import io.github.charlietap.chasm.runtime.type.RTT
+import io.github.charlietap.chasm.type.AbstractHeapType
+import io.github.charlietap.chasm.type.ValueType
 
 const val INTERPRETED_CALL_COST = 256
 
@@ -51,27 +53,65 @@ fun callFunction(
     var target = function
     var targetCaller = caller
     var arguments = values
-    while (true) {
-        val compiled = (target as? FunctionInstance.WasmFunction)?.callStrategy?.compiledEntry
-        if (compiled != null) {
-            compiled.call(context, arguments, depth + COMPILED_CALL_COST)
-            if (context.compiledUnwinding) return
-        } else {
-            interpretFunctionAt(context, targetCaller, target, arguments, depth)
+    var rootMarker = NO_ROOTS
+    try {
+        while (true) {
+            val compiled = (target as? FunctionInstance.WasmFunction)?.callStrategy?.compiledEntry
+            if (compiled != null) {
+                compiled.call(context, arguments, depth + COMPILED_CALL_COST)
+                if (context.compiledUnwinding) return
+            } else {
+                interpretFunctionAt(context, targetCaller, target, arguments, depth)
+            }
+            rootMarker = releaseRoots(context, rootMarker)
+            val next = context.pendingTailFunction ?: break
+            targetCaller = checkNotNull(context.pendingTailCaller)
+            val nextArguments = checkNotNull(context.pendingTailArguments)
+            val references = context.pendingTailReferences
+            clearPendingTailCall(context)
+            val results = next.resultCount
+            target = next
+            arguments = if (nextArguments.size >= results) nextArguments else nextArguments.copyOf(results)
+            if (references != null) rootMarker = encodeReferences(context, next, arguments, references)
         }
-        val next = context.pendingTailFunction ?: break
-        targetCaller = checkNotNull(context.pendingTailCaller)
-        val nextArguments = checkNotNull(context.pendingTailArguments)
-        clearPendingTailCall(context)
-        val results = next.resultCount
-        target = next
-        arguments = if (nextArguments.size >= results) nextArguments else nextArguments.copyOf(results)
+    } finally {
+        releaseRoots(context, rootMarker)
     }
     if (arguments !== values) {
         val results = target.resultCount
         arguments.copyInto(values, 0, 0, minOf(results, values.size))
     }
 }
+
+internal fun encodeReferences(
+    context: ExecutionContext,
+    function: FunctionInstance,
+    arguments: LongArray,
+    references: Array<Any?>,
+): Int {
+
+    val bridge = checkNotNull(context.store.referenceBridge)
+    val roots = context.references
+    val marker = roots.beginScope(0)
+    function.functionType.params.types.forEachIndexed { index, parameter ->
+        if (parameter is ValueType.Reference) {
+            val heap = parameter.referenceType.heapType
+            arguments[index] = roots.rootScoped(bridge.toHost(references[index], heap == AbstractHeapType.Extern || heap == AbstractHeapType.NoExtern))
+        }
+    }
+
+    return marker
+}
+
+internal fun releaseRoots(
+    context: ExecutionContext,
+    marker: Int,
+): Int {
+    if (marker != NO_ROOTS) context.references.endScope(marker)
+    return NO_ROOTS
+}
+
+internal const val NO_ROOTS = -1
 
 @OptIn(UnsafeHostApi::class)
 fun interpretFunction(
@@ -185,6 +225,7 @@ internal fun clearPendingTailCall(
     context.pendingTailFunction = null
     context.pendingTailCaller = null
     context.pendingTailArguments = null
+    context.pendingTailReferences = null
 }
 
 fun raiseUnwinding(

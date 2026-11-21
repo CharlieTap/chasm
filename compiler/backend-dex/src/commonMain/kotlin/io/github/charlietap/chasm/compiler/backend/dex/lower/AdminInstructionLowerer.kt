@@ -3,12 +3,9 @@ package io.github.charlietap.chasm.compiler.backend.dex.lower
 import io.github.charlietap.chasm.cir.AdminInstruction
 import io.github.charlietap.chasm.cir.InstructionIndex
 import io.github.charlietap.chasm.cir.ReferenceType
-import io.github.charlietap.chasm.compiler.backend.abi.CAST_MATCHES
 import io.github.charlietap.chasm.compiler.backend.abi.FUEL_AND_INTERRUPT_CHECK
 import io.github.charlietap.chasm.compiler.backend.abi.FUEL_CHECK
 import io.github.charlietap.chasm.compiler.backend.abi.INTERRUPT_CHECK
-import io.github.charlietap.chasm.compiler.backend.abi.OBJECT_TYPE
-import io.github.charlietap.chasm.compiler.backend.abi.Resource
 import io.github.charlietap.chasm.compiler.backend.analysis.form.Operand
 import io.github.charlietap.chasm.compiler.backend.analysis.form.immediate
 import io.github.charlietap.chasm.compiler.backend.analysis.form.operands
@@ -123,8 +120,8 @@ private fun LowerContext.nullBranch(
     isNull: Boolean,
     target: InstructionIndex,
 ) {
-    loadWide(Registers.W0, reference)
-    branchOnNull(Registers.W0, isNull, label(target))
+    val register = referenceSource(reference, Registers.OBJECT)
+    emit.branchZero(if (isNull) Cond.Eq else Cond.Ne, register, label(target))
 }
 
 private fun LowerContext.castBranch(
@@ -133,9 +130,12 @@ private fun LowerContext.castBranch(
     matches: Boolean,
     target: InstructionIndex,
 ) {
-    loadWide(Registers.W0, reference)
-    loadObject(Registers.OBJECT, Resource.TypeTest(type), OBJECT_TYPE)
-    emit.invoke(CAST_MATCHES, Registers.CONTEXT, Registers.W0, Registers.W0 + 1, Registers.OBJECT)
-    emit.moveResult(Registers.I0)
-    emit.branchZero(if (matches) Cond.Ne else Cond.Eq, Registers.I0, label(target))
+    val register = referenceSource(reference, Registers.OBJECT)
+    if (matches) {
+        return branchOnType(register, type, label(target))
+    }
+    val holds = emit.freshLabel()
+    branchOnType(register, type, holds)
+    emit.gotoLabel(label(target))
+    emit.place(holds)
 }

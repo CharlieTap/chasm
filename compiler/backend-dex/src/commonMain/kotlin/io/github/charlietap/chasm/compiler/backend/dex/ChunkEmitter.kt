@@ -75,7 +75,7 @@ internal class ProbingChunkEmitter(
         try {
 
             val protects = function.exceptions?.regions.orEmpty().any { region -> region.start.index < end && region.end.index > start }
-            val spills = writtenSlots(analysis, start, end, protects)
+            val spills = writtenSlots(analysis, start, end)
             val liveness = splitFacts.liveness
             if (liveness != null && !chunk.leavesAnywhere) {
 
@@ -113,7 +113,6 @@ internal class ProbingChunkEmitter(
         analysis: FunctionAnalysis,
         start: Int,
         end: Int,
-        protects: Boolean,
     ): BooleanArray {
 
         val written = BooleanArray(analysis.facts.frameSlots)
@@ -125,9 +124,6 @@ internal class ProbingChunkEmitter(
                 return@forEach
             }
             region.catches.forEach { handler -> handler.payloadSlots.forEach { slot -> written[slot] = true } }
-        }
-        if (protects) {
-            analysis.facts.references.slots.forEach { slot -> written[slot] = true }
         }
 
         return written
@@ -176,12 +172,10 @@ internal fun chunkRegisters(
         frameSlots = analysis.facts.frameSlots,
         temporaries = window.temporaries,
         windowWords = window.windowWords,
-        parameterWords = 2,
+        parameterWords = 3,
         cachedConstants = analysis.cachedConstants.size,
         unsafeMemory = analysis.unsafeMemory,
         inlineMemory = analysis.usesInlineMemory,
-        activation = analysis.facts.references.writesThrough,
-        savesStack = function.exceptions != null,
         callBuffer = window.callBufferWords > 0,
         homes = homes,
         held = held,

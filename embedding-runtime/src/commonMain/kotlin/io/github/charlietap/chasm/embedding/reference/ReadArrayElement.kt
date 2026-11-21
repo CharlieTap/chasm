@@ -38,10 +38,10 @@ internal fun internalReadArrayElement(
     index: Int,
     fieldValueDecoder: FieldValueDecoder,
 ): Result<FieldValue, ModuleTrapError> = runCatching {
-    val heap = store.runtime().heap
+    val runtime = store.runtime()
     val rawReference = array.toLong()
-    val fieldType = heap.arrayFieldType(rawReference)
-    fieldValueDecoder(heap.getArrayElement(rawReference, index), fieldType)
+    val fieldType = runtime.arrayFieldType(rawReference)
+    fieldValueDecoder(runtime.readArrayElement(rawReference, index), fieldType)
 }.mapError { e ->
     when (e) {
         is InvocationException -> e.error

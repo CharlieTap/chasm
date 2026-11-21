@@ -7,6 +7,7 @@ import io.github.charlietap.chasm.cir.FunctionIndex
 import io.github.charlietap.chasm.cir.MemoryIndex
 import io.github.charlietap.chasm.cir.TypeIndex
 import io.github.charlietap.chasm.compiler.backend.abi.MethodRef
+import io.github.charlietap.chasm.compiler.backend.abi.OBJECT_TYPE
 import io.github.charlietap.chasm.compiler.backend.analysis.ModuleAnalysis
 import io.github.charlietap.chasm.compiler.backend.analysis.ModuleIndexSpaces
 import io.github.charlietap.chasm.compiler.backend.analysis.analyzeModule
@@ -20,14 +21,18 @@ import io.github.charlietap.chasm.compiler.backend.dex.abi.codeClass
 import io.github.charlietap.chasm.compiler.backend.dex.abi.functionMethod
 import io.github.charlietap.chasm.compiler.backend.dex.abi.signatureClass
 import io.github.charlietap.chasm.compiler.backend.dex.binding.BindingLayout
+import io.github.charlietap.chasm.compiler.backend.dex.gc.GcLayouts
 
 internal class ModulePlan(
-    module: Module,
+    val module: Module,
     code: CirModule,
     val options: DexOptions,
     val declarations: ModuleIndexSpaces = ModuleIndexSpaces(module),
-    val analysis: ModuleAnalysis = analyzeModule(module, code, declarations),
+    val analysis: ModuleAnalysis = analyzeModule(module, code, declarations, OBJECT_TYPE),
 ) {
+
+    val referenceDescriptor = OBJECT_TYPE
+    val gc = GcLayouts(module.definedTypes)
 
     val layout = BindingLayout(declarations, analysis)
     val packagePath = options.packageName.replace('.', '/')
@@ -46,7 +51,7 @@ internal class ModulePlan(
 
     private val functionSignatures = Array(declarations.typeCount) { type ->
         val index = TypeIndex(type)
-        if (declarations.isFunctionType(index)) FunctionSignature(declarations.functionType(index)) else null
+        if (declarations.isFunctionType(index)) FunctionSignature(declarations.functionType(index), referenceDescriptor) else null
     }
 
     private val functionMethods = arrayOfNulls<MethodRef>(functionCount)
@@ -57,7 +62,7 @@ internal class ModulePlan(
         val references = DexReferences()
         for (function in code.functions) {
             val index = function.index.index
-            val method = functionMethod(codeClass(packagePath, batchOf[index]), index, declarations.functionType(function.type))
+            val method = functionMethod(codeClass(packagePath, batchOf[index]), index, declarations.functionType(function.type), referenceDescriptor)
             functionMethods[index] = method
             functionInvocations[index] = references.invocation(method)
         }

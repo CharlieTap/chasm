@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.compiler.backend.dex
 
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.cir.CirModule
+import io.github.charlietap.chasm.compiler.backend.abi.OBJECT_TYPE
 import io.github.charlietap.chasm.compiler.backend.analysis.FunctionSummary
 import io.github.charlietap.chasm.compiler.backend.analysis.ModuleIndexSpaces
 import io.github.charlietap.chasm.compiler.backend.analysis.analyzeModule
@@ -58,7 +59,7 @@ internal suspend fun ParallelModuleLowerer(
 
     val declarations = ModuleIndexSpaces(module)
     val summaries = summarizeFunctions(code, declarations, taskExecutor, workers)
-    val plan = ModulePlan(module, code, options, declarations, analyzeModule(module, code, declarations, summaries))
+    val plan = ModulePlan(module, code, options, declarations, analyzeModule(module, code, declarations, summaries, OBJECT_TYPE))
     return try {
         lowerFiles(plan, partitionedLayout(plan), taskExecutor, workers, claimOrder, functionLowerer, entryLowerer, installLowerer)
     } catch (tooLarge: DexTooLarge) {

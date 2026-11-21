@@ -112,6 +112,7 @@ sealed class AggregateInstruction : Instruction() {
         val fillValue: Long,
         val arrayElementOffset: Int,
         val addressSlot: Int,
+        val type: TypeIndex,
     ) : AggregateInstruction() {
         init {
             opcode = 560
@@ -124,6 +125,7 @@ sealed class AggregateInstruction : Instruction() {
         val fillValue: Long,
         val arrayElementOffsetSlot: Int,
         val addressSlot: Int,
+        val type: TypeIndex,
     ) : AggregateInstruction() {
         init {
             opcode = 561
@@ -136,6 +138,7 @@ sealed class AggregateInstruction : Instruction() {
         val fillValueSlot: Int,
         val arrayElementOffset: Int,
         val addressSlot: Int,
+        val type: TypeIndex,
     ) : AggregateInstruction() {
         init {
             opcode = 562
@@ -148,6 +151,7 @@ sealed class AggregateInstruction : Instruction() {
         val fillValueSlot: Int,
         val arrayElementOffsetSlot: Int,
         val addressSlot: Int,
+        val type: TypeIndex,
     ) : AggregateInstruction() {
         init {
             opcode = 563
@@ -160,6 +164,7 @@ sealed class AggregateInstruction : Instruction() {
         val fillValue: Long,
         val arrayElementOffset: Int,
         val addressSlot: Int,
+        val type: TypeIndex,
     ) : AggregateInstruction() {
         init {
             opcode = 564
@@ -172,6 +177,7 @@ sealed class AggregateInstruction : Instruction() {
         val fillValue: Long,
         val arrayElementOffsetSlot: Int,
         val addressSlot: Int,
+        val type: TypeIndex,
     ) : AggregateInstruction() {
         init {
             opcode = 565
@@ -184,6 +190,7 @@ sealed class AggregateInstruction : Instruction() {
         val fillValueSlot: Int,
         val arrayElementOffset: Int,
         val addressSlot: Int,
+        val type: TypeIndex,
     ) : AggregateInstruction() {
         init {
             opcode = 566
@@ -196,6 +203,7 @@ sealed class AggregateInstruction : Instruction() {
         val fillValueSlot: Int,
         val arrayElementOffsetSlot: Int,
         val addressSlot: Int,
+        val type: TypeIndex,
     ) : AggregateInstruction() {
         init {
             opcode = 567
@@ -282,6 +290,7 @@ sealed class AggregateInstruction : Instruction() {
     data class ArrayLenS(
         val addressSlot: Int,
         val destinationSlot: Int,
+        val type: TypeIndex?,
     ) : AggregateInstruction() {
         init {
             opcode = 574
@@ -483,6 +492,7 @@ sealed class AggregateInstruction : Instruction() {
         val value: Long,
         val field: Int,
         val addressSlot: Int,
+        val type: TypeIndex,
     ) : AggregateInstruction() {
         init {
             opcode = 590
@@ -494,6 +504,7 @@ sealed class AggregateInstruction : Instruction() {
         val value: Long,
         val fieldSlot: Int,
         val addressSlot: Int,
+        val type: TypeIndex,
     ) : AggregateInstruction() {
         init {
             opcode = 591
@@ -505,6 +516,7 @@ sealed class AggregateInstruction : Instruction() {
         val valueSlot: Int,
         val field: Int,
         val addressSlot: Int,
+        val type: TypeIndex,
     ) : AggregateInstruction() {
         init {
             opcode = 592
@@ -516,6 +528,7 @@ sealed class AggregateInstruction : Instruction() {
         val valueSlot: Int,
         val fieldSlot: Int,
         val addressSlot: Int,
+        val type: TypeIndex,
     ) : AggregateInstruction() {
         init {
             opcode = 593
@@ -902,6 +915,7 @@ sealed class AggregateInstruction : Instruction() {
         val value: Long,
         val addressSlot: Int,
         val fieldIndex: Int,
+        val type: TypeIndex,
     ) : AggregateInstruction() {
         init {
             opcode = 624
@@ -913,6 +927,7 @@ sealed class AggregateInstruction : Instruction() {
         val valueSlot: Int,
         val addressSlot: Int,
         val fieldIndex: Int,
+        val type: TypeIndex,
     ) : AggregateInstruction() {
         init {
             opcode = 625

@@ -18,12 +18,12 @@ internal fun lowerInstruction(
     when (instruction) {
         is NumericInstruction -> lowerNumericInstruction(context)
         is MemoryInstruction -> lowerMemoryInstruction(instruction, context)
-        is AggregateInstruction -> lowerAggregateInstruction(instruction, context)
-        is ReferenceInstruction -> lowerReferenceInstruction(instruction, context)
+        is AggregateInstruction -> lowerManagedAggregateInstruction(instruction, context)
+        is ReferenceInstruction -> lowerManagedReferenceInstruction(instruction, context)
         is VariableInstruction -> lowerVariableInstruction(instruction, context)
         is ParametricInstruction -> lowerParametricInstruction(instruction, context)
         is ControlInstruction -> lowerControlInstruction(instruction, context)
         is AdminInstruction -> lowerAdminInstruction(instruction, context)
-        is TableInstruction -> context.lowerHelperCall(checkNotNull(context.forms.helperCall(context.position)))
+        is TableInstruction -> lowerManagedTableInstruction(instruction, context)
     }
 }

@@ -7,7 +7,7 @@ class RuntimeAbiTest {
 
     @Test
     fun `every runtime method generated code calls exists`() {
-        val missing = FIXTURES.flatMap { name -> runtimeMethods(generate(decodeModule(fixture(name))).dex) }
+        val missing = FIXTURES.flatMap { name -> runtimeMethods(generatedDex(name)) }
             .toSortedSet()
             .filterNot(::methodExists)
 
@@ -16,11 +16,18 @@ class RuntimeAbiTest {
 
     @Test
     fun `every runtime field generated code reads exists`() {
-        val missing = FIXTURES.flatMap { name -> runtimeFields(generate(decodeModule(fixture(name))).dex) }
+        val missing = FIXTURES.flatMap { name -> runtimeFields(generatedDex(name)) }
             .toSortedSet()
             .filterNot(::fieldExists)
 
         assertEquals(emptyList(), missing)
+    }
+
+    private fun generatedDex(
+        name: String,
+    ): List<ByteArray> {
+        val generated = generate(decodeModule(fixture(name)))
+        return generated.dex + listOfNotNull(generated.shapeDex)
     }
 
     private fun methodExists(

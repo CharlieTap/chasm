@@ -31,8 +31,9 @@ internal fun internalReadGlobal(
     store: Store,
     global: Global,
 ): Result<ExecutionValue, ModuleTrapError> = runCatching {
-    val global = store.global(global)
-    global.value.toExecutionValue(global.type.valueType)
+    val instance = store.global(global)
+    val host = store.store.referenceBridge?.global(instance) ?: instance
+    host.rawValue.toExecutionValue(instance.type.valueType)
 }.mapError { e ->
     when (e) {
         is InvocationException -> e.error

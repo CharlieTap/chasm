@@ -57,7 +57,7 @@ private const val UNNAMED_PREFIX = "chasm.jit.m"
 
 private const val ALGORITHM = "SHA-256"
 
-private const val FORMAT = 1
+private const val FORMAT = 2
 
 private const val MAX_NAMES = 1_024
 

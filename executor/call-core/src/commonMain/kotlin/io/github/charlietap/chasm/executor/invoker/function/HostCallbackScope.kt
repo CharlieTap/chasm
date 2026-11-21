@@ -4,10 +4,11 @@ import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 
 @PublishedApi
 internal inline fun <T> ExecutionContext.withHostCallbackScope(block: () -> T): T {
-    val marker = heap.beginScope(0)
+    val roots = references
+    val marker = roots.beginScope(0)
     try {
         return block()
     } finally {
-        heap.endScope(marker)
+        roots.endScope(marker)
     }
 }

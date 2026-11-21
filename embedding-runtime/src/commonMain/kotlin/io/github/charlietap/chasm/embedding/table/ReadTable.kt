@@ -36,8 +36,16 @@ internal fun internalReadTable(
     table: Table,
     elementIndex: Int,
 ): Result<ReferenceValue, ModuleTrapError> = runCatching {
-    val table = store.table(table)
-    table.element(elementIndex).toReferenceValue()
+    val instance = store.table(table)
+    val bridge = store.store.referenceBridge
+    val raw = if (bridge == null) {
+        instance.element(elementIndex)
+    } else {
+        val host = bridge.table(instance)
+        if (elementIndex !in 0 until host.size) throw InvocationException(InvocationError.TableElementLookupFailed(elementIndex))
+        host.readRaw(elementIndex)
+    }
+    raw.toReferenceValue()
 }.mapError { e ->
     when (e) {
         is InvocationException -> e.error

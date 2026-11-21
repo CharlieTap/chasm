@@ -2,7 +2,9 @@ package io.github.charlietap.chasm.embedding.shapes
 
 import io.github.charlietap.chasm.embedding.error.ChasmError.ExecutionError
 import io.github.charlietap.chasm.host.HostExternReference
+import io.github.charlietap.chasm.host.HostExterns
 import io.github.charlietap.chasm.host.HostReferenceRoot
+import io.github.charlietap.chasm.host.HostReferences
 import io.github.charlietap.chasm.runtime.ext.toReferenceValue
 import io.github.charlietap.chasm.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.type.AbstractHeapType
@@ -13,6 +15,8 @@ private const val CLOSED_ROOT_SLOT = -2
 class ExternRef internal constructor(
     private val owner: Store,
     root: HostReferenceRoot,
+    private val references: HostReferences = owner.store.heap,
+    private val externs: HostExterns = owner.store.heap,
 ) : AutoCloseable {
 
     private var rootSlot = root.slot
@@ -23,7 +27,7 @@ class ExternRef internal constructor(
             return ChasmResult.Success(ReferenceValue.Null(AbstractHeapType.Extern))
         }
 
-        val reference = owner.store.heap.reference(HostReferenceRoot(rootSlot))
+        val reference = references.reference(HostReferenceRoot(rootSlot))
         return ChasmResult.Success(reference.toReferenceValue())
     }
 
@@ -31,9 +35,8 @@ class ExternRef internal constructor(
         stateError()?.let { return ChasmResult.Error(it) }
         if (rootSlot == NULL_ROOT_SLOT) return ChasmResult.Success(null)
 
-        val heap = owner.store.heap
-        val reference = HostExternReference(heap.reference(HostReferenceRoot(rootSlot)))
-        return ChasmResult.Success(heap.value(reference))
+        val reference = HostExternReference(references.reference(HostReferenceRoot(rootSlot)))
+        return ChasmResult.Success(externs.value(reference))
     }
 
     override fun close() {
@@ -42,7 +45,7 @@ class ExternRef internal constructor(
 
         rootSlot = CLOSED_ROOT_SLOT
         if (slot >= 0 && !owner.isDropped) {
-            owner.store.heap.release(HostReferenceRoot(slot))
+            references.release(HostReferenceRoot(slot))
         }
     }
 

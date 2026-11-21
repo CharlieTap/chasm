@@ -43,6 +43,8 @@ internal class BindingLayout {
             is Resource.TypeTest -> "typeTest$index"
             is Resource.Longs -> "longs$index"
             is Resource.FunctionReference -> "reference${resource.index}"
+            is Resource.FunctionObject -> "functionObject${resource.index}"
+            is Resource.ReferenceGlobal, is Resource.ReferenceTable, is Resource.ReferenceSegment -> error("$resource has no binding field")
             is Resource.TagAddress -> "tag${resource.index}"
             is Resource.RuntimeType -> "type${resource.typeIndex}"
             Resource.Unsafe -> "unsafe"
@@ -102,11 +104,12 @@ internal fun bindingDescriptor(
     is Resource.TypeTest -> OBJECT_TYPE
     is Resource.Longs -> "[J"
     is Resource.FunctionReference -> "J"
+    is Resource.FunctionObject -> FUNCTION_INSTANCE
     is Resource.TagAddress -> "I"
     is Resource.RuntimeType -> "I"
     Resource.Unsafe -> UNSAFE_TYPE
     Resource.ByteArrayBase -> "J"
-    is Resource.ExceptionTable -> error("$resource has no binding field")
+    is Resource.ExceptionTable, is Resource.ReferenceGlobal, is Resource.ReferenceTable, is Resource.ReferenceSegment -> error("$resource has no binding field")
 }
 
 internal const val PENDING_OWNER = "chasm/PendingBinding"

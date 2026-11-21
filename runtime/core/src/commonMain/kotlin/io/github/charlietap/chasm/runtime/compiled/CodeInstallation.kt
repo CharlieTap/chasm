@@ -39,6 +39,18 @@ abstract class CodeInstallation protected constructor() {
         index: Int,
     ): DataInstance
 
+    abstract fun referenceGlobal(
+        index: Int,
+    ): Any
+
+    abstract fun referenceTable(
+        index: Int,
+    ): Any
+
+    abstract fun referenceSegment(
+        index: Int,
+    ): Any
+
     abstract fun runtimeType(
         index: Int,
     ): Int

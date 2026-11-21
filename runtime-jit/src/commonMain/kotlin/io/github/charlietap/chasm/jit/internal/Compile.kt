@@ -41,7 +41,6 @@ internal suspend fun compile(
         },
         uncompilableFunctions = ::UncompilableFunctions,
         moduleLowerer = ::ParallelModuleLowerer,
-        dexLoader = ::DexLoader,
         codeClassInitializer = ::CodeClassInitializer,
     )
 }
@@ -54,11 +53,10 @@ internal suspend inline fun compile(
     crossinline moduleCompiler: ParallelModuleCompiler,
     crossinline uncompilableFunctions: UncompilableFunctions,
     crossinline moduleLowerer: ParallelModuleLowerer,
-    crossinline dexLoader: DexLoader,
     crossinline codeClassInitializer: CodeClassInitializer,
 ): CompileResult {
     return try {
-        compileUnchecked(module, config, executor, packageNames, moduleCompiler, uncompilableFunctions, moduleLowerer, dexLoader, codeClassInitializer)
+        compileUnchecked(module, config, executor, packageNames, moduleCompiler, uncompilableFunctions, moduleLowerer, codeClassInitializer)
     } catch (cancelled: CancellationException) {
         throw cancelled
     } catch (failure: RuntimeException) {
@@ -74,7 +72,6 @@ internal suspend inline fun compileUnchecked(
     crossinline moduleCompiler: ParallelModuleCompiler,
     crossinline uncompilableFunctions: UncompilableFunctions,
     crossinline moduleLowerer: ParallelModuleLowerer,
-    crossinline dexLoader: DexLoader,
     crossinline codeClassInitializer: CodeClassInitializer,
 ): CompileResult {
 
@@ -105,11 +102,17 @@ internal suspend inline fun compileUnchecked(
     }
     coroutineContext.ensureActive()
 
-    val installer = try {
-        val loader = dexLoader(dex.dex, CodeInstallation::class.java.classLoader!!)
-        codeClassInitializer(loader, dex.classesToInitialize, executor)
-        @Suppress("UNCHECKED_CAST")
-        loader.loadClass(dex.installer).getDeclaredConstructor().newInstance() as Consumer<CodeInstallation>
+    val compilation = try {
+        val loader = config.shapes.load(dex.dex, dex.shapeDex, dex.shapeClasses)
+        codeClassInitializer(loader, dex.shapeClasses + dex.classesToInitialize, executor)
+        JitCompilation(
+            packageName = packageName,
+            chunkStarts = dex.chunkStarts,
+            shapeTypes = dex.shapeTypes,
+            installer = loader.installationConsumer(dex.installer),
+            constants = dex.constants?.let { name -> loader.installationConsumer(name) },
+            inlineMemory = dex.inlineMemory,
+        )
     } catch (failure: ReflectiveOperationException) {
         return error(Stage.LOADING, failure.toString())
     } catch (failure: LinkageError) {
@@ -121,7 +124,14 @@ internal suspend inline fun compileUnchecked(
     }
     coroutineContext.ensureActive()
 
-    return CompileResult.Success(JitCompilation(packageName, dex.chunkStarts, installer, dex.inlineMemory))
+    return CompileResult.Success(compilation)
+}
+
+@Suppress("UNCHECKED_CAST")
+internal fun ClassLoader.installationConsumer(
+    name: String,
+): Consumer<CodeInstallation> {
+    return loadClass(name).getDeclaredConstructor().newInstance() as Consumer<CodeInstallation>
 }
 
 private val packageNames = PackageNames()

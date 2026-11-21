@@ -15,8 +15,7 @@ internal class Registers(
     cachedConstants: Int,
     unsafeMemory: Boolean,
     inlineMemory: Boolean,
-    activation: Boolean,
-    savesStack: Boolean,
+    savesStack: Boolean = false,
     callBuffer: Boolean,
     private val homes: RegisterHomes? = null,
     private val held: ByteArray? = null,
@@ -30,11 +29,9 @@ internal class Registers(
 
     val frameBase = if (chunk) next++ else UNUSED
 
-    val memorySize = if (inlineMemory) next++ else UNUSED
+    val objectFrame = if (chunk) next++ else UNUSED
 
-    val activationArray = if (activation) next++ else UNUSED
-    val activationFp = if (activation) next++ else UNUSED
-    val activationIndex = if (activation) next++ else UNUSED
+    val memorySize = if (inlineMemory) next++ else UNUSED
 
     val unsafe = if (unsafeMemory) next else UNUSED
 
@@ -56,7 +53,7 @@ internal class Registers(
 
             val mask = heldMask(slot)
 
-            for (kind in SlotKindFlow.LONG..SlotKindFlow.DOUBLE) {
+            for (kind in SlotKindFlow.LONG..SlotKindFlow.OBJECT) {
                 val index = slot * HOME_KINDS + SlotKindFlow.homeIndex(kind.toByte())
                 val width = when {
                     mask and SlotKindFlow.homeBit(kind.toByte()) == 0 -> 0
@@ -110,9 +107,7 @@ internal class Registers(
 
     val savedStack = if (savesStack) temporaryBase + 2 * temporaries else UNUSED
 
-    val activationSaved = if (activation) temporaryBase + 2 * temporaries + (if (savesStack) 2 else 0) else UNUSED
-
-    private val pairsEnd = temporaryBase + 2 * temporaries + (if (savesStack) 2 else 0) + (if (activation) 2 else 0)
+    private val pairsEnd = temporaryBase + 2 * temporaries + (if (savesStack) 2 else 0)
 
     val callBuffer = if (callBuffer) pairsEnd else UNUSED
 
@@ -156,13 +151,15 @@ internal class Registers(
         const val I3 = 11
 
         const val OBJECT = 12
+        const val SECOND_OBJECT = I2
+        const val THIRD_OBJECT = I3
         const val DEPTH = 13
         const val CONTEXT = 14
 
         const val NARROW = 15
 
         private const val SCRATCH = 16
-        private const val HOME_KINDS = 4
+        private const val HOME_KINDS = 5
         private const val UNSAFE_WINDOW = 6
         private const val UNUSED = Int.MIN_VALUE / 2
     }

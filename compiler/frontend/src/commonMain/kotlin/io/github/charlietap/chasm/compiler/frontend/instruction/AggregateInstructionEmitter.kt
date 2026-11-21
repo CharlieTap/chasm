@@ -116,10 +116,11 @@ internal fun FunctionCompilationContext.emitStructSet(
     value: OperandSource,
     addressSlot: Int,
     fieldIndex: Int,
+    type: TypeIndex,
 ) = if (value.isImmediate) {
-    emit(AggregateInstruction.StructSetI(value.sourceBits, addressSlot, fieldIndex))
+    emit(AggregateInstruction.StructSetI(value.sourceBits, addressSlot, fieldIndex, type))
 } else {
-    emit(AggregateInstruction.StructSetS(value.sourceSlot, addressSlot, fieldIndex))
+    emit(AggregateInstruction.StructSetS(value.sourceSlot, addressSlot, fieldIndex, type))
 }
 
 internal fun FunctionCompilationContext.emitArrayNew(
@@ -322,28 +323,31 @@ internal fun FunctionCompilationContext.emitArraySet(
     value: OperandSource,
     field: OperandSource,
     addressSlot: Int,
+    type: TypeIndex,
 ) {
     val valueImmediate = value.isImmediate
     val fieldImmediate = field.sourceKind == OperandSourceKind.I32Immediate
     when {
-        valueImmediate && fieldImmediate -> emit(AggregateInstruction.ArraySetIi(value.sourceBits, field.i32Immediate, addressSlot))
-        valueImmediate -> emit(AggregateInstruction.ArraySetIs(value.sourceBits, field.sourceSlot, addressSlot))
-        fieldImmediate -> emit(AggregateInstruction.ArraySetSi(value.sourceSlot, field.i32Immediate, addressSlot))
-        else -> emit(AggregateInstruction.ArraySetSs(value.sourceSlot, field.sourceSlot, addressSlot))
+        valueImmediate && fieldImmediate -> emit(AggregateInstruction.ArraySetIi(value.sourceBits, field.i32Immediate, addressSlot, type))
+        valueImmediate -> emit(AggregateInstruction.ArraySetIs(value.sourceBits, field.sourceSlot, addressSlot, type))
+        fieldImmediate -> emit(AggregateInstruction.ArraySetSi(value.sourceSlot, field.i32Immediate, addressSlot, type))
+        else -> emit(AggregateInstruction.ArraySetSs(value.sourceSlot, field.sourceSlot, addressSlot, type))
     }
 }
 
 internal fun FunctionCompilationContext.emitArrayLen(
     addressSlot: Int,
     destinationSlot: Int,
+    type: TypeIndex?,
 ) =
-    emit(AggregateInstruction.ArrayLenS(addressSlot, destinationSlot))
+    emit(AggregateInstruction.ArrayLenS(addressSlot, destinationSlot, type))
 
 internal fun FunctionCompilationContext.emitArrayFill(
     elements: OperandSource,
     value: OperandSource,
     offset: OperandSource,
     addressSlot: Int,
+    type: TypeIndex,
 ) {
     val ai = elements.sourceKind == OperandSourceKind.I32Immediate
     val bi = value.isImmediate
@@ -352,14 +356,14 @@ internal fun FunctionCompilationContext.emitArrayFill(
     val b = value.sourceBits
     val c = if (ci) offset.i32Immediate else offset.sourceSlot
     when {
-        ai && bi && ci -> emit(AggregateInstruction.ArrayFillIii(a, b, c, addressSlot))
-        ai && bi -> emit(AggregateInstruction.ArrayFillIis(a, b, c, addressSlot))
-        ai && ci -> emit(AggregateInstruction.ArrayFillIsi(a, value.sourceSlot, c, addressSlot))
-        ai -> emit(AggregateInstruction.ArrayFillIss(a, value.sourceSlot, c, addressSlot))
-        bi && ci -> emit(AggregateInstruction.ArrayFillSii(a, b, c, addressSlot))
-        bi -> emit(AggregateInstruction.ArrayFillSis(a, b, c, addressSlot))
-        ci -> emit(AggregateInstruction.ArrayFillSsi(a, value.sourceSlot, c, addressSlot))
-        else -> emit(AggregateInstruction.ArrayFillSss(a, value.sourceSlot, c, addressSlot))
+        ai && bi && ci -> emit(AggregateInstruction.ArrayFillIii(a, b, c, addressSlot, type))
+        ai && bi -> emit(AggregateInstruction.ArrayFillIis(a, b, c, addressSlot, type))
+        ai && ci -> emit(AggregateInstruction.ArrayFillIsi(a, value.sourceSlot, c, addressSlot, type))
+        ai -> emit(AggregateInstruction.ArrayFillIss(a, value.sourceSlot, c, addressSlot, type))
+        bi && ci -> emit(AggregateInstruction.ArrayFillSii(a, b, c, addressSlot, type))
+        bi -> emit(AggregateInstruction.ArrayFillSis(a, b, c, addressSlot, type))
+        ci -> emit(AggregateInstruction.ArrayFillSsi(a, value.sourceSlot, c, addressSlot, type))
+        else -> emit(AggregateInstruction.ArrayFillSss(a, value.sourceSlot, c, addressSlot, type))
     }
 }
 

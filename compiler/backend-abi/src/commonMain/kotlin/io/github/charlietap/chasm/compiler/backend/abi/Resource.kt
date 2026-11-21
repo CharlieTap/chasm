@@ -72,6 +72,22 @@ sealed interface Resource {
         val index: Int,
     ) : Resource
 
+    data class FunctionObject(
+        val index: Int,
+    ) : Resource
+
+    data class ReferenceGlobal(
+        val index: Int,
+    ) : Resource
+
+    data class ReferenceTable(
+        val index: Int,
+    ) : Resource
+
+    data class ReferenceSegment(
+        val index: Int,
+    ) : Resource
+
     data class TagAddress(
         val index: Int,
     ) : Resource

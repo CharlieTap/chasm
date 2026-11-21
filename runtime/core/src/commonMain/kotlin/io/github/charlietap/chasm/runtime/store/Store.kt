@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.runtime.store
 
 import io.github.charlietap.chasm.config.StoreConfig
+import io.github.charlietap.chasm.runtime.execution.AllocationMeter
 import io.github.charlietap.chasm.runtime.execution.NestedInterpreter
 import io.github.charlietap.chasm.runtime.heap.WasmHeap
 import io.github.charlietap.chasm.runtime.instance.DataInstance
@@ -10,7 +11,9 @@ import io.github.charlietap.chasm.runtime.instance.GlobalInstance
 import io.github.charlietap.chasm.runtime.instance.MemoryInstance
 import io.github.charlietap.chasm.runtime.instance.TableInstance
 import io.github.charlietap.chasm.runtime.program.Program
+import io.github.charlietap.chasm.runtime.reference.ReferenceBridge
 import io.github.charlietap.chasm.runtime.stack.ValueStack
+import kotlin.jvm.JvmField
 
 class Store(
     val functions: MutableList<FunctionInstance> = [],
@@ -31,4 +34,10 @@ class Store(
     var compiledCallDepth: Int = 0
 
     var interpreter: NestedInterpreter? = null
+
+    @JvmField
+    var referenceBridge: ReferenceBridge? = null
+
+    @JvmField
+    val allocation: AllocationMeter = AllocationMeter()
 }

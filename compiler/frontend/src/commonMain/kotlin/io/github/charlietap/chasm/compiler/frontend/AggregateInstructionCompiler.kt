@@ -48,6 +48,7 @@ import io.github.charlietap.chasm.type.StorageType
 import io.github.charlietap.chasm.type.ValueType
 import io.github.charlietap.chasm.type.ext.bitWidth
 import io.github.charlietap.chasm.cir.ReferenceType as CirReferenceType
+import io.github.charlietap.chasm.cir.TypeIndex as CirTypeIndex
 
 internal fun compileAggregateAccessChain(
     state: FunctionCompilationContext,
@@ -216,6 +217,7 @@ internal fun compileAggregateInstruction(
             value = value,
             addressSlot = state.operandSlot(address),
             fieldIndex = instruction.fieldIndex.toInt(),
+            type = state.compiler.type(instruction.typeIndex),
         )
     }
     is AggregateInstruction.ArrayNew -> {
@@ -320,12 +322,12 @@ internal fun compileAggregateInstruction(
         val value = state.pop()
         val field = state.pop()
         val address = state.pop()
-        state.emitArraySet(value, field, state.operandSlot(address))
+        state.emitArraySet(value, field, state.operandSlot(address), state.compiler.type(instruction.typeIndex))
     }
     is AggregateInstruction.ArrayLen -> {
         val address = state.pop()
         val destination = destination(state, address)
-        state.emitArrayLen(state.operandSlot(address), destination.slot)
+        state.emitArrayLen(state.operandSlot(address), destination.slot, concreteArrayType(address.type))
         completeDestination(state, I32_TYPE, destination)
     }
     is AggregateInstruction.ArrayFill -> {
@@ -333,7 +335,7 @@ internal fun compileAggregateInstruction(
         val value = state.pop()
         val offset = state.pop()
         val address = state.pop()
-        state.emitArrayFill(elements, value, offset, state.operandSlot(address))
+        state.emitArrayFill(elements, value, offset, state.operandSlot(address), state.compiler.type(instruction.typeIndex))
     }
     is AggregateInstruction.ArrayCopy -> {
         val elements = state.pop()
@@ -429,3 +431,12 @@ private fun completeReferenceDestination(
 }
 
 private val I31_REFERENCE_TYPE = ValueType.Reference(ReferenceType.Ref(AbstractHeapType.I31))
+
+private fun concreteArrayType(
+    type: ValueType?,
+): CirTypeIndex? {
+
+    val heap = (type as? ValueType.Reference)?.referenceType?.heapType as? ConcreteHeapType.TypeIndex ?: return null
+
+    return CirTypeIndex(heap.index)
+}

@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.compiler.backend.dex.analysis
 
 import io.github.charlietap.chasm.cir.AdminInstruction
 import io.github.charlietap.chasm.cir.CirFunction
+import io.github.charlietap.chasm.cir.ExceptionCatch
 import io.github.charlietap.chasm.cir.Instruction
 import io.github.charlietap.chasm.compiler.backend.analysis.InstructionTable
 import io.github.charlietap.chasm.compiler.backend.analysis.SlotReadTable
@@ -74,7 +75,7 @@ internal class SlotKindFlow(
 
         val pinned = pinnedKind(homes[slot].toInt())
         pins[slot] = pinned
-        homes[slot] = homeBit(pinned).toByte()
+        homes[slot] = (homeBit(pinned) or (homes[slot].toInt() and homeBit(OBJECT))).toByte()
     }
 
     fun leader(position: Int): Boolean {
@@ -116,21 +117,6 @@ internal class SlotKindFlow(
         }
     }
 
-    fun advanced(
-        position: Int,
-        slot: Int,
-        state: ByteArray,
-    ): Byte {
-
-        if (modes[position] == SlotWriteTable.CONDITIONAL || dense[slot] < 0) {
-            return state[slot]
-        }
-
-        val kind = written(position, slot)
-
-        return if (kind == NONE) state[slot] else kind
-    }
-
     fun written(
         position: Int,
         slot: Int,
@@ -152,11 +138,12 @@ internal class SlotKindFlow(
         const val INT: Byte = WriteKinds.INT
         const val FLOAT: Byte = WriteKinds.FLOAT
         const val DOUBLE: Byte = WriteKinds.DOUBLE
+        const val OBJECT: Byte = WriteKinds.OBJECT
         const val ANY_NARROW: Byte = WriteKinds.NARROW_CONSTANT
         const val ANY_WIDE: Byte = WriteKinds.WIDE_CONSTANT
-        const val CONFLICT_NARROW: Byte = 7
-        const val CONFLICT_WIDE: Byte = 8
-        const val CONFLICT: Byte = 9
+        const val CONFLICT_NARROW: Byte = 8
+        const val CONFLICT_WIDE: Byte = 9
+        const val CONFLICT: Byte = 10
 
         fun homeIndex(kind: Byte): Int {
             return kind - LONG
@@ -171,7 +158,7 @@ internal class SlotKindFlow(
         }
 
         fun definite(kind: Byte): Boolean {
-            return kind in LONG..DOUBLE
+            return kind in LONG..OBJECT
         }
 
         fun wide(kind: Byte): Boolean {
@@ -209,8 +196,9 @@ internal class DataflowSlotKindAnalyzer : SlotKindAnalyzer {
         }
 
         val blocks = basicBlocks(table, function)
-        val entry = entryKinds(parameters, frameSlots, facts.initialValues, initialised)
-        val fixed = fixedKinds(table, function, parameters, facts.localTypes, entry, kinds, sources)
+        val payloadKinds = payloadKinds(facts)
+        val entry = entryKinds(parameters, frameSlots, facts.initialValues, initialised, facts.localTypes)
+        val fixed = fixedKinds(table, function, parameters, facts.localTypes, entry, kinds, sources, payloadKinds)
 
         val dense = IntArray(frameSlots)
         var count = 0
@@ -223,10 +211,10 @@ internal class DataflowSlotKindAnalyzer : SlotKindAnalyzer {
         }
         val initial = ByteArray(frameSlots) { slot -> if (SlotKindFlow.definite(fixed[slot])) fixed[slot] else entry[slot] }
 
-        val dataflow = SlotKindDataflow(table, function, blocks, dense, count, kinds, sources, initial)
+        val dataflow = SlotKindDataflow(table, function, blocks, dense, count, kinds, sources, initial, payloadKinds)
         dataflow.solve(entry, tracked)
         val states = dataflow.states
-        val homes = homeKinds(table, function, blocks, states, parameters, facts.localTypes, entry, kinds)
+        val homes = homeKinds(table, function, blocks, states, parameters, facts.localTypes, entry, kinds, payloadKinds)
 
         val conflicted = states.any { reached -> reached != null && reached.any { kind -> kind >= SlotKindFlow.CONFLICT_NARROW } }
         val flow = SlotKindFlow(
@@ -254,7 +242,8 @@ private fun width(kind: Byte): Int {
     return when (kind) {
         SlotKindFlow.INT, SlotKindFlow.FLOAT, SlotKindFlow.CONFLICT_NARROW -> 1
         SlotKindFlow.LONG, SlotKindFlow.DOUBLE, SlotKindFlow.CONFLICT_WIDE -> 2
-        SlotKindFlow.CONFLICT -> 3
+        SlotKindFlow.OBJECT -> 4
+        SlotKindFlow.CONFLICT -> 7
         else -> 0
     }
 }
@@ -316,7 +305,7 @@ private fun retypeRestarts(
             continue
         }
         for (index in writes.start[position] until writes.end(position)) {
-            kinds[index] = WriteKinds.kindOf(parameters[writes.slots[index]])
+            kinds[index] = WriteKinds.kindOf(parameters[writes.slots[index]], objectReferences = true)
             sources[index] = SlotWriteTable.NOT_A_COPY
         }
     }
@@ -352,17 +341,39 @@ private fun entryKinds(
     frameSlots: Int,
     initialValues: LongArray,
     initialised: BooleanArray,
+    localTypes: Array<ValueType?>,
 ): ByteArray {
 
     val entry = ByteArray(frameSlots)
-    parameters.forEachIndexed { index, type -> entry[index] = WriteKinds.kindOf(type) }
+    parameters.forEachIndexed { index, type -> entry[index] = WriteKinds.kindOf(type, objectReferences = true) }
     for (slot in parameters.size until frameSlots) {
-        if (initialised[slot]) {
-            entry[slot] = WriteKinds.constantKind(initialValues[slot])
+        if (!initialised[slot]) {
+            continue
+        }
+        entry[slot] = if (localTypes[slot] is ValueType.Reference) {
+            SlotKindFlow.OBJECT
+        } else {
+            WriteKinds.constantKind(initialValues[slot])
         }
     }
 
     return entry
+}
+
+private fun payloadKinds(facts: FunctionFacts): (ExceptionCatch) -> ByteArray {
+    val declarations = facts.table.forms.declarations
+    return { handler ->
+        val tag = handler.tag
+        val fields = if (tag == null) emptyList() else declarations.tagFieldTypes(tag)
+        ByteArray(handler.payloadSlots.size) { index ->
+            val type = fields.getOrNull(index)
+            when {
+                type == null -> SlotKindFlow.OBJECT
+                type is ValueType.Reference -> SlotKindFlow.OBJECT
+                else -> SlotKindFlow.LONG
+            }
+        }
+    }
 }
 
 private fun fixedKinds(
@@ -373,6 +384,7 @@ private fun fixedKinds(
     entry: ByteArray,
     kinds: ByteArray,
     sources: IntArray,
+    payloadKinds: (ExceptionCatch) -> ByteArray,
 ): ByteArray {
 
     val frameSlots = entry.size
@@ -391,9 +403,10 @@ private fun fixedKinds(
     }
     function.exceptions?.regions.orEmpty().forEach { region ->
         region.catches.forEach { handler ->
-            handler.payloadSlots.forEach { slot ->
+            val payload = payloadKinds(handler)
+            handler.payloadSlots.forEachIndexed { index, slot ->
                 written[slot] = true
-                see(fixed, immediates, slot, SlotKindFlow.LONG)
+                see(fixed, immediates, slot, payload[index])
             }
         }
     }
@@ -412,6 +425,7 @@ private fun fixedKinds(
         val kind = fixed[slot]
         val mixed = when {
             kind == SlotKindFlow.CONFLICT -> false
+            kind == SlotKindFlow.OBJECT -> immediates[slot] != SlotKindFlow.UNDEFINED
             kind == SlotKindFlow.UNDEFINED ->
                 immediates[slot] != SlotKindFlow.UNDEFINED && (written[slot] || slot < parameters.size || localTypes[slot] != null)
             else -> immediates[slot] == SlotKindFlow.ANY_WIDE && !SlotKindFlow.wide(kind)
@@ -527,6 +541,7 @@ private class SlotKindDataflow(
     private val kinds: ByteArray,
     private val sources: IntArray,
     private val initial: ByteArray,
+    private val payloadKinds: (ExceptionCatch) -> ByteArray,
 ) {
     private val instructions = function.instructions
     private val size = instructions.size
@@ -613,6 +628,7 @@ private class SlotKindDataflow(
         target: Int,
         state: ByteArray,
         payload: IntArray? = null,
+        payloadKinds: ByteArray? = null,
     ) {
 
         if (target >= size) {
@@ -623,9 +639,9 @@ private class SlotKindDataflow(
         val existing = states[destination]
         if (existing == null) {
             val created = state.copyOf()
-            payload?.forEach { slot ->
+            payload?.forEachIndexed { field, slot ->
                 if (dense[slot] >= 0) {
-                    created[dense[slot]] = SlotKindFlow.LONG
+                    created[dense[slot]] = checkNotNull(payloadKinds)[field]
                 }
             }
             states[destination] = created
@@ -635,10 +651,11 @@ private class SlotKindDataflow(
 
         var changed = mergeInto(existing, state)
         if (payload != null) {
-            for (slot in payload) {
+            payload.forEachIndexed { field, slot ->
                 val index = dense[slot]
-                if (index >= 0 && existing[index] != SlotKindFlow.LONG) {
-                    existing[index] = SlotKindFlow.LONG
+                val kind = checkNotNull(payloadKinds)[field]
+                if (index >= 0 && existing[index] != kind) {
+                    existing[index] = kind
                     changed = true
                 }
             }
@@ -653,7 +670,7 @@ private class SlotKindDataflow(
         region: Int,
         state: ByteArray,
     ) {
-        regions[region].catches.forEach { handler -> flowInto(handler.target.index, state, handler.payloadSlots) }
+        regions[region].catches.forEach { handler -> flowInto(handler.target.index, state, handler.payloadSlots, payloadKinds(handler)) }
     }
 
     private fun raise(
@@ -894,6 +911,7 @@ private fun homeKinds(
     localTypes: Array<ValueType?>,
     entry: ByteArray,
     kinds: ByteArray,
+    payloadKinds: (ExceptionCatch) -> ByteArray,
 ): ByteArray {
 
     val frameSlots = entry.size
@@ -917,11 +935,13 @@ private fun homeKinds(
     }
     function.exceptions?.regions.orEmpty().forEach { region ->
         region.catches.forEach { handler ->
-            handler.payloadSlots.forEach { slot -> note(homes, anyNarrow, anyWide, slot, SlotKindFlow.LONG) }
+            val payload = payloadKinds(handler)
+            handler.payloadSlots.forEachIndexed { index, slot -> note(homes, anyNarrow, anyWide, slot, payload[index]) }
         }
     }
 
     val wideHomes = SlotKindFlow.homeBit(SlotKindFlow.LONG) or SlotKindFlow.homeBit(SlotKindFlow.DOUBLE)
+    val objectHome = SlotKindFlow.homeBit(SlotKindFlow.OBJECT)
     for (slot in 0 until frameSlots) {
 
         if (!anyNarrow[slot] && !anyWide[slot]) {
@@ -930,10 +950,13 @@ private fun homeKinds(
 
         var mask = homes[slot].toInt()
         if (mask == 0) {
-            val declared = localTypes[slot]?.let(WriteKinds::kindOf)
+            val declared = localTypes[slot]?.let { type -> WriteKinds.kindOf(type, objectReferences = true) }
             mask = SlotKindFlow.homeBit(declared ?: if (anyWide[slot]) SlotKindFlow.LONG else SlotKindFlow.INT)
         }
-        if (anyWide[slot] && mask and wideHomes == 0) {
+        if (anyNarrow[slot] && mask == objectHome && localTypes[slot] !is ValueType.Reference) {
+            mask = mask or SlotKindFlow.homeBit(SlotKindFlow.INT)
+        }
+        if (anyWide[slot] && mask and wideHomes == 0 && !(mask == objectHome && localTypes[slot] is ValueType.Reference)) {
             mask = mask or SlotKindFlow.homeBit(SlotKindFlow.LONG)
         }
 

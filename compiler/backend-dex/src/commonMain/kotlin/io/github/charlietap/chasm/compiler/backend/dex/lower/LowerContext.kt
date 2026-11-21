@@ -5,7 +5,6 @@ import io.github.charlietap.chasm.cir.InstructionIndex
 import io.github.charlietap.chasm.compiler.backend.abi.MethodRef
 import io.github.charlietap.chasm.compiler.backend.abi.Resource
 import io.github.charlietap.chasm.compiler.backend.analysis.ModuleIndexSpaces
-import io.github.charlietap.chasm.compiler.backend.analysis.References
 import io.github.charlietap.chasm.compiler.backend.analysis.form.InstructionForms
 import io.github.charlietap.chasm.compiler.backend.dex.ModuleLowering
 import io.github.charlietap.chasm.compiler.backend.dex.analysis.FunctionAnalysis
@@ -31,7 +30,6 @@ internal class LowerContext(
     val facts: FunctionFacts get() = analysis.facts
     val forms: InstructionForms get() = facts.table.forms
     val type: FunctionType get() = facts.type
-    val references: References get() = facts.references
     val frameSlots: Int get() = facts.frameSlots
     val parameterCount = type.params.types.size
     val resultCount = type.results.types.size
@@ -45,23 +43,14 @@ internal class LowerContext(
 
     val kinds = SlotKindCursor(homes, facts.frameSlots)
 
-    val roots = RootFrame(facts.references, registers, emit, chunk != null)
-
     val position: Int get() = kinds.position
 
     fun enterPrologue() {
         kinds.moveTo(SlotKindCursor.PROLOGUE)
-        roots.enterPrologue()
     }
 
     fun enterInstruction(position: Int): Boolean {
-        val reached = kinds.moveTo(position)
-        roots.enterInstruction(position)
-        return reached
-    }
-
-    fun enterColdCode() {
-        roots.enterColdCode()
+        return kinds.moveTo(position)
     }
 
     inline fun at(

@@ -6,6 +6,8 @@ import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.config.StoreConfig
 import io.github.charlietap.chasm.embedding.diagnostic.CompiledTrapSource
 import io.github.charlietap.chasm.embedding.error.ChasmError
+import io.github.charlietap.chasm.embedding.internal.MIXED_STORE_ERROR
+import io.github.charlietap.chasm.embedding.internal.holdsManagedReferences
 import io.github.charlietap.chasm.embedding.internal.instantiate
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Error
@@ -42,6 +44,9 @@ internal inline fun instance(
     val declarations = module.declarations.getOrElse { failure -> return rejected(failure.message ?: failure.toString()) }
     val trapSource = { instance: ModuleInstance ->
         CompiledTrapSource(instance, { declarations.names }) { function -> module.trapSites?.function(function) }
+    }
+    if (holdsManagedReferences(store)) {
+        return ChasmResult.Error(ChasmError.ExecutionError(MIXED_STORE_ERROR))
     }
     return instantiate(store, imports, runtimeConfig(metadata), trapSource) { effectiveConfig, runtime, runtimeImports ->
         instantiator(effectiveConfig, runtime, declarations, runtimeImports) { runtimeStore, instance, runtimeTypes, _ ->

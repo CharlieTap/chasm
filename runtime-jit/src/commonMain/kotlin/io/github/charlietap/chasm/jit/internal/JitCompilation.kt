@@ -9,7 +9,9 @@ import java.util.function.Consumer
 internal class JitCompilation(
     val packageName: String,
     val chunkStarts: Map<Int, IntArray>,
+    val shapeTypes: List<String?>,
     private val installer: Consumer<CodeInstallation>,
+    private val constants: Consumer<CodeInstallation>?,
     private val inlineMemory: Boolean,
 ) {
 
@@ -20,5 +22,6 @@ internal class JitCompilation(
             "memory 0 is not backed by a byte array the compiled code can access"
         }
         installer.accept(installation)
+        constants?.accept(installation)
     }
 }

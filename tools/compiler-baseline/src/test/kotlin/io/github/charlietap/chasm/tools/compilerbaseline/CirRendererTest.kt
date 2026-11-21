@@ -89,7 +89,7 @@ class CirRendererTest {
         )
 
         val expected = """
-            {"schema_version":2,"functions":[{"index":0,"type":0,"frame":{"frame_slots":6,"activation_header_slot":0},"instructions":[
+            {"schema_version":3,"functions":[{"index":0,"type":0,"frame":{"frame_slots":6,"activation_header_slot":0},"instructions":[
             {"tag":"memory.i32.store.is","value":0,"address_slot":1,"memory":0,"mem_arg":4},
             {"tag":"numeric.f32.add.si","left_slot":3,"right":"0x3f800000","destination_slot":4},
             {"tag":"admin.jump_if_condition","condition":{"kind":"i32.lt_u","left":{"kind":"frame_slot","offset":0},"right":{"kind":"i32_const","const":100}},"target":0},

@@ -6,6 +6,7 @@ import com.github.michaelbull.result.mapError
 import io.github.charlietap.chasm.embedding.diagnostic.executionError
 import io.github.charlietap.chasm.embedding.error.ChasmError
 import io.github.charlietap.chasm.embedding.ext.owning
+import io.github.charlietap.chasm.embedding.internal.exportedFunction
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Error
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Success
@@ -17,7 +18,6 @@ import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.ext.function
-import io.github.charlietap.chasm.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
 
@@ -26,24 +26,15 @@ fun prepareFunction(
     instance: Instance,
     name: String,
 ): ChasmResult<PreparedFunction, ChasmError.ExecutionError> {
-    if (instance.instance.deallocated) {
-        return Error(ChasmError.ExecutionError(InvocationError.InvocationOfADeinstantiatedInstance.toString()))
-    }
 
-    val extern = instance.exportsByName[name]
-    val address = (extern as? ExternalValue.Function)?.address ?: return Error(
-        ChasmError.ExecutionError(InvocationError.FunctionNotFound(name).toString()),
-    )
-
-    val function = try {
-        store.owning(instance.store).function(address)
-    } catch (exception: InvocationException) {
-        return Error(ChasmError.ExecutionError(exception.error.toString()))
+    val exported = when (val result = exportedFunction(store, instance, name)) {
+        is Success -> result.result
+        is Error -> return result
     }
 
     return Success(
         PreparedFunction { args ->
-            invokePrepared(store, instance, address, function, args)
+            invokePrepared(store, instance, exported.address, exported.function, args)
         },
     )
 }

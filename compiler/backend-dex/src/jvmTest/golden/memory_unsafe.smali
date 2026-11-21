@@ -827,11 +827,17 @@
     aput-wide v0, p2, v3
     :try_end_14
     .catch Ljava/lang/StackOverflowError; {:try_start_0 .. :try_end_14} :catch_15
+    .catch Ljava/lang/OutOfMemoryError; {:try_start_0 .. :try_end_14} :catch_19
 
     return-void
 
     :catch_15
     invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/CompiledRuntime;->callStackExhausted()Ljava/lang/Void;
+
+    return-void
+
+    :catch_19
+    invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/gc/ManagedOps;->guestHeapExhausted()Ljava/lang/Void;
 
     return-void
 .end method
@@ -873,11 +879,17 @@
     aput-wide v0, v5, p3
     :try_end_1c
     .catch Ljava/lang/StackOverflowError; {:try_start_0 .. :try_end_1c} :catch_1d
+    .catch Ljava/lang/OutOfMemoryError; {:try_start_0 .. :try_end_1c} :catch_21
 
     return-void
 
     :catch_1d
     invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/CompiledRuntime;->callStackExhausted()Ljava/lang/Void;
+
+    return-void
+
+    :catch_21
+    invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/gc/ManagedOps;->guestHeapExhausted()Ljava/lang/Void;
 
     return-void
 .end method
@@ -927,7 +939,7 @@
 
     move v9, v2
 
-    packed-switch v4, :pswitch_data_2e
+    packed-switch v4, :pswitch_data_32
 
     invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/CompiledRuntime;->unreachable()Ljava/lang/Void;
 
@@ -956,6 +968,7 @@
     aput-wide v0, p2, v3
     :try_end_29
     .catch Ljava/lang/StackOverflowError; {:try_start_0 .. :try_end_29} :catch_2a
+    .catch Ljava/lang/OutOfMemoryError; {:try_start_0 .. :try_end_29} :catch_2e
 
     return-void
 
@@ -964,7 +977,12 @@
 
     return-void
 
-    :pswitch_data_2e
+    :catch_2e
+    invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/gc/ManagedOps;->guestHeapExhausted()Ljava/lang/Void;
+
+    return-void
+
+    :pswitch_data_32
     .packed-switch 0x0
         :pswitch_19
         :pswitch_1f
@@ -1003,7 +1021,7 @@
 
     move v9, v2
 
-    packed-switch v4, :pswitch_data_36
+    packed-switch v4, :pswitch_data_3a
 
     invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/CompiledRuntime;->unreachable()Ljava/lang/Void;
 
@@ -1034,6 +1052,7 @@
     aput-wide v0, v5, p3
     :try_end_31
     .catch Ljava/lang/StackOverflowError; {:try_start_0 .. :try_end_31} :catch_32
+    .catch Ljava/lang/OutOfMemoryError; {:try_start_0 .. :try_end_31} :catch_36
 
     return-void
 
@@ -1042,7 +1061,12 @@
 
     return-void
 
-    :pswitch_data_36
+    :catch_36
+    invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/gc/ManagedOps;->guestHeapExhausted()Ljava/lang/Void;
+
+    return-void
+
+    :pswitch_data_3a
     .packed-switch 0x0
         :pswitch_1e
         :pswitch_24
@@ -1119,11 +1143,17 @@
     aput-wide v0, p2, v3
     :try_end_26
     .catch Ljava/lang/StackOverflowError; {:try_start_0 .. :try_end_26} :catch_27
+    .catch Ljava/lang/OutOfMemoryError; {:try_start_0 .. :try_end_26} :catch_2b
 
     return-void
 
     :catch_27
     invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/CompiledRuntime;->callStackExhausted()Ljava/lang/Void;
+
+    return-void
+
+    :catch_2b
+    invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/gc/ManagedOps;->guestHeapExhausted()Ljava/lang/Void;
 
     return-void
 .end method
@@ -1187,11 +1217,17 @@
     aput-wide v0, v5, p3
     :try_end_2f
     .catch Ljava/lang/StackOverflowError; {:try_start_0 .. :try_end_2f} :catch_30
+    .catch Ljava/lang/OutOfMemoryError; {:try_start_0 .. :try_end_2f} :catch_34
 
     return-void
 
     :catch_30
     invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/CompiledRuntime;->callStackExhausted()Ljava/lang/Void;
+
+    return-void
+
+    :catch_34
+    invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/gc/ManagedOps;->guestHeapExhausted()Ljava/lang/Void;
 
     return-void
 .end method
@@ -1233,7 +1269,7 @@
 
     move v8, v2
 
-    packed-switch v4, :pswitch_data_2a
+    packed-switch v4, :pswitch_data_2e
 
     invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/CompiledRuntime;->unreachable()Ljava/lang/Void;
 
@@ -1262,6 +1298,7 @@
     aput-wide v0, p2, v3
     :try_end_24
     .catch Ljava/lang/StackOverflowError; {:try_start_0 .. :try_end_24} :catch_25
+    .catch Ljava/lang/OutOfMemoryError; {:try_start_0 .. :try_end_24} :catch_29
 
     return-void
 
@@ -1270,9 +1307,14 @@
 
     return-void
 
+    :catch_29
+    invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/gc/ManagedOps;->guestHeapExhausted()Ljava/lang/Void;
+
+    return-void
+
     nop
 
-    :pswitch_data_2a
+    :pswitch_data_2e
     .packed-switch 0x0
         :pswitch_14
         :pswitch_1a
@@ -1303,7 +1345,7 @@
 
     move v8, v2
 
-    packed-switch v4, :pswitch_data_30
+    packed-switch v4, :pswitch_data_34
 
     invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/CompiledRuntime;->unreachable()Ljava/lang/Void;
 
@@ -1334,6 +1376,7 @@
     aput-wide v0, v5, p3
     :try_end_2b
     .catch Ljava/lang/StackOverflowError; {:try_start_0 .. :try_end_2b} :catch_2c
+    .catch Ljava/lang/OutOfMemoryError; {:try_start_0 .. :try_end_2b} :catch_30
 
     return-void
 
@@ -1342,7 +1385,12 @@
 
     return-void
 
-    :pswitch_data_30
+    :catch_30
+    invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/gc/ManagedOps;->guestHeapExhausted()Ljava/lang/Void;
+
+    return-void
+
+    :pswitch_data_34
     .packed-switch 0x0
         :pswitch_18
         :pswitch_1e
@@ -1379,11 +1427,17 @@
     invoke-static/range {v5 .. v7}, Lchasm/jit/Code0;->f5([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;I)V
     :try_end_8
     .catch Ljava/lang/StackOverflowError; {:try_start_0 .. :try_end_8} :catch_9
+    .catch Ljava/lang/OutOfMemoryError; {:try_start_0 .. :try_end_8} :catch_d
 
     return-void
 
     :catch_9
     invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/CompiledRuntime;->callStackExhausted()Ljava/lang/Void;
+
+    return-void
+
+    :catch_d
+    invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/gc/ManagedOps;->guestHeapExhausted()Ljava/lang/Void;
 
     return-void
 .end method
@@ -1405,11 +1459,17 @@
     invoke-static/range {v5 .. v7}, Lchasm/jit/Code0;->f5([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;I)V
     :try_end_b
     .catch Ljava/lang/StackOverflowError; {:try_start_0 .. :try_end_b} :catch_c
+    .catch Ljava/lang/OutOfMemoryError; {:try_start_0 .. :try_end_b} :catch_10
 
     return-void
 
     :catch_c
     invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/CompiledRuntime;->callStackExhausted()Ljava/lang/Void;
+
+    return-void
+
+    :catch_10
+    invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/gc/ManagedOps;->guestHeapExhausted()Ljava/lang/Void;
 
     return-void
 .end method

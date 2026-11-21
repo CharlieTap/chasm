@@ -6,6 +6,10 @@ class DexModule(
     val inlineMemory: Boolean,
     val chunkStarts: Map<Int, IntArray> = emptyMap(),
     val classesToInitialize: List<String>,
+    val shapeDex: ByteArray? = null,
+    val shapeClasses: List<String> = emptyList(),
+    val shapeTypes: List<String?>,
+    val constants: String?,
 )
 
 class UnsupportedFunctions(

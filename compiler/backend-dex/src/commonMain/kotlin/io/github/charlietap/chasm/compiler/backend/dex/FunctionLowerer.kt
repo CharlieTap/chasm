@@ -23,6 +23,7 @@ import io.github.charlietap.chasm.compiler.backend.dex.lower.ENTRY_BITS
 import io.github.charlietap.chasm.compiler.backend.dex.lower.Emitter
 import io.github.charlietap.chasm.compiler.backend.dex.lower.HomeMismatch
 import io.github.charlietap.chasm.compiler.backend.dex.lower.LowerContext
+import io.github.charlietap.chasm.compiler.backend.dex.lower.OBJECT_FRAME_TYPE
 import io.github.charlietap.chasm.compiler.backend.dex.lower.RegisterHomes
 import io.github.charlietap.chasm.compiler.backend.dex.lower.Registers
 import io.github.charlietap.chasm.compiler.backend.dex.lower.SlotKindConflict
@@ -130,17 +131,15 @@ internal class FunctionLowering(
         }
 
         val firstTemporary = if (module.analysis.usesExceptions) facts.frameSlots else facts.firstTemporary
-        val initialised = BooleanArray(facts.frameSlots) { slot -> slot < firstTemporary || facts.references.isReference[slot] }
-        val pristine = reusable?.takeIf { homes -> homes.reusableFor(initialised) }
+        val initialised = BooleanArray(facts.frameSlots) { slot -> slot < firstTemporary }
+        val homes = reusable?.takeIf { candidate -> candidate.reusableFor(initialised) }
             ?: RegisterHomes(slotKindAnalyzer.analyze(function, facts, initialised), initialised)
 
-        var current: RegisterHomes? = pristine
         while (true) {
 
-            val homes = current
-            val registers = if (homes != null) functionRegisters(function, analysis, homes) else wide
+            val registers = functionRegisters(function, analysis, homes)
             if (registers.count >= ART_MAX_COMPILED_REGISTERS) {
-                return Attempt.TooLarge(inlinedAccesses = false, homes = pristine)
+                return Attempt.TooLarge(inlinedAccesses = false, homes = homes)
             }
 
             module.constants.beginMethod()
@@ -153,18 +152,15 @@ internal class FunctionLowering(
                 return Attempt.Lowered()
             } catch (conflict: SlotKindConflict) {
                 body.abort()
-                pin(checkNotNull(homes), conflict)
+                pin(homes, conflict)
             } catch (mismatch: HomeMismatch) {
                 body.abort()
-                if (homes == null) {
-                    throw mismatch
-                }
-                current = null
+                return Attempt.Rejected("managed references need register homes: ${mismatch.message}")
             } catch (unsupported: Unsupported) {
                 body.abort()
                 return Attempt.Rejected(unsupported.message ?: "unsupported")
             } catch (_: DexterMethodTooLargeException) {
-                return Attempt.TooLarge(inlinedAccesses = analysis.usesInlineMemory, homes = pristine)
+                return Attempt.TooLarge(inlinedAccesses = analysis.usesInlineMemory, homes = homes)
             }
         }
     }
@@ -184,27 +180,20 @@ internal class FunctionLowering(
         val initialised = BooleanArray(facts.frameSlots) { true }
         val estimate = if (module.options.splitInstructions != null) null else whole?.estimate ?: estimateDexSize(module, function, analysis)
         val splitFacts = SplitFacts(function, facts, estimate)
-        var current: RegisterHomes? = reusable?.takeIf { homes -> homes.reusableFor(initialised) }
+        val homes = reusable?.takeIf { candidate -> candidate.reusableFor(initialised) }
             ?: RegisterHomes(slotKindAnalyzer.analyze(function, facts, initialised), initialised)
 
         while (true) {
 
-            val homes = current
             val chunks = try {
                 splitChunks(analysis, splitFacts, homes, starts, orphans.size)
             } catch (conflict: SlotKindConflict) {
-                pin(checkNotNull(homes), conflict)
+                pin(homes, conflict)
                 orphans += starts
                 starts.clear()
                 continue
             } catch (mismatch: HomeMismatch) {
-                if (homes == null) {
-                    throw mismatch
-                }
-                current = null
-                orphans += starts
-                starts.clear()
-                continue
+                return Attempt.Refused("managed references need register homes: ${mismatch.message}")
             } catch (unsupported: Unsupported) {
                 return Attempt.Refused(unsupported.message ?: "unsupported")
             }
@@ -363,8 +352,6 @@ private fun functionRegisters(
         cachedConstants = analysis.cachedConstants.size,
         unsafeMemory = analysis.unsafeMemory,
         inlineMemory = analysis.usesInlineMemory,
-        activation = facts.references.writesThrough,
-        savesStack = function.exceptions != null,
         callBuffer = window.callBufferWords > 0,
         homes = homes,
     )
@@ -376,16 +363,15 @@ private fun dispatcherRegisters(analysis: FunctionAnalysis): Registers {
     return Registers(
         frameSlots = 0,
         temporaries = 0,
-        windowWords = CHUNK_WINDOW_WORDS,
+        windowWords = CHUNK_WINDOW_WORDS + 1,
         parameterWords = analysis.facts.signature.argumentWords,
         cachedConstants = 0,
         unsafeMemory = false,
         inlineMemory = false,
-        activation = false,
         savesStack = true,
         callBuffer = false,
         chunk = true,
     )
 }
 
-private val CHUNK_PARAMETERS = listOf(BINDING_TYPE, CONTEXT_TYPE, "I", "I", "I")
+private val CHUNK_PARAMETERS = listOf(BINDING_TYPE, CONTEXT_TYPE, "I", "I", "I", OBJECT_FRAME_TYPE)

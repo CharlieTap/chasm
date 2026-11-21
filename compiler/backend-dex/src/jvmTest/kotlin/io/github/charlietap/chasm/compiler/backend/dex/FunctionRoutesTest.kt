@@ -157,14 +157,13 @@ class FunctionRoutesTest {
     }
 
     @Test
-    fun `a missing home found while emitting a split starts the chunks again without slot kinds`() {
+    fun `a missing home found while emitting a split refuses the function`() {
 
         val function = code.functions[FRAME]
-        val expected = forcedStarts(function)
         val lowering = ModuleLowering(module, code, FORCED)
         val received = ArrayList<RegisterHomes?>()
 
-        val generated = lower(lowering, function) { builder, method ->
+        lower(lowering, function) { builder, method ->
 
             val emitter = ProbingChunkEmitter(lowering, function, builder)
             val missing = ChunkEmitter { analysis, facts, homes, planned, chunkMethod, next ->
@@ -175,14 +174,13 @@ class FunctionRoutesTest {
                 emitter.emit(analysis, facts, homes, planned, chunkMethod, next)
             }
 
-            assertNull(functionLowering(lowering, function, builder, method, chunkEmitter = missing).lower())
+            val reason = functionLowering(lowering, function, builder, method, chunkEmitter = missing).lower()
+            assertEquals("managed references need register homes: slot 0 has no home of kind ${SlotKindFlow.INT}", reason)
         }
 
-        assertNotNull(received.first())
-        assertTrue(received.drop(2).all { homes -> homes == null })
-        assertContentEquals(intArrayOf(0) + expected, lowering.chunkStarts[FRAME])
-        assertTrue("f$FRAME\$c${expected.size}" in methodNames(generated))
-        assertRecovered(generated, upFront(function, null), function, orphans = 1, chunks = expected.size)
+        assertEquals(2, received.size)
+        assertTrue(received.all { homes -> homes != null })
+        assertNull(lowering.chunkStarts[FRAME])
     }
 
     private fun forcedStarts(function: CirFunction): IntArray {
@@ -257,7 +255,7 @@ class FunctionRoutesTest {
 
     private fun upFront(
         function: CirFunction,
-        homes: RegisterHomes?,
+        homes: RegisterHomes,
     ): ByteArray {
 
         val lowering = ModuleLowering(module, code, FORCED)

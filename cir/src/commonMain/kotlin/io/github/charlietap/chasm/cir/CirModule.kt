@@ -5,6 +5,6 @@ data class CirModule(
     val functions: List<CirFunction>,
 ) {
     companion object {
-        const val SCHEMA_VERSION = 2
+        const val SCHEMA_VERSION = 3
     }
 }

@@ -129,6 +129,7 @@ class InstructionTableStorage {
 fun instructionTable(
     forms: InstructionForms,
     storage: InstructionTableStorage = InstructionTableStorage(),
+    objectReferences: Boolean = false,
 ): InstructionTable {
 
     val function = forms.function
@@ -139,7 +140,7 @@ fun instructionTable(
     val targetStart = storage.targetStart.reusedFor(size + 1).also { reused -> storage.targetStart = reused }
     val accessStart = storage.accessStart.reusedFor(size + 1).also { reused -> storage.accessStart = reused }
     val fallsThrough = storage.fallsThrough.reusedFor(size).also { reused -> storage.fallsThrough = reused }
-    val writes = SlotWriteBuilder(storage, size)
+    val writes = SlotWriteBuilder(storage, size, objectReferences)
     val accesses = MemoryAccessBuilder(storage)
     val targets = JumpTargetBuilder(storage)
 
@@ -200,6 +201,7 @@ fun instructionTable(
 private class SlotWriteBuilder(
     private val storage: InstructionTableStorage,
     instructions: Int,
+    private val objectReferences: Boolean,
 ) : SlotWriteVisitor {
     var slots = storage.writeSlots.reusedFor(instructions)
     var sources = storage.writeSources.reusedFor(slots.size)
@@ -245,21 +247,26 @@ private class SlotWriteBuilder(
         slot: Int,
         type: ValueType,
     ) {
-        add(slot, WriteKinds.kindOf(type), SlotWriteTable.NOT_A_COPY, collectable(type))
+        add(slot, WriteKinds.kindOf(type, objectReferences), SlotWriteTable.NOT_A_COPY, collectable(type))
     }
 
     override fun opaque(
         slot: Int,
         reference: Boolean,
     ) {
-        add(slot, WriteKinds.LONG, SlotWriteTable.NOT_A_COPY, reference)
+        add(slot, if (objectReferences) WriteKinds.OBJECT else WriteKinds.LONG, SlotWriteTable.NOT_A_COPY, reference)
     }
 
     override fun helperResult(
         slot: Int,
         reference: Boolean,
     ) {
-        add(slot, if (reference) WriteKinds.LONG else WriteKinds.INT, SlotWriteTable.NOT_A_COPY, reference)
+        val kind = when {
+            !reference -> WriteKinds.INT
+            objectReferences -> WriteKinds.OBJECT
+            else -> WriteKinds.LONG
+        }
+        add(slot, kind, SlotWriteTable.NOT_A_COPY, reference)
     }
 
     override fun copy(

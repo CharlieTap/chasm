@@ -6,8 +6,6 @@ import io.github.charlietap.chasm.compiler.backend.abi.UNREACHABLE
 import io.github.charlietap.chasm.compiler.backend.abi.UNSAFE_TYPE
 import io.github.charlietap.chasm.compiler.backend.dex.analysis.SlotKindFlow
 import io.github.charlietap.dexter.ArrayKind
-import io.github.charlietap.dexter.BinaryOp
-import io.github.charlietap.dexter.Conversion
 
 internal fun LowerContext.lowerChunkBody() {
 
@@ -35,12 +33,12 @@ private fun LowerContext.lowerChunkPrologue(
     emit.move(Registers.DEPTH, registers.depthParameter)
     emit.moveObject(registers.binding, registers.bindingParameter)
     emit.move(registers.frameBase, registers.parameter(0))
+    emit.moveObject(registers.objectFrame, registers.parameter(2))
     if (chunk.usesMemory) refreshMemory()
     if (chunk.usesMemory && analysis.unsafeMemory) {
         loadObject(registers.unsafe, Resource.Unsafe, UNSAFE_TYPE)
         emit.constWide(registers.byteArrayBase, checkNotNull(module.options.byteArrayBaseOffset))
     }
-    roots.initialize()
     analysis.cachedConstants.forEachIndexed { index, constant ->
         if (chunk.constants?.get(index) == false) return@forEachIndexed
         loadCachedConstant(constant)
@@ -48,16 +46,6 @@ private fun LowerContext.lowerChunkPrologue(
     }
     cachesLoaded = true
     openWindow()
-    if (function.exceptions != null && chunk.protects) {
-        emit.move(Registers.I0, registers.frameBase)
-        emit.convert(Conversion.IntToLong, Registers.W0, Registers.I0)
-        emit.const(Registers.I1, 32)
-        emit.binary(BinaryOp.ShlLong, Registers.W0, Registers.W0, Registers.I1)
-        frameIndex(Registers.I2, frameSlots)
-        emit.convert(Conversion.IntToLong, Registers.W1, Registers.I2)
-        emit.binary(BinaryOp.OrLong, Registers.W0, Registers.W0, Registers.W1)
-        emit.moveWide(registers.savedStack, Registers.W0)
-    }
     reloadSlots()
     if (facts.window.callBufferWords > 0) {
         emit.const(Registers.I0, 0)
@@ -81,6 +69,12 @@ private fun LowerContext.reloadSlots() {
         if (!registers.holds(slot) || (reloads != null && !reloads[slot])) {
             continue
         }
+        if (registers.holds(slot, SlotKindFlow.OBJECT)) {
+            reloadReference(slot)
+        }
+        if (registers.heldMask(slot) and SlotKindFlow.homeBit(SlotKindFlow.OBJECT).inv() == 0) {
+            continue
+        }
         if (!framed) {
             loadFrameArray()
             framed = true
@@ -88,8 +82,24 @@ private fun LowerContext.reloadSlots() {
 
         frameIndex(Registers.I2, slot)
         emit.arrayGet(ArrayKind.Wide, Registers.W0, Registers.OBJECT, Registers.I2)
-        forEachKind(registers.heldMask(slot)) { kind -> decodeInto(slot, kind, Registers.W0) }
+        forEachKind(registers.heldMask(slot)) { kind -> if (kind != SlotKindFlow.OBJECT) decodeInto(slot, kind, Registers.W0) }
     }
+}
+
+private fun LowerContext.reloadReference(slot: Int) {
+    emit.moveObject(Registers.SECOND_OBJECT, registers.objectFrame)
+    emit.const(Registers.I1, slot)
+    emit.arrayGet(ArrayKind.Object, Registers.THIRD_OBJECT, Registers.SECOND_OBJECT, Registers.I1)
+    emit.moveObject(registers.home(slot, SlotKindFlow.OBJECT), Registers.THIRD_OBJECT)
+}
+
+internal fun LowerContext.spillReference(
+    slot: Int,
+    register: Int,
+) {
+    emit.moveObject(Registers.SECOND_OBJECT, registers.objectFrame)
+    emit.const(Registers.I1, slot)
+    emit.arrayPut(ArrayKind.Object, register, Registers.SECOND_OBJECT, Registers.I1)
 }
 
 private fun LowerContext.loadFrameArray() {
@@ -141,6 +151,10 @@ private fun LowerContext.spill(
     slot: Int,
     kind: Byte,
 ) {
+    if (kind == SlotKindFlow.OBJECT) {
+        emit.moveObject(Registers.THIRD_OBJECT, registers.home(slot, kind))
+        return spillReference(slot, Registers.THIRD_OBJECT)
+    }
     loadEncoded(Registers.W0, slot, kind)
     frameIndex(Registers.I2, slot)
     emit.arrayPut(ArrayKind.Wide, Registers.W0, Registers.OBJECT, Registers.I2)
@@ -196,7 +210,8 @@ private fun LowerContext.lowerExits(
                 framed = true
             }
 
-            val kind = anyHome(registers.heldMask(slot), SlotKindFlow.LONG)
+            val held = registers.heldMask(slot)
+            val kind = if (held == SlotKindFlow.homeBit(SlotKindFlow.OBJECT)) SlotKindFlow.OBJECT else anyHome(held, SlotKindFlow.LONG)
             check(kind != SlotKindFlow.NONE)
             spill(slot, kind)
         }

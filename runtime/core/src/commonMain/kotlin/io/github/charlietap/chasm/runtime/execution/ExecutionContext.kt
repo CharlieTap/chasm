@@ -47,22 +47,34 @@ data class ExecutionContext(
     var pendingTailArguments: LongArray? = null
 
     @JvmField
+    var pendingTailReferences: Array<Any?>? = null
+
+    @JvmField
+    var managedException: Any? = null
+
+    @JvmField
+    var resultReferences: Array<Any?> = arrayOfNulls(0)
+
+    @JvmField
+    val allocation: AllocationMeter = store.allocation
+
+    @JvmField
     var compiledUnwinding: Boolean = false
 
     @JvmField
     var nestedInterpreter: NestedInterpreter? = null
 
     override val references: HostReferences
-        get() = heap
+        get() = store.referenceBridge?.references ?: heap
 
     override val gc: HostGc
-        get() = heap
+        get() = store.referenceBridge?.gc ?: heap
 
     override val externs: HostExterns
-        get() = heap
+        get() = store.referenceBridge?.externs ?: heap
 
     override val exceptions: HostExceptions
-        get() = heap
+        get() = store.referenceBridge?.exceptions ?: heap
 
     override fun memory(module: HostModuleInstance, index: ModuleIndex.MemoryIndex): HostMemory {
         val address = (module as ModuleInstance).memAddresses[index.index]
@@ -76,7 +88,8 @@ data class ExecutionContext(
 
     override fun table(module: HostModuleInstance, index: ModuleIndex.TableIndex): HostTable {
         val address = (module as ModuleInstance).tableAddresses[index.index]
-        return store.tables[address.address]
+        val table = store.tables[address.address]
+        return store.referenceBridge?.table(table) ?: table
     }
 
     override fun growTable(
@@ -86,12 +99,14 @@ data class ExecutionContext(
         value: HostReference,
     ): Int {
         val address = (module as ModuleInstance).tableAddresses[index.index]
-        return store.tables[address.address].grow(elementsToAdd, value)
+        val table = store.tables[address.address]
+        return store.referenceBridge?.growTable(table, elementsToAdd, value) ?: table.grow(elementsToAdd, value)
     }
 
     override fun global(module: HostModuleInstance, index: ModuleIndex.GlobalIndex): HostGlobal {
         val address = (module as ModuleInstance).globalAddresses[index.index]
-        return store.globals[address.address]
+        val global = store.globals[address.address]
+        return store.referenceBridge?.global(global) ?: global
     }
 
     override fun tag(module: HostModuleInstance, index: ModuleIndex.TagIndex): HostTag {

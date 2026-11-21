@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.compiler.backend.dex.analysis
 import io.github.charlietap.chasm.cir.AggregateInstruction
 import io.github.charlietap.chasm.cir.CirFunction
 import io.github.charlietap.chasm.cir.ControlInstruction
+import io.github.charlietap.chasm.cir.GlobalIndex
 import io.github.charlietap.chasm.cir.Instruction
 import io.github.charlietap.chasm.cir.MemoryIndex
 import io.github.charlietap.chasm.cir.MemoryInstruction
@@ -10,14 +11,16 @@ import io.github.charlietap.chasm.cir.ReferenceInstruction
 import io.github.charlietap.chasm.cir.VariableInstruction
 import io.github.charlietap.chasm.compiler.backend.abi.GLOBAL_INSTANCE
 import io.github.charlietap.chasm.compiler.backend.abi.MEMORY_INSTANCE
+import io.github.charlietap.chasm.compiler.backend.abi.REFERENCE_GLOBAL
+import io.github.charlietap.chasm.compiler.backend.abi.REFERENCE_TABLE
 import io.github.charlietap.chasm.compiler.backend.abi.REFERENCE_TYPE_TEST
 import io.github.charlietap.chasm.compiler.backend.abi.Resource
-import io.github.charlietap.chasm.compiler.backend.abi.TABLE_INSTANCE
 import io.github.charlietap.chasm.compiler.backend.analysis.InstructionTable
 import io.github.charlietap.chasm.compiler.backend.analysis.form.HelperArgument
 import io.github.charlietap.chasm.compiler.backend.analysis.form.arrayCopy
 import io.github.charlietap.chasm.compiler.backend.analysis.redundantBoundsChecks
 import io.github.charlietap.chasm.compiler.backend.dex.ModuleLowering
+import io.github.charlietap.chasm.type.ValueType
 
 internal sealed interface CachedConstant {
 
@@ -91,11 +94,27 @@ private fun cachedConstants(
         uses.getOrPut(resource) { ResourceUse(type) }.count += times
     }
 
+    fun useGlobal(
+        global: Int,
+    ) {
+        if (module.declarations.globalType(GlobalIndex(global)) is ValueType.Reference) {
+            use(Resource.ReferenceGlobal(global), REFERENCE_GLOBAL)
+        } else {
+            use(Resource.Global(global), GLOBAL_INSTANCE)
+        }
+    }
+
+    fun useTable(
+        table: Int,
+    ) {
+        use(Resource.ReferenceTable(table), REFERENCE_TABLE)
+    }
+
     for (position in function.instructions.indices) {
         when (val instruction = function.instructions[position]) {
-            is VariableInstruction.GlobalGetS -> use(Resource.Global(instruction.global.index), GLOBAL_INSTANCE)
-            is VariableInstruction.GlobalSetI -> use(Resource.Global(instruction.global.index), GLOBAL_INSTANCE)
-            is VariableInstruction.GlobalSetS -> use(Resource.Global(instruction.global.index), GLOBAL_INSTANCE)
+            is VariableInstruction.GlobalGetS -> useGlobal(instruction.global.index)
+            is VariableInstruction.GlobalSetI -> useGlobal(instruction.global.index)
+            is VariableInstruction.GlobalSetS -> useGlobal(instruction.global.index)
             is MemoryInstruction -> {
                 val access = table.accesses.accessIndexAt(position)
                 val memory = if (access >= 0) table.accesses.memories[access] else -1
@@ -104,19 +123,19 @@ private fun cachedConstants(
                 }
             }
             is ControlInstruction.CallIndirectI -> {
-                use(Resource.Table(instruction.table.index), TABLE_INSTANCE)
+                useTable(instruction.table.index)
                 valueLoads++
             }
             is ControlInstruction.CallIndirectS -> {
-                use(Resource.Table(instruction.table.index), TABLE_INSTANCE)
+                useTable(instruction.table.index)
                 valueLoads++
             }
             is ControlInstruction.ReturnCallIndirectI -> {
-                use(Resource.Table(instruction.table.index), TABLE_INSTANCE)
+                useTable(instruction.table.index)
                 valueLoads++
             }
             is ControlInstruction.ReturnCallIndirectS -> {
-                use(Resource.Table(instruction.table.index), TABLE_INSTANCE)
+                useTable(instruction.table.index)
                 valueLoads++
             }
             is ControlInstruction.Throw -> valueLoads++

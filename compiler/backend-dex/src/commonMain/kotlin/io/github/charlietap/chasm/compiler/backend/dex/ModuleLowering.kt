@@ -18,6 +18,7 @@ import io.github.charlietap.chasm.compiler.backend.dex.abi.typedCall
 import io.github.charlietap.chasm.compiler.backend.dex.analysis.CostFamilies
 import io.github.charlietap.chasm.compiler.backend.dex.binding.BatchConstants
 import io.github.charlietap.chasm.compiler.backend.dex.binding.BindingLayout
+import io.github.charlietap.chasm.compiler.backend.dex.gc.GcLayouts
 import io.github.charlietap.dexter.ClassBuilder
 import io.github.charlietap.dexter.ClassType
 import io.github.charlietap.dexter.DexFile
@@ -39,6 +40,8 @@ internal class ModuleLowering(
     val analysis: ModuleAnalysis get() = plan.analysis
     val layout: BindingLayout get() = plan.layout
     val packagePath: String get() = plan.packagePath
+    val referenceDescriptor: String get() = plan.referenceDescriptor
+    val gc: GcLayouts get() = plan.gc
     val inlineMemory: MemoryIndex? get() = plan.inlineMemory
     val batches: List<List<CirFunction>> get() = plan.batches
 
@@ -96,7 +99,7 @@ internal class ModuleLowering(
         analysis.signatureTypes.forEach { (key, type) ->
             val owner = checkNotNull(plan.signatureClass(key))
             file.addInterface(ClassType(owner))
-                .addAbstractMethod(references.of(typedCall(owner, type)))
+                .addAbstractMethod(references.of(typedCall(owner, type, referenceDescriptor)))
         }
     }
 }

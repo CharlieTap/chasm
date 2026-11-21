@@ -81,20 +81,16 @@ internal class SlotKindCursor(
         return read(homes, slot, state[slot], natural)
     }
 
-    fun readKindAfterWrites(
-        slot: Int,
-        natural: Byte,
-    ): Byte {
-        val homes = homes ?: return SlotKindFlow.LONG
-        return read(homes, slot, homes.flow.advanced(position, slot, state), natural)
-    }
-
     private fun read(
         homes: RegisterHomes,
         slot: Int,
         kind: Byte,
         natural: Byte,
     ): Byte {
+
+        if (kind == SlotKindFlow.OBJECT || natural == SlotKindFlow.OBJECT) {
+            return objectRead(homes, slot, kind)
+        }
 
         val pin = homes.pin(slot)
         if (pin != SlotKindFlow.UNDEFINED) {
@@ -114,19 +110,36 @@ internal class SlotKindCursor(
         return homeKind
     }
 
+    private fun objectRead(
+        homes: RegisterHomes,
+        slot: Int,
+        kind: Byte,
+    ): Byte {
+
+        if (kind != SlotKindFlow.OBJECT && SlotKindFlow.definite(kind)) {
+            throw HomeMismatch(slot, position)
+        }
+        if (homes.mask(slot) and SlotKindFlow.homeBit(SlotKindFlow.OBJECT) == 0) {
+            throw HomeMismatch(slot, position)
+        }
+
+        return SlotKindFlow.OBJECT
+    }
+
     fun writeKind(slot: Int): Byte {
 
         val homes = homes ?: return SlotKindFlow.LONG
         val pin = homes.pin(slot)
         if (position == PROLOGUE) {
-            return if (pin != SlotKindFlow.UNDEFINED) pin else homes.flow.entryKind(slot)
+            val entry = homes.flow.entryKind(slot)
+            return if (entry == SlotKindFlow.OBJECT || pin == SlotKindFlow.UNDEFINED) entry else pin
         }
 
         val kind = homes.flow.written(position, slot)
         if (kind == SlotKindFlow.NONE) {
             throw HomeMismatch(slot, position)
         }
-        if (kind == SlotKindFlow.UNDEFINED || pin == SlotKindFlow.UNDEFINED) {
+        if (kind == SlotKindFlow.OBJECT || kind == SlotKindFlow.UNDEFINED || pin == SlotKindFlow.UNDEFINED) {
             return unpinned(slot, kind)
         }
         return pin
@@ -144,7 +157,7 @@ internal class SlotKindCursor(
     ): Byte {
         val homes = homes ?: return SlotKindFlow.LONG
         val pin = homes.pin(slot)
-        return if (kind == SlotKindFlow.UNDEFINED || pin == SlotKindFlow.UNDEFINED) unpinned(slot, kind) else pin
+        return if (kind == SlotKindFlow.OBJECT || kind == SlotKindFlow.UNDEFINED || pin == SlotKindFlow.UNDEFINED) unpinned(slot, kind) else pin
     }
 
     private fun unpinned(

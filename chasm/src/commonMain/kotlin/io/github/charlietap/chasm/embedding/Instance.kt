@@ -8,7 +8,9 @@ import io.github.charlietap.chasm.declarations.ModuleDeclarations
 import io.github.charlietap.chasm.embedding.diagnostic.InterpreterTrapSource
 import io.github.charlietap.chasm.embedding.diagnostic.TrapSource
 import io.github.charlietap.chasm.embedding.error.ChasmError
+import io.github.charlietap.chasm.embedding.internal.MIXED_STORE_ERROR
 import io.github.charlietap.chasm.embedding.internal.ModuleCodeInstaller
+import io.github.charlietap.chasm.embedding.internal.holdsManagedReferences
 import io.github.charlietap.chasm.embedding.internal.instantiate
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Import
@@ -44,7 +46,13 @@ internal fun instance(
     instantiator: ModuleInstantiator,
     codeInstaller: ModuleCodeInstaller,
     trapSource: (RuntimeModuleInstance) -> TrapSource?,
-): ChasmResult<Instance, ChasmError.ExecutionError> =
-    instantiate(store, imports, config, trapSource) { effectiveConfig, runtime, runtimeImports ->
+): ChasmResult<Instance, ChasmError.ExecutionError> {
+
+    if (holdsManagedReferences(store)) {
+        return ChasmResult.Error(ChasmError.ExecutionError(MIXED_STORE_ERROR))
+    }
+
+    return instantiate(store, imports, config, trapSource) { effectiveConfig, runtime, runtimeImports ->
         instantiator(effectiveConfig, runtime, declarations, runtimeImports, codeInstaller)
     }
+}

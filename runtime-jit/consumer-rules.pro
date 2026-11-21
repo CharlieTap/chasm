@@ -1,5 +1,5 @@
 -keep class io.github.charlietap.chasm.runtime.compiled.Compiled* { public static *; }
--keep class io.github.charlietap.chasm.runtime.compiled.BindingEntry { public <fields>; public <init>(...); }
+-keep class io.github.charlietap.chasm.runtime.compiled.BindingEntry { public <fields>; public <init>(...); public void callObjects(...); }
 -keep class io.github.charlietap.chasm.runtime.compiled.CodeInstallation { public *; }
 -keep interface io.github.charlietap.chasm.runtime.function.CompiledFunction { *; }
 -keep class io.github.charlietap.chasm.runtime.execution.ExecutionContext { public <fields>; }
@@ -7,3 +7,16 @@
 -keep class io.github.charlietap.chasm.runtime.instance.MemoryInstance { public byte[] byteArray; public int getSize(); }
 -keepnames class io.github.charlietap.chasm.runtime.instance.**
 -keep,allowobfuscation,allowshrinking class io.github.charlietap.chasm.executor.invoker.compiled.CompiledEntry { *** invoke(...); }
+-keep class io.github.charlietap.chasm.runtime.compiled.gc.ManagedOps { public static *; }
+-keep class io.github.charlietap.chasm.runtime.compiled.gc.ManagedArrays { public static *; }
+-keep class io.github.charlietap.chasm.runtime.compiled.gc.ManagedTables { public static *; }
+-keep class io.github.charlietap.chasm.runtime.compiled.gc.ManagedValues { public static *; }
+-keep class io.github.charlietap.chasm.runtime.compiled.gc.WasmEq { <init>(...); }
+-keep class io.github.charlietap.chasm.runtime.compiled.gc.WasmStruct { <init>(...); }
+-keep class io.github.charlietap.chasm.runtime.compiled.gc.WasmArray { <init>(...); public java.lang.Object storage(); public int length(); }
+-keep class io.github.charlietap.chasm.runtime.compiled.gc.WasmI31 { <init>(...); public <fields>; }
+-keep class io.github.charlietap.chasm.runtime.compiled.gc.WasmException { public <fields>; }
+-keep class io.github.charlietap.chasm.runtime.compiled.gc.ReferenceGlobal { public <fields>; }
+-keep class io.github.charlietap.chasm.runtime.compiled.gc.ReferenceTable { public <fields>; }
+-keep class io.github.charlietap.chasm.runtime.compiled.gc.ReferenceSegment { public <fields>; }
+-keep class io.github.charlietap.chasm.runtime.execution.AllocationMeter { public <fields>; }

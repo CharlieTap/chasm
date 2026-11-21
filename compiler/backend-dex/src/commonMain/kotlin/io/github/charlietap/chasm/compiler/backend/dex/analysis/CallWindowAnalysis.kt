@@ -8,6 +8,8 @@ import io.github.charlietap.chasm.compiler.backend.abi.ARRAY_NEW_FIXED
 import io.github.charlietap.chasm.compiler.backend.abi.ARRAY_SET
 import io.github.charlietap.chasm.compiler.backend.abi.BRIDGE_CALL_INDIRECT
 import io.github.charlietap.chasm.compiler.backend.abi.BRIDGE_CALL_REF
+import io.github.charlietap.chasm.compiler.backend.abi.CALL_INDIRECT_OBJECTS
+import io.github.charlietap.chasm.compiler.backend.abi.REQUEST_TAIL_INDIRECT_OBJECTS
 import io.github.charlietap.chasm.compiler.backend.abi.STRUCT_SET
 import io.github.charlietap.chasm.compiler.backend.abi.TAIL_CALL_INDIRECT
 import io.github.charlietap.chasm.compiler.backend.analysis.form.InstructionForms
@@ -65,6 +67,12 @@ internal fun analyzeCallWindow(
             else -> if (instruction.isArrayCopy()) ARRAY_COPY.words else forms.helperCall(position)?.words ?: 0
         }
         helperWords = maxOf(helperWords, words)
+        if (call != null && bridges) {
+            helperWords = maxOf(helperWords, CALL_INDIRECT_OBJECTS.words)
+        }
+        if (instruction is ControlInstruction.ReturnCallIndirectI || instruction is ControlInstruction.ReturnCallIndirectS) {
+            helperWords = maxOf(helperWords, REQUEST_TAIL_INDIRECT_OBJECTS.words + 1)
+        }
 
         val transfer = when (instruction) {
             is AdminInstruction.CopySlots -> instruction.sourceSlots.size

@@ -733,6 +733,19 @@ class WasmHeap internal constructor(
         return field
     }
 
+    fun runtimeStructFieldType(
+        type: HostGcType,
+        fieldIndex: Int,
+    ): FieldType {
+        return checkNotNull(structTypes[type.id]).fields[fieldIndex]
+    }
+
+    fun runtimeArrayFieldType(
+        type: HostGcType,
+    ): FieldType {
+        return checkNotNull(arrayTypes[type.id]).fieldType
+    }
+
     fun structRuntimeTypeIdOrNegative(rawReference: Long): Int {
         val runtimeTypeId = garbageCollectedHeap.structSemanticIdOrNegative(rawReference)
         return if (runtimeTypeId < 0 || structTypes.getOrNull(runtimeTypeId) == null) -1 else runtimeTypeId

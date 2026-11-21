@@ -129,6 +129,11 @@ include(":vm")
 
 includeBuild("tools/sweet")
 includeBuild("tools/corpus")
+includeBuild("../dexter") {
+    dependencySubstitution {
+        substitute(module("io.github.charlietap.dexter:dexter")).using(project(":dexter"))
+    }
+}
 
 rootProject.name = "chasm-multiplatform"
 

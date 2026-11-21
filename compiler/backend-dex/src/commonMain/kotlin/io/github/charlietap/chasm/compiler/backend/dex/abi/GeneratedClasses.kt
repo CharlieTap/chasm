@@ -25,6 +25,10 @@ internal fun installClass(
     packagePath: String,
 ) = "L$packagePath/Install;"
 
+internal fun constantsClass(
+    packagePath: String,
+) = "L$packagePath/Constants;"
+
 internal fun signatureClass(
     packagePath: String,
     index: Int,
@@ -38,8 +42,9 @@ internal fun functionMethod(
     owner: String,
     index: Int,
     type: FunctionType,
+    reference: String,
 ) =
-    MethodRef(owner, functionName(index), staticParameters(type), returnDescriptor(type))
+    MethodRef(owner, functionName(index), bindingParameters(type, reference), returnDescriptor(type, reference))
 
 internal const val TYPED_CALL = "typed"
 

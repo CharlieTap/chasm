@@ -2,29 +2,35 @@ package io.github.charlietap.chasm.compiler.backend.dex.lower
 
 import io.github.charlietap.chasm.cir.ControlInstruction
 import io.github.charlietap.chasm.cir.FunctionIndex
-import io.github.charlietap.chasm.compiler.backend.abi.BRIDGE_CALL
-import io.github.charlietap.chasm.compiler.backend.abi.BRIDGE_CALL_INDIRECT
-import io.github.charlietap.chasm.compiler.backend.abi.BRIDGE_CALL_REF
-import io.github.charlietap.chasm.compiler.backend.abi.CACHED_INDIRECT_TARGET
-import io.github.charlietap.chasm.compiler.backend.abi.COMPLETE_TAIL_CALL
+import io.github.charlietap.chasm.compiler.backend.abi.CALL_IMPORT
+import io.github.charlietap.chasm.compiler.backend.abi.CALL_INDIRECT_OBJECTS
+import io.github.charlietap.chasm.compiler.backend.abi.CALL_OBJECTS
+import io.github.charlietap.chasm.compiler.backend.abi.CALL_REFERENCE
+import io.github.charlietap.chasm.compiler.backend.abi.CALL_REFERENCE_OBJECTS
+import io.github.charlietap.chasm.compiler.backend.abi.COMPLETE_TAIL_OBJECTS
 import io.github.charlietap.chasm.compiler.backend.abi.CONTEXT_TYPE
 import io.github.charlietap.chasm.compiler.backend.abi.FUNCTION_INSTANCE
 import io.github.charlietap.chasm.compiler.backend.abi.INT_BITS_TO_FLOAT
 import io.github.charlietap.chasm.compiler.backend.abi.LONG_BITS_TO_DOUBLE
+import io.github.charlietap.chasm.compiler.backend.abi.MANAGED_INDIRECT_ENTRY
 import io.github.charlietap.chasm.compiler.backend.abi.MODULE_INSTANCE
+import io.github.charlietap.chasm.compiler.backend.abi.OBJECT_TYPE
 import io.github.charlietap.chasm.compiler.backend.abi.PENDING_TAIL_FIELD
-import io.github.charlietap.chasm.compiler.backend.abi.REF_TARGET
+import io.github.charlietap.chasm.compiler.backend.abi.REFERENCE_TABLE
+import io.github.charlietap.chasm.compiler.backend.abi.REFERENCE_TARGET
+import io.github.charlietap.chasm.compiler.backend.abi.RESULT_REFERENCES
 import io.github.charlietap.chasm.compiler.backend.abi.Resource
-import io.github.charlietap.chasm.compiler.backend.abi.TABLE_INSTANCE
 import io.github.charlietap.chasm.compiler.backend.abi.descriptorWords
 import io.github.charlietap.chasm.compiler.backend.abi.returnDescriptor
 import io.github.charlietap.chasm.compiler.backend.abi.takesArgumentArray
+import io.github.charlietap.chasm.compiler.backend.abi.takesReferenceArray
 import io.github.charlietap.chasm.compiler.backend.abi.valueDescriptor
 import io.github.charlietap.chasm.compiler.backend.analysis.form.CallSite
 import io.github.charlietap.chasm.compiler.backend.analysis.form.Operand
 import io.github.charlietap.chasm.compiler.backend.dex.abi.typedCall
 import io.github.charlietap.chasm.compiler.backend.dex.analysis.SlotKindFlow
 import io.github.charlietap.chasm.type.FunctionType
+import io.github.charlietap.chasm.type.ValueType
 import io.github.charlietap.dexter.ArrayKind
 import io.github.charlietap.dexter.Cond
 import io.github.charlietap.dexter.Conversion
@@ -75,19 +81,19 @@ private fun LowerContext.typedIndirectCall(
     when (instruction) {
         is ControlInstruction.CallIndirectS -> {
             loadValueInt(Registers.I2, Resource.RuntimeType(instruction.type.index))
-            loadObject(Registers.W1, Resource.Table(instruction.table.index), TABLE_INSTANCE)
+            loadIndirectTable(Registers.W1, instruction.table.index)
             loadInt(Registers.I0, Registers.W0, Operand.Slot(instruction.elementIndexSlot))
-            emit.invoke(CACHED_INDIRECT_TARGET, Registers.CONTEXT, Registers.W1, Registers.I2, Registers.I0)
+            emit.invoke(MANAGED_INDIRECT_ENTRY, Registers.CONTEXT, Registers.W1, Registers.I2, Registers.I0)
         }
         is ControlInstruction.CallIndirectI -> {
             loadValueInt(Registers.I2, Resource.RuntimeType(instruction.type.index))
-            loadObject(Registers.W1, Resource.Table(instruction.table.index), TABLE_INSTANCE)
+            loadIndirectTable(Registers.W1, instruction.table.index)
             emit.const(Registers.I0, instruction.elementIndex)
-            emit.invoke(CACHED_INDIRECT_TARGET, Registers.CONTEXT, Registers.W1, Registers.I2, Registers.I0)
+            emit.invoke(MANAGED_INDIRECT_ENTRY, Registers.CONTEXT, Registers.W1, Registers.I2, Registers.I0)
         }
         is ControlInstruction.CallRefS -> {
-            loadWide(Registers.W2, instruction.functionSlot)
-            emit.invoke(REF_TARGET, Registers.CONTEXT, Registers.W2, Registers.W2 + 1)
+            loadReference(Registers.OBJECT, instruction.functionSlot)
+            emit.invoke(REFERENCE_TARGET, Registers.OBJECT)
         }
         else -> throw Unsupported(instruction::class.simpleName ?: "call")
     }
@@ -109,10 +115,10 @@ private fun LowerContext.invokeTypedTarget(
     emit.moveObject(registers.window, Registers.OBJECT)
     loadWindow(call.type, call.arguments())
     emit.move(registers.window + 2, Registers.DEPTH)
-    emit.invokeInterfaceRange(typedCall(signature, call.type), registers.window)
+    emit.invokeInterfaceRange(typedCall(signature, call.type, module.referenceDescriptor), registers.window)
 
     finishCall(
-        returns = returnDescriptor(call.type),
+        returns = returnDescriptor(call.type, module.referenceDescriptor),
         call = call,
         restoreBinding = true,
         checksUnwinding = module.analysis.usesExceptions,
@@ -127,7 +133,6 @@ private fun LowerContext.conformingTarget(
 ) {
     emit.instanceOf(Registers.I3, Registers.OBJECT, signature)
     emit.branchZero(Cond.Eq, Registers.I3, bridge)
-    emit.checkCast(Registers.OBJECT, signature)
 }
 
 private fun LowerContext.finishCall(
@@ -146,17 +151,17 @@ private fun LowerContext.finishCall(
             "I" -> SlotKindFlow.INT
             "F" -> SlotKindFlow.FLOAT
             "D" -> SlotKindFlow.DOUBLE
+            OBJECT_TYPE -> SlotKindFlow.OBJECT
             else -> SlotKindFlow.LONG
         }
         val home = writeTarget(slot, kind)
 
         if (home >= 0) {
-            if (returns == "J" || returns == "D") {
-                emit.moveResultWide(home)
-            } else {
-                emit.moveResult(home)
+            when (returns) {
+                "J", "D" -> emit.moveResultWide(home)
+                OBJECT_TYPE -> emit.moveResultObject(home)
+                else -> emit.moveResult(home)
             }
-            roots.refreshAfterCall(position)
             if (returns == "J") {
                 finishWide(slot, home, home)
             }
@@ -175,10 +180,15 @@ private fun LowerContext.finishCall(
     if (checksUnwinding) {
         unwindCheck()
     }
-    if (checksPendingTailCall) {
-        completePendingTailCall(returns, results)
+    val referenceResults = results > 1 && call.type.results.types.any { type -> type is ValueType.Reference }
+    if (referenceResults) {
+        emit.const(Registers.I0, results)
+        emit.invoke(RESULT_REFERENCES, Registers.CONTEXT, Registers.I0)
+        emit.moveResultObject(Registers.THIRD_OBJECT)
     }
-    roots.refreshAfterCall(position)
+    if (checksPendingTailCall) {
+        completePendingTailObjects(call.type, returns)
+    }
 
     when (results) {
         0 -> Unit
@@ -186,44 +196,86 @@ private fun LowerContext.finishCall(
             "I" -> storeInt(call.resultBase, Registers.I1)
             "F" -> storeFloat(call.resultBase, Registers.I1)
             "D" -> storeDouble(call.resultBase, Registers.W0)
+            OBJECT_TYPE -> storeReference(call.resultBase, Registers.OBJECT)
             else -> store(call.resultBase, Registers.W0)
         }
-        else -> for (index in 0 until results) {
-            emit.const(Registers.I2, index)
-            emit.arrayGet(ArrayKind.Wide, Registers.W0, Registers.OBJECT, Registers.I2)
-            store(call.resultBase + index, Registers.W0)
+        else -> {
+            val types = call.type.results.types
+            if (referenceResults) {
+                types.forEachIndexed { index, type ->
+                    if (type !is ValueType.Reference) return@forEachIndexed
+                    emit.const(Registers.I1, index)
+                    emit.arrayGet(ArrayKind.Object, Registers.SECOND_OBJECT, Registers.THIRD_OBJECT, Registers.I1)
+                    storeReference(call.resultBase + index, Registers.SECOND_OBJECT)
+                }
+            }
+            for (index in 0 until results) {
+                if (referenceResults && types[index] is ValueType.Reference) continue
+                emit.const(Registers.I2, index)
+                emit.arrayGet(ArrayKind.Wide, Registers.W0, Registers.OBJECT, Registers.I2)
+                store(call.resultBase + index, Registers.W0)
+            }
         }
     }
 }
 
-private fun LowerContext.completePendingTailCall(
+private fun LowerContext.completePendingTailObjects(
+    type: FunctionType,
     returns: String,
-    results: Int,
 ) {
+
+    val results = type.results.types
+
     val done = emit.freshLabel()
     emit.getField(Registers.I0, Registers.CONTEXT, CONTEXT_TYPE, PENDING_TAIL_FIELD, FUNCTION_INSTANCE)
     emit.branchZero(Cond.Eq, Registers.I0, done)
-    emit.const(Registers.I0, maxOf(results, 1))
-    emit.newArray(Registers.OBJECT, Registers.I0, "[J")
-    emit.invoke(COMPLETE_TAIL_CALL, Registers.CONTEXT, Registers.OBJECT, Registers.DEPTH)
+    newLanes(maxOf(results.size, 1), words = true, references = results.any { result -> result is ValueType.Reference })
+    emit.invoke(COMPLETE_TAIL_OBJECTS, Registers.CONTEXT, Registers.SECOND_OBJECT, Registers.THIRD_OBJECT, Registers.DEPTH)
     unwindCheck()
-    if (results == 1) {
-        emit.const(Registers.I2, 0)
-        emit.arrayGet(ArrayKind.Wide, Registers.W0, Registers.OBJECT, Registers.I2)
+
+    if (results.size > 1) {
+        emit.moveObject(Registers.OBJECT, Registers.SECOND_OBJECT)
+    } else if (results.size == 1) {
+        emit.const(Registers.I0, 0)
         when (returns) {
-            "I" -> emit.convert(Conversion.LongToInt, Registers.I1, Registers.W0)
-            "F" -> {
-                emit.convert(Conversion.LongToInt, Registers.I1, Registers.W0)
-                emit.invoke(INT_BITS_TO_FLOAT, Registers.I1)
-                emit.moveResult(Registers.I1)
-            }
-            "D" -> {
-                emit.invoke(LONG_BITS_TO_DOUBLE, Registers.W0, Registers.W0 + 1)
-                emit.moveResultWide(Registers.W0)
+            OBJECT_TYPE -> emit.arrayGet(ArrayKind.Object, Registers.OBJECT, Registers.THIRD_OBJECT, Registers.I0)
+            else -> {
+                emit.arrayGet(ArrayKind.Wide, Registers.W0, Registers.SECOND_OBJECT, Registers.I0)
+                when (returns) {
+                    "I" -> emit.convert(Conversion.LongToInt, Registers.I1, Registers.W0)
+                    "F" -> {
+                        emit.convert(Conversion.LongToInt, Registers.I1, Registers.W0)
+                        emit.invoke(INT_BITS_TO_FLOAT, Registers.I1)
+                        emit.moveResult(Registers.I1)
+                    }
+                    "D" -> {
+                        emit.invoke(LONG_BITS_TO_DOUBLE, Registers.W0, Registers.W0 + 1)
+                        emit.moveResultWide(Registers.W0)
+                    }
+                }
             }
         }
     }
     emit.place(done)
+}
+
+internal fun LowerContext.newLanes(
+    size: Int,
+    words: Boolean,
+    references: Boolean,
+) {
+
+    emit.const(Registers.I0, size)
+    if (words) {
+        emit.newArray(Registers.SECOND_OBJECT, Registers.I0, "[J")
+    } else {
+        emit.const(Registers.SECOND_OBJECT, 0)
+    }
+    if (references) {
+        emit.newArray(Registers.THIRD_OBJECT, Registers.I0, OBJECT_ARRAY)
+    } else {
+        emit.const(Registers.THIRD_OBJECT, 0)
+    }
 }
 
 internal fun LowerContext.loadCallBuffer() {
@@ -242,19 +294,31 @@ internal fun LowerContext.loadWindow(
 ): Int {
     val window = registers.window
     if (takesArgumentArray(type)) {
+        val referenceArray = takesReferenceArray(type, module.referenceDescriptor)
         emit.const(Registers.I0, arguments.size)
         emit.newArray(Registers.OBJECT, Registers.I0, "[J")
         arguments.forEachIndexed { index, argument ->
+            if (referenceArray && type.params.types[index] is ValueType.Reference) return@forEachIndexed
             loadWide(Registers.W0, argument)
             emit.const(Registers.I2, index)
             emit.arrayPut(ArrayKind.Wide, Registers.W0, Registers.OBJECT, Registers.I2)
         }
         emit.moveObject(window + 3, Registers.OBJECT)
-        return 1
+        if (!referenceArray) return 1
+        emit.const(Registers.I0, arguments.size)
+        emit.newArray(Registers.SECOND_OBJECT, Registers.I0, OBJECT_ARRAY)
+        arguments.forEachIndexed { index, argument ->
+            if (type.params.types[index] !is ValueType.Reference) return@forEachIndexed
+            loadReference(Registers.OBJECT, argument)
+            emit.const(Registers.I1, index)
+            emit.arrayPut(ArrayKind.Object, Registers.OBJECT, Registers.SECOND_OBJECT, Registers.I1)
+        }
+        emit.moveObject(window + 4, Registers.SECOND_OBJECT)
+        return 2
     }
     var words = 0
     arguments.forEachIndexed { index, argument ->
-        val descriptor = valueDescriptor(type.params.types[index])
+        val descriptor = valueDescriptor(type.params.types[index], module.referenceDescriptor)
         loadArgument(window + 3 + words, argument, descriptor)
         words += descriptorWords(descriptor)
     }
@@ -286,6 +350,7 @@ internal fun LowerContext.loadArgument(
                 emit.moveWide(register, Registers.W0)
             }
         }
+        OBJECT_TYPE -> loadReference(register, argument)
         else -> when {
             argument is Operand.Slot && readsLong(argument.slot) -> emit.moveWide(register, registers.home(argument.slot, SlotKindFlow.LONG))
             argument is Operand.Immediate && register < 256 -> emit.constWide(register, argument.bits)
@@ -301,6 +366,10 @@ private fun LowerContext.bridgeCall(
     instruction: ControlInstruction,
     call: CallSite,
 ) {
+    val indirect = instruction is ControlInstruction.CallIndirectI || instruction is ControlInstruction.CallIndirectS
+    if (indirect || (call.type.params.types + call.type.results.types).any { type -> type is ValueType.Reference }) {
+        return bridgeObjects(instruction, call)
+    }
     loadCallBuffer()
     call.arguments().forEachIndexed { index, argument ->
         loadWide(Registers.W0, argument)
@@ -311,29 +380,23 @@ private fun LowerContext.bridgeCall(
         is ControlInstruction.Call -> {
             loadObject(Registers.W1, Resource.Instance, MODULE_INSTANCE)
             loadObject(Registers.W1 + 1, Resource.Function(instruction.function.index), FUNCTION_INSTANCE)
-            emit.invoke(BRIDGE_CALL, Registers.CONTEXT, Registers.W1, Registers.W1 + 1, Registers.OBJECT, Registers.DEPTH)
+            emit.invoke(CALL_IMPORT, Registers.CONTEXT, Registers.W1, Registers.W1 + 1, Registers.OBJECT, Registers.DEPTH)
         }
-        is ControlInstruction.CallIndirectI ->
-            bridgeIndirect(instruction.table.index, instruction.type.index, Operand.Immediate(instruction.elementIndex.toLong()))
-        is ControlInstruction.CallIndirectS ->
-            bridgeIndirect(instruction.table.index, instruction.type.index, Operand.Slot(instruction.elementIndexSlot))
         is ControlInstruction.CallRefS -> {
             val window = registers.window + 1
-            emit.moveObject(window + 4, Registers.OBJECT)
             emit.moveObject(window, Registers.CONTEXT)
             loadObject(Registers.W1, Resource.Instance, MODULE_INSTANCE)
             emit.moveObject(window + 1, Registers.W1)
-            loadWide(Registers.W2, instruction.functionSlot)
-            emit.moveWide(window + 2, Registers.W2)
-            emit.move(window + 5, Registers.DEPTH)
-            emit.invokeRange(BRIDGE_CALL_REF, window, BRIDGE_CALL_REF.words)
+            emit.moveObject(window + 3, Registers.OBJECT)
+            loadReference(window + 2, instruction.functionSlot)
+            emit.move(window + 4, Registers.DEPTH)
+            emit.invokeRange(CALL_REFERENCE, window, CALL_REFERENCE.words)
             restoreWindow()
             emit.moveObject(Registers.OBJECT, registers.callBuffer)
         }
         else -> throw Unsupported(instruction::class.simpleName ?: "call")
     }
     unwindCheck()
-    roots.refreshAfterCall(position)
     for (index in call.type.results.types.indices) {
         emit.const(Registers.I2, index)
         emit.arrayGet(ArrayKind.Wide, Registers.W0, Registers.OBJECT, Registers.I2)
@@ -341,24 +404,83 @@ private fun LowerContext.bridgeCall(
     }
 }
 
-private fun LowerContext.bridgeIndirect(
-    table: Int,
-    type: Int,
-    elementIndex: Operand,
+private fun LowerContext.bridgeObjects(
+    instruction: ControlInstruction,
+    call: CallSite,
 ) {
+
+    val parameters = call.type.params.types
+    val results = call.type.results.types
+    newLanes(maxOf(parameters.size, results.size, 1), words = true, references = (parameters + results).any { type -> type is ValueType.Reference })
+
+    call.arguments().forEachIndexed { index, argument ->
+        emit.const(Registers.I1, index)
+        if (parameters[index] is ValueType.Reference) {
+            loadReference(Registers.OBJECT, argument)
+            emit.arrayPut(ArrayKind.Object, Registers.OBJECT, Registers.THIRD_OBJECT, Registers.I1)
+        } else {
+            loadWide(Registers.W0, argument)
+            emit.arrayPut(ArrayKind.Wide, Registers.W0, Registers.SECOND_OBJECT, Registers.I1)
+        }
+    }
+
     val window = registers.window + 1
-    emit.moveObject(window + 5, Registers.OBJECT)
     emit.moveObject(window, Registers.CONTEXT)
-    loadValueInt(Registers.I0, Resource.RuntimeType(type))
-    emit.move(window + 3, Registers.I0)
-    loadObject(Registers.W1, Resource.Instance, MODULE_INSTANCE)
-    emit.moveObject(window + 1, Registers.W1)
-    loadObject(Registers.W1, Resource.Table(table), TABLE_INSTANCE)
-    emit.moveObject(window + 2, Registers.W1)
-    loadInt(Registers.I0, Registers.W0, elementIndex)
-    emit.move(window + 4, Registers.I0)
-    emit.move(window + 6, Registers.DEPTH)
-    emit.invokeRange(BRIDGE_CALL_INDIRECT, window, BRIDGE_CALL_INDIRECT.words)
+    loadObject(Registers.OBJECT, Resource.Instance, MODULE_INSTANCE)
+    emit.moveObject(window + 1, Registers.OBJECT)
+    when (instruction) {
+        is ControlInstruction.Call -> {
+            loadObject(Registers.OBJECT, Resource.Function(instruction.function.index), FUNCTION_INSTANCE)
+            emit.moveObject(window + 2, Registers.OBJECT)
+            objectLane(window + 3)
+            emit.invokeRange(CALL_OBJECTS, window, CALL_OBJECTS.words)
+        }
+        is ControlInstruction.CallIndirectI, is ControlInstruction.CallIndirectS -> {
+            val table = if (instruction is ControlInstruction.CallIndirectI) instruction.table.index else (instruction as ControlInstruction.CallIndirectS).table.index
+            val type = if (instruction is ControlInstruction.CallIndirectI) instruction.type.index else (instruction as ControlInstruction.CallIndirectS).type.index
+            val element = if (instruction is ControlInstruction.CallIndirectI) Operand.Immediate(instruction.elementIndex.toLong()) else Operand.Slot((instruction as ControlInstruction.CallIndirectS).elementIndexSlot)
+            loadObject(Registers.OBJECT, Resource.ReferenceTable(table), REFERENCE_TABLE)
+            emit.moveObject(window + 2, Registers.OBJECT)
+            loadValueInt(Registers.I0, Resource.RuntimeType(type))
+            emit.move(window + 3, Registers.I0)
+            loadInt(Registers.I0, Registers.W0, element)
+            emit.move(window + 4, Registers.I0)
+            objectLane(window + 5)
+            emit.invokeRange(CALL_INDIRECT_OBJECTS, window, CALL_INDIRECT_OBJECTS.words)
+        }
+        is ControlInstruction.CallRefS -> {
+            loadReference(window + 2, instruction.functionSlot)
+            objectLane(window + 3)
+            emit.invokeRange(CALL_REFERENCE_OBJECTS, window, CALL_REFERENCE_OBJECTS.words)
+        }
+        else -> throw Unsupported(instruction::class.simpleName ?: "call")
+    }
     restoreWindow()
-    emit.moveObject(Registers.OBJECT, registers.callBuffer)
+    unwindCheck()
+
+    results.forEachIndexed { index, type ->
+        emit.const(Registers.I1, index)
+        if (type is ValueType.Reference) {
+            emit.arrayGet(ArrayKind.Object, Registers.OBJECT, Registers.THIRD_OBJECT, Registers.I1)
+            storeReference(call.resultBase + index, Registers.OBJECT)
+        } else {
+            emit.arrayGet(ArrayKind.Wide, Registers.W0, Registers.SECOND_OBJECT, Registers.I1)
+            store(call.resultBase + index, Registers.W0)
+        }
+    }
 }
+
+private fun LowerContext.loadIndirectTable(
+    register: Int,
+    table: Int,
+) {
+    loadObject(register, Resource.ReferenceTable(table), REFERENCE_TABLE)
+}
+
+private fun LowerContext.objectLane(first: Int) {
+    emit.moveObject(first, Registers.SECOND_OBJECT)
+    emit.moveObject(first + 1, Registers.THIRD_OBJECT)
+    emit.move(first + 2, Registers.DEPTH)
+}
+
+private const val OBJECT_ARRAY = "[Ljava/lang/Object;"

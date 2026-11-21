@@ -1,0 +1,76 @@
+(module
+  (import "tags" "boom" (tag $boom (param i32)))
+  (import "host" "raise" (func $raise (param i32)))
+  (import "host" "raise_reference" (func $raise_reference (param externref) (param i32)))
+  (import "host" "fail" (func $fail))
+  (import "relay" "relay" (func $relay (param i32)))
+  (import "relay" "chunked_relay" (func $chunked_relay (param i32)))
+
+  (func $pass_through (param i32)
+    (call $raise (local.get 0)))
+
+  (func (export "catch_here") (param i32) (result i32)
+    (block $caught (result i32)
+      (try_table (catch $boom $caught) (call $raise (local.get 0)))
+      (return (i32.const -1)))
+    (i32.const 1)
+    (i32.add))
+
+  (func (export "catch_above") (param i32) (result i32)
+    (block $caught (result i32)
+      (try_table (catch $boom $caught) (call $pass_through (local.get 0)))
+      (return (i32.const -1)))
+    (i32.const 2)
+    (i32.add))
+
+  (func (export "catch_all_above") (param i32) (result i32)
+    (block $caught
+      (try_table (catch_all $caught) (call $pass_through (local.get 0)))
+      (return (i32.const -1)))
+    (i32.const 3))
+
+  (func (export "rethrow_to_outer") (param i32) (result i32)
+    (block $outer (result i32)
+      (try_table (catch $boom $outer)
+        (block $inner (result exnref)
+          (try_table (catch_all_ref $inner) (call $raise (local.get 0)))
+          (return (i32.const -1)))
+        (throw_ref))
+      (return (i32.const -2)))
+    (i32.const 4)
+    (i32.add))
+
+  (func (export "catch_reference_lane") (param i32) (result i32)
+    (block $caught (result i32)
+      (try_table (catch $boom $caught) (call $raise_reference (ref.null extern) (local.get 0)))
+      (return (i32.const -1)))
+    (i32.const 5)
+    (i32.add))
+
+  (func (export "catch_through_relay") (param i32) (result i32)
+    (block $caught (result i32)
+      (try_table (catch $boom $caught) (call $relay (local.get 0)))
+      (return (i32.const -1)))
+    (i32.const 6)
+    (i32.add))
+
+  (func (export "catch_through_chunked_relay_repeatedly") (param $times i32) (result i32)
+    (local $caught i32)
+    (loop $again
+      (block $caught_once (result i32)
+        (try_table (catch $boom $caught_once) (call $chunked_relay (local.get $times)))
+        (return (i32.const -1)))
+      (drop)
+      (local.set $caught (i32.add (local.get $caught) (i32.const 1)))
+      (br_if $again (i32.lt_u (local.get $caught) (local.get $times))))
+    (local.get $caught))
+
+  (func (export "trap_is_not_caught") (result i32)
+    (block $caught
+      (try_table (catch_all $caught) (call $fail))
+      (return (i32.const -1)))
+    (i32.const 7))
+
+  (func (export "uncaught_reaches_the_host") (param i32)
+    (call $pass_through (local.get 0)))
+)

@@ -4,6 +4,7 @@ import io.github.charlietap.chasm.compiler.backend.abi.MethodRef
 import io.github.charlietap.chasm.compiler.backend.abi.OBJECT_TYPE
 import io.github.charlietap.chasm.compiler.backend.dex.abi.DexReferences
 import io.github.charlietap.chasm.compiler.backend.dex.abi.Invocation
+import io.github.charlietap.chasm.compiler.backend.dex.abi.valueType
 import io.github.charlietap.dexter.ArrayKind
 import io.github.charlietap.dexter.ArrayType
 import io.github.charlietap.dexter.BinaryOp
@@ -12,6 +13,7 @@ import io.github.charlietap.dexter.CodeEmitter
 import io.github.charlietap.dexter.CompareOp
 import io.github.charlietap.dexter.Cond
 import io.github.charlietap.dexter.Conversion
+import io.github.charlietap.dexter.DexConstructor
 import io.github.charlietap.dexter.DexField
 import io.github.charlietap.dexter.HandlerLabel
 import io.github.charlietap.dexter.Label
@@ -114,6 +116,32 @@ internal class Emitter(
     ) {
         if (recording) return
         code.newArray(Reg(destination), Reg(size), references.reference(type) as ArrayType)
+    }
+
+    fun newInstance(
+        destination: Int,
+        type: String,
+    ) {
+        if (recording) return
+        code.newInstance(Reg(destination), references.reference(type) as ClassType)
+    }
+
+    fun invokeConstructor(
+        owner: String,
+        receiver: Int,
+    ) {
+        if (recording) return
+        code.invokeConstructor(DexConstructor(references.reference(owner) as ClassType), Reg(receiver))
+    }
+
+    fun invokeConstructor(
+        owner: String,
+        parameter: String,
+        receiver: Int,
+        argument: Int,
+    ) {
+        if (recording) return
+        code.invokeConstructor(DexConstructor(references.reference(owner) as ClassType, valueType(parameter)), Reg(receiver), Reg(argument))
     }
 
     fun constWide(

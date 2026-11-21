@@ -26,6 +26,9 @@ class DexFixtureTest {
     fun `gc fixture generates`() = golden("gc")
 
     @Test
+    fun `reference flow fixture generates`() = golden("reference_flow")
+
+    @Test
     fun `exception handling fixture generates`() = golden("eh")
 
     @Test
