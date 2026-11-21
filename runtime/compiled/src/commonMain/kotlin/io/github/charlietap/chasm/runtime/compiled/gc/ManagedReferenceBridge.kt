@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.runtime.compiled.gc
 
 import io.github.charlietap.chasm.host.HostExternReference
+import io.github.charlietap.chasm.host.HostGcType
 import io.github.charlietap.chasm.host.HostGlobal
 import io.github.charlietap.chasm.host.HostReferenceRoot
 import io.github.charlietap.chasm.host.HostTable
@@ -17,6 +18,7 @@ import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_MASK
 import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_NULL
 import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_STRUCT
 import io.github.charlietap.chasm.runtime.error.InvocationError
+import io.github.charlietap.chasm.runtime.exception.HostRaisedWasmException
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.ext.function
 import io.github.charlietap.chasm.runtime.ext.toLong
@@ -28,21 +30,23 @@ import io.github.charlietap.chasm.runtime.reference.ReferenceBridge
 import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.type.AbstractHeapType
+import io.github.charlietap.chasm.type.DefinedType
 import io.github.charlietap.chasm.type.HeapType
 import io.github.charlietap.chasm.type.ValueType
 import java.lang.ref.ReferenceQueue
 import java.lang.ref.WeakReference
 import java.util.Collections
 import java.util.IdentityHashMap
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.jvm.JvmField
 
 class ManagedReferenceBridge(
     private val store: Store,
-) : ReferenceBridge {
+) : ReferenceBridge, ShapeRegistry, ReferenceStorage, PendingExceptions {
 
     private val handles = HashMap<Int, MutableList<Int>>()
     private val legacyHostValues = HashMap<Long, LegacyHostValue>()
-    private val objects = ArrayList<Handle?>()
+    private val slots = ArrayList<Handle?>()
     private val freeHandles = ArrayList<Int>()
     private val collected = ReferenceQueue<Any>()
     private var results = identitySet()
@@ -50,11 +54,26 @@ class ManagedReferenceBridge(
     private val globals = IdentityHashMap<GlobalInstance, ReferenceGlobal>()
     private val tables = IdentityHashMap<TableInstance, ReferenceTable>()
     private val segments = IdentityHashMap<ElementInstance, ReferenceSegment>()
-    private val shapes = HashMap<Int, Class<*>>()
-    private val types = IdentityHashMap<Class<*>, Int>()
+    private val shapes = ConcurrentHashMap<Int, Class<*>>()
+    private val types = ConcurrentHashMap<Class<*>, Int>()
+    private val definedTypes = ConcurrentHashMap<Int, DefinedType>()
     private var raisedException: Any? = null
 
     val functions = ManagedFunctions(store)
+
+    val checks = StoreReferenceChecks(this, functions, store)
+
+    val layouts = ReflectedShapeLayouts(this, store.heap, checks)
+
+    val allocator = ManagedAllocator(store)
+
+    val objects = ManagedObjects(
+        structs = StructOperations(layouts, allocator),
+        arrays = ArrayOperations(layouts, allocator),
+        exceptions = ExceptionOperations(store, checks, this),
+        tables = TableOperations(this, checks),
+        globals = GlobalOperations(this, checks),
+    )
 
     override val references = ManagedReferences(this)
 
@@ -97,13 +116,19 @@ class ManagedReferenceBridge(
     }
 
     @Synchronized
-    fun referenceGlobal(global: GlobalInstance): ReferenceGlobal {
-        return globals.getOrPut(global) { ReferenceGlobal(fromHost(global.value)) }
+    override fun referenceGlobal(global: GlobalInstance): ReferenceGlobal {
+        return globals.getOrPut(global) {
+            require(store.globals.any { candidate -> candidate === global }) { "not a global of this store" }
+            ReferenceGlobal(fromHost(global.value))
+        }
     }
 
     @Synchronized
-    fun referenceTable(table: TableInstance): ReferenceTable {
-        return tables.getOrPut(table) { ReferenceTable(Array(table.elements.size) { index -> fromHost(table.elements[index]) }, table) }
+    override fun referenceTable(table: TableInstance): ReferenceTable {
+        return tables.getOrPut(table) {
+            require(store.tables.any { candidate -> candidate === table }) { "not a table of this store" }
+            ReferenceTable(Array(table.elements.size) { index -> fromHost(table.elements[index]) }, table)
+        }
     }
 
     @Synchronized
@@ -154,6 +179,18 @@ class ManagedReferenceBridge(
         return toHost(value, extern)
     }
 
+    override fun raise(exception: WasmException): Nothing {
+
+        store.heap.setPendingException(toHostResult(exception, false))
+
+        throw HostRaisedWasmException.instance
+    }
+
+    @Synchronized
+    override fun take(): WasmException {
+        return fromHost(store.heap.takePendingExceptionReference()) as WasmException
+    }
+
     @Synchronized
     fun holdRaised(encoded: Long) {
         raisedException = fromHost(encoded)
@@ -189,22 +226,29 @@ class ManagedReferenceBridge(
         results = identitySet()
     }
 
-    @Synchronized
     fun register(
         type: Int,
-        shape: Class<*>,
+        definedType: DefinedType,
+        shape: Class<*>?,
     ) {
-        shapes.putIfAbsent(type, shape)
-        types.putIfAbsent(shape, type)
+
+        definedTypes.putIfAbsent(type, definedType)
+
+        if (shape != null) {
+            shapes.putIfAbsent(type, shape)
+            types.putIfAbsent(shape, type)
+        }
     }
 
-    @Synchronized
-    fun shape(type: Int): Class<*> {
-        return shapes[type] ?: throw InvocationException(InvocationError.UnexpectedReferenceValue)
+    override fun shape(type: HostGcType): Class<*>? {
+        return shapes[type.id]
     }
 
-    @Synchronized
-    fun type(value: Any): Int {
+    override fun definedType(type: HostGcType): DefinedType? {
+        return definedTypes[type.id]
+    }
+
+    override fun type(value: Any): Int {
 
         var shape: Class<*>? = value.javaClass
         while (shape != null) {
@@ -222,7 +266,7 @@ class ManagedReferenceBridge(
         val identity = System.identityHashCode(value)
         val candidates = handles[identity]
         candidates?.forEach { handle ->
-            if (objects[handle - FIRST_HANDLE.toInt()]?.get() === value) {
+            if (slots[handle - FIRST_HANDLE.toInt()]?.get() === value) {
                 return handle.toLong()
             }
         }
@@ -238,14 +282,14 @@ class ManagedReferenceBridge(
         identity: Int,
     ): Int {
 
-        val handle = if (freeHandles.isEmpty()) FIRST_HANDLE.toInt() + objects.size else freeHandles.removeAt(freeHandles.size - 1)
+        val handle = if (freeHandles.isEmpty()) FIRST_HANDLE.toInt() + slots.size else freeHandles.removeAt(freeHandles.size - 1)
         val slot = handle - FIRST_HANDLE.toInt()
         val reference = Handle(value, handle, identity, collected)
 
-        if (slot == objects.size) {
-            objects += reference
+        if (slot == slots.size) {
+            slots += reference
         } else {
-            objects[slot] = reference
+            slots[slot] = reference
         }
 
         return handle
@@ -257,9 +301,9 @@ class ManagedReferenceBridge(
             val reference = collected.poll() as? Handle ?: return
             val slot = reference.handle - FIRST_HANDLE.toInt()
 
-            if (objects.getOrNull(slot) === reference) {
+            if (slots.getOrNull(slot) === reference) {
 
-                objects[slot] = null
+                slots[slot] = null
                 freeHandles += reference.handle
 
                 val candidates = handles[reference.identity]
@@ -272,7 +316,7 @@ class ManagedReferenceBridge(
     }
 
     private fun objectAt(handle: Long): Any {
-        return objects.getOrNull((handle - FIRST_HANDLE).toInt())?.get() ?: throw InvocationException(InvocationError.UnexpectedReferenceValue)
+        return slots.getOrNull((handle - FIRST_HANDLE).toInt())?.get() ?: throw InvocationException(InvocationError.UnexpectedReferenceValue)
     }
 
     private fun legacyHostValue(encoded: Long): LegacyHostValue {

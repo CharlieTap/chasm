@@ -36,7 +36,7 @@ class WasmStackTrace
         val frames: List<WasmFrame>,
         val omittedFrames: Int,
         val complete: Boolean,
-        private val omissionIndex: Int,
+        internal val omissionIndex: Int,
     ) {
 
         override fun toString(): String {

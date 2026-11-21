@@ -37,7 +37,7 @@ class ManagedExceptions(
             }
         }
 
-        val exception = WasmException(tag.rawAddress, words, references)
+        val exception = createException(store, tag.rawAddress, words, references)
         return HostException(bridge.references.rootScoped(bridge.toHost(exception, false)))
     }
 

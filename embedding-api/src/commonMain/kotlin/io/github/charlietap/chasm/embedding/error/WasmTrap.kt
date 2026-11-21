@@ -21,6 +21,17 @@ class WasmTrap
         private val omissionIndex: Int,
     ) {
 
+        @InternalChasmApi
+        constructor(trap: Trap) : this(
+            trap.reason,
+            trap.message,
+            checkNotNull(trap.stackTrace).frames,
+            checkNotNull(trap.stackTrace).omittedFrames,
+            checkNotNull(trap.stackTrace).complete,
+            trap.memoryAccess,
+            checkNotNull(trap.stackTrace).omissionIndex,
+        )
+
         override fun toString(): String {
             return toTrap().toString()
         }

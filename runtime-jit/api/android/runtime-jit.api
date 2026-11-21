@@ -18,6 +18,7 @@ public final class io/github/charlietap/chasm/jit/internal/ObjectLaneKt {
 	public static final fun _functionReference (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Function;)Ljava/lang/Object;
 	public static final fun _hostValue (Lio/github/charlietap/chasm/embedding/shapes/Store;Ljava/lang/Object;)Ljava/lang/Object;
 	public static final fun _objectLaneFunction (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/type/FunctionType;Lio/github/charlietap/chasm/jit/internal/ObjectLaneCallback;)Lio/github/charlietap/chasm/embedding/shapes/Function;
+	public static final fun _objects (Lio/github/charlietap/chasm/embedding/shapes/Store;)Lio/github/charlietap/chasm/runtime/compiled/gc/ManagedObjects;
 	public static final fun _prepareObjectCall (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Instance;Ljava/lang/String;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 	public static final fun _referenceKind (Ljava/lang/Object;)I
 	public static final fun _referenceValue (Lio/github/charlietap/chasm/embedding/shapes/Store;Ljava/lang/Object;Z)Lio/github/charlietap/chasm/runtime/value/ReferenceValue;
@@ -28,5 +29,6 @@ public final class io/github/charlietap/chasm/jit/internal/_PreparedObjectCall {
 	public final fun call ([J[Ljava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 	public final fun getSlots ()I
 	public final fun getType ()Lio/github/charlietap/chasm/type/FunctionType;
+	public final fun unsafeCall ([J[Ljava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 }
 

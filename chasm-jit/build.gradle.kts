@@ -70,6 +70,7 @@ kotlin {
                 api(projects.embeddingApi)
                 api(projects.embeddingModule)
                 api(projects.embeddingRuntime)
+                api(projects.runtime.compiledApi)
                 api(projects.stream)
                 api(libs.kotlinx.coroutines.core)
 
@@ -88,7 +89,7 @@ kotlin {
             dependencies {
                 implementation(projects.chasm)
                 implementation(projects.runtime.address)
-                implementation(projects.runtime.compiledApi)
+                implementation(projects.runtime.compiled)
                 implementation(projects.runtime.core)
                 implementation(projects.typeSystem)
                 implementation(libs.sweet.lib)

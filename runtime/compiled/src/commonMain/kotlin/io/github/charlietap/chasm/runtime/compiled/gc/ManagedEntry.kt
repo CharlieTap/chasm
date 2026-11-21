@@ -33,7 +33,7 @@ fun enterObjects(
     } catch (_: HostRaisedWasmException) {
         InvocationError.ThrownException
     } catch (_: ClassCastException) {
-        InvocationError.UnexpectedReferenceValue
+        InvocationError.FailedToCastReference
     } finally {
         if (interrupt.enabled) interrupt.depth = depth
     }

@@ -3,41 +3,44 @@
 package io.github.charlietap.chasm.jit.internal
 
 import io.github.charlietap.chasm.InternalChasmApi
-import io.github.charlietap.chasm.embedding.error.ChasmError
+import io.github.charlietap.chasm.embedding.error.ExecutionError
+import io.github.charlietap.chasm.embedding.error.InvocationError
 import io.github.charlietap.chasm.embedding.function
 import io.github.charlietap.chasm.embedding.internal.ExportedFunction
-import io.github.charlietap.chasm.embedding.internal.exportedError
 import io.github.charlietap.chasm.embedding.internal.exportedFunction
+import io.github.charlietap.chasm.embedding.internal.exportedTrap
 import io.github.charlietap.chasm.embedding.internal.functionAddress
 import io.github.charlietap.chasm.embedding.internal.storeDropped
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Function
 import io.github.charlietap.chasm.embedding.shapes.Instance
 import io.github.charlietap.chasm.embedding.shapes.Store
+import io.github.charlietap.chasm.host.HostGcType
 import io.github.charlietap.chasm.host.HostModuleInstance
 import io.github.charlietap.chasm.host.HostResources
+import io.github.charlietap.chasm.reference.ExceptionReference
 import io.github.charlietap.chasm.reference.GcReference
 import io.github.charlietap.chasm.reference.I31Reference
 import io.github.charlietap.chasm.runtime.compiled.gc.ManagedArray
 import io.github.charlietap.chasm.runtime.compiled.gc.ManagedFunction
+import io.github.charlietap.chasm.runtime.compiled.gc.ManagedObjects
 import io.github.charlietap.chasm.runtime.compiled.gc.ManagedReferenceBridge
 import io.github.charlietap.chasm.runtime.compiled.gc.ManagedStruct
 import io.github.charlietap.chasm.runtime.compiled.gc.ObjectLaneHostFunction
+import io.github.charlietap.chasm.runtime.compiled.gc.PendingExceptions
+import io.github.charlietap.chasm.runtime.compiled.gc.ReferenceCheck
 import io.github.charlietap.chasm.runtime.compiled.gc.WasmException
 import io.github.charlietap.chasm.runtime.compiled.gc.enterObjects
-import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.ext.toLongFromBoxed
 import io.github.charlietap.chasm.runtime.ext.toReferenceValue
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.value.ReferenceValue
-import io.github.charlietap.chasm.type.AbstractHeapType
-import io.github.charlietap.chasm.type.ConcreteHeapType
 import io.github.charlietap.chasm.type.FunctionType
-import io.github.charlietap.chasm.type.ReferenceType
 import io.github.charlietap.chasm.type.ValueType
 import java.util.concurrent.atomic.AtomicReference
+import io.github.charlietap.chasm.runtime.error.InvocationError as RuntimeInvocationError
 import io.github.charlietap.chasm.runtime.store.Store as RuntimeStore
 
 @InternalChasmApi
@@ -68,14 +71,20 @@ fun _prepareObjectCall(
     store: Store,
     instance: Instance,
     name: String,
-): ChasmResult<_PreparedObjectCall, ChasmError.ExecutionError> {
-    return when (val exported = exportedFunction(store, instance, name)) {
-        is ChasmResult.Success -> {
-            managedBridge(exported.result.store)
-            ChasmResult.Success(_PreparedObjectCall(store, instance, exported.result))
-        }
-        is ChasmResult.Error -> exported
+): ChasmResult<_PreparedObjectCall, ExecutionError.Rejected> {
+    val exported = when (val lookup = exportedFunction(store, instance, name)) {
+        is ChasmResult.Success -> lookup.result
+        is ChasmResult.Error -> return ChasmResult.Error(ExecutionError.Rejected(lookup.error.error))
     }
+    val bridge = managedBridge(exported.store)
+    val owner = bridge.definedType(HostGcType(exported.function.rtt.value))
+    val parameters = exported.function.functionType.params.types
+    val referenceParameters = parameters.indices.filter { index -> parameters[index] is ValueType.Reference }.toIntArray()
+    val parameterChecks = Array(referenceParameters.size) { position ->
+        bridge.checks.check((parameters[referenceParameters[position]] as ValueType.Reference).referenceType, owner)
+    }
+
+    return ChasmResult.Success(_PreparedObjectCall(store, instance, exported, referenceParameters, parameterChecks, bridge))
 }
 
 @InternalChasmApi
@@ -83,42 +92,71 @@ class _PreparedObjectCall internal constructor(
     private val embedding: Store,
     private val instance: Instance,
     private val exported: ExportedFunction,
+    private val referenceParameters: IntArray,
+    private val parameterChecks: Array<ReferenceCheck>,
+    private val exceptions: PendingExceptions,
 ) {
 
     val type: FunctionType = exported.function.functionType
 
     val slots: Int = maxOf(type.params.types.size, type.results.types.size)
 
-    private val parameterChecks = type.params.types.map { parameter -> (parameter as? ValueType.Reference)?.referenceType }
-
     private val carriesReferences = (type.params.types + type.results.types).any { value -> value is ValueType.Reference }
 
     private val idle = AtomicReference<ExecutionContext?>()
 
-    private val functions = managedBridge(exported.store).functions
-
     fun call(
         stack: LongArray,
         references: Array<Any?>,
-    ): ChasmResult<Unit, ChasmError.ExecutionError> {
+    ): ChasmResult<Unit, InvocationError<ExceptionReference>> {
 
-        if (storeDropped(embedding)) {
-            return failure(InvocationError.StoreDropped)
+        val rejection = rejection(stack, references)
+        if (rejection != null) {
+            return rejection
         }
-        if (instance.instance.deallocated) {
-            return failure(InvocationError.InvocationOfADeinstantiatedInstance)
+
+        for (position in referenceParameters.indices) {
+            val index = referenceParameters[position]
+            if (!parameterChecks[position].accepts(references[index])) {
+                return ChasmResult.Error(ExecutionError.Rejected("argument $index does not match its type"))
+            }
         }
-        if (exported.store.functions.getOrNull(exported.address.address) !== exported.function) {
-            return failure(InvocationError.FunctionLookupFailed(exported.address))
+
+        return enter(stack, references)
+    }
+
+    fun unsafeCall(
+        stack: LongArray,
+        references: Array<Any?>,
+    ): ChasmResult<Unit, InvocationError<ExceptionReference>> {
+        return rejection(stack, references) ?: enter(stack, references)
+    }
+
+    private fun rejection(
+        stack: LongArray,
+        references: Array<Any?>,
+    ): ChasmResult.Error<ExecutionError.Rejected>? {
+
+        val message = when {
+            storeDropped(embedding) -> RuntimeInvocationError.StoreDropped.toString()
+            instance.instance.deallocated -> RuntimeInvocationError.InvocationOfADeinstantiatedInstance.toString()
+            exported.store.functions.getOrNull(exported.address.address) !== exported.function -> RuntimeInvocationError.FunctionLookupFailed(exported.address).toString()
+            else -> null
         }
+        if (message != null) {
+            return ChasmResult.Error(ExecutionError.Rejected(message))
+        }
+
         require(stack.size >= slots) { "the stack holds ${stack.size} slots but the call needs $slots" }
         require(!carriesReferences || references.size >= slots) { "the references hold ${references.size} slots but the call needs $slots" }
 
-        parameterChecks.forEachIndexed { index, check ->
-            if (check != null && !accepts(check, references[index])) {
-                return failure(InvocationError.UnexpectedReferenceValue)
-            }
-        }
+        return null
+    }
+
+    private fun enter(
+        stack: LongArray,
+        references: Array<Any?>,
+    ): ChasmResult<Unit, InvocationError<ExceptionReference>> {
 
         val context = idle.getAndSet(null) ?: try {
             context()
@@ -141,42 +179,22 @@ class _PreparedObjectCall internal constructor(
         return context
     }
 
-    private fun accepts(
-        type: ReferenceType,
-        value: Any?,
-    ): Boolean {
-
-        if (value == null) {
-            return type is ReferenceType.RefNull
+    private fun failure(error: RuntimeInvocationError): ChasmResult<Unit, InvocationError<ExceptionReference>> {
+        return if (error == RuntimeInvocationError.ThrownException) {
+            ChasmResult.Error(ExecutionError.Thrown(exceptions.take()))
+        } else {
+            ChasmResult.Error(ExecutionError.Trapped(exportedTrap(embedding, error)))
         }
-
-        if (value is ManagedFunction && !functions.owns(value)) {
-            return false
-        }
-
-        return when (val heap = type.heapType) {
-            AbstractHeapType.Func -> value is ManagedFunction
-            AbstractHeapType.Extern -> value !is ManagedFunction && value !is WasmException
-            AbstractHeapType.Any -> value !is ManagedFunction && value !is WasmException
-            AbstractHeapType.Eq -> value is ManagedStruct || value is ManagedArray || value is I31Reference
-            AbstractHeapType.Struct -> value is ManagedStruct
-            AbstractHeapType.Array -> value is ManagedArray
-            AbstractHeapType.I31 -> value is I31Reference
-            AbstractHeapType.Exception -> value is WasmException
-            is ConcreteHeapType -> value is ManagedStruct || value is ManagedArray || value is ManagedFunction
-            else -> heap !is AbstractHeapType
-        }
-    }
-
-    private fun failure(
-        error: InvocationError,
-    ): ChasmResult<Unit, ChasmError.ExecutionError> {
-        return ChasmResult.Error(exportedError(embedding, error))
     }
 
     private companion object {
         val SUCCESS = ChasmResult.Success(Unit)
     }
+}
+
+@InternalChasmApi
+fun _objects(store: Store): ManagedObjects {
+    return managedBridge(store.store).objects
 }
 
 @InternalChasmApi

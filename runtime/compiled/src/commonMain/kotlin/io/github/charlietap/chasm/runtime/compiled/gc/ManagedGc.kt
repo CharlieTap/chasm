@@ -6,22 +6,17 @@ import io.github.charlietap.chasm.host.HostGcType
 import io.github.charlietap.chasm.host.HostModuleInstance
 import io.github.charlietap.chasm.host.HostReference
 import io.github.charlietap.chasm.host.HostResources
-import io.github.charlietap.chasm.runtime.execution.ARRAY_OVERHEAD
 import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.type.AbstractHeapType
 import io.github.charlietap.chasm.type.FieldType
 import io.github.charlietap.chasm.type.StorageType
 import io.github.charlietap.chasm.type.ValueType
 import java.lang.reflect.Field
-import java.util.IdentityHashMap
 
 class ManagedGc(
     private val bridge: ManagedReferenceBridge,
     private val store: Store,
 ) : HostGc {
-
-    private val structFields = IdentityHashMap<Class<*>, Array<Field>>()
-    private val arrayStorage = IdentityHashMap<Class<*>, Class<*>>()
 
     override val allocatedBytes: Long
         get() = store.allocation.allocatedBytes
@@ -62,7 +57,7 @@ class ManagedGc(
 
         val struct = checkNotNull(bridge.fromHost(reference))
         val type = HostGcType(bridge.type(struct))
-        val field = fields(struct.javaClass, type)[fieldIndex]
+        val field = fields(type)[fieldIndex]
 
         return when (field.type) {
             Int::class.javaPrimitiveType -> field.getInt(struct).toLong()
@@ -82,7 +77,7 @@ class ManagedGc(
     ) {
 
         val struct = checkNotNull(bridge.fromHost(reference))
-        val field = fields(struct.javaClass, HostGcType(bridge.type(struct)))[fieldIndex]
+        val field = fields(HostGcType(bridge.type(struct)))[fieldIndex]
         write(struct, field, value)
     }
 
@@ -182,10 +177,8 @@ class ManagedGc(
         fieldOffset: Int,
     ): HostReference {
 
-        val shape = bridge.shape(type.id)
-        val layout = fields(shape, type)
-        chargeAllocation(store, (OBJECT_HEADER_BYTES + layout.sumOf { field -> fieldBytes(field.type) } + 7) and 7.inv())
-        val struct = shape.getDeclaredConstructor().newInstance()
+        val struct = bridge.allocator.newStruct(bridge.layouts.struct(type))
+        val layout = fields(type)
         layout.forEachIndexed { index, field -> write(struct, field, fields[fieldOffset + index]) }
 
         return bridge.references.rootObject(struct, bridge.toHostResult(struct, false))
@@ -226,54 +219,23 @@ class ManagedGc(
         return store.heap.runtimeArrayFieldType(HostGcType(bridge.type(array))).isExtern()
     }
 
-    @Synchronized
-    private fun fields(
-        shape: Class<*>,
-        type: HostGcType,
-    ): Array<Field> {
-        return structFields.getOrPut(shape) {
-            Array(store.heap.structFieldCount(type)) { index -> declaredField(shape, "f$index") }
-        }
+    private fun fields(type: HostGcType): Array<Field> {
+        return bridge.layouts.struct(type).fields
     }
 
-    @Synchronized
     private fun storage(
         type: HostGcType,
         length: Int,
     ): Any {
-        val shape = bridge.shape(type.id)
-        val storage = arrayStorage.getOrPut(shape) { declaredField(shape, "data").type }
-        val component = checkNotNull(storage.componentType)
-        val shift = fieldShift(component)
-        checkArrayLength(length, shift)
-        chargeAllocation(store, (length shl shift) + ARRAY_OVERHEAD)
-        return java.lang.reflect.Array.newInstance(component, length)
+        return bridge.allocator.newStorage(bridge.layouts.array(type), length)
     }
 
     private fun wrap(
         type: HostGcType,
         storage: Any,
     ): HostReference {
-        val array = bridge.shape(type.id).getDeclaredConstructor(storage.javaClass).newInstance(storage)
+        val array = bridge.allocator.newArray(bridge.layouts.array(type), storage)
         return bridge.references.rootObject(array, bridge.toHostResult(array, false))
-    }
-
-    private fun declaredField(
-        shape: Class<*>,
-        name: String,
-    ): Field {
-
-        var owner: Class<*>? = shape
-        while (owner != null) {
-            val field = owner.declaredFields.firstOrNull { candidate -> candidate.name == name }
-            if (field != null) {
-                field.isAccessible = true
-                return field
-            }
-            owner = owner.superclass
-        }
-
-        throw NoSuchFieldException(name)
     }
 
     private fun write(
@@ -327,23 +289,6 @@ class ManagedGc(
         }
     }
 
-    private fun fieldBytes(
-        type: Class<*>,
-    ): Int {
-        return 1 shl fieldShift(type)
-    }
-
-    private fun fieldShift(
-        type: Class<*>,
-    ): Int {
-        return when (type) {
-            Byte::class.javaPrimitiveType -> 0
-            Char::class.javaPrimitiveType -> 1
-            Long::class.javaPrimitiveType, Double::class.javaPrimitiveType -> 3
-            else -> 2
-        }
-    }
-
     private fun FieldType.isExtern(): Boolean {
         val heap = ((storageType as? StorageType.Value)?.type as? ValueType.Reference)?.referenceType?.heapType
         return heap == AbstractHeapType.Extern || heap == AbstractHeapType.NoExtern
@@ -351,6 +296,5 @@ class ManagedGc(
 
     private companion object {
         const val BYTE_MASK = 0xFFL
-        const val OBJECT_HEADER_BYTES = 8
     }
 }

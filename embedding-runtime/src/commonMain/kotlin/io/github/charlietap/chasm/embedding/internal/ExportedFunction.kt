@@ -3,7 +3,9 @@ package io.github.charlietap.chasm.embedding.internal
 import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.embedding.diagnostic.executionError
+import io.github.charlietap.chasm.embedding.diagnostic.executionTrap
 import io.github.charlietap.chasm.embedding.error.ChasmError
+import io.github.charlietap.chasm.embedding.error.Trap
 import io.github.charlietap.chasm.embedding.ext.owning
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Error
@@ -78,6 +80,14 @@ fun exportedError(
     error: InvocationError,
 ): ChasmError.ExecutionError {
     return executionError(store, error)
+}
+
+@InternalChasmApi
+fun exportedTrap(
+    store: Store,
+    error: InvocationError,
+): Trap {
+    return executionTrap(store, error)
 }
 
 @InternalChasmApi

@@ -4,8 +4,10 @@ package io.github.charlietap.chasm.embedding.diagnostic
 
 import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.embedding.error.ChasmError
+import io.github.charlietap.chasm.embedding.error.Trap
 import io.github.charlietap.chasm.embedding.error.TrapReason
 import io.github.charlietap.chasm.embedding.error.WasmFrame
+import io.github.charlietap.chasm.embedding.error.WasmStackTrace
 import io.github.charlietap.chasm.embedding.error.WasmTrap
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.runtime.diagnostic.TrapSnapshot
@@ -27,12 +29,33 @@ internal fun executionError(
 ): ChasmError.ExecutionError {
     val message = error.toString()
     if (error !is InvocationError.Trapped) return ChasmError.ExecutionError(message)
-    val trap = try {
+    return ChasmError.ExecutionError(message, reportedTrap(store, error, message, instantiation)?.let(::WasmTrap))
+}
+
+internal fun executionTrap(
+    store: Store,
+    error: InvocationError,
+): Trap {
+
+    val message = error.toString()
+    if (error !is InvocationError.Trapped) {
+        return Trap(reasonOf(error), message, null, null)
+    }
+
+    return reportedTrap(store, error, message, null) ?: Trap(reasonOf(error.error), message, null, null)
+}
+
+private fun reportedTrap(
+    store: Store,
+    error: InvocationError.Trapped,
+    message: String,
+    instantiation: Instantiation?,
+): Trap? {
+    return try {
         TrapReporter(store, error.snapshot, instantiation).report(error.error, message)
     } catch (_: Exception) {
         null
     }
-    return ChasmError.ExecutionError(message, trap)
 }
 
 /** Function addresses from [firstFunctionAddress] were allocated by this instantiation. */
@@ -49,7 +72,7 @@ private class TrapReporter(
     private val runtime = store.store
     private val modules = ArrayList<Pair<ModuleInstance, ModuleFrames?>>()
 
-    fun report(error: InvocationError, message: String): WasmTrap {
+    fun report(error: InvocationError, message: String): Trap {
         var faultSite: TrapSite? = null
         val frames = List(snapshot.frameCount) { index ->
             val (frame, site) = frame(index)
@@ -57,18 +80,15 @@ private class TrapReporter(
             frame
         }
         val reason = reasonOf(error)
-        return WasmTrap(
+        return Trap(
             reason = reason,
             message = message,
-            frames = frames,
-            omittedFrames = snapshot.omittedFrames,
-            traceComplete = snapshot.complete,
             memoryAccess = if (reason == TrapReason.MEMORY_OUT_OF_BOUNDS) {
                 faultSite?.memoryAccess()
             } else {
                 null
             },
-            omissionIndex = snapshot.omissionIndex,
+            stackTrace = WasmStackTrace(frames, snapshot.omittedFrames, snapshot.complete, snapshot.omissionIndex),
         )
     }
 

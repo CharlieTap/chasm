@@ -27,6 +27,7 @@ import io.github.charlietap.chasm.runtime.compiled.ModuleCompiledFrames
 import io.github.charlietap.chasm.runtime.compiled.gc.ManagedReferenceBridge
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
+import io.github.charlietap.chasm.type.DefinedType
 
 @InternalChasmApi
 suspend fun _instance(
@@ -77,7 +78,7 @@ internal suspend inline fun instance(
                     originalLine = { _, _, line -> line },
                 )
                 val install = { installation: CodeInstallation ->
-                    registerShapes(bridge, shapes, instance, compilation.shapeTypes)
+                    registerShapes(bridge, shapes, instance, declarations.definedTypes, compilation.shapeTypes)
                     compilation.install(installation)
                 }
                 ModuleCodeInstallation(install, runtimeStore, declarations.functionTypeIndices.size, instance, runtimeTypes)
@@ -94,11 +95,11 @@ private fun registerShapes(
     bridge: ManagedReferenceBridge,
     shapes: StoreShapes,
     instance: ModuleInstance,
+    definedTypes: List<DefinedType>,
     shapeTypes: List<String?>,
 ) {
-    shapeTypes.forEachIndexed { index, name ->
-        if (name != null) {
-            bridge.register(instance.runtimeTypes[index].value, shapes.loadClass(name))
-        }
+    definedTypes.forEachIndexed { index, definedType ->
+        val shape = shapeTypes.getOrNull(index)?.let(shapes::loadClass)
+        bridge.register(instance.runtimeTypes[index].value, definedType, shape)
     }
 }

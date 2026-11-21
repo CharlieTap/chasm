@@ -14,6 +14,7 @@ public final class io/github/charlietap/chasm/jit/PreparedCall {
 	public final fun call-TUhoVVc ([J[Ljava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 	public final fun getSlots ()I
 	public final fun getType ()Lio/github/charlietap/chasm/type/FunctionType;
+	public final fun unsafeCall-TUhoVVc ([J[Ljava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 }
 
 public final class io/github/charlietap/chasm/jit/PreparedCallKt {

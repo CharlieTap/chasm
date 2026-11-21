@@ -193,10 +193,17 @@ fun createException(
     words: LongArray?,
     references: Array<Any?>?,
 ): WasmException {
-    val payload = words ?: NO_WORDS
-    val objects = references ?: NO_REFERENCES
-    chargeAllocation(context.store, EXCEPTION_BYTES + payload.size * Long.SIZE_BYTES + objects.size * REFERENCE_BYTES)
-    return WasmException(tag, payload, objects)
+    return createException(context.store, tag, words ?: NO_WORDS, references ?: NO_REFERENCES)
+}
+
+fun createException(
+    store: Store,
+    tag: Int,
+    words: LongArray,
+    references: Array<Any?>,
+): WasmException {
+    chargeAllocation(store, EXCEPTION_BYTES + words.size * Long.SIZE_BYTES + references.size * REFERENCE_BYTES)
+    return WasmException(store, tag, words, references)
 }
 
 private val NO_WORDS = LongArray(0)
@@ -386,6 +393,7 @@ private fun callObjectLane(
     val marker = roots.beginScope(0)
     try {
         function.call(values, references, 0, 0, caller, context)
+        function.checkResults((store.referenceBridge as ManagedReferenceBridge).checks, references)
     } catch (exception: HostFunctionException) {
         throw InvocationException(InvocationError.HostFunctionError(exception.reason))
     } finally {

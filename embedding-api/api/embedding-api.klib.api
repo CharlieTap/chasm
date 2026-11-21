@@ -314,6 +314,7 @@ final class io.github.charlietap.chasm.embedding.error/WasmStackTrace { // io.gi
 }
 
 final class io.github.charlietap.chasm.embedding.error/WasmTrap { // io.github.charlietap.chasm.embedding.error/WasmTrap|null[0]
+    constructor <init>(io.github.charlietap.chasm.embedding.error/Trap) // io.github.charlietap.chasm.embedding.error/WasmTrap.<init>|<init>(io.github.charlietap.chasm.embedding.error.Trap){}[0]
     constructor <init>(io.github.charlietap.chasm.embedding.error/TrapReason, kotlin/String, kotlin.collections/List<io.github.charlietap.chasm.embedding.error/WasmFrame>, kotlin/Int, kotlin/Boolean, io.github.charlietap.chasm.embedding.error/MemoryAccess?, kotlin/Int) // io.github.charlietap.chasm.embedding.error/WasmTrap.<init>|<init>(io.github.charlietap.chasm.embedding.error.TrapReason;kotlin.String;kotlin.collections.List<io.github.charlietap.chasm.embedding.error.WasmFrame>;kotlin.Int;kotlin.Boolean;io.github.charlietap.chasm.embedding.error.MemoryAccess?;kotlin.Int){}[0]
 
     final val frames // io.github.charlietap.chasm.embedding.error/WasmTrap.frames|{}frames[0]
