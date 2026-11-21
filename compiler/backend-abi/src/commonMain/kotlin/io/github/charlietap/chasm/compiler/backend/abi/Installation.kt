@@ -22,6 +22,7 @@ val INSTALLATION_REFERENCE_SEGMENT = installationAccessor("referenceSegment", OB
 val INSTALLATION_RUNTIME_TYPE = installationAccessor("runtimeType", "I")
 val INSTALLATION_TAG_ADDRESS = installationAccessor("tagAddress", "I")
 val INSTALLATION_FUNCTION_REFERENCE = installationAccessor("functionReference", "J")
+val INSTALLATION_MANAGED_FUNCTION = installationAccessor("managedFunction", OBJECT_TYPE)
 val INSTALLATION_TYPE_TEST = MethodRef(CODE_INSTALLATION, "typeTest", listOf("Z", "I"), OBJECT_TYPE)
 
 fun installationAccessor(
@@ -36,7 +37,7 @@ fun installationAccessor(
     is Resource.RuntimeType -> INSTALLATION_RUNTIME_TYPE
     is Resource.TagAddress -> INSTALLATION_TAG_ADDRESS
     is Resource.FunctionReference -> INSTALLATION_FUNCTION_REFERENCE
-    is Resource.FunctionObject -> INSTALLATION_FUNCTION
+    is Resource.FunctionObject -> INSTALLATION_MANAGED_FUNCTION
     is Resource.ReferenceGlobal -> INSTALLATION_REFERENCE_GLOBAL
     is Resource.ReferenceTable -> INSTALLATION_REFERENCE_TABLE
     is Resource.ReferenceSegment -> INSTALLATION_REFERENCE_SEGMENT

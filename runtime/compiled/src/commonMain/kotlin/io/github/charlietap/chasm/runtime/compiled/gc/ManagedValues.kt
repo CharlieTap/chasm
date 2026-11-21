@@ -3,16 +3,7 @@
 package io.github.charlietap.chasm.runtime.compiled.gc
 
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
-import kotlin.jvm.JvmField
 import kotlin.jvm.JvmName
-
-class HostValue(
-    @JvmField val value: Any,
-)
-
-class LegacyHostValue(
-    @JvmField val encoded: Long,
-)
 
 fun referenceFromHost(
     context: ExecutionContext,

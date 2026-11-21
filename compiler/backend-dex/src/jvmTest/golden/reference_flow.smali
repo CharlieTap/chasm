@@ -319,9 +319,9 @@
 
     ushr-int/lit8 v8, v8, 0x1
 
-    new-instance v12, Lio/github/charlietap/chasm/runtime/compiled/gc/WasmI31;
+    new-instance v12, Lio/github/charlietap/chasm/reference/I31Reference;
 
-    invoke-direct {v12, v8}, Lio/github/charlietap/chasm/runtime/compiled/gc/WasmI31;-><init>(I)V
+    invoke-direct {v12, v8}, Lio/github/charlietap/chasm/reference/I31Reference;-><init>(I)V
 
     move-object/from16 v25, v12
 
@@ -2956,9 +2956,9 @@
 
     ushr-int/lit8 v8, v8, 0x1
 
-    new-instance v12, Lio/github/charlietap/chasm/runtime/compiled/gc/WasmI31;
+    new-instance v12, Lio/github/charlietap/chasm/reference/I31Reference;
 
-    invoke-direct {v12, v8}, Lio/github/charlietap/chasm/runtime/compiled/gc/WasmI31;-><init>(I)V
+    invoke-direct {v12, v8}, Lio/github/charlietap/chasm/reference/I31Reference;-><init>(I)V
 
     move-object/from16 v20, v12
 
@@ -2971,7 +2971,7 @@
 
     if-eqz v12, :cond_60
 
-    instance-of v8, v12, Lio/github/charlietap/chasm/runtime/compiled/gc/WasmI31;
+    instance-of v8, v12, Lio/github/charlietap/chasm/reference/I31Reference;
 
     if-nez v8, :cond_73
 
@@ -2987,9 +2987,9 @@
 
     if-eqz v12, :cond_78
 
-    check-cast v12, Lio/github/charlietap/chasm/runtime/compiled/gc/WasmI31;
+    check-cast v12, Lio/github/charlietap/chasm/reference/I31Reference;
 
-    iget v8, v12, Lio/github/charlietap/chasm/runtime/compiled/gc/WasmI31;->value:I
+    iget v8, v12, Lio/github/charlietap/chasm/reference/I31Reference;->value:I
 
     shl-int/lit8 v8, v8, 0x1
 

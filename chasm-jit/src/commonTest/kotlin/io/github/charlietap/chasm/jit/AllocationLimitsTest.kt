@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.jit
 
 import io.github.charlietap.chasm.embedding.dsl.FunctionTypeBuilder
+import io.github.charlietap.chasm.embedding.error.ChasmError
 import io.github.charlietap.chasm.embedding.function
 import io.github.charlietap.chasm.embedding.invoke
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
@@ -31,7 +32,7 @@ class AllocationLimitsTest {
         invoke(store, instance, "release", emptyList()).expect("release")
         invoke(store, instance, "grow", listOf(I32(4))).expect("grow")
 
-        assertIs<ChasmResult.Error<*>>(exhausted)
+        assertIs<ChasmResult.Error<ChasmError.ExecutionError>>(exhausted)
         assertTrue(exhausted.error.error.contains(InvocationError.GuestHeapOutOfMemory.toString()))
     }
 
@@ -42,7 +43,7 @@ class AllocationLimitsTest {
 
         val huge = invoke(store, instance, "huge", emptyList())
 
-        assertIs<ChasmResult.Error<*>>(huge)
+        assertIs<ChasmResult.Error<ChasmError.ExecutionError>>(huge)
         assertTrue(huge.error.error.contains(InvocationError.GuestHeapOutOfMemory.toString()))
     }
 

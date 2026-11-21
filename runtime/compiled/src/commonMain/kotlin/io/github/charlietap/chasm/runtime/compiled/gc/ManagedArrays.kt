@@ -8,7 +8,7 @@ import io.github.charlietap.chasm.runtime.instance.DataInstance
 import kotlin.jvm.JvmName
 
 fun arrayLength(
-    array: WasmArray,
+    array: ManagedArray,
 ): Int {
     return array.length()
 }
@@ -193,12 +193,12 @@ private fun littleEndian(
     return value
 }
 
-private fun Any?.array(): WasmArray {
-    return this as? WasmArray ?: throw InvocationException(InvocationError.NonNullReferenceExpected)
+private fun Any?.array(): ManagedArray {
+    return this as? ManagedArray ?: throw InvocationException(InvocationError.NonNullReferenceExpected)
 }
 
 private fun checkRange(
-    array: WasmArray,
+    array: ManagedArray,
     offset: Int,
     count: Int,
 ) {

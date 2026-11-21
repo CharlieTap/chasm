@@ -62,6 +62,17 @@ fun functionInstance(
 }
 
 @InternalChasmApi
+fun functionAddress(
+    store: Store,
+    function: Function,
+): Int {
+
+    store.owning(function.store)
+
+    return function.reference.address.address
+}
+
+@InternalChasmApi
 fun exportedError(
     store: Store,
     error: InvocationError,

@@ -88,6 +88,7 @@ kotlin {
             dependencies {
                 implementation(projects.chasm)
                 implementation(projects.runtime.address)
+                implementation(projects.runtime.compiledApi)
                 implementation(projects.runtime.core)
                 implementation(projects.typeSystem)
                 implementation(libs.sweet.lib)

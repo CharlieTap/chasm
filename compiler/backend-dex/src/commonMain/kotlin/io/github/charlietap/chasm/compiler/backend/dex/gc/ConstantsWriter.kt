@@ -11,13 +11,15 @@ import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.compiler.backend.abi.CHECK_ARRAY_LENGTH
 import io.github.charlietap.chasm.compiler.backend.abi.CODE_INSTALLATION
 import io.github.charlietap.chasm.compiler.backend.abi.GLOBAL_INSTANCE
-import io.github.charlietap.chasm.compiler.backend.abi.INSTALLATION_FUNCTION
+import io.github.charlietap.chasm.compiler.backend.abi.I31_REFERENCE
 import io.github.charlietap.chasm.compiler.backend.abi.INSTALLATION_GLOBAL
+import io.github.charlietap.chasm.compiler.backend.abi.INSTALLATION_MANAGED_FUNCTION
 import io.github.charlietap.chasm.compiler.backend.abi.INSTALLATION_REFERENCE_GLOBAL
 import io.github.charlietap.chasm.compiler.backend.abi.INSTALLATION_REFERENCE_SEGMENT
 import io.github.charlietap.chasm.compiler.backend.abi.INSTALLATION_REFERENCE_TABLE
 import io.github.charlietap.chasm.compiler.backend.abi.INT_BITS_TO_FLOAT
 import io.github.charlietap.chasm.compiler.backend.abi.LONG_BITS_TO_DOUBLE
+import io.github.charlietap.chasm.compiler.backend.abi.MANAGED_FUNCTION
 import io.github.charlietap.chasm.compiler.backend.abi.MethodRef
 import io.github.charlietap.chasm.compiler.backend.abi.OBJECT_TYPE
 import io.github.charlietap.chasm.compiler.backend.abi.REFERENCE_GLOBAL
@@ -25,7 +27,6 @@ import io.github.charlietap.chasm.compiler.backend.abi.REFERENCE_GLOBAL_VALUE
 import io.github.charlietap.chasm.compiler.backend.abi.REFERENCE_SEGMENT
 import io.github.charlietap.chasm.compiler.backend.abi.REFERENCE_STORAGE_ELEMENTS
 import io.github.charlietap.chasm.compiler.backend.abi.REFERENCE_TABLE
-import io.github.charlietap.chasm.compiler.backend.abi.WASM_I31
 import io.github.charlietap.chasm.compiler.backend.dex.abi.method
 import io.github.charlietap.chasm.compiler.backend.dex.abi.referenceType
 import io.github.charlietap.chasm.compiler.backend.dex.abi.valueType
@@ -267,8 +268,9 @@ internal class ConstantsWriter(
                 is ReferenceInstruction.RefNull -> push(Kind.OBJECT) { target -> code.const(target, 0) }
                 is ReferenceInstruction.RefFunc -> push(Kind.OBJECT) { target ->
                     code.const(INDEX, instruction.funcIdx.idx.toInt())
-                    code.invokeVirtual(INSTALLATION_FUNCTION.method, installation, INDEX)
+                    code.invokeVirtual(INSTALLATION_MANAGED_FUNCTION.method, installation, INDEX)
                     code.moveResult(target)
+                    code.checkCast(target, ClassType(MANAGED_FUNCTION))
                 }
                 is VariableInstruction.GlobalGet -> globalGet(instruction.globalIdx.idx.toInt())
                 is AggregateInstruction.StructNew -> structNew(instruction.typeIndex.idx.toInt(), withFields = true)
@@ -421,8 +423,8 @@ internal class ConstantsWriter(
             code.move(NARROW, slot(kinds.size - 1))
             code.binary(LiteralOp.ShlInt, NARROW, NARROW, literal = 1)
             code.binary(LiteralOp.UshrInt, NARROW, NARROW, literal = 1)
-            code.newInstance(TARGET, ClassType(WASM_I31))
-            code.invokeConstructor(DexConstructor(ClassType(WASM_I31), DexType.Int), TARGET, NARROW)
+            code.newInstance(TARGET, ClassType(I31_REFERENCE))
+            code.invokeConstructor(DexConstructor(ClassType(I31_REFERENCE), DexType.Int), TARGET, NARROW)
 
             replace(kinds.size - 1, TARGET)
         }

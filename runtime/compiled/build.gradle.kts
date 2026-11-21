@@ -18,6 +18,7 @@ kotlin {
         commonMain {
             dependencies {
                 api(projects.runtime.core)
+                api(projects.runtime.compiledApi)
 
                 implementation(projects.executor.callCore)
                 implementation(projects.runtime.operations)

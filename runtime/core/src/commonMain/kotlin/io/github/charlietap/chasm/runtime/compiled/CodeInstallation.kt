@@ -63,6 +63,8 @@ abstract class CodeInstallation protected constructor() {
         index: Int,
     ): Long
 
+    abstract fun managedFunction(index: Int): Any
+
     abstract fun typeTest(
         nullable: Boolean,
         heapType: Int,

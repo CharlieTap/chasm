@@ -236,11 +236,12 @@ val MATH_RINT = javaMath.method("rint", "D", returns = "D")
 val MATH_SQRT = javaMath.method("sqrt", "D", returns = "D")
 val ARRAYCOPY = javaSystem.method("arraycopy", OBJECT_TYPE, "I", OBJECT_TYPE, "I", "I", returns = "V")
 
-const val WASM_EQ = "Lio/github/charlietap/chasm/runtime/compiled/gc/WasmEq;"
-const val WASM_STRUCT = "Lio/github/charlietap/chasm/runtime/compiled/gc/WasmStruct;"
-const val WASM_ARRAY = "Lio/github/charlietap/chasm/runtime/compiled/gc/WasmArray;"
-const val WASM_I31 = "Lio/github/charlietap/chasm/runtime/compiled/gc/WasmI31;"
-const val WASM_ARRAY_LENGTH = "length"
+const val EQ_REFERENCE = "Lio/github/charlietap/chasm/reference/EqReference;"
+const val I31_REFERENCE = "Lio/github/charlietap/chasm/reference/I31Reference;"
+const val MANAGED_STRUCT = "Lio/github/charlietap/chasm/runtime/compiled/gc/ManagedStruct;"
+const val MANAGED_ARRAY = "Lio/github/charlietap/chasm/runtime/compiled/gc/ManagedArray;"
+const val MANAGED_FUNCTION = "Lio/github/charlietap/chasm/runtime/compiled/gc/ManagedFunction;"
+const val MANAGED_ARRAY_LENGTH = "length"
 
 private val managedOps = Owner("Lio/github/charlietap/chasm/runtime/compiled/gc/ManagedOps;")
 
@@ -259,7 +260,7 @@ val CALL_REFERENCE = managedOps.method("callReference", CONTEXT_TYPE, MODULE_INS
 val CALL_IMPORT = managedOps.method("callImport", CONTEXT_TYPE, MODULE_INSTANCE, FUNCTION_INSTANCE, "[J", "I", returns = "V")
 
 private val managedArrays = Owner("Lio/github/charlietap/chasm/runtime/compiled/gc/ManagedArrays;")
-val ARRAY_LENGTH = managedArrays.method("arrayLength", WASM_ARRAY, returns = "I")
+val ARRAY_LENGTH = managedArrays.method("arrayLength", MANAGED_ARRAY, returns = "I")
 
 val COPY_ARRAY = managedArrays.method("copyArray", OBJECT_TYPE, "I", OBJECT_TYPE, "I", "I", returns = "V")
 val FILL_INTS = managedArrays.method("fillInts", OBJECT_TYPE, "I", "I", "I", returns = "V")
@@ -269,7 +270,7 @@ val FILL_DOUBLES = managedArrays.method("fillDoubles", OBJECT_TYPE, "I", "D", "I
 val FILL_BYTES = managedArrays.method("fillBytes", OBJECT_TYPE, "I", "I", "I", returns = "V")
 val FILL_CHARS = managedArrays.method("fillChars", OBJECT_TYPE, "I", "I", "I", returns = "V")
 val FILL_OBJECTS = managedArrays.method("fillObjects", OBJECT_TYPE, "I", OBJECT_TYPE, "I", returns = "V")
-const val WASM_ARRAY_STORAGE = "storage"
+const val MANAGED_ARRAY_STORAGE = "storage"
 const val REFERENCE_GLOBAL = "Lio/github/charlietap/chasm/runtime/compiled/gc/ReferenceGlobal;"
 const val REFERENCE_TABLE = "Lio/github/charlietap/chasm/runtime/compiled/gc/ReferenceTable;"
 const val REFERENCE_SEGMENT = "Lio/github/charlietap/chasm/runtime/compiled/gc/ReferenceSegment;"

@@ -24,16 +24,16 @@ import io.github.charlietap.chasm.compiler.backend.abi.FILL_INTS
 import io.github.charlietap.chasm.compiler.backend.abi.FILL_LONGS
 import io.github.charlietap.chasm.compiler.backend.abi.FILL_OBJECTS
 import io.github.charlietap.chasm.compiler.backend.abi.GUEST_HEAP_EXHAUSTED
+import io.github.charlietap.chasm.compiler.backend.abi.I31_REFERENCE
 import io.github.charlietap.chasm.compiler.backend.abi.INIT_ARRAY_DATA
 import io.github.charlietap.chasm.compiler.backend.abi.INIT_ARRAY_ELEMENTS
+import io.github.charlietap.chasm.compiler.backend.abi.MANAGED_ARRAY
 import io.github.charlietap.chasm.compiler.backend.abi.MethodRef
 import io.github.charlietap.chasm.compiler.backend.abi.NULL_REFERENCE
 import io.github.charlietap.chasm.compiler.backend.abi.OBJECT_TYPE
 import io.github.charlietap.chasm.compiler.backend.abi.REFERENCE_SEGMENT
 import io.github.charlietap.chasm.compiler.backend.abi.REFILL_ALLOCATION
 import io.github.charlietap.chasm.compiler.backend.abi.Resource
-import io.github.charlietap.chasm.compiler.backend.abi.WASM_ARRAY
-import io.github.charlietap.chasm.compiler.backend.abi.WASM_I31
 import io.github.charlietap.chasm.compiler.backend.analysis.form.Operand
 import io.github.charlietap.chasm.compiler.backend.analysis.form.immediate
 import io.github.charlietap.chasm.compiler.backend.analysis.form.slot
@@ -561,7 +561,7 @@ private fun LowerContext.arrayLen(
 
     loadReference(Registers.OBJECT, addressSlot)
     if (type == null) {
-        receiver(Registers.OBJECT, WASM_ARRAY)
+        receiver(Registers.OBJECT, MANAGED_ARRAY)
         emit.invoke(ARRAY_LENGTH, Registers.OBJECT)
         emit.moveResult(Registers.I0)
         return storeInt(destination, Registers.I0)
@@ -582,8 +582,8 @@ private fun LowerContext.refI31(
     loadInt(Registers.I0, Registers.W0, value)
     emit.literal(LiteralOp.ShlInt, Registers.I0, Registers.I0, 1)
     emit.literal(LiteralOp.UshrInt, Registers.I0, Registers.I0, 1)
-    emit.newInstance(Registers.OBJECT, WASM_I31)
-    emit.invokeConstructor(WASM_I31, "I", Registers.OBJECT, Registers.I0)
+    emit.newInstance(Registers.OBJECT, I31_REFERENCE)
+    emit.invokeConstructor(I31_REFERENCE, "I", Registers.OBJECT, Registers.I0)
     storeReference(destination, Registers.OBJECT)
 }
 
@@ -594,8 +594,8 @@ private fun LowerContext.i31Get(
 ) {
 
     loadReference(Registers.OBJECT, valueSlot)
-    receiver(Registers.OBJECT, WASM_I31)
-    emit.getField(Registers.I0, Registers.OBJECT, WASM_I31, I31_VALUE, "I")
+    receiver(Registers.OBJECT, I31_REFERENCE)
+    emit.getField(Registers.I0, Registers.OBJECT, I31_REFERENCE, I31_VALUE, "I")
 
     if (signed) {
         emit.literal(LiteralOp.ShlInt, Registers.I0, Registers.I0, 1)

@@ -188,7 +188,7 @@ class ManagedGc(
         val struct = shape.getDeclaredConstructor().newInstance()
         layout.forEachIndexed { index, field -> write(struct, field, fields[fieldOffset + index]) }
 
-        return bridge.references.rootObject(struct, bridge.toHost(struct, false))
+        return bridge.references.rootObject(struct, bridge.toHostResult(struct, false))
     }
 
     context(resources: HostResources)
@@ -218,11 +218,11 @@ class ManagedGc(
         return wrap(type, storage)
     }
 
-    private fun array(reference: HostReference): WasmArray {
-        return bridge.fromHost(reference) as WasmArray
+    private fun array(reference: HostReference): ManagedArray {
+        return bridge.fromHost(reference) as ManagedArray
     }
 
-    private fun extern(array: WasmArray): Boolean {
+    private fun extern(array: ManagedArray): Boolean {
         return store.heap.runtimeArrayFieldType(HostGcType(bridge.type(array))).isExtern()
     }
 
@@ -255,7 +255,7 @@ class ManagedGc(
         storage: Any,
     ): HostReference {
         val array = bridge.shape(type.id).getDeclaredConstructor(storage.javaClass).newInstance(storage)
-        return bridge.references.rootObject(array, bridge.toHost(array, false))
+        return bridge.references.rootObject(array, bridge.toHostResult(array, false))
     }
 
     private fun declaredField(

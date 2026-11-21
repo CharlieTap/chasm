@@ -1,8 +1,10 @@
 package io.github.charlietap.chasm.runtime.compiled.gc
 
+import io.github.charlietap.chasm.host.HostExternReference
 import io.github.charlietap.chasm.host.HostGlobal
 import io.github.charlietap.chasm.host.HostReferenceRoot
 import io.github.charlietap.chasm.host.HostTable
+import io.github.charlietap.chasm.reference.I31Reference
 import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.runtime.encoder.RV_SHIFT_BITS
 import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_ARRAY
@@ -32,20 +34,19 @@ import java.lang.ref.ReferenceQueue
 import java.lang.ref.WeakReference
 import java.util.Collections
 import java.util.IdentityHashMap
-import java.util.WeakHashMap
+import kotlin.jvm.JvmField
 
 class ManagedReferenceBridge(
     private val store: Store,
 ) : ReferenceBridge {
 
-    private val handles = WeakHashMap<Any, Int>()
+    private val handles = HashMap<Int, MutableList<Int>>()
+    private val legacyHostValues = HashMap<Long, LegacyHostValue>()
     private val objects = ArrayList<Handle?>()
     private val freeHandles = ArrayList<Int>()
     private val collected = ReferenceQueue<Any>()
     private var results = identitySet()
     private var previousResults = identitySet()
-    private val functions = IdentityHashMap<FunctionInstance, Int>()
-    private val legacyHostValues = HashMap<Long, LegacyHostValue>()
     private val globals = IdentityHashMap<GlobalInstance, ReferenceGlobal>()
     private val tables = IdentityHashMap<TableInstance, ReferenceTable>()
     private val segments = IdentityHashMap<ElementInstance, ReferenceSegment>()
@@ -53,11 +54,13 @@ class ManagedReferenceBridge(
     private val types = IdentityHashMap<Class<*>, Int>()
     private var raisedException: Any? = null
 
+    val functions = ManagedFunctions(store)
+
     override val references = ManagedReferences(this)
 
     override val gc = ManagedGc(this, store)
 
-    override val externs = ManagedExterns(this, store)
+    override val externs = ManagedExterns(this)
 
     override val exceptions = ManagedExceptions(this, store)
 
@@ -116,13 +119,13 @@ class ManagedReferenceBridge(
 
         val encoded = when (value) {
             null -> return if (extern) NULL_EXTERN else NULL_ANY
-            is WasmI31 -> ReferenceValue.I31(value.value.toUInt()).toLong()
-            is FunctionInstance -> ReferenceValue.Function(Address.Function(functionAddress(value))).toLong()
-            is WasmArray -> encode(RV_TYPE_ARRAY, escape(value))
+            is I31Reference -> ReferenceValue.I31(value.value.toUInt()).toLong()
+            is ManagedFunction -> ReferenceValue.Function(Address.Function(value.address)).toLong()
+            is ManagedStruct -> encode(RV_TYPE_STRUCT, escape(value))
+            is ManagedArray -> encode(RV_TYPE_ARRAY, escape(value))
             is WasmException -> encode(RV_TYPE_EXCEPTION, escape(value))
-            is HostValue -> encode(RV_TYPE_HOST, escape(value))
             is LegacyHostValue -> value.encoded
-            else -> encode(RV_TYPE_STRUCT, escape(value))
+            else -> encode(RV_TYPE_HOST, escape(value))
         }
 
         return if (extern) encode(RV_TYPE_EXTERN, encoded) else encoded
@@ -134,8 +137,8 @@ class ManagedReferenceBridge(
         val payload = encoded ushr RV_SHIFT_BITS
         return when (encoded and RV_TYPE_MASK) {
             RV_TYPE_NULL -> null
-            RV_TYPE_I31 -> WasmI31(payload.toInt())
-            RV_TYPE_FUNCTION -> store.function(Address.Function(payload.toInt()))
+            RV_TYPE_I31 -> I31Reference(payload.toInt())
+            RV_TYPE_FUNCTION -> functions.at(payload.toInt())
             RV_TYPE_EXTERN -> fromHost(payload)
             RV_TYPE_HOST -> if (payload < FIRST_HANDLE) legacyHostValue(encoded) else objectAt(payload)
             else -> objectAt(payload)
@@ -162,8 +165,7 @@ class ManagedReferenceBridge(
     }
 
     override fun retainExtern(value: Any): HostReferenceRoot {
-        val extern = HostValue(value)
-        return references.retainObject(extern, toHost(extern, true))
+        return references.retainObject(value, toHost(value, true))
     }
 
     @Synchronized
@@ -173,10 +175,7 @@ class ManagedReferenceBridge(
 
     @Synchronized
     override fun release(table: TableInstance) {
-        tables.remove(table)?.let { storage ->
-            storage.elements = emptyArray()
-            storage.targets = arrayOfNulls(0)
-        }
+        tables.remove(table)?.elements = emptyArray()
     }
 
     @Synchronized
@@ -218,25 +217,56 @@ class ManagedReferenceBridge(
 
     private fun escape(value: Any): Long {
 
-        handles[value]?.let { handle -> return handle.toLong() }
-
         reclaimHandles()
-        val handle = if (freeHandles.isEmpty()) FIRST_HANDLE.toInt() + objects.size else freeHandles.removeAt(freeHandles.size - 1)
-        val slot = handle - FIRST_HANDLE.toInt()
-        val reference = Handle(value, handle, collected)
-        if (slot == objects.size) objects += reference else objects[slot] = reference
-        handles[value] = handle
+
+        val identity = System.identityHashCode(value)
+        val candidates = handles[identity]
+        candidates?.forEach { handle ->
+            if (objects[handle - FIRST_HANDLE.toInt()]?.get() === value) {
+                return handle.toLong()
+            }
+        }
+
+        val handle = newHandle(value, identity)
+        handles.getOrPut(identity) { ArrayList(1) }.add(handle)
 
         return handle.toLong()
     }
 
+    private fun newHandle(
+        value: Any,
+        identity: Int,
+    ): Int {
+
+        val handle = if (freeHandles.isEmpty()) FIRST_HANDLE.toInt() + objects.size else freeHandles.removeAt(freeHandles.size - 1)
+        val slot = handle - FIRST_HANDLE.toInt()
+        val reference = Handle(value, handle, identity, collected)
+
+        if (slot == objects.size) {
+            objects += reference
+        } else {
+            objects[slot] = reference
+        }
+
+        return handle
+    }
+
     private fun reclaimHandles() {
         while (true) {
+
             val reference = collected.poll() as? Handle ?: return
             val slot = reference.handle - FIRST_HANDLE.toInt()
+
             if (objects.getOrNull(slot) === reference) {
+
                 objects[slot] = null
                 freeHandles += reference.handle
+
+                val candidates = handles[reference.identity]
+                candidates?.remove(reference.handle)
+                if (candidates != null && candidates.isEmpty()) {
+                    handles.remove(reference.identity)
+                }
             }
         }
     }
@@ -249,12 +279,12 @@ class ManagedReferenceBridge(
         return legacyHostValues.getOrPut(encoded) { LegacyHostValue(encoded) }
     }
 
-    private fun functionAddress(function: FunctionInstance): Int {
-
-        functions[function]?.let { address -> return address }
-        store.functions.forEachIndexed { address, candidate -> functions[candidate] = address }
-
-        return checkNotNull(functions[function]) { "function is not in this store" }
+    fun hostValue(value: Any): Any {
+        return if (value is LegacyHostValue) {
+            store.heap.value(HostExternReference((value.encoded shl RV_SHIFT_BITS) or RV_TYPE_EXTERN))
+        } else {
+            value
+        }
     }
 
     private fun encode(
@@ -275,6 +305,7 @@ class ManagedReferenceBridge(
     private class Handle(
         value: Any,
         val handle: Int,
+        val identity: Int,
         queue: ReferenceQueue<Any>,
     ) : WeakReference<Any>(value, queue)
 
@@ -284,3 +315,7 @@ class ManagedReferenceBridge(
         val NULL_EXTERN = ReferenceValue.Null(AbstractHeapType.Extern).toLong()
     }
 }
+
+class LegacyHostValue(
+    @JvmField val encoded: Long,
+)

@@ -5,7 +5,6 @@ package io.github.charlietap.chasm.runtime.compiled.gc
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.type.RTT
 import kotlin.jvm.JvmName
 
@@ -105,12 +104,12 @@ fun indirectFunction(
     table: ReferenceTable,
     type: Int,
     index: Int,
-): FunctionInstance {
+): ManagedFunction {
 
     val references = table.elements
     if (index < 0 || index >= references.size) throw InvocationException(InvocationError.TableElementLookupFailed(index))
-    val function = references[index] as? FunctionInstance ?: throw InvocationException(InvocationError.FunctionReferenceExpected)
-    if (function.rtt.value != type && !context.heap.matchesRuntimeType(function.rtt, RTT(type))) {
+    val function = references[index] as? ManagedFunction ?: throw InvocationException(InvocationError.FunctionReferenceExpected)
+    if (function.rtt != type && !context.heap.matchesRuntimeType(RTT(function.rtt), RTT(type))) {
         throw InvocationException(InvocationError.IndirectCallHasIncorrectFunctionType)
     }
 
@@ -123,22 +122,7 @@ fun indirectEntry(
     type: Int,
     index: Int,
 ): Any? {
-
-    val targets = table.targets
-    val elements = table.elements
-    if (index >= 0 && index < targets.size && index < elements.size) {
-        val target = targets[index]
-        if (target != null && target.type == type && target.function === elements[index]) {
-            return target.entry
-        }
-    }
-
-    val function = indirectFunction(context, table, type, index)
-    val entry = (function as? FunctionInstance.WasmFunction)?.callStrategy?.compiledEntry ?: return null
-    val cache = if (index < targets.size) targets else targets.copyOf(table.elements.size).also { grown -> table.targets = grown }
-    cache[index] = IndirectTarget(function, type, entry)
-
-    return entry
+    return indirectFunction(context, table, type, index).entry
 }
 
 private fun checkTableRange(

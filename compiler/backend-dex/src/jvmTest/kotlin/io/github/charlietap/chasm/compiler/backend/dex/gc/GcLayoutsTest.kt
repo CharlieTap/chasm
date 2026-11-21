@@ -2,12 +2,12 @@ package io.github.charlietap.chasm.compiler.backend.dex.gc
 
 import com.android.tools.smali.dexlib2.Opcodes
 import com.android.tools.smali.dexlib2.dexbacked.DexBackedDexFile
-import io.github.charlietap.chasm.compiler.backend.abi.FUNCTION_INSTANCE
+import io.github.charlietap.chasm.compiler.backend.abi.EQ_REFERENCE
+import io.github.charlietap.chasm.compiler.backend.abi.I31_REFERENCE
+import io.github.charlietap.chasm.compiler.backend.abi.MANAGED_ARRAY
+import io.github.charlietap.chasm.compiler.backend.abi.MANAGED_FUNCTION
+import io.github.charlietap.chasm.compiler.backend.abi.MANAGED_STRUCT
 import io.github.charlietap.chasm.compiler.backend.abi.OBJECT_TYPE
-import io.github.charlietap.chasm.compiler.backend.abi.WASM_ARRAY
-import io.github.charlietap.chasm.compiler.backend.abi.WASM_EQ
-import io.github.charlietap.chasm.compiler.backend.abi.WASM_I31
-import io.github.charlietap.chasm.compiler.backend.abi.WASM_STRUCT
 import io.github.charlietap.chasm.compiler.backend.dex.decodeModule
 import io.github.charlietap.chasm.compiler.backend.dex.fixture
 import io.github.charlietap.dexter.Dexter
@@ -59,7 +59,7 @@ class GcLayoutsTest {
         assertEquals(listOf(tree.className, leaf.className), tree.fields.map { field -> field.descriptor })
         assertEquals(listOf("J", "B", "C"), leaf.fields.map { field -> field.descriptor })
         assertEquals(
-            listOf(OBJECT_TYPE, WASM_EQ, WASM_I31, FUNCTION_INSTANCE, layouts.struct(SHAPE).className),
+            listOf(OBJECT_TYPE, EQ_REFERENCE, I31_REFERENCE, MANAGED_FUNCTION, layouts.struct(SHAPE).className),
             holder.fields.map { field -> field.descriptor },
         )
     }
@@ -85,10 +85,10 @@ class GcLayoutsTest {
         val classes = DexBackedDexFile(Opcodes.forApi(MIN_API), file.finish()).classes.associateBy { classDef -> classDef.type }
 
         assertEquals(layouts.structs.size + layouts.arrays.size, classes.size)
-        assertEquals(WASM_STRUCT, classes.getValue(layouts.struct(SHAPE).className).superclass)
+        assertEquals(MANAGED_STRUCT, classes.getValue(layouts.struct(SHAPE).className).superclass)
         assertEquals(layouts.struct(SHAPE).className, classes.getValue(layouts.struct(CIRCLE).className).superclass)
         assertEquals(listOf("f1"), classes.getValue(layouts.struct(CIRCLE).className).instanceFields.map { field -> field.name })
-        assertEquals(WASM_ARRAY, classes.getValue(layouts.array(SHAPES).className).superclass)
+        assertEquals(MANAGED_ARRAY, classes.getValue(layouts.array(SHAPES).className).superclass)
         assertEquals(listOf("data"), classes.getValue(layouts.array(SHAPES).className).instanceFields.map { field -> field.name })
         assertTrue(classes.getValue(layouts.array(CIRCLES).className).instanceFields.none())
     }

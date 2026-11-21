@@ -278,6 +278,7 @@ public final class io/github/charlietap/chasm/embedding/internal/ExportedFunctio
 public final class io/github/charlietap/chasm/embedding/internal/ExportedFunctionKt {
 	public static final fun exportedError (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/runtime/error/InvocationError;)Lio/github/charlietap/chasm/embedding/error/ChasmError$ExecutionError;
 	public static final fun exportedFunction (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Instance;Ljava/lang/String;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+	public static final fun functionAddress (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Function;)I
 	public static final fun functionInstance (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Function;)Lio/github/charlietap/chasm/runtime/instance/FunctionInstance;
 	public static final fun storeDropped (Lio/github/charlietap/chasm/embedding/shapes/Store;)Z
 }

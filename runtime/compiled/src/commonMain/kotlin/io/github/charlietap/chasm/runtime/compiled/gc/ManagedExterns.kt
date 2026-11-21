@@ -10,17 +10,14 @@ import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_EXTERN
 import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_HOST
 import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_MASK
 import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_NULL
-import io.github.charlietap.chasm.runtime.store.Store
 
 class ManagedExterns(
     private val bridge: ManagedReferenceBridge,
-    private val store: Store,
 ) : HostExterns {
 
     context(resources: HostResources)
     override fun create(value: Any): HostExternReference {
-        val extern = HostValue(value)
-        return HostExternReference(bridge.references.rootObject(extern, bridge.toHost(extern, true)))
+        return HostExternReference(bridge.references.rootObject(value, bridge.toHostResult(value, true)))
     }
 
     override fun nullReference(): HostExternReference {
@@ -38,10 +35,7 @@ class ManagedExterns(
     }
 
     override fun value(reference: HostExternReference): Any {
-        return when (val value = bridge.fromHost(reference.raw)) {
-            is LegacyHostValue -> store.heap.value(HostExternReference((value.encoded shl RV_SHIFT_BITS) or RV_TYPE_EXTERN))
-            else -> (value as HostValue).value
-        }
+        return bridge.hostValue(checkNotNull(bridge.fromHost(reference.raw)) { "extern reference is null" })
     }
 
     override fun externalizedReference(reference: HostExternReference): HostReference {

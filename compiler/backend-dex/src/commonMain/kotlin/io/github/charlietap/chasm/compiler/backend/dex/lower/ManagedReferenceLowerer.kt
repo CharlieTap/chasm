@@ -5,16 +5,16 @@ import io.github.charlietap.chasm.cir.HeapType
 import io.github.charlietap.chasm.cir.ReferenceInstruction
 import io.github.charlietap.chasm.cir.ReferenceType
 import io.github.charlietap.chasm.compiler.backend.abi.CAST_FAILED
-import io.github.charlietap.chasm.compiler.backend.abi.FUNCTION_INSTANCE
+import io.github.charlietap.chasm.compiler.backend.abi.EQ_REFERENCE
 import io.github.charlietap.chasm.compiler.backend.abi.FUNCTION_MATCHES
+import io.github.charlietap.chasm.compiler.backend.abi.I31_REFERENCE
+import io.github.charlietap.chasm.compiler.backend.abi.MANAGED_ARRAY
+import io.github.charlietap.chasm.compiler.backend.abi.MANAGED_FUNCTION
+import io.github.charlietap.chasm.compiler.backend.abi.MANAGED_STRUCT
 import io.github.charlietap.chasm.compiler.backend.abi.NULL_REFERENCE
 import io.github.charlietap.chasm.compiler.backend.abi.Resource
 import io.github.charlietap.chasm.compiler.backend.abi.SAME_I31
-import io.github.charlietap.chasm.compiler.backend.abi.WASM_ARRAY
-import io.github.charlietap.chasm.compiler.backend.abi.WASM_EQ
 import io.github.charlietap.chasm.compiler.backend.abi.WASM_EXCEPTION_TYPE
-import io.github.charlietap.chasm.compiler.backend.abi.WASM_I31
-import io.github.charlietap.chasm.compiler.backend.abi.WASM_STRUCT
 import io.github.charlietap.chasm.compiler.backend.analysis.form.slot
 import io.github.charlietap.dexter.Cond
 import io.github.charlietap.dexter.Label
@@ -28,7 +28,7 @@ internal fun lowerManagedReferenceInstruction(
         is ReferenceInstruction.RefAsNonNullS -> context.refAsNonNull(instruction.valueSlot, instruction.destinationSlot)
         is ReferenceInstruction.RefNullS -> context.writeReference(instruction.destinationSlot) { target -> context.emit.const(target, 0) }
         is ReferenceInstruction.RefFuncS -> context.writeReference(instruction.destinationSlot) { target ->
-            context.loadObject(target, Resource.FunctionObject(instruction.function.index), FUNCTION_INSTANCE)
+            context.loadObject(target, Resource.FunctionObject(instruction.function.index), MANAGED_FUNCTION)
         }
         is ReferenceInstruction.RefEqSs -> context.refEq(instruction.reference1Slot, instruction.reference2Slot, instruction.destinationSlot)
         is ReferenceInstruction.RefCastS -> context.refCast(instruction.referenceSlot, instruction.typeTest, instruction.destinationSlot)
@@ -112,15 +112,15 @@ internal fun LowerContext.branchOnType(
     when (val heap = type.heapType) {
         is HeapType.Abstract -> when (heap.type) {
             AbstractHeapType.Any -> {
-                branchOnInstance(reference, FUNCTION_INSTANCE, fails)
+                branchOnInstance(reference, MANAGED_FUNCTION, fails)
                 emit.gotoLabel(matches)
             }
             AbstractHeapType.Extern -> emit.gotoLabel(matches)
-            AbstractHeapType.Eq -> branchOnInstance(reference, WASM_EQ, matches)
-            AbstractHeapType.Struct -> branchOnInstance(reference, WASM_STRUCT, matches)
-            AbstractHeapType.Array -> branchOnInstance(reference, WASM_ARRAY, matches)
-            AbstractHeapType.I31 -> branchOnInstance(reference, WASM_I31, matches)
-            AbstractHeapType.Func -> branchOnInstance(reference, FUNCTION_INSTANCE, matches)
+            AbstractHeapType.Eq -> branchOnInstance(reference, EQ_REFERENCE, matches)
+            AbstractHeapType.Struct -> branchOnInstance(reference, MANAGED_STRUCT, matches)
+            AbstractHeapType.Array -> branchOnInstance(reference, MANAGED_ARRAY, matches)
+            AbstractHeapType.I31 -> branchOnInstance(reference, I31_REFERENCE, matches)
+            AbstractHeapType.Func -> branchOnInstance(reference, MANAGED_FUNCTION, matches)
             AbstractHeapType.Exception -> branchOnInstance(reference, WASM_EXCEPTION_TYPE, matches)
             AbstractHeapType.None, AbstractHeapType.NoFunc, AbstractHeapType.NoExtern, AbstractHeapType.NoException -> Unit
         }

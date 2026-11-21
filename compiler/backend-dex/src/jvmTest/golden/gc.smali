@@ -117,7 +117,7 @@
 
     aget-object v12, v16, v9
 
-    check-cast v12, Lio/github/charlietap/chasm/runtime/instance/FunctionInstance;
+    check-cast v12, Lio/github/charlietap/chasm/runtime/compiled/gc/ManagedFunction;
 
     move-object/from16 v22, v12
 
@@ -130,7 +130,7 @@
 
     aget-object v12, v16, v9
 
-    check-cast v12, Lio/github/charlietap/chasm/runtime/instance/FunctionInstance;
+    check-cast v12, Lio/github/charlietap/chasm/runtime/compiled/gc/ManagedFunction;
 
     move-object/from16 v22, v12
 
@@ -425,9 +425,9 @@
 
     ushr-int/lit8 v8, v8, 0x1
 
-    new-instance v12, Lio/github/charlietap/chasm/runtime/compiled/gc/WasmI31;
+    new-instance v12, Lio/github/charlietap/chasm/reference/I31Reference;
 
-    invoke-direct {v12, v8}, Lio/github/charlietap/chasm/runtime/compiled/gc/WasmI31;-><init>(I)V
+    invoke-direct {v12, v8}, Lio/github/charlietap/chasm/reference/I31Reference;-><init>(I)V
 
     move-object/from16 v18, v12
 
@@ -436,7 +436,7 @@
 
     if-eqz v12, :cond_2b
 
-    instance-of v8, v12, Lio/github/charlietap/chasm/runtime/compiled/gc/WasmI31;
+    instance-of v8, v12, Lio/github/charlietap/chasm/reference/I31Reference;
 
     if-nez v8, :cond_30
 
@@ -453,9 +453,9 @@
 
     if-eqz v12, :cond_43
 
-    check-cast v12, Lio/github/charlietap/chasm/runtime/compiled/gc/WasmI31;
+    check-cast v12, Lio/github/charlietap/chasm/reference/I31Reference;
 
-    iget v8, v12, Lio/github/charlietap/chasm/runtime/compiled/gc/WasmI31;->value:I
+    iget v8, v12, Lio/github/charlietap/chasm/reference/I31Reference;->value:I
 
     shl-int/lit8 v8, v8, 0x1
 
@@ -512,9 +512,9 @@
 
     ushr-int/lit8 v8, v8, 0x1
 
-    new-instance v12, Lio/github/charlietap/chasm/runtime/compiled/gc/WasmI31;
+    new-instance v12, Lio/github/charlietap/chasm/reference/I31Reference;
 
-    invoke-direct {v12, v8}, Lio/github/charlietap/chasm/runtime/compiled/gc/WasmI31;-><init>(I)V
+    invoke-direct {v12, v8}, Lio/github/charlietap/chasm/reference/I31Reference;-><init>(I)V
 
     move-object/from16 v17, v12
 
@@ -1396,9 +1396,9 @@
 
     ushr-int/lit8 v8, v8, 0x1
 
-    new-instance v12, Lio/github/charlietap/chasm/runtime/compiled/gc/WasmI31;
+    new-instance v12, Lio/github/charlietap/chasm/reference/I31Reference;
 
-    invoke-direct {v12, v8}, Lio/github/charlietap/chasm/runtime/compiled/gc/WasmI31;-><init>(I)V
+    invoke-direct {v12, v8}, Lio/github/charlietap/chasm/reference/I31Reference;-><init>(I)V
 
     move-object/from16 v19, v12
 
@@ -1407,9 +1407,9 @@
 
     if-eqz v12, :cond_5d
 
-    check-cast v12, Lio/github/charlietap/chasm/runtime/compiled/gc/WasmI31;
+    check-cast v12, Lio/github/charlietap/chasm/reference/I31Reference;
 
-    iget v8, v12, Lio/github/charlietap/chasm/runtime/compiled/gc/WasmI31;->value:I
+    iget v8, v12, Lio/github/charlietap/chasm/reference/I31Reference;->value:I
 
     shl-int/lit8 v8, v8, 0x1
 
@@ -1439,9 +1439,9 @@
 
     ushr-int/lit8 v8, v8, 0x1
 
-    new-instance v12, Lio/github/charlietap/chasm/runtime/compiled/gc/WasmI31;
+    new-instance v12, Lio/github/charlietap/chasm/reference/I31Reference;
 
-    invoke-direct {v12, v8}, Lio/github/charlietap/chasm/runtime/compiled/gc/WasmI31;-><init>(I)V
+    invoke-direct {v12, v8}, Lio/github/charlietap/chasm/reference/I31Reference;-><init>(I)V
 
     move-object/from16 v21, v12
 
@@ -1450,9 +1450,9 @@
 
     if-eqz v12, :cond_62
 
-    check-cast v12, Lio/github/charlietap/chasm/runtime/compiled/gc/WasmI31;
+    check-cast v12, Lio/github/charlietap/chasm/reference/I31Reference;
 
-    iget v8, v12, Lio/github/charlietap/chasm/runtime/compiled/gc/WasmI31;->value:I
+    iget v8, v12, Lio/github/charlietap/chasm/reference/I31Reference;->value:I
 
     move/from16 v20, v8
 
@@ -1758,9 +1758,9 @@
 
     ushr-int/lit8 v8, v8, 0x1
 
-    new-instance v12, Lio/github/charlietap/chasm/runtime/compiled/gc/WasmI31;
+    new-instance v12, Lio/github/charlietap/chasm/reference/I31Reference;
 
-    invoke-direct {v12, v8}, Lio/github/charlietap/chasm/runtime/compiled/gc/WasmI31;-><init>(I)V
+    invoke-direct {v12, v8}, Lio/github/charlietap/chasm/reference/I31Reference;-><init>(I)V
 
     move-object/from16 v20, v12
 
@@ -1786,7 +1786,7 @@
 
     if-eqz v12, :cond_64
 
-    instance-of v8, v12, Lio/github/charlietap/chasm/runtime/compiled/gc/WasmI31;
+    instance-of v8, v12, Lio/github/charlietap/chasm/reference/I31Reference;
 
     if-nez v8, :cond_69
 
@@ -1803,9 +1803,9 @@
 
     if-eqz v12, :cond_88
 
-    check-cast v12, Lio/github/charlietap/chasm/runtime/compiled/gc/WasmI31;
+    check-cast v12, Lio/github/charlietap/chasm/reference/I31Reference;
 
-    iget v8, v12, Lio/github/charlietap/chasm/runtime/compiled/gc/WasmI31;->value:I
+    iget v8, v12, Lio/github/charlietap/chasm/reference/I31Reference;->value:I
 
     move/from16 v23, v8
 
@@ -1894,9 +1894,9 @@
 
     ushr-int/lit8 v8, v8, 0x1
 
-    new-instance v12, Lio/github/charlietap/chasm/runtime/compiled/gc/WasmI31;
+    new-instance v12, Lio/github/charlietap/chasm/reference/I31Reference;
 
-    invoke-direct {v12, v8}, Lio/github/charlietap/chasm/runtime/compiled/gc/WasmI31;-><init>(I)V
+    invoke-direct {v12, v8}, Lio/github/charlietap/chasm/reference/I31Reference;-><init>(I)V
 
     move-object/from16 v19, v12
 
@@ -1915,7 +1915,7 @@
 
     if-eqz v12, :cond_31
 
-    instance-of v8, v12, Lio/github/charlietap/chasm/runtime/compiled/gc/WasmI31;
+    instance-of v8, v12, Lio/github/charlietap/chasm/reference/I31Reference;
 
     if-nez v8, :cond_33
 
@@ -1928,9 +1928,9 @@
 
     if-eqz v12, :cond_48
 
-    check-cast v12, Lio/github/charlietap/chasm/runtime/compiled/gc/WasmI31;
+    check-cast v12, Lio/github/charlietap/chasm/reference/I31Reference;
 
-    iget v8, v12, Lio/github/charlietap/chasm/runtime/compiled/gc/WasmI31;->value:I
+    iget v8, v12, Lio/github/charlietap/chasm/reference/I31Reference;->value:I
 
     shl-int/lit8 v8, v8, 0x1
 
@@ -2878,7 +2878,7 @@
 
     const/4 v2, 0x0
 
-    invoke-virtual {p0, v2}, Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;->function(I)Lio/github/charlietap/chasm/runtime/instance/FunctionInstance;
+    invoke-virtual {p0, v2}, Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;->managedFunction(I)Ljava/lang/Object;
 
     move-result-object v4
 
@@ -2888,7 +2888,7 @@
 
     const/4 v2, 0x1
 
-    invoke-virtual {p0, v2}, Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;->function(I)Lio/github/charlietap/chasm/runtime/instance/FunctionInstance;
+    invoke-virtual {p0, v2}, Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;->managedFunction(I)Ljava/lang/Object;
 
     move-result-object v4
 

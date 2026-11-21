@@ -49,6 +49,7 @@ fun ModuleCodeInstallation(
     val missing = installation.missing()
     if (missing != null) return Err(InstantiationError.CompiledCodeRejected("no code for function $missing"))
     installCompiledFunctions(store, installation.installations())
+    installation.publishManagedEntries()
     return Ok(Unit)
 }
 
@@ -110,6 +111,10 @@ private class Installation(
         index: Int,
     ): Long = ReferenceValue.Function(Address.Function(instance.functionAddresses[index].address)).toLong()
 
+    override fun managedFunction(index: Int): Any {
+        return bridge().functions.at(instance.functionAddresses[index].address)
+    }
+
     override fun typeTest(
         nullable: Boolean,
         heapType: Int,
@@ -132,6 +137,16 @@ private class Installation(
     private fun bridge(): ManagedReferenceBridge = checkNotNull(store.referenceBridge as? ManagedReferenceBridge) { "store has no managed references" }
 
     fun missing(): Int? = entries.indexOfFirst { it == null }.takeIf { it >= 0 }?.plus(importedFunctions)
+
+    fun publishManagedEntries() {
+
+        val functions = (store.referenceBridge as? ManagedReferenceBridge)?.functions ?: return
+
+        entries.forEachIndexed { defined, entry ->
+            val address = instance.functionAddresses[defined + importedFunctions].address
+            functions.publish(address, checkNotNull(entry))
+        }
+    }
 
     fun installations(): List<CompiledFunctionInstallation> = entries.mapIndexed { defined, entry ->
         CompiledFunctionInstallation(function(defined + importedFunctions) as FunctionInstance.WasmFunction, checkNotNull(entry))

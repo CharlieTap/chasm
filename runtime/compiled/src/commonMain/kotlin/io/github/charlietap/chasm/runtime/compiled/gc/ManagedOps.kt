@@ -6,6 +6,7 @@ import io.github.charlietap.chasm.executor.invoker.compiled.COMPILED_CALL_COST
 import io.github.charlietap.chasm.executor.invoker.compiled.INTERPRETED_CALL_COST
 import io.github.charlietap.chasm.executor.invoker.compiled.callFunction
 import io.github.charlietap.chasm.host.HostFunctionException
+import io.github.charlietap.chasm.reference.I31Reference
 import io.github.charlietap.chasm.runtime.compiled.BindingEntry
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.HostRaisedWasmException
@@ -97,7 +98,7 @@ fun sameI31(
     first: Any?,
     second: Any?,
 ): Boolean {
-    return first is WasmI31 && second is WasmI31 && first.value == second.value
+    return first is I31Reference && second is I31Reference && first.value == second.value
 }
 
 fun functionMatches(
@@ -105,14 +106,18 @@ fun functionMatches(
     function: Any?,
     rtt: Int,
 ): Boolean {
-    return function is FunctionInstance && (function.rtt.value == rtt || context.heap.matchesRuntimeType(function.rtt, RTT(rtt)))
+    return function is ManagedFunction && (function.rtt == rtt || context.heap.matchesRuntimeType(RTT(function.rtt), RTT(rtt)))
 }
 
 fun referenceTarget(
     function: Any?,
 ): Any? {
-    if (function == null) throw InvocationException(InvocationError.NonNullReferenceExpected)
-    return ((function as FunctionInstance) as? FunctionInstance.WasmFunction)?.callStrategy?.compiledEntry
+
+    if (function == null) {
+        throw InvocationException(InvocationError.NonNullReferenceExpected)
+    }
+
+    return (function as ManagedFunction).entry
 }
 
 fun callImport(
@@ -136,7 +141,7 @@ fun callReference(
 ) {
     if (function == null) throw InvocationException(InvocationError.NonNullReferenceExpected)
     unwindOnWasmException(context) {
-        callFunction(context, caller, function as FunctionInstance, values, depth)
+        callFunction(context, caller, (function as ManagedFunction).instance, values, depth)
     }
 }
 
@@ -303,7 +308,7 @@ fun requestTailIndirectObjects(
     values: LongArray,
     references: Array<Any?>?,
 ) {
-    requestTailObjects(context, caller, indirectFunction(context, table, type, elementIndex), values, references)
+    requestTailObjects(context, caller, indirectFunction(context, table, type, elementIndex).instance, values, references)
 }
 
 fun requestTailReferenceObjects(
@@ -314,7 +319,7 @@ fun requestTailReferenceObjects(
     references: Array<Any?>?,
 ) {
     if (function == null) throw InvocationException(InvocationError.NonNullReferenceExpected)
-    requestTailObjects(context, caller, function as FunctionInstance, values, references)
+    requestTailObjects(context, caller, (function as ManagedFunction).instance, values, references)
 }
 
 fun completeTailObjects(
@@ -348,7 +353,7 @@ fun callIndirectObjects(
     references: Array<Any?>?,
     depth: Int,
 ) {
-    callObjects(context, caller, indirectFunction(context, table, type, elementIndex), values, references, depth)
+    callObjects(context, caller, indirectFunction(context, table, type, elementIndex).instance, values, references, depth)
 }
 
 fun callReferenceObjects(
@@ -360,7 +365,7 @@ fun callReferenceObjects(
     depth: Int,
 ) {
     if (function == null) throw InvocationException(InvocationError.NonNullReferenceExpected)
-    callObjects(context, caller, function as FunctionInstance, values, references, depth)
+    callObjects(context, caller, (function as ManagedFunction).instance, values, references, depth)
 }
 
 private fun callObjectLane(

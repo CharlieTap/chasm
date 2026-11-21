@@ -1,9 +1,9 @@
 package io.github.charlietap.chasm.compiler.backend.dex.gc
 
-import io.github.charlietap.chasm.compiler.backend.abi.WASM_ARRAY
-import io.github.charlietap.chasm.compiler.backend.abi.WASM_ARRAY_LENGTH
-import io.github.charlietap.chasm.compiler.backend.abi.WASM_ARRAY_STORAGE
-import io.github.charlietap.chasm.compiler.backend.abi.WASM_STRUCT
+import io.github.charlietap.chasm.compiler.backend.abi.MANAGED_ARRAY
+import io.github.charlietap.chasm.compiler.backend.abi.MANAGED_ARRAY_LENGTH
+import io.github.charlietap.chasm.compiler.backend.abi.MANAGED_ARRAY_STORAGE
+import io.github.charlietap.chasm.compiler.backend.abi.MANAGED_STRUCT
 import io.github.charlietap.chasm.compiler.backend.dex.abi.referenceType
 import io.github.charlietap.chasm.compiler.backend.dex.abi.valueType
 import io.github.charlietap.dexter.ClassAccess
@@ -31,7 +31,7 @@ internal class ShapeWriter {
     ) {
 
         val type = ClassType(shape.className)
-        val superclass = ClassType(shape.parent?.className ?: WASM_STRUCT)
+        val superclass = ClassType(shape.parent?.className ?: MANAGED_STRUCT)
         val builder = file.addClass(type, superclass, access = access(shape.final))
 
         shape.fields
@@ -50,7 +50,7 @@ internal class ShapeWriter {
     ) {
 
         val type = ClassType(shape.className)
-        val superclass = ClassType(shape.parent?.className ?: WASM_ARRAY)
+        val superclass = ClassType(shape.parent?.className ?: MANAGED_ARRAY)
         val dataType = referenceType(shape.data.descriptor)
         val builder = file.addClass(type, superclass, access = access(shape.final))
         val data = DexField(ClassType(shape.data.owner), shape.data.name, dataType)
@@ -71,12 +71,12 @@ internal class ShapeWriter {
         code.finish()
 
         if (shape.parent == null) {
-            val storage = builder.beginInstanceMethod(DexMethod(type, WASM_ARRAY_STORAGE, DexType.Object), registerCount = 2)
+            val storage = builder.beginInstanceMethod(DexMethod(type, MANAGED_ARRAY_STORAGE, DexType.Object), registerCount = 2)
             storage.getField(STORAGE, storage.self, data)
             storage.returnValue(STORAGE)
             storage.finish()
 
-            val length = builder.beginInstanceMethod(DexMethod(type, WASM_ARRAY_LENGTH, DexType.Int), registerCount = 2)
+            val length = builder.beginInstanceMethod(DexMethod(type, MANAGED_ARRAY_LENGTH, DexType.Int), registerCount = 2)
             length.getField(STORAGE, length.self, data)
             length.arrayLength(LENGTH, STORAGE)
             length.returnValue(LENGTH)

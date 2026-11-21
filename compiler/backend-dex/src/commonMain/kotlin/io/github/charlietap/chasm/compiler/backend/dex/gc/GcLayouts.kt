@@ -1,11 +1,11 @@
 package io.github.charlietap.chasm.compiler.backend.dex.gc
 
-import io.github.charlietap.chasm.compiler.backend.abi.FUNCTION_INSTANCE
+import io.github.charlietap.chasm.compiler.backend.abi.EQ_REFERENCE
+import io.github.charlietap.chasm.compiler.backend.abi.I31_REFERENCE
+import io.github.charlietap.chasm.compiler.backend.abi.MANAGED_ARRAY
+import io.github.charlietap.chasm.compiler.backend.abi.MANAGED_FUNCTION
+import io.github.charlietap.chasm.compiler.backend.abi.MANAGED_STRUCT
 import io.github.charlietap.chasm.compiler.backend.abi.OBJECT_TYPE
-import io.github.charlietap.chasm.compiler.backend.abi.WASM_ARRAY
-import io.github.charlietap.chasm.compiler.backend.abi.WASM_EQ
-import io.github.charlietap.chasm.compiler.backend.abi.WASM_I31
-import io.github.charlietap.chasm.compiler.backend.abi.WASM_STRUCT
 import io.github.charlietap.chasm.compiler.backend.dex.lower.Unsupported
 import io.github.charlietap.chasm.type.AbstractHeapType
 import io.github.charlietap.chasm.type.CompositeType
@@ -114,11 +114,11 @@ internal class GcLayouts(
         owner: DefinedType?,
     ): String {
         return when (type) {
-            AbstractHeapType.Eq -> WASM_EQ
-            AbstractHeapType.Struct -> WASM_STRUCT
-            AbstractHeapType.Array -> WASM_ARRAY
-            AbstractHeapType.I31 -> WASM_I31
-            AbstractHeapType.Func, AbstractHeapType.NoFunc -> FUNCTION_INSTANCE
+            AbstractHeapType.Eq -> EQ_REFERENCE
+            AbstractHeapType.Struct -> MANAGED_STRUCT
+            AbstractHeapType.Array -> MANAGED_ARRAY
+            AbstractHeapType.I31 -> I31_REFERENCE
+            AbstractHeapType.Func, AbstractHeapType.NoFunc -> MANAGED_FUNCTION
             is AbstractHeapType -> OBJECT_TYPE
             else -> definedDescriptor(resolve(type, owner))
         }
@@ -131,7 +131,7 @@ internal class GcLayouts(
         return when (type.subType().compositeType) {
             is CompositeType.Struct -> structClass(key)
             is CompositeType.Array -> arrayClass(key)
-            is CompositeType.Function -> FUNCTION_INSTANCE
+            is CompositeType.Function -> MANAGED_FUNCTION
         }
     }
 

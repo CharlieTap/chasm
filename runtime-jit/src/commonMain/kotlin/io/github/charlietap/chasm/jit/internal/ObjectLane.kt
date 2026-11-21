@@ -8,33 +8,28 @@ import io.github.charlietap.chasm.embedding.function
 import io.github.charlietap.chasm.embedding.internal.ExportedFunction
 import io.github.charlietap.chasm.embedding.internal.exportedError
 import io.github.charlietap.chasm.embedding.internal.exportedFunction
-import io.github.charlietap.chasm.embedding.internal.functionInstance
+import io.github.charlietap.chasm.embedding.internal.functionAddress
 import io.github.charlietap.chasm.embedding.internal.storeDropped
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Function
 import io.github.charlietap.chasm.embedding.shapes.Instance
 import io.github.charlietap.chasm.embedding.shapes.Store
-import io.github.charlietap.chasm.host.HostExternReference
 import io.github.charlietap.chasm.host.HostModuleInstance
 import io.github.charlietap.chasm.host.HostResources
-import io.github.charlietap.chasm.runtime.compiled.gc.HostValue
-import io.github.charlietap.chasm.runtime.compiled.gc.LegacyHostValue
+import io.github.charlietap.chasm.reference.GcReference
+import io.github.charlietap.chasm.reference.I31Reference
+import io.github.charlietap.chasm.runtime.compiled.gc.ManagedArray
+import io.github.charlietap.chasm.runtime.compiled.gc.ManagedFunction
 import io.github.charlietap.chasm.runtime.compiled.gc.ManagedReferenceBridge
+import io.github.charlietap.chasm.runtime.compiled.gc.ManagedStruct
 import io.github.charlietap.chasm.runtime.compiled.gc.ObjectLaneHostFunction
-import io.github.charlietap.chasm.runtime.compiled.gc.WasmArray
-import io.github.charlietap.chasm.runtime.compiled.gc.WasmEq
 import io.github.charlietap.chasm.runtime.compiled.gc.WasmException
-import io.github.charlietap.chasm.runtime.compiled.gc.WasmI31
-import io.github.charlietap.chasm.runtime.compiled.gc.WasmStruct
 import io.github.charlietap.chasm.runtime.compiled.gc.enterObjects
-import io.github.charlietap.chasm.runtime.encoder.RV_SHIFT_BITS
-import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_EXTERN
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.ext.toLongFromBoxed
 import io.github.charlietap.chasm.runtime.ext.toReferenceValue
-import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.type.AbstractHeapType
@@ -100,6 +95,8 @@ class _PreparedObjectCall internal constructor(
 
     private val idle = AtomicReference<ExecutionContext?>()
 
+    private val functions = managedBridge(exported.store).functions
+
     fun call(
         stack: LongArray,
         references: Array<Any?>,
@@ -153,16 +150,20 @@ class _PreparedObjectCall internal constructor(
             return type is ReferenceType.RefNull
         }
 
+        if (value is ManagedFunction && !functions.owns(value)) {
+            return false
+        }
+
         return when (val heap = type.heapType) {
-            AbstractHeapType.Func -> value is FunctionInstance
-            AbstractHeapType.Extern -> true
-            AbstractHeapType.Any -> value !is FunctionInstance && value !is WasmException
-            AbstractHeapType.Eq -> value is WasmEq
-            AbstractHeapType.Struct -> value is WasmStruct
-            AbstractHeapType.Array -> value is WasmArray
-            AbstractHeapType.I31 -> value is WasmI31
+            AbstractHeapType.Func -> value is ManagedFunction
+            AbstractHeapType.Extern -> value !is ManagedFunction && value !is WasmException
+            AbstractHeapType.Any -> value !is ManagedFunction && value !is WasmException
+            AbstractHeapType.Eq -> value is ManagedStruct || value is ManagedArray || value is I31Reference
+            AbstractHeapType.Struct -> value is ManagedStruct
+            AbstractHeapType.Array -> value is ManagedArray
+            AbstractHeapType.I31 -> value is I31Reference
             AbstractHeapType.Exception -> value is WasmException
-            is ConcreteHeapType -> value is WasmStruct || value is WasmArray || value is FunctionInstance
+            is ConcreteHeapType -> value is ManagedStruct || value is ManagedArray || value is ManagedFunction
             else -> heap !is AbstractHeapType
         }
     }
@@ -182,7 +183,7 @@ class _PreparedObjectCall internal constructor(
 fun _externReference(
     value: Any,
 ): Any {
-    return HostValue(value)
+    return value
 }
 
 @InternalChasmApi
@@ -191,9 +192,8 @@ fun _hostValue(
     reference: Any?,
 ): Any? {
     return when (reference) {
-        is HostValue -> reference.value
-        is LegacyHostValue -> store.store.heap.value(HostExternReference((reference.encoded shl RV_SHIFT_BITS) or RV_TYPE_EXTERN))
-        else -> null
+        null, is GcReference -> null
+        else -> managedBridge(store.store).hostValue(reference)
     }
 }
 
@@ -203,11 +203,10 @@ fun _referenceKind(
 ): Int {
     return when (reference) {
         null -> REFERENCE_NULL
-        is HostValue, is LegacyHostValue -> REFERENCE_HOST_VALUE
-        is FunctionInstance -> REFERENCE_FUNCTION
-        is WasmI31 -> REFERENCE_I31
-        is WasmStruct -> REFERENCE_STRUCT
-        is WasmArray -> REFERENCE_ARRAY
+        is ManagedFunction -> REFERENCE_FUNCTION
+        is I31Reference -> REFERENCE_I31
+        is ManagedStruct -> REFERENCE_STRUCT
+        is ManagedArray -> REFERENCE_ARRAY
         is WasmException -> REFERENCE_EXCEPTION
         else -> REFERENCE_HOST_VALUE
     }
@@ -218,7 +217,7 @@ fun _functionReference(
     store: Store,
     function: Function,
 ): Any {
-    return functionInstance(store, function)
+    return managedBridge(store.store).functions.at(functionAddress(store, function))
 }
 
 @InternalChasmApi

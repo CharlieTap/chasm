@@ -1,6 +1,8 @@
 package io.github.charlietap.chasm.runtime.compiled.gc
 
-abstract class WasmArray : WasmEq() {
+import io.github.charlietap.chasm.reference.ArrayReference
+
+abstract class ManagedArray : ArrayReference() {
 
     abstract fun storage(): Any
 
