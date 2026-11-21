@@ -8,9 +8,11 @@ import io.github.charlietap.chasm.embedding.compiled.readStructField
 import io.github.charlietap.chasm.embedding.compiled.value.NumberValue.I32
 import io.github.charlietap.chasm.embedding.compiled.value.ReferenceValue
 import io.github.charlietap.chasm.embedding.shapes.expect
+import io.github.charlietap.chasm.reference.StructReference
 import kotlinx.coroutines.runBlocking
 import java.lang.ref.WeakReference
 import kotlin.test.Test
+import kotlin.test.assertFailsWith
 import kotlin.test.assertNull
 
 class StoreCollectionTest {
@@ -28,6 +30,19 @@ class StoreCollectionTest {
                 readStructField(struct, 0)
             },
         )
+    }
+
+    @Test
+    fun structsOutlivingTheirStoreReportItGone() {
+
+        var held: StructReference? = null
+        val reference = dropped("struct_accessors") { store, instance ->
+            held = (invoke(store, instance, "kinds").expect("kinds").single() as ReferenceValue.Struct).reference
+        }
+
+        assertCollected(reference)
+
+        assertFailsWith<IllegalStateException> { readStructField(checkNotNull(held), 0) }
     }
 
     private fun dropped(

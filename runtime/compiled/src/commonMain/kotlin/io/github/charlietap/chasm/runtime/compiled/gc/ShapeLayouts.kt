@@ -32,12 +32,14 @@ class StructLayout(
 
 class ArrayLayout(
     val type: HostGcType,
-    val accessor: ArrayAccessor,
+    createAccessor: () -> ArrayAccessor,
     val storage: Class<*>,
     val shift: Int,
     val mutable: Boolean,
     val check: ReferenceCheck?,
-)
+) {
+    val accessor: ArrayAccessor by lazy(createAccessor)
+}
 
 class ReflectedShapeLayouts(
     private val registry: ShapeRegistry,
@@ -138,7 +140,7 @@ class ReflectedShapeLayouts(
 
         return ArrayLayout(
             type = type,
-            accessor = accessors.array(shape, data),
+            createAccessor = { accessors.array(shape, data) },
             storage = storage,
             shift = fieldShift(storage.componentType),
             mutable = elementType.mutability == Mutability.Var,

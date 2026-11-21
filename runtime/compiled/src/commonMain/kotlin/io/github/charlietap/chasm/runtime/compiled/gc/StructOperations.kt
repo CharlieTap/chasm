@@ -41,6 +41,7 @@ class StructOperations(
         val layout = layout(managedStruct)
 
         checkFieldIndex(index, layout)
+        require(layout.checks[index] == null) { "field $index holds a reference" }
         require(layout.mutable[index]) { "field $index is immutable" }
 
         layout.accessor.writeBits(managedStruct, index, value)
@@ -135,6 +136,6 @@ class StructOperations(
     }
 
     private fun layout(struct: ManagedStruct): StructLayout {
-        return checkNotNull(layouts.struct(struct)) { "no layout for ${struct.javaClass.simpleName}" }
+        return requireNotNull(layouts.struct(struct)) { "not a struct of this store" }
     }
 }

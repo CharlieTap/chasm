@@ -31,6 +31,14 @@ class DexFixtureTest {
     }
 
     @Test
+    fun `struct accessors fixture generates shape classes`() {
+
+        val generated = generate(decodeModule(fixture("struct_accessors")))
+
+        assertGolden("struct_accessors_shape_classes.smali", renderSmali(listOf(checkNotNull(generated.shapeDex))))
+    }
+
+    @Test
     fun `struct accessors fixture generates shape accessors`() {
 
         val layouts = GcLayouts(decodeModule(fixture("struct_accessors")).definedTypes)

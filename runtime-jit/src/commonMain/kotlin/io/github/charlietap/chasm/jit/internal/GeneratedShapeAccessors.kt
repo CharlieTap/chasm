@@ -57,8 +57,7 @@ internal class GeneratedShapeAccessors(
             Double::class.javaPrimitiveType -> "D"
             Byte::class.javaPrimitiveType -> "B"
             Char::class.javaPrimitiveType -> "C"
-            Short::class.javaPrimitiveType -> "S"
-            else -> "Z"
+            else -> throw IllegalArgumentException("no shape field holds ${type.name}")
         }
     }
 }

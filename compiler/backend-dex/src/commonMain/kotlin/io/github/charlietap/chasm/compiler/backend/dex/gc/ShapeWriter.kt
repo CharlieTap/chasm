@@ -152,9 +152,7 @@ internal class ShapeWriter {
 
     private companion object {
         val RESULT = Reg(0)
-        val WIDE_RESULT = Reg(0)
         val OWNER_ENGINE = DexField(ClassType(SHAPE_OWNER_CLASS), SHAPE_OWNER_ENGINE, DexType.Object)
         val WEAK_REFERENCE = ClassType(WEAK_REFERENCE_TYPE)
-        const val BYTE_MASK = 0xFF
     }
 }
