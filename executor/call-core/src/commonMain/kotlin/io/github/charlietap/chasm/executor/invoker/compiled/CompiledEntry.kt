@@ -115,13 +115,6 @@ private class CompiledEntry(
         fp: Int,
     ): Int {
         vstack.activateFrameAtDepth(fp, fp + frameSlots)
-        val managedException = context.managedException
-        if (managedException != null) {
-            context.store.referenceBridge?.let { bridge -> context.heap.setPendingException(bridge.toHostResult(managedException, false)) }
-            context.managedException = null
-            vstack.unwindCallerFrame(activationHeaderSlot, allowNestedExit = context.compiledCallDepth > 0)
-            throw InvocationException(InvocationError.ThrownException)
-        }
         val reference = context.heap.takePendingExceptionReference()
         val returnIp = vstack.unwindCallerFrame(activationHeaderSlot, allowNestedExit = context.compiledCallDepth > 0)
         if (returnIp == EXIT_IP) {
@@ -141,33 +134,27 @@ private class CompiledEntry(
             val function = checkNotNull(context.pendingTailFunction)
             val caller = checkNotNull(context.pendingTailCaller)
             var arguments = checkNotNull(context.pendingTailArguments)
-            val references = context.pendingTailReferences
             clearPendingTailCall(context)
             val results = function.resultCount
             if (arguments.size < results) arguments = arguments.copyOf(results)
-            val rootMarker = if (references != null) encodeReferences(context, function, arguments, references) else NO_ROOTS
             val compiled = (function as? FunctionInstance.WasmFunction)?.callStrategy?.compiledEntry
-            try {
-                when {
-                    compiled != null -> {
-                        compiled.call(context, arguments, context.compiledCallDepth + COMPILED_CALL_COST)
-                        if (context.compiledUnwinding) raiseUnwinding(context)
-                    }
-                    function is FunctionInstance.WasmFunction -> {
-                        if (context.nestedInterpreter == null) throw InvocationException(InvocationError.InterpreterUnavailable)
-                        val strategy = function.callStrategy
-                        vstack.ensureCapacity(fp + strategy.frameSlots)
-                        val parameters = function.parameterCount
-                        arguments.copyInto(vstack.unsafeElements(), fp, 0, parameters)
-                        initializeLocals(vstack, strategy, fp)
-                        vstack.setFrameSlot(fp, strategy.interfaceSlotCount, header)
-                        vstack.activateFrame(fp, strategy.frameSlots)
-                        return strategy.entryIp
-                    }
-                    else -> interpretFunctionAt(context, caller, function, arguments, context.compiledCallDepth)
+            when {
+                compiled != null -> {
+                    compiled.call(context, arguments, context.compiledCallDepth + COMPILED_CALL_COST)
+                    if (context.compiledUnwinding) raiseUnwinding(context)
                 }
-            } finally {
-                releaseRoots(context, rootMarker)
+                function is FunctionInstance.WasmFunction -> {
+                    if (context.nestedInterpreter == null) throw InvocationException(InvocationError.InterpreterUnavailable)
+                    val strategy = function.callStrategy
+                    vstack.ensureCapacity(fp + strategy.frameSlots)
+                    val parameters = function.parameterCount
+                    arguments.copyInto(vstack.unsafeElements(), fp, 0, parameters)
+                    initializeLocals(vstack, strategy, fp)
+                    vstack.setFrameSlot(fp, strategy.interfaceSlotCount, header)
+                    vstack.activateFrame(fp, strategy.frameSlots)
+                    return strategy.entryIp
+                }
+                else -> interpretFunctionAt(context, caller, function, arguments, context.compiledCallDepth)
             }
             if (context.pendingTailFunction != null) continue
             arguments.copyInto(vstack.unsafeElements(), fp, 0, results)

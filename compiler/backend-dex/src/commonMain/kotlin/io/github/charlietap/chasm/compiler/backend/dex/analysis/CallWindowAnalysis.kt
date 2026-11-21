@@ -6,9 +6,8 @@ import io.github.charlietap.chasm.cir.ControlInstruction
 import io.github.charlietap.chasm.compiler.backend.abi.ARRAY_COPY
 import io.github.charlietap.chasm.compiler.backend.abi.ARRAY_NEW_FIXED
 import io.github.charlietap.chasm.compiler.backend.abi.ARRAY_SET
-import io.github.charlietap.chasm.compiler.backend.abi.BRIDGE_CALL_INDIRECT
-import io.github.charlietap.chasm.compiler.backend.abi.BRIDGE_CALL_REF
 import io.github.charlietap.chasm.compiler.backend.abi.CALL_INDIRECT_OBJECTS
+import io.github.charlietap.chasm.compiler.backend.abi.CALL_REFERENCE_OBJECTS
 import io.github.charlietap.chasm.compiler.backend.abi.REQUEST_TAIL_INDIRECT_OBJECTS
 import io.github.charlietap.chasm.compiler.backend.abi.STRUCT_SET
 import io.github.charlietap.chasm.compiler.backend.abi.TAIL_CALL_INDIRECT
@@ -44,21 +43,15 @@ internal fun analyzeCallWindow(
         if (call != null && bridges) {
             callBufferWords = maxOf(callBufferWords, call.operands.values.size, call.type.results.types.size, 1)
         }
-        when (instruction) {
-            is AggregateInstruction.StructNewS ->
-                callBufferWords = maxOf(callBufferWords, declarations.structFields(instruction.type).size, 1)
-            is AggregateInstruction.ArrayNewFixedS -> callBufferWords = maxOf(callBufferWords, instruction.size, 1)
-            else -> Unit
-        }
 
         if (direct && call != null) {
             directWords = maxOf(directWords, module.functionSignature(call.typeIndex).argumentWords)
         }
 
         val words = when (instruction) {
-            is ControlInstruction.CallIndirectI, is ControlInstruction.CallIndirectS -> BRIDGE_CALL_INDIRECT.words
+            is ControlInstruction.CallIndirectI, is ControlInstruction.CallIndirectS -> CALL_INDIRECT_OBJECTS.words
             is ControlInstruction.ReturnCallIndirectI, is ControlInstruction.ReturnCallIndirectS -> TAIL_CALL_INDIRECT.words
-            is ControlInstruction.CallRefS -> BRIDGE_CALL_REF.words
+            is ControlInstruction.CallRefS -> CALL_REFERENCE_OBJECTS.words
             is AggregateInstruction.StructSetI, is AggregateInstruction.StructSetS -> STRUCT_SET.words
             is AggregateInstruction.ArraySetIi, is AggregateInstruction.ArraySetIs,
             is AggregateInstruction.ArraySetSi, is AggregateInstruction.ArraySetSs,

@@ -1,17 +1,12 @@
 package io.github.charlietap.chasm.compiler.backend.dex
 
-import io.github.charlietap.chasm.compiler.backend.abi.ARRAYCOPY
-import io.github.charlietap.chasm.compiler.backend.abi.BRIDGE_DEPTH
 import io.github.charlietap.chasm.compiler.backend.abi.CALL_STACK_EXHAUSTED
 import io.github.charlietap.chasm.compiler.backend.abi.CONTEXT_TYPE
 import io.github.charlietap.chasm.compiler.backend.abi.DOUBLE_TO_RAW_LONG_BITS
 import io.github.charlietap.chasm.compiler.backend.abi.FLOAT_TO_RAW_INT_BITS
-import io.github.charlietap.chasm.compiler.backend.abi.FRAME
 import io.github.charlietap.chasm.compiler.backend.abi.GUEST_HEAP_EXHAUSTED
 import io.github.charlietap.chasm.compiler.backend.abi.INT_BITS_TO_FLOAT
 import io.github.charlietap.chasm.compiler.backend.abi.LONG_BITS_TO_DOUBLE
-import io.github.charlietap.chasm.compiler.backend.abi.REFERENCE_FROM_HOST
-import io.github.charlietap.chasm.compiler.backend.abi.REFERENCE_TO_HOST
 import io.github.charlietap.chasm.compiler.backend.abi.RESULT_REFERENCES
 import io.github.charlietap.chasm.compiler.backend.abi.UNREACHABLE
 import io.github.charlietap.chasm.compiler.backend.abi.descriptorWords
@@ -25,11 +20,9 @@ import io.github.charlietap.chasm.compiler.backend.dex.abi.ENTRY_ID_FIELD
 import io.github.charlietap.chasm.compiler.backend.dex.abi.entryClass
 import io.github.charlietap.chasm.compiler.backend.dex.abi.method
 import io.github.charlietap.chasm.compiler.backend.dex.abi.typedCall
-import io.github.charlietap.chasm.type.AbstractHeapType
 import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.chasm.type.ValueType
 import io.github.charlietap.dexter.ArrayKind
-import io.github.charlietap.dexter.BinaryOp
 import io.github.charlietap.dexter.ClassBuilder
 import io.github.charlietap.dexter.ClassType
 import io.github.charlietap.dexter.CodeEmitter
@@ -44,7 +37,6 @@ import io.github.charlietap.dexter.DexType
 import io.github.charlietap.dexter.HandlerLabel
 import io.github.charlietap.dexter.InstanceCodeEmitter
 import io.github.charlietap.dexter.Label
-import io.github.charlietap.dexter.LiteralOp
 import io.github.charlietap.dexter.MemberAccess
 import io.github.charlietap.dexter.Reg
 
@@ -58,11 +50,8 @@ internal class EntryGroup(
     val type: FunctionType,
     val signature: String?,
     val members: List<LoweredFunction>,
-    val reference: String = "J",
-) {
-    val crossesWithObjects: Boolean
-        get() = reference != "J" && (type.params.types + type.results.types).any { value -> value is ValueType.Reference }
-}
+    val referenceDescriptor: String,
+)
 
 internal typealias EntryLowerer = (DexFile, EntryGroup, String) -> String
 
@@ -86,9 +75,7 @@ internal fun EntryLowerer(
     constructor.invokeConstructor(ENTRY_CONSTRUCTOR, constructor.self, constructor.parameter(0), constructor.parameter(1))
     constructor.returnVoid()
     constructor.finish()
-    invokeMethod(builder, entry, group)
-    callMethod(builder, entry, group)
-    if (group.crossesWithObjects) callObjectsMethod(builder, entry, group)
+    callObjectsMethod(builder, entry, group)
     if (signature != null) typedMethod(builder, entry, group)
     return entry.descriptor
 }
@@ -108,130 +95,12 @@ private val SELECTOR = Reg(4)
 private const val WINDOW = 5
 private const val OBJECT_ARRAY = "[Ljava/lang/Object;"
 
-private fun invokeMethod(
-    builder: ClassBuilder,
-    entry: ClassType,
-    group: EntryGroup,
-) {
-    val type = group.type
-    val arrayArguments = takesArgumentArray(type)
-    val descriptors = entryDescriptors(group)
-    val returns = returnDescriptor(type, group.reference)
-    val signature = DexMethod(entry, "invoke", DexType.Void, CONTEXT, DexType.Long.array(), DexType.Int)
-    val registers = WINDOW + 3 + descriptors.sumOf(::descriptorWords) + 4
-    val code = builder.beginInstanceMethod(signature, access = MemberAccess.Public, registerCount = registers)
-    val context = code.parameter(0)
-    val frame = code.parameter(1)
-    val fp = code.parameter(2)
-    val start = code.boundLabel()
-    val end = code.label()
-    val overflow = code.handlerLabel()
-    loadBinding(code, Reg(WINDOW), group)
-    code.moveObject(Reg(WINDOW + 1), context)
-    code.invokeStatic(BRIDGE_DEPTH.method, Reg(WINDOW + 1))
-    code.moveResult(Reg(WINDOW + 2))
-    var offset = WINDOW + 3
-    if (arrayArguments) {
-        val parameters = type.params.types.size
-        code.const(INDEX, parameters)
-        code.newArray(Reg(offset), INDEX, DexType.Long.array())
-        code.const(INDEX, parameters)
-        code.const(WIDE, 0)
-        code.invokeStatic(ARRAYCOPY.method, frame, fp, Reg(offset), WIDE, INDEX)
-        if (takesReferenceArray(type, group.reference)) {
-            referenceArguments(code, group, Reg(offset + 1)) { parameter ->
-                code.binary(LiteralOp.AddInt, INDEX, fp, parameter)
-                code.arrayGet(ArrayKind.Wide, WIDE, frame, INDEX)
-            }
-        }
-    } else {
-        descriptors.forEachIndexed { parameter, descriptor ->
-            code.binary(LiteralOp.AddInt, INDEX, fp, parameter)
-            decodeArgument(code, frame, descriptor, Reg(offset), group.reference, context)
-            offset += descriptorWords(descriptor)
-        }
-    }
-    dispatch(code, group, returns)
-    if (returns == "[J") {
-        val stack = Reg(WINDOW)
-        code.branchZero(Cond.Eq, NARROW, end)
-        loadResultReferences(code, group)
-        code.invokeStatic(FRAME.method, context)
-        code.moveResult(stack)
-        for (result in type.results.types.indices) {
-            loadResult(code, group, result)
-            code.const(INDEX, result)
-            code.binary(BinaryOp.AddInt, INDEX, fp, INDEX)
-            code.arrayPut(ArrayKind.Wide, WIDE, stack, INDEX)
-        }
-    } else if (returns != "V") {
-        encodeResult(code, returns, group, context)
-        code.invokeStatic(FRAME.method, context)
-        code.moveResult(Reg(WINDOW))
-        code.arrayPut(ArrayKind.Wide, WIDE, Reg(WINDOW), fp)
-    }
-    returnOrOverflow(code, start, end, overflow)
-}
-
-private fun callMethod(
-    builder: ClassBuilder,
-    entry: ClassType,
-    group: EntryGroup,
-) {
-    val type = group.type
-    val arrayArguments = takesArgumentArray(type)
-    val descriptors = entryDescriptors(group)
-    val returns = returnDescriptor(type, group.reference)
-    val signature = DexMethod(entry, "call", DexType.Void, CONTEXT, DexType.Long.array(), DexType.Int)
-    val registers = WINDOW + 3 + descriptors.sumOf(::descriptorWords) + 4
-    val code = builder.beginInstanceMethod(signature, access = MemberAccess.Public, registerCount = registers)
-    val context = code.parameter(0)
-    val values = code.parameter(1)
-    val depth = code.parameter(2)
-    val start = code.boundLabel()
-    val end = code.label()
-    val overflow = code.handlerLabel()
-    loadBinding(code, Reg(WINDOW), group)
-    code.moveObject(Reg(WINDOW + 1), context)
-    code.move(Reg(WINDOW + 2), depth)
-    var offset = WINDOW + 3
-    if (arrayArguments) {
-        code.moveObject(Reg(offset), values)
-        if (takesReferenceArray(type, group.reference)) {
-            referenceArguments(code, group, Reg(offset + 1)) { parameter ->
-                code.const(INDEX, parameter)
-                code.arrayGet(ArrayKind.Wide, WIDE, values, INDEX)
-            }
-        }
-    } else {
-        descriptors.forEachIndexed { parameter, descriptor ->
-            code.const(INDEX, parameter)
-            decodeArgument(code, values, descriptor, Reg(offset), group.reference, context)
-            offset += descriptorWords(descriptor)
-        }
-    }
-    dispatch(code, group, returns)
-    if (returns == "[J") {
-        code.branchZero(Cond.Eq, NARROW, end)
-        loadResultReferences(code, group)
-        for (result in type.results.types.indices) {
-            loadResult(code, group, result)
-            code.arrayPut(ArrayKind.Wide, WIDE, values, INDEX)
-        }
-    } else if (returns != "V") {
-        encodeResult(code, returns, group, context)
-        code.const(INDEX, 0)
-        code.arrayPut(ArrayKind.Wide, WIDE, values, INDEX)
-    }
-    returnOrOverflow(code, start, end, overflow)
-}
-
 private fun typedMethod(
     builder: ClassBuilder,
     entry: ClassType,
     group: EntryGroup,
 ) {
-    val typed = typedCall(entry.descriptor, group.type, group.reference)
+    val typed = typedCall(entry.descriptor, group.type, group.referenceDescriptor)
     val parameters = typed.parameters
     val returns = typed.returns
     val signature = typed.method
@@ -260,7 +129,7 @@ private fun callObjectsMethod(
     val type = group.type
     val arrayArguments = takesArgumentArray(type)
     val descriptors = entryDescriptors(group)
-    val returns = returnDescriptor(type, group.reference)
+    val returns = returnDescriptor(type, group.referenceDescriptor)
     val signature = DexMethod(entry, "callObjects", DexType.Void, CONTEXT, DexType.Long.array(), DexType.Object.array(), DexType.Int)
     val registers = WINDOW + 3 + descriptors.sumOf(::descriptorWords) + 5
     val code = builder.beginInstanceMethod(signature, access = MemberAccess.Public, registerCount = registers)
@@ -277,11 +146,11 @@ private fun callObjectsMethod(
     var offset = WINDOW + 3
     if (arrayArguments) {
         code.moveObject(Reg(offset), values)
-        if (takesReferenceArray(type, group.reference)) code.moveObject(Reg(offset + 1), references)
+        if (takesReferenceArray(type, group.referenceDescriptor)) code.moveObject(Reg(offset + 1), references)
     } else {
         descriptors.forEachIndexed { parameter, descriptor ->
             code.const(INDEX, parameter)
-            if (descriptor == group.reference) {
+            if (descriptor == group.referenceDescriptor) {
                 code.arrayGet(ArrayKind.Object, Reg(offset), references, INDEX)
             } else {
                 decodeArgument(code, values, descriptor, Reg(offset))
@@ -306,7 +175,7 @@ private fun callObjectsMethod(
                 }
             }
         }
-        group.reference -> {
+        group.referenceDescriptor -> {
             code.const(INDEX, 0)
             code.arrayPut(ArrayKind.Object, WIDE, references, INDEX)
         }
@@ -324,29 +193,9 @@ private fun entryDescriptors(
 ): List<String> {
     val type = group.type
     return when {
-        takesReferenceArray(type, group.reference) -> listOf("[J", OBJECT_ARRAY)
+        takesReferenceArray(type, group.referenceDescriptor) -> listOf("[J", OBJECT_ARRAY)
         takesArgumentArray(type) -> listOf("[J")
-        else -> type.params.types.map { parameter -> valueDescriptor(parameter, group.reference) }
-    }
-}
-
-private inline fun referenceArguments(
-    code: CodeEmitter,
-    group: EntryGroup,
-    target: Reg,
-    loadEncoded: (Int) -> Unit,
-) {
-
-    val parameters = group.type.params.types
-    code.const(INDEX, parameters.size)
-    code.newArray(target, INDEX, DexType.Object.array())
-    parameters.forEachIndexed { parameter, type ->
-        if (type !is ValueType.Reference) return@forEachIndexed
-        loadEncoded(parameter)
-        code.invokeStatic(REFERENCE_FROM_HOST.method, Reg(WINDOW + 1), WIDE)
-        code.moveResult(NARROW)
-        code.const(INDEX, parameter)
-        code.arrayPut(ArrayKind.Object, NARROW, target, INDEX)
+        else -> type.params.types.map { parameter -> valueDescriptor(parameter, group.referenceDescriptor) }
     }
 }
 
@@ -356,31 +205,13 @@ private fun loadResultReferences(
 ) {
 
     val results = group.type.results.types
-    if (group.reference == "J" || results.none { result -> result is ValueType.Reference }) {
+    if (results.none { result -> result is ValueType.Reference }) {
         return
     }
 
     code.const(INDEX, results.size)
     code.invokeStatic(RESULT_REFERENCES.method, Reg(WINDOW + 1), INDEX)
     code.moveResult(SELECTOR)
-}
-
-private fun loadResult(
-    code: CodeEmitter,
-    group: EntryGroup,
-    result: Int,
-) {
-
-    val type = group.type.results.types[result]
-    code.const(INDEX, result)
-    if (group.reference == "J" || type !is ValueType.Reference) {
-        return code.arrayGet(ArrayKind.Wide, WIDE, NARROW, INDEX)
-    }
-
-    code.arrayGet(ArrayKind.Object, Reg(WINDOW + 2), SELECTOR, INDEX)
-    code.const(Reg(WINDOW + 3), if (isExternReference(type)) 1 else 0)
-    code.invokeStatic(REFERENCE_TO_HOST.method, Reg(WINDOW + 1), Reg(WINDOW + 2), Reg(WINDOW + 3))
-    code.moveResult(WIDE)
 }
 
 private fun dispatch(
@@ -426,17 +257,8 @@ private fun decodeArgument(
     array: Reg,
     descriptor: String,
     target: Reg,
-    reference: String = "J",
-    context: Reg? = null,
 ) {
     if (descriptor == "J") return code.arrayGet(ArrayKind.Wide, target, array, INDEX)
-    if (descriptor == reference) {
-        code.arrayGet(ArrayKind.Wide, WIDE, array, INDEX)
-        code.moveObject(NARROW, checkNotNull(context))
-        code.invokeStatic(REFERENCE_FROM_HOST.method, NARROW, WIDE)
-        code.moveResult(target)
-        return
-    }
     code.arrayGet(ArrayKind.Wide, WIDE, array, INDEX)
     when (descriptor) {
         "I" -> {
@@ -457,26 +279,10 @@ private fun decodeArgument(
     }
 }
 
-internal fun isExternReference(
-    type: ValueType,
-): Boolean {
-    val heap = (type as? ValueType.Reference)?.referenceType?.heapType
-    return heap == AbstractHeapType.Extern || heap == AbstractHeapType.NoExtern
-}
-
 private fun encodeResult(
     code: CodeEmitter,
     descriptor: String,
-    group: EntryGroup? = null,
-    context: Reg? = null,
 ) {
-    if (group != null && descriptor == group.reference && descriptor != "J") {
-        code.moveObject(NARROW, checkNotNull(context))
-        code.const(INDEX, if (isExternReference(group.type.results.types.single())) 1 else 0)
-        code.invokeStatic(REFERENCE_TO_HOST.method, NARROW, WIDE, INDEX)
-        code.moveResult(WIDE)
-        return
-    }
     when (descriptor) {
         "I" -> code.convert(Conversion.IntToLong, WIDE, NARROW)
         "F" -> {

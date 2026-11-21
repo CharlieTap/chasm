@@ -42,18 +42,18 @@ internal fun internalWriteArrayElement(
     value: FieldValue,
     fieldValueEncoder: FieldValueEncoder,
 ): Result<Unit, ModuleTrapError> = runCatching {
-    val runtime = store.runtime()
+    val heap = store.runtime().heap
     val rawReference = array.toLong()
-    val fieldType = runtime.arrayFieldType(rawReference)
+    val fieldType = heap.arrayFieldType(rawReference)
 
     if (fieldType.mutability != Mutability.Var) {
         throw InvocationException(InvocationError.ArrayCopyOnAConstArray)
     }
-    if (index !in 0 until runtime.arrayLength(rawReference)) {
+    if (index !in 0 until heap.arrayLengthChecked(rawReference)) {
         throw InvocationException(InvocationError.ArrayFieldLookupFailed(index))
     }
 
-    runtime.writeArrayElement(rawReference, index, fieldValueEncoder(value, fieldType))
+    heap.setArrayElement(rawReference, index, fieldValueEncoder(value, fieldType))
 }.mapError { e ->
     when (e) {
         is InvocationException -> e.error

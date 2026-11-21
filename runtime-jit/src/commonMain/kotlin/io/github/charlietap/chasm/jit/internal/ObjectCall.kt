@@ -110,11 +110,7 @@ internal class ObjectCall(
     }
 
     private fun context(): ExecutionContext {
-
-        val context = ExecutionContext(ValueStack(slots + 1, exported.store.maxStackSlots), exported.store, exported.instance, exported.config)
-        context.nestedInterpreter = exported.store.interpreter
-
-        return context
+        return ExecutionContext(ValueStack(slots + 1, exported.store.maxStackSlots), exported.store, exported.instance, exported.config)
     }
 
     private fun failure(error: RuntimeInvocationError): ChasmResult<Unit, InvocationError<ExceptionReference>> {

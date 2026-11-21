@@ -19,18 +19,6 @@ fun createExternRef(
         return ChasmResult.Success(nullExternRef(store))
     }
 
-    val bridge = store.store.referenceBridge
-    if (bridge != null) {
-        return ChasmResult.Success(
-            ExternRef(
-                owner = store,
-                root = bridge.retainExtern(value),
-                references = bridge.references,
-                externs = bridge.externs,
-            ),
-        )
-    }
-
     return try {
         ChasmResult.Success(
             ExternRef(

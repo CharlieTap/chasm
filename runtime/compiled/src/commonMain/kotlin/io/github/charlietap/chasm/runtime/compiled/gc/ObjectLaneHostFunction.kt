@@ -8,18 +8,14 @@ import io.github.charlietap.chasm.host.HostResults
 import io.github.charlietap.chasm.host.HostStack
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
-import io.github.charlietap.chasm.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.type.AbstractHeapType
 import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.chasm.type.ValueType
 
 abstract class ObjectLaneHostFunction(
-    private val type: FunctionType,
+    type: FunctionType,
 ) : HostFunction {
 
-    private val parameterTypes = type.params.types
     private val resultTypes = type.results.types
-    private val carriesReferences = (parameterTypes + resultTypes).any { value -> value is ValueType.Reference }
 
     private val resultReferenceTypes = resultTypes.mapIndexedNotNull { index, result -> (result as? ValueType.Reference)?.let { reference -> index to reference } }
 
@@ -58,32 +54,7 @@ abstract class ObjectLaneHostFunction(
         parameters: HostParameters,
         results: HostResults,
     ) {
-
-        if (!carriesReferences) {
-            return call(stack, NO_REFERENCES, parameters, results, caller, resources)
-        }
-
-        val bridge = checkNotNull((resources as ExecutionContext).store.referenceBridge) { "reference host functions need a JIT store" }
-        val slots = maxOf(parameterTypes.size, resultTypes.size)
-        val words = LongArray(slots)
-        val objects = arrayOfNulls<Any>(slots)
-        parameterTypes.forEachIndexed { index, parameter ->
-            if (parameter is ValueType.Reference) {
-                objects[index] = bridge.fromHost(stack[parameters + index])
-            } else {
-                words[index] = stack[parameters + index]
-            }
-        }
-
-        call(words, objects, 0, 0, caller, resources)
-
-        resultTypes.forEachIndexed { index, result ->
-            stack[results + index] = if (result is ValueType.Reference) {
-                bridge.toHostResult(objects[index], result.referenceType.heapType.let { heap -> heap == AbstractHeapType.Extern || heap == AbstractHeapType.NoExtern })
-            } else {
-                words[index]
-            }
-        }
+        throw UnsupportedOperationException("compiled host functions are entered through the object lane")
     }
 
     private fun resultChecks(checks: ReferenceChecks): ResultChecks {
@@ -108,8 +79,4 @@ abstract class ObjectLaneHostFunction(
         val indices: IntArray,
         val checks: Array<ReferenceCheck>,
     )
-
-    private companion object {
-        val NO_REFERENCES = arrayOfNulls<Any>(0)
-    }
 }

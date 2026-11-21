@@ -1,10 +1,6 @@
 package io.github.charlietap.chasm.runtime.compiled.gc
 
-import io.github.charlietap.chasm.host.HostExternReference
 import io.github.charlietap.chasm.host.HostGcType
-import io.github.charlietap.chasm.host.HostGlobal
-import io.github.charlietap.chasm.host.HostReferenceRoot
-import io.github.charlietap.chasm.host.HostTable
 import io.github.charlietap.chasm.reference.I31Reference
 import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.runtime.encoder.RV_SHIFT_BITS
@@ -20,10 +16,8 @@ import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_STRUCT
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.HostRaisedWasmException
 import io.github.charlietap.chasm.runtime.exception.InvocationException
-import io.github.charlietap.chasm.runtime.ext.function
 import io.github.charlietap.chasm.runtime.ext.toLong
 import io.github.charlietap.chasm.runtime.instance.ElementInstance
-import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.GlobalInstance
 import io.github.charlietap.chasm.runtime.instance.TableInstance
 import io.github.charlietap.chasm.runtime.reference.ReferenceBridge
@@ -31,21 +25,17 @@ import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.type.AbstractHeapType
 import io.github.charlietap.chasm.type.DefinedType
-import io.github.charlietap.chasm.type.HeapType
-import io.github.charlietap.chasm.type.ValueType
 import java.lang.ref.ReferenceQueue
 import java.lang.ref.WeakReference
 import java.util.Collections
 import java.util.IdentityHashMap
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.jvm.JvmField
 
 class ManagedReferenceBridge(
     private val store: Store,
 ) : ReferenceBridge, ShapeRegistry, ReferenceStorage, PendingExceptions {
 
     private val handles = HashMap<Int, MutableList<Int>>()
-    private val legacyHostValues = HashMap<Long, LegacyHostValue>()
     private val slots = ArrayList<Handle?>()
     private val freeHandles = ArrayList<Int>()
     private val collected = ReferenceQueue<Any>()
@@ -57,7 +47,6 @@ class ManagedReferenceBridge(
     private val shapes = ConcurrentHashMap<Int, Class<*>>()
     private val types = ConcurrentHashMap<Class<*>, Int>()
     private val definedTypes = ConcurrentHashMap<Int, DefinedType>()
-    private var raisedException: Any? = null
 
     lateinit var engine: Any
 
@@ -76,33 +65,6 @@ class ManagedReferenceBridge(
         tables = TableOperations(this, checks),
         globals = GlobalOperations(this, checks),
     )
-
-    override val references = ManagedReferences(this)
-
-    override val gc = ManagedGc(this, store)
-
-    override val externs = ManagedExterns(this)
-
-    override val exceptions = ManagedExceptions(this, store)
-
-    override fun global(global: GlobalInstance): HostGlobal {
-
-        val type = global.type.valueType as? ValueType.Reference ?: return global
-
-        return ManagedHostGlobal(this, referenceGlobal(global), type.referenceType.heapType.isExtern())
-    }
-
-    override fun table(table: TableInstance): HostTable {
-        return ManagedHostTable(this, referenceTable(table))
-    }
-
-    override fun growTable(
-        table: TableInstance,
-        elementsToAdd: Int,
-        value: Long,
-    ): Int {
-        return tableGrow(referenceTable(table), elementsToAdd, fromHost(value))
-    }
 
     override fun initializeTable(
         table: TableInstance,
@@ -139,7 +101,7 @@ class ManagedReferenceBridge(
     }
 
     @Synchronized
-    override fun toHost(
+    private fun toHost(
         value: Any?,
         extern: Boolean,
     ): Long {
@@ -151,7 +113,6 @@ class ManagedReferenceBridge(
             is ManagedStruct -> encode(RV_TYPE_STRUCT, escape(value))
             is ManagedArray -> encode(RV_TYPE_ARRAY, escape(value))
             is WasmException -> encode(RV_TYPE_EXCEPTION, escape(value))
-            is LegacyHostValue -> value.encoded
             else -> encode(RV_TYPE_HOST, escape(value))
         }
 
@@ -167,7 +128,6 @@ class ManagedReferenceBridge(
             RV_TYPE_I31 -> I31Reference(payload.toInt())
             RV_TYPE_FUNCTION -> functions.at(payload.toInt())
             RV_TYPE_EXTERN -> fromHost(payload)
-            RV_TYPE_HOST -> if (payload < FIRST_HANDLE) legacyHostValue(encoded) else objectAt(payload)
             else -> objectAt(payload)
         }
     }
@@ -191,20 +151,6 @@ class ManagedReferenceBridge(
     @Synchronized
     override fun take(): WasmException {
         return fromHost(store.heap.takePendingExceptionReference()) as WasmException
-    }
-
-    @Synchronized
-    fun holdRaised(encoded: Long) {
-        raisedException = fromHost(encoded)
-    }
-
-    @Synchronized
-    fun releaseRaised() {
-        raisedException = null
-    }
-
-    override fun retainExtern(value: Any): HostReferenceRoot {
-        return references.retainObject(value, toHost(value, true))
     }
 
     @Synchronized
@@ -321,18 +267,6 @@ class ManagedReferenceBridge(
         return slots.getOrNull((handle - FIRST_HANDLE).toInt())?.get() ?: throw InvocationException(InvocationError.UnexpectedReferenceValue)
     }
 
-    private fun legacyHostValue(encoded: Long): LegacyHostValue {
-        return legacyHostValues.getOrPut(encoded) { LegacyHostValue(encoded) }
-    }
-
-    fun hostValue(value: Any): Any {
-        return if (value is LegacyHostValue) {
-            store.heap.value(HostExternReference((value.encoded shl RV_SHIFT_BITS) or RV_TYPE_EXTERN))
-        } else {
-            value
-        }
-    }
-
     private fun encode(
         tag: Long,
         payload: Long,
@@ -342,10 +276,6 @@ class ManagedReferenceBridge(
 
     private fun identitySet(): MutableSet<Any> {
         return Collections.newSetFromMap(IdentityHashMap())
-    }
-
-    private fun HeapType.isExtern(): Boolean {
-        return this == AbstractHeapType.Extern || this == AbstractHeapType.NoExtern
     }
 
     private class Handle(
@@ -361,7 +291,3 @@ class ManagedReferenceBridge(
         val NULL_EXTERN = ReferenceValue.Null(AbstractHeapType.Extern).toLong()
     }
 }
-
-class LegacyHostValue(
-    @JvmField val encoded: Long,
-)

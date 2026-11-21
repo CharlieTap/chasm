@@ -64,10 +64,6 @@ fun refTarget(
 
 private fun FunctionInstance.compiledCode(): CompiledFunction? = (this as? FunctionInstance.WasmFunction)?.callStrategy?.compiledEntry
 
-fun depth(
-    context: ExecutionContext,
-): Int = context.compiledCallDepth
-
 fun isNull(
     reference: Long,
 ): Boolean = reference.isNullableReference()

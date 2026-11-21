@@ -127,7 +127,6 @@ val OPEN_ROOTS = compiledCalls.method("openRoots", CONTEXT_TYPE, "I", returns = 
 val CLEAR_ROOTS = compiledCalls.method("clearRoots", CONTEXT_TYPE, "I", "I", returns = "V")
 val CLOSE_FRAME = compiledCalls.method("closeFrame", CONTEXT_TYPE, "J", returns = "V")
 val SAVE_STACK = compiledCalls.method("saveStack", CONTEXT_TYPE, returns = "J")
-val BRIDGE_DEPTH = compiledCalls.method("depth", CONTEXT_TYPE, returns = "I")
 val BRIDGE_CALL = compiledCalls.method("call", CONTEXT_TYPE, MODULE_INSTANCE, FUNCTION_INSTANCE, "[J", "I", returns = "V")
 val BRIDGE_CALL_INDIRECT =
     compiledCalls.method("callIndirect", CONTEXT_TYPE, MODULE_INSTANCE, TABLE_INSTANCE, "I", "I", "[J", "I", returns = "V")
@@ -256,8 +255,6 @@ const val ALLOCATION_REMAINING_FIELD = "remaining"
 val SAME_I31 = managedOps.method("sameI31", OBJECT_TYPE, OBJECT_TYPE, returns = "Z")
 val FUNCTION_MATCHES = managedOps.method("functionMatches", CONTEXT_TYPE, OBJECT_TYPE, "I", returns = "Z")
 val REFERENCE_TARGET = managedOps.method("referenceTarget", OBJECT_TYPE, returns = OBJECT_TYPE)
-val CALL_REFERENCE = managedOps.method("callReference", CONTEXT_TYPE, MODULE_INSTANCE, OBJECT_TYPE, "[J", "I", returns = "V")
-val CALL_IMPORT = managedOps.method("callImport", CONTEXT_TYPE, MODULE_INSTANCE, FUNCTION_INSTANCE, "[J", "I", returns = "V")
 
 private val managedArrays = Owner("Lio/github/charlietap/chasm/runtime/compiled/gc/ManagedArrays;")
 val ARRAY_LENGTH = managedArrays.method("arrayLength", MANAGED_ARRAY, returns = "I")
@@ -310,8 +307,3 @@ val MANAGED_TABLE_COPY = managedTables.method("tableCopy", REFERENCE_TABLE, REFE
 val MANAGED_TABLE_INIT = managedTables.method("tableInit", REFERENCE_TABLE, REFERENCE_SEGMENT, "I", "I", "I", returns = "V")
 val MANAGED_ELEMENT_DROP = managedTables.method("elementDrop", REFERENCE_SEGMENT, returns = "V")
 val MANAGED_INDIRECT_ENTRY = managedTables.method("indirectEntry", CONTEXT_TYPE, REFERENCE_TABLE, "I", "I", returns = OBJECT_TYPE)
-
-private val managedValues = Owner("Lio/github/charlietap/chasm/runtime/compiled/gc/ManagedValues;")
-
-val REFERENCE_FROM_HOST = managedValues.method("referenceFromHost", CONTEXT_TYPE, "J", returns = OBJECT_TYPE)
-val REFERENCE_TO_HOST = managedValues.method("referenceToHost", CONTEXT_TYPE, OBJECT_TYPE, "Z", returns = "J")

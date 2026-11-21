@@ -42,15 +42,15 @@ internal fun internalWriteStructField(
     value: FieldValue,
     fieldValueEncoder: FieldValueEncoder,
 ): Result<Unit, ModuleTrapError> = runCatching {
-    val runtime = store.runtime()
+    val heap = store.runtime().heap
     val rawReference = struct.toLong()
-    val fieldType = runtime.structFieldType(rawReference, index)
+    val fieldType = heap.structFieldType(rawReference, index)
 
     if (fieldType.mutability != Mutability.Var) {
         throw InvocationException(InvocationError.ArrayCopyOnAConstArray)
     }
 
-    runtime.writeStructField(rawReference, index, fieldValueEncoder(value, fieldType))
+    heap.setStructField(rawReference, index, fieldValueEncoder(value, fieldType))
 }.mapError { e ->
     when (e) {
         is InvocationException -> e.error

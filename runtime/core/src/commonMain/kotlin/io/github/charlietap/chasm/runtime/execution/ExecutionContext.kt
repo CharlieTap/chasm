@@ -65,16 +65,16 @@ data class ExecutionContext(
     var nestedInterpreter: NestedInterpreter? = null
 
     override val references: HostReferences
-        get() = store.referenceBridge?.references ?: heap
+        get() = heap
 
     override val gc: HostGc
-        get() = store.referenceBridge?.gc ?: heap
+        get() = heap
 
     override val externs: HostExterns
-        get() = store.referenceBridge?.externs ?: heap
+        get() = heap
 
     override val exceptions: HostExceptions
-        get() = store.referenceBridge?.exceptions ?: heap
+        get() = heap
 
     override fun memory(module: HostModuleInstance, index: ModuleIndex.MemoryIndex): HostMemory {
         val address = (module as ModuleInstance).memAddresses[index.index]
@@ -88,8 +88,7 @@ data class ExecutionContext(
 
     override fun table(module: HostModuleInstance, index: ModuleIndex.TableIndex): HostTable {
         val address = (module as ModuleInstance).tableAddresses[index.index]
-        val table = store.tables[address.address]
-        return store.referenceBridge?.table(table) ?: table
+        return store.tables[address.address]
     }
 
     override fun growTable(
@@ -100,13 +99,12 @@ data class ExecutionContext(
     ): Int {
         val address = (module as ModuleInstance).tableAddresses[index.index]
         val table = store.tables[address.address]
-        return store.referenceBridge?.growTable(table, elementsToAdd, value) ?: table.grow(elementsToAdd, value)
+        return table.grow(elementsToAdd, value)
     }
 
     override fun global(module: HostModuleInstance, index: ModuleIndex.GlobalIndex): HostGlobal {
         val address = (module as ModuleInstance).globalAddresses[index.index]
-        val global = store.globals[address.address]
-        return store.referenceBridge?.global(global) ?: global
+        return store.globals[address.address]
     }
 
     override fun tag(module: HostModuleInstance, index: ModuleIndex.TagIndex): HostTag {

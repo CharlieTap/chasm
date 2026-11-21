@@ -38,10 +38,10 @@ internal fun internalReadStructField(
     index: Int,
     fieldValueDecoder: FieldValueDecoder,
 ): Result<FieldValue, ModuleTrapError> = runCatching {
-    val runtime = store.runtime()
+    val heap = store.runtime().heap
     val rawReference = struct.toLong()
-    val fieldType = runtime.structFieldType(rawReference, index)
-    fieldValueDecoder(runtime.readStructField(rawReference, index), fieldType)
+    val fieldType = heap.structFieldType(rawReference, index)
+    fieldValueDecoder(heap.getStructField(rawReference, index), fieldType)
 }.mapError { e ->
     when (e) {
         is InvocationException -> e.error

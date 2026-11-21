@@ -86,7 +86,6 @@ inline fun FunctionInvoker(
     crossinline wasmFunctionExecutor: WasmFunctionExecutor,
 ): Result<List<ExecutionValue>, InvocationError> {
     store.heap.clearPendingException()
-    if (store.compiledCallDepth == 0) store.referenceBridge?.releaseEscaped()
     val interrupt = store.interrupt
     if (!interrupt.enabled) return invokeFunction(config, store, instance, function, values, wasmFunctionExecutor)
 

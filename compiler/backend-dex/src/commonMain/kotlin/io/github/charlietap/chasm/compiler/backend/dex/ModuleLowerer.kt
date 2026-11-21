@@ -12,7 +12,9 @@ import io.github.charlietap.chasm.compiler.backend.dex.binding.BoundResources
 import io.github.charlietap.chasm.compiler.backend.dex.binding.boundResources
 import io.github.charlietap.chasm.compiler.backend.dex.gc.ConstantsWriter
 import io.github.charlietap.chasm.compiler.backend.dex.gc.ShapeWriter
+import io.github.charlietap.chasm.type.AbstractHeapType
 import io.github.charlietap.chasm.type.FunctionType
+import io.github.charlietap.chasm.type.ValueType
 import io.github.charlietap.dexter.DexFile
 import io.github.charlietap.dexter.Dexter
 import io.github.charlietap.dexter.DexterException
@@ -262,7 +264,7 @@ private fun entryGroups(
         val type = candidates.type
         val signature = plan.signatureClass(key.signature)
         for (members in candidates.functions.chunked(ENTRY_GROUP_SIZE)) {
-            groups += EntryGroup(number = groups.size, type = type, signature = signature, members = members, reference = plan.referenceDescriptor)
+            groups += EntryGroup(number = groups.size, type = type, signature = signature, members = members, referenceDescriptor = plan.referenceDescriptor)
         }
     }
     return groups
@@ -290,3 +292,10 @@ private fun List<EntryGroup>.chunkedBy(
 internal const val ENTRY_GROUP_SIZE = 64
 
 private const val ENTRY_FUNCTIONS_PER_FILE = 8_000
+
+private fun isExternReference(
+    type: ValueType,
+): Boolean {
+    val heap = (type as? ValueType.Reference)?.referenceType?.heapType
+    return heap == AbstractHeapType.Extern || heap == AbstractHeapType.NoExtern
+}

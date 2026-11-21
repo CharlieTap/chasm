@@ -2,10 +2,8 @@ package io.github.charlietap.chasm.compiler.backend.dex.lower
 
 import io.github.charlietap.chasm.cir.ControlInstruction
 import io.github.charlietap.chasm.cir.FunctionIndex
-import io.github.charlietap.chasm.compiler.backend.abi.CALL_IMPORT
 import io.github.charlietap.chasm.compiler.backend.abi.CALL_INDIRECT_OBJECTS
 import io.github.charlietap.chasm.compiler.backend.abi.CALL_OBJECTS
-import io.github.charlietap.chasm.compiler.backend.abi.CALL_REFERENCE
 import io.github.charlietap.chasm.compiler.backend.abi.CALL_REFERENCE_OBJECTS
 import io.github.charlietap.chasm.compiler.backend.abi.COMPLETE_TAIL_OBJECTS
 import io.github.charlietap.chasm.compiler.backend.abi.CONTEXT_TYPE
@@ -278,7 +276,7 @@ internal fun LowerContext.newLanes(
     }
 }
 
-internal fun LowerContext.loadCallBuffer() {
+private fun LowerContext.loadCallBuffer() {
     val ready = emit.freshLabel()
     emit.moveObject(Registers.OBJECT, registers.callBuffer)
     emit.branchZero(Cond.Ne, Registers.OBJECT, ready)
@@ -366,52 +364,17 @@ private fun LowerContext.bridgeCall(
     instruction: ControlInstruction,
     call: CallSite,
 ) {
-    val indirect = instruction is ControlInstruction.CallIndirectI || instruction is ControlInstruction.CallIndirectS
-    if (indirect || (call.type.params.types + call.type.results.types).any { type -> type is ValueType.Reference }) {
-        return bridgeObjects(instruction, call)
-    }
-    loadCallBuffer()
-    call.arguments().forEachIndexed { index, argument ->
-        loadWide(Registers.W0, argument)
-        emit.const(Registers.I2, index)
-        emit.arrayPut(ArrayKind.Wide, Registers.W0, Registers.OBJECT, Registers.I2)
-    }
-    when (instruction) {
-        is ControlInstruction.Call -> {
-            loadObject(Registers.W1, Resource.Instance, MODULE_INSTANCE)
-            loadObject(Registers.W1 + 1, Resource.Function(instruction.function.index), FUNCTION_INSTANCE)
-            emit.invoke(CALL_IMPORT, Registers.CONTEXT, Registers.W1, Registers.W1 + 1, Registers.OBJECT, Registers.DEPTH)
-        }
-        is ControlInstruction.CallRefS -> {
-            val window = registers.window + 1
-            emit.moveObject(window, Registers.CONTEXT)
-            loadObject(Registers.W1, Resource.Instance, MODULE_INSTANCE)
-            emit.moveObject(window + 1, Registers.W1)
-            emit.moveObject(window + 3, Registers.OBJECT)
-            loadReference(window + 2, instruction.functionSlot)
-            emit.move(window + 4, Registers.DEPTH)
-            emit.invokeRange(CALL_REFERENCE, window, CALL_REFERENCE.words)
-            restoreWindow()
-            emit.moveObject(Registers.OBJECT, registers.callBuffer)
-        }
-        else -> throw Unsupported(instruction::class.simpleName ?: "call")
-    }
-    unwindCheck()
-    for (index in call.type.results.types.indices) {
-        emit.const(Registers.I2, index)
-        emit.arrayGet(ArrayKind.Wide, Registers.W0, Registers.OBJECT, Registers.I2)
-        store(call.resultBase + index, Registers.W0)
-    }
-}
-
-private fun LowerContext.bridgeObjects(
-    instruction: ControlInstruction,
-    call: CallSite,
-) {
 
     val parameters = call.type.params.types
     val results = call.type.results.types
-    newLanes(maxOf(parameters.size, results.size, 1), words = true, references = (parameters + results).any { type -> type is ValueType.Reference })
+    loadCallBuffer()
+    emit.moveObject(Registers.SECOND_OBJECT, Registers.OBJECT)
+    if ((parameters + results).any { type -> type is ValueType.Reference }) {
+        emit.const(Registers.I0, maxOf(parameters.size, results.size, 1))
+        emit.newArray(Registers.THIRD_OBJECT, Registers.I0, OBJECT_ARRAY)
+    } else {
+        emit.const(Registers.THIRD_OBJECT, 0)
+    }
 
     call.arguments().forEachIndexed { index, argument ->
         emit.const(Registers.I1, index)

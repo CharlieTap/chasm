@@ -23,6 +23,11 @@ class DexFixtureTest {
     fun `calls fixture generates`() = golden("calls")
 
     @Test
+    fun `bridged calls fixture generates`() {
+        golden("bridges")
+    }
+
+    @Test
     fun `gc fixture generates`() = golden("gc")
 
     @Test

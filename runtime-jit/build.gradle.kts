@@ -36,6 +36,7 @@ kotlin {
             dependencies {
                 api(projects.config)
                 api(projects.embeddingApi)
+                api(projects.embeddingCompiled)
                 api(projects.embeddingModule)
                 api(projects.embeddingRuntime)
 
@@ -43,13 +44,13 @@ kotlin {
                 implementation(projects.compiler.backendDex)
                 implementation(projects.compiler.frontend)
                 implementation(projects.decoder)
+                implementation(projects.executor.callCore)
                 implementation(projects.executor.instantiator)
                 implementation(projects.libs.parallel)
                 implementation(projects.libs.parallelCoroutines)
                 implementation(projects.module)
                 implementation(projects.moduleDeclarations)
                 implementation(projects.runtime.compiled)
-                api(projects.embeddingCompiled)
                 implementation(projects.runtime.core)
                 implementation(libs.kotlinx.coroutines.core)
                 implementation(libs.result)

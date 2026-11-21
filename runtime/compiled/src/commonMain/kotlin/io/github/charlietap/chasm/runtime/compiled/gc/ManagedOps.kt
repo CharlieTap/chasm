@@ -4,7 +4,6 @@ package io.github.charlietap.chasm.runtime.compiled.gc
 
 import io.github.charlietap.chasm.executor.invoker.compiled.COMPILED_CALL_COST
 import io.github.charlietap.chasm.executor.invoker.compiled.INTERPRETED_CALL_COST
-import io.github.charlietap.chasm.executor.invoker.compiled.callFunction
 import io.github.charlietap.chasm.host.HostFunctionException
 import io.github.charlietap.chasm.reference.I31Reference
 import io.github.charlietap.chasm.runtime.compiled.BindingEntry
@@ -18,9 +17,6 @@ import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.runtime.type.RTT
-import io.github.charlietap.chasm.type.AbstractHeapType
-import io.github.charlietap.chasm.type.HeapType
-import io.github.charlietap.chasm.type.ValueType
 import kotlin.jvm.JvmName
 
 fun castFailed(): Nothing {
@@ -120,31 +116,6 @@ fun referenceTarget(
     return (function as ManagedFunction).entry
 }
 
-fun callImport(
-    context: ExecutionContext,
-    caller: ModuleInstance,
-    function: FunctionInstance,
-    values: LongArray,
-    depth: Int,
-) {
-    unwindOnWasmException(context) {
-        callFunction(context, caller, function, values, depth)
-    }
-}
-
-fun callReference(
-    context: ExecutionContext,
-    caller: ModuleInstance,
-    function: Any?,
-    values: LongArray,
-    depth: Int,
-) {
-    if (function == null) throw InvocationException(InvocationError.NonNullReferenceExpected)
-    unwindOnWasmException(context) {
-        callFunction(context, caller, (function as ManagedFunction).instance, values, depth)
-    }
-}
-
 private inline fun unwindOnWasmException(
     context: ExecutionContext,
     call: () -> Unit,
@@ -223,7 +194,7 @@ fun pendingExceptionTag(
     context: ExecutionContext,
 ): Int {
 
-    val pending = context.managedException ?: referenceFromHost(context, context.heap.takePendingExceptionReference())
+    val pending = context.managedException ?: checkNotNull(context.store.referenceBridge).fromHost(context.heap.takePendingExceptionReference())
     context.managedException = pending
 
     return (pending as WasmException).tag
@@ -265,15 +236,12 @@ private fun callObjectsUntilDone(
     var objects = references
     while (true) {
         val compiled = (target as? FunctionInstance.WasmFunction)?.callStrategy?.compiledEntry
-        val lane = (target as? FunctionInstance.HostFunction)?.function as? ObjectLaneHostFunction
         if (compiled is BindingEntry) {
             compiled.callObjects(context, words, objects, depth + COMPILED_CALL_COST)
             if (context.compiledUnwinding) return
-        } else if (lane != null) {
-            callObjectLane(context, targetCaller, lane, words, objects, depth)
         } else {
-            callHost(context, targetCaller, target, words, objects, depth)
-            if (context.compiledUnwinding) return
+            val lane = (target as FunctionInstance.HostFunction).function as ObjectLaneHostFunction
+            callObjectLane(context, targetCaller, lane, words, objects, depth)
         }
         val next = context.pendingTailFunction ?: break
         targetCaller = checkNotNull(context.pendingTailCaller)
@@ -389,39 +357,13 @@ private fun callObjectLane(
     val previousStore = store.compiledCallDepth
     context.compiledCallDepth = depth + INTERPRETED_CALL_COST
     store.compiledCallDepth = depth + INTERPRETED_CALL_COST
-    val roots = context.references
-    val marker = roots.beginScope(0)
     try {
         function.call(values, references, 0, 0, caller, context)
         function.checkResults((store.referenceBridge as ManagedReferenceBridge).checks, references)
     } catch (exception: HostFunctionException) {
         throw InvocationException(InvocationError.HostFunctionError(exception.reason))
     } finally {
-        roots.endScope(marker)
         context.compiledCallDepth = previous
         store.compiledCallDepth = previousStore
     }
-}
-
-private fun callHost(
-    context: ExecutionContext,
-    caller: ModuleInstance,
-    function: FunctionInstance,
-    values: LongArray,
-    references: Array<Any?>,
-    depth: Int,
-) {
-    val type = function.functionType
-    type.params.types.forEachIndexed { index, parameter ->
-        if (parameter is ValueType.Reference) values[index] = checkNotNull(context.store.referenceBridge).toHost(references[index], parameter.referenceType.heapType.isExternal())
-    }
-    callFunction(context, caller, function, values, depth)
-    if (context.compiledUnwinding) return
-    type.results.types.forEachIndexed { index, result ->
-        if (result is ValueType.Reference) references[index] = referenceFromHost(context, values[index])
-    }
-}
-
-private fun HeapType.isExternal(): Boolean {
-    return this == AbstractHeapType.Extern || this == AbstractHeapType.NoExtern
 }

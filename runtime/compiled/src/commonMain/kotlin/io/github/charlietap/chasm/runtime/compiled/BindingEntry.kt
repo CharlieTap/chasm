@@ -9,12 +9,26 @@ abstract class BindingEntry(
     @JvmField val id: Int,
 ) : CompiledFunction {
 
-    open fun callObjects(
+    abstract fun callObjects(
         context: ExecutionContext,
         values: LongArray,
         references: Array<Any?>,
         depth: Int,
+    )
+
+    final override fun invoke(
+        context: ExecutionContext,
+        frame: LongArray,
+        fp: Int,
     ) {
-        call(context, values, depth)
+        throw UnsupportedOperationException("compiled entries are entered through callObjects")
+    }
+
+    final override fun call(
+        context: ExecutionContext,
+        values: LongArray,
+        depth: Int,
+    ) {
+        throw UnsupportedOperationException("compiled entries are entered through callObjects")
     }
 }

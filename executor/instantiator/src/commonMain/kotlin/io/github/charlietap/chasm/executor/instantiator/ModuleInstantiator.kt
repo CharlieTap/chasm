@@ -34,14 +34,32 @@ fun ModuleInstantiator(
     module: ModuleDeclarations,
     imports: List<Import>,
     codeInstaller: ModuleCodeInstaller,
-): Result<ModuleInstance, ModuleTrapError> =
-    ModuleInstantiator(
+): Result<ModuleInstance, ModuleTrapError> {
+    return ModuleInstantiator(
         config = config,
         store = store,
         module = module,
         imports = imports,
         codeInstaller = codeInstaller,
-        invoker = ::FunctionInvoker,
+        startInvoker = ::FunctionInvoker,
+    )
+}
+
+fun ModuleInstantiator(
+    config: RuntimeConfig,
+    store: Store,
+    module: ModuleDeclarations,
+    imports: List<Import>,
+    codeInstaller: ModuleCodeInstaller,
+    startInvoker: FunctionInvoker,
+): Result<ModuleInstance, ModuleTrapError> {
+    return ModuleInstantiator(
+        config = config,
+        store = store,
+        module = module,
+        imports = imports,
+        codeInstaller = codeInstaller,
+        invoker = startInvoker,
         compatibilityChecker = ::CompatibilityChecker,
         partialAllocator = ::PartialModuleAllocator,
         allocator = ::ModuleAllocator,
@@ -51,6 +69,7 @@ fun ModuleInstantiator(
         tableInitializer = ::TableInitializer,
         memoryInitializer = ::MemoryInitializer,
     )
+}
 
 internal inline fun ModuleInstantiator(
     config: RuntimeConfig,

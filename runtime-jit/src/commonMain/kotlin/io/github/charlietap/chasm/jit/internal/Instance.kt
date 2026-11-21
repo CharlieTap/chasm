@@ -53,19 +53,26 @@ internal class JitInstantiator(
 
         return try {
             instantiateCompiled(store, imports, config, trapSource, bridge::take) { effectiveConfig, runtime, runtimeImports ->
-                ModuleInstantiator(effectiveConfig, runtime, declarations, runtimeImports) { runtimeStore, instance, runtimeTypes, _ ->
-                    instance.compiledFrames = ModuleCompiledFrames(
-                        packageName = compilation.packageName,
-                        chunkStarts = { function -> compilation.chunkStarts[function] },
-                        originalLine = { _, _, line -> line },
-                    )
-                    val install = { installation: CodeInstallation ->
-                        registerShapes(shapes, instance, declarations.definedTypes, compilation.shapeTypes)
-                        handles.installed(instance, embeddingInstance(store, effectiveConfig, instance))
-                        compilation.install(installation)
-                    }
-                    ModuleCodeInstallation(install, runtimeStore, declarations.functionTypeIndices.size, instance, runtimeTypes)
-                }
+                ModuleInstantiator(
+                    config = effectiveConfig,
+                    store = runtime,
+                    module = declarations,
+                    imports = runtimeImports,
+                    codeInstaller = { runtimeStore, instance, runtimeTypes, _ ->
+                        instance.compiledFrames = ModuleCompiledFrames(
+                            packageName = compilation.packageName,
+                            chunkStarts = { function -> compilation.chunkStarts[function] },
+                            originalLine = { _, _, line -> line },
+                        )
+                        val install = { installation: CodeInstallation ->
+                            registerShapes(shapes, instance, declarations.definedTypes, compilation.shapeTypes)
+                            handles.installed(instance, embeddingInstance(store, effectiveConfig, instance))
+                            compilation.install(installation)
+                        }
+                        ModuleCodeInstallation(install, runtimeStore, declarations.functionTypeIndices.size, instance, runtimeTypes)
+                    },
+                    startInvoker = ::runStartFunction,
+                )
             }
         } catch (failure: LinkageError) {
             ChasmResult.Error(ExecutionError.Unsupported(CompileError(failure.toString(), Stage.LOADING).message()))
