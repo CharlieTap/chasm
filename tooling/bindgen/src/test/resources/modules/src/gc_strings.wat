@@ -1,0 +1,17 @@
+(module
+  (type $utf16 (array (mut i16)))
+  (type $utf8 (array (mut i8)))
+  (type $frozen16 (array i16))
+
+  (func (export "echo_utf16") (param (ref $utf16)) (result (ref $utf16))
+    (local.get 0))
+  (func (export "echo_utf8") (param (ref $utf8)) (result (ref $utf8))
+    (local.get 0))
+  (func (export "utf16_length") (param i32 (ref $utf16)) (result i32)
+    (i32.add (local.get 0) (array.len (local.get 1))))
+  (func (export "nullable_utf16") (param (ref null $utf16)) (result i32)
+    (array.len (local.get 0)))
+  (func (export "frozen") (param (ref $frozen16)) (result (ref $frozen16))
+    (local.get 0))
+  (func (export "nullable_result") (param (ref $utf16)) (result (ref null $utf16))
+    (local.get 0)))

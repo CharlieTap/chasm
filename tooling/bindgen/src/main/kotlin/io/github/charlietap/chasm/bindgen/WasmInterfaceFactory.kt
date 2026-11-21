@@ -1,16 +1,22 @@
 package io.github.charlietap.chasm.bindgen
 
+import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.NameAllocator
 import io.github.charlietap.chasm.bindgen.ext.asType
 import io.github.charlietap.chasm.bindgen.ext.asValue
 import io.github.charlietap.chasm.embedding.shapes.FunctionNameData
 import io.github.charlietap.chasm.embedding.shapes.ModuleInfo
 import io.github.charlietap.chasm.runtime.type.ExternalType
+import io.github.charlietap.chasm.type.ConcreteHeapType
 import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.chasm.type.GlobalType
 import io.github.charlietap.chasm.type.Mutability
 import io.github.charlietap.chasm.type.NumberType
+import io.github.charlietap.chasm.type.PackedType
+import io.github.charlietap.chasm.type.ReferenceType
+import io.github.charlietap.chasm.type.StorageType
 import io.github.charlietap.chasm.type.ValueType
+import io.github.charlietap.chasm.type.ext.arrayType
 
 internal class WasmFunctionValidator {
     operator fun invoke(
@@ -22,7 +28,7 @@ internal class WasmFunctionValidator {
             convertToNumberTypes(parameter.type, parameter.stringEncodingStrategy)
         }
 
-        if (expectedParams != type.params.types) {
+        if (!matches(expectedParams, type.params.types)) {
             throw IllegalStateException(
                 "Function definition defines parameters $expectedParams but actual wasm function expects ${type.params.types}",
             )
@@ -32,38 +38,96 @@ internal class WasmFunctionValidator {
             convertToNumberTypes(returnType.type, returnType.stringEncodingStrategy)
         }
 
-        if (expectedReturns != type.results.types) {
+        if (!matches(expectedReturns, type.results.types)) {
             throw IllegalStateException(
                 "Function definition defines return type $expectedReturns but actual wasm function returns ${type.results.types}",
             )
+        }
+
+        val nullableGcStringResult = function.returnType.stringEncodingStrategy.storedInGcArray &&
+            type.results.types.any { result -> (result as? ValueType.Reference)?.referenceType is ReferenceType.RefNull }
+
+        if (nullableGcStringResult) {
+            throw IllegalStateException(
+                "Function definition returns a String from a GC array but the wasm function returns a nullable reference; " +
+                    "GC array string results must be non-null references",
+            )
+        }
+    }
+
+    private fun matches(
+        expected: List<ExpectedValueType>,
+        actual: List<ValueType>,
+    ): Boolean {
+        return expected.size == actual.size && expected.zip(actual).all { (expectedType, actualType) ->
+            expectedType.matches(actualType)
         }
     }
 
     private fun convertToNumberTypes(
         input: Type,
         encodingStrategy: StringEncodingStrategy?,
-    ): List<ValueType> {
+    ): List<ExpectedValueType> {
         return when (input) {
             is Aggregate -> {
                 input.generated.fields.flatMap { field ->
                     convertToNumberTypes(field.type, null)
                 }
             }
-            Scalar.Integer -> listOf(ValueType.Number(NumberType.I32))
-            Scalar.Long -> listOf(ValueType.Number(NumberType.I64))
-            Scalar.Float -> listOf(ValueType.Number(NumberType.F32))
-            Scalar.Double -> listOf(ValueType.Number(NumberType.F64))
+            Scalar.Integer -> listOf(ExactValueType(ValueType.Number(NumberType.I32)))
+            Scalar.Long -> listOf(ExactValueType(ValueType.Number(NumberType.I64)))
+            Scalar.Float -> listOf(ExactValueType(ValueType.Number(NumberType.F32)))
+            Scalar.Double -> listOf(ExactValueType(ValueType.Number(NumberType.F64)))
             Scalar.String -> {
                 when (requireNotNull(encodingStrategy)) {
-                    StringEncodingStrategy.POINTER_AND_LENGTH -> listOf(ValueType.Number(NumberType.I32), ValueType.Number(NumberType.I32))
-                    StringEncodingStrategy.NULL_TERMINATED -> listOf(ValueType.Number(NumberType.I32))
-                    StringEncodingStrategy.LENGTH_PREFIXED -> listOf(ValueType.Number(NumberType.I32))
-                    StringEncodingStrategy.PACKED_POINTER_AND_LENGTH -> listOf(ValueType.Number(NumberType.I64))
+                    StringEncodingStrategy.POINTER_AND_LENGTH -> listOf(
+                        ExactValueType(ValueType.Number(NumberType.I32)),
+                        ExactValueType(ValueType.Number(NumberType.I32)),
+                    )
+                    StringEncodingStrategy.NULL_TERMINATED -> listOf(ExactValueType(ValueType.Number(NumberType.I32)))
+                    StringEncodingStrategy.LENGTH_PREFIXED -> listOf(ExactValueType(ValueType.Number(NumberType.I32)))
+                    StringEncodingStrategy.PACKED_POINTER_AND_LENGTH -> listOf(ExactValueType(ValueType.Number(NumberType.I64)))
+                    StringEncodingStrategy.GC_UTF16_ARRAY -> listOf(GcArrayValueType(PackedType.I16))
+                    StringEncodingStrategy.GC_UTF8_ARRAY -> listOf(GcArrayValueType(PackedType.I8))
                 }
             }
             Scalar.Unit -> emptyList()
             else -> throw IllegalArgumentException("Unknown type: $input")
         }
+    }
+}
+
+internal sealed interface ExpectedValueType {
+    fun matches(actual: ValueType): Boolean
+}
+
+internal data class ExactValueType(
+    val type: ValueType,
+) : ExpectedValueType {
+
+    override fun matches(actual: ValueType): Boolean {
+        return actual == type
+    }
+
+    override fun toString(): String {
+        return type.toString()
+    }
+}
+
+internal data class GcArrayValueType(
+    val elementType: PackedType,
+) : ExpectedValueType {
+
+    override fun matches(actual: ValueType): Boolean {
+
+        val heapType = (actual as? ValueType.Reference)?.referenceType?.heapType
+        val arrayType = (heapType as? ConcreteHeapType.Defined)?.definedType?.arrayType()
+
+        return arrayType?.fieldType?.storageType == StorageType.Packed(elementType)
+    }
+
+    override fun toString(): String {
+        return "(ref (array $elementType))"
     }
 }
 
@@ -93,8 +157,8 @@ internal class AllocatorValidator() {
         info: ModuleInfo,
     ) {
         if (allocator == null) {
-            val functionsWithStringParams = functions.filter { fn ->
-                fn.params.any { it.type == Scalar.String }
+            val functionsWithStringParams = functions.filter { function ->
+                function.params.any { param -> param.stringEncoding is LinearMemoryString }
             }
             if (functionsWithStringParams.isNotEmpty()) {
                 val names = functionsWithStringParams.joinToString { it.name }
@@ -139,11 +203,14 @@ internal class ParameterFactory {
     operator fun invoke(
         params: List<ValueType>,
         localNames: List<String>?,
-    ): List<FunctionParameter> = params.mapIndexed { idx, param ->
-        FunctionParameter(
-            name = localNames?.getOrNull(idx) ?: "p$idx",
-            type = param.asType(),
-        )
+        gcTypes: GcTypeResolver,
+    ): List<FunctionParameter> {
+        return params.mapIndexed { idx, param ->
+            FunctionParameter(
+                name = localNames?.getOrNull(idx) ?: "p$idx",
+                type = gcTypes.signatureType(param),
+            )
+        }
     }
 }
 
@@ -155,21 +222,24 @@ internal class ReturnTypeFactory(
         config: CodegenConfig,
         input: List<ValueType>,
         types: MutableList<GeneratedType>,
-    ): Type = when {
-        input.size == 0 -> Scalar.Unit
-        input.size == 1 -> input.first().asType()
-        else -> {
-            val type = GeneratedType(
-                name = classNameFormatter(name) + "Result",
-                fields = input.mapIndexed { idx, type ->
-                    Field(
-                        name = "r$idx",
-                        type = type.asType(),
-                    )
-                },
-            )
-            types.add(type)
-            Aggregate(type)
+        gcTypes: GcTypeResolver,
+    ): Type {
+        return when {
+            input.size == 0 -> Scalar.Unit
+            input.size == 1 -> gcTypes.signatureType(input.first())
+            else -> {
+                val type = GeneratedType(
+                    name = classNameFormatter(name) + "Result",
+                    fields = input.mapIndexed { idx, type ->
+                        Field(
+                            name = "r$idx",
+                            type = gcTypes.signatureType(type),
+                        )
+                    },
+                )
+                types.add(type)
+                Aggregate(type)
+            }
         }
     }
 }
@@ -182,6 +252,7 @@ internal class ReturnFactory(
         functionName: String,
         returns: List<ValueType>,
         types: MutableList<GeneratedType>,
+        gcTypes: GcTypeResolver,
     ): FunctionReturn {
         return FunctionReturn(
             type = typeFactory(
@@ -189,6 +260,7 @@ internal class ReturnFactory(
                 config = config,
                 input = returns,
                 types = types,
+                gcTypes = gcTypes,
             ),
         )
     }
@@ -207,27 +279,23 @@ internal class FunctionFactory(
         types: MutableList<GeneratedType>,
         function: WasmFunction?,
         nameData: FunctionNameData?,
+        gcTypes: GcTypeResolver,
     ): Function {
 
         function?.let {
             functionValidator(function, type)
         }
 
-        val params = function?.parameters?.map { parameter ->
-            FunctionParameter(
-                name = parameter.name,
-                type = parameter.type,
-                stringAllocationStrategy = parameter.stringAllocationStrategy,
-                stringEncodingStrategy = parameter.stringEncodingStrategy,
-            )
-        } ?: parameterFactory(type.params.types, nameData?.localNames)
+        val params = function?.let { definition ->
+            definedParameters(definition, type, gcTypes)
+        } ?: parameterFactory(type.params.types, nameData?.localNames, gcTypes)
 
         val returnType = function?.returnType?.let {
             FunctionReturn(
                 type = it.type,
                 stringEncodingStrategy = it.stringEncodingStrategy,
             )
-        } ?: returnFactory(config, name, type.results.types, types)
+        } ?: returnFactory(config, name, type.results.types, types, gcTypes)
 
         val implementation = function?.returnType?.let {
             FunctionProxy(name)
@@ -239,6 +307,49 @@ internal class FunctionFactory(
             returns = returnType,
             resultTypes = type.results.types,
             implementation = implementation,
+        )
+    }
+
+    private fun definedParameters(
+        function: WasmFunction,
+        type: FunctionType,
+        gcTypes: GcTypeResolver,
+    ): List<FunctionParameter> {
+
+        var wasmParameterIndex = 0
+
+        return function.parameters.map { parameter ->
+
+            val strategy = parameter.stringEncodingStrategy
+            val stringEncoding = when {
+                strategy == null -> null
+                strategy.storedInGcArray -> gcArrayString(type.params.types[wasmParameterIndex], gcTypes)
+                else -> LinearMemoryString(strategy)
+            }
+
+            wasmParameterIndex += if (strategy == StringEncodingStrategy.POINTER_AND_LENGTH) 2 else 1
+
+            FunctionParameter(
+                name = parameter.name,
+                type = parameter.type,
+                stringAllocationStrategy = parameter.stringAllocationStrategy,
+                stringEncoding = stringEncoding,
+            )
+        }
+    }
+
+    private fun gcArrayString(
+        wasmParameter: ValueType,
+        gcTypes: GcTypeResolver,
+    ): GcArrayString {
+
+        val referenceType = (wasmParameter as ValueType.Reference).referenceType
+        val definedType = requireNotNull(gcTypes.definedType(referenceType))
+        val storageType = requireNotNull(definedType.arrayType()).fieldType.storageType as StorageType.Packed
+
+        return GcArrayString(
+            typeIndex = gcTypes.typeIndex(definedType),
+            elementType = storageType.type,
         )
     }
 }
@@ -340,6 +451,7 @@ internal class WasmInterfaceFactory(
     private val memoryBindingFactory: MemoryBindingFactory = MemoryBindingFactory(),
     private val allocatorValidator: AllocatorValidator = AllocatorValidator(),
     private val exportExcluder: ExportExcluder = ExportExcluder(),
+    private val embeddingApiSelector: EmbeddingApiSelector = EmbeddingApiSelector(),
 ) {
     operator fun invoke(
         interfaceName: String,
@@ -353,6 +465,11 @@ internal class WasmInterfaceFactory(
         logger: BindgenLogger,
     ): WasmInterface {
 
+        val callConvention = embeddingApiSelector.embeddingApi(config.executionTier).functionCallConvention
+        val gcTypes = GcTypeResolver(
+            interfaceClassName = ClassName(packageName, interfaceName),
+            mapsReferences = callConvention.passesReferences,
+        )
         val functions = mutableListOf<Function>()
         val properties = mutableListOf<Property>()
         val memoryExports = mutableListOf<MemoryExport>()
@@ -368,14 +485,17 @@ internal class WasmInterfaceFactory(
                 is ExternalType.Function -> {
                     try {
                         if (initializers.contains(export.name)) return@forEach
-                        val function = functionFactory(
-                            name = export.name,
-                            type = type.functionType,
-                            config = config,
-                            types = types,
-                            function = wasmFunctions.firstOrNull { it.name == export.name },
-                            nameData = export.nameData as? FunctionNameData,
-                        )
+                        val function = gcTypes.transaction {
+                            functionFactory(
+                                name = export.name,
+                                type = type.functionType,
+                                config = config,
+                                types = types,
+                                function = wasmFunctions.firstOrNull { definition -> definition.name == export.name },
+                                nameData = export.nameData as? FunctionNameData,
+                                gcTypes = gcTypes,
+                            )
+                        }
                         functions.add(function)
                     } catch (exception: Exception) {
                         logger.error("Failed to generate function ${export.name} because ${exception.message}")
@@ -406,21 +526,17 @@ internal class WasmInterfaceFactory(
         }
 
         val requiresMemory = functions.any { function ->
-            function.params.any { it.type == Scalar.String } || function.returns.type == Scalar.String
+            function.params.any { param -> param.stringEncoding is LinearMemoryString } ||
+                (function.returns.type == Scalar.String && !function.returns.stringEncodingStrategy.storedInGcArray)
         }
-        if (requiresMemory && memoryExports.none { it.name == DEFAULT_MEMORY_EXPORT_NAME }) {
+        if (requiresMemory && memoryExports.none { export -> export.name == DEFAULT_MEMORY_EXPORT_NAME }) {
             memoryExports.add(MemoryExport(DEFAULT_MEMORY_EXPORT_NAME, exposed = false))
         }
 
         val reservedNames = IMPLEMENTATION_PROPERTY_NAMES +
             properties.map { property -> property.name } +
             functions.map(::preparedFunctionPropertyName) +
-            functions.map(Function::inputCount)
-                .filter { inputCount -> inputCount > 0 }
-                .distinct()
-                .flatMap { inputCount ->
-                    listOf(FUNCTION_INPUT_BUFFER_NAME, functionInputBufferName(inputCount))
-                }
+            callConvention.reservedNames(functions)
         val memories = memoryBindingFactory(memoryExports, reservedNames)
 
         allocatorValidator(allocator, functions, info)
@@ -437,6 +553,7 @@ internal class WasmInterfaceFactory(
             linksWasiPreview1 = config.wasi == WasiLinking.AUTOMATIC && info.imports.any { definition ->
                 definition.moduleName == WASI_SNAPSHOT_PREVIEW1_MODULE_NAME
             },
+            structViews = gcTypes.structViews,
         )
     }
 

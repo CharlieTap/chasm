@@ -39,6 +39,11 @@ internal val SUSPENDING_VM_FACTORY_CLASS_NAME =
     MemberName("io.github.charlietap.chasm.vm", "suspendingVirtualMachineFactory")
 internal val IMPORT_FACTORY_CLASS_NAME = MemberName("io.github.charlietap.chasm.vm", "importFactory")
 
+internal const val COMPILED_PACKAGE = "io.github.charlietap.chasm.embedding.compiled"
+
+internal val STRUCT_REFERENCE_CLASS_NAME = ClassName("io.github.charlietap.chasm.reference", "StructReference")
+internal val ARRAY_REFERENCE_CLASS_NAME = ClassName("io.github.charlietap.chasm.reference", "ArrayReference")
+
 internal const val CREATE_STORE_FUNCTION = "storeInit"
 internal const val CREATE_MODULE_FUNCTION = "moduleDecode"
 internal const val CREATE_INSTANCE_FUNCTION = "moduleInstantiate"

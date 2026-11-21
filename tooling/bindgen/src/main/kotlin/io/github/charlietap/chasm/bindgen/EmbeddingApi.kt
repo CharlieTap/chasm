@@ -22,8 +22,6 @@ internal interface EmbeddingApi {
 
     val preparedFunction: ClassName
 
-    val executionValue: ClassName
-
     val codegenImport: ClassName
 
     val allocator: ClassName
@@ -50,6 +48,8 @@ internal interface EmbeddingApi {
 
     val memoryAccessParameters: List<ParameterSpec>
 
+    val functionCallConvention: FunctionCallConvention
+
     val moduleFactoryArguments: String
 
     fun suspendingFactories(config: CodegenConfig): Boolean
@@ -62,14 +62,7 @@ internal interface EmbeddingApi {
 
     fun instanceFactoryOverrideType(suspending: Boolean): TypeName
 
-    fun numberValue(type: Type): ClassName
-
     fun storeFunction(function: StoreFunction): MemberName
-
-    fun preparedFunctionCall(
-        preparedFunction: String,
-        arguments: String,
-    ): CodeBlock
 
     fun storeControlCall(
         call: CodeBlock,
@@ -106,6 +99,20 @@ internal interface EmbeddingApi {
         value: String,
         failure: String,
     ): CodeBlock
+}
+
+internal class EmbeddingApiSelector(
+    private val runtimeEmbeddingApi: EmbeddingApi = RuntimeEmbeddingApi(),
+    private val compiledEmbeddingApi: EmbeddingApi = CompiledEmbeddingApi(),
+) {
+    fun embeddingApi(tier: ExecutionTier): EmbeddingApi {
+        return when (tier) {
+            is ExecutionTier.Jit -> compiledEmbeddingApi
+            is ExecutionTier.Interpreter,
+            is ExecutionTier.Aot,
+            -> runtimeEmbeddingApi
+        }
+    }
 }
 
 internal enum class StoreFunction(

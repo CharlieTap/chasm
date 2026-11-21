@@ -25,4 +25,8 @@ enum class StringEncodingStrategy {
      * The pointer and length of the string are encoded in a single I64
      */
     PACKED_POINTER_AND_LENGTH,
+
+    GC_UTF16_ARRAY,
+
+    GC_UTF8_ARRAY,
 }

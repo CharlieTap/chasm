@@ -1,0 +1,131 @@
+package com.test
+
+import io.github.charlietap.chasm.embedding.compiled.readStructField
+import io.github.charlietap.chasm.embedding.compiled.readStructReference
+import io.github.charlietap.chasm.embedding.compiled.writeStructField
+import io.github.charlietap.chasm.embedding.compiled.writeStructReference
+import io.github.charlietap.chasm.reference.ArrayReference
+import io.github.charlietap.chasm.reference.StructReference
+import kotlin.Any
+import kotlin.Double
+import kotlin.Float
+import kotlin.Int
+import kotlin.Long
+import kotlin.jvm.JvmInline
+
+public data class LeafPairResult(
+  public val r0: Int,
+  public val r1: JitStructViews.Struct1,
+)
+
+public interface JitStructViews {
+  public fun makeLeaf(p0: Int): Struct1
+
+  public fun leafValue(p0: Struct1): Int
+
+  public fun next(p0: Struct2?): Struct2?
+
+  public fun link(p0: Struct2, p1: Struct2?)
+
+  public fun secondValue(p0: Struct4): Int
+
+  public fun leafPair(p0: Int): LeafPairResult
+
+  public fun mixed(
+    p0: Float,
+    p1: Struct1,
+    p2: Double,
+  ): Double
+
+  public fun identityAny(p0: Any?): Any?
+
+  public fun extern(p0: Any): Any?
+
+  public fun arrayParam(p0: ArrayReference?): ArrayReference
+
+  @JvmInline
+  public value class Struct1(
+    public val reference: StructReference,
+  ) {
+    public val f0: Int
+      get() = readStructField(reference, 0).toInt()
+  }
+
+  @JvmInline
+  public value class Struct2(
+    public val reference: StructReference,
+  ) {
+    public var f0: Int
+      get() = readStructField(reference, 0).toInt()
+      set(newValue) {
+        writeStructField(reference, 0, newValue.toLong())
+      }
+
+    public val f1: Long
+      get() = readStructField(reference, 1)
+
+    public var f2: Float
+      get() = Float.fromBits(readStructField(reference, 2).toInt())
+      set(newValue) {
+        writeStructField(reference, 2, newValue.toRawBits().toLong())
+      }
+
+    public val f3: Double
+      get() = Double.fromBits(readStructField(reference, 3))
+
+    public var f4: Int
+      get() = readStructField(reference, 4).toInt()
+      set(newValue) {
+        writeStructField(reference, 4, newValue.toLong())
+      }
+
+    public val f5: Int
+      get() = readStructField(reference, 5).toInt()
+
+    public var f6: Struct2?
+      get() = (readStructReference(reference, 6) as StructReference?)?.let { structReference -> Struct2(structReference) }
+      set(newValue) {
+        writeStructReference(reference, 6, newValue?.reference)
+      }
+
+    public val f7: Struct1
+      get() = Struct1(readStructReference(reference, 7) as StructReference)
+
+    public var f8: ArrayReference?
+      get() = readStructReference(reference, 8) as ArrayReference?
+      set(newValue) {
+        writeStructReference(reference, 8, newValue)
+      }
+
+    public val f9: ArrayReference
+      get() = readStructReference(reference, 9) as ArrayReference
+
+    public var f10: Any?
+      get() = readStructReference(reference, 10)
+      set(newValue) {
+        writeStructReference(reference, 10, newValue)
+      }
+  }
+
+  @JvmInline
+  public value class Struct3(
+    public val reference: StructReference,
+  ) {
+    public val f0: Struct4?
+      get() = (readStructReference(reference, 0) as StructReference?)?.let { structReference -> Struct4(structReference) }
+  }
+
+  @JvmInline
+  public value class Struct4(
+    public val reference: StructReference,
+  ) {
+    public var f0: Struct3?
+      get() = (readStructReference(reference, 0) as StructReference?)?.let { structReference -> Struct3(structReference) }
+      set(newValue) {
+        writeStructReference(reference, 0, newValue?.reference)
+      }
+
+    public val f1: Int
+      get() = readStructField(reference, 1).toInt()
+  }
+}

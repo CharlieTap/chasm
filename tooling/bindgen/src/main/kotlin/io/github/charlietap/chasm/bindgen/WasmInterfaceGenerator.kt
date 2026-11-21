@@ -41,8 +41,7 @@ internal class WasmInterfaceGenerator(
     private val chasmFactoryFunctionGenerator: ChasmFactoryFunctionGenerator = ChasmFactoryFunctionGenerator(),
     private val chasmClassImplementationGenerator: ChasmClassImplementationGenerator = ChasmClassImplementationGenerator(),
     private val visibilityValidator: VisibilityValidator = VisibilityValidator(),
-    private val runtimeEmbeddingApi: EmbeddingApi = RuntimeEmbeddingApi(),
-    private val compiledEmbeddingApi: EmbeddingApi = CompiledEmbeddingApi(),
+    private val embeddingApiSelector: EmbeddingApiSelector = EmbeddingApiSelector(),
 ) {
     operator fun invoke(
         interfaceVisibility: InterfaceVisibility,
@@ -80,63 +79,71 @@ internal class WasmInterfaceGenerator(
         wasmInterface: WasmInterface,
         implementationVisibility: ImplementationVisibility,
         config: CodegenConfig,
-    ): FileSpec = FileSpec.builder(wasmInterface.packageName, wasmInterface.interfaceName + "Impl").apply {
-        if (config.executionTier !is ExecutionTier.Interpreter) {
-            addAnnotation(
-                AnnotationSpec.builder(OPT_IN_CLASS_NAME)
-                    .useSiteTarget(AnnotationSpec.UseSiteTarget.FILE)
-                    .addMember("%T::class", CHASM_EXPERIMENTAL_API_CLASS_NAME)
-                    .build(),
+    ): FileSpec {
+        return FileSpec.builder(wasmInterface.packageName, wasmInterface.interfaceName + "Impl").apply {
+            if (config.executionTier !is ExecutionTier.Interpreter) {
+
+                val borrowsGcArrays = wasmInterface.functions.any { function ->
+                    function.params.any { param -> param.stringEncoding is GcArrayString } ||
+                        function.returns.stringEncodingStrategy.storedInGcArray
+                }
+
+                addAnnotation(
+                    AnnotationSpec.builder(OPT_IN_CLASS_NAME)
+                        .useSiteTarget(AnnotationSpec.UseSiteTarget.FILE)
+                        .addMember("%T::class", CHASM_EXPERIMENTAL_API_CLASS_NAME)
+                        .apply {
+                            if (borrowsGcArrays) {
+                                addMember("%T::class", UNSAFE_HOST_API_CLASS_NAME)
+                            }
+                        }
+                        .build(),
+                )
+            }
+            val api = embeddingApiSelector.embeddingApi(config.executionTier)
+            val controls = config.storeControls
+            controls.forEach { control -> addAliasedImport(api.storeFunction(control.function), control.function.alias) }
+            if (config.executionTier is ExecutionTier.Aot) {
+                addAliasedImport(api.storeFunction(StoreFunction.AddFuel), StoreFunction.AddFuel.alias)
+            }
+            addFunction(
+                when (config.runtime) {
+                    CodegenRuntime.PORTABLE_VM -> portableVmFactoryFunctionGenerator(
+                        packageName = wasmInterface.packageName,
+                        interfaceName = wasmInterface.interfaceName,
+                        visibility = factoryVisibility,
+                        generateSuspendingFactory = config.generateSuspendingFactories,
+                    )
+                    CodegenRuntime.CHASM -> chasmFactoryFunctionGenerator(
+                        packageName = wasmInterface.packageName,
+                        interfaceName = wasmInterface.interfaceName,
+                        visibility = factoryVisibility,
+                        linksWasiPreview1 = wasmInterface.linksWasiPreview1,
+                        config = config,
+                        api = api,
+                    )
+                },
             )
-        }
-        val api = when (config.executionTier) {
-            is ExecutionTier.Jit -> compiledEmbeddingApi
-            is ExecutionTier.Interpreter,
-            is ExecutionTier.Aot,
-            -> runtimeEmbeddingApi
-        }
-        val controls = config.storeControls
-        controls.forEach { control -> addAliasedImport(api.storeFunction(control.function), control.function.alias) }
-        if (config.executionTier is ExecutionTier.Aot) {
-            addAliasedImport(api.storeFunction(StoreFunction.AddFuel), StoreFunction.AddFuel.alias)
-        }
-        addFunction(
-            when (config.runtime) {
-                CodegenRuntime.PORTABLE_VM -> portableVmFactoryFunctionGenerator(
-                    packageName = wasmInterface.packageName,
-                    interfaceName = wasmInterface.interfaceName,
-                    visibility = factoryVisibility,
-                    generateSuspendingFactory = config.generateSuspendingFactories,
-                )
-                CodegenRuntime.CHASM -> chasmFactoryFunctionGenerator(
-                    packageName = wasmInterface.packageName,
-                    interfaceName = wasmInterface.interfaceName,
-                    visibility = factoryVisibility,
-                    linksWasiPreview1 = wasmInterface.linksWasiPreview1,
-                    config = config,
-                    api = api,
-                )
-            },
-        )
-        addType(
-            when (config.runtime) {
-                CodegenRuntime.PORTABLE_VM -> portableVmClassImplementationGenerator(
-                    packageName = wasmInterface.packageName,
-                    interfaceName = wasmInterface.interfaceName,
-                    visibility = implementationVisibility,
-                    wasmInterface = wasmInterface,
-                )
-                CodegenRuntime.CHASM -> chasmClassImplementationGenerator(
-                    packageName = wasmInterface.packageName,
-                    interfaceName = wasmInterface.interfaceName,
-                    visibility = implementationVisibility,
-                    wasmInterface = wasmInterface,
-                    controls = controls,
-                    api = api,
-                )
-            },
-        )
-    }.build()
+            addType(
+                when (config.runtime) {
+                    CodegenRuntime.PORTABLE_VM -> portableVmClassImplementationGenerator(
+                        packageName = wasmInterface.packageName,
+                        interfaceName = wasmInterface.interfaceName,
+                        visibility = implementationVisibility,
+                        wasmInterface = wasmInterface,
+                    )
+                    CodegenRuntime.CHASM -> chasmClassImplementationGenerator(
+                        packageName = wasmInterface.packageName,
+                        interfaceName = wasmInterface.interfaceName,
+                        visibility = implementationVisibility,
+                        wasmInterface = wasmInterface,
+                        controls = controls,
+                        api = api,
+                    )
+                },
+            )
+        }.build()
+    }
 }
 
 internal class VisibilityValidator {

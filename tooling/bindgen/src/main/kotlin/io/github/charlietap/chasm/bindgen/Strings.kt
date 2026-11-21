@@ -34,4 +34,13 @@ enum class StringEncodingStrategy {
      * The pointer and length of the string are encoded in a single I64
      */
     PACKED_POINTER_AND_LENGTH,
+
+    GC_UTF16_ARRAY,
+
+    GC_UTF8_ARRAY,
 }
+
+internal val StringEncodingStrategy?.storedInGcArray: Boolean
+    get() {
+        return this == StringEncodingStrategy.GC_UTF16_ARRAY || this == StringEncodingStrategy.GC_UTF8_ARRAY
+    }

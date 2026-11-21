@@ -12,7 +12,9 @@ import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.asClassName
 
-internal class CompiledEmbeddingApi : EmbeddingApi {
+internal class CompiledEmbeddingApi(
+    override val functionCallConvention: FunctionCallConvention = UnboxedFunctionCallConvention(),
+) : EmbeddingApi {
 
     override val store = ClassName(COMPILED_PACKAGE, "Store")
 
@@ -27,8 +29,6 @@ internal class CompiledEmbeddingApi : EmbeddingApi {
     override val global = ClassName(COMPILED_PACKAGE, "Global")
 
     override val preparedFunction = ClassName(COMPILED_PACKAGE, "PreparedFunction")
-
-    override val executionValue = ClassName(VALUE_PACKAGE, "ExecutionValue")
 
     override val codegenImport = ClassName(CODEGEN_PACKAGE, "CodegenImport")
 
@@ -81,19 +81,8 @@ internal class CompiledEmbeddingApi : EmbeddingApi {
         return LambdaTypeName.get(null, store, module, imports, returnType = instance).copy(suspending = true)
     }
 
-    override fun numberValue(type: Type): ClassName {
-        return ClassName(VALUE_PACKAGE, "NumberValue", numberValueName(type))
-    }
-
     override fun storeFunction(function: StoreFunction): MemberName {
         return MemberName(COMPILED_PACKAGE, function.functionName)
-    }
-
-    override fun preparedFunctionCall(
-        preparedFunction: String,
-        arguments: String,
-    ): CodeBlock {
-        return CodeBlock.of("%L.%M(%L)", preparedFunction, invoke, arguments)
     }
 
     override fun storeControlCall(
@@ -163,9 +152,7 @@ internal class CompiledEmbeddingApi : EmbeddingApi {
     }
 }
 
-private const val COMPILED_PACKAGE = "io.github.charlietap.chasm.embedding.compiled"
-private const val CODEGEN_PACKAGE = "io.github.charlietap.chasm.embedding.compiled.codegen"
-private const val VALUE_PACKAGE = "io.github.charlietap.chasm.embedding.compiled.value"
+private const val CODEGEN_PACKAGE = "$COMPILED_PACKAGE.codegen"
 private const val JIT_PACKAGE = "io.github.charlietap.chasm.jit"
 
 private val MODULE = MemberName(JIT_PACKAGE, "module")

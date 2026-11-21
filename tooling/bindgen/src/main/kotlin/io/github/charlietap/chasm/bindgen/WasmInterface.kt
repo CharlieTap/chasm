@@ -1,18 +1,60 @@
 package io.github.charlietap.chasm.bindgen
 
 import com.squareup.kotlinpoet.ClassName
+import io.github.charlietap.chasm.type.PackedType
 import io.github.charlietap.chasm.type.ValueType
 
 internal data class Aggregate(
     val generated: GeneratedType,
 ) : Type
 
+internal data class StructViewType(
+    val className: ClassName,
+    val nullable: Boolean,
+) : Type
+
+internal data class ArrayReferenceType(
+    val nullable: Boolean,
+) : Type
+
+internal data class AnyReferenceType(
+    val nullable: Boolean,
+) : Type
+
+internal data class StructViewField(
+    val name: String,
+    val index: Int,
+    val type: Type,
+    val mutable: Boolean,
+)
+
+internal data class StructView(
+    val className: ClassName,
+    val fields: List<StructViewField>,
+)
+
+internal sealed interface ParameterStringEncoding
+
+internal data class LinearMemoryString(
+    val strategy: StringEncodingStrategy,
+) : ParameterStringEncoding
+
+internal data class GcArrayString(
+    val typeIndex: Int,
+    val elementType: PackedType,
+) : ParameterStringEncoding
+
 internal data class FunctionParameter(
     val name: String,
     val type: Type,
     val stringAllocationStrategy: StringAllocationStrategy? = null,
-    val stringEncodingStrategy: StringEncodingStrategy? = null,
+    val stringEncoding: ParameterStringEncoding? = null,
 )
+
+internal val FunctionParameter.linearMemoryStrategy: StringEncodingStrategy?
+    get() {
+        return (stringEncoding as? LinearMemoryString)?.strategy
+    }
 
 internal data class FunctionReturn(
     val type: Type,
@@ -37,7 +79,7 @@ internal val Function.inputCount: Int
     get() = params.sumOf { param ->
         if (
             param.type == Scalar.String &&
-            param.stringEncodingStrategy == StringEncodingStrategy.POINTER_AND_LENGTH
+            param.linearMemoryStrategy == StringEncodingStrategy.POINTER_AND_LENGTH
         ) {
             2
         } else {
@@ -52,6 +94,20 @@ internal fun functionInputBufferName(inputCount: Int): String {
 internal fun preparedFunctionPropertyName(function: Function): String {
     return function.name + "PreparedFunction"
 }
+
+internal fun gcArrayTypePropertyName(typeIndex: Int): String {
+    return "arrayType$typeIndex"
+}
+
+internal val Function.invocationSlotCount: Int
+    get() {
+        return maxOf(inputCount, resultTypes.size)
+    }
+
+internal val Function.gcArrayTypeIndices: List<Int>
+    get() {
+        return params.mapNotNull { param -> (param.stringEncoding as? GcArrayString)?.typeIndex }
+    }
 
 internal data class Field(
     val name: String,
@@ -97,4 +153,5 @@ internal data class WasmInterface(
     val properties: List<Property>,
     val memories: List<MemoryBinding> = emptyList(),
     val linksWasiPreview1: Boolean = false,
+    val structViews: List<StructView> = emptyList(),
 )

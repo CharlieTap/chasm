@@ -162,7 +162,7 @@ internal class FunctionProxyImplementationGenerator(
             val bytesVar = param.name + "Bytes"
             val allocVar = param.name + "Alloc"
             addStatement("val %L = %L.encodeToByteArray()", bytesVar, param.name)
-            when (requireNotNull(param.stringEncodingStrategy)) {
+            when (requireNotNull(param.linearMemoryStrategy)) {
                 StringEncodingStrategy.POINTER_AND_LENGTH -> {
                     addStatement("val %L = allocator.alloc(%L.size)", allocVar, bytesVar)
                     addStatement(
@@ -220,6 +220,10 @@ internal class FunctionProxyImplementationGenerator(
                         bytesVar,
                     )
                 }
+
+                StringEncodingStrategy.GC_UTF16_ARRAY,
+                StringEncodingStrategy.GC_UTF8_ARRAY,
+                -> error("GC array strings require ExecutionTier.Jit")
             }
             if (param.stringAllocationStrategy?.freeAfterCall == true) {
                 allocationsToFree.add(allocVar)
@@ -234,7 +238,7 @@ internal class FunctionProxyImplementationGenerator(
                 if (param.type == Scalar.String) {
                     val bytesVar = param.name + "Bytes"
                     val allocVar = param.name + "Alloc"
-                    when (requireNotNull(param.stringEncodingStrategy)) {
+                    when (requireNotNull(param.linearMemoryStrategy)) {
                         StringEncodingStrategy.POINTER_AND_LENGTH -> {
                             addStatement(
                                 "%L[%L] = %T(%L)",
@@ -282,6 +286,10 @@ internal class FunctionProxyImplementationGenerator(
                                 bytesVar,
                             )
                         }
+
+                        StringEncodingStrategy.GC_UTF16_ARRAY,
+                        StringEncodingStrategy.GC_UTF8_ARRAY,
+                        -> error("GC array strings require ExecutionTier.Jit")
                     }
                 } else {
                     addStatement(

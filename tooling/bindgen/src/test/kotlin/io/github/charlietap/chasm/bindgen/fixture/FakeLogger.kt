@@ -31,6 +31,10 @@ class FakeLogger : BindgenLogger {
         assertEquals(message, log)
     }
 
+    fun expectErrorLogCount(count: Int) {
+        assertEquals(count, output.count { message -> message is Message.Error }, "Unexpected error logs: $output")
+    }
+
     fun expectExactlyOneErrorLog(message: String) {
         if (output.size != 1) throw AssertionError("Logger does not contain exactly one entry, $output")
         val log = (output.first() as? Message.Error)?.message

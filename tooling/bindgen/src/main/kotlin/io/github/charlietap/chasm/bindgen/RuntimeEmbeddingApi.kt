@@ -6,7 +6,12 @@ import com.squareup.kotlinpoet.MemberName
 import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.TypeName
 
-internal class RuntimeEmbeddingApi : EmbeddingApi {
+internal class RuntimeEmbeddingApi(
+    override val functionCallConvention: FunctionCallConvention = BoxedFunctionCallConvention(
+        executionValue = EXECUTION_VALUE,
+        numberValue = NUMBER_VALUE,
+    ),
+) : EmbeddingApi {
 
     override val store = ClassName(SHAPES_PACKAGE, "Store")
 
@@ -21,8 +26,6 @@ internal class RuntimeEmbeddingApi : EmbeddingApi {
     override val global = ClassName(SHAPES_PACKAGE, "Global")
 
     override val preparedFunction = ClassName(SHAPES_PACKAGE, "PreparedFunction")
-
-    override val executionValue = ClassName(VALUE_PACKAGE, "ExecutionValue")
 
     override val codegenImport = ClassName(CODEGEN_PACKAGE, "CodegenImport")
 
@@ -72,19 +75,8 @@ internal class RuntimeEmbeddingApi : EmbeddingApi {
         return if (suspending) SUSPEND_INSTANCE_FACTORY else INSTANCE_FACTORY
     }
 
-    override fun numberValue(type: Type): ClassName {
-        return ClassName(VALUE_PACKAGE, "NumberValue", numberValueName(type))
-    }
-
     override fun storeFunction(function: StoreFunction): MemberName {
         return MemberName(EMBEDDING_PACKAGE, function.functionName)
-    }
-
-    override fun preparedFunctionCall(
-        preparedFunction: String,
-        arguments: String,
-    ): CodeBlock {
-        return CodeBlock.of("%L(%L)", preparedFunction, arguments)
     }
 
     override fun storeControlCall(
@@ -131,7 +123,7 @@ internal class RuntimeEmbeddingApi : EmbeddingApi {
 
         val value = accessorCall(READ_GLOBAL, CodeBlock.of("%N", global), failure)
 
-        return CodeBlock.of("(%L as %T).value", value, numberValue(type))
+        return CodeBlock.of("(%L as %T).value", value, NUMBER_VALUE.nestedClass(numberValueName(type)))
     }
 
     override fun globalWrite(
@@ -140,7 +132,7 @@ internal class RuntimeEmbeddingApi : EmbeddingApi {
         value: String,
         failure: String,
     ): CodeBlock {
-        return accessorCall(WRITE_GLOBAL, CodeBlock.of("%N, %T(%L)", global, numberValue(type), value), failure)
+        return accessorCall(WRITE_GLOBAL, CodeBlock.of("%N, %T(%L)", global, NUMBER_VALUE.nestedClass(numberValueName(type)), value), failure)
     }
 }
 
@@ -151,6 +143,8 @@ private const val CODEGEN_PACKAGE = "io.github.charlietap.chasm.embedding.codege
 private const val COROUTINES_PACKAGE = "io.github.charlietap.chasm.coroutines"
 private const val VALUE_PACKAGE = "io.github.charlietap.chasm.runtime.value"
 
+private val EXECUTION_VALUE = ClassName(VALUE_PACKAGE, "ExecutionValue")
+private val NUMBER_VALUE = ClassName(VALUE_PACKAGE, "NumberValue")
 private val MODULE = MemberName(EMBEDDING_PACKAGE, "module")
 private val INSTANCE = MemberName(EMBEDDING_PACKAGE, "instance")
 private val SUSPENDING_MODULE = MemberName(COROUTINES_PACKAGE, "module")

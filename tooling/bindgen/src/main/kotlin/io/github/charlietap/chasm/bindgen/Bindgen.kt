@@ -60,6 +60,23 @@ private class KotlinPoetBindingGenerator(
             "generateSuspendingFactories is not supported by ExecutionTier.Aot because compiled code has no " +
                 "suspending entry points."
         }
+        val gcStringFunctions = options.functions.filter { function ->
+            function.parameters.any { parameter -> parameter.stringEncodingStrategy.storedInGcArray } ||
+                function.returnType.stringEncodingStrategy.storedInGcArray
+        }
+        require(tier is ExecutionTier.Jit || gcStringFunctions.isEmpty()) {
+            "StringEncodingStrategy.GC_UTF16_ARRAY and GC_UTF8_ARRAY require ExecutionTier.Jit, but " +
+                "${gcStringFunctions.joinToString { function -> function.name }} use them."
+        }
+        val freedGcStringFunctions = options.functions.filter { function ->
+            function.parameters.any { parameter ->
+                parameter.stringEncodingStrategy.storedInGcArray && parameter.stringAllocationStrategy?.freeAfterCall == true
+            }
+        }
+        require(freedGcStringFunctions.isEmpty()) {
+            "freeAfterCall does not apply to GC_UTF16_ARRAY or GC_UTF8_ARRAY strings because the GC owns the array, but " +
+                "${freedGcStringFunctions.joinToString { function -> function.name }} set it."
+        }
         if (tier is ExecutionTier.Aot) {
             require(QUALIFIED_CLASS_NAME.matches(tier.compiledModule)) {
                 "compiledModule must name a class as Kotlin source does, such as com.example.aot.WasmModule: " +

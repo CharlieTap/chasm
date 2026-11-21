@@ -201,6 +201,7 @@ internal val CHASM_STORE_LIMITS_CLASS_NAME = ClassName("io.github.charlietap.cha
 internal val CHASM_GC_STRATEGY_CLASS_NAME = ClassName("io.github.charlietap.chasm.config", "GCStrategy")
 internal val CHASM_EXPERIMENTAL_API_CLASS_NAME = ClassName("io.github.charlietap.chasm", "ExperimentalChasmApi")
 internal val OPT_IN_CLASS_NAME = ClassName("kotlin", "OptIn")
+internal val UNSAFE_HOST_API_CLASS_NAME = ClassName("io.github.charlietap.chasm.host", "UnsafeHostApi")
 internal val WASI_EMBEDDER_HOST_CLASS_NAME = ClassName("at.released.weh.host", "EmbedderHost")
 internal val WASI_PREVIEW1_BUILDER_CLASS_NAME =
     ClassName("at.released.weh.bindings.chasm.wasip1", "ChasmWasiPreview1Builder")

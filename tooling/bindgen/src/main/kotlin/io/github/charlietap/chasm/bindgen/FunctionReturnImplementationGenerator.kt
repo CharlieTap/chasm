@@ -101,6 +101,9 @@ internal class StringFunctionReturnImplementationGenerator(
         StringEncodingStrategy.NULL_TERMINATED -> nullTerminatedStrategy(function)
         StringEncodingStrategy.LENGTH_PREFIXED -> lengthPrefixedStrategy(function)
         StringEncodingStrategy.PACKED_POINTER_AND_LENGTH -> packedStringStrategy(function)
+        StringEncodingStrategy.GC_UTF16_ARRAY,
+        StringEncodingStrategy.GC_UTF8_ARRAY,
+        -> error("GC array strings require ExecutionTier.Jit")
     }
 }
 

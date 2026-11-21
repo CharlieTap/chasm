@@ -1,14 +1,20 @@
 package io.github.charlietap.chasm.bindgen.ext
 
+import com.squareup.kotlinpoet.ANY
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.DOUBLE
 import com.squareup.kotlinpoet.FLOAT
 import com.squareup.kotlinpoet.INT
 import com.squareup.kotlinpoet.LONG
 import com.squareup.kotlinpoet.STRING
+import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.UNIT
+import io.github.charlietap.chasm.bindgen.ARRAY_REFERENCE_CLASS_NAME
 import io.github.charlietap.chasm.bindgen.Aggregate
+import io.github.charlietap.chasm.bindgen.AnyReferenceType
+import io.github.charlietap.chasm.bindgen.ArrayReferenceType
 import io.github.charlietap.chasm.bindgen.Scalar
+import io.github.charlietap.chasm.bindgen.StructViewType
 import io.github.charlietap.chasm.bindgen.Type
 import io.github.charlietap.chasm.bindgen.VALUE_F32_CLASS_NAME
 import io.github.charlietap.chasm.bindgen.VALUE_F64_CLASS_NAME
@@ -27,13 +33,18 @@ internal fun Type.asValue(): ClassName = when (this) {
     else -> throw UnsupportedOperationException("Unknown type: $this")
 }
 
-internal fun Type.asTypeName() = when (this) {
-    Scalar.Integer -> INT
-    Scalar.Long -> LONG
-    Scalar.Float -> FLOAT
-    Scalar.Double -> DOUBLE
-    Scalar.String -> STRING
-    Scalar.Unit -> UNIT
-    is Aggregate -> throw UnsupportedOperationException("Can't convert $this to ExecutionValue")
-    else -> throw UnsupportedOperationException("Unknown type: $this")
+internal fun Type.asTypeName(): TypeName {
+    return when (this) {
+        Scalar.Integer -> INT
+        Scalar.Long -> LONG
+        Scalar.Float -> FLOAT
+        Scalar.Double -> DOUBLE
+        Scalar.String -> STRING
+        Scalar.Unit -> UNIT
+        is StructViewType -> className.copy(nullable = nullable)
+        is ArrayReferenceType -> ARRAY_REFERENCE_CLASS_NAME.copy(nullable = nullable)
+        is AnyReferenceType -> ANY.copy(nullable = nullable)
+        is Aggregate -> throw UnsupportedOperationException("Can't convert $this to ExecutionValue")
+        else -> throw UnsupportedOperationException("Unknown type: $this")
+    }
 }

@@ -9,14 +9,12 @@ import io.github.charlietap.chasm.embedding.compiled.Memory
 import io.github.charlietap.chasm.embedding.compiled.Module
 import io.github.charlietap.chasm.embedding.compiled.PreparedFunction
 import io.github.charlietap.chasm.embedding.compiled.Store
-import io.github.charlietap.chasm.embedding.compiled.`value`.ExecutionValue
-import io.github.charlietap.chasm.embedding.compiled.`value`.NumberValue
 import io.github.charlietap.chasm.embedding.compiled.codegen.CodegenImport
 import io.github.charlietap.chasm.embedding.compiled.codegen.Wasm32Allocator
 import io.github.charlietap.chasm.embedding.compiled.codegen.allocateImports
 import io.github.charlietap.chasm.embedding.compiled.exports
 import io.github.charlietap.chasm.embedding.compiled.instance
-import io.github.charlietap.chasm.embedding.compiled.invoke
+import io.github.charlietap.chasm.embedding.compiled.invokeUnboxed
 import io.github.charlietap.chasm.embedding.compiled.prepareFunction
 import io.github.charlietap.chasm.embedding.compiled.writeByte
 import io.github.charlietap.chasm.embedding.compiled.writeBytes
@@ -24,11 +22,13 @@ import io.github.charlietap.chasm.embedding.compiled.writeInt
 import io.github.charlietap.chasm.embedding.shapes.`expect`
 import io.github.charlietap.chasm.jit.module
 import io.github.charlietap.chasm.jit.store
+import kotlin.Any
+import kotlin.Array
 import kotlin.ByteArray
+import kotlin.LongArray
 import kotlin.OptIn
 import kotlin.String
 import kotlin.collections.List
-import kotlin.collections.MutableList
 
 public suspend fun jitStringParams(
   binary: ByteArray,
@@ -66,12 +66,17 @@ private class JitStringParamsImpl(
   private val freedPreparedFunction: PreparedFunction =
       prepareFunction(store, instance, "freed").`expect`("Failed to prepare function freed")
 
-  private val functionInputBuffer: MutableList<ExecutionValue> =
-      MutableList<ExecutionValue>(2) { NumberValue.I32(0) }
+  private val pointerAndLengthWords: LongArray = LongArray(2)
 
-  private val functionInputBuffer1: MutableList<ExecutionValue> = functionInputBuffer.subList(0, 1)
+  private val nullTerminatedWords: LongArray = LongArray(1)
 
-  private val functionInputBuffer2: MutableList<ExecutionValue> = functionInputBuffer
+  private val lengthPrefixedWords: LongArray = LongArray(1)
+
+  private val packedWords: LongArray = LongArray(1)
+
+  private val freedWords: LongArray = LongArray(2)
+
+  private val noReferences: Array<Any?> = arrayOfNulls<Any>(0)
 
   private val _memory: Memory =
       exports(instance).memory("memory") ?: error("Failed to find memory export with name memory")
@@ -82,10 +87,9 @@ private class JitStringParamsImpl(
     val valueBytes = value.encodeToByteArray()
     val valueAlloc = allocator.alloc(valueBytes.size)
     writeBytes(_memory, valueAlloc, valueBytes)
-    functionInputBuffer[0] = NumberValue.I32(valueAlloc)
-    functionInputBuffer[1] = NumberValue.I32(valueBytes.size)
-    val args = functionInputBuffer2
-    val values = pointerAndLengthPreparedFunction.invoke(args).`expect`("Failed to invoke function pointerAndLength")
+    pointerAndLengthWords[0] = valueAlloc.toLong()
+    pointerAndLengthWords[1] = valueBytes.size.toLong()
+    pointerAndLengthPreparedFunction.invokeUnboxed(pointerAndLengthWords, noReferences).`expect`("Failed to invoke function pointerAndLength")
   }
 
   override fun nullTerminated(`value`: String) {
@@ -93,9 +97,8 @@ private class JitStringParamsImpl(
     val valueAlloc = allocator.alloc(valueBytes.size + 1)
     writeBytes(_memory, valueAlloc, valueBytes)
     writeByte(_memory, valueAlloc + valueBytes.size, 0)
-    functionInputBuffer[0] = NumberValue.I32(valueAlloc)
-    val args = functionInputBuffer1
-    val values = nullTerminatedPreparedFunction.invoke(args).`expect`("Failed to invoke function nullTerminated")
+    nullTerminatedWords[0] = valueAlloc.toLong()
+    nullTerminatedPreparedFunction.invokeUnboxed(nullTerminatedWords, noReferences).`expect`("Failed to invoke function nullTerminated")
   }
 
   override fun lengthPrefixed(`value`: String) {
@@ -103,28 +106,25 @@ private class JitStringParamsImpl(
     val valueAlloc = allocator.alloc(valueBytes.size + 4)
     writeInt(_memory, valueAlloc, valueBytes.size)
     writeBytes(_memory, valueAlloc + 4, valueBytes)
-    functionInputBuffer[0] = NumberValue.I32(valueAlloc)
-    val args = functionInputBuffer1
-    val values = lengthPrefixedPreparedFunction.invoke(args).`expect`("Failed to invoke function lengthPrefixed")
+    lengthPrefixedWords[0] = valueAlloc.toLong()
+    lengthPrefixedPreparedFunction.invokeUnboxed(lengthPrefixedWords, noReferences).`expect`("Failed to invoke function lengthPrefixed")
   }
 
   override fun packed(`value`: String) {
     val valueBytes = value.encodeToByteArray()
     val valueAlloc = allocator.alloc(valueBytes.size)
     writeBytes(_memory, valueAlloc, valueBytes)
-    functionInputBuffer[0] = NumberValue.I64((valueAlloc.toLong() shl 32) or (valueBytes.size.toLong() and 0xFFFFFFFFL))
-    val args = functionInputBuffer1
-    val values = packedPreparedFunction.invoke(args).`expect`("Failed to invoke function packed")
+    packedWords[0] = (valueAlloc.toLong() shl 32) or (valueBytes.size.toLong() and 0xFFFFFFFFL)
+    packedPreparedFunction.invokeUnboxed(packedWords, noReferences).`expect`("Failed to invoke function packed")
   }
 
   override fun freed(`value`: String) {
     val valueBytes = value.encodeToByteArray()
     val valueAlloc = allocator.alloc(valueBytes.size)
     writeBytes(_memory, valueAlloc, valueBytes)
-    functionInputBuffer[0] = NumberValue.I32(valueAlloc)
-    functionInputBuffer[1] = NumberValue.I32(valueBytes.size)
-    val args = functionInputBuffer2
-    val values = freedPreparedFunction.invoke(args).`expect`("Failed to invoke function freed")
+    freedWords[0] = valueAlloc.toLong()
+    freedWords[1] = valueBytes.size.toLong()
+    freedPreparedFunction.invokeUnboxed(freedWords, noReferences).`expect`("Failed to invoke function freed")
     allocator.free(valueAlloc)
   }
 }

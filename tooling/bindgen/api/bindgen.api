@@ -316,6 +316,8 @@ public final class io/github/charlietap/chasm/bindgen/StringAllocationStrategy {
 }
 
 public final class io/github/charlietap/chasm/bindgen/StringEncodingStrategy : java/lang/Enum {
+	public static final field GC_UTF16_ARRAY Lio/github/charlietap/chasm/bindgen/StringEncodingStrategy;
+	public static final field GC_UTF8_ARRAY Lio/github/charlietap/chasm/bindgen/StringEncodingStrategy;
 	public static final field LENGTH_PREFIXED Lio/github/charlietap/chasm/bindgen/StringEncodingStrategy;
 	public static final field NULL_TERMINATED Lio/github/charlietap/chasm/bindgen/StringEncodingStrategy;
 	public static final field PACKED_POINTER_AND_LENGTH Lio/github/charlietap/chasm/bindgen/StringEncodingStrategy;

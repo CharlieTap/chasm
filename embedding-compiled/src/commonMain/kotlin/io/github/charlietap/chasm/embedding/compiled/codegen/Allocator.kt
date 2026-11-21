@@ -1,10 +1,10 @@
 package io.github.charlietap.chasm.embedding.compiled.codegen
 
+import io.github.charlietap.chasm.ExperimentalChasmApi
 import io.github.charlietap.chasm.embedding.compiled.Instance
 import io.github.charlietap.chasm.embedding.compiled.Store
-import io.github.charlietap.chasm.embedding.compiled.invoke
+import io.github.charlietap.chasm.embedding.compiled.invokeUnboxed
 import io.github.charlietap.chasm.embedding.compiled.prepareFunction
-import io.github.charlietap.chasm.embedding.compiled.value.NumberValue
 import io.github.charlietap.chasm.embedding.shapes.expect
 
 interface Allocator<T> {
@@ -13,6 +13,7 @@ interface Allocator<T> {
     fun free(address: T)
 }
 
+@OptIn(ExperimentalChasmApi::class)
 class Wasm32Allocator(
     instance: Instance,
     store: Store,
@@ -26,14 +27,20 @@ class Wasm32Allocator(
     private val preparedFreeFunction = prepareFunction(store, instance, freeFunction)
         .expect("Failed to prepare deallocation function $freeFunction")
 
+    private val argumentWords = LongArray(1)
+
+    private val argumentReferences = arrayOfNulls<Any>(1)
+
     override fun alloc(size: Int): Int {
 
-        val result = preparedAllocFunction(listOf(NumberValue.I32(size)))
+        argumentWords[0] = size.toLong()
+        preparedAllocFunction.invokeUnboxed(argumentWords, argumentReferences).expect("Failed to allocate $size bytes")
 
-        return (result.expect("Failed to allocate $size bytes").first() as NumberValue.I32).value
+        return argumentWords[0].toInt()
     }
 
     override fun free(address: Int) {
-        preparedFreeFunction(listOf(NumberValue.I32(address))).expect("Failed to free address $address")
+        argumentWords[0] = address.toLong()
+        preparedFreeFunction.invokeUnboxed(argumentWords, argumentReferences).expect("Failed to free address $address")
     }
 }

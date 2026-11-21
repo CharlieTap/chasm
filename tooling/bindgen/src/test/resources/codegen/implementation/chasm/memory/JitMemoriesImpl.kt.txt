@@ -9,13 +9,11 @@ import io.github.charlietap.chasm.embedding.compiled.Memory
 import io.github.charlietap.chasm.embedding.compiled.Module
 import io.github.charlietap.chasm.embedding.compiled.PreparedFunction
 import io.github.charlietap.chasm.embedding.compiled.Store
-import io.github.charlietap.chasm.embedding.compiled.`value`.ExecutionValue
-import io.github.charlietap.chasm.embedding.compiled.`value`.NumberValue
 import io.github.charlietap.chasm.embedding.compiled.codegen.CodegenImport
 import io.github.charlietap.chasm.embedding.compiled.codegen.allocateImports
 import io.github.charlietap.chasm.embedding.compiled.exports
 import io.github.charlietap.chasm.embedding.compiled.instance
-import io.github.charlietap.chasm.embedding.compiled.invoke
+import io.github.charlietap.chasm.embedding.compiled.invokeUnboxed
 import io.github.charlietap.chasm.embedding.compiled.prepareFunction
 import io.github.charlietap.chasm.embedding.compiled.readBytes
 import io.github.charlietap.chasm.embedding.compiled.readNullTerminatedUtf8String
@@ -23,8 +21,11 @@ import io.github.charlietap.chasm.embedding.compiled.writeBytes
 import io.github.charlietap.chasm.embedding.shapes.`expect`
 import io.github.charlietap.chasm.jit.module
 import io.github.charlietap.chasm.jit.store
+import kotlin.Any
+import kotlin.Array
 import kotlin.ByteArray
 import kotlin.Int
+import kotlin.LongArray
 import kotlin.OptIn
 import kotlin.String
 import kotlin.collections.List
@@ -53,6 +54,10 @@ private class JitMemoriesImpl(
   private val readStringPreparedFunction: PreparedFunction =
       prepareFunction(store, instance, "read_string").`expect`("Failed to prepare function read_string")
 
+  private val readStringWords: LongArray = LongArray(1)
+
+  private val noReferences: Array<Any?> = arrayOfNulls<Any>(0)
+
   private val _memory: Memory =
       exports(instance).memory("memory") ?: error("Failed to find memory export with name memory")
 
@@ -64,9 +69,8 @@ private class JitMemoriesImpl(
   override val scratch: JitMemories.Memory = MemoryImpl(_scratch)
 
   override fun readString(): String {
-    val args = emptyList<ExecutionValue>()
-    val values = readStringPreparedFunction.invoke(args).`expect`("Failed to invoke function readString")
-    val pointer = (values[0] as NumberValue.I32).value
+    readStringPreparedFunction.invokeUnboxed(readStringWords, noReferences).`expect`("Failed to invoke function readString")
+    val pointer = readStringWords[0].toInt()
     val result = readNullTerminatedUtf8String(_memory, pointer)
     return result
   }

@@ -1,0 +1,140 @@
+@file:OptIn(
+  ExperimentalChasmApi::class,
+  UnsafeHostApi::class,
+)
+
+package com.test
+
+import io.github.charlietap.chasm.ExperimentalChasmApi
+import io.github.charlietap.chasm.embedding.compiled.HostGcType
+import io.github.charlietap.chasm.embedding.compiled.Import
+import io.github.charlietap.chasm.embedding.compiled.Instance
+import io.github.charlietap.chasm.embedding.compiled.Module
+import io.github.charlietap.chasm.embedding.compiled.PreparedFunction
+import io.github.charlietap.chasm.embedding.compiled.Store
+import io.github.charlietap.chasm.embedding.compiled.codegen.CodegenImport
+import io.github.charlietap.chasm.embedding.compiled.codegen.allocateImports
+import io.github.charlietap.chasm.embedding.compiled.instance
+import io.github.charlietap.chasm.embedding.compiled.invokeUnboxed
+import io.github.charlietap.chasm.embedding.compiled.prepareFunction
+import io.github.charlietap.chasm.embedding.compiled.runtimeType
+import io.github.charlietap.chasm.embedding.compiled.unsafeAllocateArray
+import io.github.charlietap.chasm.embedding.compiled.unsafeBorrowBytes
+import io.github.charlietap.chasm.embedding.compiled.unsafeBorrowChars
+import io.github.charlietap.chasm.embedding.shapes.`expect`
+import io.github.charlietap.chasm.host.UnsafeHostApi
+import io.github.charlietap.chasm.jit.module
+import io.github.charlietap.chasm.jit.store
+import io.github.charlietap.chasm.reference.ArrayReference
+import kotlin.Any
+import kotlin.Array
+import kotlin.ByteArray
+import kotlin.Int
+import kotlin.LongArray
+import kotlin.OptIn
+import kotlin.String
+import kotlin.collections.List
+
+public suspend fun jitGcStrings(
+  binary: ByteArray,
+  imports: List<CodegenImport> = emptyList(),
+  moduleFactory: (suspend (ByteArray) -> Module)? = null,
+  instanceFactory: (suspend (
+    Store,
+    Module,
+    List<Import>,
+  ) -> Instance)? = null,
+): JitGcStrings {
+  val store = store()
+  val module = moduleFactory?.invoke(binary) ?: module(binary, validate = true).`expect`("Failed to decode binary")
+  val allocatedImports = allocateImports(store, imports)
+  val instance = instanceFactory?.invoke(store, module, allocatedImports) ?: instance(store, module, allocatedImports).`expect`("Failed to instantiate module")
+  return JitGcStringsImpl(store = store, instance = instance)
+}
+
+private class JitGcStringsImpl(
+  private val store: Store,
+  private val instance: Instance,
+) : JitGcStrings {
+  private val echoUtf16PreparedFunction: PreparedFunction =
+      prepareFunction(store, instance, "echo_utf16").`expect`("Failed to prepare function echo_utf16")
+
+  private val echoUtf8PreparedFunction: PreparedFunction =
+      prepareFunction(store, instance, "echo_utf8").`expect`("Failed to prepare function echo_utf8")
+
+  private val utf16LengthPreparedFunction: PreparedFunction =
+      prepareFunction(store, instance, "utf16_length").`expect`("Failed to prepare function utf16_length")
+
+  private val nullableUtf16PreparedFunction: PreparedFunction =
+      prepareFunction(store, instance, "nullable_utf16").`expect`("Failed to prepare function nullable_utf16")
+
+  private val frozenPreparedFunction: PreparedFunction =
+      prepareFunction(store, instance, "frozen").`expect`("Failed to prepare function frozen")
+
+  private val echoUtf16Words: LongArray = LongArray(1)
+
+  private val echoUtf16References: Array<Any?> = arrayOfNulls<Any>(1)
+
+  private val echoUtf8Words: LongArray = LongArray(1)
+
+  private val echoUtf8References: Array<Any?> = arrayOfNulls<Any>(1)
+
+  private val utf16LengthWords: LongArray = LongArray(2)
+
+  private val utf16LengthReferences: Array<Any?> = arrayOfNulls<Any>(2)
+
+  private val nullableUtf16Words: LongArray = LongArray(1)
+
+  private val nullableUtf16References: Array<Any?> = arrayOfNulls<Any>(1)
+
+  private val frozenWords: LongArray = LongArray(1)
+
+  private val frozenReferences: Array<Any?> = arrayOfNulls<Any>(1)
+
+  private val arrayType0: HostGcType = runtimeType(instance, 0)
+
+  private val arrayType1: HostGcType = runtimeType(instance, 1)
+
+  private val arrayType2: HostGcType = runtimeType(instance, 2)
+
+  override fun echoUtf16(`value`: String): String {
+    echoUtf16References[0] = unsafeAllocateArray(store, arrayType0, value.toCharArray())
+    echoUtf16PreparedFunction.invokeUnboxed(echoUtf16Words, echoUtf16References).`expect`("Failed to invoke function echoUtf16")
+    val result = unsafeBorrowChars(echoUtf16References[0] as ArrayReference).concatToString()
+    echoUtf16References[0] = null
+    return result
+  }
+
+  override fun echoUtf8(`value`: String): String {
+    echoUtf8References[0] = unsafeAllocateArray(store, arrayType1, value.encodeToByteArray())
+    echoUtf8PreparedFunction.invokeUnboxed(echoUtf8Words, echoUtf8References).`expect`("Failed to invoke function echoUtf8")
+    val result = unsafeBorrowBytes(echoUtf8References[0] as ArrayReference).decodeToString()
+    echoUtf8References[0] = null
+    return result
+  }
+
+  override fun utf16Length(offset: Int, `value`: String): Int {
+    utf16LengthWords[0] = offset.toLong()
+    utf16LengthReferences[1] = unsafeAllocateArray(store, arrayType0, value.toCharArray())
+    utf16LengthPreparedFunction.invokeUnboxed(utf16LengthWords, utf16LengthReferences).`expect`("Failed to invoke function utf16Length")
+    val result = utf16LengthWords[0].toInt()
+    utf16LengthReferences[1] = null
+    return result
+  }
+
+  override fun nullableUtf16(`value`: String): Int {
+    nullableUtf16References[0] = unsafeAllocateArray(store, arrayType0, value.toCharArray())
+    nullableUtf16PreparedFunction.invokeUnboxed(nullableUtf16Words, nullableUtf16References).`expect`("Failed to invoke function nullableUtf16")
+    val result = nullableUtf16Words[0].toInt()
+    nullableUtf16References[0] = null
+    return result
+  }
+
+  override fun frozen(`value`: String): String {
+    frozenReferences[0] = unsafeAllocateArray(store, arrayType2, value.toCharArray())
+    frozenPreparedFunction.invokeUnboxed(frozenWords, frozenReferences).`expect`("Failed to invoke function frozen")
+    val result = unsafeBorrowChars(frozenReferences[0] as ArrayReference).concatToString()
+    frozenReferences[0] = null
+    return result
+  }
+}

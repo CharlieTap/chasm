@@ -8,7 +8,6 @@ import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.INT
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.LONG
-import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.STRING
 import com.squareup.kotlinpoet.TypeName
@@ -31,7 +30,8 @@ internal class ChasmClassImplementationGenerator {
             addModifiers(visibility.modifier())
             addSuperinterface(ClassName(packageName, interfaceName))
             addConstructor(api)
-            addRuntimeProperties(wasmInterface, api)
+            addPreparedFunctions(wasmInterface, api)
+            addProperties(api.functionCallConvention.properties(wasmInterface.functions))
             addBindings(packageName, interfaceName, wasmInterface, api)
 
             if (wasmInterface.initializers.isNotEmpty()) {
@@ -80,7 +80,7 @@ internal class ChasmClassImplementationGenerator {
         )
     }
 
-    private fun TypeSpec.Builder.addRuntimeProperties(
+    private fun TypeSpec.Builder.addPreparedFunctions(
         wasmInterface: WasmInterface,
         api: EmbeddingApi,
     ) {
@@ -97,33 +97,6 @@ internal class ChasmClassImplementationGenerator {
                         "Failed to prepare function ${proxy.name}",
                     ).build(),
             )
-        }
-
-        val inputCounts = wasmInterface.functions.map(Function::inputCount)
-            .filter { count -> count > 0 }
-            .distinct()
-            .sorted()
-        val executionValues = MUTABLE_LIST.parameterizedBy(api.executionValue)
-        inputCounts.maxOrNull()?.let { maximumInputCount ->
-            addProperty(
-                PropertySpec.builder(FUNCTION_INPUT_BUFFER_NAME, executionValues)
-                    .addModifiers(KModifier.PRIVATE)
-                    .initializer("MutableList<%T>(%L) { %T(0) }", api.executionValue, maximumInputCount, api.numberValue(Scalar.Integer))
-                    .build(),
-            )
-            inputCounts.forEach { inputCount ->
-                val initializer = if (inputCount == maximumInputCount) {
-                    CodeBlock.of("%L", FUNCTION_INPUT_BUFFER_NAME)
-                } else {
-                    CodeBlock.of("%L.subList(0, %L)", FUNCTION_INPUT_BUFFER_NAME, inputCount)
-                }
-                addProperty(
-                    PropertySpec.builder(functionInputBufferName(inputCount), executionValues)
-                        .addModifiers(KModifier.PRIVATE)
-                        .initializer(initializer)
-                        .build(),
-                )
-            }
         }
     }
 
@@ -238,7 +211,7 @@ internal class ChasmClassImplementationGenerator {
             function.params.forEach { param -> addParameter(param.name, param.type.asTypeName()) }
 
             val allocationsToFree = writeStringParameters(function, api)
-            writeArguments(function, api)
+            writeArguments(function, api.functionCallConvention)
             writeReturn(function, returnType, allocationsToFree, api)
         }.build()
     }
@@ -248,11 +221,14 @@ internal class ChasmClassImplementationGenerator {
         api: EmbeddingApi,
     ): List<String> {
         val allocationsToFree = mutableListOf<String>()
-        function.params.filter { param -> param.type == Scalar.String }.forEach { param ->
+        val linearMemoryStringParams = function.params.filter { param ->
+            param.stringEncoding is LinearMemoryString
+        }
+        linearMemoryStringParams.forEach { param ->
             val bytes = param.name + "Bytes"
             val allocation = param.name + "Alloc"
             addStatement("val %L = %L.encodeToByteArray()", bytes, param.name)
-            when (requireNotNull(param.stringEncodingStrategy)) {
+            when (requireNotNull(param.linearMemoryStrategy)) {
                 StringEncodingStrategy.POINTER_AND_LENGTH,
                 StringEncodingStrategy.PACKED_POINTER_AND_LENGTH,
                 -> {
@@ -286,6 +262,9 @@ internal class ChasmClassImplementationGenerator {
                         ),
                     )
                 }
+                StringEncodingStrategy.GC_UTF16_ARRAY,
+                StringEncodingStrategy.GC_UTF8_ARRAY,
+                -> error("GC array strings are not written to linear memory")
             }
             if (param.stringAllocationStrategy?.freeAfterCall == true) allocationsToFree.add(allocation)
         }
@@ -309,47 +288,35 @@ internal class ChasmClassImplementationGenerator {
 
     private fun FunSpec.Builder.writeArguments(
         function: Function,
-        api: EmbeddingApi,
+        callConvention: FunctionCallConvention,
     ) {
-        if (function.params.isEmpty()) {
-            addStatement("val args = emptyList<%T>()", api.executionValue)
-            return
-        }
-
-        val i32 = api.numberValue(Scalar.Integer)
         var inputIndex = 0
         function.params.forEach { param ->
-            if (param.type == Scalar.String) {
-                val bytes = param.name + "Bytes"
-                val allocation = param.name + "Alloc"
-                when (requireNotNull(param.stringEncodingStrategy)) {
-                    StringEncodingStrategy.POINTER_AND_LENGTH -> {
-                        setArgument(inputIndex++, i32, allocation)
-                        setArgument(inputIndex++, i32, "$bytes.size")
-                    }
-                    StringEncodingStrategy.NULL_TERMINATED,
-                    StringEncodingStrategy.LENGTH_PREFIXED,
-                    -> setArgument(inputIndex++, i32, allocation)
-                    StringEncodingStrategy.PACKED_POINTER_AND_LENGTH -> {
-                        addStatement(
-                            "%L[%L] = %T((%L.toLong() shl 32) or (%L.size.toLong() and 0xFFFFFFFFL))",
-                            FUNCTION_INPUT_BUFFER_NAME,
-                            inputIndex++,
-                            api.numberValue(Scalar.Long),
-                            allocation,
-                            bytes,
-                        )
+            when (val encoding = param.stringEncoding) {
+                is LinearMemoryString -> {
+                    val bytes = param.name + "Bytes"
+                    val allocation = param.name + "Alloc"
+                    when (encoding.strategy) {
+                        StringEncodingStrategy.POINTER_AND_LENGTH -> {
+                            addCode(callConvention.argumentAssignment(function, inputIndex++, Scalar.Integer, CodeBlock.of("%L", allocation)))
+                            addCode(callConvention.argumentAssignment(function, inputIndex++, Scalar.Integer, CodeBlock.of("%L.size", bytes)))
+                        }
+                        StringEncodingStrategy.NULL_TERMINATED,
+                        StringEncodingStrategy.LENGTH_PREFIXED,
+                        -> addCode(callConvention.argumentAssignment(function, inputIndex++, Scalar.Integer, CodeBlock.of("%L", allocation)))
+                        StringEncodingStrategy.PACKED_POINTER_AND_LENGTH -> {
+                            val packed = CodeBlock.of("(%L.toLong() shl 32) or (%L.size.toLong() and 0xFFFFFFFFL)", allocation, bytes)
+                            addCode(callConvention.argumentAssignment(function, inputIndex++, Scalar.Long, packed))
+                        }
+                        StringEncodingStrategy.GC_UTF16_ARRAY,
+                        StringEncodingStrategy.GC_UTF8_ARRAY,
+                        -> error("GC array strings are not written to linear memory")
                     }
                 }
-            } else {
-                setArgument(inputIndex++, api.numberValue(param.type), param.name)
+                is GcArrayString -> addCode(callConvention.stringArrayArgumentAssignment(function, inputIndex++, param.name, encoding))
+                null -> addCode(callConvention.argumentAssignment(function, inputIndex++, param.type, CodeBlock.of("%L", param.name)))
             }
         }
-        addStatement("val args = %L", functionInputBufferName(function.inputCount))
-    }
-
-    private fun FunSpec.Builder.setArgument(index: Int, type: ClassName, value: String) {
-        addStatement("%L[%L] = %T(%L)", FUNCTION_INPUT_BUFFER_NAME, index, type, value)
     }
 
     private fun FunSpec.Builder.writeReturn(
@@ -358,28 +325,22 @@ internal class ChasmClassImplementationGenerator {
         allocationsToFree: List<String>,
         api: EmbeddingApi,
     ) {
-        addStatement(
-            "val values = %L.%M(%S)",
-            api.preparedFunctionCall(preparedFunctionPropertyName(function), "args"),
-            CHASM_EXPECT,
-            "Failed to invoke function ${function.name}",
-        )
+
+        val callConvention = api.functionCallConvention
+
+        addCode(callConvention.invocation(function))
+
         when (val type = function.returns.type) {
             Scalar.Integer,
             Scalar.Long,
             Scalar.Float,
             Scalar.Double,
-            -> {
-                addStatement("val result = (values.first() as %T).value", api.numberValue(type))
-                free(allocationsToFree)
-                addStatement("return result")
-            }
-            Scalar.Unit -> free(allocationsToFree)
-            Scalar.String -> {
-                writeStringReturn(function, api)
-                free(allocationsToFree)
-                addStatement("return result")
-            }
+            is StructViewType,
+            is ArrayReferenceType,
+            is AnyReferenceType,
+            -> addStatement("val result = %L", callConvention.singleResult(function, type))
+            Scalar.Unit -> Unit
+            Scalar.String -> writeStringReturn(function, api)
             is Aggregate -> {
                 addCode(
                     CodeBlock.builder()
@@ -387,15 +348,20 @@ internal class ChasmClassImplementationGenerator {
                         .indent()
                         .apply {
                             type.generated.fields.forEachIndexed { index, field ->
-                                add("r%L = (values[%L] as %T).value,\n", index, index, api.numberValue(field.type))
+                                add("r%L = %L,\n", index, callConvention.result(function, index, field.type))
                             }
                         }.unindent()
                         .add(")\n")
                         .build(),
                 )
-                free(allocationsToFree)
-                addStatement("return result")
             }
+        }
+
+        addCode(callConvention.referenceRelease(function))
+        free(allocationsToFree)
+
+        if (function.returns.type != Scalar.Unit) {
+            addStatement("return result")
         }
     }
 
@@ -404,27 +370,28 @@ internal class ChasmClassImplementationGenerator {
         api: EmbeddingApi,
     ) {
 
-        val i32 = api.numberValue(Scalar.Integer)
+        val callConvention = api.functionCallConvention
+        val pointerResult = callConvention.result(function, 0, Scalar.Integer)
         val failure = "Failed to read string result for ${function.name}"
 
-        when (requireNotNull(function.returns.stringEncodingStrategy)) {
+        when (val encoding = requireNotNull(function.returns.stringEncodingStrategy)) {
             StringEncodingStrategy.POINTER_AND_LENGTH -> {
-                addStatement("val pointer = (values[0] as %T).value", i32)
-                addStatement("val length = (values[1] as %T).value", i32)
+                addStatement("val pointer = %L", pointerResult)
+                addStatement("val length = %L", callConvention.result(function, 1, Scalar.Integer))
                 addStatement(
                     "val result = %L",
                     api.accessorCall(api.readUtf8String, CodeBlock.of("%L, pointer, length", DEFAULT_MEMORY_BACKING_NAME), failure),
                 )
             }
             StringEncodingStrategy.NULL_TERMINATED -> {
-                addStatement("val pointer = (values[0] as %T).value", i32)
+                addStatement("val pointer = %L", pointerResult)
                 addStatement(
                     "val result = %L",
                     api.accessorCall(api.readNullTerminatedUtf8String, CodeBlock.of("%L, pointer", DEFAULT_MEMORY_BACKING_NAME), failure),
                 )
             }
             StringEncodingStrategy.LENGTH_PREFIXED -> {
-                addStatement("val pointer = (values[0] as %T).value", i32)
+                addStatement("val pointer = %L", pointerResult)
                 addStatement(
                     "val length = %L",
                     api.accessorCall(api.readInt, CodeBlock.of("%L, pointer", DEFAULT_MEMORY_BACKING_NAME), "Failed to read string length"),
@@ -435,7 +402,7 @@ internal class ChasmClassImplementationGenerator {
                 )
             }
             StringEncodingStrategy.PACKED_POINTER_AND_LENGTH -> {
-                addStatement("val packed = (values[0] as %T).value", api.numberValue(Scalar.Long))
+                addStatement("val packed = %L", callConvention.result(function, 0, Scalar.Long))
                 addStatement("val pointer = (packed ushr 32).toInt()")
                 addStatement("val length = packed.toInt()")
                 addStatement(
@@ -443,6 +410,9 @@ internal class ChasmClassImplementationGenerator {
                     api.accessorCall(api.readUtf8String, CodeBlock.of("%L, pointer, length", DEFAULT_MEMORY_BACKING_NAME), failure),
                 )
             }
+            StringEncodingStrategy.GC_UTF16_ARRAY,
+            StringEncodingStrategy.GC_UTF8_ARRAY,
+            -> addStatement("val result = %L", callConvention.stringArrayResult(function, encoding))
         }
     }
 
@@ -515,6 +485,10 @@ internal class ChasmClassImplementationGenerator {
         Scalar.String -> STRING
         Scalar.Unit -> UNIT
         is Aggregate -> ClassName(packageName, type.generated.name)
+        is StructViewType,
+        is ArrayReferenceType,
+        is AnyReferenceType,
+        -> type.asTypeName()
         else -> error("Unsupported return type: $type")
     }
 
@@ -524,5 +498,3 @@ internal class ChasmClassImplementationGenerator {
         ImplementationVisibility.PRIVATE -> KModifier.PRIVATE
     }
 }
-
-private val MUTABLE_LIST = ClassName("kotlin.collections", "MutableList")

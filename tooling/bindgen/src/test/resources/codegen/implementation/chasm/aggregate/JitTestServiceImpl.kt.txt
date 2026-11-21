@@ -10,13 +10,11 @@ import io.github.charlietap.chasm.embedding.compiled.Memory
 import io.github.charlietap.chasm.embedding.compiled.Module
 import io.github.charlietap.chasm.embedding.compiled.PreparedFunction
 import io.github.charlietap.chasm.embedding.compiled.Store
-import io.github.charlietap.chasm.embedding.compiled.`value`.ExecutionValue
-import io.github.charlietap.chasm.embedding.compiled.`value`.NumberValue
 import io.github.charlietap.chasm.embedding.compiled.codegen.CodegenImport
 import io.github.charlietap.chasm.embedding.compiled.codegen.allocateImports
 import io.github.charlietap.chasm.embedding.compiled.exports
 import io.github.charlietap.chasm.embedding.compiled.instance
-import io.github.charlietap.chasm.embedding.compiled.invoke
+import io.github.charlietap.chasm.embedding.compiled.invokeUnboxed
 import io.github.charlietap.chasm.embedding.compiled.prepareFunction
 import io.github.charlietap.chasm.embedding.compiled.readBytes
 import io.github.charlietap.chasm.embedding.compiled.readGlobal
@@ -28,15 +26,17 @@ import io.github.charlietap.chasm.embedding.compiled.writeGlobal
 import io.github.charlietap.chasm.embedding.shapes.`expect`
 import io.github.charlietap.chasm.jit.module
 import io.github.charlietap.chasm.jit.store
+import kotlin.Any
+import kotlin.Array
 import kotlin.ByteArray
 import kotlin.Double
 import kotlin.Float
 import kotlin.Int
 import kotlin.Long
+import kotlin.LongArray
 import kotlin.OptIn
 import kotlin.String
 import kotlin.collections.List
-import kotlin.collections.MutableList
 
 public suspend fun jitTestService(
   binary: ByteArray,
@@ -92,10 +92,29 @@ private class JitTestServiceImpl(
   private val multipleReturnFunctionPreparedFunction: PreparedFunction =
       prepareFunction(store, instance, "multiple_return_function").`expect`("Failed to prepare function multiple_return_function")
 
-  private val functionInputBuffer: MutableList<ExecutionValue> =
-      MutableList<ExecutionValue>(2) { NumberValue.I32(0) }
+  private val intFunctionWords: LongArray = LongArray(1)
 
-  private val functionInputBuffer2: MutableList<ExecutionValue> = functionInputBuffer
+  private val longFunctionWords: LongArray = LongArray(1)
+
+  private val floatFunctionWords: LongArray = LongArray(1)
+
+  private val doubleFunctionWords: LongArray = LongArray(1)
+
+  private val palStringFunctionWords: LongArray = LongArray(2)
+
+  private val lengthPrefixedStringFunctionWords: LongArray = LongArray(1)
+
+  private val nullTerminatedStringFunctionWords: LongArray = LongArray(1)
+
+  private val packedI64StringFunctionWords: LongArray = LongArray(1)
+
+  private val multipleParamFunctionWords: LongArray = LongArray(2)
+
+  private val multipleReturnFunctionWords: LongArray = LongArray(2)
+
+  private val noWords: LongArray = LongArray(0)
+
+  private val noReferences: Array<Any?> = arrayOfNulls<Any>(0)
 
   private val _memory: Memory =
       exports(instance).memory("memory") ?: error("Failed to find memory export with name memory")
@@ -118,63 +137,55 @@ private class JitTestServiceImpl(
   override val memory: JitTestService.Memory = MemoryImpl(_memory)
 
   override fun intFunction(): Int {
-    val args = emptyList<ExecutionValue>()
-    val values = intFunctionPreparedFunction.invoke(args).`expect`("Failed to invoke function intFunction")
-    val result = (values.first() as NumberValue.I32).value
+    intFunctionPreparedFunction.invokeUnboxed(intFunctionWords, noReferences).`expect`("Failed to invoke function intFunction")
+    val result = intFunctionWords[0].toInt()
     return result
   }
 
   override fun longFunction(): Long {
-    val args = emptyList<ExecutionValue>()
-    val values = longFunctionPreparedFunction.invoke(args).`expect`("Failed to invoke function longFunction")
-    val result = (values.first() as NumberValue.I64).value
+    longFunctionPreparedFunction.invokeUnboxed(longFunctionWords, noReferences).`expect`("Failed to invoke function longFunction")
+    val result = longFunctionWords[0]
     return result
   }
 
   override fun floatFunction(): Float {
-    val args = emptyList<ExecutionValue>()
-    val values = floatFunctionPreparedFunction.invoke(args).`expect`("Failed to invoke function floatFunction")
-    val result = (values.first() as NumberValue.F32).value
+    floatFunctionPreparedFunction.invokeUnboxed(floatFunctionWords, noReferences).`expect`("Failed to invoke function floatFunction")
+    val result = Float.fromBits(floatFunctionWords[0].toInt())
     return result
   }
 
   override fun doubleFunction(): Double {
-    val args = emptyList<ExecutionValue>()
-    val values = doubleFunctionPreparedFunction.invoke(args).`expect`("Failed to invoke function doubleFunction")
-    val result = (values.first() as NumberValue.F64).value
+    doubleFunctionPreparedFunction.invokeUnboxed(doubleFunctionWords, noReferences).`expect`("Failed to invoke function doubleFunction")
+    val result = Double.fromBits(doubleFunctionWords[0])
     return result
   }
 
   override fun palStringFunction(): String {
-    val args = emptyList<ExecutionValue>()
-    val values = palStringFunctionPreparedFunction.invoke(args).`expect`("Failed to invoke function palStringFunction")
-    val pointer = (values[0] as NumberValue.I32).value
-    val length = (values[1] as NumberValue.I32).value
+    palStringFunctionPreparedFunction.invokeUnboxed(palStringFunctionWords, noReferences).`expect`("Failed to invoke function palStringFunction")
+    val pointer = palStringFunctionWords[0].toInt()
+    val length = palStringFunctionWords[1].toInt()
     val result = readUtf8String(_memory, pointer, length)
     return result
   }
 
   override fun lengthPrefixedStringFunction(): String {
-    val args = emptyList<ExecutionValue>()
-    val values = lengthPrefixedStringFunctionPreparedFunction.invoke(args).`expect`("Failed to invoke function lengthPrefixedStringFunction")
-    val pointer = (values[0] as NumberValue.I32).value
+    lengthPrefixedStringFunctionPreparedFunction.invokeUnboxed(lengthPrefixedStringFunctionWords, noReferences).`expect`("Failed to invoke function lengthPrefixedStringFunction")
+    val pointer = lengthPrefixedStringFunctionWords[0].toInt()
     val length = readInt(_memory, pointer)
     val result = readUtf8String(_memory, pointer + 4, length)
     return result
   }
 
   override fun nullTerminatedStringFunction(): String {
-    val args = emptyList<ExecutionValue>()
-    val values = nullTerminatedStringFunctionPreparedFunction.invoke(args).`expect`("Failed to invoke function nullTerminatedStringFunction")
-    val pointer = (values[0] as NumberValue.I32).value
+    nullTerminatedStringFunctionPreparedFunction.invokeUnboxed(nullTerminatedStringFunctionWords, noReferences).`expect`("Failed to invoke function nullTerminatedStringFunction")
+    val pointer = nullTerminatedStringFunctionWords[0].toInt()
     val result = readNullTerminatedUtf8String(_memory, pointer)
     return result
   }
 
   override fun packedI64StringFunction(): String {
-    val args = emptyList<ExecutionValue>()
-    val values = packedI64StringFunctionPreparedFunction.invoke(args).`expect`("Failed to invoke function packedI64StringFunction")
-    val packed = (values[0] as NumberValue.I64).value
+    packedI64StringFunctionPreparedFunction.invokeUnboxed(packedI64StringFunctionWords, noReferences).`expect`("Failed to invoke function packedI64StringFunction")
+    val packed = packedI64StringFunctionWords[0]
     val pointer = (packed ushr 32).toInt()
     val length = packed.toInt()
     val result = readUtf8String(_memory, pointer, length)
@@ -182,25 +193,22 @@ private class JitTestServiceImpl(
   }
 
   override fun unitFunction() {
-    val args = emptyList<ExecutionValue>()
-    val values = unitFunctionPreparedFunction.invoke(args).`expect`("Failed to invoke function unitFunction")
+    unitFunctionPreparedFunction.invokeUnboxed(noWords, noReferences).`expect`("Failed to invoke function unitFunction")
   }
 
   override fun multipleParamFunction(p0: Int, p1: Double): Double {
-    functionInputBuffer[0] = NumberValue.I32(p0)
-    functionInputBuffer[1] = NumberValue.F64(p1)
-    val args = functionInputBuffer2
-    val values = multipleParamFunctionPreparedFunction.invoke(args).`expect`("Failed to invoke function multipleParamFunction")
-    val result = (values.first() as NumberValue.F64).value
+    multipleParamFunctionWords[0] = p0.toLong()
+    multipleParamFunctionWords[1] = p1.toRawBits()
+    multipleParamFunctionPreparedFunction.invokeUnboxed(multipleParamFunctionWords, noReferences).`expect`("Failed to invoke function multipleParamFunction")
+    val result = Double.fromBits(multipleParamFunctionWords[0])
     return result
   }
 
   override fun multipleReturnFunction(): MultipleReturnFunctionResult {
-    val args = emptyList<ExecutionValue>()
-    val values = multipleReturnFunctionPreparedFunction.invoke(args).`expect`("Failed to invoke function multipleReturnFunction")
+    multipleReturnFunctionPreparedFunction.invokeUnboxed(multipleReturnFunctionWords, noReferences).`expect`("Failed to invoke function multipleReturnFunction")
     val result = MultipleReturnFunctionResult(
-      r0 = (values[0] as NumberValue.I32).value,
-      r1 = (values[1] as NumberValue.I64).value,
+      r0 = multipleReturnFunctionWords[0].toInt(),
+      r1 = multipleReturnFunctionWords[1],
     )
     return result
   }

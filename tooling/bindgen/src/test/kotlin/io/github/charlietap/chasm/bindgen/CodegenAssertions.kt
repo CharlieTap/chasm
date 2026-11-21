@@ -1,6 +1,8 @@
 package io.github.charlietap.chasm.bindgen
 
 import com.goncalossilva.resources.Resource
+import io.github.charlietap.chasm.bindgen.fixture.NeverLogger
+import io.github.charlietap.chasm.embedding.shapes.expect
 import kotlin.test.assertEquals
 
 internal fun assertGenerates(
@@ -47,6 +49,31 @@ internal fun assertGenerates(
             actual = files.getValue(wasmInterface.interfaceName + "Impl").toString(),
         )
     }
+}
+
+internal fun assertModuleGenerates(
+    category: String,
+    module: String,
+    options: BindingOptions,
+    logger: BindgenLogger = NeverLogger,
+) {
+
+    val info = moduleInfo(moduleBytes(module)).expect("$module should decode")
+    val files = BindingGenerator(logger).generate(info, options).associateBy { file -> file.name }
+
+    assertGolden(
+        path = "codegen/interface/$category/${options.interfaceName}.kt.txt",
+        actual = files.getValue(options.interfaceName).toString(),
+    )
+    assertGolden(
+        path = "codegen/implementation/${options.config.runtime.goldenDirectory}/$category/${options.interfaceName}Impl.kt.txt",
+        actual = files.getValue(options.interfaceName + "Impl").toString(),
+    )
+}
+
+internal fun moduleBytes(module: String): ByteArray {
+    return checkNotNull(BindingGenerator::class.java.getResourceAsStream("/modules/$module.wasm")) { "missing module $module" }
+        .use { stream -> stream.readBytes() }
 }
 
 private val CodegenRuntime.goldenDirectory: String

@@ -31,6 +31,10 @@ internal class FunctionGenerator {
             Scalar.String -> STRING
             Scalar.Unit -> UNIT
             is Aggregate -> ClassName(packageName, type.generated.name)
+            is StructViewType,
+            is ArrayReferenceType,
+            is AnyReferenceType,
+            -> type.asTypeName()
             else -> throw IllegalArgumentException("Unsupported return type: $type")
         }
         returns(type)
@@ -96,6 +100,7 @@ internal class ClassInterfaceGenerator(
     private val propertyGenerator: PropertyGenerator = PropertyGenerator(),
     private val memoryInterfaceGenerator: MemoryInterfaceGenerator = MemoryInterfaceGenerator(),
     private val memoryPropertyGenerator: MemoryPropertyGenerator = MemoryPropertyGenerator(),
+    private val structViewGenerator: StructViewGenerator = StructViewGenerator(),
 ) {
     operator fun invoke(
         packageName: String,
@@ -114,6 +119,10 @@ internal class ClassInterfaceGenerator(
         val exposedMemories = wasmInterface.memories.filter { it.exposed }
         if (exposedMemories.isNotEmpty()) {
             addType(memoryInterfaceGenerator())
+        }
+
+        wasmInterface.structViews.forEach { view ->
+            addType(structViewGenerator(view))
         }
 
         wasmInterface.functions.forEach { function ->

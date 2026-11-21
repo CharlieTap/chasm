@@ -11,6 +11,7 @@ import io.github.charlietap.chasm.bindgen.FunctionProxy
 import io.github.charlietap.chasm.bindgen.FunctionReturn
 import io.github.charlietap.chasm.bindgen.GeneratedType
 import io.github.charlietap.chasm.bindgen.GlobalProxy
+import io.github.charlietap.chasm.bindgen.LinearMemoryString
 import io.github.charlietap.chasm.bindgen.MemoryBinding
 import io.github.charlietap.chasm.bindgen.Property
 import io.github.charlietap.chasm.bindgen.PropertyImplementation
@@ -68,7 +69,7 @@ internal fun functionParameter(
     name = name,
     type = type,
     stringAllocationStrategy = stringAllocationStrategy,
-    stringEncodingStrategy = stringEncodingStrategy,
+    stringEncoding = stringEncodingStrategy?.let(::LinearMemoryString),
 )
 
 internal fun functionReturn(
