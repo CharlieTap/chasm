@@ -8,6 +8,9 @@ import io.github.charlietap.chasm.compiler.backend.abi.MANAGED_ARRAY
 import io.github.charlietap.chasm.compiler.backend.abi.MANAGED_FUNCTION
 import io.github.charlietap.chasm.compiler.backend.abi.MANAGED_STRUCT
 import io.github.charlietap.chasm.compiler.backend.abi.OBJECT_TYPE
+import io.github.charlietap.chasm.compiler.backend.abi.REFERENCE_OWNER
+import io.github.charlietap.chasm.compiler.backend.abi.SHAPE_OWNER_CLASS
+import io.github.charlietap.chasm.compiler.backend.abi.SHAPE_OWNER_ENGINE
 import io.github.charlietap.chasm.compiler.backend.dex.decodeModule
 import io.github.charlietap.chasm.compiler.backend.dex.fixture
 import io.github.charlietap.dexter.Dexter
@@ -84,7 +87,10 @@ class GcLayoutsTest {
         ShapeWriter().write(file, layouts)
         val classes = DexBackedDexFile(Opcodes.forApi(MIN_API), file.finish()).classes.associateBy { classDef -> classDef.type }
 
-        assertEquals(layouts.structs.size + layouts.arrays.size, classes.size)
+        assertEquals(layouts.structs.size + layouts.arrays.size + 1, classes.size)
+        assertEquals(listOf(SHAPE_OWNER_ENGINE), classes.getValue(SHAPE_OWNER_CLASS).staticFields.map { field -> field.name })
+        assertTrue(classes.getValue(layouts.struct(SHAPE).className).virtualMethods.any { method -> method.name == REFERENCE_OWNER })
+        assertTrue(classes.getValue(layouts.struct(CIRCLE).className).virtualMethods.none { method -> method.name == REFERENCE_OWNER })
         assertEquals(MANAGED_STRUCT, classes.getValue(layouts.struct(SHAPE).className).superclass)
         assertEquals(layouts.struct(SHAPE).className, classes.getValue(layouts.struct(CIRCLE).className).superclass)
         assertEquals(listOf("f1"), classes.getValue(layouts.struct(CIRCLE).className).instanceFields.map { field -> field.name })

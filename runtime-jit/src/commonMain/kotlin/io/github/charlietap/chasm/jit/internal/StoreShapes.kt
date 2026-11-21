@@ -1,16 +1,14 @@
 package io.github.charlietap.chasm.jit.internal
 
 import dalvik.system.InMemoryDexClassLoader
-import io.github.charlietap.chasm.runtime.compiled.gc.ManagedStore
-import io.github.charlietap.chasm.runtime.compiled.gc.ShapeOwners
-import io.github.charlietap.chasm.runtime.store.Store
+import io.github.charlietap.chasm.compiler.backend.abi.SHAPE_OWNER_CLASS
+import io.github.charlietap.chasm.compiler.backend.abi.SHAPE_OWNER_ENGINE
 import java.lang.ref.WeakReference
 import java.nio.ByteBuffer
-import java.util.WeakHashMap
 
 internal class StoreShapes(
     root: ClassLoader,
-    private val managedStore: WeakReference<ManagedStore>,
+    private val owner: Any,
 ) {
 
     private val defined = HashSet<String>()
@@ -33,7 +31,7 @@ internal class StoreShapes(
         }
 
         val loader = InMemoryDexClassLoader((listOf(shapes) + code).map(ByteBuffer::wrap).toTypedArray(), newest)
-        ShapeOwners.register(loader, checkNotNull(managedStore.get()))
+        loader.loadClass(SHAPE_OWNER_NAME).getField(SHAPE_OWNER_ENGINE).set(null, WeakReference(owner))
         newest = loader
         defined.addAll(classNames)
 
@@ -44,16 +42,7 @@ internal class StoreShapes(
         return newest.loadClass(name)
     }
 
-    companion object {
-
-        private val stores = WeakHashMap<Store, StoreShapes>()
-
-        @Synchronized
-        fun of(
-            store: Store,
-            root: ClassLoader,
-        ): StoreShapes {
-            return stores.getOrPut(store) { StoreShapes(root, WeakReference(managedStore(store))) }
-        }
+    private companion object {
+        val SHAPE_OWNER_NAME = SHAPE_OWNER_CLASS.removePrefix("L").removeSuffix(";").replace('/', '.')
     }
 }

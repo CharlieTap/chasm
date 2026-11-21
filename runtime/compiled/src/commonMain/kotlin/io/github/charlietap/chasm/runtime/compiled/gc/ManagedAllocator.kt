@@ -12,7 +12,7 @@ class ManagedAllocator(
 
         chargeAllocation(store, layout.bytes)
 
-        return layout.constructor.newInstance() as ManagedStruct
+        return layout.accessor.newStruct()
     }
 
     fun newStorage(
@@ -22,7 +22,7 @@ class ManagedAllocator(
 
         chargeStorage(layout, length)
 
-        return ReflectArray.newInstance(layout.storage.componentType, length)
+        return layout.accessor.newStorage(length)
     }
 
     fun adoptStorage(
@@ -36,7 +36,7 @@ class ManagedAllocator(
         layout: ArrayLayout,
         storage: Any,
     ): ManagedArray {
-        return layout.constructor.newInstance(storage) as ManagedArray
+        return layout.accessor.newArray(storage)
     }
 
     private fun chargeStorage(

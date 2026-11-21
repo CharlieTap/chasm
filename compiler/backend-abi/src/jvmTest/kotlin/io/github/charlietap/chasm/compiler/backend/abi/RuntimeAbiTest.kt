@@ -18,9 +18,9 @@ class RuntimeAbiTest {
     }
 
     @Test
-    fun `only global, memory, unsafe and byte buffer accessors are instance methods`() {
+    fun `only global, memory, unsafe, byte buffer and weak reference accessors are instance methods`() {
         methods().forEach { method ->
-            val expectedStatic = method.owner !in setOf(GLOBAL_INSTANCE, MEMORY_INSTANCE, UNSAFE_TYPE, BYTE_BUFFER_TYPE)
+            val expectedStatic = method.owner !in setOf(GLOBAL_INSTANCE, MEMORY_INSTANCE, UNSAFE_TYPE, BYTE_BUFFER_TYPE, WEAK_REFERENCE_TYPE)
             val actualStatic = Modifier.isStatic(resolve(method).modifiers)
             assertEquals(expectedStatic, actualStatic, method.toString())
         }

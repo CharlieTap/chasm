@@ -33,6 +33,8 @@ internal class JitInstantiator(
     private val handles: JitHandles,
 ) {
 
+    private val shapes = StoreShapes(CodeInstallation::class.java.classLoader!!, managedStore.engine)
+
     suspend fun instantiate(
         module: Module,
         imports: List<Import>,
@@ -40,7 +42,6 @@ internal class JitInstantiator(
     ): ChasmResult<Instance, InstantiationError<ExceptionReference>> {
 
         val storeConfig = store.store.config
-        val shapes = StoreShapes.of(store.store, CodeInstallation::class.java.classLoader!!)
         val compilation = when (val compiled = compile(module, CompileConfig(storeConfig.meterFuel, storeConfig.interruptible, config.debugInfo, shapes))) {
             is CompileResult.Success -> compiled.compilation
             is CompileResult.Error -> return ChasmResult.Error(ExecutionError.Unsupported(compiled.error.message()))

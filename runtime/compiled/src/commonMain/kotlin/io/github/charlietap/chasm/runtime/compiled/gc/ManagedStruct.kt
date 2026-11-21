@@ -5,9 +5,4 @@ import io.github.charlietap.chasm.reference.StructReference
 
 abstract class ManagedStruct :
     StructReference(),
-    ReferenceOwner {
-
-    override fun owner(): Any {
-        return ShapeOwners.owner(javaClass)
-    }
-}
+    ReferenceOwner

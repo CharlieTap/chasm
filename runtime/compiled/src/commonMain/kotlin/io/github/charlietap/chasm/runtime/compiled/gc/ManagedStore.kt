@@ -21,6 +21,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 class ManagedStore(
     private val store: Store,
+    accessors: ShapeAccessors,
 ) : ReferenceStorage, ShapeRegistry {
 
     private val globals = IdentityHashMap<GlobalInstance, ReferenceGlobal>()
@@ -36,7 +37,7 @@ class ManagedStore(
 
     val checks = StoreReferenceChecks(this, functions, store)
 
-    val layouts = ReflectedShapeLayouts(this, store.heap, checks)
+    val layouts = ReflectedShapeLayouts(this, store.heap, checks, accessors)
 
     val allocator = ManagedAllocator(store)
 

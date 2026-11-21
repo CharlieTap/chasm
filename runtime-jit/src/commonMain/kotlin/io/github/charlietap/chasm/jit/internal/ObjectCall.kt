@@ -151,6 +151,6 @@ internal class ObjectCall(
 
 internal fun managedStore(store: RuntimeStore): ManagedStore {
     synchronized(store) {
-        return store.referenceStorage as? ManagedStore ?: ManagedStore(store).also { managedStore -> store.referenceStorage = managedStore }
+        return store.referenceStorage as? ManagedStore ?: ManagedStore(store, GeneratedShapeAccessors()).also { managedStore -> store.referenceStorage = managedStore }
     }
 }

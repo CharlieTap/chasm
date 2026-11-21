@@ -10,7 +10,6 @@
 -keep class io.github.charlietap.chasm.runtime.compiled.gc.ManagedOps { public static *; }
 -keep class io.github.charlietap.chasm.runtime.compiled.gc.ManagedArrays { public static *; }
 -keep class io.github.charlietap.chasm.runtime.compiled.gc.ManagedTables { public static *; }
--keep class io.github.charlietap.chasm.runtime.compiled.gc.ManagedValues { public static *; }
 -keep interface io.github.charlietap.chasm.reference.GcReference
 -keep interface io.github.charlietap.chasm.reference.EqReference
 -keep class io.github.charlietap.chasm.reference.StructReference { <init>(...); }
@@ -18,8 +17,12 @@
 -keep class io.github.charlietap.chasm.reference.FunctionReference { <init>(...); }
 -keep class io.github.charlietap.chasm.reference.ExceptionReference { <init>(...); }
 -keep class io.github.charlietap.chasm.reference.I31Reference { <init>(...); public <fields>; }
--keep class io.github.charlietap.chasm.runtime.compiled.gc.ManagedStruct { <init>(...); }
--keep class io.github.charlietap.chasm.runtime.compiled.gc.ManagedArray { <init>(...); public java.lang.Object storage(); public int length(); }
+-keep interface io.github.charlietap.chasm.reference.ReferenceOwner { *; }
+-keep class io.github.charlietap.chasm.runtime.compiled.gc.ManagedStruct { <init>(...); public abstract *; }
+-keep class io.github.charlietap.chasm.runtime.compiled.gc.ManagedArray { <init>(...); public abstract *; }
+-keep class io.github.charlietap.chasm.runtime.compiled.gc.ManagedFields { public static *; }
+-keep interface io.github.charlietap.chasm.runtime.compiled.gc.StructAccessor { *; }
+-keep interface io.github.charlietap.chasm.runtime.compiled.gc.ArrayAccessor { *; }
 -keep class io.github.charlietap.chasm.runtime.compiled.gc.ManagedFunction { public <fields>; }
 -keep class io.github.charlietap.chasm.runtime.compiled.gc.WasmException { public <fields>; }
 -keep class io.github.charlietap.chasm.runtime.compiled.gc.ReferenceGlobal { public <fields>; }

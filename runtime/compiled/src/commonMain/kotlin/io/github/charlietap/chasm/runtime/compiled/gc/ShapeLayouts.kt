@@ -8,7 +8,6 @@ import io.github.charlietap.chasm.type.Mutability
 import io.github.charlietap.chasm.type.ReferenceType
 import io.github.charlietap.chasm.type.StorageType
 import io.github.charlietap.chasm.type.ValueType
-import java.lang.reflect.Constructor
 import java.lang.reflect.Field
 import java.util.concurrent.ConcurrentHashMap
 
@@ -25,16 +24,15 @@ interface ShapeLayouts {
 
 class StructLayout(
     val type: HostGcType,
-    val constructor: Constructor<*>,
+    val accessor: StructAccessor,
     val bytes: Int,
-    val fields: Array<Field>,
     val mutable: BooleanArray,
     val checks: Array<ReferenceCheck?>,
 )
 
 class ArrayLayout(
     val type: HostGcType,
-    val constructor: Constructor<*>,
+    val accessor: ArrayAccessor,
     val storage: Class<*>,
     val shift: Int,
     val mutable: Boolean,
@@ -45,6 +43,7 @@ class ReflectedShapeLayouts(
     private val registry: ShapeRegistry,
     private val heap: WasmHeap,
     private val checks: ReferenceChecks,
+    private val accessors: ShapeAccessors,
 ) : ShapeLayouts {
 
     private val structs = ConcurrentHashMap<Class<*>, StructLayout>()
@@ -121,9 +120,8 @@ class ReflectedShapeLayouts(
 
         return StructLayout(
             type = type,
-            constructor = shape.getDeclaredConstructor(),
+            accessor = accessors.struct(shape, fields.asList()),
             bytes = (bytes + ALIGNMENT - 1) and (ALIGNMENT - 1).inv(),
-            fields = fields,
             mutable = BooleanArray(count) { index -> fieldTypes[index].mutability == Mutability.Var },
             checks = Array(count) { index -> check(fieldTypes[index], owner) },
         )
@@ -135,11 +133,12 @@ class ReflectedShapeLayouts(
     ): ArrayLayout {
 
         val elementType = heap.runtimeArrayFieldType(type)
-        val storage = declaredField(shape, "data").type
+        val data = declaredField(shape, "data")
+        val storage = data.type
 
         return ArrayLayout(
             type = type,
-            constructor = shape.getDeclaredConstructor(storage),
+            accessor = accessors.array(shape, data),
             storage = storage,
             shift = fieldShift(storage.componentType),
             mutable = elementType.mutability == Mutability.Var,
@@ -162,14 +161,9 @@ class ReflectedShapeLayouts(
         shape: Class<*>,
         name: String,
     ): Field {
-
-        val field = generateSequence(shape) { owner -> owner.superclass }
+        return generateSequence(shape) { owner -> owner.superclass }
             .firstNotNullOfOrNull { owner -> owner.declaredFields.firstOrNull { candidate -> candidate.name == name } }
             ?: throw NoSuchFieldException(name)
-
-        field.isAccessible = true
-
-        return field
     }
 
     private fun fieldShift(type: Class<*>): Int {

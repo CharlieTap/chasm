@@ -10,8 +10,4 @@ abstract class ManagedArray :
     abstract fun storage(): Any
 
     abstract fun length(): Int
-
-    override fun owner(): Any {
-        return ShapeOwners.owner(javaClass)
-    }
 }

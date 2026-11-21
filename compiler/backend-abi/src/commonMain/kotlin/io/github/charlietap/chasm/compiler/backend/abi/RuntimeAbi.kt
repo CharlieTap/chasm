@@ -241,6 +241,27 @@ const val MANAGED_STRUCT = "Lio/github/charlietap/chasm/runtime/compiled/gc/Mana
 const val MANAGED_ARRAY = "Lio/github/charlietap/chasm/runtime/compiled/gc/ManagedArray;"
 const val MANAGED_FUNCTION = "Lio/github/charlietap/chasm/runtime/compiled/gc/ManagedFunction;"
 const val MANAGED_ARRAY_LENGTH = "length"
+const val STRUCT_ACCESSOR = "Lio/github/charlietap/chasm/runtime/compiled/gc/StructAccessor;"
+const val ARRAY_ACCESSOR = "Lio/github/charlietap/chasm/runtime/compiled/gc/ArrayAccessor;"
+const val ACCESSOR_CLASS_SUFFIX = "${'$'}Accessor"
+const val STRUCT_ACCESSOR_READ_BITS = "readBits"
+const val STRUCT_ACCESSOR_READ_REFERENCE = "readReference"
+const val STRUCT_ACCESSOR_WRITE_BITS = "writeBits"
+const val STRUCT_ACCESSOR_WRITE_REFERENCE = "writeReference"
+const val STRUCT_ACCESSOR_NEW = "newStruct"
+const val ARRAY_ACCESSOR_NEW_STORAGE = "newStorage"
+const val ARRAY_ACCESSOR_NEW = "newArray"
+const val REFERENCE_OWNER = "owner"
+const val SHAPE_OWNER_CLASS = "Lchasm/gc/ShapeOwner;"
+const val SHAPE_OWNER_ENGINE = "engine"
+
+private val managedFields = Owner("Lio/github/charlietap/chasm/runtime/compiled/gc/ManagedFields;")
+val CREATE_FIELD_INDEX_ERROR = managedFields.method("fieldIndexError", "I", returns = "Ljava/lang/IndexOutOfBoundsException;")
+val CREATE_REFERENCE_FIELD_ERROR = managedFields.method("referenceFieldError", "I", returns = "Ljava/lang/IllegalArgumentException;")
+val CREATE_OWNER_COLLECTED_ERROR = managedFields.method("ownerCollectedError", returns = "Ljava/lang/IllegalStateException;")
+const val WEAK_REFERENCE_TYPE = "Ljava/lang/ref/WeakReference;"
+val WEAK_REFERENCE_GET = Owner(WEAK_REFERENCE_TYPE).method("get", returns = OBJECT_TYPE)
+val CREATE_NUMBER_FIELD_ERROR = managedFields.method("numberFieldError", "I", returns = "Ljava/lang/IllegalArgumentException;")
 
 private val managedOps = Owner("Lio/github/charlietap/chasm/runtime/compiled/gc/ManagedOps;")
 

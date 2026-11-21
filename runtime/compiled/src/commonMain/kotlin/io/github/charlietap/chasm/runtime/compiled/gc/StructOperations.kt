@@ -1,7 +1,6 @@
 package io.github.charlietap.chasm.runtime.compiled.gc
 
 import io.github.charlietap.chasm.host.HostGcType
-import java.lang.reflect.Field
 
 class StructOperations(
     private val layouts: ShapeLayouts,
@@ -9,7 +8,7 @@ class StructOperations(
 ) {
 
     fun structType(struct: Any?): HostGcType {
-        return layout(struct).type
+        return layout(ownedStruct(struct)).type
     }
 
     fun readStructField(
@@ -17,12 +16,9 @@ class StructOperations(
         index: Int,
     ): Long {
 
-        val layout = layout(struct)
+        val managedStruct = ownedStruct(struct)
 
-        checkIndex(index, layout.fields.size)
-        require(layout.checks[index] == null) { "field $index holds a reference" }
-
-        return readNumber(layout.fields[index], struct)
+        return layout(managedStruct).accessor.readBits(managedStruct, index)
     }
 
     fun readStructReference(
@@ -30,12 +26,9 @@ class StructOperations(
         index: Int,
     ): Any? {
 
-        val layout = layout(struct)
+        val managedStruct = ownedStruct(struct)
 
-        checkIndex(index, layout.fields.size)
-        requireNotNull(layout.checks[index]) { "field $index holds a number" }
-
-        return layout.fields[index].get(struct)
+        return layout(managedStruct).accessor.readReference(managedStruct, index)
     }
 
     fun writeStructField(
@@ -44,13 +37,13 @@ class StructOperations(
         value: Long,
     ) {
 
-        val layout = layout(struct)
+        val managedStruct = ownedStruct(struct)
+        val layout = layout(managedStruct)
 
-        checkIndex(index, layout.fields.size)
-        require(layout.checks[index] == null) { "field $index holds a reference" }
+        checkFieldIndex(index, layout)
         require(layout.mutable[index]) { "field $index is immutable" }
 
-        writeNumber(layout.fields[index], struct, value)
+        layout.accessor.writeBits(managedStruct, index, value)
     }
 
     fun writeStructReference(
@@ -59,14 +52,15 @@ class StructOperations(
         value: Any?,
     ) {
 
-        val layout = layout(struct)
+        val managedStruct = ownedStruct(struct)
+        val layout = layout(managedStruct)
 
-        checkIndex(index, layout.fields.size)
+        checkFieldIndex(index, layout)
         val check = requireNotNull(layout.checks[index]) { "field $index holds a number" }
         require(layout.mutable[index]) { "field $index is immutable" }
         require(check.accepts(value)) { "the value does not match the type of field $index" }
 
-        layout.fields[index].set(struct, value)
+        layout.accessor.writeReference(managedStruct, index, value)
     }
 
     fun unsafeWriteStructReference(
@@ -74,7 +68,10 @@ class StructOperations(
         index: Int,
         value: Any?,
     ) {
-        layout(struct).fields[index].set(struct, value)
+
+        val managedStruct = ownedStruct(struct)
+
+        layout(managedStruct).accessor.writeReference(managedStruct, index, value)
     }
 
     fun allocateStruct(
@@ -84,7 +81,7 @@ class StructOperations(
     ): ManagedStruct {
 
         val layout = layouts.struct(type)
-        val count = layout.fields.size
+        val count = layout.checks.size
 
         require(fields.size >= count && references.size >= count) { "the struct has $count fields" }
         layout.checks.forEachIndexed { index, check ->
@@ -110,51 +107,34 @@ class StructOperations(
 
         val struct = allocator.newStruct(layout)
 
-        layout.fields.forEachIndexed { index, field ->
-            if (layout.checks[index] == null) {
-                writeNumber(field, struct, fields[index])
+        layout.checks.forEachIndexed { index, check ->
+            if (check == null) {
+                layout.accessor.writeBits(struct, index, fields[index])
             } else {
-                field.set(struct, references[index])
+                layout.accessor.writeReference(struct, index, references[index])
             }
         }
 
         return struct
     }
 
-    private fun layout(struct: Any?): StructLayout {
-        return requireNotNull(struct?.let(layouts::struct)) { "not a struct of this store" }
+    private fun ownedStruct(struct: Any?): ManagedStruct {
+
+        require(struct is ManagedStruct) { "not a struct of this store" }
+
+        return struct
     }
 
-    private fun readNumber(
-        field: Field,
-        struct: Any?,
-    ): Long {
-        return when (field.type) {
-            Int::class.javaPrimitiveType -> field.getInt(struct).toLong()
-            Long::class.javaPrimitiveType -> field.getLong(struct)
-            Float::class.javaPrimitiveType -> field.getFloat(struct).toRawBits().toLong()
-            Double::class.javaPrimitiveType -> field.getDouble(struct).toRawBits()
-            Byte::class.javaPrimitiveType -> field.getByte(struct).toLong() and BYTE_MASK
-            else -> field.getChar(struct).code.toLong()
-        }
-    }
-
-    private fun writeNumber(
-        field: Field,
-        struct: Any?,
-        value: Long,
+    private fun checkFieldIndex(
+        index: Int,
+        layout: StructLayout,
     ) {
-        when (field.type) {
-            Int::class.javaPrimitiveType -> field.setInt(struct, value.toInt())
-            Long::class.javaPrimitiveType -> field.setLong(struct, value)
-            Float::class.javaPrimitiveType -> field.setFloat(struct, Float.fromBits(value.toInt()))
-            Double::class.javaPrimitiveType -> field.setDouble(struct, Double.fromBits(value))
-            Byte::class.javaPrimitiveType -> field.setByte(struct, value.toByte())
-            else -> field.setChar(struct, value.toInt().toChar())
+        if (index !in layout.checks.indices) {
+            throw fieldIndexError(index)
         }
     }
 
-    private companion object {
-        const val BYTE_MASK = 0xFFL
+    private fun layout(struct: ManagedStruct): StructLayout {
+        return checkNotNull(layouts.struct(struct)) { "no layout for ${struct.javaClass.simpleName}" }
     }
 }
