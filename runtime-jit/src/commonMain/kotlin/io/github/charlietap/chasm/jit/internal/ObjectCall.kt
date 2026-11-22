@@ -38,7 +38,8 @@ internal class ObjectCall(
 
     private val slots = maxOf(type.params.types.size, type.results.types.size)
 
-    private val carriesReferences = (type.params.types + type.results.types).any { value -> value is ValueType.Reference }
+    private val carriesReferences = type.params.types.any { value -> value is ValueType.Reference } ||
+        type.results.types.any { value -> value is ValueType.Reference }
 
     private val idle = AtomicReference<ExecutionContext?>()
 
@@ -125,6 +126,8 @@ internal class ObjectCall(
 
         private val SUCCESS = ChasmResult.Success(Unit)
 
+        private val NO_PARAMETER_CHECKS = emptyArray<ReferenceCheck>()
+
         fun prepare(
             store: Store,
             instance: Instance,
@@ -137,9 +140,15 @@ internal class ObjectCall(
                 is ChasmResult.Error -> return lookup
             }
 
-            val owner = managedStore.definedType(HostGcType(exported.function.rtt.value))
             val parameters = exported.function.functionType.params.types
             val referenceParameters = parameters.indices.filter { index -> parameters[index] is ValueType.Reference }.toIntArray()
+            if (referenceParameters.isEmpty()) {
+                val call = ObjectCall(store, instance, exported, referenceParameters, NO_PARAMETER_CHECKS, managedStore.pending)
+                return ChasmResult.Success(call)
+            }
+
+            val owner = managedStore.definedType(HostGcType(exported.function.rtt.value))
+
             val parameterChecks = Array(referenceParameters.size) { position ->
                 managedStore.checks.check((parameters[referenceParameters[position]] as ValueType.Reference).referenceType, owner)
             }

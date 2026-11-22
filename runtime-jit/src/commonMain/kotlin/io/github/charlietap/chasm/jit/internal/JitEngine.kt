@@ -117,6 +117,7 @@ internal class JitEngine(
         check(!jit.module.deallocated) { "the instance has already been dropped" }
 
         classicDropInstance(classic, jit.embedding)
+        jit.prepared = emptyMap()
     }
 
     override fun addFuel(fuel: Long) {
@@ -233,8 +234,27 @@ internal class JitEngine(
         }
 
         return when (val result = instantiator.instantiate(module.payload as ClassicModule, classicImports, config)) {
-            is ChasmResult.Success -> ChasmResult.Success(instanceOf(result.result.instance))
+            is ChasmResult.Success -> {
+                val instance = instanceOf(result.result.instance)
+                prepareExports(jit(instance))
+                ChasmResult.Success(instance)
+            }
             is ChasmResult.Error -> result
+        }
+    }
+
+    private fun prepareExports(jit: JitInstance) {
+
+        jit.prepared = buildMap(jit.module.exports.size) {
+            jit.module.exports.forEach { export ->
+                if (export.value is ExternalValue.Function) {
+                    val name = export.name.name
+                    val preparation = ObjectCall.prepare(classic, jit.embedding, name, managedStore)
+                    if (preparation is ChasmResult.Success) {
+                        put(name, PreparedFunction(preparation.result.type, this@JitEngine, preparation.result))
+                    }
+                }
+            }
         }
     }
 
@@ -272,10 +292,7 @@ internal class JitEngine(
         }
 
         return when (val prepared = ObjectCall.prepare(classic, jit.embedding, name, managedStore)) {
-            is ChasmResult.Success -> {
-                val function = PreparedFunction(prepared.result.type, this, prepared.result)
-                ChasmResult.Success(jit.prepared.putIfAbsent(name, function) ?: function)
-            }
+            is ChasmResult.Success -> ChasmResult.Success(PreparedFunction(prepared.result.type, this, prepared.result))
             is ChasmResult.Error -> prepared
         }
     }

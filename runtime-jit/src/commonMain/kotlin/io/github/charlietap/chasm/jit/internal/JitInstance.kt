@@ -8,7 +8,6 @@ import io.github.charlietap.chasm.embedding.compiled.Table
 import io.github.charlietap.chasm.embedding.compiled.Tag
 import io.github.charlietap.chasm.embedding.shapes.Instance
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
-import java.util.concurrent.ConcurrentHashMap
 
 internal class JitInstance(
     val module: ModuleInstance,
@@ -16,7 +15,8 @@ internal class JitInstance(
     private val handles: JitHandles,
 ) {
 
-    val prepared = ConcurrentHashMap<String, PreparedFunction>()
+    @Volatile
+    var prepared: Map<String, PreparedFunction> = emptyMap()
 
     @Volatile
     var exports: Exports? = null
