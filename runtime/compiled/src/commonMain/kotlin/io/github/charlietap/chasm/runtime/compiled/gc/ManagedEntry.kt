@@ -5,6 +5,11 @@ import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
+import kotlin.reflect.KClass
+
+val managedEntryClass: KClass<*> = ManagedEntry::class
+
+private val MANAGED_ENTRY = ManagedEntry()
 
 fun enterObjects(
     context: ExecutionContext,
@@ -13,25 +18,42 @@ fun enterObjects(
     references: Array<Any?>,
     pending: PendingExceptions,
 ): InvocationError? {
+    return MANAGED_ENTRY.enter(context, function, words, references, pending)
+}
 
-    val store = context.store
-    val interrupt = store.interrupt
-    val depth = interrupt.depth
-    if (interrupt.enabled) {
-        if (depth == 0 && interrupt.requested) interrupt.requested = false
-        interrupt.depth = depth + 1
-    }
+private class ManagedEntry {
 
-    return try {
-        context.compiledCallDepth = store.compiledCallDepth
-        callObjects(context, context.instance, function, words, references, context.compiledCallDepth)
-        if (context.compiledUnwinding) holdThrown(context, pending) else null
-    } catch (exception: InvocationException) {
-        if (context.config.debugInfo) traceableTrap(store, context.vstack, exception, entryIp(function)) else exception.error
-    } catch (_: ClassCastException) {
-        InvocationError.FailedToCastReference
-    } finally {
-        if (interrupt.enabled) interrupt.depth = depth
+    fun enter(
+        context: ExecutionContext,
+        function: FunctionInstance,
+        words: LongArray,
+        references: Array<Any?>,
+        pending: PendingExceptions,
+    ): InvocationError? {
+
+        val store = context.store
+        val interrupt = store.interrupt
+        val depth = interrupt.depth
+        if (interrupt.enabled) {
+            if (depth == 0 && interrupt.requested) {
+                interrupt.requested = false
+            }
+            interrupt.depth = depth + 1
+        }
+
+        return try {
+            context.compiledCallDepth = store.compiledCallDepth
+            callObjects(context, context.instance, function, words, references, context.compiledCallDepth)
+            if (context.compiledUnwinding) holdThrown(context, pending) else null
+        } catch (exception: InvocationException) {
+            if (context.config.debugInfo) traceableTrap(store, context.vstack, exception, entryIp(function)) else exception.error
+        } catch (_: ClassCastException) {
+            InvocationError.FailedToCastReference
+        } finally {
+            if (interrupt.enabled) {
+                interrupt.depth = depth
+            }
+        }
     }
 }
 

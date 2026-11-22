@@ -19,26 +19,28 @@ import kotlin.test.assertFailsWith
 class ConstructionCodegenTest {
 
     @Test
-    fun `generates synchronous construction`() = assertConstruction("SynchronousConstruction")
+    fun `generates synchronous portable VM construction`() = assertConstruction(
+        scenario = "SynchronousConstruction",
+        runtimes = listOf(CodegenRuntime.PORTABLE_VM),
+    )
 
     @Test
-    fun `generates suspending construction from codegen config`() = assertConstruction(
+    fun `generates suspending portable VM construction from codegen config`() = assertConstruction(
         scenario = "SuspendingConstruction",
         config = codegenConfig(generateSuspendingFactories = true),
+        runtimes = listOf(CodegenRuntime.PORTABLE_VM),
+    )
+
+    @Test
+    fun `generates construction`() = assertConstruction(
+        scenario = "Construction",
+        runtimes = listOf(CodegenRuntime.CHASM),
     )
 
     @Test
     fun `generates WASI Preview 1 construction`() = assertConstruction(
         scenario = "WasiPreview1Construction",
         linksWasiPreview1 = true,
-        runtimes = listOf(CodegenRuntime.CHASM),
-    )
-
-    @Test
-    fun `generates suspending WASI Preview 1 construction`() = assertConstruction(
-        scenario = "SuspendingWasiPreview1Construction",
-        linksWasiPreview1 = true,
-        config = codegenConfig(generateSuspendingFactories = true),
         runtimes = listOf(CodegenRuntime.CHASM),
     )
 
@@ -57,16 +59,16 @@ class ConstructionCodegenTest {
     )
 
     @Test
-    fun `generates construction with store settings`() = assertConstruction(
-        scenario = "StoreSettingsConstruction",
-        config = storeSettings(ExecutionTier.Interpreter()),
+    fun `generates AOT construction from a compiled module bridge object`() = assertConstruction(
+        scenario = "AotBridgeConstruction",
+        config = codegenConfig(executionTier = ExecutionTier.Aot("com.test.AotBridgeConstructionCompiledModule")),
         runtimes = listOf(CodegenRuntime.CHASM),
     )
 
     @Test
-    fun `generates suspending construction with store settings`() = assertConstruction(
-        scenario = "SuspendingStoreSettingsConstruction",
-        config = storeSettings(ExecutionTier.Interpreter()).copy(generateSuspendingFactories = true),
+    fun `generates construction with store settings`() = assertConstruction(
+        scenario = "StoreSettingsConstruction",
+        config = storeSettings(ExecutionTier.Interpreter()),
         runtimes = listOf(CodegenRuntime.CHASM),
     )
 
@@ -95,32 +97,6 @@ class ConstructionCodegenTest {
     )
 
     @Test
-    fun `generates JIT initializers`() {
-        assertGenerates(
-            category = "construction",
-            wasmInterface = wasmInterface(
-                interfaceName = "JitInitializers",
-                packageName = "com.test",
-                initializers = linkedSetOf("initialize", "start"),
-            ),
-            config = codegenConfig(executionTier = ExecutionTier.Jit()),
-            runtimes = listOf(CodegenRuntime.CHASM),
-        )
-    }
-
-    @Test
-    fun `generates JIT internal visibility`() {
-        assertConstruction(
-            scenario = "JitInternalVisibility",
-            interfaceVisibility = InterfaceVisibility.INTERNAL,
-            factoryVisibility = FactoryVisibility.INTERNAL,
-            implementationVisibility = ImplementationVisibility.INTERNAL,
-            config = codegenConfig(executionTier = ExecutionTier.Jit()),
-            runtimes = listOf(CodegenRuntime.CHASM),
-        )
-    }
-
-    @Test
     fun `generates internal visibility`() = assertGenerates(
         category = "construction",
         wasmInterface = wasmInterface(
@@ -133,16 +109,17 @@ class ConstructionCodegenTest {
     )
 
     @Test
-    fun `generates suspending internal visibility`() = assertConstruction(
+    fun `generates suspending portable VM internal visibility`() = assertConstruction(
         scenario = "SuspendingInternalVisibility",
         interfaceVisibility = InterfaceVisibility.INTERNAL,
         factoryVisibility = FactoryVisibility.INTERNAL,
         implementationVisibility = ImplementationVisibility.INTERNAL,
         config = codegenConfig(generateSuspendingFactories = true),
+        runtimes = listOf(CodegenRuntime.PORTABLE_VM),
     )
 
     @Test
-    fun `generates non-empty suspending service`() = assertGenerates(
+    fun `generates non-empty suspending portable VM service`() = assertGenerates(
         category = "construction",
         wasmInterface = wasmInterface(
             interfaceName = "SuspendingService",
@@ -170,6 +147,7 @@ class ConstructionCodegenTest {
             memories = listOf(memoryBinding("memory", "memory")),
         ),
         config = codegenConfig(generateSuspendingFactories = true),
+        runtimes = listOf(CodegenRuntime.PORTABLE_VM),
     )
 
     @Test
@@ -200,7 +178,7 @@ class ConstructionCodegenTest {
                                 .copy(runtime = runtime),
                         )
                         val implementation = files.last().toString()
-                        val suspendModifier = if (suspending) "suspend " else ""
+                        val suspendModifier = if (suspending || runtime == CodegenRuntime.CHASM) "suspend " else ""
                         assertContains(implementation, "${visibility.name.lowercase()} class ServiceImpl(")
                         assertContains(implementation, "${factoryVisibility.name.lowercase()} ${suspendModifier}fun service(")
                     }

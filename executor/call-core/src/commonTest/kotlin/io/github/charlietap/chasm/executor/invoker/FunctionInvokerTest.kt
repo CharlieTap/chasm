@@ -17,17 +17,17 @@ import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.fixture.type.i32ValueType
 import io.github.charlietap.chasm.fixture.type.resultType
 import io.github.charlietap.chasm.fixture.type.tagType
-import io.github.charlietap.chasm.host.HostFunction
-import io.github.charlietap.chasm.host.HostModuleInstance
-import io.github.charlietap.chasm.host.HostResources
 import io.github.charlietap.chasm.host.ModuleIndex
-import io.github.charlietap.chasm.host.raise
 import io.github.charlietap.chasm.host.readI32
-import io.github.charlietap.chasm.host.withExceptions
-import io.github.charlietap.chasm.host.withTag
 import io.github.charlietap.chasm.host.writeI32
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
+import io.github.charlietap.chasm.runtime.host.RawHostFunction
+import io.github.charlietap.chasm.runtime.host.RawHostModuleInstance
+import io.github.charlietap.chasm.runtime.host.RawHostResources
+import io.github.charlietap.chasm.runtime.host.raise
+import io.github.charlietap.chasm.runtime.host.withExceptions
+import io.github.charlietap.chasm.runtime.host.withTag
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
 import kotlin.contextOf
 import kotlin.test.Test
@@ -117,8 +117,8 @@ class FunctionInvokerTest {
         val functionInstance = hostFunctionInstance(
             functionType = functionType,
             function = { parameters, results ->
-                val caller = contextOf<HostModuleInstance>()
-                val context = contextOf<HostResources>()
+                val caller = contextOf<RawHostModuleInstance>()
+                val context = contextOf<RawHostResources>()
                 context as ExecutionContext
                 assertEquals(config, context.config)
                 assertEquals(runtimeStore, context.store)
@@ -157,8 +157,8 @@ class FunctionInvokerTest {
                 results = resultType(listOf(i32ValueType())),
             ),
         ) { parameters, results ->
-            val caller = contextOf<HostModuleInstance>()
-            val context = contextOf<HostResources>()
+            val caller = contextOf<RawHostModuleInstance>()
+            val context = contextOf<RawHostResources>()
             context as ExecutionContext
             assertEquals(config, context.config)
             assertEquals(runtimeStore, context.store)
@@ -189,7 +189,7 @@ class FunctionInvokerTest {
         val tagAddress = runtimeStore.heap.registerTag(rtt(), tagType())
         val moduleInstance = moduleInstance(tagAddresses = mutableListOf(tagAddress))
         val functionInstance = hostFunctionInstance(
-            function = HostFunction { parameters, _ ->
+            function = RawHostFunction { parameters, _ ->
                 withExceptions {
                     assertFalse(hasPending)
                 }

@@ -1,12 +1,13 @@
 package io.github.charlietap.chasm.jit
 
-import io.github.charlietap.chasm.embedding.compiled.Instance
-import io.github.charlietap.chasm.embedding.compiled.Store
-import io.github.charlietap.chasm.embedding.compiled.instance
-import io.github.charlietap.chasm.embedding.compiled.invoke
-import io.github.charlietap.chasm.embedding.compiled.value.ExecutionValue
-import io.github.charlietap.chasm.embedding.compiled.value.NumberValue.I32
+import io.github.charlietap.chasm.embedding.instance
+import io.github.charlietap.chasm.embedding.invoke
+import io.github.charlietap.chasm.embedding.module
+import io.github.charlietap.chasm.embedding.shapes.Instance
+import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.shapes.expect
+import io.github.charlietap.chasm.embedding.value.ExecutionValue
+import io.github.charlietap.chasm.embedding.value.NumberValue.I32
 import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -44,8 +45,8 @@ class ReferenceFlowTest {
     @Test
     fun siblingCastsSelectTheTestedType() {
 
-        val left = invoke(store, instance, "make_left").expect("make_left").single()
-        val right = invoke(store, instance, "make_right").expect("make_right").single()
+        val left = invoke(instance, "make_left").expect("make_left").single()
+        val right = invoke(instance, "make_right").expect("make_right").single()
 
         assertEquals(33, call("sibling_casts", left))
         assertEquals(-1, call("sibling_casts", right))
@@ -104,7 +105,7 @@ class ReferenceFlowTest {
         name: String,
         vararg arguments: ExecutionValue,
     ): Int {
-        val result = invoke(store, instance, name, arguments.toList()).expect(name).single()
+        val result = invoke(instance, name, arguments.toList()).expect(name).single()
         return (result as I32).value
     }
 

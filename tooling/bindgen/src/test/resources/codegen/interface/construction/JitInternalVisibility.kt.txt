@@ -1,3 +1,0 @@
-package com.test
-
-internal interface JitInternalVisibility

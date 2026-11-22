@@ -16,6 +16,7 @@ import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_NULL
 import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_STRUCT
 import io.github.charlietap.chasm.runtime.ext.toLongFromBoxed
 import io.github.charlietap.chasm.runtime.store.Store
+import io.github.charlietap.chasm.runtime.store.withLiveStack
 import io.github.charlietap.chasm.runtime.type.RTT
 import io.github.charlietap.chasm.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.type.AbstractHeapType
@@ -42,7 +43,7 @@ class GarbageCollectorTest {
         val runtimeType = store.registerStruct(referenceFields = emptySet())
         val reference = store.heap.allocateStruct(runtimeType, LongArray(0))
 
-        assertEquals(Ok(Unit), GarbageCollector(store, vstack()))
+        assertEquals(Ok(Unit), GarbageCollector(store))
         assertDead(store, reference)
     }
 
@@ -54,7 +55,7 @@ class GarbageCollectorTest {
             LongArray(0),
         )
 
-        assertEquals(Ok(Unit), GarbageCollector(store, vstack()))
+        assertEquals(Ok(Unit), GarbageCollector(store))
         assertArrayDead(store, reference)
     }
 
@@ -65,7 +66,7 @@ class GarbageCollectorTest {
         val reference = store.heap.allocateStruct(runtimeType, LongArray(0))
         val stack = vstack().apply { push(reference) }
 
-        assertEquals(Ok(Unit), GarbageCollector(store, stack))
+        assertEquals(Ok(Unit), store.withLiveStack(stack) { GarbageCollector(store) })
         assertLive(store, runtimeType, reference)
     }
 
@@ -77,7 +78,7 @@ class GarbageCollectorTest {
             LongArray(0),
         )
 
-        assertEquals(Ok(Unit), GarbageCollector(store, vstack(listOf(arrayReference(reference)))))
+        assertEquals(Ok(Unit), store.withLiveStack(vstack(listOf(arrayReference(reference)))) { GarbageCollector(store) })
         assertArrayLive(store, runtimeType, reference)
     }
 
@@ -91,7 +92,7 @@ class GarbageCollectorTest {
             longArrayOf(structReference),
         )
 
-        assertEquals(Ok(Unit), GarbageCollector(store, vstack(listOf(arrayReference(rawArrayReference)))))
+        assertEquals(Ok(Unit), store.withLiveStack(vstack(listOf(arrayReference(rawArrayReference)))) { GarbageCollector(store) })
         assertArrayLive(store, arrayRuntimeType, rawArrayReference)
         assertLive(store, runtimeType, structReference)
     }
@@ -106,7 +107,7 @@ class GarbageCollectorTest {
         val runtimeType = store.registerStruct(referenceFields = setOf(0))
         val structReference = store.heap.allocateStruct(runtimeType, longArrayOf(rawArrayReference))
 
-        assertEquals(Ok(Unit), GarbageCollector(store, vstack().apply { push(structReference) }))
+        assertEquals(Ok(Unit), store.withLiveStack(vstack().apply { push(structReference) }) { GarbageCollector(store) })
         assertLive(store, runtimeType, structReference)
         assertArrayLive(store, arrayRuntimeType, rawArrayReference)
     }
@@ -130,7 +131,7 @@ class GarbageCollectorTest {
         )
         val exceptionReference = store.heap.allocateException(tagAddress, longArrayOf(structReference))
 
-        assertEquals(Ok(Unit), GarbageCollector(store, vstack().apply { push(exceptionReference) }))
+        assertEquals(Ok(Unit), store.withLiveStack(vstack().apply { push(exceptionReference) }) { GarbageCollector(store) })
         assertLive(store, runtimeType, structReference)
         assertArrayLive(store, arrayRuntimeType, rawArrayReference)
     }
@@ -145,7 +146,7 @@ class GarbageCollectorTest {
 
         val stack = vstack(listOf(arrayReference(arrays[2]))).apply { push(structs[1]) }
 
-        assertEquals(Ok(Unit), GarbageCollector(store, stack))
+        assertEquals(Ok(Unit), store.withLiveStack(stack) { GarbageCollector(store) })
         assertDead(store, structs[0])
         assertLive(store, runtimeType, structs[1])
         assertDead(store, structs[2])
@@ -165,7 +166,7 @@ class GarbageCollectorTest {
         val structReference = store.heap.allocateStruct(runtimeType, longArrayOf(arrayReference))
         store.heap.setArrayElement(arrayReference, 0, structReference)
 
-        assertEquals(Ok(Unit), GarbageCollector(store, vstack()))
+        assertEquals(Ok(Unit), GarbageCollector(store))
         assertDead(store, structReference)
         assertArrayDead(store, arrayReference)
     }
@@ -177,7 +178,7 @@ class GarbageCollectorTest {
         val numericReference = numericStore.heap.allocateStruct(numericType, LongArray(0))
         numericStore.globals += globalInstance(value = numericReference)
 
-        assertEquals(Ok(Unit), GarbageCollector(numericStore, null))
+        assertEquals(Ok(Unit), GarbageCollector(numericStore))
         assertDead(numericStore, numericReference)
 
         val referenceStore = store()
@@ -187,7 +188,7 @@ class GarbageCollectorTest {
             type = globalType(referenceValueType()),
             value = reference,
         )
-        assertEquals(Ok(Unit), GarbageCollector(referenceStore, null))
+        assertEquals(Ok(Unit), GarbageCollector(referenceStore))
         assertLive(referenceStore, referenceType, reference)
     }
 
@@ -215,7 +216,7 @@ class GarbageCollectorTest {
         }
 
         val root = arrayReference(arrays[0])
-        assertEquals(Ok(Unit), GarbageCollector(store, vstack(listOf(root))))
+        assertEquals(Ok(Unit), store.withLiveStack(vstack(listOf(root))) { GarbageCollector(store) })
 
         arrays.forEach { assertArrayLive(store, arrayRuntimeType, it) }
         assertLive(store, runtimeType, structReference)
@@ -238,7 +239,7 @@ class GarbageCollectorTest {
 
         assertEquals(
             Ok(Unit),
-            GarbageCollector(numericStore, vstack(listOf(arrayReference(numericArray)))),
+            numericStore.withLiveStack(vstack(listOf(arrayReference(numericArray)))) { GarbageCollector(numericStore) },
         )
         assertDead(numericStore, numericStruct)
 
@@ -257,7 +258,7 @@ class GarbageCollectorTest {
 
         assertEquals(
             Ok(Unit),
-            GarbageCollector(referenceStore, vstack(listOf(arrayReference(referenceArray)))),
+            referenceStore.withLiveStack(vstack(listOf(arrayReference(referenceArray)))) { GarbageCollector(referenceStore) },
         )
         assertLive(referenceStore, referenceType, referencedStruct)
     }

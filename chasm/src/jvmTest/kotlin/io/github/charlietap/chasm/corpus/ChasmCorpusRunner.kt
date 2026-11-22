@@ -1,5 +1,3 @@
-@file:OptIn(InternalChasmApi::class)
-
 package io.github.charlietap.chasm.corpus
 
 import at.released.weh.bindings.chasm.wasip1.ChasmWasiPreview1Builder
@@ -11,26 +9,27 @@ import at.released.weh.host.EntropySource
 import at.released.weh.host.SystemEnvProvider
 import at.released.weh.host.clock.Clock
 import at.released.weh.host.clock.MonotonicClock
-import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.config.Config
 import io.github.charlietap.chasm.config.GCStrategy
 import io.github.charlietap.chasm.config.RuntimeConfig
-import io.github.charlietap.chasm.coroutines.instance
-import io.github.charlietap.chasm.coroutines.module
-import io.github.charlietap.chasm.coroutines.validate
 import io.github.charlietap.chasm.embedding.error.ExecutionError
 import io.github.charlietap.chasm.embedding.error.TrapReason
+import io.github.charlietap.chasm.embedding.exports
 import io.github.charlietap.chasm.embedding.function
 import io.github.charlietap.chasm.embedding.global
 import io.github.charlietap.chasm.embedding.global.readGlobal
+import io.github.charlietap.chasm.embedding.global.readGlobalReference
 import io.github.charlietap.chasm.embedding.global.writeGlobal
+import io.github.charlietap.chasm.embedding.global.writeGlobalReference
+import io.github.charlietap.chasm.embedding.instance
 import io.github.charlietap.chasm.embedding.invoke
 import io.github.charlietap.chasm.embedding.memory
 import io.github.charlietap.chasm.embedding.memory.growMemory
 import io.github.charlietap.chasm.embedding.memory.readBytes
 import io.github.charlietap.chasm.embedding.memory.writeBytes
-import io.github.charlietap.chasm.embedding.moduleInfo
+import io.github.charlietap.chasm.embedding.module
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
+import io.github.charlietap.chasm.embedding.shapes.Exports
 import io.github.charlietap.chasm.embedding.shapes.Global
 import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.ImportDefinition
@@ -40,18 +39,22 @@ import io.github.charlietap.chasm.embedding.shapes.Module
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.shapes.fold
 import io.github.charlietap.chasm.embedding.store
+import io.github.charlietap.chasm.embedding.validate
+import io.github.charlietap.chasm.embedding.value.ExecutionValue
+import io.github.charlietap.chasm.embedding.value.NumberValue
+import io.github.charlietap.chasm.embedding.value.ReferenceValue
 import io.github.charlietap.chasm.host.HostStack
-import io.github.charlietap.chasm.runtime.ext.toExecutionValue
-import io.github.charlietap.chasm.runtime.ext.toLongFromBoxed
-import io.github.charlietap.chasm.runtime.instance.ExternalValue
+import io.github.charlietap.chasm.host.writeReference
+import io.github.charlietap.chasm.reference.ArrayReference
+import io.github.charlietap.chasm.reference.ExceptionReference
+import io.github.charlietap.chasm.reference.FunctionReference
+import io.github.charlietap.chasm.reference.I31Reference
+import io.github.charlietap.chasm.reference.StructReference
 import io.github.charlietap.chasm.runtime.type.ExternalType
-import io.github.charlietap.chasm.runtime.value.ExecutionValue
-import io.github.charlietap.chasm.runtime.value.NumberValue
-import io.github.charlietap.chasm.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.type.AbstractHeapType
 import io.github.charlietap.chasm.type.FunctionType
-import io.github.charlietap.chasm.type.GlobalType
-import io.github.charlietap.chasm.type.Mutability
+import io.github.charlietap.chasm.type.HeapType
+import io.github.charlietap.chasm.type.NumberType
 import io.github.charlietap.chasm.type.ValueType
 import io.github.charlietap.corpus.lib.CorpusExecution
 import io.github.charlietap.corpus.lib.CorpusFileReader
@@ -111,7 +114,6 @@ class ChasmCorpusRunner(
         )
     }
 
-    @Suppress("DEPRECATION")
     private suspend fun executeFixture(
         corpusRoot: String,
         fixture: Fixture,
@@ -123,7 +125,7 @@ class ChasmCorpusRunner(
         timings.binarySizeBytes = bytes.size.toLong()
         val decoded = when (
             val result = timings.decode {
-                module(bytes, config.moduleConfig)
+                module(bytes, config.moduleConfig, validate = false)
             }
         ) {
             is ChasmResult.Success -> result.result
@@ -155,9 +157,9 @@ class ChasmCorpusRunner(
         }
 
         fixture.tests.forEachIndexed { testIndex, test ->
-            val (store, setupResult) = timings.instantiate {
+            val setupResult = timings.instantiate {
                 val store = store()
-                store to instantiate(fixture, store, validated, test, timings)
+                instantiate(fixture, store, validated, test, timings)
             }
             val setup = setupResult.fold(
                 { setup ->
@@ -174,7 +176,6 @@ class ChasmCorpusRunner(
                     val result = runStep(
                         fixture = fixture,
                         context = "test[$testIndex] step[$stepIndex]",
-                        store = store,
                         setup = setup,
                         captures = captures,
                         step = step,
@@ -204,13 +205,16 @@ class ChasmCorpusRunner(
 
         return instance(store, module, importResolution.imports, config.runtimeConfig).fold(
             { instance ->
-                val exportedMemory = instance.exports.firstNotNullOfOrNull { export -> export.value as? Memory }
+                val exports = exports(instance)
+                val exportedMemory = exports.all.firstNotNullOfOrNull { export -> export.value as? Memory }
                 if (importResolution.memories.isEmpty() && exportedMemory != null) {
                     importResolution.memories["memory"] = exportedMemory
                 }
                 RunnerResult.Success(
                     RuntimeSetup(
+                        module = module,
                         instance = instance,
+                        exports = exports,
                         importMemories = importResolution.memories,
                         importGlobals = importResolution.globals,
                         hosts = importResolution.hosts,
@@ -260,7 +264,7 @@ class ChasmCorpusRunner(
         }
 
         if (wasi != null && hasWasiImports) {
-            imports += ChasmWasiPreview1Builder(store, moduleInfo(module)) {
+            imports += ChasmWasiPreview1Builder(store, module) {
                 host = wasi.host
             }.build()
         }
@@ -285,7 +289,8 @@ class ChasmCorpusRunner(
                         }
                     }
                     val trap = fixtureImport?.stub?.trap
-                    val defaults = defaultResults(type.functionType, fixtureImport).map { value -> value.toLongFromBoxed() }
+                    val parameterCount = type.functionType.params.types.size
+                    val defaults = defaultResults(type.functionType, fixtureImport)
                     imports += Import(
                         definition.moduleName,
                         definition.entityName,
@@ -293,15 +298,17 @@ class ChasmCorpusRunner(
                             val stack = contextOf<HostStack>()
                             if (capture != null) {
                                 timings.harness {
-                                    val params = List(type.functionType.params.types.size) { index ->
-                                        stack[parameters + index].toExecutionValue(type.functionType.params.types[index])
-                                    }
+                                    val params = List(parameterCount) { index -> stack[parameters + index] }
                                     importCaptures.getValue(capture.name).append(capture, params)
                                 }
                             }
                             trap?.let(::error)
                             defaults.forEachIndexed { index, value ->
-                                stack[results + index] = value
+                                when (value) {
+                                    is NumberValue<*> -> stack[results + index] = value.bits()
+                                    is ReferenceValue -> results.writeReference(index, value.reference())
+                                    else -> error("Unsupported corpus import result: $value")
+                                }
                             }
                         },
                     )
@@ -376,19 +383,18 @@ class ChasmCorpusRunner(
     private fun runStep(
         fixture: Fixture,
         context: String,
-        store: Store,
         setup: RuntimeSetup,
         captures: MutableMap<String, ExecutionValue>,
         step: JsonObject,
         timings: CorpusTimingRecorder,
     ): CorpusResult {
         return when (val type = step.string("type")) {
-            "function.invoke" -> runFunctionInvoke(fixture, context, store, setup, captures, step, timings)
-            "memory.write" -> runMemoryWrite(fixture, context, store, setup, captures, step, timings)
-            "memory.read" -> runMemoryRead(fixture, context, store, setup, captures, step, timings)
-            "memory.grow" -> runMemoryGrow(fixture, context, store, setup, captures, step, timings)
-            "global.write" -> runGlobalWrite(fixture, context, store, setup, captures, step, timings)
-            "global.read" -> runGlobalRead(fixture, context, store, setup, captures, step, timings)
+            "function.invoke" -> runFunctionInvoke(fixture, context, setup, captures, step, timings)
+            "memory.write" -> runMemoryWrite(fixture, context, setup, captures, step, timings)
+            "memory.read" -> runMemoryRead(fixture, context, setup, captures, step, timings)
+            "memory.grow" -> runMemoryGrow(fixture, context, setup, captures, step, timings)
+            "global.write" -> runGlobalWrite(fixture, context, setup, captures, step, timings)
+            "global.read" -> runGlobalRead(fixture, context, setup, captures, step, timings)
             "table.write", "table.read" -> CorpusResult.Skipped(fixture.name, "$type steps are not supported yet")
             else -> failure(fixture, context, "unsupported corpus step", type)
         }
@@ -397,14 +403,13 @@ class ChasmCorpusRunner(
     private fun runFunctionInvoke(
         fixture: Fixture,
         context: String,
-        store: Store,
         setup: RuntimeSetup,
         captures: MutableMap<String, ExecutionValue>,
         step: JsonObject,
         timings: CorpusTimingRecorder,
     ): CorpusResult {
         val function = step.string("function")
-        val functionType = setup.functionType(store, function)
+        val functionType = setup.functionType(function)
         val params = step.array("params").mapIndexed { index, value ->
             parseValue(value.jsonObject, captures, functionType?.params?.types?.getOrNull(index))
         }
@@ -413,7 +418,7 @@ class ChasmCorpusRunner(
         val hostEffects = step["host_effects"]?.jsonObject
         val expectedExitCode = hostEffects?.get("exit_code")?.jsonPrimitive?.intOrNull
 
-        val result = when (val invocation = timings.execute { invoke(store, setup.instance, function, params) }) {
+        val result = when (val invocation = timings.execute { invoke(setup.instance, function, params) }) {
             is ChasmResult.Success -> invocation.result
             is ChasmResult.Error -> {
                 val actualExitCode = hostFunctionExitCodeOrNull(invocation.error)
@@ -468,13 +473,13 @@ class ChasmCorpusRunner(
             if (expectedObject["value"] == null) return@forEachIndexed
 
             val parsed = parseValue(expectedObject, captures, functionType?.results?.types?.getOrNull(index))
-            if (parsed.toLongFromBoxed() != actualValue.toLongFromBoxed()) {
+            if (!parsed.matches(actualValue)) {
                 return failure(
                     fixture,
                     context,
                     "result mismatch",
-                    expected = "result[$index]=${parsed.describeBits()}",
-                    actual = "result[$index]=${actualValue.describeBits()}",
+                    expected = "result[$index]=${parsed.describe()}",
+                    actual = "result[$index]=${actualValue.describe()}",
                 )
             }
         }
@@ -531,7 +536,6 @@ class ChasmCorpusRunner(
     private fun runMemoryWrite(
         fixture: Fixture,
         context: String,
-        store: Store,
         setup: RuntimeSetup,
         captures: MutableMap<String, ExecutionValue>,
         step: JsonObject,
@@ -544,7 +548,7 @@ class ChasmCorpusRunner(
             ?: return failure(fixture, context, "memory write requires bytes or value")
 
         return try {
-            timings.execute { writeBytes(store, memory, offset, bytes) }
+            timings.execute { writeBytes(memory, offset, bytes) }
             CorpusResult.Success
         } catch (failure: IndexOutOfBoundsException) {
             failure(fixture, context, "memory write failed", failure.message)
@@ -554,7 +558,6 @@ class ChasmCorpusRunner(
     private fun runMemoryRead(
         fixture: Fixture,
         context: String,
-        store: Store,
         setup: RuntimeSetup,
         captures: MutableMap<String, ExecutionValue>,
         step: JsonObject,
@@ -565,7 +568,7 @@ class ChasmCorpusRunner(
         val offset = parseIndex(step.getValue("offset"), captures)
         val capture = step["capture"]?.jsonObject
         if (capture != null) {
-            val value = readMemoryValue(fixture, context, store, memory, offset, capture.string("type"), timings)
+            val value = readMemoryValue(fixture, context, memory, offset, capture.string("type"), timings)
                 ?: return failure(fixture, context, "memory capture failed")
             captures[capture.string("capture")] = value
             return CorpusResult.Success
@@ -578,7 +581,7 @@ class ChasmCorpusRunner(
         val buffer = ByteArray(expected.size)
 
         val actual = try {
-            timings.execute { readBytes(store, memory, buffer, offset, expected.size) }
+            timings.execute { readBytes(memory, buffer, offset, expected.size) }
         } catch (failure: IndexOutOfBoundsException) {
             return failure(fixture, context, "memory read failed", failure.message)
         }
@@ -593,7 +596,6 @@ class ChasmCorpusRunner(
     private fun runMemoryGrow(
         fixture: Fixture,
         context: String,
-        store: Store,
         setup: RuntimeSetup,
         captures: MutableMap<String, ExecutionValue>,
         step: JsonObject,
@@ -602,7 +604,7 @@ class ChasmCorpusRunner(
         val memory = resolveMemory(setup, step.stringOrDefault("memory", "memory"))
             ?: return failure(fixture, context, "memory not found", step["memory"]?.toString())
         val pagesToAdd = parseIndex(step.getValue("pages"), captures)
-        val actual = NumberValue.I32(timings.execute { growMemory(store, memory, pagesToAdd) })
+        val actual = NumberValue.I32(timings.execute { growMemory(memory, pagesToAdd) })
 
         step["capture"]?.jsonPrimitive?.contentOrNull?.let { capture ->
             captures[capture] = actual
@@ -612,17 +614,16 @@ class ChasmCorpusRunner(
         val expected = assertion["value"]?.jsonObject?.let { value -> parseValue(value, captures) }
             ?: return failure(fixture, context, "unsupported memory grow assertion")
 
-        return if (expected.toLongFromBoxed() == actual.toLongFromBoxed()) {
+        return if (expected.matches(actual)) {
             CorpusResult.Success
         } else {
-            failure(fixture, context, "memory grow mismatch", expected = expected.describeBits(), actual = actual.describeBits())
+            failure(fixture, context, "memory grow mismatch", expected = expected.describe(), actual = actual.describe())
         }
     }
 
     private fun runGlobalWrite(
         fixture: Fixture,
         context: String,
-        store: Store,
         setup: RuntimeSetup,
         captures: MutableMap<String, ExecutionValue>,
         step: JsonObject,
@@ -633,7 +634,17 @@ class ChasmCorpusRunner(
         val value = parseValue(step.getValue("value").jsonObject, captures)
 
         return try {
-            timings.execute { writeGlobal(store, global, value) }
+            when (value) {
+                is NumberValue<*> -> {
+                    val bits = value.bits()
+                    timings.execute { writeGlobal(global, bits) }
+                }
+                is ReferenceValue -> {
+                    val reference = value.reference()
+                    timings.execute { writeGlobalReference(global, reference) }
+                }
+                else -> return failure(fixture, context, "global write failed", "unsupported value $value")
+            }
             CorpusResult.Success
         } catch (failure: IllegalArgumentException) {
             failure(fixture, context, "global write failed", failure.message)
@@ -643,7 +654,6 @@ class ChasmCorpusRunner(
     private fun runGlobalRead(
         fixture: Fixture,
         context: String,
-        store: Store,
         setup: RuntimeSetup,
         captures: MutableMap<String, ExecutionValue>,
         step: JsonObject,
@@ -651,13 +661,16 @@ class ChasmCorpusRunner(
     ): CorpusResult {
         val global = resolveGlobal(setup, step.string("global"))
             ?: return failure(fixture, context, "global not found", step.string("global"))
-        val actual = timings.execute { readGlobal(store, global) }
+        val actual = when (val type = global.type.valueType) {
+            is ValueType.Reference -> referenceValue(timings.execute { readGlobalReference(global) }, type.referenceType.heapType)
+            else -> numberValue(timings.execute { readGlobal(global) }, type)
+        }
         val expected = parseValue(step.getValue("assert").jsonObject.getValue("value").jsonObject, captures)
 
-        return if (expected.toLongFromBoxed() == actual.toLongFromBoxed()) {
+        return if (expected.matches(actual)) {
             CorpusResult.Success
         } else {
-            failure(fixture, context, "global mismatch", expected = expected.describeBits(), actual = actual.describeBits())
+            failure(fixture, context, "global mismatch", expected = expected.describe(), actual = actual.describe())
         }
     }
 
@@ -665,12 +678,12 @@ class ChasmCorpusRunner(
         setup: RuntimeSetup,
         name: String,
     ): Memory? {
-        setup.instance.exports.firstOrNull { export -> export.name == name }?.value?.let { value ->
+        setup.exports.all.firstOrNull { export -> export.name == name }?.value?.let { value ->
             return value as? Memory
         }
         if (name == "env.memory") return setup.importMemories[name]
         if (name == "memory") {
-            setup.instance.exports.firstOrNull { export -> export.value is Memory }?.value?.let { value ->
+            setup.exports.all.firstOrNull { export -> export.value is Memory }?.value?.let { value ->
                 return value as Memory
             }
         }
@@ -681,7 +694,7 @@ class ChasmCorpusRunner(
         setup: RuntimeSetup,
         name: String,
     ): Global? {
-        setup.instance.exports.firstOrNull { export -> export.name == name }?.value?.let { value ->
+        setup.exports.all.firstOrNull { export -> export.name == name }?.value?.let { value ->
             return value as? Global
         }
         return setup.importGlobals[name]
@@ -698,15 +711,32 @@ class ChasmCorpusRunner(
     }
 
     private fun defaultValue(type: ValueType): ExecutionValue = when (type) {
-        is ValueType.Number -> when (type.numberType.name) {
-            "I32" -> NumberValue.I32(0)
-            "I64" -> NumberValue.I64(0)
-            "F32" -> NumberValue.F32(0f)
-            "F64" -> NumberValue.F64(0.0)
-            else -> NumberValue.I32(0)
-        }
+        is ValueType.Number -> numberValue(0L, type)
         is ValueType.Reference -> ReferenceValue.Null(type.referenceType.heapType)
-        else -> ExecutionValue.Uninitialised
+        else -> error("Unsupported corpus value type: $type")
+    }
+
+    private fun numberValue(
+        bits: Long,
+        type: ValueType,
+    ): NumberValue<*> = when ((type as ValueType.Number).numberType) {
+        NumberType.I32 -> NumberValue.I32(bits.toInt())
+        NumberType.I64 -> NumberValue.I64(bits)
+        NumberType.F32 -> NumberValue.F32(Float.fromBits(bits.toInt()))
+        NumberType.F64 -> NumberValue.F64(Double.fromBits(bits))
+    }
+
+    private fun referenceValue(
+        reference: Any?,
+        heapType: HeapType,
+    ): ReferenceValue = when (reference) {
+        null -> ReferenceValue.Null(heapType)
+        is StructReference -> ReferenceValue.Struct(reference)
+        is ArrayReference -> ReferenceValue.Array(reference)
+        is I31Reference -> ReferenceValue.I31(reference)
+        is FunctionReference -> ReferenceValue.Function(reference)
+        is ExceptionReference -> ReferenceValue.Exception(reference)
+        else -> ReferenceValue.Extern(reference)
     }
 
     private fun parseFixtureValue(value: FixtureValue): ExecutionValue {
@@ -739,7 +769,7 @@ class ChasmCorpusRunner(
             "i32" -> {
                 val parsed = raw?.let { it.toIntOrNull() ?: it.toUInt().toInt() } ?: 0
                 if (expectedType is ValueType.Reference) {
-                    ReferenceValue.I31(parsed.toUInt())
+                    ReferenceValue.I31(I31Reference(parsed))
                 } else {
                     NumberValue.I32(parsed)
                 }
@@ -749,14 +779,13 @@ class ChasmCorpusRunner(
             "f64" -> NumberValue.F64(raw?.let { Double.fromBits(it.toULong().toLong()) } ?: 0.0)
             "funcref" -> ReferenceValue.Null(AbstractHeapType.Func)
             "externref" -> ReferenceValue.Null(AbstractHeapType.Extern)
-            else -> ExecutionValue.Uninitialised
+            else -> error("Unsupported corpus value type: $type")
         }
     }
 
     private fun readMemoryValue(
         fixture: Fixture,
         context: String,
-        store: Store,
         memory: Memory,
         offset: Int,
         type: String,
@@ -765,7 +794,7 @@ class ChasmCorpusRunner(
         val size = if (type == "i64" || type == "f64") 8 else 4
         val buffer = ByteArray(size)
         val bytes = try {
-            timings.execute { readBytes(store, memory, buffer, offset, size) }
+            timings.execute { readBytes(memory, buffer, offset, size) }
         } catch (_: IndexOutOfBoundsException) {
             return null
         }
@@ -788,11 +817,11 @@ class ChasmCorpusRunner(
     ): Int {
         value.jsonPrimitiveOrNull()?.intOrNull?.let { return it }
         val variable = value.jsonObject["var"]?.jsonPrimitive?.content ?: error("Invalid corpus index expression")
-        return captures.getValue(variable).toLongFromBoxed().toInt()
+        return (captures.getValue(variable) as NumberValue<*>).bits().toInt()
     }
 
     private fun encodeValueBytes(value: JsonObject): ByteArray {
-        val parsed = parseValue(value, emptyMap()).toLongFromBoxed()
+        val parsed = (parseValue(value, emptyMap()) as NumberValue<*>).bits()
         val size = when (value.string("type")) {
             "i64", "f64" -> 8
             else -> 4
@@ -842,7 +871,32 @@ class ChasmCorpusRunner(
 
     private fun JsonElement.jsonPrimitiveOrNull(): JsonPrimitive? = this as? JsonPrimitive
 
-    private fun ExecutionValue.describeBits(): String = "bits=${toLongFromBoxed()}"
+    private fun NumberValue<*>.bits(): Long = when (this) {
+        is NumberValue.I32 -> value.toLong()
+        is NumberValue.I64 -> value
+        is NumberValue.F32 -> value.toRawBits().toLong()
+        is NumberValue.F64 -> value.toRawBits()
+    }
+
+    private fun ReferenceValue.reference(): Any? = when (this) {
+        is ReferenceValue.Null -> null
+        is ReferenceValue.Struct -> reference
+        is ReferenceValue.Array -> reference
+        is ReferenceValue.I31 -> reference
+        is ReferenceValue.Function -> reference
+        is ReferenceValue.Exception -> reference
+        is ReferenceValue.Extern -> value
+    }
+
+    private fun ExecutionValue.matches(other: ExecutionValue): Boolean = when (this) {
+        is NumberValue<*> -> other is NumberValue<*> && bits() == other.bits()
+        else -> this == other
+    }
+
+    private fun ExecutionValue.describe(): String = when (this) {
+        is NumberValue<*> -> "bits=${bits()}"
+        else -> toString()
+    }
 
     private fun ByteArray.readLittleEndian(): Long {
         var result = 0L
@@ -856,7 +910,7 @@ class ChasmCorpusRunner(
         byte.toUByte().toString(16).padStart(2, '0')
     }
 
-    private fun hostFunctionExitCodeOrNull(error: ExecutionError<*>): Int? {
+    private fun hostFunctionExitCodeOrNull(error: ExecutionError): Int? {
 
         val trap = (error as? ExecutionError.Trapped)?.trap ?: return null
         if (trap.reason != TrapReason.HOST_FUNCTION_FAILURE) {
@@ -903,7 +957,9 @@ class ChasmCorpusRunner(
     )
 
     private data class RuntimeSetup(
+        val module: Module,
         val instance: Instance,
+        val exports: Exports,
         val importMemories: Map<String, Memory>,
         val importGlobals: Map<String, Global>,
         val hosts: List<EmbedderHost>,
@@ -911,17 +967,9 @@ class ChasmCorpusRunner(
         val stderr: MutableList<Byte>,
         val importCaptures: Map<String, ImportCapture>,
     ) {
-        fun functionType(
-            store: Store,
-            name: String,
-        ): FunctionType? {
-            val address = instance.instance.exports
-                .firstOrNull { export -> export.name.name == name }
-                ?.value
-                ?.let { value -> (value as? ExternalValue.Function)?.address }
-                ?: return null
-
-            return store.store.functions.getOrNull(address.address)?.functionType
+        fun functionType(name: String): FunctionType? {
+            val export = module.exports.firstOrNull { definition -> definition.name == name } ?: return null
+            return (export.type as? ExternalType.Function)?.functionType
         }
 
         fun close() {
@@ -1013,12 +1061,11 @@ class ChasmCorpusRunner(
     ) {
         fun append(
             capture: FixtureImportCapture,
-            params: List<ExecutionValue>,
+            params: List<Long>,
         ) {
             if (calls < maxCalls) {
-                val value = params.getOrNull(capture.param)
+                val bits = params.getOrNull(capture.param)
                     ?: error("Import capture ${capture.name} param ${capture.param} is missing")
-                val bits = value.toLongFromBoxed()
                 when (capture.format ?: capture.encoding ?: "utf16_code_unit") {
                     "utf16_code_unit" -> text.append((bits.toInt() and 0xffff).toChar())
                     "unicode_code_point" -> text.appendCodePoint(bits.toInt())

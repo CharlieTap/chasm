@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.compiled.script
 
+import io.github.charlietap.chasm.aot.store
 import io.github.charlietap.chasm.compiled.Compiler
 import io.github.charlietap.chasm.compiled.script.command.CommandResult
 import io.github.charlietap.chasm.compiled.script.command.CommandRunner
@@ -8,7 +9,6 @@ import io.github.charlietap.chasm.config.Config
 import io.github.charlietap.chasm.config.GCStrategy
 import io.github.charlietap.chasm.config.StoreConfig
 import io.github.charlietap.chasm.embedding.dropStore
-import io.github.charlietap.chasm.embedding.store
 import io.github.charlietap.sweet.lib.Script
 import io.github.charlietap.sweet.lib.ScriptResult
 import io.github.charlietap.sweet.lib.ScriptRunner

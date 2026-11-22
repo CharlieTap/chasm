@@ -52,7 +52,6 @@ include(":benchmark")
 include(":chasm")
 include(":chasm-aot")
 include(":chasm-jit")
-include(":chasm-coroutines")
 include(":chasm-gradle-plugin")
 include(":cir")
 include(":config")
@@ -69,7 +68,7 @@ include(":executor:dispatch")
 include(":executor:instantiator")
 include(":executor:interpreter")
 
-include(":host")
+include(":runtime:host")
 
 include(":gc")
 

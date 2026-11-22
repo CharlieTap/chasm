@@ -86,7 +86,7 @@ class TableOperations(
         require(count >= 0) { "negative growth $count" }
         require(check(table).accepts(initial)) { "the value does not match the table's element type" }
 
-        return tableGrow(table, count, initial)
+        return tableGrowWithoutTrap(table, count, initial)
     }
 
     fun fillTable(

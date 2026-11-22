@@ -10,7 +10,6 @@ import io.github.charlietap.chasm.aot.internal.readTrapLines
 import io.github.charlietap.chasm.aot.internal.readTrapSites
 import io.github.charlietap.chasm.aot.internal.trapLinesResource
 import io.github.charlietap.chasm.aot.internal.trapSitesResource
-import io.github.charlietap.chasm.declarations.ModuleDeclarations
 
 @ExperimentalChasmApi
 @OptIn(InternalChasmApi::class)
@@ -22,16 +21,6 @@ class CompiledModule internal constructor(
 
     val metadata: CompiledModuleMetadata
         get() = metadataResult.getOrThrow()
-
-    @InternalChasmApi
-    @Suppress("TooGenericExceptionCaught")
-    val declarations: Result<ModuleDeclarations> by lazy {
-        try {
-            Result.success(code.buildDeclarations())
-        } catch (exception: Exception) {
-            Result.failure(exception)
-        }
-    }
 
     // The package the module was compiled into, which its code's class names keep unless a shrinker renames them.
     @InternalChasmApi

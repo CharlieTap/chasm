@@ -3,11 +3,11 @@ package io.github.charlietap.chasm.runtime
 import io.github.charlietap.chasm.config.GCStrategy
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.fixture.config.runtimeConfig
-import io.github.charlietap.chasm.host.HostExternKind
-import io.github.charlietap.chasm.host.HostExternReference
-import io.github.charlietap.chasm.host.withExterns
 import io.github.charlietap.chasm.runtime.encoder.ReferenceValueEncoder
+import io.github.charlietap.chasm.runtime.host.HostExternKind
+import io.github.charlietap.chasm.runtime.host.HostExternReference
 import io.github.charlietap.chasm.runtime.store.Store
+import io.github.charlietap.chasm.runtime.store.withLiveStack
 import io.github.charlietap.chasm.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.type.AbstractHeapType
 import kotlin.test.Test
@@ -25,7 +25,7 @@ class HostExternsTest {
         val marker = store.heap.beginScope()
 
         val reference = context(context) {
-            withExterns { create("value") }
+            context.externs.create("value")
         }
 
         assertEquals("value", store.heap.value(reference))
@@ -101,7 +101,9 @@ class HostExternsTest {
         assertEquals(64, store.heap.countLiveExterns())
 
         val marker = store.heap.beginScope()
-        val created = context(context) { store.heap.create("created") }
+        val created = store.withLiveStack(context.vstack) {
+            context(context) { store.heap.create("created") }
+        }
 
         assertEquals(2, store.heap.countLiveExterns())
         assertEquals("stack root", store.heap.value(stackRoot))

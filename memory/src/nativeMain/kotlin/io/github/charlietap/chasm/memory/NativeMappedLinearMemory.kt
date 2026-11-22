@@ -6,7 +6,7 @@
 package io.github.charlietap.chasm.memory
 
 import io.github.charlietap.chasm.config.LinearMemoryConfig
-import io.github.charlietap.chasm.host.HostMemory
+import io.github.charlietap.chasm.runtime.host.HostMemory
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
 import kotlinx.cinterop.ByteVar
 import kotlinx.cinterop.CPointer

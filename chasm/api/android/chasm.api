@@ -1,42 +1,18 @@
 public final class io/github/charlietap/chasm/embedding/ComponentKt {
-	public static final fun component (Lio/github/charlietap/chasm/stream/SourceReader;Lio/github/charlietap/chasm/config/ComponentConfig;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
-	public static final fun component ([BLio/github/charlietap/chasm/config/ComponentConfig;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
-	public static synthetic fun component$default (Lio/github/charlietap/chasm/stream/SourceReader;Lio/github/charlietap/chasm/config/ComponentConfig;ILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
-	public static synthetic fun component$default ([BLio/github/charlietap/chasm/config/ComponentConfig;ILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+	public static final fun component (Lio/github/charlietap/chasm/stream/SourceReader;Lio/github/charlietap/chasm/config/ComponentConfig;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun component ([BLio/github/charlietap/chasm/config/ComponentConfig;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun component$default (Lio/github/charlietap/chasm/stream/SourceReader;Lio/github/charlietap/chasm/config/ComponentConfig;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun component$default ([BLio/github/charlietap/chasm/config/ComponentConfig;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 }
 
-public final class io/github/charlietap/chasm/embedding/InstanceKt {
-	public static final fun instance (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Module;Ljava/util/List;Lio/github/charlietap/chasm/config/RuntimeConfig;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
-	public static synthetic fun instance$default (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Module;Ljava/util/List;Lio/github/charlietap/chasm/config/RuntimeConfig;ILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
-}
-
-public final class io/github/charlietap/chasm/embedding/ModuleInfoKt {
-	public static final fun moduleInfo (Lio/github/charlietap/chasm/embedding/shapes/Module;)Lio/github/charlietap/chasm/embedding/shapes/ModuleInfo;
-}
-
-public final class io/github/charlietap/chasm/embedding/ModuleKt {
-	public static final fun module (Lio/github/charlietap/chasm/stream/SourceReader;Lio/github/charlietap/chasm/config/ModuleConfig;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
-	public static final fun module ([BLio/github/charlietap/chasm/config/ModuleConfig;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
-	public static synthetic fun module$default (Lio/github/charlietap/chasm/stream/SourceReader;Lio/github/charlietap/chasm/config/ModuleConfig;ILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
-	public static synthetic fun module$default ([BLio/github/charlietap/chasm/config/ModuleConfig;ILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+public final class io/github/charlietap/chasm/embedding/StoreKt {
+	public static final fun memory (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/type/MemoryType;Lio/github/charlietap/chasm/config/LinearMemoryConfig;)Lio/github/charlietap/chasm/embedding/shapes/Memory;
+	public static final fun store (Lio/github/charlietap/chasm/config/StoreConfig;)Lio/github/charlietap/chasm/embedding/shapes/Store;
+	public static synthetic fun store$default (Lio/github/charlietap/chasm/config/StoreConfig;ILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/Store;
 }
 
 public final class io/github/charlietap/chasm/embedding/ValidateKt {
-	public static final fun validate (Lio/github/charlietap/chasm/embedding/shapes/Component;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
-	public static final fun validate (Lio/github/charlietap/chasm/embedding/shapes/Module;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
-}
-
-public final class io/github/charlietap/chasm/embedding/internal/InstanceKt {
-	public static final fun _instance (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Module;Ljava/util/List;Lio/github/charlietap/chasm/config/RuntimeConfig;Lio/github/charlietap/chasm/parallel/ParallelTaskExecutor;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-}
-
-public final class io/github/charlietap/chasm/embedding/internal/ModuleKt {
-	public static final fun _module ([BLio/github/charlietap/chasm/config/ModuleConfig;Lio/github/charlietap/chasm/parallel/ParallelTaskExecutor;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun _module ([BLio/github/charlietap/chasm/config/ModuleConfig;Lio/github/charlietap/chasm/parallel/ParallelTaskExecutor;ZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
-}
-
-public final class io/github/charlietap/chasm/embedding/internal/ValidateKt {
-	public static final fun _validate (Lio/github/charlietap/chasm/embedding/shapes/Module;Lio/github/charlietap/chasm/parallel/ParallelTaskExecutor;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun validate (Lio/github/charlietap/chasm/embedding/shapes/Component;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public final class io/github/charlietap/chasm/embedding/shapes/Component {

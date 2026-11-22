@@ -1,16 +1,17 @@
 package io.github.charlietap.chasm.jit
 
-import io.github.charlietap.chasm.embedding.compiled.Import
-import io.github.charlietap.chasm.embedding.compiled.Instance
-import io.github.charlietap.chasm.embedding.compiled.Store
-import io.github.charlietap.chasm.embedding.compiled.exports
-import io.github.charlietap.chasm.embedding.compiled.instance
-import io.github.charlietap.chasm.embedding.compiled.invoke
-import io.github.charlietap.chasm.embedding.compiled.value.ExecutionValue
-import io.github.charlietap.chasm.embedding.compiled.value.NumberValue.I32
-import io.github.charlietap.chasm.embedding.compiled.value.NumberValue.I64
+import io.github.charlietap.chasm.embedding.exports
+import io.github.charlietap.chasm.embedding.instance
+import io.github.charlietap.chasm.embedding.invoke
+import io.github.charlietap.chasm.embedding.module
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
+import io.github.charlietap.chasm.embedding.shapes.Import
+import io.github.charlietap.chasm.embedding.shapes.Instance
+import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.shapes.expect
+import io.github.charlietap.chasm.embedding.value.ExecutionValue
+import io.github.charlietap.chasm.embedding.value.NumberValue.I32
+import io.github.charlietap.chasm.embedding.value.NumberValue.I64
 import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -69,7 +70,7 @@ class LocalThrowsTest {
     @Test
     fun uncaughtLocalThrowsFailTheCall() {
 
-        val uncaught = invoke(store, instance, "uncaught_propagates", listOf(I32(3)))
+        val uncaught = invoke(instance, "uncaught_propagates", listOf(I32(3)))
 
         assertIs<ChasmResult.Error<*>>(uncaught)
         assertEquals(I32(5), call("catch_all_then_continue", I32(3)))
@@ -79,7 +80,7 @@ class LocalThrowsTest {
         name: String,
         argument: ExecutionValue,
     ): ExecutionValue {
-        return invoke(store, instance, name, listOf(argument)).expect(name).single()
+        return invoke(instance, name, listOf(argument)).expect(name).single()
     }
 
     private fun instantiate(store: Store): Instance {

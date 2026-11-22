@@ -7,6 +7,7 @@ import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesTo
 import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
+import kotlinx.coroutines.runBlocking
 import java.io.FileNotFoundException
 
 @ContributesTo(AppScope::class)
@@ -20,6 +21,6 @@ interface TestProvider {
         val bytes = TestProvider::class.java.classLoader.getResourceAsStream("test.wasm")?.use {
             it.readBytes()
         } ?: throw FileNotFoundException("Could not find resource 'test.wasm' on the classpath")
-        return testService(bytes, wasiHost)
+        return runBlocking { testService(bytes, wasiHost) }
     }
 }

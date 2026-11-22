@@ -27,6 +27,7 @@ kotlin {
             dependencies {
                 implementation(projects.compiler.frontend)
                 implementation(projects.decoder)
+                implementation(projects.embeddingApi)
                 implementation(projects.validator)
                 implementation(libs.kotlin.test)
                 implementation(libs.result)

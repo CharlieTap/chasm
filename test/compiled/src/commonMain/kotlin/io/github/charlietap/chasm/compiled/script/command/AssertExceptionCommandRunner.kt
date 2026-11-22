@@ -28,7 +28,7 @@ private fun AssertExceptionCommandRunner(
             CommandResult.Failure(command, "expected exception but action succeeded")
         }
         is ActionResult.Failure -> {
-            if (result.error is ExecutionError.Thrown<*>) {
+            if (result.error is ExecutionError.Thrown) {
                 CommandResult.Success
             } else {
                 CommandResult.Failure(command, "expected trap but encountered error ${result.error} with reason ${result.reason}")

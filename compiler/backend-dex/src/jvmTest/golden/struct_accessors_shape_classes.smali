@@ -19,28 +19,18 @@
 
 
 # virtual methods
-.method public length()I
+.method public engine()Lio/github/charlietap/chasm/embedding/engine/Engine;
     .registers 2
 
-    iget-object v0, p0, Lchasm/gc/Ac0286ece071e69880d9c42db8f326591_0;->data:[Lchasm/gc/Sfbe3de40f765f78d9a17013eded91e72_0;
-
-    array-length v0, v0
-
-    return v0
-.end method
-
-.method public owner()Ljava/lang/Object;
-    .registers 2
-
-    sget-object v0, Lchasm/gc/ShapeOwner;->engine:Ljava/lang/Object;
-
-    check-cast v0, Ljava/lang/ref/WeakReference;
+    sget-object v0, Lchasm/gc/ShapeOwner;->engine:Ljava/lang/ref/WeakReference;
 
     invoke-virtual {v0}, Ljava/lang/ref/WeakReference;->get()Ljava/lang/Object;
 
     move-result-object v0
 
     if-eqz v0, :cond_b
+
+    check-cast v0, Lio/github/charlietap/chasm/embedding/engine/Engine;
 
     return-object v0
 
@@ -50,6 +40,16 @@
     move-result-object v0
 
     throw v0
+.end method
+
+.method public length()I
+    .registers 2
+
+    iget-object v0, p0, Lchasm/gc/Ac0286ece071e69880d9c42db8f326591_0;->data:[Lchasm/gc/Sfbe3de40f765f78d9a17013eded91e72_0;
+
+    array-length v0, v0
+
+    return v0
 .end method
 
 .method public storage()Ljava/lang/Object;
@@ -75,18 +75,18 @@
 
 
 # virtual methods
-.method public owner()Ljava/lang/Object;
+.method public engine()Lio/github/charlietap/chasm/embedding/engine/Engine;
     .registers 2
 
-    sget-object v0, Lchasm/gc/ShapeOwner;->engine:Ljava/lang/Object;
-
-    check-cast v0, Ljava/lang/ref/WeakReference;
+    sget-object v0, Lchasm/gc/ShapeOwner;->engine:Ljava/lang/ref/WeakReference;
 
     invoke-virtual {v0}, Ljava/lang/ref/WeakReference;->get()Ljava/lang/Object;
 
     move-result-object v0
 
     if-eqz v0, :cond_b
+
+    check-cast v0, Lio/github/charlietap/chasm/embedding/engine/Engine;
 
     return-object v0
 
@@ -117,18 +117,18 @@
 
 
 # virtual methods
-.method public owner()Ljava/lang/Object;
+.method public engine()Lio/github/charlietap/chasm/embedding/engine/Engine;
     .registers 2
 
-    sget-object v0, Lchasm/gc/ShapeOwner;->engine:Ljava/lang/Object;
-
-    check-cast v0, Ljava/lang/ref/WeakReference;
+    sget-object v0, Lchasm/gc/ShapeOwner;->engine:Ljava/lang/ref/WeakReference;
 
     invoke-virtual {v0}, Ljava/lang/ref/WeakReference;->get()Ljava/lang/Object;
 
     move-result-object v0
 
     if-eqz v0, :cond_b
+
+    check-cast v0, Lio/github/charlietap/chasm/embedding/engine/Engine;
 
     return-object v0
 
@@ -194,18 +194,18 @@
 
 
 # virtual methods
-.method public owner()Ljava/lang/Object;
+.method public engine()Lio/github/charlietap/chasm/embedding/engine/Engine;
     .registers 2
 
-    sget-object v0, Lchasm/gc/ShapeOwner;->engine:Ljava/lang/Object;
-
-    check-cast v0, Ljava/lang/ref/WeakReference;
+    sget-object v0, Lchasm/gc/ShapeOwner;->engine:Ljava/lang/ref/WeakReference;
 
     invoke-virtual {v0}, Ljava/lang/ref/WeakReference;->get()Ljava/lang/Object;
 
     move-result-object v0
 
     if-eqz v0, :cond_b
+
+    check-cast v0, Lio/github/charlietap/chasm/embedding/engine/Engine;
 
     return-object v0
 
@@ -222,4 +222,4 @@
 
 
 # static fields
-.field public static engine:Ljava/lang/Object;
+.field public static engine:Ljava/lang/ref/WeakReference;

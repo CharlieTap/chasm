@@ -3,7 +3,6 @@ package io.github.charlietap.chasm.integration.test
 import io.github.charlietap.chasm.embedding.error.TrapReason
 import io.github.charlietap.chasm.embedding.function
 import io.github.charlietap.chasm.embedding.shapes.Import
-import io.github.charlietap.chasm.embedding.store
 import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.fixture.type.i32ValueType
 import io.github.charlietap.chasm.fixture.type.resultType
@@ -21,7 +20,7 @@ class HostFunctionExceptionTest {
     @Test
     fun `can run a host function that throws an exception and return a chasm error`() = integrationTest(FIXTURE) {
 
-        val store = store()
+        val store = engine.store()
 
         val functionType = functionType(
             results = resultType(

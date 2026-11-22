@@ -1,28 +1,38 @@
+@file:OptIn(ExperimentalChasmApi::class)
+
 package com.test
 
+import io.github.charlietap.chasm.ExperimentalChasmApi
 import io.github.charlietap.chasm.embedding.codegen.CodegenImport
-import io.github.charlietap.chasm.embedding.codegen.InstanceFactory
-import io.github.charlietap.chasm.embedding.codegen.ModuleFactory
 import io.github.charlietap.chasm.embedding.codegen.allocateImports
 import io.github.charlietap.chasm.embedding.instance
+import io.github.charlietap.chasm.embedding.invokeUnboxed
 import io.github.charlietap.chasm.embedding.module
 import io.github.charlietap.chasm.embedding.prepareFunction
+import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.Instance
+import io.github.charlietap.chasm.embedding.shapes.Module
 import io.github.charlietap.chasm.embedding.shapes.PreparedFunction
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.shapes.`expect`
 import io.github.charlietap.chasm.embedding.store
-import io.github.charlietap.chasm.runtime.`value`.ExecutionValue
-import io.github.charlietap.chasm.runtime.`value`.NumberValue
+import kotlin.Any
+import kotlin.Array
 import kotlin.ByteArray
 import kotlin.Float
+import kotlin.LongArray
+import kotlin.OptIn
 import kotlin.collections.List
 
-public fun floatReturn(
+public suspend fun floatReturn(
   binary: ByteArray,
   imports: List<CodegenImport> = emptyList(),
-  moduleFactory: ModuleFactory? = null,
-  instanceFactory: InstanceFactory? = null,
+  moduleFactory: (suspend (ByteArray) -> Module)? = null,
+  instanceFactory: (suspend (
+    Store,
+    Module,
+    List<Import>,
+  ) -> Instance)? = null,
 ): FloatReturn {
   val store = store()
   val module = moduleFactory?.invoke(binary) ?: module(binary).`expect`("Failed to decode binary")
@@ -36,12 +46,15 @@ private class FloatReturnImpl(
   private val instance: Instance,
 ) : FloatReturn {
   private val invokePreparedFunction: PreparedFunction =
-      prepareFunction(store, instance, "invoke").`expect`("Failed to prepare function invoke")
+      prepareFunction(instance, "invoke").`expect`("Failed to prepare function invoke")
+
+  private val invokeWords: LongArray = LongArray(1)
+
+  private val noReferences: Array<Any?> = arrayOfNulls<Any>(0)
 
   override fun invoke(): Float {
-    val args = emptyList<ExecutionValue>()
-    val values = invokePreparedFunction(args).`expect`("Failed to invoke function invoke")
-    val result = (values.first() as NumberValue.F32).value
+    invokePreparedFunction.invokeUnboxed(invokeWords, noReferences).`expect`("Failed to invoke function invoke")
+    val result = Float.fromBits(invokeWords[0].toInt())
     return result
   }
 }

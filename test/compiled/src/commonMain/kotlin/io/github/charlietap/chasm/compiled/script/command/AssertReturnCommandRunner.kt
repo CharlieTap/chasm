@@ -6,7 +6,7 @@ import io.github.charlietap.chasm.compiled.script.action.ActionRunner
 import io.github.charlietap.chasm.compiled.script.ext.mismatchTemplate
 import io.github.charlietap.chasm.compiled.script.value.ValueMapper
 import io.github.charlietap.chasm.compiled.script.value.ValueMatcher
-import io.github.charlietap.chasm.runtime.value.ExecutionValue
+import io.github.charlietap.chasm.embedding.value.ExecutionValue
 import io.github.charlietap.sweet.lib.command.AssertReturnCommand
 import io.github.charlietap.sweet.lib.value.Value
 

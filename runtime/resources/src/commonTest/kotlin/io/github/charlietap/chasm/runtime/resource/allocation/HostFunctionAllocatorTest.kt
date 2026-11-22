@@ -4,7 +4,7 @@ import io.github.charlietap.chasm.fixture.runtime.instance.functionAddress
 import io.github.charlietap.chasm.fixture.runtime.instance.functionExternalValue
 import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.fixture.type.functionType
-import io.github.charlietap.chasm.host.HostFunction
+import io.github.charlietap.chasm.runtime.host.RawHostFunction
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.type.ext.definedType
 import kotlin.test.Test
@@ -21,7 +21,7 @@ class HostFunctionAllocatorTest {
         )
 
         val functionType = functionType()
-        val hostFunction = HostFunction { _, _ -> }
+        val hostFunction = RawHostFunction { _, _ -> }
 
         val rtt = store.heap.registerRuntimeType(functionType.definedType())
 

@@ -8,6 +8,7 @@ import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
+import io.github.charlietap.chasm.runtime.store.withLiveStack
 import io.github.charlietap.chasm.runtime.type.RTT
 import io.github.charlietap.chasm.type.AbstractHeapType
 import io.github.charlietap.chasm.type.ArrayType
@@ -146,7 +147,7 @@ class ExceptionStoreTest {
         )
         val roots = ValueStack().apply { push(exceptionReference) }
 
-        store.heap.collectGarbage(store, roots)
+        store.withLiveStack(roots) { store.heap.collectGarbage(store) }
 
         assertEquals(runtimeType.value, store.heap.structRuntimeTypeIdOrNegative(retainedStruct))
         assertEquals(-1, store.heap.structRuntimeTypeIdOrNegative(falseCandidate))
@@ -204,7 +205,7 @@ class ExceptionStoreTest {
         )
         store.heap.setArrayElementTrusted(arrayReference, 0, exceptionReference)
 
-        store.heap.collectGarbage(store, ValueStack().apply { push(exceptionReference) })
+        store.withLiveStack(ValueStack().apply { push(exceptionReference) }) { store.heap.collectGarbage(store) }
         assertEquals(tagAddress.address, store.heap.exceptionTagAddressOrNegative(exceptionReference))
         assertEquals(arrayRuntimeType.value, store.heap.arrayRuntimeTypeIdOrNegative(arrayReference))
 

@@ -1,19 +1,19 @@
 package io.github.charlietap.chasm.runtime.compiled.gc
 
-import io.github.charlietap.chasm.host.HostFunction
-import io.github.charlietap.chasm.host.HostModuleInstance
 import io.github.charlietap.chasm.host.HostParameters
-import io.github.charlietap.chasm.host.HostResources
 import io.github.charlietap.chasm.host.HostResults
 import io.github.charlietap.chasm.host.HostStack
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
+import io.github.charlietap.chasm.runtime.host.RawHostFunction
+import io.github.charlietap.chasm.runtime.host.RawHostModuleInstance
+import io.github.charlietap.chasm.runtime.host.RawHostResources
 import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.chasm.type.ValueType
 
 abstract class ObjectLaneHostFunction(
     type: FunctionType,
-) : HostFunction {
+) : RawHostFunction {
 
     private val resultTypes = type.results.types
 
@@ -45,11 +45,11 @@ abstract class ObjectLaneHostFunction(
         references: Array<Any?>,
         parameters: Int,
         results: Int,
-        caller: HostModuleInstance,
-        resources: HostResources,
+        caller: RawHostModuleInstance,
+        resources: RawHostResources,
     )
 
-    context(stack: HostStack, caller: HostModuleInstance, resources: HostResources)
+    context(stack: HostStack, caller: RawHostModuleInstance, resources: RawHostResources)
     override fun invoke(
         parameters: HostParameters,
         results: HostResults,

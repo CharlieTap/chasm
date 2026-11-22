@@ -50,6 +50,7 @@ internal fun TrapSnapshot(
         val strategy = function.callStrategy
         val innermost = frames.total == 0
         val compiled = if (strategy.compiledEntry != null) function.module.compiledFrames else null
+        var enteredCompiled = false
         if (compiled != null && exception != null) {
             val reader = trace ?: compiled.trace(store, exception).also { created -> trace = created }
             val before = frames.total
@@ -57,6 +58,7 @@ internal fun TrapSnapshot(
                 frames.add(address, position, TrapSnapshot.COMPILED_FRAME, TrapSnapshot.COMPILED_FRAME)
             }
             if (!reachedEntry) complete = false
+            enteredCompiled = reachedEntry
             if (frames.total == before) {
                 frames.add(lookup.address(index), -1, TrapSnapshot.COMPILED_FRAME, TrapSnapshot.COMPILED_FRAME)
             }
@@ -75,7 +77,7 @@ internal fun TrapSnapshot(
 
         val headerSlot = fp + strategy.interfaceSlotCount
         if (fp < 0 || headerSlot >= vstack.sp) {
-            complete = false
+            complete = complete && enteredCompiled && fp == 0
             break
         }
         val header = vstack.getFrameSlot(fp, strategy.interfaceSlotCount)

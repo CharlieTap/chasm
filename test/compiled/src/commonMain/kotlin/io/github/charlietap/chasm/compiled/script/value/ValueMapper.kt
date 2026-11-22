@@ -1,10 +1,9 @@
 package io.github.charlietap.chasm.compiled.script.value
 
-import io.github.charlietap.chasm.runtime.address.Address
-import io.github.charlietap.chasm.runtime.value.ExecutionValue
-import io.github.charlietap.chasm.runtime.value.NumberValue
-import io.github.charlietap.chasm.runtime.value.ReferenceValue
-import io.github.charlietap.chasm.runtime.value.VectorValue
+import io.github.charlietap.chasm.embedding.value.ExecutionValue
+import io.github.charlietap.chasm.embedding.value.NumberValue
+import io.github.charlietap.chasm.embedding.value.ReferenceValue
+import io.github.charlietap.chasm.embedding.value.VectorValue
 import io.github.charlietap.chasm.type.AbstractHeapType
 import io.github.charlietap.chasm.type.BottomType
 import io.github.charlietap.sweet.lib.value.Value
@@ -92,7 +91,7 @@ private fun f64ValueMapper(
 private fun anyRefValueMapper(
     value: Value.AnyRef,
 ): ReferenceValue = value.value?.let(::coalesceNullableInt)?.let {
-    ReferenceValue.Host(Address.Host(it))
+    ReferenceValue.Extern(HostReference(it))
 } ?: ReferenceValue.Null(AbstractHeapType.Any)
 
 private fun arrayRefValueMapper(
@@ -109,9 +108,10 @@ private fun bottomRefValueMapper(
 
 private fun funcRefValueMapper(
     value: Value.FuncRef,
-): ReferenceValue = value.value?.let(::coalesceNullableInt)?.let {
-    ReferenceValue.Function(Address.Function(it))
-} ?: ReferenceValue.Null(AbstractHeapType.Func)
+): ReferenceValue? = when (value.value?.let(::coalesceNullableInt)) {
+    null -> ReferenceValue.Null(AbstractHeapType.Func)
+    else -> null
+}
 
 private fun eqRefValueMapper(
     value: Value.EqRef,
@@ -128,7 +128,7 @@ private fun exceptionRefValueMapper(
 private fun externRefValueMapper(
     value: Value.ExternRef,
 ): ReferenceValue = value.value?.let(::coalesceNullableInt)?.let {
-    ReferenceValue.Extern(ReferenceValue.Host(Address.Host(it)))
+    ReferenceValue.Extern(HostReference(it))
 } ?: ReferenceValue.Null(AbstractHeapType.Extern)
 
 private fun i31RefValueMapper(

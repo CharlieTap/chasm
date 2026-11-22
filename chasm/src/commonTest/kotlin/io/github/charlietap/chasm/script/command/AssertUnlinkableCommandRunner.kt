@@ -2,30 +2,27 @@ package io.github.charlietap.chasm.script.command
 
 import io.github.charlietap.chasm.embedding.instance
 import io.github.charlietap.chasm.embedding.module
-import io.github.charlietap.chasm.embedding.shapes.flatMap
-import io.github.charlietap.chasm.embedding.shapes.fold
-import io.github.charlietap.chasm.embedding.validate
+import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.script.ScriptContext
 import io.github.charlietap.chasm.script.ext.readBytesFromPath
 import io.github.charlietap.sweet.lib.command.AssertUnlinkableCommand
 
-typealias AssertUnlinkableCommandRunner = (ScriptContext, AssertUnlinkableCommand) -> CommandResult
+typealias AssertUnlinkableCommandRunner = suspend (ScriptContext, AssertUnlinkableCommand) -> CommandResult
 
-fun AssertUnlinkableCommandRunner(
+suspend fun AssertUnlinkableCommandRunner(
     context: ScriptContext,
     command: AssertUnlinkableCommand,
 ): CommandResult {
     val moduleFilePath = context.binaryDirectory + "/" + command.filename
     val bytes = moduleFilePath.readBytesFromPath()
 
-    return module(bytes, context.config.moduleConfig)
-        .flatMap { module ->
-            validate(module)
-        }.flatMap { module ->
-            instance(context.store, module, context.imports, context.config.runtimeConfig)
-        }.fold({ _ ->
-            CommandResult.Failure(command, "unlinkable module was instantiated when it should have failed")
-        }) {
-            CommandResult.Success
-        }
+    val module = when (val decoded = module(bytes, context.config.moduleConfig)) {
+        is ChasmResult.Success -> decoded.result
+        is ChasmResult.Error -> return CommandResult.Success
+    }
+
+    return when (instance(context.store, module, context.imports, context.config.runtimeConfig)) {
+        is ChasmResult.Success -> CommandResult.Failure(command, "unlinkable module was instantiated when it should have failed")
+        is ChasmResult.Error -> CommandResult.Success
+    }
 }

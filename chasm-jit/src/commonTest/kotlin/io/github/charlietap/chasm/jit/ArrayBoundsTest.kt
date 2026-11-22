@@ -1,18 +1,19 @@
 package io.github.charlietap.chasm.jit
 
-import io.github.charlietap.chasm.embedding.compiled.Import
-import io.github.charlietap.chasm.embedding.compiled.Instance
-import io.github.charlietap.chasm.embedding.compiled.Store
-import io.github.charlietap.chasm.embedding.compiled.function
-import io.github.charlietap.chasm.embedding.compiled.host.HostFunction
-import io.github.charlietap.chasm.embedding.compiled.instance
-import io.github.charlietap.chasm.embedding.compiled.invoke
-import io.github.charlietap.chasm.embedding.compiled.value.NumberValue.I32
 import io.github.charlietap.chasm.embedding.dsl.FunctionTypeBuilder
 import io.github.charlietap.chasm.embedding.error.ExecutionError
 import io.github.charlietap.chasm.embedding.error.TrapReason
+import io.github.charlietap.chasm.embedding.function
+import io.github.charlietap.chasm.embedding.instance
+import io.github.charlietap.chasm.embedding.invoke
+import io.github.charlietap.chasm.embedding.module
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
+import io.github.charlietap.chasm.embedding.shapes.Import
+import io.github.charlietap.chasm.embedding.shapes.Instance
+import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.shapes.expect
+import io.github.charlietap.chasm.embedding.value.NumberValue.I32
+import io.github.charlietap.chasm.host.HostFunction
 import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -45,9 +46,9 @@ class ArrayBoundsTest {
     @Test
     fun aFailedSetLeavesTheArrayUnchanged() {
 
-        invoke(store, instance, "set_shared", listOf(I32(1), I32(7))).expect("set")
+        invoke(instance, "set_shared", listOf(I32(1), I32(7))).expect("set")
 
-        assertArrayTrap(invoke(store, instance, "set_shared", listOf(I32(4), I32(9))))
+        assertArrayTrap(invoke(instance, "set_shared", listOf(I32(4), I32(9))))
         assertEquals(I32(7), call("read_shared", 1).expect("read").single())
         assertEquals(I32(0), call("read_shared", 3).expect("read").single())
     }
@@ -60,7 +61,7 @@ class ArrayBoundsTest {
     @Test
     fun hostArrayIndexFailuresAreNotReportedAsArrayTraps() {
 
-        val result = runCatching { invoke(store, instance, "host_failure", emptyList()) }
+        val result = runCatching { invoke(instance, "host_failure", emptyList()) }
         val failure = result.exceptionOrNull()
 
         if (failure != null) {
@@ -80,7 +81,7 @@ class ArrayBoundsTest {
     private fun call(
         name: String,
         index: Int,
-    ) = invoke(store, instance, name, listOf(I32(index)))
+    ) = invoke(instance, name, listOf(I32(index)))
 
     private fun instantiate(store: Store): Instance {
 

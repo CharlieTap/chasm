@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.embedding.error
 
 import io.github.charlietap.chasm.InternalChasmApi
+import io.github.charlietap.chasm.reference.ExceptionReference
 
 class Trap
     @InternalChasmApi
@@ -69,6 +70,6 @@ class WasmStackTrace
     }
 
 class UncaughtWasmException(
-    val exception: Any?,
+    val exception: ExceptionReference,
     message: String,
 ) : IllegalStateException(message)

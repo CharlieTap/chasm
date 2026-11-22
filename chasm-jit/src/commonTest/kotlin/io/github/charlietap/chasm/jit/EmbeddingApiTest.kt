@@ -1,92 +1,100 @@
+@file:OptIn(InternalChasmApi::class)
+
 package io.github.charlietap.chasm.jit
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.config.StoreConfig
-import io.github.charlietap.chasm.embedding.compiled.Global
-import io.github.charlietap.chasm.embedding.compiled.Import
-import io.github.charlietap.chasm.embedding.compiled.Instance
-import io.github.charlietap.chasm.embedding.compiled.Store
-import io.github.charlietap.chasm.embedding.compiled.addFuel
-import io.github.charlietap.chasm.embedding.compiled.arrayElementInfo
-import io.github.charlietap.chasm.embedding.compiled.arrayType
-import io.github.charlietap.chasm.embedding.compiled.collect
-import io.github.charlietap.chasm.embedding.compiled.copyMemory
-import io.github.charlietap.chasm.embedding.compiled.dropInstance
-import io.github.charlietap.chasm.embedding.compiled.dropStore
-import io.github.charlietap.chasm.embedding.compiled.exports
-import io.github.charlietap.chasm.embedding.compiled.fillMemory
-import io.github.charlietap.chasm.embedding.compiled.function
-import io.github.charlietap.chasm.embedding.compiled.global
-import io.github.charlietap.chasm.embedding.compiled.growMemory
-import io.github.charlietap.chasm.embedding.compiled.host.HostFunction
-import io.github.charlietap.chasm.embedding.compiled.host.HostModuleInstance
-import io.github.charlietap.chasm.embedding.compiled.host.copy
-import io.github.charlietap.chasm.embedding.compiled.host.fill
-import io.github.charlietap.chasm.embedding.compiled.host.hasPending
-import io.github.charlietap.chasm.embedding.compiled.host.move
-import io.github.charlietap.chasm.embedding.compiled.host.raise
-import io.github.charlietap.chasm.embedding.compiled.host.rawValue
-import io.github.charlietap.chasm.embedding.compiled.host.read
-import io.github.charlietap.chasm.embedding.compiled.host.readI32
-import io.github.charlietap.chasm.embedding.compiled.host.runtimeType
-import io.github.charlietap.chasm.embedding.compiled.host.size
-import io.github.charlietap.chasm.embedding.compiled.host.structFieldCount
-import io.github.charlietap.chasm.embedding.compiled.host.withGlobal
-import io.github.charlietap.chasm.embedding.compiled.host.withMemory
-import io.github.charlietap.chasm.embedding.compiled.host.withTable
-import io.github.charlietap.chasm.embedding.compiled.host.write
-import io.github.charlietap.chasm.embedding.compiled.host.writeI32
-import io.github.charlietap.chasm.embedding.compiled.host.writeUtf8String
-import io.github.charlietap.chasm.embedding.compiled.instance
-import io.github.charlietap.chasm.embedding.compiled.interrupt
-import io.github.charlietap.chasm.embedding.compiled.invoke
-import io.github.charlietap.chasm.embedding.compiled.isSubtype
-import io.github.charlietap.chasm.embedding.compiled.memory
-import io.github.charlietap.chasm.embedding.compiled.memoryByteSize
-import io.github.charlietap.chasm.embedding.compiled.moveMemory
-import io.github.charlietap.chasm.embedding.compiled.moveTable
-import io.github.charlietap.chasm.embedding.compiled.readByte
-import io.github.charlietap.chasm.embedding.compiled.readBytes
-import io.github.charlietap.chasm.embedding.compiled.readDouble
-import io.github.charlietap.chasm.embedding.compiled.readFloat
-import io.github.charlietap.chasm.embedding.compiled.readGlobal
-import io.github.charlietap.chasm.embedding.compiled.readInt
-import io.github.charlietap.chasm.embedding.compiled.readLong
-import io.github.charlietap.chasm.embedding.compiled.readNullTerminatedUtf8String
-import io.github.charlietap.chasm.embedding.compiled.readPayload
-import io.github.charlietap.chasm.embedding.compiled.readShort
-import io.github.charlietap.chasm.embedding.compiled.readStructField
-import io.github.charlietap.chasm.embedding.compiled.readTable
-import io.github.charlietap.chasm.embedding.compiled.readUtf8String
-import io.github.charlietap.chasm.embedding.compiled.remainingFuel
-import io.github.charlietap.chasm.embedding.compiled.resetFuel
-import io.github.charlietap.chasm.embedding.compiled.sizeMemory
-import io.github.charlietap.chasm.embedding.compiled.structFieldCount
-import io.github.charlietap.chasm.embedding.compiled.structFieldInfo
-import io.github.charlietap.chasm.embedding.compiled.structType
-import io.github.charlietap.chasm.embedding.compiled.table
-import io.github.charlietap.chasm.embedding.compiled.tag
-import io.github.charlietap.chasm.embedding.compiled.value.ExecutionValue
-import io.github.charlietap.chasm.embedding.compiled.value.NumberValue.F32
-import io.github.charlietap.chasm.embedding.compiled.value.NumberValue.F64
-import io.github.charlietap.chasm.embedding.compiled.value.NumberValue.I32
-import io.github.charlietap.chasm.embedding.compiled.value.NumberValue.I64
-import io.github.charlietap.chasm.embedding.compiled.value.ReferenceValue
-import io.github.charlietap.chasm.embedding.compiled.writeByte
-import io.github.charlietap.chasm.embedding.compiled.writeBytes
-import io.github.charlietap.chasm.embedding.compiled.writeDouble
-import io.github.charlietap.chasm.embedding.compiled.writeFloat
-import io.github.charlietap.chasm.embedding.compiled.writeGlobal
-import io.github.charlietap.chasm.embedding.compiled.writeInt
-import io.github.charlietap.chasm.embedding.compiled.writeLong
-import io.github.charlietap.chasm.embedding.compiled.writeShort
-import io.github.charlietap.chasm.embedding.compiled.writeTable
-import io.github.charlietap.chasm.embedding.compiled.writeUtf8String
+import io.github.charlietap.chasm.embedding.addFuel
+import io.github.charlietap.chasm.embedding.collect
+import io.github.charlietap.chasm.embedding.dropInstance
+import io.github.charlietap.chasm.embedding.dropStore
 import io.github.charlietap.chasm.embedding.error.ExecutionError
 import io.github.charlietap.chasm.embedding.error.TrapReason
+import io.github.charlietap.chasm.embedding.exports
+import io.github.charlietap.chasm.embedding.function
+import io.github.charlietap.chasm.embedding.functionReference
+import io.github.charlietap.chasm.embedding.global
+import io.github.charlietap.chasm.embedding.global.readGlobal
+import io.github.charlietap.chasm.embedding.global.writeGlobal
+import io.github.charlietap.chasm.embedding.instance
+import io.github.charlietap.chasm.embedding.interrupt
+import io.github.charlietap.chasm.embedding.invoke
+import io.github.charlietap.chasm.embedding.memory
+import io.github.charlietap.chasm.embedding.memory.copyMemory
+import io.github.charlietap.chasm.embedding.memory.fillMemory
+import io.github.charlietap.chasm.embedding.memory.growMemory
+import io.github.charlietap.chasm.embedding.memory.memoryByteSize
+import io.github.charlietap.chasm.embedding.memory.moveMemory
+import io.github.charlietap.chasm.embedding.memory.readByte
+import io.github.charlietap.chasm.embedding.memory.readBytes
+import io.github.charlietap.chasm.embedding.memory.readDouble
+import io.github.charlietap.chasm.embedding.memory.readFloat
+import io.github.charlietap.chasm.embedding.memory.readInt
+import io.github.charlietap.chasm.embedding.memory.readLong
+import io.github.charlietap.chasm.embedding.memory.readNullTerminatedUtf8String
+import io.github.charlietap.chasm.embedding.memory.readShort
+import io.github.charlietap.chasm.embedding.memory.readUtf8String
+import io.github.charlietap.chasm.embedding.memory.sizeMemory
+import io.github.charlietap.chasm.embedding.memory.writeByte
+import io.github.charlietap.chasm.embedding.memory.writeBytes
+import io.github.charlietap.chasm.embedding.memory.writeDouble
+import io.github.charlietap.chasm.embedding.memory.writeFloat
+import io.github.charlietap.chasm.embedding.memory.writeInt
+import io.github.charlietap.chasm.embedding.memory.writeLong
+import io.github.charlietap.chasm.embedding.memory.writeShort
+import io.github.charlietap.chasm.embedding.memory.writeUtf8String
+import io.github.charlietap.chasm.embedding.module
+import io.github.charlietap.chasm.embedding.reference.arrayElementInfo
+import io.github.charlietap.chasm.embedding.reference.arrayType
+import io.github.charlietap.chasm.embedding.reference.exceptionTag
+import io.github.charlietap.chasm.embedding.reference.isSubtype
+import io.github.charlietap.chasm.embedding.reference.readPayload
+import io.github.charlietap.chasm.embedding.reference.readStructField
+import io.github.charlietap.chasm.embedding.reference.structFieldCount
+import io.github.charlietap.chasm.embedding.reference.structFieldInfo
+import io.github.charlietap.chasm.embedding.reference.structType
+import io.github.charlietap.chasm.embedding.remainingFuel
+import io.github.charlietap.chasm.embedding.resetFuel
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
+import io.github.charlietap.chasm.embedding.shapes.Global
+import io.github.charlietap.chasm.embedding.shapes.Import
+import io.github.charlietap.chasm.embedding.shapes.Instance
+import io.github.charlietap.chasm.embedding.shapes.Store
+import io.github.charlietap.chasm.embedding.shapes._engine
+import io.github.charlietap.chasm.embedding.shapes._module
 import io.github.charlietap.chasm.embedding.shapes.expect
+import io.github.charlietap.chasm.embedding.table
+import io.github.charlietap.chasm.embedding.table.moveTable
+import io.github.charlietap.chasm.embedding.table.readTable
+import io.github.charlietap.chasm.embedding.table.writeTable
+import io.github.charlietap.chasm.embedding.tag
+import io.github.charlietap.chasm.embedding.validate
+import io.github.charlietap.chasm.embedding.value.ExecutionValue
+import io.github.charlietap.chasm.embedding.value.NumberValue.F32
+import io.github.charlietap.chasm.embedding.value.NumberValue.F64
+import io.github.charlietap.chasm.embedding.value.NumberValue.I32
+import io.github.charlietap.chasm.embedding.value.NumberValue.I64
+import io.github.charlietap.chasm.embedding.value.ReferenceValue
+import io.github.charlietap.chasm.host.HostFunction
+import io.github.charlietap.chasm.host.HostModuleInstance
 import io.github.charlietap.chasm.host.ModuleIndex
-import io.github.charlietap.chasm.reference.ExceptionReference
+import io.github.charlietap.chasm.host.copy
+import io.github.charlietap.chasm.host.fill
+import io.github.charlietap.chasm.host.hasPending
+import io.github.charlietap.chasm.host.move
+import io.github.charlietap.chasm.host.raise
+import io.github.charlietap.chasm.host.rawValue
+import io.github.charlietap.chasm.host.read
+import io.github.charlietap.chasm.host.readI32
+import io.github.charlietap.chasm.host.runtimeType
+import io.github.charlietap.chasm.host.size
+import io.github.charlietap.chasm.host.structFieldCount
+import io.github.charlietap.chasm.host.withGlobal
+import io.github.charlietap.chasm.host.withMemory
+import io.github.charlietap.chasm.host.withTable
+import io.github.charlietap.chasm.host.write
+import io.github.charlietap.chasm.host.writeI32
+import io.github.charlietap.chasm.host.writeUtf8String
 import io.github.charlietap.chasm.reference.FunctionReference
 import io.github.charlietap.chasm.reference.I31Reference
 import io.github.charlietap.chasm.type.AbstractHeapType
@@ -118,14 +126,14 @@ class EmbeddingApiTest {
     @Test
     fun memoryCallsReadAndWriteThroughTheCatalogueAndTheHost() {
 
-        val (store, instance) = instantiate()
+        val (_, instance) = instantiate()
         val memory = checkNotNull(exports(instance).memory("memory"))
 
         writeInt(memory, 0, 41)
-        call(store, instance, "call_touch_memory")
+        call(instance, "call_touch_memory")
 
         assertEquals(42, readInt(memory, 0))
-        assertEquals(42, call(store, instance, "load", I32(0)).single().let { value -> (value as I32).value })
+        assertEquals(42, call(instance, "load", I32(0)).single().let { value -> (value as I32).value })
         assertContentEquals(byteArrayOf(1, 2, 3), readBytes(memory, ByteArray(3), 8, 3))
         assertEquals(9, readByte(memory, 16).toInt())
         assertContentEquals(byteArrayOf(1, 1, 2, 3), readBytes(memory, ByteArray(4), 32, 4))
@@ -161,25 +169,25 @@ class EmbeddingApiTest {
     @Test
     fun tablesThroughTheCatalogueAndTheHost() {
 
-        val (store, instance) = instantiate()
+        val (_, instance) = instantiate()
         val table = checkNotNull(exports(instance).table("table"))
-        val inc = (call(store, instance, "inc_ref").single() as ReferenceValue.Function).reference
+        val inc = (call(instance, "inc_ref").single() as ReferenceValue.Function).reference
 
         writeTable(table, 0, inc)
-        call(store, instance, "call_touch_table")
+        call(instance, "call_touch_table")
         moveTable(table, 0, table, 2, 2)
 
-        assertEquals(I32(6), call(store, instance, "call_slot", I32(1), I32(5)).single())
+        assertEquals(I32(6), call(instance, "call_slot", I32(1), I32(5)).single())
         assertSame(inc, readTable(table, 3))
     }
 
     @Test
     fun globalsThroughTheCatalogueAndTheHost() {
 
-        val (store, instance) = instantiate()
+        val (_, instance) = instantiate()
         val counter = checkNotNull(exports(instance).global("counter"))
 
-        call(store, instance, "call_touch_global")
+        call(instance, "call_touch_global")
 
         assertEquals(15L, readGlobal(counter))
     }
@@ -191,7 +199,7 @@ class EmbeddingApiTest {
 
         writeGlobal(sharedGlobal, 9)
 
-        assertEquals(I64(9), call(store, instance, "shared").single())
+        assertEquals(I64(9), call(instance, "shared").single())
         assertFailsWith<IllegalArgumentException> { global(store, GlobalType(ValueType.Number(NumberType.I32), Mutability.Var), F64(1.0)) }
     }
 
@@ -199,9 +207,9 @@ class EmbeddingApiTest {
     fun gcTypeQueriesAnswerFromTheStoreAndTheHost() {
 
         val (store, instance) = instantiate()
-        val box = structType(call(store, instance, "box", I32(1)).single().let { value -> (value as ReferenceValue.Struct).reference })
-        val bigBox = structType(call(store, instance, "big_box").single().let { value -> (value as ReferenceValue.Struct).reference })
-        val bytes = arrayType(call(store, instance, "bytes", I32(2)).single().let { value -> (value as ReferenceValue.Array).reference })
+        val box = structType(call(instance, "box", I32(1)).single().let { value -> (value as ReferenceValue.Struct).reference })
+        val bigBox = structType(call(instance, "big_box").single().let { value -> (value as ReferenceValue.Struct).reference })
+        val bytes = arrayType(call(instance, "bytes", I32(2)).single().let { value -> (value as ReferenceValue.Array).reference })
 
         assertEquals(2, structFieldCount(store, box))
         assertTrue(structFieldInfo(store, box, 1).isPackedI8)
@@ -209,29 +217,29 @@ class EmbeddingApiTest {
         assertTrue(arrayElementInfo(store, bytes).isPackedI8)
         assertTrue(isSubtype(store, bigBox, box))
         assertFalse(isSubtype(store, box, bigBox))
-        assertEquals(I32(2), call(store, instance, "call_types").single())
+        assertEquals(I32(2), call(instance, "call_types").single())
     }
 
     @Test
     fun hostsReRaiseExceptionsFromNestedCalls() {
 
-        val (store, instance) = instantiate()
+        val (_, instance) = instantiate()
 
-        assertEquals(I32(4), call(store, instance, "relay_caught", I32(4)).single())
+        assertEquals(I32(4), call(instance, "relay_caught", I32(4)).single())
     }
 
     @Test
     fun boxedCallsConvertValuesByType() {
 
-        val (store, instance) = instantiate()
+        val (_, instance) = instantiate()
 
-        assertIs<ExecutionError.Rejected>(error(invoke(store, instance, "inc", emptyList())))
-        assertIs<ExecutionError.Rejected>(error(invoke(store, instance, "inc", listOf(F32(1f)))))
-        assertEquals(ReferenceValue.Null(AbstractHeapType.NoFunc), call(store, instance, "null_func").single())
-        assertEquals(ReferenceValue.Null(AbstractHeapType.NoException), call(store, instance, "null_exn").single())
-        assertEquals(5, (call(store, instance, "i31", I32(5)).single() as ReferenceValue.I31).reference.value)
-        assertIs<FunctionReference>((call(store, instance, "inc_ref").single() as ReferenceValue.Function).reference)
-        assertIs<I31Reference>((call(store, instance, "i31", I32(1)).single() as ReferenceValue.I31).reference)
+        assertIs<ExecutionError.Rejected>(error(invoke(instance, "inc", emptyList())))
+        assertIs<ExecutionError.Rejected>(error(invoke(instance, "inc", listOf(F32(1f)))))
+        assertEquals(ReferenceValue.Null(AbstractHeapType.NoFunc), call(instance, "null_func").single())
+        assertEquals(ReferenceValue.Null(AbstractHeapType.NoException), call(instance, "null_exn").single())
+        assertEquals(5, (call(instance, "i31", I32(5)).single() as ReferenceValue.I31).reference.value)
+        assertIs<FunctionReference>((call(instance, "inc_ref").single() as ReferenceValue.Function).reference)
+        assertIs<I31Reference>((call(instance, "i31", I32(1)).single() as ReferenceValue.I31).reference)
     }
 
     @Test
@@ -255,7 +263,7 @@ class EmbeddingApiTest {
         val store = store(StoreConfig(interruptible = true))
         val instance = instantiate(store)
         var result: ChasmResult<List<ExecutionValue>, *>? = null
-        val guest = Thread { result = invoke(store, instance, "spin") }
+        val guest = Thread { result = invoke(instance, "spin") }
 
         guest.start()
         val deadline = System.nanoTime() + INTERRUPT_DEADLINE
@@ -291,8 +299,8 @@ class EmbeddingApiTest {
     fun objectsRefuseStoreCallsOnceTheirStoreIsDropped() {
 
         val (store, instance) = instantiate()
-        val box = (call(store, instance, "box", I32(1)).single() as ReferenceValue.Struct).reference
-        val failed = assertIs<ExecutionError.Thrown<ExceptionReference>>(error(invoke(store, instance, "fail", listOf(I32(2))))).exception
+        val box = (call(instance, "box", I32(1)).single() as ReferenceValue.Struct).reference
+        val failed = assertIs<ExecutionError.Thrown>(error(invoke(instance, "fail", listOf(I32(2))))).exception
 
         dropStore(store)
 
@@ -301,11 +309,48 @@ class EmbeddingApiTest {
     }
 
     @Test
+    fun functionReferencesOfHandlesAreTheGuestsReferences() {
+
+        val (store, instance) = instantiate()
+        val inc = checkNotNull(exports(instance).function("inc"))
+        val guest = (call(instance, "inc_ref").single() as ReferenceValue.Function).reference
+        val host = function(store, functionType(emptyList(), emptyList()), touchGlobal)
+
+        assertSame(guest, functionReference(inc))
+        assertSame(functionReference(host), functionReference(host))
+        assertSame(store._engine(), functionReference(host).engine())
+    }
+
+    @Test
+    fun exceptionsOfOneTagShareItsHandle() {
+
+        val (store, instance) = instantiate()
+        val failed = checkNotNull(exports(instance).tag("failed"))
+        val first = assertIs<ExecutionError.Thrown>(error(invoke(instance, "fail", listOf(I32(1))))).exception
+        val second = assertIs<ExecutionError.Thrown>(error(invoke(instance, "fail", listOf(I32(2))))).exception
+
+        assertEquals(failed, exceptionTag(first))
+        assertSame(exceptionTag(first), exceptionTag(second))
+        assertSame(store._engine(), first.engine())
+    }
+
+    @Test
+    fun modulesNotDecodedByModuleAreUnsupported() {
+
+        val store = store()
+        val module = _module(emptyList(), emptyList(), Any())
+
+        val result = runBlocking { instance(store, module) }
+
+        assertIs<ExecutionError.Unsupported>(error(result))
+    }
+
+    @Test
     fun unvalidatedModulesValidate() {
 
         val unvalidated = runBlocking { module(resourceBytes("modules/embedding_api.wasm"), validate = false) }.expect("module")
 
-        validate(unvalidated).expect("validate")
+        runBlocking { validate(unvalidated) }.expect("validate")
     }
 
     @Test
@@ -319,6 +364,20 @@ class EmbeddingApiTest {
         assertEquals(ModuleIndex.GlobalIndex(1), indices["counter"])
         assertEquals(ModuleIndex.TagIndex(1), indices["failed"])
         assertEquals(ModuleIndex.FunctionIndex(5), indices["inc"])
+    }
+
+    @Test
+    fun moduleImportsCarryTheirIndexInTheModule() {
+
+        val module = runBlocking { module(resourceBytes("modules/embedding_api.wasm")) }.expect("module")
+        val indices = module.imports.associate { import -> import.entityName to import.index }
+
+        assertEquals(ModuleIndex.FunctionIndex(0), indices["touch_memory"])
+        assertEquals(ModuleIndex.FunctionIndex(4), indices["types"])
+        assertEquals(ModuleIndex.MemoryIndex(0), indices["shared_memory"])
+        assertEquals(ModuleIndex.GlobalIndex(0), indices["shared_global"])
+        assertEquals(ModuleIndex.TableIndex(0), indices["shared_table"])
+        assertEquals(ModuleIndex.TagIndex(0), indices["shared_tag"])
     }
 
     private lateinit var sharedGlobal: Global
@@ -338,7 +397,7 @@ class EmbeddingApiTest {
             Import("host", "touch_memory", function(store, functionType(emptyList(), emptyList()), touchMemory)),
             Import("host", "touch_table", function(store, functionType(emptyList(), emptyList()), touchTable)),
             Import("host", "touch_global", function(store, functionType(emptyList(), emptyList()), touchGlobal)),
-            Import("host", "relay", function(store, functionType(listOf(I32_TYPE), listOf(I32_TYPE)), relay(store))),
+            Import("host", "relay", function(store, functionType(listOf(I32_TYPE), listOf(I32_TYPE)), relay)),
             Import("host", "types", function(store, functionType(emptyList(), listOf(I32_TYPE)), types)),
             Import("env", "shared_memory", memory(store, memoryType())),
             Import("env", "shared_global", sharedGlobal),
@@ -373,15 +432,13 @@ class EmbeddingApiTest {
         }
     }
 
-    private fun relay(store: Store): HostFunction {
-        return HostFunction { parameters, results ->
-            val module = contextOf<HostModuleInstance>()
-            val thrown = invoke(store, module.instance, "fail", listOf(I32(parameters.readI32(0))))
-            val exception = assertIs<ExecutionError.Thrown<ExceptionReference>>(error(thrown)).exception
-            check(!hasPending)
-            results.writeI32(0, 0)
-            raise(exception)
-        }
+    private val relay = HostFunction { parameters, results ->
+        val module = contextOf<HostModuleInstance>()
+        val thrown = invoke(module.instance, "fail", listOf(I32(parameters.readI32(0))))
+        val exception = assertIs<ExecutionError.Thrown>(error(thrown)).exception
+        check(!hasPending)
+        results.writeI32(0, 0)
+        raise(exception)
     }
 
     private val types = HostFunction { _, results ->
@@ -389,12 +446,11 @@ class EmbeddingApiTest {
     }
 
     private fun call(
-        store: Store,
         instance: Instance,
         name: String,
         vararg args: ExecutionValue,
     ): List<ExecutionValue> {
-        return invoke(store, instance, name, args.toList()).expect(name)
+        return invoke(instance, name, args.toList()).expect(name)
     }
 
     private fun error(result: ChasmResult<*, *>): Any? {

@@ -10,9 +10,7 @@ import io.github.charlietap.chasm.compiler.backend.dex.ParallelModuleLowerer
 import io.github.charlietap.chasm.compiler.backend.dex.UnsupportedFunctions
 import io.github.charlietap.chasm.compiler.frontend.ParallelModuleCompiler
 import io.github.charlietap.chasm.compiler.frontend.UncompilableFunctions
-import io.github.charlietap.chasm.embedding.shapes.Module
-import io.github.charlietap.chasm.embedding.shapes._binary
-import io.github.charlietap.chasm.embedding.shapes._module
+import io.github.charlietap.chasm.embedding.shapes.DecodedModule
 import io.github.charlietap.chasm.jit.internal.CompileError.Stage
 import io.github.charlietap.chasm.parallel.ParallelTaskExecutor
 import io.github.charlietap.chasm.runtime.compiled.CodeInstallation
@@ -23,7 +21,7 @@ import kotlin.coroutines.cancellation.CancellationException
 import kotlin.coroutines.coroutineContext
 
 internal suspend fun compile(
-    module: Module,
+    module: DecodedModule,
     config: CompileConfig,
 ): CompileResult {
     return compile(
@@ -46,7 +44,7 @@ internal suspend fun compile(
 }
 
 internal suspend inline fun compile(
-    module: Module,
+    module: DecodedModule,
     config: CompileConfig,
     executor: ParallelTaskExecutor,
     crossinline packageNames: (ByteArray?, DexOptions) -> String,
@@ -65,7 +63,7 @@ internal suspend inline fun compile(
 }
 
 internal suspend inline fun compileUnchecked(
-    module: Module,
+    module: DecodedModule,
     config: CompileConfig,
     executor: ParallelTaskExecutor,
     crossinline packageNames: (ByteArray?, DexOptions) -> String,
@@ -76,7 +74,7 @@ internal suspend inline fun compileUnchecked(
 ): CompileResult {
 
     coroutineContext.ensureActive()
-    val ast = module._module()
+    val ast = module.module
     val types = ast.typeResolver()
     val code = moduleCompiler(ast, types, executor).getOrElse { failure ->
         coroutineContext.ensureActive()
@@ -93,7 +91,7 @@ internal suspend inline fun compileUnchecked(
         interruptible = config.interruptible,
         byteArrayBaseOffset = byteArrayBase().takeIf { base -> base >= 0 },
     )
-    val packageName = packageNames(module._binary(), emission)
+    val packageName = packageNames(module.binary, emission)
     val options = emission.copy(packageName = packageName)
     val dex = try {
         moduleLowerer(ast, code, options, executor)

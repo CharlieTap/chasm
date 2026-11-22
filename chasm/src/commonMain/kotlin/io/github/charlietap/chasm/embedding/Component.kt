@@ -11,7 +11,7 @@ import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Success
 import io.github.charlietap.chasm.embedding.shapes.Component
 import io.github.charlietap.chasm.stream.SourceReader
 
-fun component(
+suspend fun component(
     sourceReader: SourceReader,
     config: ComponentConfig = ComponentConfig(),
 ): ChasmResult<Component, ModuleError.Malformed> {
@@ -22,7 +22,7 @@ fun component(
     )
 }
 
-fun component(
+suspend fun component(
     bytes: ByteArray,
     config: ComponentConfig = ComponentConfig(),
 ): ChasmResult<Component, ModuleError.Malformed> {

@@ -86,19 +86,24 @@ dependencies {
 
 ### Invoking functions
 
-WebAssembly compilations output a [Module](chasm/src/commonMain/kotlin/io/github/charlietap/chasm/embedding/shapes/Module.kt) encoded as either a
+WebAssembly compilations output a [Module](embedding-api/src/commonMain/kotlin/io/github/charlietap/chasm/embedding/shapes/Module.kt) encoded as either a
 `.wasm` or `.wat` file (currently only `.wasm` binaries are supported):
 
 ```kotlin
 val wasmFileAsByteArray = ...
-val module = module(wasmFileAsByteArray)
+val module = module(wasmFileAsByteArray).expect("Failed to decode module")
 ```
 
-Decoding does not check that a module is valid. Unless the binary comes
-from a source you trust, validate it before instantiating it:
+Decoding a module, validating it and instantiating it are suspending
+functions; callers outside a coroutine can wrap them in `runBlocking`.
+Executing functions and every accessor remain ordinary functions.
+
+`module` validates the binary as it decodes it. If the binary comes from a
+source you trust you can skip validation and validate the module later:
 
 ```kotlin
-val validated = validate(module)
+val unvalidated = module(wasmFileAsByteArray, validate = false).expect("Failed to decode module")
+val validated = validate(unvalidated)
 ```
 
 Once a module has been decoded you'll need to instantiate it, and for
@@ -106,14 +111,14 @@ that you'll also need a store:
 
 ```kotlin
 val store = store()
-val instance = instance(store, module)
+val instance = instance(store, module).expect("Failed to instantiate module")
 ```
 
 Instances allow you to invoke functions that are exported from the
 module:
 
 ```kotlin
-val result = invoke(store, instance, "fibonacci")
+val result = invoke(instance, "fibonacci", listOf(NumberValue.I32(10)))
 ```
 
 Preparing a function resolves the named export and its runtime function up
@@ -128,7 +133,7 @@ function. This is useful when either:
 Prepare the function once and retain the returned handle:
 
 ```kotlin
-val fibonacci = prepareFunction(store, instance, "fibonacci")
+val fibonacci = prepareFunction(instance, "fibonacci")
     .expect("Failed to prepare fibonacci")
 
 val result = fibonacci(listOf(NumberValue.I32(10)))
@@ -139,9 +144,33 @@ Invoking one after either has been dropped returns an execution error.
 Ordinary `invoke` remains useful when the export is selected dynamically or
 there is no useful opportunity to prepare it ahead of invocation.
 
+### Engines
+
+Chasm runs modules on three engines: an interpreter, a JIT for Android and
+an ahead-of-time (AOT) compiler for the JVM and Android. Every call above
+works on all three; only the store and, for AOT, the module are created
+differently:
+
+```kotlin
+// interpreter: io.github.charlietap.chasm:chasm
+val store = io.github.charlietap.chasm.embedding.store()
+val module = module(wasmFileAsByteArray).expect("Failed to decode module")
+
+// JIT: io.github.charlietap.chasm:chasm-jit
+val store = io.github.charlietap.chasm.jit.store()
+val module = module(wasmFileAsByteArray).expect("Failed to decode module")
+
+// AOT: io.github.charlietap.chasm:runtime-aot, with the module compiled at build time
+val store = io.github.charlietap.chasm.aot.store()
+val module = io.github.charlietap.chasm.aot.compiledModule(ExampleModule.INSTANCE).expect("Failed to load module")
+```
+
+A store runs modules on one engine only, so a module made for one engine
+cannot be instantiated in a store of another.
+
 ### Imports
 
-Modules often depend on [imports](chasm/src/commonMain/kotlin/io/github/charlietap/chasm/embedding/shapes/Import.kt). Imports can be one of the
+Modules often depend on [imports](embedding-api/src/commonMain/kotlin/io/github/charlietap/chasm/embedding/shapes/Importable.kt). Imports can be one of the
 following:
 
 - Functions
@@ -172,7 +201,7 @@ val import = Import(
     "import entity name",
     function,
 )
-val instance = instance(store, module, listOf(import))
+val instance = instance(store, module, listOf(import)).expect("Failed to instantiate module")
 ```
 
 ### Host functions
@@ -187,13 +216,31 @@ runtime can call it and use its results. Once you have defined a
 function type you can allocate the host function like so:
 
 ```kotlin
-val functionType = FunctionType(emptyList(), listOf(ValueType.Number.I32))
-val hostFunction = HostFunction { params ->
+val functionType = FunctionType(
+    ResultType(emptyList()),
+    ResultType(listOf(ValueType.Number(NumberType.I32))),
+)
+val hostFunction = HostFunction { _, results ->
     println("Hello world")
-    listOf(Value.Number.I32(117))
+    results.writeI32(0, 117)
 }
 
-val result = function(store, functionType, hostFunction)
+val function = function(store, functionType, hostFunction)
+```
+
+A host function receives the positions of its parameters and results rather
+than lists of values. Numbers are read and written with `readI32`..`readF64`
+and `writeI32`..`writeF64`, references with `readReference` and
+`writeReference`. The memories, tables, globals and tags of the calling
+instance are available inside the function, for example:
+
+```kotlin
+val log = HostFunction { parameters, _ ->
+    val message = withMemory(0) {
+        readUtf8String(parameters.readI32(0), parameters.readI32(1))
+    }
+    println(message)
+}
 ```
 
 # Working with modules that contain syscalls

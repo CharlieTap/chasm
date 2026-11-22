@@ -10,11 +10,13 @@ import io.github.charlietap.chasm.embedding.instance
 import io.github.charlietap.chasm.embedding.invoke
 import io.github.charlietap.chasm.embedding.module
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
+import io.github.charlietap.chasm.embedding.shapes.expect
 import io.github.charlietap.chasm.embedding.shapes.flatMap
 import io.github.charlietap.chasm.embedding.store
+import io.github.charlietap.chasm.embedding.value.ExecutionValue
+import io.github.charlietap.chasm.embedding.value.NumberValue
 import io.github.charlietap.chasm.host.writeI64
-import io.github.charlietap.chasm.runtime.value.ExecutionValue
-import io.github.charlietap.chasm.runtime.value.NumberValue
+import kotlinx.coroutines.runBlocking
 import kotlin.time.Clock
 
 /** Takes an optional store configuration: `plain` (the default), `fuel`, `interrupt`, or `fuel+interrupt`. */
@@ -74,12 +76,9 @@ class CoremarkBenchmark(private val config: StoreConfig = StoreConfig()) {
             }
         }
 
-        val results = module(bytes)
-            .flatMap { module ->
-                instance(store, module, imports)
-            }.flatMap { instance ->
-                invoke(store, instance, "run")
-            }
+        val results = runBlocking {
+            instance(store, module(bytes).expect("CoreMark decodes"), imports)
+        }.flatMap { instance -> invoke(instance, "run") }
 
         if (results is ChasmResult.Success<List<ExecutionValue>>) {
             val score = results.result.first() as NumberValue.F32

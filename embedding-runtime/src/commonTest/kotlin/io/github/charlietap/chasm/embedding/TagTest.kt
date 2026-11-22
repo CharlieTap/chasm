@@ -1,27 +1,24 @@
 package io.github.charlietap.chasm.embedding
 
-import io.github.charlietap.chasm.embedding.fixture.publicStore
-import io.github.charlietap.chasm.embedding.fixture.publicTag
+import io.github.charlietap.chasm.embedding.fixture.interpreterStore
+import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.fixture.type.tagType
 import io.github.charlietap.chasm.runtime.address.Address
-import io.github.charlietap.chasm.runtime.instance.ExternalValue
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class TagTest {
 
     @Test
-    fun `can allocate a tag in the store and return an external value`() {
+    fun `can allocate a tag in the store and return a handle`() {
 
-        val store = publicStore()
-        val tagType = tagType()
+        val runtime = store()
+        val store = interpreterStore(runtime)
+        val type = tagType()
 
-        val expectedExternalValue = ExternalValue.Tag(Address.Tag(0))
-        val expected = publicTag(expectedExternalValue)
+        val actual = tag(store, type)
 
-        val actual = tag(store, tagType)
-
-        assertEquals(expected, actual)
-        assertEquals(tagType(), store.store.heap.tag(Address.Tag(0)).type)
+        assertEquals(type, actual.type)
+        assertEquals(tagType(), runtime.heap.tag(Address.Tag(0)).type)
     }
 }

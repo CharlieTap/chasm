@@ -38,12 +38,12 @@ kotlin {
                 api(projects.embeddingApi)
                 api(projects.embeddingCompiled)
                 api(projects.embeddingModule)
-                api(projects.embeddingRuntime)
 
                 implementation(projects.ast)
                 implementation(projects.compiler.backendDex)
                 implementation(projects.compiler.frontend)
                 implementation(projects.decoder)
+                implementation(projects.embeddingRuntime)
                 implementation(projects.executor.callCore)
                 implementation(projects.executor.instantiator)
                 implementation(projects.libs.parallel)

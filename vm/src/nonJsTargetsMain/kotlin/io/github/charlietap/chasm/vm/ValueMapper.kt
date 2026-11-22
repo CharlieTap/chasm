@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.vm
 
-import io.github.charlietap.chasm.runtime.value.ExecutionValue
-import io.github.charlietap.chasm.runtime.value.NumberValue
+import io.github.charlietap.chasm.embedding.value.ExecutionValue
+import io.github.charlietap.chasm.embedding.value.NumberValue
 import io.github.charlietap.chasm.vm.WasmVirtualMachine.Value
 import io.github.charlietap.chasm.vm.WasmVirtualMachine.Value.F32
 import io.github.charlietap.chasm.vm.WasmVirtualMachine.Value.F64
@@ -24,6 +24,15 @@ object ValueMapper {
         is I64 -> value.value
         is F32 -> value.value.toRawBits().toLong()
         is F64 -> value.value.toRawBits()
+    }
+
+    internal fun valueType(value: Value): ValueType {
+        return when (value) {
+            is I32 -> ValueType.Number(NumberType.I32)
+            is I64 -> ValueType.Number(NumberType.I64)
+            is F32 -> ValueType.Number(NumberType.F32)
+            is F64 -> ValueType.Number(NumberType.F64)
+        }
     }
 
     fun from(value: Value): ExecutionValue {

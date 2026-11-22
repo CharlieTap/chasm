@@ -1,10 +1,10 @@
 package io.github.charlietap.chasm.integration.test
 
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
+import io.github.charlietap.chasm.embedding.value.NumberValue
+import io.github.charlietap.chasm.embedding.value.ReferenceValue
 import io.github.charlietap.chasm.integration.integrationTest
 import io.github.charlietap.chasm.integration.invoke
-import io.github.charlietap.chasm.runtime.value.NumberValue
-import io.github.charlietap.chasm.runtime.value.ReferenceValue
 import kotlin.test.Test
 import kotlin.test.assertIs
 

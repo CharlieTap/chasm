@@ -1,22 +1,23 @@
 package io.github.charlietap.chasm.jit
 
-import io.github.charlietap.chasm.embedding.compiled.Import
-import io.github.charlietap.chasm.embedding.compiled.Instance
-import io.github.charlietap.chasm.embedding.compiled.Module
-import io.github.charlietap.chasm.embedding.compiled.PreparedFunction
-import io.github.charlietap.chasm.embedding.compiled.Store
-import io.github.charlietap.chasm.embedding.compiled.exports
-import io.github.charlietap.chasm.embedding.compiled.function
-import io.github.charlietap.chasm.embedding.compiled.host.HostFunction
-import io.github.charlietap.chasm.embedding.compiled.host.readI32
-import io.github.charlietap.chasm.embedding.compiled.host.writeI32
-import io.github.charlietap.chasm.embedding.compiled.instance
-import io.github.charlietap.chasm.embedding.compiled.invoke
-import io.github.charlietap.chasm.embedding.compiled.prepareFunction
-import io.github.charlietap.chasm.embedding.compiled.value.ExecutionValue
-import io.github.charlietap.chasm.embedding.compiled.value.NumberValue.I32
 import io.github.charlietap.chasm.embedding.dsl.FunctionTypeBuilder
+import io.github.charlietap.chasm.embedding.exports
+import io.github.charlietap.chasm.embedding.function
+import io.github.charlietap.chasm.embedding.instance
+import io.github.charlietap.chasm.embedding.invoke
+import io.github.charlietap.chasm.embedding.module
+import io.github.charlietap.chasm.embedding.prepareFunction
+import io.github.charlietap.chasm.embedding.shapes.Import
+import io.github.charlietap.chasm.embedding.shapes.Instance
+import io.github.charlietap.chasm.embedding.shapes.Module
+import io.github.charlietap.chasm.embedding.shapes.PreparedFunction
+import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.shapes.expect
+import io.github.charlietap.chasm.embedding.value.ExecutionValue
+import io.github.charlietap.chasm.embedding.value.NumberValue.I32
+import io.github.charlietap.chasm.host.HostFunction
+import io.github.charlietap.chasm.host.readI32
+import io.github.charlietap.chasm.host.writeI32
 import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -64,7 +65,7 @@ class NumericBridgesTest {
         vararg arguments: Int,
     ): Int {
 
-        val result = invoke(store, instance, name, arguments.map { argument -> I32(argument) }).expect(name)
+        val result = invoke(instance, name, arguments.map { argument -> I32(argument) }).expect(name)
 
         return (result.single() as I32).value
     }
@@ -100,7 +101,7 @@ class NumericBridgesTest {
             Import("other", "double", checkNotNull(exports(other).function("double"))),
         )
         val instance = runBlocking { instance(store, module("numeric_bridges"), imports) }.expect("numeric_bridges")
-        countdown = prepareFunction(store, instance, "countdown").expect("prepare countdown")
+        countdown = prepareFunction(instance, "countdown").expect("prepare countdown")
 
         return instance
     }

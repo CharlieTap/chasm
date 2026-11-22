@@ -2,13 +2,13 @@ package io.github.charlietap.chasm.executor.invoker.function
 
 import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.executor.invoker.instruction.control.ThrowRefValueExecutor
-import io.github.charlietap.chasm.host.HostFunction
 import io.github.charlietap.chasm.host.HostFunctionException
 import io.github.charlietap.chasm.host.UnsafeHostApi
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.HostRaisedWasmException
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
+import io.github.charlietap.chasm.runtime.host.RawHostFunction
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.stack.ValueStack
@@ -33,7 +33,7 @@ fun HostFunctionCall(
     )
 }
 
-internal inline fun HostFunction.invokeHost(
+internal inline fun RawHostFunction.invokeHost(
     stack: LongArray,
     parameterBase: Int,
     resultBase: Int,

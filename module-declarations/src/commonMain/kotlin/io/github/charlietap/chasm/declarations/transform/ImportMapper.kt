@@ -2,10 +2,10 @@ package io.github.charlietap.chasm.declarations.transform
 
 import io.github.charlietap.chasm.ast.module.Import
 import io.github.charlietap.chasm.declarations.ModuleDeclarations
-import io.github.charlietap.chasm.declarations.ext.clone
 import io.github.charlietap.chasm.embedding.shapes.ImportDefinition
 import io.github.charlietap.chasm.host.ModuleIndex
 import io.github.charlietap.chasm.runtime.type.ExternalType
+import io.github.charlietap.chasm.runtime.type.ext.clone
 import io.github.charlietap.chasm.type.ext.functionType
 
 internal typealias ImportMapper = (ModuleDeclarations, Import, ModuleIndex) -> ImportDefinition

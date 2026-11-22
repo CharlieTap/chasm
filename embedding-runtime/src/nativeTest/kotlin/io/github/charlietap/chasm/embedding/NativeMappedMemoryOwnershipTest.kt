@@ -5,20 +5,24 @@
 
 package io.github.charlietap.chasm.embedding
 
-import io.github.charlietap.chasm.embedding.fixture.publicInstance
-import io.github.charlietap.chasm.embedding.fixture.publicMemory
-import io.github.charlietap.chasm.embedding.fixture.publicStore
+import io.github.charlietap.chasm.embedding.engine.Engine
+import io.github.charlietap.chasm.embedding.fixture.INSTANCE_MODULE
+import io.github.charlietap.chasm.embedding.fixture.MEMORY_IMPORT_MODULE
+import io.github.charlietap.chasm.embedding.fixture.instantiate
+import io.github.charlietap.chasm.embedding.fixture.interpreterStore
+import io.github.charlietap.chasm.embedding.internal.InterpreterEngine
+import io.github.charlietap.chasm.embedding.memory.readInt
+import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.Instance
 import io.github.charlietap.chasm.embedding.shapes.Memory
-import io.github.charlietap.chasm.fixture.runtime.instance.memoryAddress
-import io.github.charlietap.chasm.fixture.runtime.instance.memoryExternalValue
-import io.github.charlietap.chasm.fixture.runtime.instance.memoryInstance
-import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
+import io.github.charlietap.chasm.embedding.shapes.Store
+import io.github.charlietap.chasm.embedding.shapes._engine
 import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.fixture.type.limits
 import io.github.charlietap.chasm.fixture.type.memoryType
-import io.github.charlietap.chasm.memory.factory.LinearMemoryFactory
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
+import io.github.charlietap.chasm.type.MemoryType
+import kotlinx.coroutines.test.runTest
 import platform.posix.usleep
 import kotlin.native.ref.WeakReference
 import kotlin.native.runtime.GC
@@ -26,22 +30,19 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
-import io.github.charlietap.chasm.runtime.store.Store as InternalStore
+import io.github.charlietap.chasm.runtime.store.Store as RuntimeStore
 
 class NativeMappedMemoryOwnershipTest {
 
     @Test
     fun `dropStore releases every mapped memory before returning`() {
-        val first = mappedMemory()
-        val second = mappedMemory()
-        val store = publicStore(
-            store(
-                memories = mutableListOf(
-                    memoryInstance(type = onePageMemoryType(), data = first),
-                    memoryInstance(type = onePageMemoryType(), data = second),
-                ),
-            ),
-        )
+
+        val runtime = store()
+        val store = interpreterStore(runtime)
+        memory(store, onePageMemoryType())
+        memory(store, onePageMemoryType())
+        val first = runtime.memories[0].data
+        val second = runtime.memories[1].data
 
         dropStore(store)
 
@@ -50,20 +51,15 @@ class NativeMappedMemoryOwnershipTest {
     }
 
     @Test
-    fun `dropInstance leaves imported mapped memory alive in its store`() {
-        val backing = mappedMemory()
-        val internalStore = store(
-            memories = mutableListOf(
-                memoryInstance(type = onePageMemoryType(), data = backing),
-            ),
-        )
-        val store = publicStore(internalStore)
-        val importingInstance = publicInstance(
-            store = internalStore,
-            moduleInstance = moduleInstance(memAddresses = mutableListOf(memoryAddress(0))),
-        )
+    fun `dropInstance leaves imported mapped memory alive in its store`() = runTest {
 
-        dropInstance(store, importingInstance)
+        val runtime = store()
+        val store = interpreterStore(runtime)
+        val memory = memory(store, onePageMemoryType())
+        val backing = runtime.memories.single().data
+        val importingInstance = instantiate(store, MEMORY_IMPORT_MODULE, listOf(Import("env", "memory", memory)))
+
+        dropInstance(importingInstance)
 
         assertEquals(LinearMemory.PAGE_SIZE, backing.byteSize)
         backing.writeI32(7, 0x12345678)
@@ -73,128 +69,116 @@ class NativeMappedMemoryOwnershipTest {
     }
 
     @Test
-    fun `memory handle retains its internal store and mapped backing`() {
+    fun `memory handle retains its store and mapped backing`() {
+
         val graph = memoryHandleGraph()
 
-        awaitCollected(graph.publicStore)
+        awaitCollected(graph.unrelated)
 
-        assertNull(graph.publicStore.value)
-        val internalStore = assertNotNull(graph.internalStore.value)
+        assertNotNull(graph.runtime.value)
         val backing = assertNotNull(graph.backing.value)
         backing.writeI32(3, 42)
         assertEquals(42, backing.readI32(3))
-        assertEquals(memoryExternalValue(memoryAddress(0)), graph.handle.reference)
+        assertEquals(42, readInt(graph.handle, 3))
 
-        dropStore(publicStore(internalStore))
+        dropStore(storeOf(graph.handle._engine()))
     }
 
     @Test
-    fun `instance handle retains its internal store and mapped backing`() {
+    fun `instance handle retains its store and mapped backing`() = runTest {
+
         val graph = instanceHandleGraph()
 
-        awaitCollected(graph.publicStore)
+        awaitCollected(graph.unrelated)
 
-        assertNull(graph.publicStore.value)
-        val internalStore = assertNotNull(graph.internalStore.value)
+        assertNotNull(graph.runtime.value)
         val backing = assertNotNull(graph.backing.value)
         backing.writeI32(3, 42)
         assertEquals(42, backing.readI32(3))
-        assertEquals(1, graph.handle.instance.memAddresses.size)
+        assertEquals(42, readInt(assertNotNull(exports(graph.handle).memory("memory")), 3))
 
-        dropStore(publicStore(internalStore))
+        dropStore(storeOf(graph.handle._engine()))
     }
 
     @Test
     fun `dropping the final memory handle makes the store graph unreachable`() {
+
         val graph = forgottenMemoryHandleGraph()
 
-        awaitCollected(graph.internalStore)
+        awaitCollected(graph.runtime)
         awaitCollected(graph.backing)
 
-        assertNull(graph.internalStore.value)
+        assertNull(graph.runtime.value)
         assertNull(graph.backing.value)
     }
 
-    private fun mappedMemory(): LinearMemory {
-        val pages = LinearMemory.Pages(1u)
-        return LinearMemoryFactory(pages, pages)
+    private fun onePageMemoryType(): MemoryType {
+        return memoryType(limits = limits(min = 1u, max = 1u))
     }
 
-    private fun onePageMemoryType() = memoryType(
-        limits = limits(min = 1u, max = 1u),
-    )
-
     private fun memoryHandleGraph(): MemoryHandleGraph {
-        val backing = mappedMemory()
-        val internalStore = store(
-            memories = mutableListOf(
-                memoryInstance(type = onePageMemoryType(), data = backing),
-            ),
-        )
-        val publicStore = publicStore(internalStore)
-        val handle = publicMemory(
-            reference = memoryExternalValue(memoryAddress(0)),
-            store = internalStore,
-        )
+
+        val runtime = store()
+        val handle = memory(interpreterStore(runtime), onePageMemoryType())
+
         return MemoryHandleGraph(
-            publicStore = WeakReference(publicStore),
-            internalStore = WeakReference(internalStore),
-            backing = WeakReference(backing),
+            runtime = WeakReference(runtime),
+            backing = WeakReference(runtime.memories.single().data),
+            unrelated = WeakReference(interpreterStore()),
             handle = handle,
         )
     }
 
-    private fun instanceHandleGraph(): InstanceHandleGraph {
-        val backing = mappedMemory()
-        val internalStore = store(
-            memories = mutableListOf(
-                memoryInstance(type = onePageMemoryType(), data = backing),
-            ),
-        )
-        val publicStore = publicStore(internalStore)
-        val handle = publicInstance(
-            store = internalStore,
-            moduleInstance = moduleInstance(memAddresses = mutableListOf(memoryAddress(0))),
-        )
+    private suspend fun instanceHandleGraph(): InstanceHandleGraph {
+
+        val runtime = store()
+        val handle = instantiate(interpreterStore(runtime), INSTANCE_MODULE)
+
         return InstanceHandleGraph(
-            publicStore = WeakReference(publicStore),
-            internalStore = WeakReference(internalStore),
-            backing = WeakReference(backing),
+            runtime = WeakReference(runtime),
+            backing = WeakReference(runtime.memories.single().data),
+            unrelated = WeakReference(interpreterStore()),
             handle = handle,
         )
     }
 
     private fun forgottenMemoryHandleGraph(): ForgottenGraph {
+
         val graph = memoryHandleGraph()
-        return ForgottenGraph(graph.internalStore, graph.backing)
+
+        return ForgottenGraph(graph.runtime, graph.backing)
+    }
+
+    private fun storeOf(engine: Engine): Store {
+        return (engine as InterpreterEngine).store
     }
 
     private fun <T : Any> awaitCollected(reference: WeakReference<T>) {
         repeat(100) {
             GC.collect()
             usleep(10_000u)
-            if (isCollected(reference)) return
+            if (reference.value == null) {
+                return
+            }
         }
     }
 
-    private fun <T : Any> isCollected(reference: WeakReference<T>): Boolean = reference.value == null
-
     private class MemoryHandleGraph(
-        val publicStore: WeakReference<io.github.charlietap.chasm.embedding.shapes.Store>,
-        val internalStore: WeakReference<InternalStore>,
+        val runtime: WeakReference<RuntimeStore>,
         val backing: WeakReference<LinearMemory>,
+        val unrelated: WeakReference<Store>,
         val handle: Memory,
     )
 
     private class InstanceHandleGraph(
-        val publicStore: WeakReference<io.github.charlietap.chasm.embedding.shapes.Store>,
-        val internalStore: WeakReference<InternalStore>,
+        val runtime: WeakReference<RuntimeStore>,
         val backing: WeakReference<LinearMemory>,
+        val unrelated: WeakReference<Store>,
         val handle: Instance,
     )
 
     private class ForgottenGraph(
-        val internalStore: WeakReference<InternalStore>,
+        val runtime: WeakReference<RuntimeStore>,
         val backing: WeakReference<LinearMemory>,
     )
 }

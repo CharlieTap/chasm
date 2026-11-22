@@ -77,8 +77,6 @@ kotlin {
             kotlin.srcDir("src/nonJsTargetsMain/kotlin")
             dependencies {
                 implementation(projects.chasm)
-                implementation(projects.chasmCoroutines)
-                implementation(projects.libs.parallel)
             }
         }
 

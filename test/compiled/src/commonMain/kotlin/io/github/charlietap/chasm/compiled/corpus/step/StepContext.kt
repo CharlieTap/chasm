@@ -3,7 +3,7 @@ package io.github.charlietap.chasm.compiled.corpus.step
 import io.github.charlietap.chasm.compiled.corpus.CorpusTimingRecorder
 import io.github.charlietap.chasm.compiled.corpus.failure
 import io.github.charlietap.chasm.compiled.corpus.instance.RuntimeSetup
-import io.github.charlietap.chasm.runtime.value.ExecutionValue
+import io.github.charlietap.chasm.embedding.value.ExecutionValue
 import io.github.charlietap.corpus.lib.CorpusResult
 import io.github.charlietap.corpus.lib.fixture.Fixture
 

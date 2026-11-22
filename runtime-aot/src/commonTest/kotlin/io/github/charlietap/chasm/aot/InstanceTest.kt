@@ -1,13 +1,11 @@
 package io.github.charlietap.chasm.aot
 
-import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.getOrThrow
 import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.aot.internal.COMPILED_RUNTIME_ABI
 import io.github.charlietap.chasm.aot.internal.CompiledCode
 import io.github.charlietap.chasm.aot.internal.UNSET
 import io.github.charlietap.chasm.aot.internal.UNSET_LONG
-import io.github.charlietap.chasm.aot.internal.compiledModule
 import io.github.charlietap.chasm.config.GCStrategy
 import io.github.charlietap.chasm.config.GCThreshold
 import io.github.charlietap.chasm.config.ModuleConfig
@@ -17,18 +15,20 @@ import io.github.charlietap.chasm.declarations.ModuleDeclarations
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
 import io.github.charlietap.chasm.embedding.dropStore
 import io.github.charlietap.chasm.embedding.error.ExecutionError
+import io.github.charlietap.chasm.embedding.error.ModuleError
+import io.github.charlietap.chasm.embedding.instance
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
-import io.github.charlietap.chasm.embedding.store
+import io.github.charlietap.chasm.embedding.shapes.Module
+import io.github.charlietap.chasm.embedding.shapes.expect
 import io.github.charlietap.chasm.module.ModuleDeclarationsFactory
 import io.github.charlietap.chasm.runtime.compiled.CodeInstallation
-import io.github.charlietap.chasm.runtime.error.InstantiationError
 import io.github.charlietap.chasm.validator.WasmModuleValidator
+import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertIs
-import kotlin.test.assertSame
 import kotlin.test.assertTrue
 import kotlin.test.fail
 
@@ -38,44 +38,28 @@ class InstanceTest {
     private val emptyDeclarations = emptyModuleDeclarations()
 
     @Test
-    fun `a module is instantiated from its declarations into the store`() {
-        val store = store(StoreConfig())
-        val module = compiledModule(FakeCode())
-        var instantiated = false
+    fun `a module is instantiated from its declarations into the store`() = runBlocking<Unit> {
+        val code = FakeCode()
 
-        val result = instance(
-            store = store,
-            module = module,
-            imports = emptyList(),
-            instantiator = { _, runtimeStore, moduleDeclarations, imports, _ ->
-                instantiated = true
-                assertSame(store.store, runtimeStore)
-                assertSame(emptyDeclarations, moduleDeclarations)
-                assertEquals(emptyList(), imports)
-                Err(InstantiationError.DataUnavailable("no data"))
-            },
-        )
+        val result = instance(store(StoreConfig()), module(code))
 
-        assertEquals(true, instantiated)
-        assertIs<ChasmResult.Error<*>>(result)
-        assertTrue("no data" in result.error.toString(), result.error.toString())
+        assertIs<ChasmResult.Success<*>>(result)
+        assertTrue(code.declarationsBuilt)
     }
 
     @Test
-    fun `a dropped store is refused before the compiled module is checked`() {
+    fun `a dropped store is refused before the compiled module is checked`() = runBlocking<Unit> {
 
         val store = store(StoreConfig())
         dropStore(store)
 
         assertFailsWith<IllegalStateException> {
-            instance(store, compiledModule(FakeCode(meterFuel = true)), emptyList()) { _, _, _, _, _ ->
-                fail("a dropped store is never instantiated into")
-            }
+            instance(store, module(FakeCode(meterFuel = true)))
         }
     }
 
     @Test
-    fun `a store that does not match the module's fuel and interrupt checks is rejected before instantiation`() {
+    fun `a store that does not match the module's fuel and interrupt checks is rejected before instantiation`() = runBlocking<Unit> {
         val cases = listOf(
             Triple(FakeCode(meterFuel = true), StoreConfig(), "the module was compiled with fuel checks but the store does not meter fuel"),
             Triple(FakeCode(), StoreConfig(meterFuel = true), "the store meters fuel but the module was compiled without fuel checks"),
@@ -92,7 +76,10 @@ class InstanceTest {
         )
 
         cases.forEach { (code, config, reason) ->
-            assertEquals(unsupported(reason), instantiateOnly(code, config), reason)
+            val result = instance(store(config), module(code))
+
+            assertEquals(ChasmResult.Error(ExecutionError.Unsupported("Compiled module rejected: $reason")), result, reason)
+            assertFalse(code.installed, "a rejected module was installed")
         }
     }
 
@@ -100,21 +87,62 @@ class InstanceTest {
     fun `a module compiled for another runtime is rejected before anything else is read from it`() {
         val code = FakeCode(abi = COMPILED_RUNTIME_ABI + 1, readOnlyAbi = true)
 
-        val result = instantiateOnly(code, StoreConfig())
+        val result = compiledModule(fakeModuleClass(code))
 
         assertEquals(
-            unsupported("the module was compiled for runtime ABI ${COMPILED_RUNTIME_ABI + 1} but this runtime supports $COMPILED_RUNTIME_ABI"),
+            malformed("the module was compiled for runtime ABI ${COMPILED_RUNTIME_ABI + 1} but this runtime supports $COMPILED_RUNTIME_ABI"),
             result,
         )
+        assertFalse(code.declarationsBuilt, "a rejected module built its declarations")
     }
 
     @Test
     fun `a module compiled before its metadata existed is rejected`() {
         val code = FakeCode(missingAbi = true)
 
-        val result = instantiateOnly(code, StoreConfig())
+        val result = compiledModule(fakeModuleClass(code))
 
-        assertEquals(unsupported("the module was compiled for an older runtime"), result)
+        assertEquals(malformed("the module was compiled for an older runtime"), result)
+        assertFalse(code.declarationsBuilt, "a rejected module built its declarations")
+    }
+
+    @Test
+    fun `a class that is not on the class path is rejected`() {
+        val result = compiledModule("chasm.aot.missing.WasmModule", InstanceTest::class.java.classLoader)
+
+        assertEquals(malformed("chasm.aot.missing.WasmModule is not on the class path"), result)
+    }
+
+    @Test
+    fun `a class without a compiled module instance is rejected`() {
+        val result = compiledModule(String::class.java)
+
+        assertEquals(malformed("java.lang.String is not a compiled module class"), result)
+    }
+
+    @Test
+    fun `a class whose compiled module instance is not static is rejected`() {
+
+        val moduleClass = InstanceFieldModuleClass::class.java
+
+        val result = compiledModule(moduleClass)
+
+        assertEquals(malformed("${moduleClass.name} is not a compiled module class"), result)
+    }
+
+    @Test
+    fun `a class whose initializer fails is rejected`() {
+
+        val moduleClass = FailingModuleClass::class.java
+
+        val fromClass = compiledModule(moduleClass)
+        val fromName = compiledModule(moduleClass.name, moduleClass.classLoader)
+
+        listOf(fromClass, fromName).forEach { result ->
+            val error = assertIs<ChasmResult.Error<ModuleError>>(result).error
+            val message = assertIs<ModuleError.Malformed>(error).message
+            assertTrue(message.startsWith("Compiled module rejected: ${moduleClass.name} could not be initialised"), message)
+        }
     }
 
     @Test
@@ -131,7 +159,7 @@ class InstanceTest {
             stackBytes = 4096,
         )
 
-        val metadata = compiledModule(code).metadata
+        val metadata = compiledModuleMetadata(module(code))
 
         assertEquals(Capabilities(meterFuel = true, interruptible = false, stacktraces = true), metadata.capabilities)
         assertEquals(42L, metadata.initialFuel)
@@ -149,7 +177,7 @@ class InstanceTest {
 
     @Test
     fun `an unset stack limit reads back as the platform default`() {
-        val metadata = compiledModule(FakeCode()).metadata
+        val metadata = compiledModuleMetadata(module(FakeCode()))
 
         assertEquals(null, metadata.initialFuel)
         assertEquals(StoreLimits().stackBytes, metadata.storeConfig.limits.stackBytes)
@@ -157,27 +185,12 @@ class InstanceTest {
         assertEquals(null, metadata.storeConfig.gcThreshold)
     }
 
-    private fun instantiateOnly(
+    private fun module(
         code: FakeCode,
-        config: StoreConfig,
-    ): ChasmResult<*, *> {
-        var instantiated = false
-        val result = instance(
-            store = store(config),
-            module = compiledModule(code),
-            imports = emptyList(),
-            instantiator = { _, _, _, _, _ ->
-                instantiated = true
-                Err(InstantiationError.DataUnavailable("no data"))
-            },
-        )
-        assertFalse(instantiated, "a rejected module reached instantiation")
-        assertFalse(code.declarationsBuilt, "a rejected module built its declarations")
-        return result
-    }
+    ): Module = compiledModule(fakeModuleClass(code)).expect("loads")
 
-    private fun unsupported(reason: String): ChasmResult.Error<ExecutionError.Unsupported> {
-        return ChasmResult.Error(ExecutionError.Unsupported("Compiled module rejected: $reason"))
+    private fun malformed(reason: String): ChasmResult.Error<ModuleError.Malformed> {
+        return ChasmResult.Error(ModuleError.Malformed("Compiled module rejected: $reason"))
     }
 
     private inner class FakeCode(
@@ -198,9 +211,13 @@ class InstanceTest {
 
         var declarationsBuilt = false
 
+        var installed = false
+
         override fun install(
             installation: CodeInstallation,
-        ) = fail("installation belongs to the instantiator")
+        ) {
+            installed = true
+        }
 
         override fun buildDeclarations(): ModuleDeclarations {
             declarationsBuilt = true

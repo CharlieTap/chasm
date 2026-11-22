@@ -1,30 +1,38 @@
+@file:OptIn(ExperimentalChasmApi::class)
+
 package com.test
 
+import io.github.charlietap.chasm.ExperimentalChasmApi
 import io.github.charlietap.chasm.embedding.codegen.CodegenImport
-import io.github.charlietap.chasm.embedding.codegen.InstanceFactory
-import io.github.charlietap.chasm.embedding.codegen.ModuleFactory
 import io.github.charlietap.chasm.embedding.codegen.allocateImports
+import io.github.charlietap.chasm.embedding.exports
 import io.github.charlietap.chasm.embedding.global.readGlobal
 import io.github.charlietap.chasm.embedding.instance
 import io.github.charlietap.chasm.embedding.module
 import io.github.charlietap.chasm.embedding.shapes.Global
+import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.Instance
+import io.github.charlietap.chasm.embedding.shapes.Module
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.shapes.`expect`
 import io.github.charlietap.chasm.embedding.store
-import io.github.charlietap.chasm.runtime.`value`.NumberValue
 import kotlin.ByteArray
 import kotlin.Double
 import kotlin.Float
 import kotlin.Int
 import kotlin.Long
+import kotlin.OptIn
 import kotlin.collections.List
 
-public fun numericGlobals(
+public suspend fun numericGlobals(
   binary: ByteArray,
   imports: List<CodegenImport> = emptyList(),
-  moduleFactory: ModuleFactory? = null,
-  instanceFactory: InstanceFactory? = null,
+  moduleFactory: (suspend (ByteArray) -> Module)? = null,
+  instanceFactory: (suspend (
+    Store,
+    Module,
+    List<Import>,
+  ) -> Instance)? = null,
 ): NumericGlobals {
   val store = store()
   val module = moduleFactory?.invoke(binary) ?: module(binary).`expect`("Failed to decode binary")
@@ -38,26 +46,26 @@ private class NumericGlobalsImpl(
   private val instance: Instance,
 ) : NumericGlobals {
   private val _intValue: Global =
-      (instance.exports.firstOrNull { export -> export.name == "int_value" }?.value as? Global) ?: error("Failed to find global export with name int_value")
+      exports(instance).global("int_value") ?: error("Failed to find global export with name int_value")
 
   override val intValue: Int
-    get() = (readGlobal(store, _intValue) as NumberValue.I32).value
+    get() = readGlobal(_intValue).toInt()
 
   private val _longValue: Global =
-      (instance.exports.firstOrNull { export -> export.name == "long_value" }?.value as? Global) ?: error("Failed to find global export with name long_value")
+      exports(instance).global("long_value") ?: error("Failed to find global export with name long_value")
 
   override val longValue: Long
-    get() = (readGlobal(store, _longValue) as NumberValue.I64).value
+    get() = readGlobal(_longValue)
 
   private val _floatValue: Global =
-      (instance.exports.firstOrNull { export -> export.name == "float_value" }?.value as? Global) ?: error("Failed to find global export with name float_value")
+      exports(instance).global("float_value") ?: error("Failed to find global export with name float_value")
 
   override val floatValue: Float
-    get() = (readGlobal(store, _floatValue) as NumberValue.F32).value
+    get() = Float.fromBits(readGlobal(_floatValue).toInt())
 
   private val _doubleValue: Global =
-      (instance.exports.firstOrNull { export -> export.name == "double_value" }?.value as? Global) ?: error("Failed to find global export with name double_value")
+      exports(instance).global("double_value") ?: error("Failed to find global export with name double_value")
 
   override val doubleValue: Double
-    get() = (readGlobal(store, _doubleValue) as NumberValue.F64).value
+    get() = Double.fromBits(readGlobal(_doubleValue))
 }

@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.memory
 
-import io.github.charlietap.chasm.host.ByteArrayHostMemory
 import io.github.charlietap.chasm.host.UnsafeHostApi
 import io.github.charlietap.chasm.memory.copy.LinearMemoryCopier
 import io.github.charlietap.chasm.memory.fill.LinearMemoryFiller
@@ -35,6 +34,7 @@ import io.github.charlietap.chasm.memory.write.I64Writer
 import io.github.charlietap.chasm.memory.write.StringWriter
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
+import io.github.charlietap.chasm.runtime.host.ByteArrayHostMemory
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
 import io.github.charlietap.chasm.runtime.memory.LinearMemory.Companion.PAGE_SIZE
 import io.github.charlietap.chasm.runtime.memory.OutOfMemoryError

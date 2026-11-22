@@ -1,18 +1,19 @@
 package io.github.charlietap.chasm.compiled.script
 
 import io.github.charlietap.chasm.compiled.Compiler
-import io.github.charlietap.chasm.compiled.Instantiable
 import io.github.charlietap.chasm.compiled.ScriptFailure
 import io.github.charlietap.chasm.config.Config
 import io.github.charlietap.chasm.config.StoreConfig
 import io.github.charlietap.chasm.embedding.error.InstantiationError
 import io.github.charlietap.chasm.embedding.exports
+import io.github.charlietap.chasm.embedding.instance
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.Instance
+import io.github.charlietap.chasm.embedding.shapes.Module
 import io.github.charlietap.chasm.embedding.shapes.Store
-import io.github.charlietap.chasm.runtime.value.ReferenceValue
 import io.github.charlietap.sweet.lib.SemanticPhase
+import kotlinx.coroutines.runBlocking
 
 data class ScriptContext(
     val config: Config,
@@ -22,7 +23,7 @@ data class ScriptContext(
     val compiler: Compiler,
     val files: ScriptFileReader,
     val store: Store,
-    val modules: MutableMap<String?, Instantiable>,
+    val modules: MutableMap<String?, Module>,
     val instances: MutableMap<String?, Instance>,
     val imports: MutableList<Import> = mutableListOf(),
 ) {
@@ -34,19 +35,19 @@ data class ScriptContext(
         moduleName: String,
         instance: Instance,
     ) {
-        imports += exports(instance).map { export -> Import(moduleName, export.name, export.value) }
+        imports += exports(instance).all.map { export -> Import(moduleName, export.name, export.value) }
     }
 
     fun compile(
         bytes: ByteArray,
-    ): ChasmResult<Instantiable, ScriptFailure> {
+    ): ChasmResult<Module, ScriptFailure> {
         return compiler(bytes, config.moduleConfig, storeConfig)
     }
 
     fun instantiate(
-        module: Instantiable,
-    ): ChasmResult<Instance, InstantiationError<ReferenceValue.Exception>> {
-        return module(store, imports)
+        module: Module,
+    ): ChasmResult<Instance, InstantiationError> {
+        return runBlocking { instance(store, module, imports) }
     }
 
     fun instantiate(

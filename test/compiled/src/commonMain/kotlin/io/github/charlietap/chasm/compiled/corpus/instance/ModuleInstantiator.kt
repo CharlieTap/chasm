@@ -7,20 +7,23 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.getOrElse
 import io.github.charlietap.chasm.compiled.corpus.failure
 import io.github.charlietap.chasm.compiled.corpus.fixture.FixtureContext
-import io.github.charlietap.chasm.compiled.corpus.fixture.PreparedModule
 import io.github.charlietap.chasm.compiled.corpus.imports.ImportResolver
+import io.github.charlietap.chasm.embedding.exports
+import io.github.charlietap.chasm.embedding.instance
 import io.github.charlietap.chasm.embedding.shapes.Memory
+import io.github.charlietap.chasm.embedding.shapes.Module
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.shapes.fold
 import io.github.charlietap.corpus.lib.CorpusResult
 import io.github.charlietap.corpus.lib.fixture.FixtureTest
+import kotlinx.coroutines.runBlocking
 
-internal typealias ModuleInstantiator = (FixtureContext, Store, PreparedModule, FixtureTest?) -> Result<RuntimeSetup, CorpusResult>
+internal typealias ModuleInstantiator = (FixtureContext, Store, Module, FixtureTest?) -> Result<RuntimeSetup, CorpusResult>
 
 internal fun ModuleInstantiator(
     context: FixtureContext,
     store: Store,
-    module: PreparedModule,
+    module: Module,
     test: FixtureTest?,
 ): Result<RuntimeSetup, CorpusResult> = ModuleInstantiator(
     context = context,
@@ -33,19 +36,20 @@ internal fun ModuleInstantiator(
 private fun ModuleInstantiator(
     context: FixtureContext,
     store: Store,
-    module: PreparedModule,
+    module: Module,
     test: FixtureTest?,
     importResolver: ImportResolver,
 ): Result<RuntimeSetup, CorpusResult> {
-    val imports = importResolver(context.fixture, store, module.decoded, test, context.timings).getOrElse { error -> return Err(error) }
+    val imports = importResolver(context.fixture, store, module, test, context.timings).getOrElse { error -> return Err(error) }
 
-    return module.compiled(store, imports.imports).fold(
+    return runBlocking { instance(store, module, imports.imports) }.fold(
         { instance ->
-            val exportedMemory = instance.exports.firstNotNullOfOrNull { export -> export.value as? Memory }
+            val exports = exports(instance)
+            val exportedMemory = exports.all.firstNotNullOfOrNull { export -> export.value as? Memory }
             if (imports.memories.isEmpty() && exportedMemory != null) {
                 imports.memories["memory"] = exportedMemory
             }
-            Ok(RuntimeSetup(store, instance, imports))
+            Ok(RuntimeSetup(instance, exports, imports))
         },
         { error ->
             imports.hosts.forEach(EmbedderHost::close)

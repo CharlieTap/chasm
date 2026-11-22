@@ -2,21 +2,29 @@ package io.github.charlietap.chasm.compiler.backend.dex.gc
 
 import com.android.tools.smali.dexlib2.Opcodes
 import com.android.tools.smali.dexlib2.dexbacked.DexBackedDexFile
+import io.github.charlietap.chasm.InternalChasmApi
+import io.github.charlietap.chasm.compiler.backend.abi.ENGINE_TYPE
 import io.github.charlietap.chasm.compiler.backend.abi.EQ_REFERENCE
 import io.github.charlietap.chasm.compiler.backend.abi.I31_REFERENCE
 import io.github.charlietap.chasm.compiler.backend.abi.MANAGED_ARRAY
 import io.github.charlietap.chasm.compiler.backend.abi.MANAGED_FUNCTION
 import io.github.charlietap.chasm.compiler.backend.abi.MANAGED_STRUCT
 import io.github.charlietap.chasm.compiler.backend.abi.OBJECT_TYPE
-import io.github.charlietap.chasm.compiler.backend.abi.REFERENCE_OWNER
+import io.github.charlietap.chasm.compiler.backend.abi.REFERENCE_ENGINE
 import io.github.charlietap.chasm.compiler.backend.abi.SHAPE_OWNER_CLASS
 import io.github.charlietap.chasm.compiler.backend.abi.SHAPE_OWNER_ENGINE
+import io.github.charlietap.chasm.compiler.backend.abi.WEAK_REFERENCE_TYPE
 import io.github.charlietap.chasm.compiler.backend.dex.decodeModule
 import io.github.charlietap.chasm.compiler.backend.dex.fixture
+import io.github.charlietap.chasm.compiler.backend.dex.lower.Unsupported
+import io.github.charlietap.chasm.embedding.engine.Engine
 import io.github.charlietap.dexter.Dexter
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
@@ -89,14 +97,48 @@ class GcLayoutsTest {
 
         assertEquals(layouts.structs.size + layouts.arrays.size + 1, classes.size)
         assertEquals(listOf(SHAPE_OWNER_ENGINE), classes.getValue(SHAPE_OWNER_CLASS).staticFields.map { field -> field.name })
-        assertTrue(classes.getValue(layouts.struct(SHAPE).className).virtualMethods.any { method -> method.name == REFERENCE_OWNER })
-        assertTrue(classes.getValue(layouts.struct(CIRCLE).className).virtualMethods.none { method -> method.name == REFERENCE_OWNER })
+        assertEquals(listOf(WEAK_REFERENCE_TYPE), classes.getValue(SHAPE_OWNER_CLASS).staticFields.map { field -> field.type })
+        assertEquals(
+            listOf(ENGINE_TYPE),
+            classes.getValue(layouts.struct(SHAPE).className).virtualMethods
+                .filter { method -> method.name == REFERENCE_ENGINE }
+                .map { method -> method.returnType },
+        )
+        assertTrue(classes.getValue(layouts.struct(CIRCLE).className).virtualMethods.none { method -> method.name == REFERENCE_ENGINE })
         assertEquals(MANAGED_STRUCT, classes.getValue(layouts.struct(SHAPE).className).superclass)
         assertEquals(layouts.struct(SHAPE).className, classes.getValue(layouts.struct(CIRCLE).className).superclass)
         assertEquals(listOf("f1"), classes.getValue(layouts.struct(CIRCLE).className).instanceFields.map { field -> field.name })
         assertEquals(MANAGED_ARRAY, classes.getValue(layouts.array(SHAPES).className).superclass)
         assertEquals(listOf("data"), classes.getValue(layouts.array(SHAPES).className).instanceFields.map { field -> field.name })
         assertTrue(classes.getValue(layouts.array(CIRCLES).className).instanceFields.none())
+    }
+
+    @Test
+    @OptIn(InternalChasmApi::class)
+    fun `the engine type names the shared engine interface`() {
+        assertEquals("L" + Engine::class.java.name.replace('.', '/') + ";", ENGINE_TYPE)
+    }
+
+    @Test
+    fun `types that cannot be laid out fail only where they are used`() {
+
+        val vectors = GcLayouts(decodeModule(fixture("gc_vector_types")).definedTypes)
+
+        assertFailsWith<Unsupported> { vectors.struct(VECTOR) }
+        assertFailsWith<Unsupported> { vectors.typeDescriptor(VECTOR) }
+        assertFailsWith<Unsupported> { vectors.struct(VECTOR_CHILD) }
+        assertNull(vectors.className(VECTOR))
+        assertNotNull(vectors.className(PLAIN))
+        assertTrue(vectors.structs.none { shape -> shape.className == vectors.className(VECTOR) })
+    }
+
+    @Test
+    fun `references to types that cannot be laid out use the managed base classes`() {
+
+        val vectors = GcLayouts(decodeModule(fixture("gc_vector_types")).definedTypes)
+
+        assertEquals(listOf(MANAGED_STRUCT), vectors.struct(VECTOR_HOLDER).fields.map { field -> field.descriptor })
+        assertEquals("[$MANAGED_STRUCT", vectors.array(VECTOR_HOLDERS).data.descriptor)
     }
 
     private companion object {
@@ -110,5 +152,10 @@ class GcLayoutsTest {
         const val CIRCLES = 6
         const val BYTES = 7
         const val SAME_SHAPE = 8
+        const val VECTOR = 0
+        const val VECTOR_CHILD = 1
+        const val VECTOR_HOLDER = 2
+        const val VECTOR_HOLDERS = 3
+        const val PLAIN = 4
     }
 }

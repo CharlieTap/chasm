@@ -22,12 +22,7 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                api(projects.config)
                 api(projects.embeddingApi)
-                api(projects.host)
-                api(projects.runtime.compiledApi)
-                api(projects.stream)
-                api(projects.typeSystem)
             }
         }
     }
@@ -35,5 +30,5 @@ kotlin {
 
 configure<PublishingConventionsExtension> {
     name = "embedding-compiled"
-    description = "The embedding and host-function API of Chasm's compiled engines, where references are the objects themselves"
+    description = "Zero-copy access to GC arrays and table elements on Chasm's JIT engine, for embedders and host functions"
 }

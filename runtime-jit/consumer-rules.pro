@@ -7,17 +7,18 @@
 -keep class io.github.charlietap.chasm.runtime.instance.MemoryInstance { public byte[] byteArray; public int getSize(); }
 -keepnames class io.github.charlietap.chasm.runtime.instance.**
 -keep,allowobfuscation,allowshrinking class io.github.charlietap.chasm.executor.invoker.compiled.CompiledEntry { *** invoke(...); }
+-keep,allowobfuscation,allowshrinking class io.github.charlietap.chasm.runtime.compiled.gc.ManagedEntry { *** enter(...); }
 -keep class io.github.charlietap.chasm.runtime.compiled.gc.ManagedOps { public static *; }
 -keep class io.github.charlietap.chasm.runtime.compiled.gc.ManagedArrays { public static *; }
 -keep class io.github.charlietap.chasm.runtime.compiled.gc.ManagedTables { public static *; }
 -keep interface io.github.charlietap.chasm.reference.GcReference
 -keep interface io.github.charlietap.chasm.reference.EqReference
--keep class io.github.charlietap.chasm.reference.StructReference { <init>(...); }
--keep class io.github.charlietap.chasm.reference.ArrayReference { <init>(...); }
+-keep class io.github.charlietap.chasm.reference.StructReference { <init>(...); public abstract io.github.charlietap.chasm.embedding.engine.Engine engine(); }
+-keep class io.github.charlietap.chasm.reference.ArrayReference { <init>(...); public abstract io.github.charlietap.chasm.embedding.engine.Engine engine(); }
 -keep class io.github.charlietap.chasm.reference.FunctionReference { <init>(...); }
 -keep class io.github.charlietap.chasm.reference.ExceptionReference { <init>(...); }
 -keep class io.github.charlietap.chasm.reference.I31Reference { <init>(...); public <fields>; }
--keep interface io.github.charlietap.chasm.reference.ReferenceOwner { *; }
+-keep interface io.github.charlietap.chasm.embedding.engine.Engine
 -keep class io.github.charlietap.chasm.runtime.compiled.gc.ManagedStruct { <init>(...); public abstract *; }
 -keep class io.github.charlietap.chasm.runtime.compiled.gc.ManagedArray { <init>(...); public abstract *; }
 -keep class io.github.charlietap.chasm.runtime.compiled.gc.ManagedFields { public static *; }

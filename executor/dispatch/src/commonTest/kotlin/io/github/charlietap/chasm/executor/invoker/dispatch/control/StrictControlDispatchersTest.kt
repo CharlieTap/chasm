@@ -17,12 +17,12 @@ import io.github.charlietap.chasm.fixture.type.functionRecursiveType
 import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.fixture.type.i32ValueType
 import io.github.charlietap.chasm.fixture.type.resultType
-import io.github.charlietap.chasm.host.HostModuleInstance
 import io.github.charlietap.chasm.host.readI32
 import io.github.charlietap.chasm.host.writeI32
 import io.github.charlietap.chasm.runtime.ext.toLong
 import io.github.charlietap.chasm.runtime.function.LocalInitialization
 import io.github.charlietap.chasm.runtime.function.classifyLocalInitialization
+import io.github.charlietap.chasm.runtime.host.RawHostModuleInstance
 import io.github.charlietap.chasm.runtime.instruction.TransferSource
 import io.github.charlietap.chasm.runtime.program.Program
 import kotlin.contextOf
@@ -118,7 +118,7 @@ class StrictControlDispatchersTest {
                 results = resultType(listOf(i32ValueType())),
             ),
         ) { parameters, results ->
-            val caller = contextOf<HostModuleInstance>()
+            val caller = contextOf<RawHostModuleInstance>()
             assertEquals(module, caller)
             results.writeI32(0, parameters.readI32(0) + 1)
         }
@@ -155,7 +155,7 @@ class StrictControlDispatchersTest {
             rtt = runtimeType,
             functionType = functionType,
         ) { parameters, results ->
-            val caller = contextOf<HostModuleInstance>()
+            val caller = contextOf<RawHostModuleInstance>()
             assertEquals(module, caller)
             results.writeI32(0, parameters.readI32(0) + 1)
         }

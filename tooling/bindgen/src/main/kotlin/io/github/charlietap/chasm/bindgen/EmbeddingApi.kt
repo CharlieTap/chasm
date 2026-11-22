@@ -3,7 +3,6 @@ package io.github.charlietap.chasm.bindgen
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.MemberName
-import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.TypeName
 
 internal interface EmbeddingApi {
@@ -26,9 +25,15 @@ internal interface EmbeddingApi {
 
     val allocator: ClassName
 
-    val storeFactory: MemberName
-
     val allocateImports: MemberName
+
+    val moduleFactory: MemberName
+
+    val instanceFactory: MemberName
+
+    val compiledModuleFactory: MemberName
+
+    val compiledModuleMetadata: MemberName
 
     val prepareFunction: MemberName
 
@@ -46,28 +51,15 @@ internal interface EmbeddingApi {
 
     val readNullTerminatedUtf8String: MemberName
 
-    val memoryAccessParameters: List<ParameterSpec>
+    val moduleFactoryOverrideType: TypeName
+
+    val instanceFactoryOverrideType: TypeName
 
     val functionCallConvention: FunctionCallConvention
 
-    val moduleFactoryArguments: String
-
-    fun suspendingFactories(config: CodegenConfig): Boolean
-
-    fun moduleFactory(suspending: Boolean): MemberName
-
-    fun instanceFactory(suspending: Boolean): MemberName
-
-    fun moduleFactoryOverrideType(suspending: Boolean): TypeName
-
-    fun instanceFactoryOverrideType(suspending: Boolean): TypeName
+    fun storeFactory(tier: ExecutionTier): MemberName
 
     fun storeFunction(function: StoreFunction): MemberName
-
-    fun accessorCall(
-        function: MemberName,
-        arguments: CodeBlock,
-    ): CodeBlock
 
     fun writeNullTerminator(
         memory: String,
@@ -75,10 +67,8 @@ internal interface EmbeddingApi {
     ): CodeBlock
 
     fun exportLookup(
-        kind: String,
-        exportsAccessor: String,
+        kind: ExportKind,
         name: String,
-        type: ClassName,
     ): CodeBlock
 
     fun globalRead(
@@ -93,18 +83,11 @@ internal interface EmbeddingApi {
     ): CodeBlock
 }
 
-internal class EmbeddingApiSelector(
-    private val runtimeEmbeddingApi: EmbeddingApi = RuntimeEmbeddingApi(),
-    private val compiledEmbeddingApi: EmbeddingApi = CompiledEmbeddingApi(),
+internal enum class ExportKind(
+    val accessor: String,
 ) {
-    fun embeddingApi(tier: ExecutionTier): EmbeddingApi {
-        return when (tier) {
-            is ExecutionTier.Jit -> compiledEmbeddingApi
-            is ExecutionTier.Interpreter,
-            is ExecutionTier.Aot,
-            -> runtimeEmbeddingApi
-        }
-    }
+    Memory("memory"),
+    Global("global"),
 }
 
 internal enum class StoreFunction(
@@ -114,14 +97,4 @@ internal enum class StoreFunction(
     AddFuel("addFuel", "chasmAddFuel"),
     RemainingFuel("remainingFuel", "chasmRemainingFuel"),
     Interrupt("interrupt", "chasmInterrupt"),
-}
-
-internal fun numberValueName(type: Type): String {
-    return when (type) {
-        Scalar.Integer -> "I32"
-        Scalar.Long -> "I64"
-        Scalar.Float -> "F32"
-        Scalar.Double -> "F64"
-        else -> error("Cannot convert $type to a Chasm execution value")
-    }
 }

@@ -1,9 +1,9 @@
 package io.github.charlietap.chasm.script.command
 
-import io.github.charlietap.chasm.embedding.compiled.instance
 import io.github.charlietap.chasm.embedding.error.ExecutionError
+import io.github.charlietap.chasm.embedding.instance
+import io.github.charlietap.chasm.embedding.module
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
-import io.github.charlietap.chasm.jit.module
 import io.github.charlietap.chasm.script.ScriptContext
 import io.github.charlietap.chasm.script.ext.readBytesFromPath
 import io.github.charlietap.sweet.lib.command.AssertUninstantiableCommand

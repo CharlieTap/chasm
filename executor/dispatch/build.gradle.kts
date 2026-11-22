@@ -25,7 +25,7 @@ kotlin {
 
         commonTest {
             dependencies {
-                implementation(projects.host)
+                implementation(projects.runtime.host)
                 implementation(projects.test.fixture.runtime)
             }
         }

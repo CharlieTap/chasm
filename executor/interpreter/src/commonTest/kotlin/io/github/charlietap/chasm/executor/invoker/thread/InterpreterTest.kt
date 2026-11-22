@@ -33,10 +33,10 @@ import io.github.charlietap.chasm.fixture.type.resultType
 import io.github.charlietap.chasm.fixture.type.structCompositeType
 import io.github.charlietap.chasm.fixture.type.tagType
 import io.github.charlietap.chasm.gc.GuestHeapOutOfMemoryException
-import io.github.charlietap.chasm.host.HostException
-import io.github.charlietap.chasm.host.HostFunction
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.error.InvocationError
+import io.github.charlietap.chasm.runtime.host.HostException
+import io.github.charlietap.chasm.runtime.host.RawHostFunction
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.program.Program
 import io.github.charlietap.chasm.runtime.resource.gc.GarbageCollector
@@ -45,6 +45,7 @@ import io.github.charlietap.chasm.runtime.value.ExecutionValue
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
 
 class InterpreterTest {
@@ -67,7 +68,7 @@ class InterpreterTest {
         )
         val module = moduleInstance(tagAddresses = mutableListOf(tagAddress))
         val hostFunction = hostFunctionInstance(
-            function = HostFunction { _, _ ->
+            function = RawHostFunction { _, _ ->
                 store.heap.raise(HostException(exceptionReference))
             },
         )
@@ -124,7 +125,7 @@ class InterpreterTest {
         )
         val module = moduleInstance()
         val hostFunction = hostFunctionInstance(
-            function = HostFunction { _, _ ->
+            function = RawHostFunction { _, _ ->
                 store.heap.raise(HostException(exceptionReference))
             },
         )
@@ -234,20 +235,22 @@ class InterpreterTest {
 
     @Test
     fun `collects garbage after the invocation frame has been removed`() {
-        val program = Program()
-        val entryIp = program.append(
+
+        val store = store(program = Program())
+        val result = allocateUnreachableGuestObject(store)
+        val dead = allocateUnreachableGuestObject(store)
+        val entryIp = store.program.append(
             arrayOf(
                 DispatchableInstruction { vstack, _, nextIp ->
-                    vstack.setFrameSlot(0, 117L)
-                    vstack.setFrameSlot(2, 999L)
+                    vstack.setFrameSlot(0, result)
+                    vstack.setFrameSlot(2, dead)
                     nextIp
                 },
                 EndFunctionDispatcher(resultCount = 1, activationHeaderSlot = 1),
             ),
         )
-        val module = moduleInstance()
         val function = wasmFunctionInstance(
-            module = module,
+            module = moduleInstance(),
             functionType = functionType(
                 results = resultType(listOf(i32ValueType())),
             ),
@@ -256,15 +259,6 @@ class InterpreterTest {
                 frameSlots = 3,
             ),
         )
-        val store = store(program = program)
-        allocateUnreachableGuestObject(store)
-        var collected = false
-        val collector: GarbageCollector = { _, stack ->
-            collected = true
-            assertEquals(1, stack?.sp)
-            assertEquals(117L, stack?.getFrameSlot(0))
-            Ok(Unit)
-        }
 
         val actual = interpret(
             config = RuntimeConfig(
@@ -274,11 +268,11 @@ class InterpreterTest {
             store = store,
             instance = function,
             values = emptyList(),
-            garbageCollector = collector,
         )
 
-        assertEquals(Ok(listOf(117L)), actual)
-        assertTrue(collected)
+        assertEquals(Ok(listOf(result)), actual)
+        assertNotEquals(-1, store.heap.structRuntimeTypeIdOrNegative(result))
+        assertEquals(-1, store.heap.structRuntimeTypeIdOrNegative(dead))
     }
 
     @Test
@@ -297,7 +291,7 @@ class InterpreterTest {
         val store = store(program = program)
         allocateUnreachableGuestObject(store)
         var collected = false
-        val collector: GarbageCollector = { _, _ ->
+        val collector: GarbageCollector = { _ ->
             collected = true
             Ok(Unit)
         }
@@ -341,7 +335,7 @@ class InterpreterTest {
             store = store,
             instance = function,
             values = emptyList(),
-            garbageCollector = { _, _ -> Err(failure) },
+            garbageCollector = { _ -> Err(failure) },
         )
 
         assertEquals(Err(failure), actual)
@@ -359,7 +353,8 @@ class InterpreterTest {
         return WasmFunctionExecutor(config, store, instance, values, garbageCollector)
     }
 
-    private fun allocateUnreachableGuestObject(store: Store) {
+    private fun allocateUnreachableGuestObject(store: Store): Long {
+
         val types = listOf(
             definedType(
                 recursiveType = recursiveType(
@@ -368,6 +363,7 @@ class InterpreterTest {
             ),
         )
         val runtimeType = store.heap.registerRuntimeTypes(types)[0]
-        store.heap.allocateStruct(runtimeType, LongArray(0))
+
+        return store.heap.allocateStruct(runtimeType, LongArray(0))
     }
 }

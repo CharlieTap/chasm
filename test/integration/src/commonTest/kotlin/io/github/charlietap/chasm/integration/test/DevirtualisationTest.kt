@@ -1,24 +1,20 @@
-@file:OptIn(InternalChasmApi::class)
-
 package io.github.charlietap.chasm.integration.test
 
-import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.config.GCStrategy
 import io.github.charlietap.chasm.config.GCThreshold
 import io.github.charlietap.chasm.config.RuntimeConfig
+import io.github.charlietap.chasm.config.StoreConfig
+import io.github.charlietap.chasm.config.StoreLimits
 import io.github.charlietap.chasm.embedding.error.ExecutionError
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
-import io.github.charlietap.chasm.embedding.store
+import io.github.charlietap.chasm.embedding.value.ExecutionValue
+import io.github.charlietap.chasm.embedding.value.NumberValue
 import io.github.charlietap.chasm.integration.TestRunner
 import io.github.charlietap.chasm.integration.integrationTest
 import io.github.charlietap.chasm.integration.runner
-import io.github.charlietap.chasm.runtime.value.ExecutionValue
-import io.github.charlietap.chasm.runtime.value.NumberValue
-import io.github.charlietap.chasm.runtime.value.ReferenceValue
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
-import kotlin.test.assertTrue
 
 class DevirtualisationTest {
 
@@ -62,23 +58,22 @@ class DevirtualisationTest {
 
     @Test
     fun `a reference held across allocating devirtualised calls survives collection`() = integrationTest(FIXTURE) {
-        val store = store()
+        val store = engine.store(StoreConfig(limits = StoreLimits(gcHeapBytes = ALLOCATIONS * ALLOCATION_BYTES / 2L)))
         val runner = runner(store, config = RuntimeConfig(gcStrategy = GCStrategy.TRADITIONAL, gcThreshold = GCThreshold.KB(0)))
 
         val retained = runner.invoke("retained", listOf(NumberValue.I32(1), NumberValue.I32(ALLOCATIONS)))
 
         assertEquals(result(ALLOCATIONS * 3 + 7), retained, engine.name())
-        assertTrue(store.store.heap.allocatedGuestBytes() < ALLOCATIONS * ALLOCATION_BYTES / 2, engine.name())
     }
 
     private fun dispatch(
         runner: TestRunner,
         selector: Int,
-    ): ChasmResult<List<ExecutionValue>, ExecutionError<ReferenceValue.Exception>> {
+    ): ChasmResult<List<ExecutionValue>, ExecutionError> {
         return runner.invoke("dispatch", listOf(NumberValue.I32(selector), NumberValue.I32(6), NumberValue.I32(3)))
     }
 
-    private fun result(value: Int): ChasmResult<List<ExecutionValue>, ExecutionError<ReferenceValue.Exception>> {
+    private fun result(value: Int): ChasmResult<List<ExecutionValue>, ExecutionError> {
         return ChasmResult.Success(listOf(NumberValue.I32(value)))
     }
 

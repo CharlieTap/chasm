@@ -3,81 +3,84 @@
 package io.github.charlietap.chasm.jit
 
 import io.github.charlietap.chasm.ExperimentalChasmApi
-import io.github.charlietap.chasm.embedding.compiled.ExternalType
-import io.github.charlietap.chasm.embedding.compiled.Global
-import io.github.charlietap.chasm.embedding.compiled.HostGcType
-import io.github.charlietap.chasm.embedding.compiled.Import
-import io.github.charlietap.chasm.embedding.compiled.Instance
-import io.github.charlietap.chasm.embedding.compiled.Store
-import io.github.charlietap.chasm.embedding.compiled.Table
-import io.github.charlietap.chasm.embedding.compiled.Tag
-import io.github.charlietap.chasm.embedding.compiled.allocateArray
-import io.github.charlietap.chasm.embedding.compiled.allocateStruct
-import io.github.charlietap.chasm.embedding.compiled.arrayLength
-import io.github.charlietap.chasm.embedding.compiled.arrayType
-import io.github.charlietap.chasm.embedding.compiled.copyArray
-import io.github.charlietap.chasm.embedding.compiled.copyTable
-import io.github.charlietap.chasm.embedding.compiled.createException
-import io.github.charlietap.chasm.embedding.compiled.dropInstance
-import io.github.charlietap.chasm.embedding.compiled.dropStore
-import io.github.charlietap.chasm.embedding.compiled.exceptionTag
-import io.github.charlietap.chasm.embedding.compiled.exports
-import io.github.charlietap.chasm.embedding.compiled.fillArray
-import io.github.charlietap.chasm.embedding.compiled.fillTable
-import io.github.charlietap.chasm.embedding.compiled.function
-import io.github.charlietap.chasm.embedding.compiled.growTable
-import io.github.charlietap.chasm.embedding.compiled.host.HostFunction
-import io.github.charlietap.chasm.embedding.compiled.host.createException
-import io.github.charlietap.chasm.embedding.compiled.host.raise
-import io.github.charlietap.chasm.embedding.compiled.host.readI32
-import io.github.charlietap.chasm.embedding.compiled.host.readReference
-import io.github.charlietap.chasm.embedding.compiled.host.writeReference
-import io.github.charlietap.chasm.embedding.compiled.instance
-import io.github.charlietap.chasm.embedding.compiled.invokeUnboxed
-import io.github.charlietap.chasm.embedding.compiled.payloadSize
-import io.github.charlietap.chasm.embedding.compiled.prepareFunction
-import io.github.charlietap.chasm.embedding.compiled.readArrayElement
-import io.github.charlietap.chasm.embedding.compiled.readArrayElements
-import io.github.charlietap.chasm.embedding.compiled.readArrayReference
-import io.github.charlietap.chasm.embedding.compiled.readGlobal
-import io.github.charlietap.chasm.embedding.compiled.readGlobalReference
-import io.github.charlietap.chasm.embedding.compiled.readPayload
-import io.github.charlietap.chasm.embedding.compiled.readPayloadReference
-import io.github.charlietap.chasm.embedding.compiled.readStructField
-import io.github.charlietap.chasm.embedding.compiled.readStructReference
-import io.github.charlietap.chasm.embedding.compiled.readTable
-import io.github.charlietap.chasm.embedding.compiled.sizeTable
-import io.github.charlietap.chasm.embedding.compiled.structType
 import io.github.charlietap.chasm.embedding.compiled.unsafeAllocateArray
-import io.github.charlietap.chasm.embedding.compiled.unsafeAllocateStruct
 import io.github.charlietap.chasm.embedding.compiled.unsafeBorrowBytes
 import io.github.charlietap.chasm.embedding.compiled.unsafeBorrowElements
 import io.github.charlietap.chasm.embedding.compiled.unsafeBorrowReferences
-import io.github.charlietap.chasm.embedding.compiled.unsafeInvokeUnboxed
-import io.github.charlietap.chasm.embedding.compiled.unsafeWriteArrayReference
-import io.github.charlietap.chasm.embedding.compiled.unsafeWriteGlobalReference
-import io.github.charlietap.chasm.embedding.compiled.unsafeWriteStructReference
-import io.github.charlietap.chasm.embedding.compiled.unsafeWriteTable
-import io.github.charlietap.chasm.embedding.compiled.writeArrayElement
-import io.github.charlietap.chasm.embedding.compiled.writeArrayElements
-import io.github.charlietap.chasm.embedding.compiled.writeArrayReference
-import io.github.charlietap.chasm.embedding.compiled.writeGlobal
-import io.github.charlietap.chasm.embedding.compiled.writeGlobalReference
-import io.github.charlietap.chasm.embedding.compiled.writeStructField
-import io.github.charlietap.chasm.embedding.compiled.writeStructReference
-import io.github.charlietap.chasm.embedding.compiled.writeTable
+import io.github.charlietap.chasm.embedding.dropInstance
+import io.github.charlietap.chasm.embedding.dropStore
 import io.github.charlietap.chasm.embedding.dsl.FunctionTypeBuilder
 import io.github.charlietap.chasm.embedding.error.ExecutionError
 import io.github.charlietap.chasm.embedding.error.InvocationError
 import io.github.charlietap.chasm.embedding.error.TrapReason
+import io.github.charlietap.chasm.embedding.exports
+import io.github.charlietap.chasm.embedding.function
+import io.github.charlietap.chasm.embedding.global.readGlobal
+import io.github.charlietap.chasm.embedding.global.readGlobalReference
+import io.github.charlietap.chasm.embedding.global.unsafeWriteGlobalReference
+import io.github.charlietap.chasm.embedding.global.writeGlobal
+import io.github.charlietap.chasm.embedding.global.writeGlobalReference
+import io.github.charlietap.chasm.embedding.instance
+import io.github.charlietap.chasm.embedding.invokeUnboxed
+import io.github.charlietap.chasm.embedding.module
+import io.github.charlietap.chasm.embedding.prepareFunction
+import io.github.charlietap.chasm.embedding.reference.allocateNumericArray
+import io.github.charlietap.chasm.embedding.reference.allocateReferenceArray
+import io.github.charlietap.chasm.embedding.reference.allocateStruct
+import io.github.charlietap.chasm.embedding.reference.arrayLength
+import io.github.charlietap.chasm.embedding.reference.arrayType
+import io.github.charlietap.chasm.embedding.reference.copyArray
+import io.github.charlietap.chasm.embedding.reference.createException
+import io.github.charlietap.chasm.embedding.reference.exceptionTag
+import io.github.charlietap.chasm.embedding.reference.fillArray
+import io.github.charlietap.chasm.embedding.reference.payloadSize
+import io.github.charlietap.chasm.embedding.reference.readArrayElement
+import io.github.charlietap.chasm.embedding.reference.readArrayElements
+import io.github.charlietap.chasm.embedding.reference.readArrayReference
+import io.github.charlietap.chasm.embedding.reference.readPayload
+import io.github.charlietap.chasm.embedding.reference.readPayloadReference
+import io.github.charlietap.chasm.embedding.reference.readStructField
+import io.github.charlietap.chasm.embedding.reference.readStructReference
+import io.github.charlietap.chasm.embedding.reference.structType
+import io.github.charlietap.chasm.embedding.reference.unsafeAllocateStruct
+import io.github.charlietap.chasm.embedding.reference.unsafeWriteArrayReference
+import io.github.charlietap.chasm.embedding.reference.unsafeWriteStructReference
+import io.github.charlietap.chasm.embedding.reference.writeArrayElement
+import io.github.charlietap.chasm.embedding.reference.writeArrayElements
+import io.github.charlietap.chasm.embedding.reference.writeArrayReference
+import io.github.charlietap.chasm.embedding.reference.writeStructField
+import io.github.charlietap.chasm.embedding.reference.writeStructReference
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
+import io.github.charlietap.chasm.embedding.shapes.Global
+import io.github.charlietap.chasm.embedding.shapes.Import
+import io.github.charlietap.chasm.embedding.shapes.Instance
+import io.github.charlietap.chasm.embedding.shapes.Store
+import io.github.charlietap.chasm.embedding.shapes.Table
+import io.github.charlietap.chasm.embedding.shapes.Tag
 import io.github.charlietap.chasm.embedding.shapes.expect
+import io.github.charlietap.chasm.embedding.table.copyTable
+import io.github.charlietap.chasm.embedding.table.fillTable
+import io.github.charlietap.chasm.embedding.table.growTable
+import io.github.charlietap.chasm.embedding.table.readTable
+import io.github.charlietap.chasm.embedding.table.readTableElements
+import io.github.charlietap.chasm.embedding.table.sizeTable
+import io.github.charlietap.chasm.embedding.table.unsafeWriteTable
+import io.github.charlietap.chasm.embedding.table.writeTable
+import io.github.charlietap.chasm.embedding.table.writeTableElements
+import io.github.charlietap.chasm.embedding.unsafeInvokeUnboxed
+import io.github.charlietap.chasm.host.HostFunction
+import io.github.charlietap.chasm.host.HostGcType
 import io.github.charlietap.chasm.host.UnsafeHostApi
+import io.github.charlietap.chasm.host.createException
+import io.github.charlietap.chasm.host.raise
+import io.github.charlietap.chasm.host.readI32
+import io.github.charlietap.chasm.host.readReference
+import io.github.charlietap.chasm.host.writeReference
 import io.github.charlietap.chasm.reference.ArrayReference
-import io.github.charlietap.chasm.reference.ExceptionReference
 import io.github.charlietap.chasm.reference.FunctionReference
 import io.github.charlietap.chasm.reference.I31Reference
 import io.github.charlietap.chasm.reference.StructReference
+import io.github.charlietap.chasm.runtime.type.ExternalType
 import io.github.charlietap.chasm.type.FunctionType
 import kotlinx.coroutines.runBlocking
 import java.lang.ref.WeakReference
@@ -156,7 +159,7 @@ class ObjectCallsTest {
     fun structsAnswerThroughTheirOwnStore() {
 
         val foreignStore = store()
-        val foreign = point(foreignStore, instantiate(foreignStore))
+        val foreign = point(instantiate(foreignStore))
 
         writeStructField(foreign, 0, 6)
 
@@ -199,7 +202,7 @@ class ObjectCallsTest {
         writeArrayReference(points, 0, subtype)
         writeTable(table("slots"), 0, subtype)
         writeGlobalReference(global("current"), subtype)
-        createException(store, carry, LongArray(1), arrayOf(subtype))
+        createException(carry, LongArray(1), arrayOf(subtype))
 
         assertEquals(7, call("x", references = arrayOf(subtype)).words[0].toInt())
         assertIs<ExecutionError.Rejected>(failure("x", references = arrayOf(sibling)))
@@ -207,7 +210,7 @@ class ObjectCallsTest {
         assertFailsWith<IllegalArgumentException> { writeArrayReference(points, 0, sibling) }
         assertFailsWith<IllegalArgumentException> { writeTable(table("slots"), 0, sibling) }
         assertFailsWith<IllegalArgumentException> { writeGlobalReference(global("current"), sibling) }
-        assertFailsWith<IllegalArgumentException> { createException(store, carry, LongArray(1), arrayOf(sibling)) }
+        assertFailsWith<IllegalArgumentException> { createException(carry, LongArray(1), arrayOf(sibling)) }
     }
 
     @Test
@@ -244,7 +247,7 @@ class ObjectCallsTest {
 
         assertFailsWith<IllegalArgumentException> { writeGlobalReference(global("origin"), null) }
         assertFailsWith<IllegalArgumentException> { writeTable(table("required"), 0, null) }
-        assertFailsWith<IllegalArgumentException> { createException(store, tag("strict_carry"), LongArray(1), arrayOfNulls(1)) }
+        assertFailsWith<IllegalArgumentException> { createException(tag("strict_carry"), LongArray(1), arrayOfNulls(1)) }
         assertIs<ExecutionError.Rejected>(failure("x", references = arrayOfNulls(1)))
 
         writeGlobalReference(global("origin"), point)
@@ -270,7 +273,7 @@ class ObjectCallsTest {
         assertEquals(9L, readArrayElement(longs, 2))
         assertFailsWith<IllegalArgumentException> { copyArray(longs, 0, bytes, 0, 1) }
         assertFailsWith<IndexOutOfBoundsException> { readArrayElements(longs, 2, read, 0, 2) }
-        assertFailsWith<IllegalArgumentException> { allocateArray(store, arrayType(bytes), -1, 0L) }
+        assertFailsWith<IllegalArgumentException> { allocateNumericArray(store, arrayType(bytes), -1, 0L) }
     }
 
     @Test
@@ -304,8 +307,8 @@ class ObjectCallsTest {
         writeArrayReference(points, 1, point)
         unsafeWriteArrayReference(points, 0, point)
 
-        val filled = allocateArray(store, type, 2, point)
-        val copied = allocateArray(store, type, arrayOf(null, point))
+        val filled = allocateReferenceArray(store, type, 2, point)
+        val copied = allocateReferenceArray(store, type, arrayOf(null, point))
 
         assertSame(point, call("point_at", words = longArrayOf(0, 1), references = arrayOf(points)).references[0])
         assertSame(point, readArrayReference(points, 0))
@@ -313,9 +316,9 @@ class ObjectCallsTest {
         assertNull(readArrayReference(copied, 0))
         assertSame(point, call("point_at", words = longArrayOf(0, 1), references = arrayOf(copied)).references[0])
         assertFailsWith<IllegalArgumentException> { writeArrayReference(points, 0, "text") }
-        assertFailsWith<IllegalArgumentException> { allocateArray(store, type, arrayOf<Any?>("text")) }
+        assertFailsWith<IllegalArgumentException> { allocateReferenceArray(store, type, arrayOf<Any?>("text")) }
         assertFailsWith<IllegalArgumentException> { readArrayElement(points, 0) }
-        assertFailsWith<IllegalArgumentException> { allocateArray(store, type, 2, 0L) }
+        assertFailsWith<IllegalArgumentException> { allocateNumericArray(store, type, 2, 0L) }
     }
 
     @Test
@@ -407,7 +410,7 @@ class ObjectCallsTest {
     fun objectsSurviveCollectionWithoutRetaining() {
 
         val point = point(21)
-        val bytes = allocateArray(store, arrayType(bytes(1)), 2, 4L)
+        val bytes = allocateNumericArray(store, arrayType(bytes(1)), 2, 4L)
 
         repeat(3) { System.gc() }
 
@@ -435,14 +438,14 @@ class ObjectCallsTest {
     fun thrownExceptionsComeBackAsObjects() {
 
         val thrown = failure("throw", longArrayOf(7), arrayOf(null, "payload"))
-        val exception = assertIs<ExecutionError.Thrown<ExceptionReference>>(thrown).exception
+        val exception = assertIs<ExecutionError.Thrown>(thrown).exception
         val rethrown = failure("rethrow", references = arrayOf(exception))
 
         assertEquals(tag("boom"), exceptionTag(exception))
         assertEquals(2, payloadSize(exception))
         assertEquals(7L, readPayload(exception, 0))
         assertSame("payload", readPayloadReference(exception, 1))
-        assertSame(exception, assertIs<ExecutionError.Thrown<ExceptionReference>>(rethrown).exception)
+        assertSame(exception, assertIs<ExecutionError.Thrown>(rethrown).exception)
         assertFailsWith<IllegalArgumentException> { readPayload(exception, 1) }
     }
 
@@ -450,8 +453,8 @@ class ObjectCallsTest {
     fun guestExceptionsWithSingleKindPayloadsReportTheirSize() {
 
         val point = point(1)
-        val carried = assertIs<ExecutionError.Thrown<ExceptionReference>>(failure("throw_carry", references = arrayOf(point))).exception
-        val numbers = assertIs<ExecutionError.Thrown<ExceptionReference>>(failure("throw_numbers", words = longArrayOf(4, 5))).exception
+        val carried = assertIs<ExecutionError.Thrown>(failure("throw_carry", references = arrayOf(point))).exception
+        val numbers = assertIs<ExecutionError.Thrown>(failure("throw_numbers", words = longArrayOf(4, 5))).exception
 
         assertEquals(1, payloadSize(carried))
         assertSame(point, readPayloadReference(carried, 0))
@@ -480,7 +483,7 @@ class ObjectCallsTest {
 
     @Test
     fun exceptionPayloadsAreChecked() {
-        assertFailsWith<IllegalArgumentException> { createException(store, tag("boom"), LongArray(2), arrayOf(null, function(INC))) }
+        assertFailsWith<IllegalArgumentException> { createException(tag("boom"), LongArray(2), arrayOf(null, function(INC))) }
     }
 
     @Test
@@ -519,8 +522,8 @@ class ObjectCallsTest {
         writeTable(slots, 5, point)
         fillTable(slots, 1, other, 2)
         copyTable(slots, 0, slots, 3, 1)
-        writeTable(slots, 4, arrayOf<Any?>(point, null))
-        readTable(slots, buffer, 4, 2)
+        writeTableElements(slots, 4, arrayOf<Any?>(point, null))
+        readTableElements(slots, buffer, 4, 2)
 
         assertEquals(4, previous)
         assertEquals(6, sizeTable(slots))
@@ -583,26 +586,26 @@ class ObjectCallsTest {
 
         val dropped = store()
         val instance = instantiate(dropped)
-        val prepared = prepareFunction(dropped, instance, "x").expect("x")
-        val point = point(dropped, instance)
+        val prepared = prepareFunction(instance, "x").expect("x")
+        val point = point(instance)
 
         dropInstance(instance)
         val deinstantiated = prepared.invokeUnboxed(LongArray(prepared.slots), arrayOf(point))
         dropStore(dropped)
         val storeDropped = prepared.invokeUnboxed(LongArray(prepared.slots), arrayOf(point))
 
-        assertIs<ExecutionError.Rejected>(assertIs<ChasmResult.Error<InvocationError<*>>>(deinstantiated).error)
-        assertIs<ExecutionError.Rejected>(assertIs<ChasmResult.Error<InvocationError<*>>>(storeDropped).error)
+        assertIs<ExecutionError.Rejected>(assertIs<ChasmResult.Error<InvocationError>>(deinstantiated).error)
+        assertIs<ExecutionError.Rejected>(assertIs<ChasmResult.Error<InvocationError>>(storeDropped).error)
     }
 
     @Test
     fun uncheckedCallsFailInsideTheGuest() {
 
-        val prepared = prepareFunction(store, instance, "x").expect("x")
+        val prepared = prepareFunction(instance, "x").expect("x")
 
         val result = prepared.unsafeInvokeUnboxed(LongArray(prepared.slots), arrayOf("text"))
 
-        val trap = assertIs<ExecutionError.Trapped>(assertIs<ChasmResult.Error<InvocationError<*>>>(result).error).trap
+        val trap = assertIs<ExecutionError.Trapped>(assertIs<ChasmResult.Error<InvocationError>>(result).error).trap
         assertEquals(TrapReason.CAST_FAILURE, trap.reason)
     }
 
@@ -622,30 +625,24 @@ class ObjectCallsTest {
         return call("sum_bytes", references = arrayOf(bytes)).words[0].toInt()
     }
 
-    private fun point(
-        store: Store,
-        instance: Instance,
-    ): StructReference {
-        return call(store, instance, "point", longArrayOf(1), arrayOf()).references[0] as StructReference
+    private fun point(instance: Instance): StructReference {
+        return call(instance, "point", longArrayOf(1), arrayOf()).references[0] as StructReference
     }
 
     private fun foreignPoint(): StructReference {
-        val foreign = store()
-        return point(foreign, instantiate(foreign))
+        return point(instantiate(store()))
     }
 
     private fun foreignException(): Any {
 
-        val foreign = store()
-        val prepared = prepareFunction(foreign, instantiate(foreign), "throw").expect("throw")
+        val prepared = prepareFunction(instantiate(store()), "throw").expect("throw")
         val result = prepared.invokeUnboxed(LongArray(prepared.slots), arrayOfNulls(prepared.slots))
 
-        return assertIs<ExecutionError.Thrown<ExceptionReference>>(assertIs<ChasmResult.Error<InvocationError<ExceptionReference>>>(result).error).exception
+        return assertIs<ExecutionError.Thrown>(assertIs<ChasmResult.Error<InvocationError>>(result).error).exception
     }
 
     private fun foreignFunction(): Any? {
-        val foreign = store()
-        return call(foreign, instantiate(foreign), "function", longArrayOf(INC.toLong()), arrayOf()).references[0]
+        return call(instantiate(store()), "function", longArrayOf(INC.toLong()), arrayOf()).references[0]
     }
 
     private fun function(index: Int): FunctionReference {
@@ -657,18 +654,17 @@ class ObjectCallsTest {
         words: LongArray = LongArray(0),
         references: Array<Any?> = arrayOf(),
     ): Lanes {
-        return call(store, instance, name, words, references)
+        return call(instance, name, words, references)
     }
 
     private fun call(
-        store: Store,
         instance: Instance,
         name: String,
         words: LongArray,
         references: Array<Any?>,
     ): Lanes {
 
-        val prepared = prepareFunction(store, instance, name).expect(name)
+        val prepared = prepareFunction(instance, name).expect(name)
         val lanes = Lanes(words.copyOf(prepared.slots), references.copyOf(prepared.slots))
 
         prepared.invokeUnboxed(lanes.words, lanes.references).expect(name)
@@ -680,12 +676,12 @@ class ObjectCallsTest {
         name: String,
         words: LongArray = LongArray(0),
         references: Array<Any?> = arrayOf(),
-    ): InvocationError<ExceptionReference> {
+    ): InvocationError {
 
-        val prepared = prepareFunction(store, instance, name).expect(name)
+        val prepared = prepareFunction(instance, name).expect(name)
         val result = prepared.invokeUnboxed(words.copyOf(prepared.slots), references.copyOf(prepared.slots))
 
-        return assertIs<ChasmResult.Error<InvocationError<ExceptionReference>>>(result).error
+        return assertIs<ChasmResult.Error<InvocationError>>(result).error
     }
 
     private fun table(name: String): Table {

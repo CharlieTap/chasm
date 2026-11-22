@@ -56,10 +56,6 @@ private class KotlinPoetBindingGenerator(
             "cpu, memory, interrupts, stacktraces and gcStrategy require CodegenRuntime.CHASM because they " +
                 "configure Chasm's store."
         }
-        require(tier !is ExecutionTier.Aot || !config.generateSuspendingFactories) {
-            "generateSuspendingFactories is not supported by ExecutionTier.Aot because compiled code has no " +
-                "suspending entry points."
-        }
         val gcStringFunctions = options.functions.filter { function ->
             function.parameters.any { parameter -> parameter.stringEncodingStrategy.storedInGcArray } ||
                 function.returnType.stringEncodingStrategy.storedInGcArray

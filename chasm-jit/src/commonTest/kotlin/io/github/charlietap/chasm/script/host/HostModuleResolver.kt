@@ -1,12 +1,12 @@
 package io.github.charlietap.chasm.script.host
 
 import com.goncalossilva.resources.Resource
-import io.github.charlietap.chasm.embedding.compiled.Instance
-import io.github.charlietap.chasm.embedding.compiled.Store
-import io.github.charlietap.chasm.embedding.compiled.instance
+import io.github.charlietap.chasm.embedding.instance
+import io.github.charlietap.chasm.embedding.module
+import io.github.charlietap.chasm.embedding.shapes.Instance
+import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.shapes.expect
 import io.github.charlietap.chasm.embedding.shapes.flatMap
-import io.github.charlietap.chasm.jit.module
 import kotlinx.coroutines.runBlocking
 
 typealias HostModuleResolver = (Store) -> Instance

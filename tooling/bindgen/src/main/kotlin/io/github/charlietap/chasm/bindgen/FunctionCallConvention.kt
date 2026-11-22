@@ -13,8 +13,6 @@ import io.github.charlietap.chasm.type.ValueType
 
 internal interface FunctionCallConvention {
 
-    val passesReferences: Boolean
-
     fun reservedNames(functions: List<Function>): List<String>
 
     fun properties(functions: List<Function>): List<PropertySpec>
@@ -54,125 +52,7 @@ internal interface FunctionCallConvention {
     fun referenceRelease(function: Function): CodeBlock
 }
 
-internal class BoxedFunctionCallConvention(
-    private val executionValue: ClassName,
-    private val numberValue: ClassName,
-) : FunctionCallConvention {
-
-    override val passesReferences = false
-
-    override fun reservedNames(functions: List<Function>): List<String> {
-        return inputCounts(functions).flatMap { inputCount ->
-            listOf(FUNCTION_INPUT_BUFFER_NAME, functionInputBufferName(inputCount))
-        }
-    }
-
-    override fun properties(functions: List<Function>): List<PropertySpec> {
-
-        val inputCounts = inputCounts(functions).sorted()
-        val maximumInputCount = inputCounts.maxOrNull() ?: return emptyList()
-        val executionValues = MUTABLE_LIST.parameterizedBy(executionValue)
-
-        val buffer = PropertySpec.builder(FUNCTION_INPUT_BUFFER_NAME, executionValues)
-            .addModifiers(KModifier.PRIVATE)
-            .initializer("MutableList<%T>(%L) { %T(0) }", executionValue, maximumInputCount, numberValueClass(Scalar.Integer))
-            .build()
-        val views = inputCounts.map { inputCount ->
-
-            val initializer = if (inputCount == maximumInputCount) {
-                CodeBlock.of("%L", FUNCTION_INPUT_BUFFER_NAME)
-            } else {
-                CodeBlock.of("%L.subList(0, %L)", FUNCTION_INPUT_BUFFER_NAME, inputCount)
-            }
-
-            PropertySpec.builder(functionInputBufferName(inputCount), executionValues)
-                .addModifiers(KModifier.PRIVATE)
-                .initializer(initializer)
-                .build()
-        }
-
-        return listOf(buffer) + views
-    }
-
-    override fun argumentAssignment(
-        function: Function,
-        index: Int,
-        type: Type,
-        value: CodeBlock,
-    ): CodeBlock {
-        return CodeBlock.builder()
-            .addStatement("%L[%L] = %T(%L)", FUNCTION_INPUT_BUFFER_NAME, index, numberValueClass(type), value)
-            .build()
-    }
-
-    override fun stringArrayArgumentAssignment(
-        function: Function,
-        index: Int,
-        value: String,
-        encoding: GcArrayString,
-    ): CodeBlock {
-        error("GC array strings require ExecutionTier.Jit")
-    }
-
-    override fun invocation(function: Function): CodeBlock {
-
-        val arguments = if (function.params.isEmpty()) {
-            CodeBlock.of("emptyList<%T>()", executionValue)
-        } else {
-            CodeBlock.of("%L", functionInputBufferName(function.inputCount))
-        }
-
-        return CodeBlock.builder()
-            .addStatement("val args = %L", arguments)
-            .addStatement(
-                "val values = %L(args).%M(%S)",
-                preparedFunctionPropertyName(function),
-                CHASM_EXPECT,
-                "Failed to invoke function ${function.name}",
-            )
-            .build()
-    }
-
-    override fun singleResult(
-        function: Function,
-        type: Type,
-    ): CodeBlock {
-        return CodeBlock.of("(values.first() as %T).value", numberValueClass(type))
-    }
-
-    override fun result(
-        function: Function,
-        index: Int,
-        type: Type,
-    ): CodeBlock {
-        return CodeBlock.of("(values[%L] as %T).value", index, numberValueClass(type))
-    }
-
-    override fun stringArrayResult(
-        function: Function,
-        encoding: StringEncodingStrategy,
-    ): CodeBlock {
-        error("GC array strings require ExecutionTier.Jit")
-    }
-
-    override fun referenceRelease(function: Function): CodeBlock {
-        return CodeBlock.of("")
-    }
-
-    private fun inputCounts(functions: List<Function>): List<Int> {
-        return functions.map(Function::inputCount)
-            .filter { inputCount -> inputCount > 0 }
-            .distinct()
-    }
-
-    private fun numberValueClass(type: Type): ClassName {
-        return numberValue.nestedClass(numberValueName(type))
-    }
-}
-
 internal class UnboxedFunctionCallConvention : FunctionCallConvention {
-
-    override val passesReferences = true
 
     override fun reservedNames(functions: List<Function>): List<String> {
 
@@ -375,11 +255,10 @@ internal class UnboxedFunctionCallConvention : FunctionCallConvention {
 private const val NO_WORDS_NAME = "noWords"
 private const val NO_REFERENCES_NAME = "noReferences"
 
-private val MUTABLE_LIST = ClassName("kotlin.collections", "MutableList")
 private val NULLABLE_ANY_ARRAY = ClassName("kotlin", "Array").parameterizedBy(ANY.copy(nullable = true))
-private val HOST_GC_TYPE_CLASS_NAME = ClassName(COMPILED_PACKAGE, "HostGcType")
-private val RUNTIME_TYPE = MemberName(COMPILED_PACKAGE, "runtimeType")
-private val INVOKE_UNBOXED = MemberName(COMPILED_PACKAGE, "invokeUnboxed", isExtension = true)
+private val HOST_GC_TYPE_CLASS_NAME = ClassName("io.github.charlietap.chasm.host", "HostGcType")
+private val RUNTIME_TYPE = MemberName("io.github.charlietap.chasm.embedding.reference", "runtimeType")
+private val INVOKE_UNBOXED = MemberName("io.github.charlietap.chasm.embedding", "invokeUnboxed", isExtension = true)
 private val UNSAFE_ALLOCATE_ARRAY = MemberName(COMPILED_PACKAGE, "unsafeAllocateArray")
 private val UNSAFE_BORROW_CHARS = MemberName(COMPILED_PACKAGE, "unsafeBorrowChars")
 private val UNSAFE_BORROW_BYTES = MemberName(COMPILED_PACKAGE, "unsafeBorrowBytes")

@@ -4,13 +4,15 @@ package com.test
 
 import com.test.aot.WasmModule
 import io.github.charlietap.chasm.ExperimentalChasmApi
-import io.github.charlietap.chasm.aot.instance
+import io.github.charlietap.chasm.aot.compiledModule
+import io.github.charlietap.chasm.aot.compiledModuleMetadata
+import io.github.charlietap.chasm.aot.store
 import io.github.charlietap.chasm.embedding.codegen.CodegenImport
 import io.github.charlietap.chasm.embedding.codegen.allocateImports
+import io.github.charlietap.chasm.embedding.instance
 import io.github.charlietap.chasm.embedding.shapes.Instance
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.shapes.`expect`
-import io.github.charlietap.chasm.embedding.store
 import kotlin.Boolean
 import kotlin.Long
 import kotlin.OptIn
@@ -20,11 +22,15 @@ import io.github.charlietap.chasm.embedding.addFuel as chasmAddFuel
 import io.github.charlietap.chasm.embedding.interrupt as chasmInterrupt
 import io.github.charlietap.chasm.embedding.remainingFuel as chasmRemainingFuel
 
-public fun aotStoreSettingsConstruction(imports: List<CodegenImport> = emptyList()): AotStoreSettingsConstruction {
-  val module = WasmModule.INSTANCE
-  check(module.metadata.capabilities.stacktraces) { "com.test.aot.WasmModule was compiled without stack traces" }
-  val store = store(module.metadata.storeConfig)
-  module.metadata.initialFuel?.let { fuel -> chasmAddFuel(store, fuel) }
+public suspend fun aotStoreSettingsConstruction(imports: List<CodegenImport> = emptyList()): AotStoreSettingsConstruction {
+  val module = compiledModule(WasmModule.INSTANCE).`expect`("Failed to load com.test.aot.WasmModule")
+  val metadata = compiledModuleMetadata(module)
+  check(metadata.capabilities.stacktraces) { "com.test.aot.WasmModule was compiled without stack traces" }
+  val store = store(metadata.storeConfig)
+  val initialFuel = metadata.initialFuel
+  if (initialFuel != null) {
+    chasmAddFuel(store, initialFuel)
+  }
   val allocatedImports = allocateImports(store, imports)
   val instance = instance(store, module, allocatedImports).`expect`("Failed to instantiate module")
   return AotStoreSettingsConstructionImpl(store = store, instance = instance)

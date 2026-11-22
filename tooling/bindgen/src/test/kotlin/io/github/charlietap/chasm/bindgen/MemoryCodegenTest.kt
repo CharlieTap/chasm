@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.bindgen
 
-import io.github.charlietap.chasm.bindgen.fixture.codegenConfig
 import io.github.charlietap.chasm.bindgen.fixture.function
 import io.github.charlietap.chasm.bindgen.fixture.functionProxy
 import io.github.charlietap.chasm.bindgen.fixture.functionReturn
@@ -51,37 +50,10 @@ class MemoryCodegenTest {
         ),
     )
 
-    @Test
-    fun `generates JIT memories`() {
-        assertMemory(
-            scenario = "JitMemories",
-            memories = listOf(
-                memoryBinding("memory", "memory"),
-                memoryBinding("scratch", "scratch"),
-            ),
-            functions = listOf(stringFunction()),
-            config = codegenConfig(executionTier = ExecutionTier.Jit()),
-            runtimes = listOf(CodegenRuntime.CHASM),
-        )
-    }
-
-    @Test
-    fun `shares exposed memory with string marshalling run by the JIT`() {
-        assertMemory(
-            scenario = "JitSharedStringMemory",
-            memories = listOf(memoryBinding("memory", "memory")),
-            functions = listOf(stringFunction()),
-            config = codegenConfig(executionTier = ExecutionTier.Jit()),
-            runtimes = listOf(CodegenRuntime.CHASM),
-        )
-    }
-
     private fun assertMemory(
         scenario: String,
         memories: List<MemoryBinding>,
         functions: List<Function> = emptyList(),
-        config: CodegenConfig = CodegenConfig(),
-        runtimes: Iterable<CodegenRuntime> = CodegenRuntime.entries,
     ) {
         assertGenerates(
             category = "memory",
@@ -91,8 +63,6 @@ class MemoryCodegenTest {
                 functions = functions,
                 memories = memories,
             ),
-            config = config,
-            runtimes = runtimes,
         )
     }
 

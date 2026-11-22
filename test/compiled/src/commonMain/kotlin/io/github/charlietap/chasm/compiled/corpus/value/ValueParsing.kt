@@ -1,10 +1,10 @@
 package io.github.charlietap.chasm.compiled.corpus.value
 
 import io.github.charlietap.chasm.compiled.corpus.ext.string
-import io.github.charlietap.chasm.runtime.ext.toLongFromBoxed
-import io.github.charlietap.chasm.runtime.value.ExecutionValue
-import io.github.charlietap.chasm.runtime.value.NumberValue
-import io.github.charlietap.chasm.runtime.value.ReferenceValue
+import io.github.charlietap.chasm.embedding.value.ExecutionValue
+import io.github.charlietap.chasm.embedding.value.NumberValue
+import io.github.charlietap.chasm.embedding.value.ReferenceValue
+import io.github.charlietap.chasm.reference.I31Reference
 import io.github.charlietap.chasm.type.AbstractHeapType
 import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.chasm.type.ValueType
@@ -25,11 +25,11 @@ internal fun parseValue(
     }
     val raw = value["value"]?.jsonPrimitive?.contentOrNull
 
-    return when (value.string("type")) {
+    return when (val type = value.string("type")) {
         "i32" -> {
             val parsed = raw?.let { it.toIntOrNull() ?: it.toUInt().toInt() } ?: 0
             if (expectedType is ValueType.Reference) {
-                ReferenceValue.I31(parsed.toUInt())
+                ReferenceValue.I31(I31Reference(parsed))
             } else {
                 NumberValue.I32(parsed)
             }
@@ -39,7 +39,7 @@ internal fun parseValue(
         "f64" -> NumberValue.F64(raw?.let { Double.fromBits(it.toULong().toLong()) } ?: 0.0)
         "funcref" -> ReferenceValue.Null(AbstractHeapType.Func)
         "externref" -> ReferenceValue.Null(AbstractHeapType.Extern)
-        else -> ExecutionValue.Uninitialised
+        else -> error("Unsupported corpus value type: $type")
     }
 }
 
@@ -70,15 +70,7 @@ internal fun defaultResults(
 internal fun defaultValue(
     type: ValueType,
 ): ExecutionValue = when (type) {
-    is ValueType.Number -> when (type.numberType.name) {
-        "I32" -> NumberValue.I32(0)
-        "I64" -> NumberValue.I64(0)
-        "F32" -> NumberValue.F32(0f)
-        "F64" -> NumberValue.F64(0.0)
-        else -> NumberValue.I32(0)
-    }
+    is ValueType.Number -> numberValue(0L, type)
     is ValueType.Reference -> ReferenceValue.Null(type.referenceType.heapType)
-    else -> ExecutionValue.Uninitialised
+    else -> error("Unsupported corpus value type: $type")
 }
-
-internal fun ExecutionValue.describeBits(): String = "bits=${toLongFromBoxed()}"

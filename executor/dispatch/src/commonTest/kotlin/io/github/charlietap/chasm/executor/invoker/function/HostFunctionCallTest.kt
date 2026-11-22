@@ -15,9 +15,6 @@ import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.fixture.type.i32ValueType
 import io.github.charlietap.chasm.fixture.type.i64ValueType
 import io.github.charlietap.chasm.fixture.type.resultType
-import io.github.charlietap.chasm.host.HostFunction
-import io.github.charlietap.chasm.host.HostModuleInstance
-import io.github.charlietap.chasm.host.HostResources
 import io.github.charlietap.chasm.host.readF32
 import io.github.charlietap.chasm.host.readF64
 import io.github.charlietap.chasm.host.readI32
@@ -26,6 +23,9 @@ import io.github.charlietap.chasm.host.writeF32
 import io.github.charlietap.chasm.host.writeF64
 import io.github.charlietap.chasm.host.writeI32
 import io.github.charlietap.chasm.host.writeI64
+import io.github.charlietap.chasm.runtime.host.RawHostFunction
+import io.github.charlietap.chasm.runtime.host.RawHostModuleInstance
+import io.github.charlietap.chasm.runtime.host.RawHostResources
 import io.github.charlietap.chasm.runtime.stack.activationHeader
 import kotlin.contextOf
 import kotlin.test.Test
@@ -41,9 +41,9 @@ class HostFunctionCallTest {
         val context = executionContext(store = store, vstack = vstack)
         var invocations = 0
         val function = hostFunctionInstance(
-            function = HostFunction { _, _ ->
-                val actualCaller = contextOf<HostModuleInstance>()
-                val actualContext = contextOf<HostResources>()
+            function = RawHostFunction { _, _ ->
+                val actualCaller = contextOf<RawHostModuleInstance>()
+                val actualContext = contextOf<RawHostResources>()
                 assertEquals(caller, actualCaller)
                 assertEquals(context, actualContext)
                 invocations++
@@ -63,8 +63,8 @@ class HostFunctionCallTest {
         val vstack = vstack()
         val context = executionContext(store = store, vstack = vstack)
         val nestedFunction = hostFunctionInstance(
-            function = HostFunction { _, _ ->
-                val references = contextOf<HostResources>().references
+            function = RawHostFunction { _, _ ->
+                val references = contextOf<RawHostResources>().references
                 references.rootScoped(2L)
                 val marker = references.beginScope()
                 assertEquals(2, marker)
@@ -72,8 +72,8 @@ class HostFunctionCallTest {
             },
         )
         val function = hostFunctionInstance(
-            function = HostFunction { _, _ ->
-                val references = contextOf<HostResources>().references
+            function = RawHostFunction { _, _ ->
+                val references = contextOf<RawHostResources>().references
                 references.rootScoped(1L)
                 HostFunctionCall(vstack, context, caller, nestedFunction, 0, 0)
                 val marker = references.beginScope()
@@ -104,9 +104,9 @@ class HostFunctionCallTest {
                 params = resultType(listOf(i32ValueType(), i32ValueType())),
                 results = resultType(listOf(i32ValueType())),
             ),
-            function = HostFunction { parameters, results ->
-                val actualCaller = contextOf<HostModuleInstance>()
-                val actualContext = contextOf<HostResources>()
+            function = RawHostFunction { parameters, results ->
+                val actualCaller = contextOf<RawHostModuleInstance>()
+                val actualContext = contextOf<RawHostResources>()
                 assertEquals(caller, actualCaller)
                 assertEquals(context, actualContext)
                 results.writeI32(0, parameters.readI32(0) + parameters.readI32(1))
@@ -148,7 +148,7 @@ class HostFunctionCallTest {
                 params = resultType(numericTypes),
                 results = resultType(numericTypes),
             ),
-            function = HostFunction { parameters, results ->
+            function = RawHostFunction { parameters, results ->
                 results.writeI32(0, parameters.readI32(0))
                 results.writeI64(1, parameters.readI64(1))
                 results.writeF32(2, parameters.readF32(2))
@@ -190,7 +190,7 @@ class HostFunctionCallTest {
                 params = resultType(listOf(i32ValueType())),
                 results = resultType(listOf(i32ValueType())),
             ),
-            function = HostFunction { parameters, results ->
+            function = RawHostFunction { parameters, results ->
                 results.writeI32(0, parameters.readI32(0) + 1)
             },
         )

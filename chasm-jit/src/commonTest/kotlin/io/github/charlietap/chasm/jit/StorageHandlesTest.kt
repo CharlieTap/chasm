@@ -1,28 +1,37 @@
 package io.github.charlietap.chasm.jit
 
-import io.github.charlietap.chasm.embedding.compiled.Import
-import io.github.charlietap.chasm.embedding.compiled.Instance
-import io.github.charlietap.chasm.embedding.compiled.Store
-import io.github.charlietap.chasm.embedding.compiled.dropInstance
-import io.github.charlietap.chasm.embedding.compiled.dropStore
-import io.github.charlietap.chasm.embedding.compiled.exports
-import io.github.charlietap.chasm.embedding.compiled.global
-import io.github.charlietap.chasm.embedding.compiled.instance
-import io.github.charlietap.chasm.embedding.compiled.readGlobal
-import io.github.charlietap.chasm.embedding.compiled.readGlobalReference
-import io.github.charlietap.chasm.embedding.compiled.readTable
-import io.github.charlietap.chasm.embedding.compiled.table
-import io.github.charlietap.chasm.embedding.compiled.value.NumberValue.I32
-import io.github.charlietap.chasm.embedding.compiled.value.ReferenceValue
-import io.github.charlietap.chasm.embedding.compiled.writeGlobalReference
+import io.github.charlietap.chasm.embedding.dropInstance
+import io.github.charlietap.chasm.embedding.dropStore
+import io.github.charlietap.chasm.embedding.exports
+import io.github.charlietap.chasm.embedding.global
+import io.github.charlietap.chasm.embedding.global.readGlobal
+import io.github.charlietap.chasm.embedding.global.readGlobalReference
+import io.github.charlietap.chasm.embedding.global.writeGlobalReference
+import io.github.charlietap.chasm.embedding.instance
+import io.github.charlietap.chasm.embedding.memory
+import io.github.charlietap.chasm.embedding.memory.growMemory
+import io.github.charlietap.chasm.embedding.memory.sizeMemory
+import io.github.charlietap.chasm.embedding.module
+import io.github.charlietap.chasm.embedding.shapes.Global
+import io.github.charlietap.chasm.embedding.shapes.Import
+import io.github.charlietap.chasm.embedding.shapes.Instance
+import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.shapes.expect
+import io.github.charlietap.chasm.embedding.table
+import io.github.charlietap.chasm.embedding.table.growTable
+import io.github.charlietap.chasm.embedding.table.readTable
+import io.github.charlietap.chasm.embedding.table.sizeTable
+import io.github.charlietap.chasm.embedding.value.NumberValue.I32
+import io.github.charlietap.chasm.embedding.value.ReferenceValue
 import io.github.charlietap.chasm.type.AbstractHeapType
 import io.github.charlietap.chasm.type.AddressType
 import io.github.charlietap.chasm.type.GlobalType
 import io.github.charlietap.chasm.type.Limits
+import io.github.charlietap.chasm.type.MemoryType
 import io.github.charlietap.chasm.type.Mutability
 import io.github.charlietap.chasm.type.NumberType
 import io.github.charlietap.chasm.type.ReferenceType
+import io.github.charlietap.chasm.type.SharedStatus
 import io.github.charlietap.chasm.type.TableType
 import io.github.charlietap.chasm.type.ValueType
 import kotlinx.coroutines.runBlocking
@@ -98,6 +107,48 @@ class StorageHandlesTest {
         assertEquals(hostGlobal.hashCode(), global.hashCode())
         writeGlobalReference(global, "written")
         assertEquals("written", readGlobalReference(hostGlobal))
+    }
+
+    @Test
+    fun handleTypesKeepTheLimitsTheyWereCreatedWith() {
+
+        val store = store()
+        val memoryType = MemoryType(AddressType.I32, Limits(1u, 3u), SharedStatus.Unshared)
+        val tableType = TableType(AddressType.I32, ReferenceType.RefNull(AbstractHeapType.Func), Limits(2u))
+        val hostMemory = memory(store, memoryType)
+        val hostTable = table(store, tableType, null)
+        val imports = listOf(Import("host", "table", hostTable), Import("host", "refs", referenceGlobal(store)))
+        val exported = checkNotNull(exports(instantiate(store, "reexport_storage", imports)).table("table"))
+
+        growMemory(hostMemory, 1)
+        growTable(hostTable, 1, null)
+
+        assertEquals(Limits(1u, 3u), hostMemory.type.limits)
+        assertEquals(Limits(2u), hostTable.type.limits)
+        assertEquals(Limits(2u), exported.type.limits)
+        assertEquals(Limits(1u, 3u), memoryType.limits)
+        assertEquals(Limits(2u), tableType.limits)
+        assertEquals(2, sizeMemory(hostMemory))
+        assertEquals(3, sizeTable(hostTable))
+    }
+
+    @Test
+    fun importsFromAnotherStoreAreRejectedBeforeCompiling() {
+
+        val store = store()
+        val foreignTable = table(store(), TableType(AddressType.I32, ReferenceType.RefNull(AbstractHeapType.Func), Limits(2u)), null)
+        val module = runBlocking { module(resourceBytes("modules/reexport_storage.wasm")) }.expect("reexport_storage")
+        val imports = listOf(Import("host", "table", foreignTable), Import("host", "refs", referenceGlobal(store)))
+
+        val failure = assertFailsWith<IllegalArgumentException> {
+            runBlocking { instance(store, module, imports) }
+        }
+
+        assertEquals("the import host.table belongs to a different store", failure.message)
+    }
+
+    private fun referenceGlobal(store: Store): Global {
+        return global(store, GlobalType(EXTERN_TYPE, Mutability.Var), ReferenceValue.Extern("value"))
     }
 
     private fun instantiate(

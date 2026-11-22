@@ -27,7 +27,6 @@ private fun InvokeActionRunner(
     valueMapper: ValueMapper,
 ): ActionResult {
     val result = invoke(
-        context.store,
         context.instances[action.moduleName]!!,
         action.field,
         action.args.mapNotNull(valueMapper),

@@ -2,14 +2,14 @@ package io.github.charlietap.chasm.compiled.corpus.step
 
 import io.github.charlietap.chasm.compiled.corpus.ext.array
 import io.github.charlietap.chasm.compiled.corpus.ext.string
-import io.github.charlietap.chasm.compiled.corpus.value.describeBits
+import io.github.charlietap.chasm.compiled.corpus.value.describe
+import io.github.charlietap.chasm.compiled.corpus.value.matches
 import io.github.charlietap.chasm.compiled.corpus.value.parseValue
 import io.github.charlietap.chasm.embedding.error.ExecutionError
 import io.github.charlietap.chasm.embedding.error.TrapReason
 import io.github.charlietap.chasm.embedding.invoke
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
-import io.github.charlietap.chasm.runtime.ext.toLongFromBoxed
-import io.github.charlietap.chasm.runtime.value.ExecutionValue
+import io.github.charlietap.chasm.embedding.value.ExecutionValue
 import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.corpus.lib.CorpusResult
 import kotlinx.serialization.json.JsonArray
@@ -46,7 +46,7 @@ private fun FunctionInvokeStepRunner(
     val hostEffects = step["host_effects"]?.jsonObject
     val expectedExitCode = hostEffects?.get("exit_code")?.jsonPrimitive?.intOrNull
 
-    val results = when (val invocation = context.timings.execute { invoke(setup.store, setup.instance, function, params) }) {
+    val results = when (val invocation = context.timings.execute { invoke(setup.instance, function, params) }) {
         is ChasmResult.Success -> invocation.result
         is ChasmResult.Error -> {
             if (trap != null) return CorpusResult.Success
@@ -72,7 +72,7 @@ private fun FunctionInvokeStepRunner(
 
 private fun exitFailure(
     context: StepContext,
-    error: ExecutionError<*>,
+    error: ExecutionError,
     hostEffects: JsonObject?,
     expectedExitCode: Int?,
     hostEffectsVerifier: HostEffectsVerifier,
@@ -107,11 +107,11 @@ private fun matchResults(
         if (expectedObject["value"] == null) return@forEachIndexed
 
         val parsed = parseValue(expectedObject, context.captures, functionType?.results?.types?.getOrNull(index))
-        if (parsed.toLongFromBoxed() != actualValue.toLongFromBoxed()) {
+        if (!parsed.matches(actualValue)) {
             return context.failure(
                 "result mismatch",
-                expected = "result[$index]=${parsed.describeBits()}",
-                actual = "result[$index]=${actualValue.describeBits()}",
+                expected = "result[$index]=${parsed.describe()}",
+                actual = "result[$index]=${actualValue.describe()}",
             )
         }
     }
@@ -127,7 +127,7 @@ private fun capturedOutput(
     return "stdout=$stdout stderr=$stderr"
 }
 
-private fun hostFunctionExitCodeOrNull(error: ExecutionError<*>): Int? {
+private fun hostFunctionExitCodeOrNull(error: ExecutionError): Int? {
 
     val trap = (error as? ExecutionError.Trapped)?.trap ?: return null
     if (trap.reason != TrapReason.HOST_FUNCTION_FAILURE) {

@@ -8,35 +8,31 @@ import io.github.charlietap.chasm.embedding.error.Trap
 import io.github.charlietap.chasm.embedding.error.TrapReason
 import io.github.charlietap.chasm.embedding.error.WasmFrame
 import io.github.charlietap.chasm.embedding.error.WasmStackTrace
-import io.github.charlietap.chasm.embedding.shapes.Store
+import io.github.charlietap.chasm.embedding.internal.StoreRuntime
+import io.github.charlietap.chasm.reference.ExceptionReference
 import io.github.charlietap.chasm.runtime.diagnostic.TrapSnapshot
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
-import io.github.charlietap.chasm.runtime.ext.toReferenceValue
 import io.github.charlietap.chasm.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
-import io.github.charlietap.chasm.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.embedding.error.InstantiationError as EmbeddingInstantiationError
 import io.github.charlietap.chasm.embedding.error.InvocationError as EmbeddingInvocationError
 import io.github.charlietap.chasm.runtime.error.InstantiationError as RuntimeInstantiationError
 
 internal fun invocationError(
-    store: Store,
+    store: StoreRuntime,
     error: InvocationError,
-): EmbeddingInvocationError<ReferenceValue.Exception> {
+    thrown: () -> ExceptionReference,
+): EmbeddingInvocationError {
     return when (error) {
-        InvocationError.ThrownException -> ExecutionError.Thrown(pendingException(store))
+        InvocationError.ThrownException -> ExecutionError.Thrown(thrown())
         else -> ExecutionError.Trapped(executionTrap(store, error))
     }
 }
 
-internal fun pendingException(store: Store): ReferenceValue.Exception {
-    return store.store.heap.peekPendingExceptionReference().toReferenceValue() as ReferenceValue.Exception
-}
-
 internal fun executionTrap(
-    store: Store,
+    store: StoreRuntime,
     error: InvocationError,
 ): Trap {
 
@@ -48,12 +44,12 @@ internal fun executionTrap(
     return reportedTrap(store, error, message, null) ?: Trap(reasonOf(error.error), message, null, null)
 }
 
-internal fun <E> instantiationError(
-    store: Store,
+internal fun instantiationError(
+    store: StoreRuntime,
     error: ModuleTrapError,
     instantiation: Instantiation,
-    thrown: () -> E,
-): EmbeddingInstantiationError<E> {
+    thrown: () -> ExceptionReference,
+): EmbeddingInstantiationError {
 
     val cause = if (error is InvocationError.Trapped) error.error else error
 
@@ -68,7 +64,7 @@ internal fun <E> instantiationError(
 }
 
 private fun invocationTrap(
-    store: Store,
+    store: StoreRuntime,
     error: InvocationError,
     instantiation: Instantiation,
 ): Trap {
@@ -82,7 +78,7 @@ private fun invocationTrap(
 }
 
 private fun reportedTrap(
-    store: Store,
+    store: StoreRuntime,
     error: InvocationError.Trapped,
     message: String,
     instantiation: Instantiation?,
@@ -101,11 +97,11 @@ internal class Instantiation(
 )
 
 private class TrapReporter(
-    private val store: Store,
+    private val store: StoreRuntime,
     private val snapshot: TrapSnapshot,
     private val instantiation: Instantiation?,
 ) {
-    private val runtime = store.store
+    private val runtime = store.runtime()
     private val modules = ArrayList<Pair<ModuleInstance, ModuleFrames?>>()
 
     fun report(error: InvocationError, message: String): Trap {
@@ -150,7 +146,7 @@ private class TrapReporter(
         instance: ModuleInstance,
     ): ModuleFrames? {
         modules.firstOrNull { (candidate, _) -> candidate === instance }?.let { (_, frames) -> return frames }
-        val source = store.diagnostics.find(instance) ?: startSource(instance)
+        val source = store.trapSource(instance) ?: startSource(instance)
         val frames = source?.frames(runtime, snapshot)
         modules.add(instance to frames)
         return frames

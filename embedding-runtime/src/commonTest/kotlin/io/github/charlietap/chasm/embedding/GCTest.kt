@@ -1,43 +1,45 @@
 package io.github.charlietap.chasm.embedding
 
-import com.github.michaelbull.result.Err
-import io.github.charlietap.chasm.embedding.fixture.publicStore
-import io.github.charlietap.chasm.embedding.reference.arrayFieldTestFixture
-import io.github.charlietap.chasm.fixture.type.arrayType
-import io.github.charlietap.chasm.runtime.error.InvocationError
-import io.github.charlietap.chasm.runtime.resource.gc.GarbageCollector
+import io.github.charlietap.chasm.embedding.fixture.interpreterStore
+import io.github.charlietap.chasm.embedding.fixture.registerArrayType
+import io.github.charlietap.chasm.embedding.reference.allocateNumericArray
+import io.github.charlietap.chasm.embedding.reference.arrayLength
+import io.github.charlietap.chasm.embedding.reference.readArrayElements
+import io.github.charlietap.chasm.fixture.runtime.store
+import io.github.charlietap.chasm.fixture.type.fieldType
+import io.github.charlietap.chasm.runtime.type.RTT
 import kotlin.test.Test
+import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
 
 class GCTest {
 
     @Test
-    fun `gc runs successfully and correctly handles collection`() {
+    fun `collect frees guest objects nothing references`() {
 
-        val fixture = arrayFieldTestFixture(arrayType(), LongArray(0))
-        val publicStore = fixture.store
+        val runtime = store()
+        val store = interpreterStore(runtime)
+        val type = registerArrayType(runtime, fieldType())
+        val rawReference = runtime.heap.allocateArrayFromElements(RTT(type.id), LongArray(0), 0, 0)
 
-        gc(publicStore)
+        collect(store)
 
-        assertEquals(-1, publicStore.store.heap.arrayRuntimeTypeIdOrNegative(fixture.rawReference))
+        assertEquals(-1, runtime.heap.arrayRuntimeTypeIdOrNegative(rawReference))
     }
 
     @Test
-    fun `gc propagates the error when collection fails`() {
+    fun `collect keeps the objects the host holds`() {
 
-        val publicStore = publicStore()
-        val error = InvocationError.GarbageCollectionFailed("Test error")
+        val runtime = store()
+        val store = interpreterStore(runtime)
+        val type = registerArrayType(runtime, fieldType())
+        val array = allocateNumericArray(store, type, longArrayOf(116L, 117L, 118L))
 
-        val collector: GarbageCollector = { _store, _ ->
-            assertEquals(publicStore.store, _store)
-            Err(error)
-        }
+        collect(store)
 
-        val failure = assertFailsWith<IllegalArgumentException> {
-            gc(publicStore, collector)
-        }
-
-        assertEquals(error.toString(), failure.message)
+        val elements = LongArray(3)
+        readArrayElements(array, 0, elements)
+        assertEquals(3, arrayLength(array))
+        assertContentEquals(longArrayOf(116L, 117L, 118L), elements)
     }
 }

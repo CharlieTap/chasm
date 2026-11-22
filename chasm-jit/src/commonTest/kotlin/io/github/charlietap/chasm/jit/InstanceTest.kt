@@ -6,11 +6,12 @@ import io.github.charlietap.chasm.ExperimentalChasmApi
 import io.github.charlietap.chasm.config.GCStrategy
 import io.github.charlietap.chasm.config.GCThreshold
 import io.github.charlietap.chasm.config.StoreConfig
-import io.github.charlietap.chasm.embedding.compiled.instance
-import io.github.charlietap.chasm.embedding.compiled.invoke
-import io.github.charlietap.chasm.embedding.compiled.value.ExecutionValue
-import io.github.charlietap.chasm.embedding.compiled.value.NumberValue.I32
+import io.github.charlietap.chasm.embedding.instance
+import io.github.charlietap.chasm.embedding.invoke
+import io.github.charlietap.chasm.embedding.module
 import io.github.charlietap.chasm.embedding.shapes.expect
+import io.github.charlietap.chasm.embedding.value.ExecutionValue
+import io.github.charlietap.chasm.embedding.value.NumberValue.I32
 import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -23,7 +24,7 @@ class InstanceTest {
         val module = runBlocking { module(fixture("loops"), validate = true) }.expect("module")
         val instance = runBlocking { instance(store, module, emptyList()) }.expect("instance")
 
-        val result = invoke(store, instance, "loops", listOf(I32(10))).expect("loops")
+        val result = invoke(instance, "loops", listOf(I32(10))).expect("loops")
 
         assertEquals(listOf<ExecutionValue>(I32(expected(10))), result)
     }
@@ -34,7 +35,7 @@ class InstanceTest {
         val module = runBlocking { module(fixture("loops"), validate = true) }.expect("module")
         val instances = List(2) { runBlocking { instance(store, module, emptyList()) }.expect("instance") }
 
-        val results = instances.mapIndexed { index, instance -> invoke(store, instance, "loops", listOf(I32(index + 3))).expect("loops") }
+        val results = instances.mapIndexed { index, instance -> invoke(instance, "loops", listOf(I32(index + 3))).expect("loops") }
 
         assertEquals(listOf(listOf<ExecutionValue>(I32(expected(3))), listOf<ExecutionValue>(I32(expected(4)))), results)
     }
@@ -46,7 +47,7 @@ class InstanceTest {
         val module = runBlocking { module(fixture("restart"), validate = true) }.expect("module")
         val instance = runBlocking { instance(store, module, emptyList()) }.expect("instance")
 
-        val result = invoke(store, instance, "swap", listOf(I32(3))).expect("swap")
+        val result = invoke(instance, "swap", listOf(I32(3))).expect("swap")
 
         assertEquals(listOf<ExecutionValue>(I32(21)), result)
     }

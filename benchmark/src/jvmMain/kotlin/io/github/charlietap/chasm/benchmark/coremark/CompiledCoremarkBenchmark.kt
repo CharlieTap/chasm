@@ -7,23 +7,26 @@ import io.github.charlietap.chasm.ExperimentalChasmApi
 import io.github.charlietap.chasm.aot.CompileConfig
 import io.github.charlietap.chasm.aot.CompileOutput
 import io.github.charlietap.chasm.aot.compile
+import io.github.charlietap.chasm.aot.compiledModule
 import io.github.charlietap.chasm.aot.expect
-import io.github.charlietap.chasm.aot.instance
+import io.github.charlietap.chasm.aot.store
 import io.github.charlietap.chasm.embedding.addFuel
 import io.github.charlietap.chasm.embedding.function
+import io.github.charlietap.chasm.embedding.instance
 import io.github.charlietap.chasm.embedding.invoke
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Import
+import io.github.charlietap.chasm.embedding.shapes.expect
 import io.github.charlietap.chasm.embedding.shapes.flatMap
-import io.github.charlietap.chasm.embedding.store
+import io.github.charlietap.chasm.embedding.value.ExecutionValue
+import io.github.charlietap.chasm.embedding.value.NumberValue
 import io.github.charlietap.chasm.host.HostFunction
 import io.github.charlietap.chasm.host.writeI64
-import io.github.charlietap.chasm.runtime.value.ExecutionValue
-import io.github.charlietap.chasm.runtime.value.NumberValue
 import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.chasm.type.NumberType
 import io.github.charlietap.chasm.type.ResultType
 import io.github.charlietap.chasm.type.ValueType
+import kotlinx.coroutines.runBlocking
 import kotlin.time.Clock
 
 fun main(
@@ -34,7 +37,8 @@ fun main(
     val compileConfig = CompileConfig("chasm.benchmark.coremark") {
         store(config)
     }
-    val compiled = output.load(compile(bytes, output, compileConfig).expect("CoreMark compiles"))
+    val module = compiledModule(output.load(compile(bytes, output, compileConfig).expect("CoreMark compiles")))
+        .expect("CoreMark loads")
 
     val store = store(config)
     if (config.meterFuel) addFuel(store, Long.MAX_VALUE)
@@ -42,7 +46,7 @@ fun main(
     val clockType = FunctionType(ResultType(emptyList()), ResultType(listOf(ValueType.Number(NumberType.I64))))
     val imports = listOf(Import("env", "clock_ms", function(store, clockType, clock)))
 
-    val results = instance(store, compiled, imports).flatMap { instance -> invoke(store, instance, "run") }
+    val results = runBlocking { instance(store, module, imports) }.flatMap { instance -> invoke(instance, "run") }
     if (results is ChasmResult.Success<List<ExecutionValue>>) {
         val score = results.result.first() as NumberValue.F32
         println("CoreMark 1.0 : ${score.value}")

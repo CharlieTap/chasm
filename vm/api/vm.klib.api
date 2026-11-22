@@ -441,8 +441,8 @@ final object io.github.charlietap.chasm.vm/NonJsVirtualMachine : io.github.charl
 
 // Targets: [native]
 final object io.github.charlietap.chasm.vm/ValueMapper { // io.github.charlietap.chasm.vm/ValueMapper|null[0]
-    final fun from(io.github.charlietap.chasm.vm/WasmVirtualMachine.Value): io.github.charlietap.chasm.runtime.value/ExecutionValue // io.github.charlietap.chasm.vm/ValueMapper.from|from(io.github.charlietap.chasm.vm.WasmVirtualMachine.Value){}[0]
-    final fun to(io.github.charlietap.chasm.runtime.value/ExecutionValue): io.github.charlietap.chasm.vm/WasmVirtualMachine.Value // io.github.charlietap.chasm.vm/ValueMapper.to|to(io.github.charlietap.chasm.runtime.value.ExecutionValue){}[0]
+    final fun from(io.github.charlietap.chasm.vm/WasmVirtualMachine.Value): io.github.charlietap.chasm.embedding.value/ExecutionValue // io.github.charlietap.chasm.vm/ValueMapper.from|from(io.github.charlietap.chasm.vm.WasmVirtualMachine.Value){}[0]
+    final fun to(io.github.charlietap.chasm.embedding.value/ExecutionValue): io.github.charlietap.chasm.vm/WasmVirtualMachine.Value // io.github.charlietap.chasm.vm/ValueMapper.to|to(io.github.charlietap.chasm.embedding.value.ExecutionValue){}[0]
 }
 
 // Targets: [js]

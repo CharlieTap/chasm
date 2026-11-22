@@ -6,22 +6,10 @@ import io.github.charlietap.chasm.gc.GarbageCollectedHeap
 import io.github.charlietap.chasm.gc.GcHostReferenceMarker
 import io.github.charlietap.chasm.gc.GcRootMarker
 import io.github.charlietap.chasm.gc.GuestHeapOutOfMemoryException
-import io.github.charlietap.chasm.host.HostException
-import io.github.charlietap.chasm.host.HostExceptions
-import io.github.charlietap.chasm.host.HostExternKind
-import io.github.charlietap.chasm.host.HostExternReference
-import io.github.charlietap.chasm.host.HostExterns
 import io.github.charlietap.chasm.host.HostFunctionException
-import io.github.charlietap.chasm.host.HostGc
 import io.github.charlietap.chasm.host.HostGcFieldInfo
 import io.github.charlietap.chasm.host.HostGcType
-import io.github.charlietap.chasm.host.HostModuleInstance
-import io.github.charlietap.chasm.host.HostReference
-import io.github.charlietap.chasm.host.HostReferenceRoot
-import io.github.charlietap.chasm.host.HostReferences
-import io.github.charlietap.chasm.host.HostResources
 import io.github.charlietap.chasm.host.HostStack
-import io.github.charlietap.chasm.host.HostTag
 import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.runtime.encoder.HEAP_TYPE_EXTERN
 import io.github.charlietap.chasm.runtime.encoder.RV_SHIFT_BITS
@@ -36,6 +24,18 @@ import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.HostRaisedWasmException
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
+import io.github.charlietap.chasm.runtime.host.HostException
+import io.github.charlietap.chasm.runtime.host.HostExceptions
+import io.github.charlietap.chasm.runtime.host.HostExternKind
+import io.github.charlietap.chasm.runtime.host.HostExternReference
+import io.github.charlietap.chasm.runtime.host.HostExterns
+import io.github.charlietap.chasm.runtime.host.HostGc
+import io.github.charlietap.chasm.runtime.host.HostReference
+import io.github.charlietap.chasm.runtime.host.HostReferenceRoot
+import io.github.charlietap.chasm.runtime.host.HostReferences
+import io.github.charlietap.chasm.runtime.host.HostTag
+import io.github.charlietap.chasm.runtime.host.RawHostModuleInstance
+import io.github.charlietap.chasm.runtime.host.RawHostResources
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.instance.TagInstance
 import io.github.charlietap.chasm.runtime.stack.ValueStack
@@ -90,6 +90,8 @@ class WasmHeap internal constructor(
 
     private var pendingExceptionReference = 0L
 
+    var heldRoots: HeldRoots? = null
+
     override val allocatedBytes: Long
         get() = allocatedGuestBytes()
 
@@ -132,12 +134,12 @@ class WasmHeap internal constructor(
         retainedRootFreeHead = slot
     }
 
-    context(resources: HostResources)
+    context(resources: RawHostResources)
     override fun collect() {
         collectFromHost(resources as ExecutionContext)
     }
 
-    context(resources: HostResources)
+    context(resources: RawHostResources)
     override fun collect(
         additionalRoots: LongArray,
         rootOffset: Int,
@@ -225,13 +227,17 @@ class WasmHeap internal constructor(
         )
     }
 
-    override fun runtimeType(module: HostModuleInstance, typeIndex: Int): HostGcType =
-        HostGcType((module as ModuleInstance).runtimeTypes[typeIndex].value)
+    override fun runtimeType(
+        module: RawHostModuleInstance,
+        typeIndex: Int,
+    ): HostGcType {
+        return HostGcType((module as ModuleInstance).runtimeTypes[typeIndex].value)
+    }
 
     override fun isSubtype(actual: HostGcType, expected: HostGcType): Boolean =
         matchesRuntimeType(RTT(actual.id), RTT(expected.id))
 
-    context(resources: HostResources)
+    context(resources: RawHostResources)
     override fun allocateStruct(
         type: HostGcType,
         fields: LongArray,
@@ -260,7 +266,7 @@ class WasmHeap internal constructor(
         return rootScoped(result)
     }
 
-    context(resources: HostResources)
+    context(resources: RawHostResources)
     override fun allocateArray(
         type: HostGcType,
         length: Int,
@@ -280,7 +286,7 @@ class WasmHeap internal constructor(
         return rootScoped(result)
     }
 
-    context(resources: HostResources)
+    context(resources: RawHostResources)
     override fun allocateArray(
         type: HostGcType,
         elements: LongArray,
@@ -311,13 +317,33 @@ class WasmHeap internal constructor(
         return rootScoped(result)
     }
 
-    context(resources: HostResources)
+    context(resources: RawHostResources)
     override fun create(value: Any): HostExternReference {
         prepareExternAllocation(resources)
         val slot = allocateExternSlot(value)
         val reference = HostExternReference(encodeExternHostSlot(slot))
         rootScoped(reference.raw)
         return reference
+    }
+
+    fun createScopedExtern(
+        store: Store,
+        value: Any,
+    ): HostReference {
+
+        try {
+            prepareRetainedExternAllocation(store)
+        } catch (failure: GuestHeapOutOfMemoryException) {
+            throw InvocationException(
+                InvocationError.GarbageCollectionFailed(
+                    failure.message ?: "collection exhausted host memory",
+                ),
+            )
+        }
+
+        val slot = allocateExternSlot(value)
+
+        return rootScoped(encodeExternHostSlot(slot))
     }
 
     fun createRetainedExtern(
@@ -350,6 +376,10 @@ class WasmHeap internal constructor(
         }
     }
 
+    fun hostValue(raw: Long): Any {
+        return checkNotNull(externValues[(raw shr RV_SHIFT_BITS).toInt()])
+    }
+
     override fun value(reference: HostExternReference): Any {
         val inner = reference.raw shr RV_SHIFT_BITS
         val slot = (inner shr RV_SHIFT_BITS).toInt()
@@ -373,7 +403,7 @@ class WasmHeap internal constructor(
         }
     }
 
-    context(resources: HostResources)
+    context(resources: RawHostResources)
     override fun create(
         tag: HostTag,
         payload: HostStack,
@@ -750,6 +780,14 @@ class WasmHeap internal constructor(
         return checkNotNull(arrayTypes[type.id]).fieldType
     }
 
+    fun isStructType(type: HostGcType): Boolean {
+        return structTypes.getOrNull(type.id) != null
+    }
+
+    fun isArrayType(type: HostGcType): Boolean {
+        return arrayTypes.getOrNull(type.id) != null
+    }
+
     fun structRuntimeTypeIdOrNegative(rawReference: Long): Int {
         val runtimeTypeId = garbageCollectedHeap.structSemanticIdOrNegative(rawReference)
         return if (runtimeTypeId < 0 || structTypes.getOrNull(runtimeTypeId) == null) -1 else runtimeTypeId
@@ -1067,11 +1105,10 @@ class WasmHeap internal constructor(
         return allocatedWords != 0L && allocatedWords >= floorWords
     }
 
-    private fun prepareStructAllocation(
+    fun prepareStructAllocation(
         store: Store,
         runtimeType: RTT,
         thresholdBytes: Long,
-        valueStack: ValueStack,
     ) {
         val descriptorKey = structDescriptorKey(runtimeType)
         prepareAllocation(
@@ -1079,16 +1116,14 @@ class WasmHeap internal constructor(
             pendingSlotWords = garbageCollectedHeap.fixedAllocationSlotWords(descriptorKey),
             availability = garbageCollectedHeap.fixedAllocationAvailability(descriptorKey),
             thresholdBytes = thresholdBytes,
-            valueStack = valueStack,
         )
     }
 
-    private fun prepareArrayAllocation(
+    fun prepareArrayAllocation(
         store: Store,
         runtimeType: RTT,
         length: Int,
         thresholdBytes: Long,
-        valueStack: ValueStack,
     ) {
         val descriptorKey = arrayDescriptorKey(runtimeType)
         prepareAllocation(
@@ -1096,15 +1131,13 @@ class WasmHeap internal constructor(
             pendingSlotWords = garbageCollectedHeap.arrayAllocationSlotWords(descriptorKey, length),
             availability = garbageCollectedHeap.arrayAllocationAvailability(descriptorKey, length),
             thresholdBytes = thresholdBytes,
-            valueStack = valueStack,
         )
     }
 
-    private fun prepareExceptionAllocation(
+    fun prepareExceptionAllocation(
         store: Store,
         tagAddress: Address.Tag,
         thresholdBytes: Long,
-        valueStack: ValueStack,
     ) {
         val descriptorKey = exceptionDescriptorKey(tagAddress)
         prepareAllocation(
@@ -1112,7 +1145,6 @@ class WasmHeap internal constructor(
             pendingSlotWords = garbageCollectedHeap.fixedAllocationSlotWords(descriptorKey),
             availability = garbageCollectedHeap.fixedAllocationAvailability(descriptorKey),
             thresholdBytes = thresholdBytes,
-            valueStack = valueStack,
         )
     }
 
@@ -1126,7 +1158,6 @@ class WasmHeap internal constructor(
             store = context.store,
             runtimeType = runtimeType,
             thresholdBytes = context.config.gcThreshold.bytes,
-            valueStack = context.vstack,
         )
     }
 
@@ -1142,7 +1173,6 @@ class WasmHeap internal constructor(
             runtimeType = runtimeType,
             length = length,
             thresholdBytes = context.config.gcThreshold.bytes,
-            valueStack = context.vstack,
         )
     }
 
@@ -1156,7 +1186,6 @@ class WasmHeap internal constructor(
             store = context.store,
             tagAddress = tagAddress,
             thresholdBytes = context.config.gcThreshold.bytes,
-            valueStack = context.vstack,
         )
     }
 
@@ -1164,6 +1193,14 @@ class WasmHeap internal constructor(
         if (pendingExceptionReference != 0L) {
             rootMarker.markRoot(pendingExceptionReference)
         }
+
+        var liveStack = store.liveStacks
+        while (liveStack != null) {
+            liveStack.stack.visitGcRoots(rootMarker)
+            liveStack = liveStack.next
+        }
+
+        heldRoots?.visit(rootMarker)
 
         var rootIndex = 0
         while (rootIndex < scopedRootTop) {
@@ -1210,21 +1247,16 @@ class WasmHeap internal constructor(
         }
     }
 
-    fun collectGarbage(
-        store: Store,
-        supplementalStack: ValueStack? = null,
-    ) {
-        collectGarbage(store, supplementalStack, 0L)
+    fun collectGarbage(store: Store) {
+        collectGarbage(store, 0L)
     }
 
     private fun collectGarbage(
         store: Store,
-        supplementalStack: ValueStack?,
         pendingSlotWords: Long,
     ) {
         garbageCollectedHeap.beginCollection(this)
         try {
-            supplementalStack?.visitGcRoots(garbageCollectedHeap)
             visitGcRoots(store, garbageCollectedHeap)
             garbageCollectedHeap.finishCollection()
             updateAutomaticExternThreshold(sweepExterns())
@@ -1241,7 +1273,6 @@ class WasmHeap internal constructor(
         pendingSlotWords: Int,
         availability: AllocationAvailability,
         thresholdBytes: Long,
-        valueStack: ValueStack,
     ) {
         val maximumWords = garbageCollectedHeap.maximumPayloadWords()
         val floorWords = minOf(bytesToWordsCeiling(thresholdBytes), maximumWords)
@@ -1257,7 +1288,6 @@ class WasmHeap internal constructor(
         try {
             collectGarbage(
                 store = store,
-                supplementalStack = valueStack,
                 pendingSlotWords = pendingSlotWords.toLong(),
             )
         } catch (failure: GuestHeapOutOfMemoryException) {
@@ -1421,13 +1451,13 @@ class WasmHeap internal constructor(
 
     private fun collectFromHost(context: ExecutionContext) {
         try {
-            collectGarbage(context.store, context.vstack)
+            collectGarbage(context.store)
         } catch (failure: GuestHeapOutOfMemoryException) {
             throw HostFunctionException(failure.message ?: "collection exhausted host memory")
         }
     }
 
-    private fun prepareExternAllocation(resources: HostResources) {
+    private fun prepareExternAllocation(resources: RawHostResources) {
         if (externFreeHead != NO_SLOT || externTop < nextAutomaticExternThreshold) return
         collectFromHost(resources as ExecutionContext)
     }

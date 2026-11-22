@@ -7,6 +7,7 @@ import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
+import io.github.charlietap.chasm.runtime.store.withLiveStack
 import io.github.charlietap.chasm.type.AbstractHeapType
 import io.github.charlietap.chasm.type.ArrayType
 import io.github.charlietap.chasm.type.CompositeType
@@ -186,7 +187,7 @@ class ArrayStoreTest {
                 val reference = store.heap.allocateArrayFilled(runtimeType, length, length.toLong())
                 val roots = ValueStack().apply { push(reference) }
 
-                store.heap.collectGarbage(store, roots)
+                store.withLiveStack(roots) { store.heap.collectGarbage(store) }
 
                 assertEquals(length, store.heap.arrayLength(reference))
                 if (length > 0) {
@@ -200,7 +201,7 @@ class ArrayStoreTest {
         }
 
         val dedicated = store.heap.allocateArrayFilled(runtimeType, 1024, 1024)
-        store.heap.collectGarbage(store, ValueStack().apply { push(dedicated) })
+        store.withLiveStack(ValueStack().apply { push(dedicated) }) { store.heap.collectGarbage(store) }
         assertEquals(1024, store.heap.arrayLength(dedicated))
         assertEquals(1024, store.heap.getArrayElement(dedicated, 0))
         assertEquals(1024, store.heap.getArrayElement(dedicated, 1023))
@@ -213,7 +214,7 @@ class ArrayStoreTest {
         val reference = store.heap.allocateArrayFromElements(runtimeType, LongArray(8) { it.toLong() }, 0, 8)
         val roots = ValueStack().apply { push(reference) }
 
-        store.heap.collectGarbage(store, roots)
+        store.withLiveStack(roots) { store.heap.collectGarbage(store) }
         store.heap.copyArray(reference, 0, reference, 2, 6)
         assertContentEquals(
             longArrayOf(0, 1, 0, 1, 2, 3, 4, 5),
@@ -221,7 +222,7 @@ class ArrayStoreTest {
         )
 
         store.heap.copyArray(reference, 2, reference, 0, 6)
-        store.heap.collectGarbage(store, roots)
+        store.withLiveStack(roots) { store.heap.collectGarbage(store) }
         assertContentEquals(
             longArrayOf(0, 1, 2, 3, 4, 5, 4, 5),
             LongArray(8) { store.heap.getArrayElement(reference, it) },
@@ -246,11 +247,11 @@ class ArrayStoreTest {
             }
         }
 
-        store.heap.collectGarbage(store, initialRoots)
+        store.withLiveStack(initialRoots) { store.heap.collectGarbage(store) }
         val shorter = store.heap.allocateArrayFilled(arrayRuntimeType, 97, RV_TYPE_NULL)
         assertEquals(poisoned, shorter)
 
-        store.heap.collectGarbage(store, ValueStack().apply { push(shorter) })
+        store.withLiveStack(ValueStack().apply { push(shorter) }) { store.heap.collectGarbage(store) }
 
         assertEquals(-1, store.heap.structRuntimeTypeIdOrNegative(staleStruct))
         assertEquals(RV_TYPE_NULL, store.heap.getArrayElement(shorter, 0))

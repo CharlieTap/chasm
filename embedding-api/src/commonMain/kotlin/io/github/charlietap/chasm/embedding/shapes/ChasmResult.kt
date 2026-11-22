@@ -64,7 +64,7 @@ private fun expectFailure(
 ): Throwable {
     return when (error) {
         is ExecutionError.Trapped -> WasmTrapException(error.trap, "$message: ${error.trap}")
-        is ExecutionError.Thrown<*> -> UncaughtWasmException(error.exception, "$message: uncaught exception ${error.exception}")
+        is ExecutionError.Thrown -> UncaughtWasmException(error.exception, "$message: uncaught exception ${error.exception}")
         else -> IllegalStateException("$message: $error")
     }
 }

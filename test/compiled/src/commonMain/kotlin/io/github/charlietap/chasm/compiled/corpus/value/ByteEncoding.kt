@@ -1,7 +1,6 @@
 package io.github.charlietap.chasm.compiled.corpus.value
 
 import io.github.charlietap.chasm.compiled.corpus.ext.string
-import io.github.charlietap.chasm.runtime.ext.toLongFromBoxed
 import io.github.charlietap.corpus.lib.fixture.FixtureBytes
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
@@ -23,7 +22,7 @@ internal fun decodeFixtureBytes(
 internal fun encodeValueBytes(
     value: JsonObject,
 ): ByteArray {
-    val parsed = parseValue(value, emptyMap()).toLongFromBoxed()
+    val parsed = parseValue(value, emptyMap()).bits()
     val size = when (value.string("type")) {
         "i64", "f64" -> 8
         else -> 4

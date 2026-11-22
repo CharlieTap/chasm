@@ -38,6 +38,20 @@ fun tableGrow(
     count: Int,
     value: Any?,
 ): Int {
+
+    val previous = tableGrowWithoutTrap(table, count, value)
+    if (previous < 0 && table.trapOnGrowFailure) {
+        throw InvocationException(InvocationError.TableGrowFailed)
+    }
+
+    return previous
+}
+
+fun tableGrowWithoutTrap(
+    table: ReferenceTable,
+    count: Int,
+    value: Any?,
+): Int {
     val references = table.elements
     val size = references.size
     if (count == 0) return size

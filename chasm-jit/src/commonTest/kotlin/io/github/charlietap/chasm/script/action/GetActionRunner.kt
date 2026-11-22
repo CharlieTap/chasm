@@ -1,18 +1,18 @@
 package io.github.charlietap.chasm.script.action
 
-import io.github.charlietap.chasm.embedding.compiled.ExternalType
-import io.github.charlietap.chasm.embedding.compiled.Global
-import io.github.charlietap.chasm.embedding.compiled.exports
-import io.github.charlietap.chasm.embedding.compiled.readGlobal
-import io.github.charlietap.chasm.embedding.compiled.readGlobalReference
-import io.github.charlietap.chasm.embedding.compiled.value.ExecutionValue
-import io.github.charlietap.chasm.embedding.compiled.value.NumberValue
-import io.github.charlietap.chasm.embedding.compiled.value.ReferenceValue
+import io.github.charlietap.chasm.embedding.exports
+import io.github.charlietap.chasm.embedding.global.readGlobal
+import io.github.charlietap.chasm.embedding.global.readGlobalReference
+import io.github.charlietap.chasm.embedding.shapes.Global
+import io.github.charlietap.chasm.embedding.value.ExecutionValue
+import io.github.charlietap.chasm.embedding.value.NumberValue
+import io.github.charlietap.chasm.embedding.value.ReferenceValue
 import io.github.charlietap.chasm.reference.ArrayReference
 import io.github.charlietap.chasm.reference.ExceptionReference
 import io.github.charlietap.chasm.reference.FunctionReference
 import io.github.charlietap.chasm.reference.I31Reference
 import io.github.charlietap.chasm.reference.StructReference
+import io.github.charlietap.chasm.runtime.type.ExternalType
 import io.github.charlietap.chasm.script.ScriptContext
 import io.github.charlietap.chasm.type.NumberType
 import io.github.charlietap.chasm.type.ValueType

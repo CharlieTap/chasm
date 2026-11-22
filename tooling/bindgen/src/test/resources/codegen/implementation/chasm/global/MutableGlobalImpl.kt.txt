@@ -1,28 +1,36 @@
+@file:OptIn(ExperimentalChasmApi::class)
+
 package com.test
 
+import io.github.charlietap.chasm.ExperimentalChasmApi
 import io.github.charlietap.chasm.embedding.codegen.CodegenImport
-import io.github.charlietap.chasm.embedding.codegen.InstanceFactory
-import io.github.charlietap.chasm.embedding.codegen.ModuleFactory
 import io.github.charlietap.chasm.embedding.codegen.allocateImports
+import io.github.charlietap.chasm.embedding.exports
 import io.github.charlietap.chasm.embedding.global.readGlobal
 import io.github.charlietap.chasm.embedding.global.writeGlobal
 import io.github.charlietap.chasm.embedding.instance
 import io.github.charlietap.chasm.embedding.module
 import io.github.charlietap.chasm.embedding.shapes.Global
+import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.Instance
+import io.github.charlietap.chasm.embedding.shapes.Module
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.shapes.`expect`
 import io.github.charlietap.chasm.embedding.store
-import io.github.charlietap.chasm.runtime.`value`.NumberValue
 import kotlin.ByteArray
 import kotlin.Int
+import kotlin.OptIn
 import kotlin.collections.List
 
-public fun mutableGlobal(
+public suspend fun mutableGlobal(
   binary: ByteArray,
   imports: List<CodegenImport> = emptyList(),
-  moduleFactory: ModuleFactory? = null,
-  instanceFactory: InstanceFactory? = null,
+  moduleFactory: (suspend (ByteArray) -> Module)? = null,
+  instanceFactory: (suspend (
+    Store,
+    Module,
+    List<Import>,
+  ) -> Instance)? = null,
 ): MutableGlobal {
   val store = store()
   val module = moduleFactory?.invoke(binary) ?: module(binary).`expect`("Failed to decode binary")
@@ -36,11 +44,11 @@ private class MutableGlobalImpl(
   private val instance: Instance,
 ) : MutableGlobal {
   private val _value: Global =
-      (instance.exports.firstOrNull { export -> export.name == "value" }?.value as? Global) ?: error("Failed to find global export with name value")
+      exports(instance).global("value") ?: error("Failed to find global export with name value")
 
   override var `value`: Int
-    get() = (readGlobal(store, _value) as NumberValue.I32).value
+    get() = readGlobal(_value).toInt()
     set(newValue) {
-      writeGlobal(store, _value, NumberValue.I32(newValue))
+      writeGlobal(_value, newValue.toLong())
     }
 }

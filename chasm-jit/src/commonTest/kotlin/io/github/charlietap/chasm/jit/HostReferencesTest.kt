@@ -1,32 +1,33 @@
 package io.github.charlietap.chasm.jit
 
-import io.github.charlietap.chasm.embedding.compiled.Import
-import io.github.charlietap.chasm.embedding.compiled.Instance
-import io.github.charlietap.chasm.embedding.compiled.Store
-import io.github.charlietap.chasm.embedding.compiled.exports
-import io.github.charlietap.chasm.embedding.compiled.function
-import io.github.charlietap.chasm.embedding.compiled.host.HostFunction
-import io.github.charlietap.chasm.embedding.compiled.host.allocateStruct
-import io.github.charlietap.chasm.embedding.compiled.host.createException
-import io.github.charlietap.chasm.embedding.compiled.host.raise
-import io.github.charlietap.chasm.embedding.compiled.host.readI32
-import io.github.charlietap.chasm.embedding.compiled.host.readReference
-import io.github.charlietap.chasm.embedding.compiled.host.readStructReference
-import io.github.charlietap.chasm.embedding.compiled.host.runtimeType
-import io.github.charlietap.chasm.embedding.compiled.host.withTag
-import io.github.charlietap.chasm.embedding.compiled.host.writeI32
-import io.github.charlietap.chasm.embedding.compiled.host.writeReference
-import io.github.charlietap.chasm.embedding.compiled.instance
-import io.github.charlietap.chasm.embedding.compiled.invoke
-import io.github.charlietap.chasm.embedding.compiled.readStructField
-import io.github.charlietap.chasm.embedding.compiled.readStructReference
-import io.github.charlietap.chasm.embedding.compiled.readTable
-import io.github.charlietap.chasm.embedding.compiled.value.ExecutionValue
-import io.github.charlietap.chasm.embedding.compiled.value.NumberValue.I32
-import io.github.charlietap.chasm.embedding.compiled.writeGlobalReference
-import io.github.charlietap.chasm.embedding.compiled.writeStructField
 import io.github.charlietap.chasm.embedding.dsl.FunctionTypeBuilder
+import io.github.charlietap.chasm.embedding.exports
+import io.github.charlietap.chasm.embedding.function
+import io.github.charlietap.chasm.embedding.global.writeGlobalReference
+import io.github.charlietap.chasm.embedding.instance
+import io.github.charlietap.chasm.embedding.invoke
+import io.github.charlietap.chasm.embedding.module
+import io.github.charlietap.chasm.embedding.reference.readStructField
+import io.github.charlietap.chasm.embedding.reference.readStructReference
+import io.github.charlietap.chasm.embedding.reference.writeStructField
+import io.github.charlietap.chasm.embedding.shapes.Import
+import io.github.charlietap.chasm.embedding.shapes.Instance
+import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.shapes.expect
+import io.github.charlietap.chasm.embedding.table.readTable
+import io.github.charlietap.chasm.embedding.value.ExecutionValue
+import io.github.charlietap.chasm.embedding.value.NumberValue.I32
+import io.github.charlietap.chasm.host.HostFunction
+import io.github.charlietap.chasm.host.allocateStruct
+import io.github.charlietap.chasm.host.createException
+import io.github.charlietap.chasm.host.raise
+import io.github.charlietap.chasm.host.readI32
+import io.github.charlietap.chasm.host.readReference
+import io.github.charlietap.chasm.host.readStructReference
+import io.github.charlietap.chasm.host.runtimeType
+import io.github.charlietap.chasm.host.withTag
+import io.github.charlietap.chasm.host.writeI32
+import io.github.charlietap.chasm.host.writeReference
 import io.github.charlietap.chasm.reference.StructReference
 import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
@@ -38,9 +39,9 @@ class HostReferencesTest {
     @Test
     fun hostFunctionsReadAndWriteGuestStructs() {
 
-        val (store, instance) = instantiate()
+        val instance = instantiate()
 
-        val result = invoke(store, instance, "inspect", listOf(I32(3))).expect("inspect")
+        val result = invoke(instance, "inspect", listOf(I32(3))).expect("inspect")
 
         assertEquals(listOf<ExecutionValue>(I32(3 + 200 + 7 + 1000)), result)
     }
@@ -48,9 +49,9 @@ class HostReferencesTest {
     @Test
     fun hostAllocatedStructsCarryHostValues() {
 
-        val (store, instance) = instantiate()
+        val instance = instantiate()
 
-        val result = invoke(store, instance, "make", emptyList()).expect("make")
+        val result = invoke(instance, "make", emptyList()).expect("make")
 
         assertEquals(listOf<ExecutionValue>(I32(5 + 1)), result)
     }
@@ -58,9 +59,9 @@ class HostReferencesTest {
     @Test
     fun hostRaisedExceptionsAreCaughtByTheGuest() {
 
-        val (store, instance) = instantiate()
+        val instance = instantiate()
 
-        val result = invoke(store, instance, "catch_host", listOf(I32(20))).expect("catch_host")
+        val result = invoke(instance, "catch_host", listOf(I32(20))).expect("catch_host")
 
         assertEquals(listOf<ExecutionValue>(I32(41)), result)
     }
@@ -68,26 +69,25 @@ class HostReferencesTest {
     @Test
     fun guestStructsMoveThroughEmbeddingTablesAndGlobals() {
 
-        val (store, instance) = instantiate()
+        val instance = instantiate()
         val exports = exports(instance)
-        invoke(store, instance, "store", listOf(I32(9))).expect("store")
+        invoke(instance, "store", listOf(I32(9))).expect("store")
 
         val struct = assertIs<StructReference>(readTable(checkNotNull(exports.table("things")), 1))
         val field = readStructField(struct, 0)
         writeGlobalReference(checkNotNull(exports.global("saved")), struct)
-        val saved = invoke(store, instance, "saved_x", emptyList()).expect("saved_x")
+        val saved = invoke(instance, "saved_x", emptyList()).expect("saved_x")
 
         assertEquals(9L, field)
         assertEquals(listOf<ExecutionValue>(I32(9)), saved)
     }
 
-    private fun instantiate(): Pair<Store, Instance> {
+    private fun instantiate(): Instance {
 
         val store = store()
         val module = runBlocking { module(resourceBytes("modules/host_references.wasm"), validate = true) }.expect("module")
-        val instance = runBlocking { instance(store, module, imports(store)) }.expect("instance")
 
-        return store to instance
+        return runBlocking { instance(store, module, imports(store)) }.expect("instance")
     }
 
     private fun imports(

@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.script.action
 
-import io.github.charlietap.chasm.embedding.compiled.invoke
+import io.github.charlietap.chasm.embedding.invoke
 import io.github.charlietap.chasm.embedding.shapes.fold
 import io.github.charlietap.chasm.script.ScriptContext
 import io.github.charlietap.chasm.script.value.ValueMapper
@@ -32,7 +32,6 @@ private fun InvokeActionRunner(
     }
 
     val result = invoke(
-        context.store,
         context.instances[action.moduleName]!!,
         action.field,
         arguments.filterNotNull(),

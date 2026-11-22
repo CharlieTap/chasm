@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.runtime.compiled.gc
 
+import io.github.charlietap.chasm.embedding.engine.Engine
 import io.github.charlietap.chasm.host.HostGcType
 import io.github.charlietap.chasm.reference.I31Reference
 import io.github.charlietap.chasm.runtime.encoder.RV_SHIFT_BITS
@@ -31,9 +32,9 @@ class ManagedStore(
     private val types = ConcurrentHashMap<Class<*>, Int>()
     private val definedTypes = ConcurrentHashMap<Int, DefinedType>()
 
-    lateinit var engine: Any
+    lateinit var engine: Engine
 
-    val functions = ManagedFunctions(store)
+    val functions = ManagedFunctions(store, this)
 
     val checks = StoreReferenceChecks(this, functions, store)
 
@@ -81,7 +82,11 @@ class ManagedStore(
 
         val storage = tables.getOrPut(table) {
             require(store.tables.any { candidate -> candidate === table }) { "not a table of this store" }
-            ReferenceTable(Array(table.elements.size) { index -> decodeReference(table.elements[index]) }, table)
+            ReferenceTable(
+                Array(table.elements.size) { index -> decodeReference(table.elements[index]) },
+                table,
+                store.config.limits.trapOnGrowFailure,
+            )
         }
         check(!storage.released) { "the table's instance has been dropped" }
 

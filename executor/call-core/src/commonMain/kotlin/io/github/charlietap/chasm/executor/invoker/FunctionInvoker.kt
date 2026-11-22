@@ -22,6 +22,7 @@ import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
+import io.github.charlietap.chasm.runtime.store.withLiveStack
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
 
 typealias FunctionInvoker = (RuntimeConfig, Store, ModuleInstance, Address.Function, List<ExecutionValue>) -> Result<List<ExecutionValue>, InvocationError>
@@ -141,15 +142,19 @@ internal inline fun invokeFunction(
             stack.reserveDepth(resultCount)
             val context = ExecutionContext(stack, store, instance, config)
             try {
-                context.withHostCallbackScope {
-                    context(stack.unsafeElements(), instance, context) {
-                        function.function.invoke(0, 0)
+                store.withLiveStack(stack) {
+                    context.withHostCallbackScope {
+
+                        context(stack.unsafeElements(), instance, context) {
+                            function.function.invoke(0, 0)
+                        }
+
+                        Ok(
+                            List(resultCount) { index ->
+                                stack.unsafeElements()[index].toExecutionValue(function.functionType.results.types[index])
+                            },
+                        )
                     }
-                    Ok(
-                        List(resultCount) { index ->
-                            stack.unsafeElements()[index].toExecutionValue(function.functionType.results.types[index])
-                        },
-                    )
                 }
             } catch (_: HostRaisedWasmException) {
                 Err(InvocationError.ThrownException)

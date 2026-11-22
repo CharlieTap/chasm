@@ -14,7 +14,8 @@ import io.github.charlietap.chasm.embedding.function
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.expect
-import io.github.charlietap.chasm.embedding.store
+import io.github.charlietap.chasm.embedding.value.ExecutionValue
+import io.github.charlietap.chasm.embedding.value.NumberValue
 import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.host.HostFunction
 import io.github.charlietap.chasm.host.HostFunctionException
@@ -24,8 +25,6 @@ import io.github.charlietap.chasm.integration.integrationTest
 import io.github.charlietap.chasm.integration.runner
 import io.github.charlietap.chasm.integration.trapOf
 import io.github.charlietap.chasm.runtime.error.InvocationError
-import io.github.charlietap.chasm.runtime.value.ExecutionValue
-import io.github.charlietap.chasm.runtime.value.NumberValue
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -215,7 +214,7 @@ class TrapDiagnosticsTest {
 
     @Test
     fun `a trap in a call a host function makes back into the module reports the frames of that call`() = integrationTest(FIXTURE) {
-        val store = store()
+        val store = engine.store()
         lateinit var runner: TestRunner
         var inner: ChasmResult<*, *>? = null
         val hostFunction = HostFunction { _, _ ->
@@ -300,7 +299,7 @@ class TrapDiagnosticsTest {
 
     @Test
     fun `a trap in a start function is reported by instantiation`() = integrationTest(START_FIXTURE) {
-        val result = runner(store(), config = DIAGNOSTICS).invoke("start")
+        val result = runner(config = DIAGNOSTICS).invoke("start")
 
         val trap = trapOf(result, engine.name())
         assertEquals(TrapReason.UNREACHABLE, trap.reason, engine.name())
@@ -316,9 +315,9 @@ class TrapDiagnosticsTest {
 
     @Test
     fun `an imported start function is not attributed to the module being instantiated`() = integrationTest(START_IMPORT_FIXTURE) {
-        val store = store()
+        val store = engine.store()
         val owner = runner(store, script = START_OWNER_FIXTURE)
-        val boom = owner.exports().expect("owner exports").single { export -> export.name == "boom" }.value
+        val boom = assertNotNull(owner.exports().expect("owner exports").function("boom"), engine.name())
 
         val result = runner(store, listOf(Import("owner", "boom", boom)), DIAGNOSTICS).invoke("not_executed")
 
@@ -336,11 +335,11 @@ class TrapDiagnosticsTest {
         assertEquals(ChasmResult.Success(listOf<ExecutionValue>(NumberValue.I32(0))), result, engine.name())
     }
 
-    private fun TestScope.fixture(
+    private suspend fun TestScope.fixture(
         config: RuntimeConfig,
         imports: Boolean = true,
     ): TestRunner {
-        val store = store()
+        val store = engine.store()
         val hostFunction = HostFunction { _, _ -> throw HostFunctionException("host failed") }
         val import = Import("env", "host_fail", function(store, functionType(), hostFunction))
         return runner(store, if (imports) listOf(import) else emptyList(), config)

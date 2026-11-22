@@ -15,10 +15,14 @@ kotlin {
     @OptIn(ExperimentalAbiValidation::class)
     abiValidation()
 
+    compilerOptions {
+        optIn.add("io.github.charlietap.chasm.InternalChasmApi")
+    }
+
     sourceSets {
         commonMain {
             dependencies {
-                api(projects.host)
+                api(projects.config)
                 api(projects.runtime.type)
                 api(projects.typeSystem)
             }
@@ -28,5 +32,5 @@ kotlin {
 
 configure<PublishingConventionsExtension> {
     name = "embedding-api"
-    description = "The results, errors, imports, module information and type builders Chasm's entry points share"
+    description = "The stores, modules, instances, calls, values, errors and host functions shared by every Chasm engine"
 }

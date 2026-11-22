@@ -6,9 +6,9 @@ import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.config.Config
 import io.github.charlietap.chasm.config.GCStrategy
 import io.github.charlietap.chasm.config.RuntimeConfig
-import io.github.charlietap.chasm.embedding.compiled.Instance
-import io.github.charlietap.chasm.embedding.compiled.Module
-import io.github.charlietap.chasm.embedding.compiled.Store
+import io.github.charlietap.chasm.embedding.shapes.Instance
+import io.github.charlietap.chasm.embedding.shapes.Module
+import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.jit.onLargeStack
 import io.github.charlietap.chasm.jit.store
 import io.github.charlietap.chasm.script.command.CommandResult

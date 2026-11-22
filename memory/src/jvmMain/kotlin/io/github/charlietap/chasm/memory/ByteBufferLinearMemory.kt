@@ -1,9 +1,9 @@
 package io.github.charlietap.chasm.memory
 
 import io.github.charlietap.chasm.config.LinearMemoryConfig
-import io.github.charlietap.chasm.host.ByteBufferHostMemory
-import io.github.charlietap.chasm.host.HostMemory
 import io.github.charlietap.chasm.host.UnsafeHostApi
+import io.github.charlietap.chasm.runtime.host.ByteBufferHostMemory
+import io.github.charlietap.chasm.runtime.host.HostMemory
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
 import io.github.charlietap.chasm.runtime.memory.OutOfMemoryError
 import java.nio.ByteBuffer

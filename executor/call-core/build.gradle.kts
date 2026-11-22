@@ -17,7 +17,7 @@ kotlin {
                 api(projects.embeddingApi)
                 api(libs.result)
 
-                implementation(projects.host)
+                implementation(projects.runtime.host)
                 implementation(projects.runtime.resources)
             }
         }

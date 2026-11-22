@@ -16,14 +16,14 @@ import io.github.charlietap.chasm.embedding.prepareFunction
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.Instance
-import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.shapes.expect
 import io.github.charlietap.chasm.embedding.store
+import io.github.charlietap.chasm.embedding.value.ExecutionValue
 import io.github.charlietap.chasm.fake.decoder.FakeSourceReader
 import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.host.HostFunction
 import io.github.charlietap.chasm.host.HostFunctionException
-import io.github.charlietap.chasm.runtime.value.ExecutionValue
+import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
@@ -33,9 +33,9 @@ import kotlin.test.assertNull
 class TrapDiagnosticsTest {
 
     @Test
-    fun `prepared functions report traps too`() {
-        val fixture = Fixture(DIAGNOSTICS)
-        val prepared = prepareFunction(fixture.store, fixture.instance, "nested_unreachable").expect("prepare")
+    fun `prepared functions report traps too`() = runTest {
+        val fixture = fixture(DIAGNOSTICS)
+        val prepared = prepareFunction(fixture.instance, "nested_unreachable").expect("prepare")
 
         val result = prepared.invoke(emptyList())
 
@@ -45,8 +45,8 @@ class TrapDiagnosticsTest {
     }
 
     @Test
-    fun `a module decoded from a stream reports frames without offsets`() {
-        val fixture = Fixture(DIAGNOSTICS, streamed = true)
+    fun `a module decoded from a stream reports frames without offsets`() = runTest {
+        val fixture = fixture(DIAGNOSTICS, streamed = true)
 
         val stackTrace = fixture.stackTrace("nested_unreachable")
 
@@ -61,9 +61,9 @@ class TrapDiagnosticsTest {
     }
 
     @Test
-    fun `a binary that no longer matches the installed code yields no offsets`() {
+    fun `a binary that no longer matches the installed code yields no offsets`() = runTest {
         val bytes = Resource(FIXTURE).readBytes()
-        val fixture = Fixture(DIAGNOSTICS, bytes = bytes)
+        val fixture = fixture(DIAGNOSTICS, bytes = bytes)
         // Replace the leaf's unreachable with nop; the shared binary now disagrees with the installed code.
         bytes[0x14f] = 0x01
 
@@ -73,26 +73,29 @@ class TrapDiagnosticsTest {
         assertEquals(0x153, stackTrace.frames[1].wasmOffset)
     }
 
-    private class Fixture(
+    private suspend fun fixture(
         config: RuntimeConfig,
         streamed: Boolean = false,
         bytes: ByteArray = Resource(FIXTURE).readBytes(),
-    ) {
-        val store: Store = store()
-        val instance: Instance
-
-        init {
-            val hostFunction = HostFunction { _, _ -> throw HostFunctionException("host failed") }
-            val import = Import("env", "host_fail", function(store, functionType(), hostFunction))
-            val module = if (streamed) {
-                module(FakeSourceReader(bytes)).expect("decode")
-            } else {
-                module(bytes).expect("decode")
-            }
-            instance = instance(store, module, listOf(import), config).expect("instantiate")
+    ): Fixture {
+        val store = store()
+        val hostFunction = HostFunction { _, _ -> throw HostFunctionException("host failed") }
+        val import = Import("env", "host_fail", function(store, functionType(), hostFunction))
+        val module = if (streamed) {
+            module(FakeSourceReader(bytes)).expect("decode")
+        } else {
+            module(bytes).expect("decode")
         }
+        val instance = instance(store, module, listOf(import), config).expect("instantiate")
 
-        fun invoke(name: String, vararg args: ExecutionValue) = invoke(store, instance, name, args.toList())
+        return Fixture(instance)
+    }
+
+    private class Fixture(
+        val instance: Instance,
+    ) {
+
+        fun invoke(name: String, vararg args: ExecutionValue) = invoke(instance, name, args.toList())
 
         fun stackTrace(
             name: String,

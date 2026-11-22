@@ -1,6 +1,6 @@
 package com.test
 
-import io.github.charlietap.chasm.embedding.compiled.readStructField
+import io.github.charlietap.chasm.embedding.reference.readStructField
 import io.github.charlietap.chasm.reference.StructReference
 import kotlin.Long
 import kotlin.jvm.JvmInline

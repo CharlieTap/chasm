@@ -5,9 +5,10 @@ import io.github.charlietap.chasm.embedding.global
 import io.github.charlietap.chasm.embedding.memory
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Import
-import io.github.charlietap.chasm.embedding.store
 import io.github.charlietap.chasm.embedding.table
 import io.github.charlietap.chasm.embedding.tag
+import io.github.charlietap.chasm.embedding.value.ExecutionValue
+import io.github.charlietap.chasm.embedding.value.NumberValue
 import io.github.charlietap.chasm.fixture.type.constMutability
 import io.github.charlietap.chasm.fixture.type.exceptionAttribute
 import io.github.charlietap.chasm.fixture.type.functionType
@@ -23,9 +24,6 @@ import io.github.charlietap.chasm.fixture.type.tagType
 import io.github.charlietap.chasm.host.HostFunction
 import io.github.charlietap.chasm.integration.integrationTest
 import io.github.charlietap.chasm.integration.runner
-import io.github.charlietap.chasm.runtime.value.ExecutionValue
-import io.github.charlietap.chasm.runtime.value.NumberValue
-import io.github.charlietap.chasm.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.type.AbstractHeapType
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -35,7 +33,7 @@ class ImportTest {
     @Test
     fun `can run a wasm file with all types of import and return a correct result`() = integrationTest(FIXTURE) {
 
-        val store = store()
+        val store = engine.store()
 
         val functionType = functionType(
             params = resultType(
@@ -70,7 +68,7 @@ class ImportTest {
         )
 
         val tableType = tableType(i32AddressType(), refNullReferenceType(AbstractHeapType.Func), limits(1u))
-        val tableExternal = table(store, tableType, ReferenceValue.Null(AbstractHeapType.Func))
+        val tableExternal = table(store, tableType, null)
         val tableImport = Import(
             "env",
             "table",

@@ -3,20 +3,23 @@ package io.github.charlietap.chasm.aot
 import com.github.michaelbull.result.getOrThrow
 import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.aot.compiled.fixture
+import io.github.charlietap.chasm.aot.internal.COMPILED_RUNTIME_ABI
 import io.github.charlietap.chasm.aot.internal.CompiledCode
-import io.github.charlietap.chasm.aot.internal.compiledModule
+import io.github.charlietap.chasm.aot.internal.UNSET
+import io.github.charlietap.chasm.aot.internal.UNSET_LONG
 import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.declarations.ModuleDeclarations
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
-import io.github.charlietap.chasm.embedding.error.ExecutionError
+import io.github.charlietap.chasm.embedding.error.ModuleError
+import io.github.charlietap.chasm.embedding.moduleInfo
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.ModuleInfo
+import io.github.charlietap.chasm.embedding.shapes.expect
 import io.github.charlietap.chasm.module.ModuleDeclarationsFactory
 import io.github.charlietap.chasm.runtime.compiled.CodeInstallation
 import io.github.charlietap.chasm.validator.WasmModuleValidator
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertIs
 import kotlin.test.fail
 import io.github.charlietap.chasm.declarations.moduleInfo as declarationsModuleInfo
 
@@ -26,11 +29,10 @@ class ModuleInfoTest {
     @Test
     fun `module info contains the compiled module's imports and exports`() {
         val declarations = declarations(fixture("call_add"))
-        val module = compiledModule(FakeCode { declarations })
+        val module = compiledModule(fakeModuleClass(FakeCode { declarations })).expect("loads")
 
-        val result = moduleInfo(module)
+        val info = moduleInfo(module)
 
-        val info = assertIs<ChasmResult.Success<ModuleInfo>>(result).result
         assertEquals(declarationsModuleInfo(declarations), info)
         assertEquals(listOf("add" to "add"), info.imports.map { it.moduleName to it.entityName })
         assertEquals(listOf("call_add", "tail_add"), info.exports.map { it.name })
@@ -39,21 +41,19 @@ class ModuleInfoTest {
     @Test
     fun `module info is empty for a module without imports or exports`() {
         val declarations = declarations(byteArrayOf(0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00))
-        val module = compiledModule(FakeCode { declarations })
+        val module = compiledModule(fakeModuleClass(FakeCode { declarations })).expect("loads")
 
-        val result = moduleInfo(module)
+        val info = moduleInfo(module)
 
-        assertEquals(ChasmResult.Success(ModuleInfo(emptyList(), emptyList())), result)
+        assertEquals(ModuleInfo(emptyList(), emptyList()), info)
     }
 
     @Test
-    fun `a declarations failure is returned as unsupported`() {
-        val module = compiledModule(FakeCode { throw IllegalStateException("broken declarations") })
-
-        val result = moduleInfo(module)
+    fun `a declarations failure rejects the module as malformed`() {
+        val result = compiledModule(fakeModuleClass(FakeCode { throw IllegalStateException("broken declarations") }))
 
         assertEquals(
-            ChasmResult.Error(ExecutionError.Unsupported("Compiled module rejected: broken declarations")),
+            ChasmResult.Error(ModuleError.Malformed("Compiled module rejected: broken declarations")),
             result,
         )
     }
@@ -61,12 +61,11 @@ class ModuleInfoTest {
     @Test
     fun `a declarations failure without a message uses its string representation`() {
         val failure = IllegalStateException()
-        val module = compiledModule(FakeCode { throw failure })
 
-        val result = moduleInfo(module)
+        val result = compiledModule(fakeModuleClass(FakeCode { throw failure }))
 
         assertEquals(
-            ChasmResult.Error(ExecutionError.Unsupported("Compiled module rejected: $failure")),
+            ChasmResult.Error(ModuleError.Malformed("Compiled module rejected: $failure")),
             result,
         )
     }
@@ -92,30 +91,30 @@ class ModuleInfoTest {
 
         override fun trapSitesResource(): String? = fail("module info does not read trap sites")
 
-        override fun runtimeAbi(): Int = fail("module info does not read metadata")
+        override fun runtimeAbi(): Int = COMPILED_RUNTIME_ABI
 
-        override fun meterFuel(): Boolean = fail("module info does not read metadata")
+        override fun meterFuel(): Boolean = false
 
-        override fun interruptible(): Boolean = fail("module info does not read metadata")
+        override fun interruptible(): Boolean = false
 
-        override fun stacktraces(): Boolean = fail("module info does not read metadata")
+        override fun stacktraces(): Boolean = false
 
-        override fun initialFuel(): Long = fail("module info does not read metadata")
+        override fun initialFuel(): Long = UNSET_LONG
 
-        override fun gcStrategy(): Int = fail("module info does not read metadata")
+        override fun gcStrategy(): Int = UNSET
 
-        override fun gcThresholdKind(): Int = fail("module info does not read metadata")
+        override fun gcThresholdKind(): Int = UNSET
 
-        override fun gcThresholdValue(): Int = fail("module info does not read metadata")
+        override fun gcThresholdValue(): Int = UNSET
 
-        override fun gcHeapBytes(): Long = fail("module info does not read metadata")
+        override fun gcHeapBytes(): Long = UNSET_LONG
 
-        override fun memoryPages(): Int = fail("module info does not read metadata")
+        override fun memoryPages(): Int = UNSET
 
-        override fun tableElements(): Int = fail("module info does not read metadata")
+        override fun tableElements(): Int = UNSET
 
-        override fun trapOnGrowFailure(): Boolean = fail("module info does not read metadata")
+        override fun trapOnGrowFailure(): Boolean = false
 
-        override fun stackBytes(): Long = fail("module info does not read metadata")
+        override fun stackBytes(): Long = UNSET_LONG
     }
 }

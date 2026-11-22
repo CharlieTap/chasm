@@ -1,8 +1,8 @@
 package io.github.charlietap.chasm.runtime.instance
 
-import io.github.charlietap.chasm.host.HostModuleInstance
 import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.runtime.diagnostic.CompiledFrames
+import io.github.charlietap.chasm.runtime.host.RawHostModuleInstance
 import io.github.charlietap.chasm.runtime.type.RuntimeTypeMap
 
 data class ModuleInstance(
@@ -16,7 +16,7 @@ data class ModuleInstance(
     val dataAddresses: MutableList<Address.Data> = [],
     val exports: MutableList<ExportInstance> = [],
     var deallocated: Boolean = false,
-) : HostModuleInstance {
+) : RawHostModuleInstance {
     // Set before compiled code can run, so a trap can name the frames it ran.
     var compiledFrames: CompiledFrames? = null
 

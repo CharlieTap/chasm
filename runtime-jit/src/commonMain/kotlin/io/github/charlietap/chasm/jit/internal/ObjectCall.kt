@@ -1,16 +1,12 @@
 package io.github.charlietap.chasm.jit.internal
 
+import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.embedding.error.ExecutionError
 import io.github.charlietap.chasm.embedding.error.InvocationError
-import io.github.charlietap.chasm.embedding.internal.ExportedFunction
-import io.github.charlietap.chasm.embedding.internal.exportedFunction
-import io.github.charlietap.chasm.embedding.internal.exportedTrap
-import io.github.charlietap.chasm.embedding.internal.storeDropped
+import io.github.charlietap.chasm.embedding.internal.StoreRuntime
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
-import io.github.charlietap.chasm.embedding.shapes.Instance
-import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.host.HostGcType
-import io.github.charlietap.chasm.reference.ExceptionReference
+import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.runtime.compiled.gc.ManagedStore
 import io.github.charlietap.chasm.runtime.compiled.gc.PendingExceptions
 import io.github.charlietap.chasm.runtime.compiled.gc.ReferenceCheck
@@ -18,6 +14,9 @@ import io.github.charlietap.chasm.runtime.compiled.gc.enterObjects
 import io.github.charlietap.chasm.runtime.compiled.gc.takeException
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
+import io.github.charlietap.chasm.runtime.ext.function
+import io.github.charlietap.chasm.runtime.instance.FunctionInstance
+import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.chasm.type.ValueType
@@ -26,15 +25,18 @@ import io.github.charlietap.chasm.runtime.error.InvocationError as RuntimeInvoca
 import io.github.charlietap.chasm.runtime.store.Store as RuntimeStore
 
 internal class ObjectCall(
-    private val store: Store,
-    private val instance: Instance,
-    private val exported: ExportedFunction,
+    private val store: StoreRuntime,
+    private val runtime: RuntimeStore,
+    private val instance: ModuleInstance,
+    private val config: RuntimeConfig,
+    private val address: Address.Function,
+    private val function: FunctionInstance,
     private val referenceParameters: IntArray,
     private val parameterChecks: Array<ReferenceCheck>,
     private val pending: PendingExceptions,
 ) {
 
-    val type: FunctionType = exported.function.functionType
+    val type: FunctionType = function.functionType
 
     private val slots = maxOf(type.params.types.size, type.results.types.size)
 
@@ -46,7 +48,7 @@ internal class ObjectCall(
     fun call(
         stack: LongArray,
         references: Array<Any?>,
-    ): ChasmResult<Unit, InvocationError<ExceptionReference>> {
+    ): ChasmResult<Unit, InvocationError> {
 
         val rejection = rejection(stack, references)
         if (rejection != null) {
@@ -66,7 +68,7 @@ internal class ObjectCall(
     fun unsafeCall(
         stack: LongArray,
         references: Array<Any?>,
-    ): ChasmResult<Unit, InvocationError<ExceptionReference>> {
+    ): ChasmResult<Unit, InvocationError> {
         return rejection(stack, references) ?: enter(stack, references)
     }
 
@@ -76,9 +78,9 @@ internal class ObjectCall(
     ): ChasmResult.Error<ExecutionError.Rejected>? {
 
         val message = when {
-            storeDropped(store) -> RuntimeInvocationError.StoreDropped.toString()
-            instance.instance.deallocated -> RuntimeInvocationError.InvocationOfADeinstantiatedInstance.toString()
-            exported.store.functions.getOrNull(exported.address.address) !== exported.function -> RuntimeInvocationError.FunctionLookupFailed(exported.address).toString()
+            store.dropped -> RuntimeInvocationError.StoreDropped.toString()
+            instance.deallocated -> RuntimeInvocationError.InvocationOfADeinstantiatedInstance.toString()
+            runtime.functions.getOrNull(address.address) !== function -> RuntimeInvocationError.FunctionLookupFailed(address).toString()
             else -> null
         }
         if (message != null) {
@@ -94,7 +96,7 @@ internal class ObjectCall(
     private fun enter(
         stack: LongArray,
         references: Array<Any?>,
-    ): ChasmResult<Unit, InvocationError<ExceptionReference>> {
+    ): ChasmResult<Unit, InvocationError> {
 
         val context = idle.getAndSet(null) ?: try {
             context()
@@ -102,7 +104,7 @@ internal class ObjectCall(
             return trapped(exception.error)
         }
 
-        val error = enterObjects(context, exported.function, stack, references, pending)
+        val error = enterObjects(context, function, stack, references, pending)
         if (error == RuntimeInvocationError.ThrownException) {
             return ChasmResult.Error(ExecutionError.Thrown(takeException(context)))
         }
@@ -115,11 +117,14 @@ internal class ObjectCall(
     }
 
     private fun context(): ExecutionContext {
-        return ExecutionContext(ValueStack(slots + 1, exported.store.maxStackSlots), exported.store, exported.instance, exported.config)
+
+        val stackSlots = if (function is FunctionInstance.HostFunction) slots else slots + 1
+
+        return ExecutionContext(ValueStack(stackSlots, runtime.maxStackSlots), runtime, instance, config)
     }
 
-    private fun trapped(error: RuntimeInvocationError): ChasmResult<Unit, InvocationError<ExceptionReference>> {
-        return ChasmResult.Error(ExecutionError.Trapped(exportedTrap(store, error)))
+    private fun trapped(error: RuntimeInvocationError): ChasmResult<Unit, InvocationError> {
+        return ChasmResult.Error(ExecutionError.Trapped(store.trap(error)))
     }
 
     companion object {
@@ -129,31 +134,38 @@ internal class ObjectCall(
         private val NO_PARAMETER_CHECKS = emptyArray<ReferenceCheck>()
 
         fun prepare(
-            store: Store,
-            instance: Instance,
-            name: String,
+            store: StoreRuntime,
+            instance: ModuleInstance,
+            config: RuntimeConfig,
+            address: Address.Function,
             managedStore: ManagedStore,
         ): ChasmResult<ObjectCall, ExecutionError.Rejected> {
 
-            val exported = when (val lookup = exportedFunction(store, instance, name)) {
-                is ChasmResult.Success -> lookup.result
-                is ChasmResult.Error -> return lookup
+            if (instance.deallocated) {
+                return ChasmResult.Error(ExecutionError.Rejected(RuntimeInvocationError.InvocationOfADeinstantiatedInstance.toString()))
             }
 
-            val parameters = exported.function.functionType.params.types
+            val runtime = store.liveStore()
+            val function = try {
+                runtime.function(address)
+            } catch (exception: InvocationException) {
+                return ChasmResult.Error(ExecutionError.Rejected(exception.error.toString()))
+            }
+
+            val parameters = function.functionType.params.types
             val referenceParameters = parameters.indices.filter { index -> parameters[index] is ValueType.Reference }.toIntArray()
             if (referenceParameters.isEmpty()) {
-                val call = ObjectCall(store, instance, exported, referenceParameters, NO_PARAMETER_CHECKS, managedStore.pending)
+                val call = ObjectCall(store, runtime, instance, config, address, function, referenceParameters, NO_PARAMETER_CHECKS, managedStore.pending)
                 return ChasmResult.Success(call)
             }
 
-            val owner = managedStore.definedType(HostGcType(exported.function.rtt.value))
+            val owner = managedStore.definedType(HostGcType(function.rtt.value))
 
             val parameterChecks = Array(referenceParameters.size) { position ->
                 managedStore.checks.check((parameters[referenceParameters[position]] as ValueType.Reference).referenceType, owner)
             }
 
-            return ChasmResult.Success(ObjectCall(store, instance, exported, referenceParameters, parameterChecks, managedStore.pending))
+            return ChasmResult.Success(ObjectCall(store, runtime, instance, config, address, function, referenceParameters, parameterChecks, managedStore.pending))
         }
     }
 }

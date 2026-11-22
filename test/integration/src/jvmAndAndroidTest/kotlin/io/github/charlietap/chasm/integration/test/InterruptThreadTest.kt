@@ -2,10 +2,11 @@ package io.github.charlietap.chasm.integration.test
 
 import io.github.charlietap.chasm.config.StoreConfig
 import io.github.charlietap.chasm.embedding.error.TrapReason
+import io.github.charlietap.chasm.embedding.interrupt
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
+import io.github.charlietap.chasm.embedding.value.NumberValue
 import io.github.charlietap.chasm.integration.assertTrapped
 import io.github.charlietap.chasm.integration.integrationTest
-import io.github.charlietap.chasm.runtime.value.NumberValue
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.FutureTask
 import java.util.concurrent.TimeUnit
@@ -40,7 +41,7 @@ class InterruptThreadTest {
         try {
             assertTrue(started.await(5, TimeUnit.SECONDS), "${engine.name()}: Wasm execution did not reach the host callback")
 
-            assertEquals(true, engine.interrupt(store), engine.name())
+            assertEquals(true, interrupt(store), engine.name())
 
             assertTrapped(TrapReason.INTERRUPTED, invocation.get(5, TimeUnit.SECONDS), engine.name())
         } finally {

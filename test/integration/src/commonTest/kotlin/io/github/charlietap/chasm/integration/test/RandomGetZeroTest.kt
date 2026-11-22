@@ -3,13 +3,12 @@ package io.github.charlietap.chasm.integration.test
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.embedding.dsl.imports
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
-import io.github.charlietap.chasm.embedding.store
+import io.github.charlietap.chasm.embedding.value.ExecutionValue
 import io.github.charlietap.chasm.host.HostFunctionException
 import io.github.charlietap.chasm.host.readI32
 import io.github.charlietap.chasm.host.writeI32
 import io.github.charlietap.chasm.integration.integrationTest
 import io.github.charlietap.chasm.integration.runner
-import io.github.charlietap.chasm.runtime.value.ExecutionValue
 import kotlin.test.Test
 import kotlin.test.assertIs
 
@@ -18,7 +17,7 @@ class RandomGetZeroTest {
     @Test
     fun `can execute _start from random_get_zero successfully`() = integrationTest(FIXTURE) {
 
-        val store = store()
+        val store = engine.store()
         val imports = imports(store) {
             function {
                 moduleName = "wasi_snapshot_preview1"

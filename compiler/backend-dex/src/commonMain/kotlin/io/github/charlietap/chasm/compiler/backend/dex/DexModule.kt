@@ -18,6 +18,10 @@ class UnsupportedFunctions(
         "${reasons.size} functions cannot compile: " + reasons.entries.take(10).joinToString { (index, reason) -> "f$index: $reason" },
     )
 
+class UnsupportedModule(
+    message: String,
+) : IllegalArgumentException(message)
+
 class DexTooLarge(
     message: String,
     cause: Throwable,

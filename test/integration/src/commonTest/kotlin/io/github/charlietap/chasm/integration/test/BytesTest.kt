@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.integration.test
 
+import io.github.charlietap.chasm.embedding.memory.readBytes
 import io.github.charlietap.chasm.embedding.shapes.Memory
 import io.github.charlietap.chasm.embedding.shapes.expect
 import io.github.charlietap.chasm.integration.TestRunner
@@ -8,6 +9,7 @@ import io.github.charlietap.chasm.integration.runner
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertNotNull
 
 class BytesTest {
 
@@ -22,7 +24,7 @@ class BytesTest {
         val expected = string.encodeToByteArray()
         val buffer = ByteArray(expected.size)
 
-        val actual = runner.readBytes(
+        val actual = readBytes(
             memory = memory,
             buffer = buffer,
             memoryPointer = 1,
@@ -33,25 +35,24 @@ class BytesTest {
     }
 
     @Test
-    fun `reading bytes past the end of its memory throws index out of bounds`() {
-        integrationTest(FIXTURE) {
+    fun `reading bytes past the end of its memory throws index out of bounds`() = integrationTest(FIXTURE) {
 
-            val runner = runner()
-            val memory = runner.memory()
+        val runner = runner()
+        val memory = runner.memory()
 
-            assertFailsWith<IndexOutOfBoundsException>(engine.name()) {
-                runner.readBytes(
-                    memory = memory,
-                    buffer = ByteArray(4),
-                    memoryPointer = Int.MAX_VALUE - 1,
-                    bytesToRead = 4,
-                )
-            }
+        assertFailsWith<IndexOutOfBoundsException>(engine.name()) {
+            readBytes(
+                memory = memory,
+                buffer = ByteArray(4),
+                memoryPointer = Int.MAX_VALUE - 1,
+                bytesToRead = 4,
+            )
         }
     }
 
-    private fun TestRunner.memory(): Memory =
-        exports().expect("exports").first { export -> export.name == "memory" }.value as Memory
+    private fun TestRunner.memory(): Memory {
+        return assertNotNull(exports().expect("exports").memory("memory"))
+    }
 
     private companion object {
         const val FIXTURE = "string"

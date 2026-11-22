@@ -1,23 +1,31 @@
+@file:OptIn(ExperimentalChasmApi::class)
+
 package com.test
 
+import io.github.charlietap.chasm.ExperimentalChasmApi
 import io.github.charlietap.chasm.embedding.codegen.CodegenImport
-import io.github.charlietap.chasm.embedding.codegen.InstanceFactory
-import io.github.charlietap.chasm.embedding.codegen.ModuleFactory
 import io.github.charlietap.chasm.embedding.codegen.allocateImports
 import io.github.charlietap.chasm.embedding.instance
 import io.github.charlietap.chasm.embedding.module
+import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.Instance
+import io.github.charlietap.chasm.embedding.shapes.Module
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.shapes.`expect`
 import io.github.charlietap.chasm.embedding.store
 import kotlin.ByteArray
+import kotlin.OptIn
 import kotlin.collections.List
 
-internal fun internalVisibility(
+internal suspend fun internalVisibility(
   binary: ByteArray,
   imports: List<CodegenImport> = emptyList(),
-  moduleFactory: ModuleFactory? = null,
-  instanceFactory: InstanceFactory? = null,
+  moduleFactory: (suspend (ByteArray) -> Module)? = null,
+  instanceFactory: (suspend (
+    Store,
+    Module,
+    List<Import>,
+  ) -> Instance)? = null,
 ): InternalVisibility {
   val store = store()
   val module = moduleFactory?.invoke(binary) ?: module(binary).`expect`("Failed to decode binary")

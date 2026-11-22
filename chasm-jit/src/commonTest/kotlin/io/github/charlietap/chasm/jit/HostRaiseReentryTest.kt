@@ -1,26 +1,26 @@
 package io.github.charlietap.chasm.jit
 
-import io.github.charlietap.chasm.embedding.compiled.Import
-import io.github.charlietap.chasm.embedding.compiled.Instance
-import io.github.charlietap.chasm.embedding.compiled.Module
-import io.github.charlietap.chasm.embedding.compiled.Store
-import io.github.charlietap.chasm.embedding.compiled.exports
-import io.github.charlietap.chasm.embedding.compiled.function
-import io.github.charlietap.chasm.embedding.compiled.host.HostFunction
-import io.github.charlietap.chasm.embedding.compiled.host.createException
-import io.github.charlietap.chasm.embedding.compiled.host.raise
-import io.github.charlietap.chasm.embedding.compiled.host.readI32
-import io.github.charlietap.chasm.embedding.compiled.host.withTag
-import io.github.charlietap.chasm.embedding.compiled.instance
-import io.github.charlietap.chasm.embedding.compiled.invoke
-import io.github.charlietap.chasm.embedding.compiled.readGlobal
-import io.github.charlietap.chasm.embedding.compiled.readPayload
-import io.github.charlietap.chasm.embedding.compiled.value.NumberValue.I32
 import io.github.charlietap.chasm.embedding.dsl.FunctionTypeBuilder
 import io.github.charlietap.chasm.embedding.error.ExecutionError
+import io.github.charlietap.chasm.embedding.exports
+import io.github.charlietap.chasm.embedding.function
+import io.github.charlietap.chasm.embedding.global.readGlobal
+import io.github.charlietap.chasm.embedding.instance
+import io.github.charlietap.chasm.embedding.invoke
+import io.github.charlietap.chasm.embedding.module
+import io.github.charlietap.chasm.embedding.reference.readPayload
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
+import io.github.charlietap.chasm.embedding.shapes.Import
+import io.github.charlietap.chasm.embedding.shapes.Instance
+import io.github.charlietap.chasm.embedding.shapes.Module
+import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.shapes.expect
-import io.github.charlietap.chasm.reference.ExceptionReference
+import io.github.charlietap.chasm.embedding.value.NumberValue.I32
+import io.github.charlietap.chasm.host.HostFunction
+import io.github.charlietap.chasm.host.createException
+import io.github.charlietap.chasm.host.raise
+import io.github.charlietap.chasm.host.readI32
+import io.github.charlietap.chasm.host.withTag
 import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -37,7 +37,7 @@ class HostRaiseReentryTest {
     @Test
     fun aRaiseSurvivesACleanupCallIntoTheGuest() {
 
-        val caught = invoke(store, instance, "catch_after_cleanup", listOf(I32(4))).expect("catch_after_cleanup")
+        val caught = invoke(instance, "catch_after_cleanup", listOf(I32(4))).expect("catch_after_cleanup")
 
         assertEquals(I32(4), caught.single())
         assertEquals(1L, readGlobal(checkNotNull(exports(instance).global("cleanups"))))
@@ -48,7 +48,7 @@ class HostRaiseReentryTest {
 
         cleanup = "throw_in_cleanup"
 
-        val caught = invoke(store, instance, "catch_after_cleanup", listOf(I32(6))).expect("catch_after_cleanup")
+        val caught = invoke(instance, "catch_after_cleanup", listOf(I32(6))).expect("catch_after_cleanup")
 
         assertEquals(I32(6), caught.single())
     }
@@ -56,8 +56,8 @@ class HostRaiseReentryTest {
     @Test
     fun anUncaughtRaiseSurvivesCollection() {
 
-        val result = invoke(store, instance, "uncaught_after_cleanup", listOf(I32(5)))
-        val error = assertIs<ExecutionError.Thrown<ExceptionReference>>(assertIs<ChasmResult.Error<*>>(result).error)
+        val result = invoke(instance, "uncaught_after_cleanup", listOf(I32(5)))
+        val error = assertIs<ExecutionError.Thrown>(assertIs<ChasmResult.Error<*>>(result).error)
 
         System.gc()
         System.runFinalization()
@@ -79,7 +79,7 @@ class HostRaiseReentryTest {
                         raise(createException(words, arrayOfNulls(1)))
                     }
                 } finally {
-                    invoke(store, created, cleanup)
+                    invoke(created, cleanup)
                 }
             },
         )

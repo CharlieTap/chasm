@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.runtime.instance
 
-import io.github.charlietap.chasm.host.ByteArrayHostMemory
 import io.github.charlietap.chasm.host.UnsafeHostApi
+import io.github.charlietap.chasm.runtime.host.ByteArrayHostMemory
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
 import io.github.charlietap.chasm.runtime.memory.LinearMemory.Companion.MAX_PAGES
 import io.github.charlietap.chasm.runtime.memory.LinearMemory.Companion.PAGE_SIZE
@@ -59,6 +59,11 @@ data class MemoryInstance(
         refresh()
 
         return currentSize
+    }
+
+    @UnsafeHostApi
+    fun unsafeBorrowStorage(): Any? {
+        return (data as? ByteArrayHostMemory)?.unsafeBorrowByteArray() ?: borrowedBuffer(data)
     }
 
     private fun size() = type.limits.min.toInt() * PAGE_SIZE

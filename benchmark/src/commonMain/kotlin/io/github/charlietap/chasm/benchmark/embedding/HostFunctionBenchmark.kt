@@ -9,11 +9,10 @@ import io.github.charlietap.chasm.embedding.invoke
 import io.github.charlietap.chasm.embedding.module
 import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.expect
-import io.github.charlietap.chasm.embedding.shapes.flatMap
 import io.github.charlietap.chasm.embedding.store
+import io.github.charlietap.chasm.embedding.value.NumberValue
 import io.github.charlietap.chasm.host.readI32
 import io.github.charlietap.chasm.host.writeI32
-import io.github.charlietap.chasm.runtime.value.NumberValue
 import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.chasm.type.NumberType
 import io.github.charlietap.chasm.type.ResultType
@@ -28,6 +27,7 @@ import kotlinx.benchmark.OutputTimeUnit
 import kotlinx.benchmark.Scope
 import kotlinx.benchmark.State
 import kotlinx.benchmark.Warmup
+import kotlinx.coroutines.runBlocking
 
 @State(Scope.Benchmark)
 @BenchmarkMode(Mode.AverageTime)
@@ -62,9 +62,10 @@ class HostFunctionBenchmark : StabilizedBenchmark() {
             },
         ),
     )
-    private val instance = module(Resource("benchmark/host-function.wasm").readBytes())
-        .flatMap { instance(store, it, imports) }
-        .expect("Failed to instantiate host-function benchmark module")
+    private val instance = runBlocking {
+        val module = module(Resource("benchmark/host-function.wasm").readBytes()).expect("Failed to decode host-function benchmark module")
+        instance(store, module, imports)
+    }.expect("Failed to instantiate host-function benchmark module")
     private val arguments = listOf(NumberValue.I32(CALL_COUNT))
 
     @Benchmark
@@ -123,8 +124,9 @@ class HostFunctionBenchmark : StabilizedBenchmark() {
         blackhole.consume(invokeExport("wasm_roundtrip2"))
     }
 
-    private fun invokeExport(name: String): Int =
-        (invoke(store, instance, name, arguments).expect("Failed to invoke $name").first() as NumberValue.I32).value
+    private fun invokeExport(name: String): Int {
+        return (invoke(instance, name, arguments).expect("Failed to invoke $name").first() as NumberValue.I32).value
+    }
 
     private companion object {
         const val CALL_COUNT = 10_000

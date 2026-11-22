@@ -18,12 +18,17 @@ kotlin {
         commonMain {
             dependencies {
                 api(projects.runtime.core)
-                api(projects.runtime.compiledApi)
 
                 implementation(projects.executor.callCore)
                 implementation(projects.runtime.operations)
                 implementation(projects.memory)
-                implementation(projects.host)
+                implementation(projects.runtime.host)
+            }
+        }
+
+        jvmTest {
+            dependencies {
+                implementation(projects.test.fixture.runtime)
             }
         }
     }

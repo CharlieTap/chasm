@@ -2,8 +2,8 @@ package io.github.charlietap.chasm.script.decoder
 
 import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.embedding.error.ModuleError
+import io.github.charlietap.chasm.embedding.module
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
-import io.github.charlietap.chasm.jit.module
 import kotlinx.coroutines.runBlocking
 
 internal fun BinaryValidator(

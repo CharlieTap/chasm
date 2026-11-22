@@ -1,12 +1,15 @@
 package io.github.charlietap.chasm.embedding.internal
 
-import io.github.charlietap.chasm.runtime.value.ExecutionValue
-import io.github.charlietap.chasm.runtime.value.NumberValue
-import io.github.charlietap.chasm.runtime.value.ReferenceValue
-import io.github.charlietap.chasm.runtime.value.VectorValue
+import io.github.charlietap.chasm.embedding.value.ExecutionValue
+import io.github.charlietap.chasm.embedding.value.NumberValue
+import io.github.charlietap.chasm.embedding.value.ReferenceValue
+import io.github.charlietap.chasm.embedding.value.VectorValue
+import io.github.charlietap.chasm.type.FieldType
 import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.chasm.type.NumberType
+import io.github.charlietap.chasm.type.PackedType
 import io.github.charlietap.chasm.type.ReferenceType
+import io.github.charlietap.chasm.type.StorageType
 import io.github.charlietap.chasm.type.ValueType
 
 internal fun argumentMismatch(
@@ -42,3 +45,33 @@ internal fun matchesType(
         is ValueType.Bottom -> false
     }
 }
+
+internal fun usesVector(type: FunctionType): Boolean {
+    return type.params.types.any { valueType -> valueType is ValueType.Vector } ||
+        type.results.types.any { valueType -> valueType is ValueType.Vector }
+}
+
+internal fun referenceType(type: ValueType): ReferenceType? {
+    return (type as? ValueType.Reference)?.referenceType
+}
+
+internal fun referenceType(field: FieldType): ReferenceType? {
+
+    val storage = field.storageType as? StorageType.Value ?: return null
+
+    return referenceType(storage.type)
+}
+
+internal fun packedValue(
+    field: FieldType,
+    value: Long,
+): Long {
+    return when ((field.storageType as? StorageType.Packed)?.type) {
+        PackedType.I8 -> value and BYTE_MASK
+        PackedType.I16 -> value and SHORT_MASK
+        null -> value
+    }
+}
+
+private const val BYTE_MASK = 0xFFL
+private const val SHORT_MASK = 0xFFFFL

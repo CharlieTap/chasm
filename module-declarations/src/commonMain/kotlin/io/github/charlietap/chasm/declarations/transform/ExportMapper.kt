@@ -5,11 +5,11 @@ import io.github.charlietap.chasm.ast.module.Import
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.toInt
 import io.github.charlietap.chasm.declarations.ModuleDeclarations
-import io.github.charlietap.chasm.declarations.ext.clone
 import io.github.charlietap.chasm.embedding.shapes.ExportDefinition
 import io.github.charlietap.chasm.embedding.shapes.FunctionNameData
 import io.github.charlietap.chasm.host.ModuleIndex
 import io.github.charlietap.chasm.runtime.type.ExternalType
+import io.github.charlietap.chasm.runtime.type.ext.clone
 import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.chasm.type.GlobalType
 import io.github.charlietap.chasm.type.MemoryType

@@ -5,10 +5,11 @@ import io.github.charlietap.chasm.config.GCThreshold
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.fixture.config.runtimeConfig
 import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
-import io.github.charlietap.chasm.host.HostGc
 import io.github.charlietap.chasm.host.HostGcType
+import io.github.charlietap.chasm.runtime.host.HostGc
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.store.Store
+import io.github.charlietap.chasm.runtime.store.withLiveStack
 import io.github.charlietap.chasm.type.AbstractHeapType
 import io.github.charlietap.chasm.type.ArrayType
 import io.github.charlietap.chasm.type.CompositeType
@@ -104,10 +105,14 @@ class HostGcTest {
 
         val stackReference = store.heap.allocateStruct(runtimeType, longArrayOf())
         context.vstack.push(stackReference)
-        context(context) { context.gc.collect() }
+        store.withLiveStack(context.vstack) {
+            context(context) { context.gc.collect() }
+        }
         assertNotEquals(-1, store.heap.structRuntimeTypeIdOrNegative(stackReference))
         context.vstack.pop()
-        context(context) { context.gc.collect() }
+        store.withLiveStack(context.vstack) {
+            context(context) { context.gc.collect() }
+        }
         assertEquals(-1, store.heap.structRuntimeTypeIdOrNegative(stackReference))
     }
 

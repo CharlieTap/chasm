@@ -1,9 +1,7 @@
 package io.github.charlietap.chasm.compiled.corpus.fixture
 
 import io.github.charlietap.chasm.compiled.corpus.failure
-import io.github.charlietap.chasm.config.GCStrategy
-import io.github.charlietap.chasm.config.StoreConfig
-import io.github.charlietap.chasm.embedding.module
+import io.github.charlietap.chasm.compiled.script.ScriptModules
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.corpus.lib.CorpusPhase
 import io.github.charlietap.corpus.lib.CorpusResult
@@ -28,19 +26,16 @@ private fun FixtureRunner(
     val timings = context.timings
     val moduleConfig = context.config.moduleConfig
 
-    val decoded = when (val result = timings.decode { module(bytes, moduleConfig) }) {
-        is ChasmResult.Success -> result.result
-        is ChasmResult.Error -> return fixture.failure("decode", "failed to decode wasm", result.error.toString())
-    }
+    val decoded = timings.decode { ScriptModules.decode(bytes, moduleConfig) }
+    if (decoded is ChasmResult.Error) return fixture.failure("decode", "failed to decode wasm", decoded.error.toString())
     if (context.phase == CorpusPhase.DECODING) return CorpusResult.Success
 
-    val compiled = when (val result = timings.validate { context.compiler(bytes, moduleConfig, STORE_CONFIG) }) {
+    val module = when (val result = timings.validate { context.compiler(bytes, moduleConfig, context.storeConfig) }) {
         is ChasmResult.Success -> result.result
         is ChasmResult.Error -> return fixture.failure("validate", "failed to validate wasm", result.error.toString())
     }
     if (context.phase == CorpusPhase.VALIDATION) return CorpusResult.Success
 
-    val module = PreparedModule(decoded, compiled)
     if (fixture.tests.isEmpty()) return testRunner(context, module, null)
 
     fixture.tests.withIndex().forEach { test ->
@@ -49,5 +44,3 @@ private fun FixtureRunner(
     }
     return CorpusResult.Success
 }
-
-private val STORE_CONFIG = StoreConfig(gcStrategy = GCStrategy.TRADITIONAL)

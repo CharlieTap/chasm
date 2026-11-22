@@ -1,27 +1,36 @@
+@file:OptIn(ExperimentalChasmApi::class)
+
 package com.test
 
+import io.github.charlietap.chasm.ExperimentalChasmApi
 import io.github.charlietap.chasm.embedding.codegen.CodegenImport
-import io.github.charlietap.chasm.embedding.codegen.InstanceFactory
-import io.github.charlietap.chasm.embedding.codegen.ModuleFactory
 import io.github.charlietap.chasm.embedding.codegen.allocateImports
+import io.github.charlietap.chasm.embedding.exports
 import io.github.charlietap.chasm.embedding.instance
 import io.github.charlietap.chasm.embedding.memory.readBytes
 import io.github.charlietap.chasm.embedding.memory.writeBytes
 import io.github.charlietap.chasm.embedding.module
+import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.Instance
 import io.github.charlietap.chasm.embedding.shapes.Memory
+import io.github.charlietap.chasm.embedding.shapes.Module
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.shapes.`expect`
 import io.github.charlietap.chasm.embedding.store
 import kotlin.ByteArray
 import kotlin.Int
+import kotlin.OptIn
 import kotlin.collections.List
 
-public fun multipleMemories(
+public suspend fun multipleMemories(
   binary: ByteArray,
   imports: List<CodegenImport> = emptyList(),
-  moduleFactory: ModuleFactory? = null,
-  instanceFactory: InstanceFactory? = null,
+  moduleFactory: (suspend (ByteArray) -> Module)? = null,
+  instanceFactory: (suspend (
+    Store,
+    Module,
+    List<Import>,
+  ) -> Instance)? = null,
 ): MultipleMemories {
   val store = store()
   val module = moduleFactory?.invoke(binary) ?: module(binary).`expect`("Failed to decode binary")
@@ -35,17 +44,16 @@ private class MultipleMemoriesImpl(
   private val instance: Instance,
 ) : MultipleMemories {
   private val _memory1: Memory =
-      (instance.exports.firstOrNull { export -> export.name == "memory1" }?.value as? Memory) ?: error("Failed to find memory export with name memory1")
+      exports(instance).memory("memory1") ?: error("Failed to find memory export with name memory1")
 
   private val _memory2: Memory =
-      (instance.exports.firstOrNull { export -> export.name == "memory2" }?.value as? Memory) ?: error("Failed to find memory export with name memory2")
+      exports(instance).memory("memory2") ?: error("Failed to find memory export with name memory2")
 
-  override val memory1: MultipleMemories.Memory = MemoryImpl(store, _memory1)
+  override val memory1: MultipleMemories.Memory = MemoryImpl(_memory1)
 
-  override val memory2: MultipleMemories.Memory = MemoryImpl(store, _memory2)
+  override val memory2: MultipleMemories.Memory = MemoryImpl(_memory2)
 
   private class MemoryImpl(
-    private val store: Store,
     private val memory: Memory,
   ) : MultipleMemories.Memory {
     override fun read(
@@ -53,7 +61,7 @@ private class MultipleMemoriesImpl(
       memoryPointer: Int,
       bufferPointer: Int,
       bytesToRead: Int,
-    ): ByteArray = readBytes(store, memory, buffer, memoryPointer, bytesToRead, bufferPointer)
+    ): ByteArray = readBytes(memory, buffer, memoryPointer, bytesToRead, bufferPointer)
 
     override fun write(
       pointer: Int,
@@ -61,7 +69,7 @@ private class MultipleMemoriesImpl(
       bufferPointer: Int,
       bytesToWrite: Int,
     ) {
-      writeBytes(store, memory, pointer, buffer, bufferPointer, bytesToWrite)
+      writeBytes(memory, pointer, buffer, bufferPointer, bytesToWrite)
     }
   }
 }

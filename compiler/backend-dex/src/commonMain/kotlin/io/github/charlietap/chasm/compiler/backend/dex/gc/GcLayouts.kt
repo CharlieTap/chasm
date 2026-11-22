@@ -47,26 +47,34 @@ internal class GcLayouts(
     private val structsByIndex = arrayOfNulls<StructShape>(types.size)
     private val arraysByIndex = arrayOfNulls<ArrayShape>(types.size)
     private val descriptorsByIndex = arrayOfNulls<String>(types.size)
+    private val unsupportedByIndex = arrayOfNulls<String>(types.size)
+    private val layableByKey = HashMap<String, Boolean>()
 
     val structs: Collection<StructShape> get() = structsByKey.values
     val arrays: Collection<ArrayShape> get() = arraysByKey.values
 
     init {
         types.forEachIndexed { index, type ->
-            when (type.subType().compositeType) {
-                is CompositeType.Struct -> structsByIndex[index] = structShape(type)
-                is CompositeType.Array -> arraysByIndex[index] = arrayShape(type)
-                is CompositeType.Function -> Unit
+            try {
+                when (type.subType().compositeType) {
+                    is CompositeType.Struct -> structsByIndex[index] = structShape(type)
+                    is CompositeType.Array -> arraysByIndex[index] = arrayShape(type)
+                    is CompositeType.Function -> Unit
+                }
+                descriptorsByIndex[index] = definedDescriptor(type)
+            } catch (unsupported: Unsupported) {
+                unsupportedByIndex[index] = unsupported.message.orEmpty()
             }
-            descriptorsByIndex[index] = definedDescriptor(type)
         }
     }
 
     fun struct(index: Int): StructShape {
+        requireSupported(index)
         return structsByIndex[index] ?: error("type $index is not a struct type")
     }
 
     fun array(index: Int): ArrayShape {
+        requireSupported(index)
         return arraysByIndex[index] ?: error("type $index is not an array type")
     }
 
@@ -74,6 +82,11 @@ internal class GcLayouts(
         get() = types.size
 
     fun className(index: Int): String? {
+
+        if (unsupportedByIndex[index] != null) {
+            return null
+        }
+
         return when (types[index].subType().compositeType) {
             is CompositeType.Struct -> struct(index).className
             is CompositeType.Array -> array(index).className
@@ -82,7 +95,15 @@ internal class GcLayouts(
     }
 
     fun typeDescriptor(index: Int): String {
+        requireSupported(index)
         return checkNotNull(descriptorsByIndex[index])
+    }
+
+    private fun requireSupported(index: Int) {
+        val reason = unsupportedByIndex[index]
+        if (reason != null) {
+            throw Unsupported(reason)
+        }
     }
 
     fun isFunction(index: Int): Boolean {
@@ -127,12 +148,33 @@ internal class GcLayouts(
     private fun definedDescriptor(type: DefinedType): String {
 
         val key = keys.key(type)
+        val layable = layable(type)
 
         return when (type.subType().compositeType) {
-            is CompositeType.Struct -> structClass(key)
-            is CompositeType.Array -> arrayClass(key)
+            is CompositeType.Struct -> if (layable) structClass(key) else MANAGED_STRUCT
+            is CompositeType.Array -> if (layable) arrayClass(key) else MANAGED_ARRAY
             is CompositeType.Function -> MANAGED_FUNCTION
         }
+    }
+
+    private fun layable(type: DefinedType): Boolean {
+
+        val key = keys.key(type)
+        layableByKey[key]?.let { layable -> return layable }
+
+        val ownStorageLayable = when (val composite = type.subType().compositeType) {
+            is CompositeType.Struct -> composite.structType.fields.none { field -> isVector(field.storageType) }
+            is CompositeType.Array -> !isVector(composite.arrayType.fieldType.storageType)
+            is CompositeType.Function -> true
+        }
+        val layable = ownStorageLayable && supertype(type)?.let(::layable) != false
+        layableByKey[key] = layable
+
+        return layable
+    }
+
+    private fun isVector(storage: StorageType): Boolean {
+        return storage is StorageType.Value && storage.type is ValueType.Vector
     }
 
     private fun structShape(type: DefinedType): StructShape {

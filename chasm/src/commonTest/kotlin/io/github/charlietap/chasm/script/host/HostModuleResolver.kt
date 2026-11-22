@@ -6,18 +6,15 @@ import io.github.charlietap.chasm.embedding.module
 import io.github.charlietap.chasm.embedding.shapes.Instance
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.shapes.expect
-import io.github.charlietap.chasm.embedding.shapes.flatMap
 
-typealias HostModuleResolver = (Store) -> Instance
+typealias HostModuleResolver = suspend (Store) -> Instance
 
-fun HostModuleResolver(store: Store): Instance {
+suspend fun HostModuleResolver(store: Store): Instance {
 
     val hostModuleFile = Resource(FILE_HOST_MODULE)
+    val module = module(hostModuleFile.readBytes()).expect("Failed to decode script host module")
 
-    return module(hostModuleFile.readBytes())
-        .flatMap { module ->
-            instance(store, module, emptyList())
-        }.expect("Failed to instantiate script host module")
+    return instance(store, module, emptyList()).expect("Failed to instantiate script host module")
 }
 
 private const val FILE_HOST_MODULE = "script/spectest-host.wasm"

@@ -1,52 +1,65 @@
 package io.github.charlietap.chasm.jit.internal
 
 import io.github.charlietap.chasm.InternalChasmApi
+import io.github.charlietap.chasm.config.LinearMemoryConfig
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.config.StoreConfig
-import io.github.charlietap.chasm.embedding.compiled.CompiledEngine
-import io.github.charlietap.chasm.embedding.compiled.Export
-import io.github.charlietap.chasm.embedding.compiled.Exports
-import io.github.charlietap.chasm.embedding.compiled.Function
-import io.github.charlietap.chasm.embedding.compiled.Global
-import io.github.charlietap.chasm.embedding.compiled.HostGcFieldInfo
-import io.github.charlietap.chasm.embedding.compiled.HostGcType
-import io.github.charlietap.chasm.embedding.compiled.Import
-import io.github.charlietap.chasm.embedding.compiled.Importable
-import io.github.charlietap.chasm.embedding.compiled.Instance
-import io.github.charlietap.chasm.embedding.compiled.Memory
-import io.github.charlietap.chasm.embedding.compiled.Module
-import io.github.charlietap.chasm.embedding.compiled.PreparedFunction
-import io.github.charlietap.chasm.embedding.compiled.Store
-import io.github.charlietap.chasm.embedding.compiled.Table
-import io.github.charlietap.chasm.embedding.compiled.Tag
-import io.github.charlietap.chasm.embedding.compiled.host.HostFunction
-import io.github.charlietap.chasm.embedding.compiled.host.HostModuleInstance
-import io.github.charlietap.chasm.embedding.compiled.value.ExecutionValue
+import io.github.charlietap.chasm.embedding.compiled.ManagedEngine
 import io.github.charlietap.chasm.embedding.error.ExecutionError
 import io.github.charlietap.chasm.embedding.error.InstantiationError
 import io.github.charlietap.chasm.embedding.error.InvocationError
-import io.github.charlietap.chasm.embedding.internal.externalValue
-import io.github.charlietap.chasm.embedding.internal.importable
-import io.github.charlietap.chasm.embedding.internal.storeDropped
+import io.github.charlietap.chasm.embedding.internal.StoreRuntime
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
-import io.github.charlietap.chasm.host.HostMemory
-import io.github.charlietap.chasm.host.readNullTerminatedUtf8String
-import io.github.charlietap.chasm.host.readUtf8String
-import io.github.charlietap.chasm.host.writeUtf8String
+import io.github.charlietap.chasm.embedding.shapes.DecodedModule
+import io.github.charlietap.chasm.embedding.shapes.Export
+import io.github.charlietap.chasm.embedding.shapes.Exports
+import io.github.charlietap.chasm.embedding.shapes.Function
+import io.github.charlietap.chasm.embedding.shapes.Global
+import io.github.charlietap.chasm.embedding.shapes.Import
+import io.github.charlietap.chasm.embedding.shapes.Importable
+import io.github.charlietap.chasm.embedding.shapes.Instance
+import io.github.charlietap.chasm.embedding.shapes.Memory
+import io.github.charlietap.chasm.embedding.shapes.Module
+import io.github.charlietap.chasm.embedding.shapes.PreparedFunction
+import io.github.charlietap.chasm.embedding.shapes.Store
+import io.github.charlietap.chasm.embedding.shapes.Table
+import io.github.charlietap.chasm.embedding.shapes.Tag
+import io.github.charlietap.chasm.embedding.shapes._engine
+import io.github.charlietap.chasm.embedding.shapes._exports
+import io.github.charlietap.chasm.embedding.shapes._function
+import io.github.charlietap.chasm.embedding.shapes._global
+import io.github.charlietap.chasm.embedding.shapes._instance
+import io.github.charlietap.chasm.embedding.shapes._memory
+import io.github.charlietap.chasm.embedding.shapes._payload
+import io.github.charlietap.chasm.embedding.shapes._preparedFunction
+import io.github.charlietap.chasm.embedding.shapes._store
+import io.github.charlietap.chasm.embedding.shapes._table
+import io.github.charlietap.chasm.embedding.shapes._tag
+import io.github.charlietap.chasm.embedding.value.ExecutionValue
+import io.github.charlietap.chasm.executor.instantiator.compat.CompatibilityChecker
+import io.github.charlietap.chasm.host.HostFunction
+import io.github.charlietap.chasm.host.HostGcFieldInfo
+import io.github.charlietap.chasm.host.HostGcType
+import io.github.charlietap.chasm.host.HostModuleInstance
+import io.github.charlietap.chasm.host.UnsafeHostApi
 import io.github.charlietap.chasm.reference.ArrayReference
 import io.github.charlietap.chasm.reference.ExceptionReference
+import io.github.charlietap.chasm.reference.FunctionReference
 import io.github.charlietap.chasm.reference.StructReference
 import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.runtime.compiled.gc.ManagedObjects
 import io.github.charlietap.chasm.runtime.compiled.gc.ReferenceGlobal
 import io.github.charlietap.chasm.runtime.compiled.gc.ReferenceTable
 import io.github.charlietap.chasm.runtime.exception.HostRaisedWasmException
+import io.github.charlietap.chasm.runtime.ext.toLongFromBoxed
+import io.github.charlietap.chasm.runtime.host.HostMemory
+import io.github.charlietap.chasm.runtime.host.readNullTerminatedUtf8String
+import io.github.charlietap.chasm.runtime.host.readUtf8String
+import io.github.charlietap.chasm.runtime.host.writeUtf8String
 import io.github.charlietap.chasm.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.runtime.instance.GlobalInstance
 import io.github.charlietap.chasm.runtime.instance.MemoryInstance
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
-import io.github.charlietap.chasm.runtime.instance.TableInstance
-import io.github.charlietap.chasm.runtime.value.NumberValue
 import io.github.charlietap.chasm.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.type.AbstractHeapType
 import io.github.charlietap.chasm.type.FunctionType
@@ -55,57 +68,44 @@ import io.github.charlietap.chasm.type.MemoryType
 import io.github.charlietap.chasm.type.TableType
 import io.github.charlietap.chasm.type.TagType
 import io.github.charlietap.chasm.type.ValueType
-import io.github.charlietap.chasm.embedding.addFuel as classicAddFuel
-import io.github.charlietap.chasm.embedding.dropInstance as classicDropInstance
-import io.github.charlietap.chasm.embedding.dropStore as classicDropStore
-import io.github.charlietap.chasm.embedding.function as classicFunction
-import io.github.charlietap.chasm.embedding.global as classicGlobal
-import io.github.charlietap.chasm.embedding.interrupt as classicInterrupt
-import io.github.charlietap.chasm.embedding.memory as classicMemory
-import io.github.charlietap.chasm.embedding.remainingFuel as classicRemainingFuel
-import io.github.charlietap.chasm.embedding.resetFuel as classicResetFuel
-import io.github.charlietap.chasm.embedding.shapes.Import as ClassicImport
-import io.github.charlietap.chasm.embedding.shapes.Instance as ClassicInstance
-import io.github.charlietap.chasm.embedding.shapes.Module as ClassicModule
-import io.github.charlietap.chasm.embedding.shapes.Store as ClassicStore
-import io.github.charlietap.chasm.embedding.store as classicStore
-import io.github.charlietap.chasm.embedding.table as classicTable
-import io.github.charlietap.chasm.embedding.tag as classicTag
-import io.github.charlietap.chasm.host.HostGcType as RuntimeGcType
+import io.github.charlietap.chasm.runtime.error.InvocationError as RuntimeInvocationError
+import io.github.charlietap.chasm.runtime.store.Store as RuntimeStore
 
 @InternalChasmApi
-fun _store(config: StoreConfig): Store {
-    return JitEngine(classicStore(config)).store
+fun _jitStore(config: StoreConfig): Store {
+    return JitEngine(StoreRuntime(RuntimeStore(config = config))).store
 }
 
 internal class JitEngine(
-    private val classic: ClassicStore,
-) : CompiledEngine,
+    private val storeRuntime: StoreRuntime,
+) : ManagedEngine,
     JitHandles {
 
-    private val runtime = classic.store
+    private val runtime = storeRuntime.liveStore()
 
     private val managedStore = managedStore(runtime).also { created -> created.engine = this }
 
     private val objects: ManagedObjects
         get() {
-            live()
+            requireLiveStore()
             return managedStore.objects
         }
 
     private val values = LaneValues()
 
-    val store = Store(this)
+    private var exceptionTags = arrayOfNulls<Tag>(0)
+
+    val store = _store(this)
 
     private val resources = JitHostResources(store)
 
-    private val instantiator = JitInstantiator(classic, managedStore, this)
+    private val instantiator = JitInstantiator(storeRuntime, managedStore, this, ::CompatibilityChecker)
 
     override fun dropStore() {
 
-        live()
+        requireLiveStore()
 
-        classicDropStore(classic)
+        storeRuntime.drop()
         managedStore.drop()
     }
 
@@ -113,45 +113,45 @@ internal class JitEngine(
 
         val jit = jit(instance)
 
-        live()
+        requireLiveStore()
         check(!jit.module.deallocated) { "the instance has already been dropped" }
 
-        classicDropInstance(classic, jit.embedding)
+        storeRuntime.dropInstance(jit.module)
         jit.prepared = emptyMap()
     }
 
     override fun addFuel(fuel: Long) {
 
-        live()
+        requireLiveStore()
         require(fuel >= 0) { "negative fuel $fuel" }
 
-        classicAddFuel(classic, fuel)
+        storeRuntime.addFuel(fuel)
     }
 
     override fun resetFuel() {
 
-        live()
+        requireLiveStore()
 
-        classicResetFuel(classic)
+        storeRuntime.resetFuel()
     }
 
     override fun remainingFuel(): Long {
 
-        live()
+        requireLiveStore()
 
-        return classicRemainingFuel(classic)
+        return storeRuntime.remainingFuel()
     }
 
     override fun interrupt(): Boolean {
 
-        live()
+        requireLiveStore()
 
-        return classicInterrupt(classic)
+        return storeRuntime.interrupt()
     }
 
     override fun collect() {
 
-        live()
+        requireLiveStore()
 
         Runtime.getRuntime().gc()
     }
@@ -161,16 +161,16 @@ internal class JitEngine(
         function: HostFunction,
     ): Function {
 
-        live()
+        requireLiveStore()
 
-        return Function(this, externalValue(classicFunction(classic, type, CompiledHostFunction(type, function, this, resources))))
+        return _function(this, storeRuntime.function(type, CompiledHostFunction(type, function, this, resources)), type)
     }
 
     override fun memory(type: MemoryType): Memory {
 
-        live()
+        requireLiveStore()
 
-        return Memory(this, externalValue(classicMemory(classic, type)))
+        return memoryAt(storeRuntime.memory(type, LinearMemoryConfig()).address)
     }
 
     override fun global(
@@ -178,20 +178,18 @@ internal class JitEngine(
         value: ExecutionValue,
     ): Global {
 
-        live()
+        requireLiveStore()
 
         val reference = type.valueType as? ValueType.Reference
         if (reference == null) {
-            val address = (externalValue(classicGlobal(classic, type, values.number(type.valueType, value))) as ExternalValue.Global).address
-            return globalAt(address)
+            return globalAt(storeRuntime.global(type, values.number(type.valueType, value)).address)
         }
 
         val initial = values.reference(value)
 
         require(managedStore.checks.check(reference.referenceType, null).accepts(initial)) { "the value does not match the global's type" }
 
-        val address = (externalValue(classicGlobal(classic, type, NULL_REFERENCE)) as ExternalValue.Global).address
-        val global = globalAt(address)
+        val global = globalAt(storeRuntime.global(type, NULL_REFERENCE_WORD).address)
         managedStore.objects.globals.unsafeWriteGlobalReference(referenceGlobal(global), initial)
 
         return global
@@ -202,10 +200,9 @@ internal class JitEngine(
         initial: Any?,
     ): Table {
 
-        live()
+        requireLiveStore()
 
-        val address = (externalValue(classicTable(classic, type, NULL_REFERENCE)) as ExternalValue.Table).address
-        val table = tableAt(address)
+        val table = tableAt(storeRuntime.table(type, NULL_REFERENCE_WORD).address)
         val storage = referenceTable(table)
 
         managedStore.objects.tables.fillTable(storage, 0, initial, managedStore.objects.tables.sizeTable(storage))
@@ -215,25 +212,34 @@ internal class JitEngine(
 
     override fun tag(type: TagType): Tag {
 
-        live()
+        requireLiveStore()
 
-        return Tag(this, externalValue(classicTag(classic, type)))
+        return _tag(this, storeRuntime.tag(type), type)
+    }
+
+    override fun functionReference(function: Function): FunctionReference {
+
+        require(function._engine() === this) { "the function belongs to a different store" }
+        requireLiveStore()
+
+        return managedStore.functions.at((function._payload() as ExternalValue.Function).address.address)
     }
 
     override suspend fun instance(
         module: Module,
         imports: List<Import>,
         config: RuntimeConfig,
-    ): ChasmResult<Instance, InstantiationError<ExceptionReference>> {
+    ): ChasmResult<Instance, InstantiationError> {
 
-        live()
+        requireLiveStore()
 
-        val classicImports = imports.map { import ->
-            require(import.value.engine === this) { "the import ${import.moduleName}.${import.entityName} belongs to a different store" }
-            ClassicImport(import.moduleName, import.entityName, importable(classic, externalValueOf(import.value.payload)))
+        val decoded = module._payload() as? DecodedModule ?: return ChasmResult.Error(ExecutionError.Unsupported(UNSUPPORTED_MODULE))
+
+        imports.forEach { import ->
+            require(import.value._engine() === this) { "the import ${import.moduleName}.${import.entityName} belongs to a different store" }
         }
 
-        return when (val result = instantiator.instantiate(module.payload as ClassicModule, classicImports, config)) {
+        return when (val result = instantiator.instantiate(decoded, imports, config)) {
             is ChasmResult.Success -> {
                 val instance = instanceOf(result.result.instance)
                 prepareExports(jit(instance))
@@ -247,11 +253,11 @@ internal class JitEngine(
 
         jit.prepared = buildMap(jit.module.exports.size) {
             jit.module.exports.forEach { export ->
-                if (export.value is ExternalValue.Function) {
-                    val name = export.name.name
-                    val preparation = ObjectCall.prepare(classic, jit.embedding, name, managedStore)
+                val value = export.value
+                if (value is ExternalValue.Function) {
+                    val preparation = ObjectCall.prepare(storeRuntime, jit.module, jit.config, value.address, managedStore)
                     if (preparation is ChasmResult.Success) {
-                        put(name, PreparedFunction(preparation.result.type, this@JitEngine, preparation.result))
+                        put(export.name.name, _preparedFunction(preparation.result.type, this@JitEngine, preparation.result))
                     }
                 }
             }
@@ -262,7 +268,7 @@ internal class JitEngine(
 
         val jit = jit(instance)
 
-        live()
+        requireLiveStore()
         check(!jit.module.deallocated) { "the instance has been dropped" }
 
         val cached = jit.exports
@@ -270,7 +276,7 @@ internal class JitEngine(
             return cached
         }
 
-        val exports = Exports(jit.module.exports.map { export -> Export(export.name.name, importable(export.value)) })
+        val exports = _exports(jit.module.exports.map { export -> Export(export.name.name, importable(export.value)) })
         jit.exports = exports
 
         return exports
@@ -282,7 +288,7 @@ internal class JitEngine(
     ): ChasmResult<PreparedFunction, ExecutionError.Rejected> {
 
         val jit = jit(instance)
-        if (storeDropped(classic) || jit.module.deallocated) {
+        if (storeRuntime.dropped || jit.module.deallocated) {
             return ChasmResult.Error(ExecutionError.Rejected("the instance or its store has been dropped"))
         }
 
@@ -291,8 +297,12 @@ internal class JitEngine(
             return ChasmResult.Success(cached)
         }
 
-        return when (val prepared = ObjectCall.prepare(classic, jit.embedding, name, managedStore)) {
-            is ChasmResult.Success -> ChasmResult.Success(PreparedFunction(prepared.result.type, this, prepared.result))
+        val export = jit.module.exports.firstOrNull { candidate -> candidate.name.name == name }
+        val address = (export?.value as? ExternalValue.Function)?.address
+            ?: return ChasmResult.Error(ExecutionError.Rejected(RuntimeInvocationError.FunctionNotFound(name).toString()))
+
+        return when (val prepared = ObjectCall.prepare(storeRuntime, jit.module, jit.config, address, managedStore)) {
+            is ChasmResult.Success -> ChasmResult.Success(_preparedFunction(prepared.result.type, this, prepared.result))
             is ChasmResult.Error -> prepared
         }
     }
@@ -300,7 +310,7 @@ internal class JitEngine(
     override fun invoke(
         function: PreparedFunction,
         args: List<ExecutionValue>,
-    ): ChasmResult<List<ExecutionValue>, InvocationError<ExceptionReference>> {
+    ): ChasmResult<List<ExecutionValue>, InvocationError> {
 
         val words = LongArray(function.slots)
         val references = arrayOfNulls<Any>(function.slots)
@@ -319,7 +329,7 @@ internal class JitEngine(
         function: PreparedFunction,
         words: LongArray,
         references: Array<Any?>,
-    ): ChasmResult<Unit, InvocationError<ExceptionReference>> {
+    ): ChasmResult<Unit, InvocationError> {
         return call(function).call(words, references)
     }
 
@@ -327,7 +337,7 @@ internal class JitEngine(
         function: PreparedFunction,
         words: LongArray,
         references: Array<Any?>,
-    ): ChasmResult<Unit, InvocationError<ExceptionReference>> {
+    ): ChasmResult<Unit, InvocationError> {
         return call(function).unsafeCall(words, references)
     }
 
@@ -337,6 +347,11 @@ internal class JitEngine(
 
     override fun memoryByteSize(memory: Memory): Int {
         return linear(memory).byteSize
+    }
+
+    @OptIn(UnsafeHostApi::class)
+    override fun unsafeBorrowMemory(memory: Memory): Any? {
+        return memoryInstance(memory).unsafeBorrowStorage()
     }
 
     override fun growMemory(
@@ -564,7 +579,7 @@ internal class JitEngine(
         managedStore.objects.tables.writeTable(referenceTable(table), index, value)
     }
 
-    override fun readTable(
+    override fun readTableElements(
         table: Table,
         buffer: Array<Any?>,
         elementIndex: Int,
@@ -574,7 +589,7 @@ internal class JitEngine(
         return managedStore.objects.tables.readTable(referenceTable(table), buffer, elementIndex, elementsToRead, bufferIndex)
     }
 
-    override fun writeTable(
+    override fun writeTableElements(
         table: Table,
         elementIndex: Int,
         buffer: Array<Any?>,
@@ -616,7 +631,7 @@ internal class JitEngine(
     }
 
     override fun structType(struct: StructReference): HostGcType {
-        return HostGcType(objects.structs.structType(struct).id)
+        return objects.structs.structType(struct)
     }
 
     override fun readStructField(
@@ -658,7 +673,7 @@ internal class JitEngine(
     }
 
     override fun arrayType(array: ArrayReference): HostGcType {
-        return HostGcType(objects.arrays.arrayType(array).id)
+        return objects.arrays.arrayType(array)
     }
 
     override fun arrayLength(array: ArrayReference): Int {
@@ -753,29 +768,29 @@ internal class JitEngine(
         instance: Instance,
         typeIndex: Int,
     ): HostGcType {
-        return HostGcType(runtime.heap.runtimeType(jit(instance).module, typeIndex).id)
+        return runtime.heap.runtimeType(jit(instance).module, typeIndex)
     }
 
     override fun structFieldCount(type: HostGcType): Int {
-        return runtime.heap.structFieldCount(RuntimeGcType(type.id))
+        return runtime.heap.structFieldCount(type)
     }
 
     override fun structFieldInfo(
         type: HostGcType,
         fieldIndex: Int,
     ): HostGcFieldInfo {
-        return HostGcFieldInfo(runtime.heap.structFieldInfo(RuntimeGcType(type.id), fieldIndex).encoding)
+        return runtime.heap.structFieldInfo(type, fieldIndex)
     }
 
     override fun arrayElementInfo(type: HostGcType): HostGcFieldInfo {
-        return HostGcFieldInfo(runtime.heap.arrayElementInfo(RuntimeGcType(type.id)).encoding)
+        return runtime.heap.arrayElementInfo(type)
     }
 
     override fun isSubtype(
         actual: HostGcType,
         expected: HostGcType,
     ): Boolean {
-        return runtime.heap.isSubtype(RuntimeGcType(actual.id), RuntimeGcType(expected.id))
+        return runtime.heap.isSubtype(actual, expected)
     }
 
     override fun allocateStruct(
@@ -783,7 +798,7 @@ internal class JitEngine(
         fields: LongArray,
         references: Array<Any?>,
     ): StructReference {
-        return objects.structs.allocateStruct(RuntimeGcType(type.id), fields, references)
+        return objects.structs.allocateStruct(type, fields, references)
     }
 
     override fun unsafeAllocateStruct(
@@ -791,48 +806,48 @@ internal class JitEngine(
         fields: LongArray,
         references: Array<Any?>,
     ): StructReference {
-        return objects.structs.unsafeAllocateStruct(RuntimeGcType(type.id), fields, references)
+        return objects.structs.unsafeAllocateStruct(type, fields, references)
     }
 
-    override fun allocateArray(
+    override fun allocateNumericArray(
         type: HostGcType,
         length: Int,
         initialValue: Long,
     ): ArrayReference {
-        return objects.arrays.allocateArray(RuntimeGcType(type.id), length, initialValue)
+        return objects.arrays.allocateArray(type, length, initialValue)
     }
 
-    override fun allocateArray(
+    override fun allocateReferenceArray(
         type: HostGcType,
         length: Int,
         initialReference: Any?,
     ): ArrayReference {
-        return objects.arrays.allocateArray(RuntimeGcType(type.id), length, initialReference)
+        return objects.arrays.allocateArray(type, length, initialReference)
     }
 
-    override fun allocateArray(
+    override fun allocateNumericArray(
         type: HostGcType,
         elements: LongArray,
         elementOffset: Int,
         elementCount: Int,
     ): ArrayReference {
-        return objects.arrays.allocateArray(RuntimeGcType(type.id), elements, elementOffset, elementCount)
+        return objects.arrays.allocateArray(type, elements, elementOffset, elementCount)
     }
 
-    override fun allocateArray(
+    override fun allocateReferenceArray(
         type: HostGcType,
         elements: Array<Any?>,
         elementOffset: Int,
         elementCount: Int,
     ): ArrayReference {
-        return objects.arrays.allocateArray(RuntimeGcType(type.id), elements, elementOffset, elementCount)
+        return objects.arrays.allocateArray(type, elements, elementOffset, elementCount)
     }
 
     override fun unsafeAllocateArray(
         type: HostGcType,
         storage: Any,
     ): ArrayReference {
-        return objects.arrays.unsafeAllocateArray(RuntimeGcType(type.id), storage)
+        return objects.arrays.unsafeAllocateArray(type, storage)
     }
 
     override fun createException(
@@ -844,7 +859,22 @@ internal class JitEngine(
     }
 
     override fun exceptionTag(exception: ExceptionReference): Tag {
-        return Tag(this, ExternalValue.Tag(objects.exceptions.exceptionTag(exception)))
+
+        val address = objects.exceptions.exceptionTag(exception)
+        val cached = exceptionTags.getOrNull(address.address)
+        if (cached != null) {
+            return cached
+        }
+
+        val tag = tagAt(address)
+        var tags = exceptionTags
+        if (address.address >= tags.size) {
+            tags = tags.copyOf(maxOf(address.address + 1, tags.size * 2))
+        }
+        tags[address.address] = tag
+        exceptionTags = tags
+
+        return tag
     }
 
     override fun payloadSize(exception: ExceptionReference): Int {
@@ -886,10 +916,10 @@ internal class JitEngine(
 
     override fun installed(
         module: ModuleInstance,
-        embedding: ClassicInstance,
+        config: RuntimeConfig,
     ): Instance {
 
-        val instance = Instance(this, JitInstance(module, embedding, this))
+        val instance = _instance(this, JitInstance(module, config, this))
         module.compiledInstance = JitModuleContext(instance)
 
         return instance
@@ -904,11 +934,19 @@ internal class JitEngine(
     }
 
     override fun memoryAt(address: Address.Memory): Memory {
-        return Memory(this, ExternalValue.Memory(address))
+
+        val instance = runtime.memories[address.address]
+        val type = instance.type.copy(limits = instance.type.limits.copy())
+
+        return _memory(this, JitMemory(address, instance), type)
     }
 
     override fun tableAt(address: Address.Table): Table {
-        return Table(this, JitTable(address, managedStore.referenceTable(runtime.tables[address.address])))
+
+        val instance = runtime.tables[address.address]
+        val type = instance.type.copy(limits = instance.type.limits.copy())
+
+        return _table(this, JitTable(address, managedStore.referenceTable(instance)), type)
     }
 
     override fun globalAt(address: Address.Global): Global {
@@ -919,43 +957,43 @@ internal class JitEngine(
             else -> NumberJitGlobal(address, instance)
         }
 
-        return Global(this, payload)
+        return _global(this, payload, instance.type)
     }
 
     override fun tagAt(address: Address.Tag): Tag {
-        return Tag(this, ExternalValue.Tag(address))
+        return _tag(this, ExternalValue.Tag(address), runtime.heap.tag(address).type)
     }
 
     private fun importable(value: ExternalValue): Importable {
         return when (value) {
-            is ExternalValue.Function -> Function(this, value)
-            is ExternalValue.Memory -> Memory(this, value)
+            is ExternalValue.Function -> _function(this, value, runtime.functions[value.address.address].functionType)
+            is ExternalValue.Memory -> memoryAt(value.address)
             is ExternalValue.Global -> globalAt(value.address)
             is ExternalValue.Table -> tableAt(value.address)
-            is ExternalValue.Tag -> Tag(this, value)
+            is ExternalValue.Tag -> tagAt(value.address)
         }
     }
 
     private fun jit(instance: Instance): JitInstance {
 
-        require(instance.engine === this) { "the instance belongs to a different store" }
+        require(instance._engine() === this) { "the instance belongs to a different store" }
 
-        return instance.payload as JitInstance
+        return instance._payload() as JitInstance
     }
 
     private fun call(function: PreparedFunction): ObjectCall {
 
-        require(function.engine === this) { "the function belongs to a different store" }
+        require(function._engine() === this) { "the function belongs to a different store" }
 
-        return function.payload as ObjectCall
+        return function._payload() as ObjectCall
     }
 
     private fun memoryInstance(memory: Memory): MemoryInstance {
 
-        require(memory.engine === this) { "the memory belongs to a different store" }
-        live()
+        require(memory._engine() === this) { "the memory belongs to a different store" }
+        requireLiveStore()
 
-        return runtime.memories[(memory.payload as ExternalValue.Memory).address.address]
+        return (memory._payload() as JitMemory).instance
     }
 
     private fun linear(memory: Memory): HostMemory {
@@ -972,10 +1010,10 @@ internal class JitEngine(
 
     private fun jitTable(table: Table): JitTable {
 
-        require(table.engine === this) { "the table belongs to a different store" }
-        live()
+        require(table._engine() === this) { "the table belongs to a different store" }
+        requireLiveStore()
 
-        return table.payload as JitTable
+        return table._payload() as JitTable
     }
 
     private fun referenceGlobal(global: Global): ReferenceGlobal {
@@ -996,32 +1034,25 @@ internal class JitEngine(
 
     private fun jitGlobal(global: Global): JitGlobal {
 
-        require(global.engine === this) { "the global belongs to a different store" }
-        live()
+        require(global._engine() === this) { "the global belongs to a different store" }
+        requireLiveStore()
 
-        return global.payload as JitGlobal
-    }
-
-    private fun externalValueOf(payload: Any): ExternalValue {
-        return when (payload) {
-            is JitTable -> ExternalValue.Table(payload.address)
-            is JitGlobal -> ExternalValue.Global(payload.address)
-            else -> payload as ExternalValue
-        }
+        return global._payload() as JitGlobal
     }
 
     private fun tagAddress(tag: Tag): Address.Tag {
 
-        require(tag.engine === this) { "the tag belongs to a different store" }
+        require(tag._engine() === this) { "the tag belongs to a different store" }
 
-        return (tag.payload as ExternalValue.Tag).address
+        return (tag._payload() as ExternalValue.Tag).address
     }
 
-    private fun live() {
-        check(!storeDropped(classic)) { "the store has been dropped" }
+    private fun requireLiveStore() {
+        check(!storeRuntime.dropped) { "the store has been dropped" }
     }
 
     private companion object {
-        val NULL_REFERENCE = ReferenceValue.Null(AbstractHeapType.None)
+        val NULL_REFERENCE_WORD = ReferenceValue.Null(AbstractHeapType.None).toLongFromBoxed()
+        const val UNSUPPORTED_MODULE = "a chasm-jit store only instantiates modules decoded by module()"
     }
 }

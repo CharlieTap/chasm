@@ -200,7 +200,6 @@ chasm {
             packageName = ...
             codegenConfig = CodegenConfig(
                 generateTypesafeGlobalProperties = true,
-                generateSuspendingFactories = true,
                 runtime = CodegenRuntime.CHASM,
                 wasi = WasiLinking.AUTOMATIC,
             )
@@ -247,7 +246,9 @@ factory API.
 
 default = false
 
-When set Chasm generates a suspending factory for that module. This can be configured independently for each module.
+Applies to `CodegenRuntime.PORTABLE_VM`: when set the factory for that module suspends. Factories generated for
+`CodegenRuntime.CHASM` always suspend, because creating a module and instance suspends on every engine. This can be
+configured independently for each module.
 
 ### `generateTypesafeGlobalProperties: Boolean`
 

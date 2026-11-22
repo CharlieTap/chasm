@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.runtime.memory
 
-import io.github.charlietap.chasm.host.HostMemory
+import io.github.charlietap.chasm.runtime.host.HostMemory
 import kotlin.jvm.JvmInline
 
 interface LinearMemory : HostMemory {

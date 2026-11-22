@@ -1,9 +1,9 @@
 package io.github.charlietap.chasm.runtime.instance
 
 import io.github.charlietap.chasm.runtime.function.WasmFunctionCallStrategy
+import io.github.charlietap.chasm.runtime.host.RawHostFunction
 import io.github.charlietap.chasm.runtime.type.RTT
 import io.github.charlietap.chasm.type.FunctionType
-import io.github.charlietap.chasm.host.HostFunction as HostCallback
 
 sealed class FunctionInstance {
 
@@ -26,7 +26,7 @@ sealed class FunctionInstance {
     data class HostFunction(
         override val rtt: RTT,
         override val functionType: FunctionType,
-        val function: HostCallback,
+        val function: RawHostFunction,
     ) : FunctionInstance() {
         override val parameterCount: Int = functionType.params.types.size
 

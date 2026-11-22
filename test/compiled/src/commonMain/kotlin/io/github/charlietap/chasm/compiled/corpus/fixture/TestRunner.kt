@@ -4,17 +4,17 @@ import com.github.michaelbull.result.getOrElse
 import io.github.charlietap.chasm.compiled.corpus.instance.ModuleInstantiator
 import io.github.charlietap.chasm.compiled.corpus.step.StepContext
 import io.github.charlietap.chasm.compiled.corpus.step.StepRunner
-import io.github.charlietap.chasm.embedding.store
-import io.github.charlietap.chasm.runtime.value.ExecutionValue
+import io.github.charlietap.chasm.embedding.shapes.Module
+import io.github.charlietap.chasm.embedding.value.ExecutionValue
 import io.github.charlietap.corpus.lib.CorpusPhase
 import io.github.charlietap.corpus.lib.CorpusResult
 import io.github.charlietap.corpus.lib.fixture.FixtureTest
 
-internal typealias TestRunner = (FixtureContext, PreparedModule, IndexedValue<FixtureTest>?) -> CorpusResult
+internal typealias TestRunner = (FixtureContext, Module, IndexedValue<FixtureTest>?) -> CorpusResult
 
 internal fun TestRunner(
     context: FixtureContext,
-    module: PreparedModule,
+    module: Module,
     test: IndexedValue<FixtureTest>?,
 ): CorpusResult = TestRunner(
     context = context,
@@ -26,14 +26,14 @@ internal fun TestRunner(
 
 private fun TestRunner(
     context: FixtureContext,
-    module: PreparedModule,
+    module: Module,
     test: IndexedValue<FixtureTest>?,
     moduleInstantiator: ModuleInstantiator,
     stepRunner: StepRunner,
 ): CorpusResult {
     val timings = context.timings
     val setup = timings.instantiate {
-        moduleInstantiator(context, store(), module, test?.value)
+        moduleInstantiator(context, context.storeFactory(context.storeConfig), module, test?.value)
     }.getOrElse { error -> return error }
     timings.moduleBuildCount++
 

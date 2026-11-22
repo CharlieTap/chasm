@@ -1,8 +1,8 @@
 package io.github.charlietap.chasm.script.value
 
-import io.github.charlietap.chasm.embedding.compiled.value.ExecutionValue
-import io.github.charlietap.chasm.embedding.compiled.value.NumberValue
-import io.github.charlietap.chasm.embedding.compiled.value.ReferenceValue
+import io.github.charlietap.chasm.embedding.value.ExecutionValue
+import io.github.charlietap.chasm.embedding.value.NumberValue
+import io.github.charlietap.chasm.embedding.value.ReferenceValue
 import io.github.charlietap.chasm.type.AbstractHeapType
 
 typealias ValueMatcher = (ExecutionValue, ExecutionValue) -> Boolean

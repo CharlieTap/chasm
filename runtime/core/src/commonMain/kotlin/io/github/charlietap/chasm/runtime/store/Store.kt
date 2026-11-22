@@ -42,4 +42,8 @@ class Store(
 
     @JvmField
     val allocation: AllocationMeter = AllocationMeter()
+
+    @PublishedApi
+    @JvmField
+    internal var liveStacks: LiveStack? = null
 }

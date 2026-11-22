@@ -1,8 +1,8 @@
 package io.github.charlietap.chasm.runtime.instance
 
-import io.github.charlietap.chasm.host.HostReference
-import io.github.charlietap.chasm.host.HostTable
 import io.github.charlietap.chasm.host.UnsafeHostApi
+import io.github.charlietap.chasm.runtime.host.HostReference
+import io.github.charlietap.chasm.runtime.host.HostTable
 import io.github.charlietap.chasm.type.TableType
 
 @OptIn(UnsafeHostApi::class)

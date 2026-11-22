@@ -5,18 +5,19 @@ import io.github.charlietap.chasm.embedding.module
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.expect
 import io.github.charlietap.chasm.embedding.validate
+import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertIs
 
 class TypeSystemCorrectnessTest {
 
     @Test
-    fun `recursive type cannot declare a later type as its supertype`() {
+    fun `recursive type cannot declare a later type as its supertype`() = runTest {
         assertValidationFails("type_system_forward_supertype.wasm")
     }
 
-    private fun assertValidationFails(fileName: String) {
-        val decoded = module(Resource(FILE_DIR + fileName).readBytes())
+    private suspend fun assertValidationFails(fileName: String) {
+        val decoded = module(Resource(FILE_DIR + fileName).readBytes(), validate = false)
             .expect("expected $fileName to decode")
 
         assertIs<ChasmResult.Error<*>>(validate(decoded))

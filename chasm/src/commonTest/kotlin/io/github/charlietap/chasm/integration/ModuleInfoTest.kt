@@ -54,6 +54,7 @@ import io.github.charlietap.chasm.fixture.type.varMutability
 import io.github.charlietap.chasm.runtime.type.ExternalType
 import io.github.charlietap.chasm.type.AbstractHeapType
 import io.github.charlietap.chasm.type.RecursiveType
+import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -231,7 +232,7 @@ class ModuleInfoTest {
     }
 
     @Test
-    fun `changing returned module info does not change the module`() {
+    fun `changing returned module info does not change the module`() = runTest {
         val byteStream = Resource(FILE_DIR + "module_info.wasm").readBytes()
         val module = module(FakeSourceReader(byteStream), moduleConfig(decodeNameSection = true)).getOrNull()!!
         val unchanged = module(FakeSourceReader(byteStream), moduleConfig(decodeNameSection = true)).getOrNull()!!
@@ -253,7 +254,7 @@ class ModuleInfoTest {
     }
 
     @Test
-    fun `can return module info for all import and export types`() {
+    fun `can return module info for all import and export types`() = runTest {
 
         val importedFunctionType = functionType(
             params = resultType(listOf(i32ValueType())),

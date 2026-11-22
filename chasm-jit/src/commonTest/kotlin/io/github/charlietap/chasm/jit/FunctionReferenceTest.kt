@@ -1,24 +1,25 @@
 package io.github.charlietap.chasm.jit
 
 import io.github.charlietap.chasm.config.RuntimeConfig
-import io.github.charlietap.chasm.embedding.compiled.Import
-import io.github.charlietap.chasm.embedding.compiled.Instance
-import io.github.charlietap.chasm.embedding.compiled.PreparedFunction
-import io.github.charlietap.chasm.embedding.compiled.Store
-import io.github.charlietap.chasm.embedding.compiled.exports
-import io.github.charlietap.chasm.embedding.compiled.function
-import io.github.charlietap.chasm.embedding.compiled.host.HostFunction
-import io.github.charlietap.chasm.embedding.compiled.host.readI32
-import io.github.charlietap.chasm.embedding.compiled.host.writeI32
-import io.github.charlietap.chasm.embedding.compiled.instance
-import io.github.charlietap.chasm.embedding.compiled.invoke
-import io.github.charlietap.chasm.embedding.compiled.invokeUnboxed
-import io.github.charlietap.chasm.embedding.compiled.prepareFunction
-import io.github.charlietap.chasm.embedding.compiled.value.NumberValue.I32
 import io.github.charlietap.chasm.embedding.dsl.FunctionTypeBuilder
 import io.github.charlietap.chasm.embedding.error.ExecutionError
+import io.github.charlietap.chasm.embedding.exports
+import io.github.charlietap.chasm.embedding.function
+import io.github.charlietap.chasm.embedding.instance
+import io.github.charlietap.chasm.embedding.invoke
+import io.github.charlietap.chasm.embedding.invokeUnboxed
+import io.github.charlietap.chasm.embedding.module
+import io.github.charlietap.chasm.embedding.prepareFunction
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
+import io.github.charlietap.chasm.embedding.shapes.Import
+import io.github.charlietap.chasm.embedding.shapes.Instance
+import io.github.charlietap.chasm.embedding.shapes.PreparedFunction
+import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.shapes.expect
+import io.github.charlietap.chasm.embedding.value.NumberValue.I32
+import io.github.charlietap.chasm.host.HostFunction
+import io.github.charlietap.chasm.host.readI32
+import io.github.charlietap.chasm.host.writeI32
 import io.github.charlietap.chasm.reference.FunctionReference
 import io.github.charlietap.chasm.type.FunctionType
 import kotlinx.coroutines.runBlocking
@@ -82,7 +83,7 @@ class FunctionReferenceTest {
 
         val otherStore = store()
         val otherExporter = instantiate(otherStore, "modules/function_exporter.wasm", emptyList())
-        val foreignCall = prepareFunction(otherStore, otherExporter, "double_ref").expect("double_ref")
+        val foreignCall = prepareFunction(otherExporter, "double_ref").expect("double_ref")
         val foreignReferences = arrayOfNulls<Any>(foreignCall.slots)
         foreignCall.invokeUnboxed(LongArray(foreignCall.slots), foreignReferences).expect("double_ref")
         val foreign = foreignReferences[0]
@@ -136,7 +137,7 @@ class FunctionReferenceTest {
         val debugStore = store()
         val debugExporter = instantiate(debugStore, "modules/function_exporter.wasm", emptyList())
         val debugImporter = instantiate(debugStore, "modules/function_importer.wasm", imports(debugStore, debugExporter), RuntimeConfig(debugInfo = true))
-        val result = invoke(debugStore, debugImporter, "call_boom", listOf(I32(1)))
+        val result = invoke(debugImporter, "call_boom", listOf(I32(1)))
 
         val error = assertIs<ChasmResult.Error<*>>(result).error
         val frames = checkNotNull(assertIs<ExecutionError.Trapped>(error).trap.stackTrace).frames
@@ -216,7 +217,7 @@ class FunctionReferenceTest {
         instance: Instance,
         name: String,
     ): PreparedFunction {
-        return prepareFunction(store, instance, name).expect(name)
+        return prepareFunction(instance, name).expect(name)
     }
 
     private fun instantiate(

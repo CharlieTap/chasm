@@ -5,9 +5,9 @@ import io.github.charlietap.chasm.embedding.shapes.fold
 import io.github.charlietap.chasm.script.ScriptContext
 import io.github.charlietap.sweet.lib.command.ModuleInstanceCommand
 
-typealias ModuleInstanceCommandRunner = (ScriptContext, ModuleInstanceCommand) -> CommandResult
+typealias ModuleInstanceCommandRunner = suspend (ScriptContext, ModuleInstanceCommand) -> CommandResult
 
-fun ModuleInstanceCommandRunner(
+suspend fun ModuleInstanceCommandRunner(
     context: ScriptContext,
     command: ModuleInstanceCommand,
 ): CommandResult {

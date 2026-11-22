@@ -8,9 +8,9 @@ import io.github.charlietap.chasm.embedding.instance
 import io.github.charlietap.chasm.embedding.invoke
 import io.github.charlietap.chasm.embedding.module
 import io.github.charlietap.chasm.embedding.shapes.expect
-import io.github.charlietap.chasm.embedding.shapes.flatMap
 import io.github.charlietap.chasm.embedding.store
-import io.github.charlietap.chasm.runtime.value.NumberValue
+import io.github.charlietap.chasm.embedding.value.NumberValue
+import kotlinx.coroutines.runBlocking
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -25,10 +25,9 @@ class MinBenchmark {
         it.readBytes()
     }
     private val store = store()
-    private val instance = module(bytes)
-        .flatMap {
-            instance(store, it, emptyList())
-        }.expect("failed to create instance")
+    private val instance = runBlocking {
+        instance(store, module(bytes).expect("failed to decode module"), emptyList())
+    }.expect("failed to create instance")
 
     private val op1 = NumberValue.F32(116f)
     private val op2 = NumberValue.F32(117f)
@@ -36,7 +35,7 @@ class MinBenchmark {
     @Test
     fun benchmark() {
         benchmarkRule.measureRepeated {
-            invoke(store, instance, "min", listOf(op1, op2))
+            invoke(instance, "min", listOf(op1, op2))
         }
     }
 }

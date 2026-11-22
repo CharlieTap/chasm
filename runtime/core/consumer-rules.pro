@@ -1,0 +1,1 @@
+-keep,allowobfuscation,allowshrinking class io.github.charlietap.chasm.runtime.stack.ValueStack { <fields>; }

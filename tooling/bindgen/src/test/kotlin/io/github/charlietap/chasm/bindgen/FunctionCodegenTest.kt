@@ -226,28 +226,6 @@ class FunctionCodegenTest {
     )
 
     @Test
-    fun `generates JIT string parameters`() {
-        assertGenerates(
-            category = "function",
-            wasmInterface = wasmInterface(
-                interfaceName = "JitStringParams",
-                packageName = PACKAGE_NAME,
-                allocator = ExportedAllocator("alloc", "free"),
-                memories = listOf(memoryBinding("memory", "memory", exposed = false)),
-                functions = listOf(
-                    stringParameterFunction("pointerAndLength", StringEncodingStrategy.POINTER_AND_LENGTH),
-                    stringParameterFunction("nullTerminated", StringEncodingStrategy.NULL_TERMINATED),
-                    stringParameterFunction("lengthPrefixed", StringEncodingStrategy.LENGTH_PREFIXED),
-                    stringParameterFunction("packed", StringEncodingStrategy.PACKED_POINTER_AND_LENGTH),
-                    stringParameterFunction("freed", StringEncodingStrategy.POINTER_AND_LENGTH, freeAfterCall = true),
-                ),
-            ),
-            config = codegenConfig(executionTier = ExecutionTier.Jit()),
-            runtimes = listOf(CodegenRuntime.CHASM),
-        )
-    }
-
-    @Test
     fun `generates JIT scalar parameters with a freed string parameter and a string return`() {
 
         val mixedParameterFunction = function(

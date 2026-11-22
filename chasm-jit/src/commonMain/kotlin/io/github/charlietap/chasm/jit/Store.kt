@@ -4,13 +4,9 @@ package io.github.charlietap.chasm.jit
 
 import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.config.StoreConfig
-import io.github.charlietap.chasm.embedding.compiled.Store
-import io.github.charlietap.chasm.jit.internal._store
+import io.github.charlietap.chasm.embedding.shapes.Store
+import io.github.charlietap.chasm.jit.internal._jitStore
 
-fun store(): Store {
-    return _store(StoreConfig())
-}
-
-fun store(config: StoreConfig): Store {
-    return _store(config)
+fun store(config: StoreConfig = StoreConfig()): Store {
+    return _jitStore(config)
 }

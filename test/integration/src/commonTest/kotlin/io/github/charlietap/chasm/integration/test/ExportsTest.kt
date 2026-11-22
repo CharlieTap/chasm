@@ -18,7 +18,7 @@ class ExportsTest {
     fun `can instantiate a module and return its exports`() = integrationTest(FIXTURE) {
 
         val actual = exports().map { exports ->
-            exports.map { export -> export.name to export.value::class }
+            exports.all.map { export -> export.name to export.value::class }
         }
 
         val expected = listOf(

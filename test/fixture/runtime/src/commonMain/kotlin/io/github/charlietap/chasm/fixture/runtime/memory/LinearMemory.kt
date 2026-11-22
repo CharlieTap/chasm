@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.fixture.runtime.memory
 
-import io.github.charlietap.chasm.host.HostMemory
+import io.github.charlietap.chasm.runtime.host.HostMemory
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
 
 object NoOpLinearMemory : LinearMemory {

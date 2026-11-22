@@ -1,15 +1,17 @@
 package io.github.charlietap.chasm.jit
 
 import io.github.charlietap.chasm.InternalChasmApi
-import io.github.charlietap.chasm.embedding.compiled.Instance
-import io.github.charlietap.chasm.embedding.compiled.PreparedFunction
-import io.github.charlietap.chasm.embedding.compiled.instance
-import io.github.charlietap.chasm.embedding.compiled.invoke
-import io.github.charlietap.chasm.embedding.compiled.invokeUnboxed
-import io.github.charlietap.chasm.embedding.compiled.prepareFunction
-import io.github.charlietap.chasm.embedding.compiled.value.ReferenceValue
+import io.github.charlietap.chasm.embedding.engine.Engine
+import io.github.charlietap.chasm.embedding.instance
+import io.github.charlietap.chasm.embedding.invoke
+import io.github.charlietap.chasm.embedding.invokeUnboxed
+import io.github.charlietap.chasm.embedding.module
+import io.github.charlietap.chasm.embedding.prepareFunction
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
+import io.github.charlietap.chasm.embedding.shapes.Instance
+import io.github.charlietap.chasm.embedding.shapes.PreparedFunction
 import io.github.charlietap.chasm.embedding.shapes.expect
+import io.github.charlietap.chasm.embedding.value.ReferenceValue
 import io.github.charlietap.chasm.reference.I31Reference
 import io.github.charlietap.chasm.reference.StructReference
 import kotlinx.coroutines.runBlocking
@@ -232,13 +234,13 @@ class ExternIdentityTest {
 
     private fun boxedIdentity(value: Any): Any {
 
-        val result = invoke(store, instance, "identity", listOf(ReferenceValue.Extern(value))).expect("identity")
+        val result = invoke(instance, "identity", listOf(ReferenceValue.Extern(value))).expect("identity")
 
         return assertIs<ReferenceValue.Extern>(result.single()).value
     }
 
     private fun prepare(name: String): PreparedFunction {
-        return prepareFunction(store, instance, name).expect(name)
+        return prepareFunction(instance, name).expect(name)
     }
 
     private fun instantiate(): Instance {
@@ -251,5 +253,10 @@ class ExternIdentityTest {
     private data class Label(val text: String)
 
     @OptIn(InternalChasmApi::class)
-    private class Forged : StructReference()
+    private class Forged : StructReference() {
+
+        override fun engine(): Engine {
+            error("forged references belong to no engine")
+        }
+    }
 }

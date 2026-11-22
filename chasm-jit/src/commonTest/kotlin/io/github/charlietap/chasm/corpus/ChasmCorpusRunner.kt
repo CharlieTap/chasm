@@ -3,37 +3,37 @@ package io.github.charlietap.chasm.corpus
 import io.github.charlietap.chasm.config.Config
 import io.github.charlietap.chasm.config.GCStrategy
 import io.github.charlietap.chasm.config.RuntimeConfig
-import io.github.charlietap.chasm.embedding.compiled.Exports
-import io.github.charlietap.chasm.embedding.compiled.ExternalType
-import io.github.charlietap.chasm.embedding.compiled.Global
-import io.github.charlietap.chasm.embedding.compiled.Import
-import io.github.charlietap.chasm.embedding.compiled.Instance
-import io.github.charlietap.chasm.embedding.compiled.Memory
-import io.github.charlietap.chasm.embedding.compiled.Module
-import io.github.charlietap.chasm.embedding.compiled.ModuleImport
-import io.github.charlietap.chasm.embedding.compiled.Store
-import io.github.charlietap.chasm.embedding.compiled.exports
-import io.github.charlietap.chasm.embedding.compiled.function
-import io.github.charlietap.chasm.embedding.compiled.global
-import io.github.charlietap.chasm.embedding.compiled.growMemory
-import io.github.charlietap.chasm.embedding.compiled.host.HostStack
-import io.github.charlietap.chasm.embedding.compiled.host.writeReference
-import io.github.charlietap.chasm.embedding.compiled.instance
-import io.github.charlietap.chasm.embedding.compiled.invoke
-import io.github.charlietap.chasm.embedding.compiled.memory
-import io.github.charlietap.chasm.embedding.compiled.readBytes
-import io.github.charlietap.chasm.embedding.compiled.readGlobal
-import io.github.charlietap.chasm.embedding.compiled.readGlobalReference
-import io.github.charlietap.chasm.embedding.compiled.value.ExecutionValue
-import io.github.charlietap.chasm.embedding.compiled.value.NumberValue
-import io.github.charlietap.chasm.embedding.compiled.value.ReferenceValue
-import io.github.charlietap.chasm.embedding.compiled.writeBytes
-import io.github.charlietap.chasm.embedding.compiled.writeGlobal
-import io.github.charlietap.chasm.embedding.compiled.writeGlobalReference
 import io.github.charlietap.chasm.embedding.error.ModuleError
+import io.github.charlietap.chasm.embedding.exports
+import io.github.charlietap.chasm.embedding.function
+import io.github.charlietap.chasm.embedding.global
+import io.github.charlietap.chasm.embedding.global.readGlobal
+import io.github.charlietap.chasm.embedding.global.readGlobalReference
+import io.github.charlietap.chasm.embedding.global.writeGlobal
+import io.github.charlietap.chasm.embedding.global.writeGlobalReference
+import io.github.charlietap.chasm.embedding.instance
+import io.github.charlietap.chasm.embedding.invoke
+import io.github.charlietap.chasm.embedding.memory
+import io.github.charlietap.chasm.embedding.memory.growMemory
+import io.github.charlietap.chasm.embedding.memory.readBytes
+import io.github.charlietap.chasm.embedding.memory.writeBytes
+import io.github.charlietap.chasm.embedding.module
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
+import io.github.charlietap.chasm.embedding.shapes.Exports
+import io.github.charlietap.chasm.embedding.shapes.Global
+import io.github.charlietap.chasm.embedding.shapes.Import
+import io.github.charlietap.chasm.embedding.shapes.ImportDefinition
+import io.github.charlietap.chasm.embedding.shapes.Instance
+import io.github.charlietap.chasm.embedding.shapes.Memory
+import io.github.charlietap.chasm.embedding.shapes.Module
+import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.shapes.fold
-import io.github.charlietap.chasm.jit.module
+import io.github.charlietap.chasm.embedding.value.ExecutionValue
+import io.github.charlietap.chasm.embedding.value.NumberValue
+import io.github.charlietap.chasm.embedding.value.ReferenceValue
+import io.github.charlietap.chasm.embedding.value.VectorValue
+import io.github.charlietap.chasm.host.HostStack
+import io.github.charlietap.chasm.host.writeReference
 import io.github.charlietap.chasm.jit.onLargeStack
 import io.github.charlietap.chasm.jit.store
 import io.github.charlietap.chasm.reference.ArrayReference
@@ -41,6 +41,7 @@ import io.github.charlietap.chasm.reference.ExceptionReference
 import io.github.charlietap.chasm.reference.FunctionReference
 import io.github.charlietap.chasm.reference.I31Reference
 import io.github.charlietap.chasm.reference.StructReference
+import io.github.charlietap.chasm.runtime.type.ExternalType
 import io.github.charlietap.chasm.type.AbstractHeapType
 import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.chasm.type.HeapType
@@ -139,9 +140,8 @@ class ChasmCorpusRunner(
         }
 
         fixture.tests.forEachIndexed { testIndex, test ->
-            val (store, setupResult) = timings.instantiate {
-                val store = store()
-                store to instantiate(fixture, store, validated, timings)
+            val setupResult = timings.instantiate {
+                instantiate(fixture, store(), validated, timings)
             }
             val setup = setupResult.fold(
                 { setup ->
@@ -157,7 +157,6 @@ class ChasmCorpusRunner(
                 val result = runStep(
                     fixture = fixture,
                     context = "test[$testIndex] step[$stepIndex]",
-                    store = store,
                     setup = setup,
                     captures = captures,
                     step = step,
@@ -260,6 +259,7 @@ class ChasmCorpusRunner(
                                 when (value) {
                                     is NumberValue<*> -> stack[results + index] = value.bits()
                                     is ReferenceValue -> results.writeReference(index, value.reference())
+                                    is VectorValue -> error("Unsupported stub result $value")
                                 }
                             }
                         },
@@ -295,14 +295,13 @@ class ChasmCorpusRunner(
     private fun runStep(
         fixture: Fixture,
         context: String,
-        store: Store,
         setup: RuntimeSetup,
         captures: MutableMap<String, ExecutionValue>,
         step: JsonObject,
         timings: CorpusTimingRecorder,
     ): CorpusResult {
         return when (val type = step.string("type")) {
-            "function.invoke" -> runFunctionInvoke(fixture, context, store, setup, captures, step, timings)
+            "function.invoke" -> runFunctionInvoke(fixture, context, setup, captures, step, timings)
             "memory.write" -> runMemoryWrite(fixture, context, setup, captures, step, timings)
             "memory.read" -> runMemoryRead(fixture, context, setup, captures, step, timings)
             "memory.grow" -> runMemoryGrow(fixture, context, setup, captures, step, timings)
@@ -316,7 +315,6 @@ class ChasmCorpusRunner(
     private fun runFunctionInvoke(
         fixture: Fixture,
         context: String,
-        store: Store,
         setup: RuntimeSetup,
         captures: MutableMap<String, ExecutionValue>,
         step: JsonObject,
@@ -331,7 +329,7 @@ class ChasmCorpusRunner(
         val trap = step["trap"]?.jsonPrimitive?.contentOrNull
         val hostEffects = step["host_effects"]?.jsonObject
 
-        val result = when (val invocation = timings.execute { invoke(store, setup.instance, function, params) }) {
+        val result = when (val invocation = timings.execute { invoke(setup.instance, function, params) }) {
             is ChasmResult.Success -> invocation.result
             is ChasmResult.Error -> {
                 return if (trap != null) {
@@ -511,6 +509,7 @@ class ChasmCorpusRunner(
                 val reference = value.reference()
                 timings.execute { writeGlobalReference(global.global, reference) }
             }
+            is VectorValue -> return failure(fixture, context, "unsupported global value", value.toString())
         }
         return CorpusResult.Success
     }
@@ -709,7 +708,7 @@ class ChasmCorpusRunner(
         return imports.firstOrNull { import -> import.module == module && import.name == name }
     }
 
-    private fun ModuleImport.importKey(): String {
+    private fun ImportDefinition.importKey(): String {
         return "$moduleName.$entityName"
     }
 
@@ -745,11 +744,13 @@ class ChasmCorpusRunner(
     private fun ExecutionValue.matches(other: ExecutionValue): Boolean = when (this) {
         is NumberValue<*> -> other is NumberValue<*> && bits() == other.bits()
         is ReferenceValue -> this == other
+        is VectorValue.V128 -> other is VectorValue.V128 && v128.contentEquals(other.v128)
     }
 
     private fun ExecutionValue.describe(): String = when (this) {
         is NumberValue<*> -> "bits=${bits()}"
         is ReferenceValue -> toString()
+        is VectorValue.V128 -> "v128=${v128.toHex()}"
     }
 
     private fun ByteArray.readLittleEndian(): Long {

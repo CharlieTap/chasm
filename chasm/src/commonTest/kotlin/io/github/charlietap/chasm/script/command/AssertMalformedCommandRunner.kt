@@ -6,9 +6,9 @@ import io.github.charlietap.chasm.script.decoder.BinaryDecoder
 import io.github.charlietap.chasm.script.ext.readBytesFromPath
 import io.github.charlietap.sweet.lib.command.AssertMalformedCommand
 
-typealias AssertMalformedCommandRunner = (ScriptContext, AssertMalformedCommand) -> CommandResult
+typealias AssertMalformedCommandRunner = suspend (ScriptContext, AssertMalformedCommand) -> CommandResult
 
-fun AssertMalformedCommandRunner(
+suspend fun AssertMalformedCommandRunner(
     context: ScriptContext,
     command: AssertMalformedCommand,
 ): CommandResult {

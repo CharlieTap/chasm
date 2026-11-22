@@ -21,9 +21,23 @@ kotlin {
                 api(projects.config)
                 api(projects.embeddingApi)
 
+                api(projects.stream)
+
                 implementation(projects.ast)
+                implementation(projects.decoder)
+                implementation(projects.libs.parallel)
+                implementation(projects.libs.parallelCoroutines)
                 implementation(projects.module)
                 implementation(projects.moduleDeclarations)
+                implementation(projects.validator)
+            }
+        }
+
+        commonTest {
+            dependencies {
+                implementation(projects.test.fake.decoder)
+
+                implementation(libs.kotlinx.coroutines.test)
             }
         }
     }

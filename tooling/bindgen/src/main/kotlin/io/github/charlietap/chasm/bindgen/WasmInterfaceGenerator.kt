@@ -41,7 +41,7 @@ internal class WasmInterfaceGenerator(
     private val chasmFactoryFunctionGenerator: ChasmFactoryFunctionGenerator = ChasmFactoryFunctionGenerator(),
     private val chasmClassImplementationGenerator: ChasmClassImplementationGenerator = ChasmClassImplementationGenerator(),
     private val visibilityValidator: VisibilityValidator = VisibilityValidator(),
-    private val embeddingApiSelector: EmbeddingApiSelector = EmbeddingApiSelector(),
+    private val api: EmbeddingApi = ChasmEmbeddingApi(),
 ) {
     operator fun invoke(
         interfaceVisibility: InterfaceVisibility,
@@ -81,7 +81,7 @@ internal class WasmInterfaceGenerator(
         config: CodegenConfig,
     ): FileSpec {
         return FileSpec.builder(wasmInterface.packageName, wasmInterface.interfaceName + "Impl").apply {
-            if (config.executionTier !is ExecutionTier.Interpreter) {
+            if (config.runtime == CodegenRuntime.CHASM) {
 
                 val borrowsGcArrays = wasmInterface.functions.any { function ->
                     function.params.any { param -> param.stringEncoding is GcArrayString } ||
@@ -100,7 +100,6 @@ internal class WasmInterfaceGenerator(
                         .build(),
                 )
             }
-            val api = embeddingApiSelector.embeddingApi(config.executionTier)
             val controls = config.storeControls
             controls.forEach { control -> addAliasedImport(api.storeFunction(control.function), control.function.alias) }
             if (config.executionTier is ExecutionTier.Aot) {

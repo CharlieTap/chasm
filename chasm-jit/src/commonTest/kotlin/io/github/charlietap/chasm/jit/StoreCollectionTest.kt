@@ -1,13 +1,14 @@
 package io.github.charlietap.chasm.jit
 
-import io.github.charlietap.chasm.embedding.compiled.Instance
-import io.github.charlietap.chasm.embedding.compiled.Store
-import io.github.charlietap.chasm.embedding.compiled.instance
-import io.github.charlietap.chasm.embedding.compiled.invoke
-import io.github.charlietap.chasm.embedding.compiled.readStructField
-import io.github.charlietap.chasm.embedding.compiled.value.NumberValue.I32
-import io.github.charlietap.chasm.embedding.compiled.value.ReferenceValue
+import io.github.charlietap.chasm.embedding.instance
+import io.github.charlietap.chasm.embedding.invoke
+import io.github.charlietap.chasm.embedding.module
+import io.github.charlietap.chasm.embedding.reference.readStructField
+import io.github.charlietap.chasm.embedding.shapes.Instance
+import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.shapes.expect
+import io.github.charlietap.chasm.embedding.value.NumberValue.I32
+import io.github.charlietap.chasm.embedding.value.ReferenceValue
 import io.github.charlietap.chasm.reference.StructReference
 import kotlinx.coroutines.runBlocking
 import java.lang.ref.WeakReference
@@ -19,14 +20,14 @@ class StoreCollectionTest {
 
     @Test
     fun storesThatRanNumericCodeAreCollected() {
-        assertCollected(dropped("function_exporter") { store, instance -> invoke(store, instance, "double", listOf(I32(2))).expect("double") })
+        assertCollected(dropped("function_exporter") { instance -> invoke(instance, "double", listOf(I32(2))).expect("double") })
     }
 
     @Test
     fun storesWhoseStructsTheHostReadAreCollected() {
         assertCollected(
-            dropped("struct_accessors") { store, instance ->
-                val struct = (invoke(store, instance, "kinds").expect("kinds").single() as ReferenceValue.Struct).reference
+            dropped("struct_accessors") { instance ->
+                val struct = (invoke(instance, "kinds").expect("kinds").single() as ReferenceValue.Struct).reference
                 readStructField(struct, 0)
             },
         )
@@ -36,8 +37,8 @@ class StoreCollectionTest {
     fun structsOutlivingTheirStoreReportItGone() {
 
         var held: StructReference? = null
-        val reference = dropped("struct_accessors") { store, instance ->
-            held = (invoke(store, instance, "kinds").expect("kinds").single() as ReferenceValue.Struct).reference
+        val reference = dropped("struct_accessors") { instance ->
+            held = (invoke(instance, "kinds").expect("kinds").single() as ReferenceValue.Struct).reference
         }
 
         assertCollected(reference)
@@ -47,7 +48,7 @@ class StoreCollectionTest {
 
     private fun dropped(
         name: String,
-        body: (Store, Instance) -> Unit,
+        body: (Instance) -> Unit,
     ): WeakReference<Store> {
 
         var reference: WeakReference<Store>? = null
@@ -55,7 +56,7 @@ class StoreCollectionTest {
             val created = store()
             val module = runBlocking { module(resourceBytes("modules/$name.wasm")) }.expect(name)
             val instance = runBlocking { instance(created, module) }.expect(name)
-            body(created, instance)
+            body(instance)
             reference = WeakReference(created)
         }
 

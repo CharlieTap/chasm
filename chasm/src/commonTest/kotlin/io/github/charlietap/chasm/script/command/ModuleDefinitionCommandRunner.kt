@@ -1,10 +1,8 @@
 package io.github.charlietap.chasm.script.command
 
 import io.github.charlietap.chasm.embedding.module
-import io.github.charlietap.chasm.embedding.shapes.flatMap
 import io.github.charlietap.chasm.embedding.shapes.fold
 import io.github.charlietap.chasm.embedding.shapes.map
-import io.github.charlietap.chasm.embedding.validate
 import io.github.charlietap.chasm.script.ScriptContext
 import io.github.charlietap.chasm.script.decoder.BinaryDecoder
 import io.github.charlietap.chasm.script.decoder.BinaryValidator
@@ -12,9 +10,9 @@ import io.github.charlietap.chasm.script.ext.readBytesFromPath
 import io.github.charlietap.sweet.lib.SemanticPhase
 import io.github.charlietap.sweet.lib.command.ModuleDefinitionCommand
 
-typealias ModuleDefinitionCommandRunner = (ScriptContext, ModuleDefinitionCommand) -> CommandResult
+typealias ModuleDefinitionCommandRunner = suspend (ScriptContext, ModuleDefinitionCommand) -> CommandResult
 
-fun ModuleDefinitionCommandRunner(
+suspend fun ModuleDefinitionCommandRunner(
     context: ScriptContext,
     command: ModuleDefinitionCommand,
 ): CommandResult {
@@ -31,9 +29,7 @@ fun ModuleDefinitionCommandRunner(
         SemanticPhase.VALIDATION -> BinaryValidator(bytes, context.config.moduleConfig)
 
         SemanticPhase.EXECUTION -> module(bytes, context.config.moduleConfig)
-            .flatMap { module ->
-                validate(module)
-            }.map { module ->
+            .map { module ->
                 context.modules[null] = module
                 command.name?.let {
                     context.modules[command.name] = module

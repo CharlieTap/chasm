@@ -6,9 +6,9 @@ import io.github.charlietap.chasm.fixture.runtime.memory.linearMemory
 import io.github.charlietap.chasm.fixture.type.limits
 import io.github.charlietap.chasm.fixture.type.memoryType
 import io.github.charlietap.chasm.fixture.type.unsharedStatus
-import io.github.charlietap.chasm.host.ByteArrayHostMemory
 import io.github.charlietap.chasm.host.UnsafeHostApi
 import io.github.charlietap.chasm.memory.destruct.LinearMemoryDestructor
+import io.github.charlietap.chasm.runtime.host.ByteArrayHostMemory
 import io.github.charlietap.chasm.runtime.instance.MemoryInstance
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
 import io.github.charlietap.chasm.runtime.memory.LinearMemory.Companion.PAGE_SIZE

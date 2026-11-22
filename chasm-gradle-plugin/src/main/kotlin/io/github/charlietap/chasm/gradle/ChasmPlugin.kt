@@ -145,11 +145,6 @@ class ChasmPlugin : Plugin<Project> {
         }
         addDependency(project, selection, apiConfigurationName, implementationConfigurationName, runtimeNotation)
 
-        val coroutineNotation = config.filter { value ->
-            value.runtime == CodegenRuntime.CHASM && value.generateSuspendingFactories
-        }.map { resolveChasmCoroutinesRuntimeNotation(jvmArtifact) }
-        addDependency(project, selection, apiConfigurationName, implementationConfigurationName, coroutineNotation)
-
         val wasiPreview1Notation = config.filter { value -> value.wasi == WasiLinking.AUTOMATIC }
             .map { resolveWasiPreview1RuntimeNotation() }
         addDependency(project, selection, apiConfigurationName, implementationConfigurationName, wasiPreview1Notation)
@@ -218,14 +213,6 @@ class ChasmPlugin : Plugin<Project> {
 
     private fun resolveChasmRuntimeNotation(jvmArtifact: Boolean = false): String {
         return if (jvmArtifact) BuildConfig.CHASM_JVM_DEPENDENCY else BuildConfig.CHASM_DEPENDENCY
-    }
-
-    private fun resolveChasmCoroutinesRuntimeNotation(jvmArtifact: Boolean = false): String {
-        return if (jvmArtifact) {
-            BuildConfig.CHASM_COROUTINES_JVM_DEPENDENCY
-        } else {
-            BuildConfig.CHASM_COROUTINES_DEPENDENCY
-        }
     }
 
     private fun resolveWasiPreview1RuntimeNotation(): String = BuildConfig.WASI_PREVIEW1_DEPENDENCY

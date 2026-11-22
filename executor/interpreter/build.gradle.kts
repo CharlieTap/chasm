@@ -20,7 +20,7 @@ kotlin {
         commonTest {
             dependencies {
                 implementation(projects.executor.dispatch)
-                implementation(projects.host)
+                implementation(projects.runtime.host)
                 implementation(projects.runtime.resources)
                 implementation(projects.test.fixture.runtime)
             }

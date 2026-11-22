@@ -39,7 +39,7 @@ reached. Arena adds no per-allocation policy check.
 ### Manual
 
 Chasm performs no automatic collection. The embedding triggers collection with
-the public `gc` function.
+the public `collect` function.
 
 ### Traditional
 

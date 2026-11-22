@@ -1,16 +1,18 @@
+@file:OptIn(ExperimentalChasmApi::class)
+
 package io.github.charlietap.chasm.benchmark.embedding
 
+import io.github.charlietap.chasm.ExperimentalChasmApi
 import io.github.charlietap.chasm.benchmark.BenchmarkConfig
 import io.github.charlietap.chasm.benchmark.StabilizedBenchmark
-import io.github.charlietap.chasm.embedding.exports
 import io.github.charlietap.chasm.embedding.instance
 import io.github.charlietap.chasm.embedding.invoke
+import io.github.charlietap.chasm.embedding.invokeUnboxed
 import io.github.charlietap.chasm.embedding.module
 import io.github.charlietap.chasm.embedding.prepareFunction
-import io.github.charlietap.chasm.embedding.shapes.Function
 import io.github.charlietap.chasm.embedding.shapes.expect
 import io.github.charlietap.chasm.embedding.store
-import io.github.charlietap.chasm.runtime.value.NumberValue
+import io.github.charlietap.chasm.embedding.value.NumberValue
 import kotlinx.benchmark.Benchmark
 import kotlinx.benchmark.BenchmarkMode
 import kotlinx.benchmark.BenchmarkTimeUnit
@@ -21,6 +23,7 @@ import kotlinx.benchmark.OutputTimeUnit
 import kotlinx.benchmark.Scope
 import kotlinx.benchmark.State
 import kotlinx.benchmark.Warmup
+import kotlinx.coroutines.runBlocking
 
 @State(Scope.Benchmark)
 @BenchmarkMode(Mode.AverageTime)
@@ -30,24 +33,22 @@ import kotlinx.benchmark.Warmup
 class PreparedFunctionBenchmark : StabilizedBenchmark() {
 
     private val store = store()
-    private val instance = instance(
-        store = store,
-        module = module(IDENTITY_MODULE).expect("Failed to decode benchmark module"),
-        imports = emptyList(),
-    ).expect("Failed to instantiate benchmark module")
-    private val function = exports(instance).single().value as Function
-    private val preparedFunction = prepareFunction(store, instance, FUNCTION_NAME)
+    private val instance = runBlocking {
+        instance(
+            store = store,
+            module = module(IDENTITY_MODULE).expect("Failed to decode benchmark module"),
+            imports = emptyList(),
+        )
+    }.expect("Failed to instantiate benchmark module")
+    private val preparedFunction = prepareFunction(instance, FUNCTION_NAME)
         .expect("Failed to prepare benchmark function")
-    private val arguments = listOf(NumberValue.I32(42))
+    private val arguments = listOf(NumberValue.I32(ARGUMENT))
+    private val words = LongArray(1)
+    private val references = arrayOfNulls<Any>(1)
 
     @Benchmark
     fun invokeByName(blackhole: Blackhole) {
-        blackhole.consume(invoke(store, instance, FUNCTION_NAME, arguments))
-    }
-
-    @Benchmark
-    fun invokeByFunction(blackhole: Blackhole) {
-        blackhole.consume(invoke(store, instance, function, arguments))
+        blackhole.consume(invoke(instance, FUNCTION_NAME, arguments))
     }
 
     @Benchmark
@@ -56,12 +57,22 @@ class PreparedFunctionBenchmark : StabilizedBenchmark() {
     }
 
     @Benchmark
+    fun invokeUnboxed(blackhole: Blackhole) {
+
+        words[0] = ARGUMENT.toLong()
+
+        blackhole.consume(preparedFunction.invokeUnboxed(words, references))
+        blackhole.consume(words[0])
+    }
+
+    @Benchmark
     fun prepare(blackhole: Blackhole) {
-        blackhole.consume(prepareFunction(store, instance, FUNCTION_NAME))
+        blackhole.consume(prepareFunction(instance, FUNCTION_NAME))
     }
 
     private companion object {
         const val FUNCTION_NAME = "identity"
+        const val ARGUMENT = 42
 
         // (module (func (export "identity") (param i32) (result i32) local.get 0))
         val IDENTITY_MODULE = byteArrayOf(

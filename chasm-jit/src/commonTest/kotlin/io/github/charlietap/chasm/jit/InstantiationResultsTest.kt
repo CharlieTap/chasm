@@ -3,35 +3,35 @@ package io.github.charlietap.chasm.jit
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.config.StoreConfig
 import io.github.charlietap.chasm.config.StoreLimits
-import io.github.charlietap.chasm.embedding.compiled.Import
-import io.github.charlietap.chasm.embedding.compiled.Instance
-import io.github.charlietap.chasm.embedding.compiled.Module
-import io.github.charlietap.chasm.embedding.compiled.Store
-import io.github.charlietap.chasm.embedding.compiled.exports
-import io.github.charlietap.chasm.embedding.compiled.function
-import io.github.charlietap.chasm.embedding.compiled.host.HostFunction
-import io.github.charlietap.chasm.embedding.compiled.host.HostModuleInstance
-import io.github.charlietap.chasm.embedding.compiled.host.createException
-import io.github.charlietap.chasm.embedding.compiled.host.raise
-import io.github.charlietap.chasm.embedding.compiled.host.readI32
-import io.github.charlietap.chasm.embedding.compiled.host.readReference
-import io.github.charlietap.chasm.embedding.compiled.host.withTag
-import io.github.charlietap.chasm.embedding.compiled.host.writeReference
-import io.github.charlietap.chasm.embedding.compiled.instance
-import io.github.charlietap.chasm.embedding.compiled.invoke
-import io.github.charlietap.chasm.embedding.compiled.payloadSize
-import io.github.charlietap.chasm.embedding.compiled.readGlobal
-import io.github.charlietap.chasm.embedding.compiled.readGlobalReference
-import io.github.charlietap.chasm.embedding.compiled.readPayload
-import io.github.charlietap.chasm.embedding.compiled.value.ExecutionValue
-import io.github.charlietap.chasm.embedding.compiled.value.NumberValue.I32
 import io.github.charlietap.chasm.embedding.dsl.FunctionTypeBuilder
 import io.github.charlietap.chasm.embedding.error.ExecutionError
 import io.github.charlietap.chasm.embedding.error.InstantiationError
 import io.github.charlietap.chasm.embedding.error.TrapReason
+import io.github.charlietap.chasm.embedding.exports
+import io.github.charlietap.chasm.embedding.function
+import io.github.charlietap.chasm.embedding.global.readGlobal
+import io.github.charlietap.chasm.embedding.global.readGlobalReference
+import io.github.charlietap.chasm.embedding.instance
+import io.github.charlietap.chasm.embedding.invoke
+import io.github.charlietap.chasm.embedding.module
+import io.github.charlietap.chasm.embedding.reference.payloadSize
+import io.github.charlietap.chasm.embedding.reference.readPayload
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
+import io.github.charlietap.chasm.embedding.shapes.Import
+import io.github.charlietap.chasm.embedding.shapes.Instance
+import io.github.charlietap.chasm.embedding.shapes.Module
+import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.shapes.expect
-import io.github.charlietap.chasm.reference.ExceptionReference
+import io.github.charlietap.chasm.embedding.value.ExecutionValue
+import io.github.charlietap.chasm.embedding.value.NumberValue.I32
+import io.github.charlietap.chasm.host.HostFunction
+import io.github.charlietap.chasm.host.HostModuleInstance
+import io.github.charlietap.chasm.host.createException
+import io.github.charlietap.chasm.host.raise
+import io.github.charlietap.chasm.host.readI32
+import io.github.charlietap.chasm.host.readReference
+import io.github.charlietap.chasm.host.withTag
+import io.github.charlietap.chasm.host.writeReference
 import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -58,7 +58,7 @@ class InstantiationResultsTest {
     @Test
     fun aThrowingStartFunctionHandsOverTheException() {
 
-        val error = assertIs<ExecutionError.Thrown<ExceptionReference>>(failure(store(), "instantiation_start_throw"))
+        val error = assertIs<ExecutionError.Thrown>(failure(store(), "instantiation_start_throw"))
 
         assertEquals(7L, readPayload(error.exception, 0))
         assertEquals(1, payloadSize(error.exception))
@@ -106,14 +106,14 @@ class InstantiationResultsTest {
             FunctionTypeBuilder().build(),
             HostFunction { _, _ ->
                 val module = contextOf<HostModuleInstance>()
-                seen = invoke(store, module.instance, "value").expect("value during start")
+                seen = invoke(module.instance, "value").expect("value during start")
             },
         )
 
         val instance = instantiate(store, "instantiation_start_reentry", listOf(Import("host", "during_start", duringStart)))
 
         assertEquals(listOf<ExecutionValue>(I32(3)), seen)
-        assertEquals(listOf<ExecutionValue>(I32(3)), invoke(store, instance, "value").expect("value"))
+        assertEquals(listOf<ExecutionValue>(I32(3)), invoke(instance, "value").expect("value"))
     }
 
     @Test
@@ -185,7 +185,7 @@ class InstantiationResultsTest {
         val store = store()
 
         val result = runBlocking { instance(store, load("instantiation_start_raise_uncaught"), raiseImports(store)) }
-        val error = assertIs<ExecutionError.Thrown<ExceptionReference>>(assertIs<ChasmResult.Error<InstantiationError<ExceptionReference>>>(result).error)
+        val error = assertIs<ExecutionError.Thrown>(assertIs<ChasmResult.Error<InstantiationError>>(result).error)
 
         assertEquals(50L, readPayload(error.exception, 0))
     }
@@ -194,7 +194,7 @@ class InstantiationResultsTest {
     fun aTrappingStartFunctionReportsFramesWithDebugInfo() {
 
         val result = runBlocking { instance(store(), load("instantiation_start_trap"), emptyList(), RuntimeConfig(debugInfo = true)) }
-        val error = assertIs<ExecutionError.Trapped>(assertIs<ChasmResult.Error<InstantiationError<ExceptionReference>>>(result).error)
+        val error = assertIs<ExecutionError.Trapped>(assertIs<ChasmResult.Error<InstantiationError>>(result).error)
 
         val frames = checkNotNull(error.trap.stackTrace).frames
         assertTrue(frames.isNotEmpty(), frames.toString())
@@ -220,11 +220,11 @@ class InstantiationResultsTest {
     private fun failure(
         store: Store,
         name: String,
-    ): InstantiationError<ExceptionReference> {
+    ): InstantiationError {
 
         val result = runBlocking { instance(store, load(name), emptyList()) }
 
-        return assertIs<ChasmResult.Error<InstantiationError<ExceptionReference>>>(result).error
+        return assertIs<ChasmResult.Error<InstantiationError>>(result).error
     }
 
     private fun instantiate(

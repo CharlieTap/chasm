@@ -1,51 +1,43 @@
 package io.github.charlietap.chasm.embedding
 
 import io.github.charlietap.chasm.config.LinearMemoryConfig
-import io.github.charlietap.chasm.embedding.fixture.publicMemory
-import io.github.charlietap.chasm.embedding.fixture.publicStore
+import io.github.charlietap.chasm.embedding.fixture.interpreterStore
+import io.github.charlietap.chasm.embedding.internal.InterpreterEngine
+import io.github.charlietap.chasm.embedding.shapes._engine
+import io.github.charlietap.chasm.fixture.runtime.store
+import io.github.charlietap.chasm.fixture.type.limits
 import io.github.charlietap.chasm.fixture.type.memoryType
-import io.github.charlietap.chasm.runtime.address.Address
-import io.github.charlietap.chasm.runtime.instance.ExternalValue
+import io.github.charlietap.chasm.runtime.memory.LinearMemory.Companion.PAGE_SIZE
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 class MemoryTest {
 
     @Test
-    fun `can allocate a memory in the store and return an external value`() {
+    fun `can allocate a memory in the store and return a handle`() {
 
-        val store = publicStore()
-        val memoryType = memoryType()
+        val runtime = store()
+        val store = interpreterStore(runtime)
+        val type = memoryType(limits = limits(min = 1u))
 
-        val expectedExternalValue = ExternalValue.Memory(Address.Memory(0))
-        val expected = publicMemory(expectedExternalValue)
+        val actual = memory(store, type)
 
-        val actual = memory(store, memoryType)
-
-        assertEquals(expected, actual)
-        assertEquals(memoryType(), store.store.memories[0].type)
+        assertEquals(type, actual.type)
+        assertEquals(memoryType(limits = limits(min = 1u)), runtime.memories[0].type)
+        assertEquals(PAGE_SIZE, runtime.memories[0].size)
     }
 
     @Test
-    fun `passes linear memory config to the allocator`() {
-        val store = publicStore()
-        val memoryType = memoryType()
-        val config = LinearMemoryConfig(prefault = true)
-        var called = false
+    fun `an interpreter memory can be allocated with a linear memory config`() {
 
-        val actual = memory(
-            store = store,
-            type = memoryType,
-            config = config,
-            allocator = { _, _, actualConfig ->
-                assertEquals(config, actualConfig)
-                called = true
-                Address.Memory(0)
-            },
-        )
+        val runtime = store()
+        val store = interpreterStore(runtime)
+        val engine = store._engine() as InterpreterEngine
+        val type = memoryType(limits = limits(min = 1u))
 
-        assertTrue(called)
-        assertEquals(publicMemory(ExternalValue.Memory(Address.Memory(0))), actual)
+        val actual = engine.memory(type, LinearMemoryConfig(prefault = true))
+
+        assertEquals(type, actual.type)
+        assertEquals(PAGE_SIZE, runtime.memories.single().size)
     }
 }

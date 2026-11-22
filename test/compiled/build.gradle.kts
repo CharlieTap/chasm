@@ -19,13 +19,11 @@ kotlin {
                 api(libs.corpus.lib)
                 api(libs.sweet.lib)
 
-                implementation(projects.chasm)
-
                 implementation(projects.ast)
                 implementation(projects.decoder)
                 implementation(projects.validator)
                 implementation(projects.typeSystem)
-                implementation(projects.runtime.address)
+                implementation(libs.kotlinx.coroutines.core)
                 implementation(libs.kotlinx.io.core)
                 implementation(libs.kotlinx.serialization)
                 implementation(libs.result)

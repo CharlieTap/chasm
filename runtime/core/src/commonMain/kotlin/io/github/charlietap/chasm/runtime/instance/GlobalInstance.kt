@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.runtime.instance
 
-import io.github.charlietap.chasm.host.HostGlobal
+import io.github.charlietap.chasm.runtime.host.HostGlobal
 import io.github.charlietap.chasm.type.GlobalType
 
 data class GlobalInstance(

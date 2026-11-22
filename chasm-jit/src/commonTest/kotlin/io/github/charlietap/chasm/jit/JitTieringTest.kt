@@ -3,16 +3,17 @@
 package io.github.charlietap.chasm.jit
 
 import io.github.charlietap.chasm.ExperimentalChasmApi
-import io.github.charlietap.chasm.embedding.compiled.Import
-import io.github.charlietap.chasm.embedding.compiled.exports
-import io.github.charlietap.chasm.embedding.compiled.function
-import io.github.charlietap.chasm.embedding.compiled.growMemory
-import io.github.charlietap.chasm.embedding.compiled.instance
-import io.github.charlietap.chasm.embedding.compiled.invoke
-import io.github.charlietap.chasm.embedding.compiled.readBytes
-import io.github.charlietap.chasm.embedding.compiled.value.NumberValue.I32
-import io.github.charlietap.chasm.embedding.compiled.writeBytes
+import io.github.charlietap.chasm.embedding.exports
+import io.github.charlietap.chasm.embedding.function
+import io.github.charlietap.chasm.embedding.instance
+import io.github.charlietap.chasm.embedding.invoke
+import io.github.charlietap.chasm.embedding.memory.growMemory
+import io.github.charlietap.chasm.embedding.memory.readBytes
+import io.github.charlietap.chasm.embedding.memory.writeBytes
+import io.github.charlietap.chasm.embedding.module
+import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.expect
+import io.github.charlietap.chasm.embedding.value.NumberValue.I32
 import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.chasm.type.NumberType
 import io.github.charlietap.chasm.type.ResultType
@@ -49,11 +50,11 @@ class JitTieringTest {
         val rom = fixtureRom()
         growMemory(memory, 1)
         writeBytes(memory, 0, rom)
-        invoke(store, instance, "init_extern", listOf(I32(rom.size))).expect("init")
+        invoke(instance, "init_extern", listOf(I32(rom.size))).expect("init")
 
         val frameMicros = List(FRAME_COUNT) {
             val start = System.nanoTime()
-            invoke(store, instance, "run_frame_extern").expect("frame")
+            invoke(instance, "run_frame_extern").expect("frame")
             (System.nanoTime() - start) / 1_000
         }
 

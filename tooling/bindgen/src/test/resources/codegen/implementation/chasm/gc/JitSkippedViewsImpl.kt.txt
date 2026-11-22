@@ -3,18 +3,18 @@
 package com.test
 
 import io.github.charlietap.chasm.ExperimentalChasmApi
-import io.github.charlietap.chasm.embedding.compiled.Import
-import io.github.charlietap.chasm.embedding.compiled.Instance
-import io.github.charlietap.chasm.embedding.compiled.Module
-import io.github.charlietap.chasm.embedding.compiled.PreparedFunction
-import io.github.charlietap.chasm.embedding.compiled.Store
-import io.github.charlietap.chasm.embedding.compiled.codegen.CodegenImport
-import io.github.charlietap.chasm.embedding.compiled.codegen.allocateImports
-import io.github.charlietap.chasm.embedding.compiled.instance
-import io.github.charlietap.chasm.embedding.compiled.invokeUnboxed
-import io.github.charlietap.chasm.embedding.compiled.prepareFunction
+import io.github.charlietap.chasm.embedding.codegen.CodegenImport
+import io.github.charlietap.chasm.embedding.codegen.allocateImports
+import io.github.charlietap.chasm.embedding.instance
+import io.github.charlietap.chasm.embedding.invokeUnboxed
+import io.github.charlietap.chasm.embedding.module
+import io.github.charlietap.chasm.embedding.prepareFunction
+import io.github.charlietap.chasm.embedding.shapes.Import
+import io.github.charlietap.chasm.embedding.shapes.Instance
+import io.github.charlietap.chasm.embedding.shapes.Module
+import io.github.charlietap.chasm.embedding.shapes.PreparedFunction
+import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.shapes.`expect`
-import io.github.charlietap.chasm.jit.module
 import io.github.charlietap.chasm.jit.store
 import kotlin.Any
 import kotlin.Array
@@ -35,7 +35,7 @@ public suspend fun jitSkippedViews(
   ) -> Instance)? = null,
 ): JitSkippedViews {
   val store = store()
-  val module = moduleFactory?.invoke(binary) ?: module(binary, validate = true).`expect`("Failed to decode binary")
+  val module = moduleFactory?.invoke(binary) ?: module(binary).`expect`("Failed to decode binary")
   val allocatedImports = allocateImports(store, imports)
   val instance = instanceFactory?.invoke(store, module, allocatedImports) ?: instance(store, module, allocatedImports).`expect`("Failed to instantiate module")
   return JitSkippedViewsImpl(store = store, instance = instance)
@@ -46,17 +46,20 @@ private class JitSkippedViewsImpl(
   private val instance: Instance,
 ) : JitSkippedViews {
   private val usesKeptPreparedFunction: PreparedFunction =
-      prepareFunction(store, instance, "uses_kept").`expect`("Failed to prepare function uses_kept")
+      prepareFunction(instance, "uses_kept").`expect`("Failed to prepare function uses_kept")
 
   private val usesKeptWords: LongArray = LongArray(1)
 
   private val usesKeptReferences: Array<Any?> = arrayOfNulls<Any>(1)
 
   override fun usesKept(p0: JitSkippedViews.Struct2): Long {
-    usesKeptReferences[0] = p0.reference
-    usesKeptPreparedFunction.invokeUnboxed(usesKeptWords, usesKeptReferences).`expect`("Failed to invoke function usesKept")
-    val result = usesKeptWords[0]
-    usesKeptReferences[0] = null
-    return result
+    try {
+      usesKeptReferences[0] = p0.reference
+      usesKeptPreparedFunction.invokeUnboxed(usesKeptWords, usesKeptReferences).`expect`("Failed to invoke function usesKept")
+      val result = usesKeptWords[0]
+      return result
+    } finally {
+      usesKeptReferences[0] = null
+    }
   }
 }

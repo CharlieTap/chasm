@@ -6,9 +6,9 @@ import io.github.charlietap.chasm.script.decoder.BinaryValidator
 import io.github.charlietap.chasm.script.ext.readBytesFromPath
 import io.github.charlietap.sweet.lib.command.AssertInvalidCommand
 
-typealias AssertInvalidCommandRunner = (ScriptContext, AssertInvalidCommand) -> CommandResult
+typealias AssertInvalidCommandRunner = suspend (ScriptContext, AssertInvalidCommand) -> CommandResult
 
-fun AssertInvalidCommandRunner(
+suspend fun AssertInvalidCommandRunner(
     context: ScriptContext,
     command: AssertInvalidCommand,
 ): CommandResult {

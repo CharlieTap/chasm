@@ -451,7 +451,7 @@ internal class WasmInterfaceFactory(
     private val memoryBindingFactory: MemoryBindingFactory = MemoryBindingFactory(),
     private val allocatorValidator: AllocatorValidator = AllocatorValidator(),
     private val exportExcluder: ExportExcluder = ExportExcluder(),
-    private val embeddingApiSelector: EmbeddingApiSelector = EmbeddingApiSelector(),
+    private val callConvention: FunctionCallConvention = UnboxedFunctionCallConvention(),
 ) {
     operator fun invoke(
         interfaceName: String,
@@ -465,10 +465,9 @@ internal class WasmInterfaceFactory(
         logger: BindgenLogger,
     ): WasmInterface {
 
-        val callConvention = embeddingApiSelector.embeddingApi(config.executionTier).functionCallConvention
         val gcTypes = GcTypeResolver(
             interfaceClassName = ClassName(packageName, interfaceName),
-            mapsReferences = callConvention.passesReferences,
+            mapsReferences = config.runtime == CodegenRuntime.CHASM,
         )
         val functions = mutableListOf<Function>()
         val properties = mutableListOf<Property>()
@@ -533,10 +532,14 @@ internal class WasmInterfaceFactory(
             memoryExports.add(MemoryExport(DEFAULT_MEMORY_EXPORT_NAME, exposed = false))
         }
 
+        val runtimePropertyNames = when (config.runtime) {
+            CodegenRuntime.PORTABLE_VM -> portableVmBufferNames(functions)
+            CodegenRuntime.CHASM -> callConvention.reservedNames(functions)
+        }
         val reservedNames = IMPLEMENTATION_PROPERTY_NAMES +
             properties.map { property -> property.name } +
             functions.map(::preparedFunctionPropertyName) +
-            callConvention.reservedNames(functions)
+            runtimePropertyNames
         val memories = memoryBindingFactory(memoryExports, reservedNames)
 
         allocatorValidator(allocator, functions, info)
@@ -555,6 +558,13 @@ internal class WasmInterfaceFactory(
             },
             structViews = gcTypes.structViews,
         )
+    }
+
+    private fun portableVmBufferNames(functions: List<Function>): List<String> {
+        return functions.map(Function::inputCount)
+            .filter { inputCount -> inputCount > 0 }
+            .distinct()
+            .flatMap { inputCount -> listOf(FUNCTION_INPUT_BUFFER_NAME, functionInputBufferName(inputCount)) }
     }
 
     private companion object {

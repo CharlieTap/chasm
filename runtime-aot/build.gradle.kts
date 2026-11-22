@@ -47,12 +47,15 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                api(projects.embeddingRuntime)
+                api(projects.config)
+                api(projects.embeddingApi)
                 api(projects.runtime.compiledApi)
 
+                implementation(projects.embeddingRuntime)
                 implementation(projects.moduleDeclarations)
                 implementation(projects.runtime.compiled)
 
+                implementation(projects.executor.callCore)
                 implementation(projects.executor.instantiator)
                 implementation(projects.runtime.core)
 

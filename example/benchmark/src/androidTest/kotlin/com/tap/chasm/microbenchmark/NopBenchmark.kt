@@ -8,8 +8,8 @@ import io.github.charlietap.chasm.embedding.instance
 import io.github.charlietap.chasm.embedding.invoke
 import io.github.charlietap.chasm.embedding.module
 import io.github.charlietap.chasm.embedding.shapes.expect
-import io.github.charlietap.chasm.embedding.shapes.flatMap
 import io.github.charlietap.chasm.embedding.store
+import kotlinx.coroutines.runBlocking
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -24,15 +24,14 @@ class NopBenchmark {
         it.readBytes()
     }
     private val store = store()
-    private val instance = module(bytes)
-        .flatMap {
-            instance(store, it, emptyList())
-        }.expect("failed to create instance")
+    private val instance = runBlocking {
+        instance(store, module(bytes).expect("failed to decode module"), emptyList())
+    }.expect("failed to create instance")
 
     @Test
     fun benchmark() {
         benchmarkRule.measureRepeated {
-            invoke(store, instance, "nop", emptyList())
+            invoke(instance, "nop", emptyList())
         }
     }
 }

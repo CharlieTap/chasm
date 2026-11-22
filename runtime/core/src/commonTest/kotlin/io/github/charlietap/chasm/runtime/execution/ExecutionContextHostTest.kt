@@ -15,14 +15,10 @@ import io.github.charlietap.chasm.fixture.type.limits
 import io.github.charlietap.chasm.fixture.type.memoryType
 import io.github.charlietap.chasm.fixture.type.tableType
 import io.github.charlietap.chasm.fixture.type.tagType
-import io.github.charlietap.chasm.host.HostTag
 import io.github.charlietap.chasm.host.ModuleIndex
 import io.github.charlietap.chasm.host.UnsafeHostApi
-import io.github.charlietap.chasm.host.withGc
-import io.github.charlietap.chasm.host.withGlobal
-import io.github.charlietap.chasm.host.withMemory
-import io.github.charlietap.chasm.host.withTable
-import io.github.charlietap.chasm.host.withTag
+import io.github.charlietap.chasm.runtime.host.HostTag
+import io.github.charlietap.chasm.runtime.host.withTag
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
 import io.github.charlietap.chasm.runtime.memory.LinearMemory.Companion.PAGE_SIZE
 import io.github.charlietap.chasm.runtime.memory.OutOfMemoryError
@@ -165,11 +161,7 @@ class ExecutionContextHostTest {
         assertEquals(HostTag(targetTagAddress.address), context.tag(caller, tagIndex))
 
         context(caller, context) {
-            withGc { assertSame(store.heap, this) }
-            withMemory(memoryIndex) { assertSame(targetMemory, this) }
-            withTable(tableIndex) { assertSame(targetTable, this) }
-            withGlobal(0) { assertSame(targetGlobal, this) }
-            withTag(0) { assertEquals(targetTagAddress.address, rawAddress) }
+            withTag(tagIndex) { assertEquals(targetTagAddress.address, rawAddress) }
         }
 
         table.writeRaw(1, 31L)

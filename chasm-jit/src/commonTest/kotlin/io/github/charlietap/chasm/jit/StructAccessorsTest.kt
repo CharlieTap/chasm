@@ -1,23 +1,24 @@
 package io.github.charlietap.chasm.jit
 
-import io.github.charlietap.chasm.embedding.compiled.Instance
-import io.github.charlietap.chasm.embedding.compiled.Store
-import io.github.charlietap.chasm.embedding.compiled.allocateArray
-import io.github.charlietap.chasm.embedding.compiled.arrayLength
-import io.github.charlietap.chasm.embedding.compiled.arrayType
-import io.github.charlietap.chasm.embedding.compiled.instance
-import io.github.charlietap.chasm.embedding.compiled.invoke
-import io.github.charlietap.chasm.embedding.compiled.readArrayReference
-import io.github.charlietap.chasm.embedding.compiled.readStructField
-import io.github.charlietap.chasm.embedding.compiled.readStructReference
-import io.github.charlietap.chasm.embedding.compiled.unsafeWriteStructReference
-import io.github.charlietap.chasm.embedding.compiled.value.ExecutionValue
-import io.github.charlietap.chasm.embedding.compiled.value.NumberValue.F32
-import io.github.charlietap.chasm.embedding.compiled.value.NumberValue.I32
-import io.github.charlietap.chasm.embedding.compiled.value.ReferenceValue
-import io.github.charlietap.chasm.embedding.compiled.writeStructField
-import io.github.charlietap.chasm.embedding.compiled.writeStructReference
+import io.github.charlietap.chasm.embedding.instance
+import io.github.charlietap.chasm.embedding.invoke
+import io.github.charlietap.chasm.embedding.module
+import io.github.charlietap.chasm.embedding.reference.allocateReferenceArray
+import io.github.charlietap.chasm.embedding.reference.arrayLength
+import io.github.charlietap.chasm.embedding.reference.arrayType
+import io.github.charlietap.chasm.embedding.reference.readArrayReference
+import io.github.charlietap.chasm.embedding.reference.readStructField
+import io.github.charlietap.chasm.embedding.reference.readStructReference
+import io.github.charlietap.chasm.embedding.reference.unsafeWriteStructReference
+import io.github.charlietap.chasm.embedding.reference.writeStructField
+import io.github.charlietap.chasm.embedding.reference.writeStructReference
+import io.github.charlietap.chasm.embedding.shapes.Instance
+import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.shapes.expect
+import io.github.charlietap.chasm.embedding.value.ExecutionValue
+import io.github.charlietap.chasm.embedding.value.NumberValue.F32
+import io.github.charlietap.chasm.embedding.value.NumberValue.I32
+import io.github.charlietap.chasm.embedding.value.ReferenceValue
 import io.github.charlietap.chasm.host.UnsafeHostApi
 import io.github.charlietap.chasm.reference.ArrayReference
 import io.github.charlietap.chasm.reference.StructReference
@@ -130,7 +131,7 @@ class StructAccessorsTest {
         val type = arrayType(guestArray("boxes"))
         val kinds = kinds()
 
-        val array = allocateArray(store, type, 3, kinds)
+        val array = allocateReferenceArray(store, type, 3, kinds)
 
         assertEquals(3, arrayLength(array))
         assertSame(kinds, readArrayReference(array, 2))
@@ -141,18 +142,18 @@ class StructAccessorsTest {
     }
 
     private fun guestStruct(name: String): StructReference {
-        return (invoke(store, instance, name).expect(name).single() as ReferenceValue.Struct).reference
+        return (invoke(instance, name).expect(name).single() as ReferenceValue.Struct).reference
     }
 
     private fun guestArray(name: String): ArrayReference {
-        return (invoke(store, instance, name).expect(name).single() as ReferenceValue.Array).reference
+        return (invoke(instance, name).expect(name).single() as ReferenceValue.Array).reference
     }
 
     private fun guestCall(
         name: String,
         struct: StructReference,
     ): ExecutionValue {
-        return invoke(store, instance, name, listOf(ReferenceValue.Struct(struct))).expect(name).single()
+        return invoke(instance, name, listOf(ReferenceValue.Struct(struct))).expect(name).single()
     }
 
     private fun instantiate(store: Store): Instance {

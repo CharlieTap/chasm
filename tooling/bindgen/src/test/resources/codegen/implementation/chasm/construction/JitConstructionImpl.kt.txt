@@ -3,15 +3,15 @@
 package com.test
 
 import io.github.charlietap.chasm.ExperimentalChasmApi
-import io.github.charlietap.chasm.embedding.compiled.Import
-import io.github.charlietap.chasm.embedding.compiled.Instance
-import io.github.charlietap.chasm.embedding.compiled.Module
-import io.github.charlietap.chasm.embedding.compiled.Store
-import io.github.charlietap.chasm.embedding.compiled.codegen.CodegenImport
-import io.github.charlietap.chasm.embedding.compiled.codegen.allocateImports
-import io.github.charlietap.chasm.embedding.compiled.instance
+import io.github.charlietap.chasm.embedding.codegen.CodegenImport
+import io.github.charlietap.chasm.embedding.codegen.allocateImports
+import io.github.charlietap.chasm.embedding.instance
+import io.github.charlietap.chasm.embedding.module
+import io.github.charlietap.chasm.embedding.shapes.Import
+import io.github.charlietap.chasm.embedding.shapes.Instance
+import io.github.charlietap.chasm.embedding.shapes.Module
+import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.shapes.`expect`
-import io.github.charlietap.chasm.jit.module
 import io.github.charlietap.chasm.jit.store
 import kotlin.ByteArray
 import kotlin.OptIn
@@ -28,7 +28,7 @@ public suspend fun jitConstruction(
   ) -> Instance)? = null,
 ): JitConstruction {
   val store = store()
-  val module = moduleFactory?.invoke(binary) ?: module(binary, validate = true).`expect`("Failed to decode binary")
+  val module = moduleFactory?.invoke(binary) ?: module(binary).`expect`("Failed to decode binary")
   val allocatedImports = allocateImports(store, imports)
   val instance = instanceFactory?.invoke(store, module, allocatedImports) ?: instance(store, module, allocatedImports).`expect`("Failed to instantiate module")
   return JitConstructionImpl(store = store, instance = instance)

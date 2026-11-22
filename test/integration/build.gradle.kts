@@ -38,6 +38,7 @@ kotlin {
                 implementation(projects.runtime.core)
                 implementation(projects.test.fixture.typeSystem)
                 implementation(projects.typeSystem)
+                implementation(libs.kotlinx.coroutines.test)
                 implementation(libs.kotlinx.test.resources)
             }
         }
@@ -51,6 +52,7 @@ kotlin {
 
         named("androidDeviceTest") {
             dependencies {
+                implementation(projects.chasmJit)
                 implementation(libs.kotlin.junit)
                 implementation(libs.androidx.test.junit)
                 implementation(libs.androidx.test.runner)

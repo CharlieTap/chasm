@@ -1,8 +1,8 @@
 package io.github.charlietap.chasm.aot.compiled
 
 import com.github.michaelbull.result.getOrThrow
-import io.github.charlietap.chasm.aot.CompiledModule
-import io.github.charlietap.chasm.aot.instance
+import io.github.charlietap.chasm.aot.compiledModule
+import io.github.charlietap.chasm.aot.store
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.typeResolver
 import io.github.charlietap.chasm.compiler.backend.jvm.JvmModule
@@ -20,10 +20,10 @@ import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Instance
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.shapes.expect
-import io.github.charlietap.chasm.embedding.store
+import io.github.charlietap.chasm.embedding.value.ExecutionValue
 import io.github.charlietap.chasm.module.ModuleDeclarationsFactory
-import io.github.charlietap.chasm.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.validator.WasmModuleValidator
+import kotlinx.coroutines.runBlocking
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.util.CheckClassAdapter
 import java.io.ByteArrayOutputStream
@@ -32,6 +32,8 @@ import java.io.OutputStream
 import java.io.PrintWriter
 import java.io.StringWriter
 import kotlin.test.assertEquals
+import io.github.charlietap.chasm.embedding.shapes.Module as EmbeddingModule
+import io.github.charlietap.chasm.embedding.store as interpreterStore
 
 internal fun fixture(
     name: String,
@@ -74,8 +76,8 @@ internal class Generated : JvmOutput {
         return result
     }
 
-    fun compiledModule(): CompiledModule =
-        GeneratedClassLoader(this).loadClass(module.moduleClass).getField("INSTANCE").get(null) as CompiledModule
+    fun compiledModule(): EmbeddingModule =
+        compiledModule(GeneratedClassLoader(this).loadClass(module.moduleClass)).expect("loads")
 }
 
 internal fun generate(
@@ -126,20 +128,20 @@ internal fun Generated.verify() {
 internal class InterpretedFixture(
     bytes: ByteArray,
 ) {
-    val store: Store = store()
-    val instance: Instance = instance(store, module(bytes).expect("decodes"), emptyList()).expect("instantiates")
+    val store: Store = interpreterStore()
+    val instance: Instance = runBlocking { instance(store, module(bytes).expect("decodes")) }.expect("instantiates")
 
     fun invoke(
         name: String,
         vararg args: ExecutionValue,
     ): ChasmResult<List<ExecutionValue>, *> =
-        invoke(store, instance, name, args.toList())
+        invoke(instance, name, args.toList())
 
     fun call(
         name: String,
         vararg args: ExecutionValue,
     ): List<ExecutionValue> =
-        invoke(store, instance, name, args.toList()).expect(name)
+        invoke(instance, name, args.toList()).expect(name)
 }
 
 internal class CompiledFixture(
@@ -149,17 +151,17 @@ internal class CompiledFixture(
 ) {
     val generated = generate(bytes, options)
     val store: Store = store(storeConfig)
-    val instance: Instance = instance(store, generated.compiledModule(), emptyList()).expect("instantiates")
+    val instance: Instance = runBlocking { instance(store, generated.compiledModule()) }.expect("instantiates")
 
     fun invoke(
         name: String,
         vararg args: ExecutionValue,
     ): ChasmResult<List<ExecutionValue>, *> =
-        invoke(store, instance, name, args.toList())
+        invoke(instance, name, args.toList())
 
     fun call(
         name: String,
         vararg args: ExecutionValue,
     ): List<ExecutionValue> =
-        invoke(store, instance, name, args.toList()).expect(name)
+        invoke(instance, name, args.toList()).expect(name)
 }

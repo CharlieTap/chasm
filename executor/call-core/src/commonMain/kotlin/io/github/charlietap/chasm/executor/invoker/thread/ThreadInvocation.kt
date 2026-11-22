@@ -18,10 +18,10 @@ import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.resource.gc.GarbageCollector
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
+import io.github.charlietap.chasm.runtime.store.withLiveStack
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
 
 @InternalChasmApi
-@Suppress("DEPRECATION")
 inline fun ThreadInvocation(
     config: RuntimeConfig,
     store: Store,
@@ -31,7 +31,41 @@ inline fun ThreadInvocation(
     crossinline garbageCollector: GarbageCollector,
     crossinline run: (Int, ExecutionContext) -> Unit,
     crossinline trap: (InvocationException, ValueStack) -> InvocationError,
-): Result<List<Long>, InvocationError> = binding {
+): Result<List<Long>, InvocationError> {
+    return ThreadInvocation(
+        config = config,
+        store = store,
+        instance = instance,
+        nested = nested,
+        garbageCollector = garbageCollector,
+        arguments = { vstack ->
+            values.forEachIndexed { index, value ->
+                vstack.setFrameSlot(index, value.toLongFromBoxed())
+            }
+        },
+        run = run,
+        trap = trap,
+        results = { vstack, count ->
+            List(count) {
+                vstack.pop()
+            }.asReversed()
+        },
+    )
+}
+
+@InternalChasmApi
+@Suppress("DEPRECATION")
+inline fun <R> ThreadInvocation(
+    config: RuntimeConfig,
+    store: Store,
+    instance: FunctionInstance.WasmFunction,
+    nested: NestedInterpreter?,
+    crossinline garbageCollector: GarbageCollector,
+    crossinline arguments: (ValueStack) -> Unit,
+    crossinline run: (Int, ExecutionContext) -> Unit,
+    crossinline trap: (InvocationException, ValueStack) -> InvocationError,
+    crossinline results: (ValueStack, Int) -> R,
+): Result<R, InvocationError> = binding {
     val callStrategy = instance.callStrategy
     val vstack = try {
         ValueStack(callStrategy.frameSlots, store.maxStackSlots)
@@ -46,36 +80,35 @@ inline fun ThreadInvocation(
     )
     context.nestedInterpreter = nested
 
-    val results = instance.functionType.results.types.size
+    val resultCount = instance.functionType.results.types.size
     vstack.writeRootActivationHeader(callStrategy.interfaceSlotCount)
     vstack.activateFrame(ROOT_FP, callStrategy.frameSlots)
-    values.forEachIndexed { index, value ->
-        vstack.setFrameSlot(index, value.toLongFromBoxed())
-    }
+    arguments(vstack)
     initializeLocals(vstack, callStrategy, ROOT_FP)
-    try {
-        run(callStrategy.entryIp, context)
-    } catch (exception: InvocationException) {
-        Err(trap(exception, vstack)).bind()
-    } catch (_: GuestHeapOutOfMemoryException) {
-        Err(InvocationError.GuestHeapOutOfMemory).bind()
+
+    store.withLiveStack(vstack) {
+
+        try {
+            run(callStrategy.entryIp, context)
+        } catch (exception: InvocationException) {
+            Err(trap(exception, vstack)).bind()
+        } catch (_: GuestHeapOutOfMemoryException) {
+            Err(InvocationError.GuestHeapOutOfMemory).bind()
+        }
+
+        if (vstack.fp != ROOT_FP || vstack.sp != resultCount) {
+            Err(InvocationError.ProgramFinishedInconsistentState).bind<Unit>()
+        }
+
+        if (
+            config.gcStrategy == GCStrategy.ARENA &&
+            context.heap.shouldCollectGarbage(config.gcThreshold.bytes)
+        ) {
+            garbageCollector(store).bind()
+        }
     }
 
-    if (vstack.fp != ROOT_FP || vstack.sp != results) {
-        Err(InvocationError.ProgramFinishedInconsistentState).bind<List<Long>>()
-    }
-
-    if (
-        config.gcStrategy == GCStrategy.ARENA &&
-        context.heap.shouldCollectGarbage(config.gcThreshold.bytes)
-    ) {
-        garbageCollector(store, vstack).bind()
-    }
-
-    List(results) {
-        vstack.pop()
-    }
-        .asReversed()
+    results(vstack, resultCount)
 }
 
 @InternalChasmApi

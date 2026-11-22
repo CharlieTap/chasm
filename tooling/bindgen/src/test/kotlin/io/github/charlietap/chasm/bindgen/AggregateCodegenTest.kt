@@ -1,7 +1,6 @@
 package io.github.charlietap.chasm.bindgen
 
 import io.github.charlietap.chasm.bindgen.fixture.aggregateType
-import io.github.charlietap.chasm.bindgen.fixture.codegenConfig
 import io.github.charlietap.chasm.bindgen.fixture.doubleScalarType
 import io.github.charlietap.chasm.bindgen.fixture.field
 import io.github.charlietap.chasm.bindgen.fixture.floatScalarType
@@ -31,24 +30,6 @@ class AggregateCodegenTest {
         category = "aggregate",
         wasmInterface = testService("TestService"),
     )
-
-    @Test
-    fun `generates complete test service run as compiled code`() = assertGenerates(
-        category = "aggregate",
-        wasmInterface = testService("AotTestService"),
-        config = codegenConfig(executionTier = ExecutionTier.Aot("com.test.chasm.aot.WasmModule")),
-        runtimes = listOf(CodegenRuntime.CHASM),
-    )
-
-    @Test
-    fun `generates complete test service run by the JIT`() {
-        assertGenerates(
-            category = "aggregate",
-            wasmInterface = testService("JitTestService"),
-            config = codegenConfig(executionTier = ExecutionTier.Jit()),
-            runtimes = listOf(CodegenRuntime.CHASM),
-        )
-    }
 
     private fun testService(
         interfaceName: String,

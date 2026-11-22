@@ -71,8 +71,10 @@ internal class StructViewGenerator {
     }
 }
 
+private const val REFERENCE_PACKAGE = "io.github.charlietap.chasm.embedding.reference"
+
 private val JVM_INLINE = ClassName("kotlin.jvm", "JvmInline")
-private val READ_STRUCT_FIELD = MemberName(COMPILED_PACKAGE, "readStructField")
-private val READ_STRUCT_REFERENCE = MemberName(COMPILED_PACKAGE, "readStructReference")
-private val WRITE_STRUCT_FIELD = MemberName(COMPILED_PACKAGE, "writeStructField")
-private val WRITE_STRUCT_REFERENCE = MemberName(COMPILED_PACKAGE, "writeStructReference")
+private val READ_STRUCT_FIELD = MemberName(REFERENCE_PACKAGE, "readStructField")
+private val READ_STRUCT_REFERENCE = MemberName(REFERENCE_PACKAGE, "readStructReference")
+private val WRITE_STRUCT_FIELD = MemberName(REFERENCE_PACKAGE, "writeStructField")
+private val WRITE_STRUCT_REFERENCE = MemberName(REFERENCE_PACKAGE, "writeStructReference")

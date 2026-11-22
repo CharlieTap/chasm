@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.script.command
 
-import io.github.charlietap.chasm.embedding.compiled.value.ExecutionValue
+import io.github.charlietap.chasm.embedding.value.ExecutionValue
 import io.github.charlietap.chasm.script.ScriptContext
 import io.github.charlietap.chasm.script.action.ActionResult
 import io.github.charlietap.chasm.script.action.ActionRunner

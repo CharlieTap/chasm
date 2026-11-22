@@ -10,11 +10,12 @@ import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.fixture.type.refNullReferenceType
 import io.github.charlietap.chasm.fixture.type.referenceValueType
 import io.github.charlietap.chasm.fixture.type.resultType
-import io.github.charlietap.chasm.host.HostException
-import io.github.charlietap.chasm.host.HostTag
 import io.github.charlietap.chasm.host.UnsafeHostApi
 import io.github.charlietap.chasm.runtime.exception.HostRaisedWasmException
+import io.github.charlietap.chasm.runtime.host.HostException
+import io.github.charlietap.chasm.runtime.host.HostTag
 import io.github.charlietap.chasm.runtime.store.Store
+import io.github.charlietap.chasm.runtime.store.withLiveStack
 import io.github.charlietap.chasm.runtime.type.RTT
 import io.github.charlietap.chasm.type.AbstractHeapType
 import io.github.charlietap.chasm.type.CompositeType
@@ -168,8 +169,10 @@ class HostExceptionsTest {
         )
         val marker = store.heap.beginScope()
 
-        val exception = context(context) {
-            store.heap.create(HostTag(tagAddress.address), stack.unsafeElements(), 0)
+        val exception = store.withLiveStack(stack) {
+            context(context) {
+                store.heap.create(HostTag(tagAddress.address), stack.unsafeElements(), 0)
+            }
         }
 
         assertNotEquals(-1, store.heap.structRuntimeTypeIdOrNegative(struct))

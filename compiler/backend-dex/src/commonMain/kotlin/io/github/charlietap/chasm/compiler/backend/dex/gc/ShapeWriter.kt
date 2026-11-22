@@ -1,11 +1,12 @@
 package io.github.charlietap.chasm.compiler.backend.dex.gc
 
 import io.github.charlietap.chasm.compiler.backend.abi.CREATE_OWNER_COLLECTED_ERROR
+import io.github.charlietap.chasm.compiler.backend.abi.ENGINE_TYPE
 import io.github.charlietap.chasm.compiler.backend.abi.MANAGED_ARRAY
 import io.github.charlietap.chasm.compiler.backend.abi.MANAGED_ARRAY_LENGTH
 import io.github.charlietap.chasm.compiler.backend.abi.MANAGED_ARRAY_STORAGE
 import io.github.charlietap.chasm.compiler.backend.abi.MANAGED_STRUCT
-import io.github.charlietap.chasm.compiler.backend.abi.REFERENCE_OWNER
+import io.github.charlietap.chasm.compiler.backend.abi.REFERENCE_ENGINE
 import io.github.charlietap.chasm.compiler.backend.abi.SHAPE_OWNER_CLASS
 import io.github.charlietap.chasm.compiler.backend.abi.SHAPE_OWNER_ENGINE
 import io.github.charlietap.chasm.compiler.backend.abi.WEAK_REFERENCE_GET
@@ -61,7 +62,7 @@ internal class ShapeWriter {
         code.finish()
 
         if (shape.parent == null) {
-            writeOwner(builder, type)
+            writeEngine(builder, type)
         }
     }
 
@@ -92,7 +93,7 @@ internal class ShapeWriter {
         code.finish()
 
         if (shape.parent == null) {
-            writeOwner(builder, type)
+            writeEngine(builder, type)
             writeStorage(builder, type, data)
             writeLength(builder, type, data)
         }
@@ -125,19 +126,19 @@ internal class ShapeWriter {
         code.finish()
     }
 
-    private fun writeOwner(
+    private fun writeEngine(
         builder: ClassBuilder,
         type: ClassType,
     ) {
 
-        val code = builder.beginInstanceMethod(DexMethod(type, REFERENCE_OWNER, DexType.Object), registerCount = 2)
+        val code = builder.beginInstanceMethod(DexMethod(type, REFERENCE_ENGINE, ENGINE), registerCount = 2)
         val collected = code.label()
 
         code.getStatic(RESULT, OWNER_ENGINE)
-        code.checkCast(RESULT, WEAK_REFERENCE)
         code.invokeVirtual(WEAK_REFERENCE_GET.method, RESULT)
         code.moveResult(RESULT)
         code.branchZero(Cond.Eq, RESULT, collected)
+        code.checkCast(RESULT, ENGINE)
         code.returnValue(RESULT)
         code.bind(collected)
         code.invokeStatic(CREATE_OWNER_COLLECTED_ERROR.method)
@@ -152,7 +153,7 @@ internal class ShapeWriter {
 
     private companion object {
         val RESULT = Reg(0)
-        val OWNER_ENGINE = DexField(ClassType(SHAPE_OWNER_CLASS), SHAPE_OWNER_ENGINE, DexType.Object)
-        val WEAK_REFERENCE = ClassType(WEAK_REFERENCE_TYPE)
+        val OWNER_ENGINE = DexField(ClassType(SHAPE_OWNER_CLASS), SHAPE_OWNER_ENGINE, ClassType(WEAK_REFERENCE_TYPE))
+        val ENGINE = ClassType(ENGINE_TYPE)
     }
 }

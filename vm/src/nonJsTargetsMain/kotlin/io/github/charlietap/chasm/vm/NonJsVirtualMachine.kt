@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.vm
 
-import io.github.charlietap.chasm.embedding.dsl.hostFunction
+import io.github.charlietap.chasm.embedding.exports
 import io.github.charlietap.chasm.embedding.function
 import io.github.charlietap.chasm.embedding.global.readGlobal
 import io.github.charlietap.chasm.embedding.global.writeGlobal
@@ -18,11 +18,9 @@ import io.github.charlietap.chasm.embedding.store
 import io.github.charlietap.chasm.host.HostStack
 import io.github.charlietap.chasm.vm.WasmVirtualMachine.Result
 import io.github.charlietap.chasm.vm.WasmVirtualMachine.Value
+import kotlinx.coroutines.runBlocking
 import kotlin.contextOf
-import io.github.charlietap.chasm.embedding.shapes.Function as ChasmFunction
-import io.github.charlietap.chasm.embedding.shapes.Global as ChasmGlobal
-import io.github.charlietap.chasm.embedding.shapes.Memory as ChasmMemory
-import io.github.charlietap.chasm.embedding.shapes.Table as ChasmTable
+import io.github.charlietap.chasm.host.HostFunction as ChasmHostFunction
 
 object NonJsVirtualMachine : WasmVirtualMachine {
 
@@ -40,7 +38,7 @@ object NonJsVirtualMachine : WasmVirtualMachine {
     }
 
     override fun moduleDecode(binary: ByteArray): Result<Module> {
-        val module = module(binary).expect("Failed to decode module")
+        val module = runBlocking { module(binary) }.expect("Failed to decode module")
         return Result.Ok(Module(module))
     }
 
@@ -50,7 +48,7 @@ object NonJsVirtualMachine : WasmVirtualMachine {
         imports: List<Import>,
     ): Result<Instance> {
         val mappedImports = imports.map(ImportMapper::from)
-        val instance = instance(store.reference, module.reference, mappedImports).expect("Failed to instantiate module")
+        val instance = runBlocking { instance(store.reference, module.reference, mappedImports) }.expect("Failed to instantiate module")
         return Result.Ok(Instance(instance))
     }
 
@@ -62,7 +60,7 @@ object NonJsVirtualMachine : WasmVirtualMachine {
 
         val functionType = FunctionTypeMapper.from(type)
 
-        val hostFunction = hostFunction { parameters, results ->
+        val hostFunction = ChasmHostFunction { parameters, results ->
             val stack = contextOf<HostStack>()
             val mappedParams = List(type.params.size) { index ->
                 ValueMapper.fromRaw(stack[parameters + index], type.params[index])
@@ -81,8 +79,7 @@ object NonJsVirtualMachine : WasmVirtualMachine {
         instance: Instance,
         name: String,
     ): Result<Function> {
-        val export = instance.reference.exports.firstOrNull { it.name == name }
-        val function = (export?.value as? ChasmFunction)?.let(::Function)
+        val function = exports(instance.reference).function(name)?.let(::Function)
         return function?.let { value -> Result.Ok(value) } ?: Result.Error("Failed to find function export with name $name")
     }
 
@@ -90,8 +87,7 @@ object NonJsVirtualMachine : WasmVirtualMachine {
         instance: Instance,
         name: String,
     ): Result<Global> {
-        val export = instance.reference.exports.firstOrNull { it.name == name }
-        val global = (export?.value as? ChasmGlobal)?.let(::Global)
+        val global = exports(instance.reference).global(name)?.let(::Global)
         return global?.let { value -> Result.Ok(value) } ?: Result.Error("Failed to find global export with name $name")
     }
 
@@ -99,8 +95,7 @@ object NonJsVirtualMachine : WasmVirtualMachine {
         instance: Instance,
         name: String,
     ): Result<Memory> {
-        val export = instance.reference.exports.firstOrNull { it.name == name }
-        val memory = (export?.value as? ChasmMemory)?.let(::Memory)
+        val memory = exports(instance.reference).memory(name)?.let(::Memory)
         return memory?.let { value -> Result.Ok(value) } ?: Result.Error("Failed to find memory export with name $name")
     }
 
@@ -108,8 +103,7 @@ object NonJsVirtualMachine : WasmVirtualMachine {
         instance: Instance,
         name: String,
     ): Result<Table> {
-        val export = instance.reference.exports.firstOrNull { it.name == name }
-        val table = (export?.value as? ChasmTable)?.let(::Table)
+        val table = exports(instance.reference).table(name)?.let(::Table)
         return table?.let { value -> Result.Ok(value) } ?: Result.Error("Failed to find table export with name $name")
     }
 
@@ -119,7 +113,7 @@ object NonJsVirtualMachine : WasmVirtualMachine {
         functionName: String,
         resultTypes: List<ValueType>,
     ): Result<PreparedFunction> {
-        return prepareFunction(store.reference, instance.reference, functionName).let(ResultFactory::new).map { function ->
+        return prepareFunction(instance.reference, functionName).let(ResultFactory::new).map { function ->
             PreparedFunction { args ->
                 function(args.map(ValueMapper::from)).map { values ->
                     values.map(ValueMapper::to)
@@ -134,7 +128,7 @@ object NonJsVirtualMachine : WasmVirtualMachine {
         functionName: String,
         args: List<Value>,
     ): Result<List<Value>> {
-        return invoke(store.reference, instance.reference, functionName, args.map(ValueMapper::from)).map { values ->
+        return invoke(instance.reference, functionName, args.map(ValueMapper::from)).map { values ->
             values.map(ValueMapper::to)
         }.let(ResultFactory::new)
     }
@@ -154,7 +148,7 @@ object NonJsVirtualMachine : WasmVirtualMachine {
         global: Global,
     ): Result<Value> {
         return catchingAccessorFailure {
-            ValueMapper.to(readGlobal(store.reference, global.reference))
+            ValueMapper.fromRaw(readGlobal(global.reference), ValueTypeMapper.to(global.reference.type.valueType))
         }
     }
 
@@ -163,8 +157,14 @@ object NonJsVirtualMachine : WasmVirtualMachine {
         global: Global,
         value: Value,
     ): Result<Unit> {
+
+        val globalType = global.reference.type.valueType
+        if (ValueTypeMapper.from(ValueMapper.valueType(value)) != globalType) {
+            return Result.Error("Cannot write $value to a global of type $globalType")
+        }
+
         return catchingAccessorFailure {
-            writeGlobal(store.reference, global.reference, ValueMapper.from(value))
+            writeGlobal(global.reference, ValueMapper.toRaw(value))
         }
     }
 
@@ -177,7 +177,7 @@ object NonJsVirtualMachine : WasmVirtualMachine {
         bufferPointer: Int,
     ): Result<ByteArray> {
         return catchingAccessorFailure {
-            readBytes(store.reference, memory.reference, buffer, pointer, bytesToRead, bufferPointer)
+            readBytes(memory.reference, buffer, pointer, bytesToRead, bufferPointer)
         }
     }
 
@@ -188,7 +188,7 @@ object NonJsVirtualMachine : WasmVirtualMachine {
         bytes: ByteArray,
     ): Result<Unit> {
         return catchingAccessorFailure {
-            writeBytes(store.reference, memory.reference, pointer, bytes)
+            writeBytes(memory.reference, pointer, bytes)
         }
     }
 
@@ -201,7 +201,7 @@ object NonJsVirtualMachine : WasmVirtualMachine {
         bytesToWrite: Int,
     ): Result<Unit> {
         return catchingAccessorFailure {
-            writeBytes(store.reference, memory.reference, pointer, buffer, bufferPointer, bytesToWrite)
+            writeBytes(memory.reference, pointer, buffer, bufferPointer, bytesToWrite)
         }
     }
 
@@ -211,7 +211,7 @@ object NonJsVirtualMachine : WasmVirtualMachine {
         pointer: Int,
     ): Result<String> {
         return catchingAccessorFailure {
-            readNullTerminatedUtf8String(store.reference, memory.reference, pointer)
+            readNullTerminatedUtf8String(memory.reference, pointer)
         }
     }
 

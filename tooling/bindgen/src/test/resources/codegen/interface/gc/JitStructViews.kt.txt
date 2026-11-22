@@ -1,9 +1,9 @@
 package com.test
 
-import io.github.charlietap.chasm.embedding.compiled.readStructField
-import io.github.charlietap.chasm.embedding.compiled.readStructReference
-import io.github.charlietap.chasm.embedding.compiled.writeStructField
-import io.github.charlietap.chasm.embedding.compiled.writeStructReference
+import io.github.charlietap.chasm.embedding.reference.readStructField
+import io.github.charlietap.chasm.embedding.reference.readStructReference
+import io.github.charlietap.chasm.embedding.reference.writeStructField
+import io.github.charlietap.chasm.embedding.reference.writeStructReference
 import io.github.charlietap.chasm.reference.ArrayReference
 import io.github.charlietap.chasm.reference.StructReference
 import kotlin.Any

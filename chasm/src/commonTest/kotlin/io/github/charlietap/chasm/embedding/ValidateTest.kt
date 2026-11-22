@@ -4,27 +4,29 @@ package io.github.charlietap.chasm.embedding
 
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
+import com.goncalossilva.resources.Resource
 import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.embedding.error.ModuleError
 import io.github.charlietap.chasm.embedding.fixture.componentTypes
 import io.github.charlietap.chasm.embedding.fixture.publicComponent
-import io.github.charlietap.chasm.embedding.fixture.publicModule
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Component
+import io.github.charlietap.chasm.embedding.shapes.DecodedModule
 import io.github.charlietap.chasm.embedding.shapes.Module
-import io.github.charlietap.chasm.embedding.shapes._module
-import io.github.charlietap.chasm.embedding.shapes._validated
+import io.github.charlietap.chasm.embedding.shapes._payload
+import io.github.charlietap.chasm.embedding.shapes.expect
 import io.github.charlietap.chasm.fixture.ast.component.component
-import io.github.charlietap.chasm.fixture.ast.module.module
 import io.github.charlietap.chasm.fixture.config.componentConfig
 import io.github.charlietap.chasm.fixture.config.moduleConfig
 import io.github.charlietap.chasm.validator.WasmComponentAnalyzer
-import io.github.charlietap.chasm.validator.WasmModuleValidator
 import io.github.charlietap.chasm.validator.error.ComponentValidatorError
-import io.github.charlietap.chasm.validator.error.TypeValidatorError
+import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertIs
+import kotlin.test.assertSame
+import kotlin.test.assertTrue
 
 class ValidateTest {
 
@@ -78,63 +80,46 @@ class ValidateTest {
     }
 
     @Test
-    fun `calling validate on a module calls WasmModuleValidator and propagates result`() {
+    fun `calling validate on an unvalidated module validates it with its config`() = runTest {
 
-        val config = moduleConfig()
-        val internalModule = module()
-        val module = publicModule(config, internalModule)
+        val config = moduleConfig(decodeNameSection = true)
+        val module = module(Resource(FILE_DIR + "empty.wasm").readBytes(), config, validate = false)
+            .expect("the module decodes")
+        val decoded = assertIs<DecodedModule>(module._payload())
 
-        val validator: WasmModuleValidator = { _config, _module ->
-            assertEquals(config, _config)
-            assertEquals(module._module(), _module)
-            Ok(module._module())
-        }
-
-        val actual = validate(module, validator)
+        val actual = validate(module)
 
         assertIs<ChasmResult.Success<Module>>(actual)
-        assertEquals(internalModule, actual.result._module())
+        val validated = assertIs<DecodedModule>(actual.result._payload())
+        assertFalse(decoded.validated)
+        assertTrue(validated.validated)
+        assertEquals(config, validated.config)
+        assertEquals(decoded.module, validated.module)
     }
 
     @Test
-    fun `calling validate on a validated module does not validate it again`() {
+    fun `calling validate on a validated module does not validate it again`() = runTest {
 
-        val module = publicModule(validated = true)
-        val validator: WasmModuleValidator = { _, _ -> error("validator must not be called") }
+        val module = module(Resource(FILE_DIR + "empty.wasm").readBytes())
+            .expect("the module decodes and validates")
 
-        val actual = validate(module, validator)
+        val actual = validate(module)
 
-        assertEquals(ChasmResult.Success(module), actual)
+        assertSame(module, assertIs<ChasmResult.Success<Module>>(actual).result)
     }
 
     @Test
-    fun `calling validate on a module marks it as validated`() {
+    fun `calling validate on an invalid module propagates the error result`() = runTest {
 
-        val module = publicModule()
-        val validator: WasmModuleValidator = { _, _ -> Ok(module._module()) }
+        val module = module(Resource(FILE_DIR + "invalid.wasm").readBytes(), validate = false)
+            .expect("the module decodes")
 
-        val actual = validate(module, validator)
+        val actual = validate(module)
 
-        assertIs<ChasmResult.Success<Module>>(actual)
-        assertEquals(true, actual.result._validated())
+        assertIs<ModuleError.Invalid>(assertIs<ChasmResult.Error<ModuleError.Invalid>>(actual).error)
     }
 
-    @Test
-    fun `calling validate on a module calls WasmModuleValidator and propagates error result`() {
-
-        val config = moduleConfig()
-        val module = publicModule(
-            config = config,
-        )
-
-        val validator: WasmModuleValidator = { _config, _module ->
-            assertEquals(config, _config)
-            assertEquals(module._module(), _module)
-            Err(TypeValidatorError.TypeMismatch)
-        }
-
-        val actual = validate(module, validator)
-
-        assertEquals(ChasmResult.Error(ModuleError.Invalid(TypeValidatorError.TypeMismatch.toString())), actual)
+    private companion object {
+        const val FILE_DIR = "embedding/"
     }
 }

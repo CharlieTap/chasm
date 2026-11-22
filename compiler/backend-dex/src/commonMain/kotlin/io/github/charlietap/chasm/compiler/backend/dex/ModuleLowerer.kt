@@ -12,6 +12,7 @@ import io.github.charlietap.chasm.compiler.backend.dex.binding.BoundResources
 import io.github.charlietap.chasm.compiler.backend.dex.binding.boundResources
 import io.github.charlietap.chasm.compiler.backend.dex.gc.ConstantsWriter
 import io.github.charlietap.chasm.compiler.backend.dex.gc.ShapeWriter
+import io.github.charlietap.chasm.compiler.backend.dex.lower.Unsupported
 import io.github.charlietap.chasm.type.AbstractHeapType
 import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.chasm.type.ValueType
@@ -46,8 +47,10 @@ internal fun ModuleLowerer(
     entryLowerer: EntryLowerer,
     installLowerer: InstallLowerer,
 ): DexModule {
-    val plan = ModulePlan(module, code, options)
     return try {
+
+        val plan = ModulePlan(module, code, options)
+
         try {
             lowerFiles(plan, layout(plan), functionLowerer, entryLowerer, installLowerer)
         } catch (_: DexterFileFullException) {
@@ -55,6 +58,8 @@ internal fun ModuleLowerer(
         }
     } catch (tooLarge: DexterException) {
         throw DexTooLarge(tooLarge.message ?: tooLarge.toString(), tooLarge)
+    } catch (unsupported: Unsupported) {
+        throw UnsupportedModule(unsupported.message.orEmpty())
     }
 }
 

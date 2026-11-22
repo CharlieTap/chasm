@@ -58,12 +58,14 @@ kotlin {
                 api(projects.config)
                 api(projects.embeddingApi)
                 api(projects.embeddingModule)
-                api(projects.embeddingRuntime)
-                api(projects.host)
                 api(projects.libs.parallel)
                 api(projects.runtime.type)
-                api(projects.runtime.value)
                 api(projects.stream)
+                api(libs.kotlinx.coroutines.core)
+
+                implementation(projects.embeddingRuntime)
+                implementation(projects.libs.parallelCoroutines)
+                implementation(projects.runtime.value)
 
                 implementation(projects.ast)
                 implementation(projects.cir)
@@ -82,8 +84,6 @@ kotlin {
 
         commonTest {
             dependencies {
-                implementation(projects.memory)
-                implementation(projects.runtime.address)
                 implementation(projects.test.fake.decoder)
                 implementation(projects.test.fixture.ast)
                 implementation(projects.test.fixture.chasm)
@@ -100,7 +100,6 @@ kotlin {
 
         jvmTest {
             dependencies {
-                implementation(projects.chasmCoroutines)
                 implementation(libs.corpus.lib)
                 implementation(libs.wasi.emscripten.host.chasm.wasip1.kmp)
             }

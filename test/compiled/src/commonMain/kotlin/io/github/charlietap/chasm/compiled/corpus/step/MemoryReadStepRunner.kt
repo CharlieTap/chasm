@@ -10,9 +10,8 @@ import io.github.charlietap.chasm.compiled.corpus.value.readLittleEndian
 import io.github.charlietap.chasm.compiled.corpus.value.toHex
 import io.github.charlietap.chasm.embedding.memory.readBytes
 import io.github.charlietap.chasm.embedding.shapes.Memory
-import io.github.charlietap.chasm.embedding.shapes.Store
-import io.github.charlietap.chasm.runtime.value.ExecutionValue
-import io.github.charlietap.chasm.runtime.value.NumberValue
+import io.github.charlietap.chasm.embedding.value.ExecutionValue
+import io.github.charlietap.chasm.embedding.value.NumberValue
 import io.github.charlietap.corpus.lib.CorpusResult
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonObject
@@ -23,13 +22,12 @@ internal fun MemoryReadStepRunner(
     context: StepContext,
     step: JsonObject,
 ): CorpusResult {
-    val store = context.setup.store
     val memory = context.setup.memory(step.stringOrDefault("memory", "memory"))
         ?: return context.failure("memory not found", step["memory"]?.toString())
     val offset = parseIndex(step.getValue("offset"), context.captures)
 
     step["capture"]?.jsonObject?.let { capture ->
-        val value = readValue(context.timings, store, memory, offset, capture.string("type"))
+        val value = readValue(context.timings, memory, offset, capture.string("type"))
             ?: return context.failure("memory capture failed")
         context.captures[capture.string("capture")] = value
         return CorpusResult.Success
@@ -43,7 +41,7 @@ internal fun MemoryReadStepRunner(
 
     val buffer = ByteArray(expected.size)
     val actual = try {
-        context.timings.execute { readBytes(store, memory, buffer, offset, expected.size) }
+        context.timings.execute { readBytes(memory, buffer, offset, expected.size) }
     } catch (failure: IndexOutOfBoundsException) {
         return context.failure("memory read failed", failure.message)
     }
@@ -57,7 +55,6 @@ internal fun MemoryReadStepRunner(
 
 private fun readValue(
     timings: CorpusTimingRecorder,
-    store: Store,
     memory: Memory,
     offset: Int,
     type: String,
@@ -65,7 +62,7 @@ private fun readValue(
     val size = if (type == "i64" || type == "f64") 8 else 4
     val buffer = ByteArray(size)
     val bytes = try {
-        timings.execute { readBytes(store, memory, buffer, offset, size) }
+        timings.execute { readBytes(memory, buffer, offset, size) }
     } catch (_: IndexOutOfBoundsException) {
         return null
     }

@@ -28,13 +28,13 @@ import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.fixture.type.i64ValueType
 import io.github.charlietap.chasm.fixture.type.resultType
 import io.github.charlietap.chasm.fixture.type.tagType
-import io.github.charlietap.chasm.host.HostFunction
-import io.github.charlietap.chasm.host.withExceptions
 import io.github.charlietap.chasm.host.writeI64
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.CompiledCatch
 import io.github.charlietap.chasm.runtime.ext.toLongFromBoxed
+import io.github.charlietap.chasm.runtime.host.RawHostFunction
+import io.github.charlietap.chasm.runtime.host.withExceptions
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.program.Program
 import kotlin.test.Test
@@ -63,7 +63,7 @@ class HostExceptionIntegrationTest {
         runtimeStore.functions.add(nested)
         val bridge = hostFunctionInstance(
             functionType = functionType(results = resultType(listOf(i64ValueType()))),
-            function = HostFunction { _, results ->
+            function = RawHostFunction { _, results ->
                 val invocation = FunctionInvoker(config, runtimeStore, module, nested, emptyList())
                 assertEquals(Err(InvocationError.ThrownException), invocation)
 
@@ -119,7 +119,7 @@ class HostExceptionIntegrationTest {
         val nested = escapingFunction(program, module, exceptionReference)
         runtimeStore.functions.add(nested)
         val bridge = hostFunctionInstance(
-            function = HostFunction { _, _ ->
+            function = RawHostFunction { _, _ ->
                 val invocation = FunctionInvoker(config, runtimeStore, module, nested, emptyList())
                 assertEquals(Err(InvocationError.ThrownException), invocation)
                 withExceptions {

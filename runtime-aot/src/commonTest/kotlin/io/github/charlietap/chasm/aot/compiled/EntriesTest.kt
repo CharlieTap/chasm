@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.aot.compiled
 
-import io.github.charlietap.chasm.runtime.value.NumberValue.I32
+import io.github.charlietap.chasm.embedding.value.NumberValue.I32
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

@@ -11,7 +11,6 @@ import io.github.charlietap.chasm.compiled.corpus.value.parseFixtureValue
 import io.github.charlietap.chasm.compiled.corpus.wasi.WasiHostFactory
 import io.github.charlietap.chasm.embedding.global
 import io.github.charlietap.chasm.embedding.memory
-import io.github.charlietap.chasm.embedding.moduleInfo
 import io.github.charlietap.chasm.embedding.shapes.Global
 import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.ImportDefinition
@@ -68,7 +67,7 @@ private fun ImportResolver(
     if (wasiHost != null && hasWasiImports) {
         val host = wasiHostFactory(wasiHost, stdout, stderr)
         hosts += host
-        imports += ChasmWasiPreview1Builder(store, moduleInfo(module)) {
+        imports += ChasmWasiPreview1Builder(store, module) {
             this.host = host
         }.build()
     }

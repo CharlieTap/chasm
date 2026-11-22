@@ -1,25 +1,25 @@
 package io.github.charlietap.chasm.jit
 
-import io.github.charlietap.chasm.embedding.compiled.Import
-import io.github.charlietap.chasm.embedding.compiled.Instance
-import io.github.charlietap.chasm.embedding.compiled.Store
-import io.github.charlietap.chasm.embedding.compiled.exports
-import io.github.charlietap.chasm.embedding.compiled.function
-import io.github.charlietap.chasm.embedding.compiled.host.HostFunction
-import io.github.charlietap.chasm.embedding.compiled.host.createException
-import io.github.charlietap.chasm.embedding.compiled.host.raise
-import io.github.charlietap.chasm.embedding.compiled.host.readI32
-import io.github.charlietap.chasm.embedding.compiled.host.withTag
-import io.github.charlietap.chasm.embedding.compiled.instance
-import io.github.charlietap.chasm.embedding.compiled.invoke
-import io.github.charlietap.chasm.embedding.compiled.readPayload
-import io.github.charlietap.chasm.embedding.compiled.value.NumberValue.I32
 import io.github.charlietap.chasm.embedding.dsl.FunctionTypeBuilder
 import io.github.charlietap.chasm.embedding.error.ExecutionError
+import io.github.charlietap.chasm.embedding.exports
+import io.github.charlietap.chasm.embedding.function
+import io.github.charlietap.chasm.embedding.instance
+import io.github.charlietap.chasm.embedding.invoke
+import io.github.charlietap.chasm.embedding.module
+import io.github.charlietap.chasm.embedding.reference.readPayload
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
+import io.github.charlietap.chasm.embedding.shapes.Import
+import io.github.charlietap.chasm.embedding.shapes.Instance
+import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.shapes.expect
+import io.github.charlietap.chasm.embedding.value.NumberValue.I32
+import io.github.charlietap.chasm.host.HostFunction
 import io.github.charlietap.chasm.host.HostFunctionException
-import io.github.charlietap.chasm.reference.ExceptionReference
+import io.github.charlietap.chasm.host.createException
+import io.github.charlietap.chasm.host.raise
+import io.github.charlietap.chasm.host.readI32
+import io.github.charlietap.chasm.host.withTag
 import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -64,7 +64,7 @@ class HostExceptionsTest {
     @Test
     fun hostTrapsAreNotCaughtByCatchAll() {
 
-        val trapped = invoke(store, instance, "trap_is_not_caught", emptyList())
+        val trapped = invoke(instance, "trap_is_not_caught", emptyList())
 
         assertIs<ExecutionError.Trapped>(assertIs<ChasmResult.Error<*>>(trapped).error)
         assertEquals(31, call("catch_here", 3))
@@ -73,10 +73,10 @@ class HostExceptionsTest {
     @Test
     fun uncaughtHostExceptionsFailOnlyTheirCall() {
 
-        val uncaught = invoke(store, instance, "uncaught_reaches_the_host", listOf(I32(3)))
+        val uncaught = invoke(instance, "uncaught_reaches_the_host", listOf(I32(3)))
 
-        val thrown = assertIs<ExecutionError.Thrown<*>>(assertIs<ChasmResult.Error<*>>(uncaught).error)
-        assertEquals(3 * PAYLOAD_SCALE, readPayload(thrown.exception as ExceptionReference, 0))
+        val thrown = assertIs<ExecutionError.Thrown>(assertIs<ChasmResult.Error<*>>(uncaught).error)
+        assertEquals(3 * PAYLOAD_SCALE, readPayload(thrown.exception, 0))
         assertEquals(32, call("catch_above", 3))
     }
 
@@ -84,7 +84,7 @@ class HostExceptionsTest {
         name: String,
         argument: Int,
     ): Int {
-        val result = invoke(store, instance, name, listOf(I32(argument))).expect(name).single()
+        val result = invoke(instance, name, listOf(I32(argument))).expect(name).single()
         return (result as I32).value
     }
 

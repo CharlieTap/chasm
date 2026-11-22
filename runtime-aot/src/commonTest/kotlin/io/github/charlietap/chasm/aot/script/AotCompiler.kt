@@ -1,11 +1,8 @@
 package io.github.charlietap.chasm.aot.script
 
 import com.github.michaelbull.result.fold
-import io.github.charlietap.chasm.aot.CompiledModule
-import io.github.charlietap.chasm.aot.instance
-import io.github.charlietap.chasm.ast.module.Module
+import io.github.charlietap.chasm.aot.compiledModule
 import io.github.charlietap.chasm.ast.module.typeResolver
-import io.github.charlietap.chasm.compiled.Instantiable
 import io.github.charlietap.chasm.compiled.ScriptFailure
 import io.github.charlietap.chasm.compiled.script.ScriptModules
 import io.github.charlietap.chasm.compiler.backend.jvm.JvmModule
@@ -19,7 +16,7 @@ import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.config.StoreConfig
 import io.github.charlietap.chasm.embedding.error.ExecutionError
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
-import io.github.charlietap.chasm.embedding.shapes.map
+import io.github.charlietap.chasm.embedding.shapes.Module
 import io.github.charlietap.chasm.module.ModuleDeclarationsFactory
 import io.github.charlietap.chasm.runtime.execution.CompiledStack
 import java.io.ByteArrayOutputStream
@@ -29,6 +26,7 @@ import java.net.URL
 import java.nio.ByteBuffer
 import java.nio.file.Files
 import java.util.concurrent.ConcurrentHashMap
+import io.github.charlietap.chasm.ast.module.Module as WasmModule
 
 internal object AotCompiler {
 
@@ -38,7 +36,7 @@ internal object AotCompiler {
 
     private val MEMORY: MemoryLowering = System.getProperty("chasm.test.aot.memory")?.let(MemoryLowering::valueOf) ?: JvmOptions().memory
 
-    private val compiled = ConcurrentHashMap<CompileKey, ChasmResult<CompiledModule, ScriptFailure>>()
+    private val compiled = ConcurrentHashMap<CompileKey, ChasmResult<Module, ScriptFailure>>()
 
     fun useTestStack() {
         CompiledStack.budgetSource = { CompiledStack.budgetFor(TEST_STACK_BYTES) }
@@ -48,7 +46,7 @@ internal object AotCompiler {
         bytes: ByteArray,
         config: ModuleConfig,
         storeConfig: StoreConfig,
-    ): ChasmResult<Instantiable, ScriptFailure> {
+    ): ChasmResult<Module, ScriptFailure> {
 
         val options = JvmOptions(
             storeConfig = storeConfig,
@@ -60,18 +58,25 @@ internal object AotCompiler {
             when (val validated = ScriptModules.validate(bytes, config)) {
                 is ChasmResult.Error -> ChasmResult.Error(ScriptFailure.Module(validated.error))
                 is ChasmResult.Success -> try {
-                    ChasmResult.Success(lower(validated.result, options))
+                    load(lower(validated.result, options))
                 } catch (failure: IllegalStateException) {
                     ChasmResult.Error(ScriptFailure.Execution(ExecutionError.Unsupported(failure.message ?: failure.toString())))
                 }
             }
-        }.map { module -> { store, imports -> instance(store, module, imports) } }
+        }
+    }
+
+    private fun load(
+        moduleClass: Class<*>,
+    ): ChasmResult<Module, ScriptFailure> = when (val loaded = compiledModule(moduleClass)) {
+        is ChasmResult.Success -> loaded
+        is ChasmResult.Error -> ChasmResult.Error(ScriptFailure.Module(loaded.error))
     }
 
     private fun lower(
-        module: Module,
+        module: WasmModule,
         options: JvmOptions,
-    ): CompiledModule {
+    ): Class<*> {
         val cir = ModuleCompiler(
             module = module,
             types = module.typeResolver(),
@@ -84,7 +89,7 @@ internal object AotCompiler {
         } catch (unsupported: UnsupportedFunctions) {
             throw IllegalStateException("AOT: ${unsupported.message}")
         }
-        return generated.compiledModule(result)
+        return generated.moduleClass(result)
     }
 }
 
@@ -120,10 +125,9 @@ private class GeneratedCode : ClassLoader(GeneratedCode::class.java.classLoader)
         return result
     }
 
-    fun compiledModule(
+    fun moduleClass(
         module: JvmModule,
-    ): CompiledModule =
-        loadClass(module.moduleClass).getField("INSTANCE").get(null) as CompiledModule
+    ): Class<*> = loadClass(module.moduleClass)
 
     override fun findClass(
         name: String,

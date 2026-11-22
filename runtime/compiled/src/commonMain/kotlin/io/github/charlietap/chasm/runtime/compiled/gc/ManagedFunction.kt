@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.runtime.compiled.gc
 
+import io.github.charlietap.chasm.embedding.engine.Engine
 import io.github.charlietap.chasm.reference.FunctionReference
 import io.github.charlietap.chasm.runtime.function.CompiledFunction
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
@@ -10,14 +11,20 @@ class ManagedFunction(
     @JvmField val instance: FunctionInstance,
     @JvmField val address: Int,
     @JvmField val rtt: Int,
+    @JvmField val owningEngine: Engine,
 ) : FunctionReference() {
 
     @JvmField
     var entry: CompiledFunction? = null
+
+    override fun engine(): Engine {
+        return owningEngine
+    }
 }
 
 class ManagedFunctions(
     private val store: Store,
+    private val managedStore: ManagedStore,
 ) {
 
     private var functions = arrayOfNulls<ManagedFunction>(0)
@@ -54,7 +61,7 @@ class ManagedFunctions(
 
         val instance = store.functions[address]
 
-        return ManagedFunction(instance, address, instance.rtt.value).apply {
+        return ManagedFunction(instance, address, instance.rtt.value, managedStore.engine).apply {
             entry = (instance as? FunctionInstance.WasmFunction)?.callStrategy?.compiledEntry
         }
     }

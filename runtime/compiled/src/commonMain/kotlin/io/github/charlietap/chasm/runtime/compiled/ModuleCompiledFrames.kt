@@ -5,12 +5,14 @@ import io.github.charlietap.chasm.runtime.diagnostic.CompiledFrames
 import io.github.charlietap.chasm.runtime.diagnostic.CompiledFrames.Companion.NOT_COMPILED
 import io.github.charlietap.chasm.runtime.diagnostic.CompiledTrace
 import io.github.charlietap.chasm.runtime.store.Store
+import kotlin.reflect.KClass
 
 @InternalChasmApi
 class ModuleCompiledFrames(
     packageName: String,
     private val chunkStarts: (function: Int) -> IntArray?,
     private val originalLine: (className: String, methodName: String, line: Int) -> Int,
+    private val entryClass: KClass<*>,
 ) : CompiledFrames {
 
     private val classPrefix = "$packageName."
@@ -53,5 +55,5 @@ class ModuleCompiledFrames(
     override fun trace(
         store: Store,
         exception: Throwable,
-    ): CompiledTrace = CompiledStackTrace(store, exception)
+    ): CompiledTrace = CompiledStackTrace(store, exception, entryClass)
 }

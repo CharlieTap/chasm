@@ -1,27 +1,39 @@
+@file:OptIn(ExperimentalChasmApi::class)
+
 package com.test
 
+import io.github.charlietap.chasm.ExperimentalChasmApi
 import io.github.charlietap.chasm.embedding.codegen.CodegenImport
-import io.github.charlietap.chasm.embedding.codegen.InstanceFactory
-import io.github.charlietap.chasm.embedding.codegen.ModuleFactory
 import io.github.charlietap.chasm.embedding.codegen.allocateImports
 import io.github.charlietap.chasm.embedding.instance
+import io.github.charlietap.chasm.embedding.invokeUnboxed
 import io.github.charlietap.chasm.embedding.module
 import io.github.charlietap.chasm.embedding.prepareFunction
+import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.Instance
+import io.github.charlietap.chasm.embedding.shapes.Module
 import io.github.charlietap.chasm.embedding.shapes.PreparedFunction
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.shapes.`expect`
 import io.github.charlietap.chasm.embedding.store
-import io.github.charlietap.chasm.runtime.`value`.ExecutionValue
-import io.github.charlietap.chasm.runtime.`value`.NumberValue
+import kotlin.Any
+import kotlin.Array
 import kotlin.ByteArray
+import kotlin.Double
+import kotlin.Float
+import kotlin.LongArray
+import kotlin.OptIn
 import kotlin.collections.List
 
-public fun multipleReturns(
+public suspend fun multipleReturns(
   binary: ByteArray,
   imports: List<CodegenImport> = emptyList(),
-  moduleFactory: ModuleFactory? = null,
-  instanceFactory: InstanceFactory? = null,
+  moduleFactory: (suspend (ByteArray) -> Module)? = null,
+  instanceFactory: (suspend (
+    Store,
+    Module,
+    List<Import>,
+  ) -> Instance)? = null,
 ): MultipleReturns {
   val store = store()
   val module = moduleFactory?.invoke(binary) ?: module(binary).`expect`("Failed to decode binary")
@@ -35,16 +47,19 @@ private class MultipleReturnsImpl(
   private val instance: Instance,
 ) : MultipleReturns {
   private val invokePreparedFunction: PreparedFunction =
-      prepareFunction(store, instance, "invoke").`expect`("Failed to prepare function invoke")
+      prepareFunction(instance, "invoke").`expect`("Failed to prepare function invoke")
+
+  private val invokeWords: LongArray = LongArray(4)
+
+  private val noReferences: Array<Any?> = arrayOfNulls<Any>(0)
 
   override fun invoke(): MultipleReturnsResult {
-    val args = emptyList<ExecutionValue>()
-    val values = invokePreparedFunction(args).`expect`("Failed to invoke function invoke")
+    invokePreparedFunction.invokeUnboxed(invokeWords, noReferences).`expect`("Failed to invoke function invoke")
     val result = MultipleReturnsResult(
-      r0 = (values[0] as NumberValue.I32).value,
-      r1 = (values[1] as NumberValue.I64).value,
-      r2 = (values[2] as NumberValue.F32).value,
-      r3 = (values[3] as NumberValue.F64).value,
+      r0 = invokeWords[0].toInt(),
+      r1 = invokeWords[1],
+      r2 = Float.fromBits(invokeWords[2].toInt()),
+      r3 = Double.fromBits(invokeWords[3]),
     )
     return result
   }

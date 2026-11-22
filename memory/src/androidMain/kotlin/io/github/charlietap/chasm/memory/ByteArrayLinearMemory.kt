@@ -1,7 +1,5 @@
 package io.github.charlietap.chasm.memory
 
-import io.github.charlietap.chasm.host.ByteArrayHostMemory
-import io.github.charlietap.chasm.host.HostMemory
 import io.github.charlietap.chasm.host.UnsafeHostApi
 import io.github.charlietap.chasm.memory.ext.copyInto
 import io.github.charlietap.chasm.memory.ext.toDoubleLittleEndian
@@ -9,6 +7,8 @@ import io.github.charlietap.chasm.memory.ext.toFloatLittleEndian
 import io.github.charlietap.chasm.memory.ext.toIntLittleEndian
 import io.github.charlietap.chasm.memory.ext.toLongLittleEndian
 import io.github.charlietap.chasm.memory.ext.toShortLittleEndian
+import io.github.charlietap.chasm.runtime.host.ByteArrayHostMemory
+import io.github.charlietap.chasm.runtime.host.HostMemory
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
 import io.github.charlietap.chasm.runtime.memory.OutOfMemoryError
 

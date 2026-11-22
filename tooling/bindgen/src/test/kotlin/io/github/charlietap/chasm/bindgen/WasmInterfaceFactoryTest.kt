@@ -194,6 +194,35 @@ class WasmInterfaceFactoryTest {
     }
 
     @Test
+    fun `memory names avoid only the properties of the targeted runtime`() {
+
+        val info = moduleInfo(
+            exports = listOf(
+                exportDefinition(name = "tick", type = functionExternalType()),
+                exportDefinition(
+                    name = "add",
+                    type = functionExternalType(
+                        functionType = functionType(params = resultType(listOf(i32ValueType()))),
+                    ),
+                ),
+                exportDefinition(name = "noWords", index = memoryIndex(), type = memoryExternalType()),
+                exportDefinition(name = "functionInputBuffer", index = memoryIndex(), type = memoryExternalType()),
+            ),
+        )
+
+        val memoryNames = CodegenRuntime.entries.associateWith { runtime ->
+            val wasmInterface = createInterface(
+                config = codegenConfig(generateTypesafeMemoryProperties = true, runtime = runtime),
+                info = info,
+            )
+            wasmInterface.memories.map { memory -> memory.name }
+        }
+
+        assertEquals(listOf("noWords", "functionInputBuffer_"), memoryNames[CodegenRuntime.PORTABLE_VM])
+        assertEquals(listOf("noWords_", "functionInputBuffer"), memoryNames[CodegenRuntime.CHASM])
+    }
+
+    @Test
     fun `creates an unexposed default memory binding for string functions`() {
         val info = moduleInfo(
             exports = listOf(

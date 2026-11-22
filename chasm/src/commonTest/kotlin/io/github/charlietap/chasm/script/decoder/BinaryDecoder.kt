@@ -7,11 +7,11 @@ import io.github.charlietap.chasm.embedding.error.ModuleError
 import io.github.charlietap.chasm.embedding.module
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 
-internal typealias BinaryDecoder = (ByteArray, ModuleConfig) -> ChasmResult<Any, ModuleError>
-internal typealias CoreBinaryDecoder = (ByteArray, ModuleConfig) -> ChasmResult<Any, ModuleError>
-internal typealias ComponentBinaryDecoder = (ByteArray, ComponentConfig) -> ChasmResult<Any, ModuleError>
+internal typealias BinaryDecoder = suspend (ByteArray, ModuleConfig) -> ChasmResult<Any, ModuleError>
+internal typealias CoreBinaryDecoder = suspend (ByteArray, ModuleConfig) -> ChasmResult<Any, ModuleError>
+internal typealias ComponentBinaryDecoder = suspend (ByteArray, ComponentConfig) -> ChasmResult<Any, ModuleError>
 
-internal fun BinaryDecoder(
+internal suspend fun BinaryDecoder(
     bytes: ByteArray,
     moduleConfig: ModuleConfig,
 ): ChasmResult<Any, ModuleError> {
@@ -24,7 +24,7 @@ internal fun BinaryDecoder(
     )
 }
 
-internal fun BinaryDecoder(
+internal suspend fun BinaryDecoder(
     bytes: ByteArray,
     moduleConfig: ModuleConfig,
     layerDecoder: WasmLayerDecoder,
@@ -38,14 +38,14 @@ internal fun BinaryDecoder(
     }
 }
 
-private fun CoreBinaryDecoder(
+private suspend fun CoreBinaryDecoder(
     bytes: ByteArray,
     config: ModuleConfig,
 ): ChasmResult<Any, ModuleError> {
-    return module(bytes, config)
+    return module(bytes, config, validate = false)
 }
 
-private fun ComponentBinaryDecoder(
+private suspend fun ComponentBinaryDecoder(
     bytes: ByteArray,
     config: ComponentConfig,
 ): ChasmResult<Any, ModuleError> {

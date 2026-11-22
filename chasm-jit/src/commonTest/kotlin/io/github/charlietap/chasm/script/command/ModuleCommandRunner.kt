@@ -1,10 +1,10 @@
 package io.github.charlietap.chasm.script.command
 
-import io.github.charlietap.chasm.embedding.compiled.instance
+import io.github.charlietap.chasm.embedding.instance
+import io.github.charlietap.chasm.embedding.module
 import io.github.charlietap.chasm.embedding.shapes.flatMap
 import io.github.charlietap.chasm.embedding.shapes.fold
 import io.github.charlietap.chasm.embedding.shapes.map
-import io.github.charlietap.chasm.jit.module
 import io.github.charlietap.chasm.script.ScriptContext
 import io.github.charlietap.chasm.script.decoder.BinaryDecoder
 import io.github.charlietap.chasm.script.decoder.BinaryValidator

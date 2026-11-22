@@ -1,9 +1,10 @@
 package io.github.charlietap.chasm.benchmark.runtime
 
-import io.github.charlietap.chasm.host.HostReferenceRoot
 import io.github.charlietap.chasm.runtime.encoder.ReferenceValueEncoder
+import io.github.charlietap.chasm.runtime.host.HostReferenceRoot
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
+import io.github.charlietap.chasm.runtime.store.withLiveStack
 import io.github.charlietap.chasm.runtime.type.RTT
 import io.github.charlietap.chasm.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.type.CompositeType
@@ -207,7 +208,7 @@ open class GcBenchmark {
     @Measurement(iterations = 10)
     @Benchmark
     open fun collect(state: CollectionState): Long {
-        state.store.heap.collectGarbage(state.store, state.roots)
+        state.store.withLiveStack(state.roots) { state.store.heap.collectGarbage(state.store) }
         return state.store.heap.allocatedGuestBytes()
     }
 }
@@ -285,7 +286,7 @@ open class ManagedHeapRetainedRootCollectionBenchmark {
 
     @Benchmark
     open fun collect(state: CollectionState): Long {
-        state.store.heap.collectGarbage(state.store, state.roots)
+        state.store.withLiveStack(state.roots) { state.store.heap.collectGarbage(state.store) }
         return state.store.heap.allocatedGuestBytes()
     }
 }

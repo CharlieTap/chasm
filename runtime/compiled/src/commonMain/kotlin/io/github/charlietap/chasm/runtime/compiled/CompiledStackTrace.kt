@@ -1,12 +1,12 @@
 package io.github.charlietap.chasm.runtime.compiled
 
-import io.github.charlietap.chasm.executor.invoker.compiled.compiledEntryClass
 import io.github.charlietap.chasm.runtime.diagnostic.CompiledFrames
 import io.github.charlietap.chasm.runtime.diagnostic.CompiledTrace
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.store.Store
 import java.util.IdentityHashMap
+import kotlin.reflect.KClass
 
 /**
  * Reads compiled frames from the JVM stack trace of a trap. Each run of
@@ -17,10 +17,11 @@ import java.util.IdentityHashMap
 class CompiledStackTrace(
     private val store: Store,
     exception: Throwable,
+    entryClass: KClass<*>,
 ) : CompiledTrace {
 
     private val elements = exception.stackTrace
-    private val entryClass = compiledEntryClass.java.name
+    private val entryClassName = entryClass.java.name
     private var cursor = 0
 
     // Compared by identity: a module instance's own equality walks everything it holds.
@@ -42,9 +43,11 @@ class CompiledStackTrace(
         var reachedEntry = false
         while (cursor < elements.size) {
             val element = elements[cursor]
-            if (element.className == entryClass) {
+            if (element.className == entryClassName) {
                 reachedEntry = true
-                while (cursor < elements.size && elements[cursor].className == entryClass) cursor++
+                while (cursor < elements.size && elements[cursor].className == entryClassName) {
+                    cursor++
+                }
                 break
             }
             run += element

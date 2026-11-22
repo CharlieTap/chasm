@@ -1,27 +1,36 @@
+@file:OptIn(ExperimentalChasmApi::class)
+
 package com.test
 
+import io.github.charlietap.chasm.ExperimentalChasmApi
 import io.github.charlietap.chasm.embedding.codegen.CodegenImport
-import io.github.charlietap.chasm.embedding.codegen.InstanceFactory
-import io.github.charlietap.chasm.embedding.codegen.ModuleFactory
 import io.github.charlietap.chasm.embedding.codegen.allocateImports
+import io.github.charlietap.chasm.embedding.exports
 import io.github.charlietap.chasm.embedding.instance
 import io.github.charlietap.chasm.embedding.memory.readBytes
 import io.github.charlietap.chasm.embedding.memory.writeBytes
 import io.github.charlietap.chasm.embedding.module
+import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.Instance
 import io.github.charlietap.chasm.embedding.shapes.Memory
+import io.github.charlietap.chasm.embedding.shapes.Module
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.shapes.`expect`
 import io.github.charlietap.chasm.embedding.store
 import kotlin.ByteArray
 import kotlin.Int
+import kotlin.OptIn
 import kotlin.collections.List
 
-public fun singleMemory(
+public suspend fun singleMemory(
   binary: ByteArray,
   imports: List<CodegenImport> = emptyList(),
-  moduleFactory: ModuleFactory? = null,
-  instanceFactory: InstanceFactory? = null,
+  moduleFactory: (suspend (ByteArray) -> Module)? = null,
+  instanceFactory: (suspend (
+    Store,
+    Module,
+    List<Import>,
+  ) -> Instance)? = null,
 ): SingleMemory {
   val store = store()
   val module = moduleFactory?.invoke(binary) ?: module(binary).`expect`("Failed to decode binary")
@@ -35,12 +44,11 @@ private class SingleMemoryImpl(
   private val instance: Instance,
 ) : SingleMemory {
   private val _memory: Memory =
-      (instance.exports.firstOrNull { export -> export.name == "memory" }?.value as? Memory) ?: error("Failed to find memory export with name memory")
+      exports(instance).memory("memory") ?: error("Failed to find memory export with name memory")
 
-  override val memory: SingleMemory.Memory = MemoryImpl(store, _memory)
+  override val memory: SingleMemory.Memory = MemoryImpl(_memory)
 
   private class MemoryImpl(
-    private val store: Store,
     private val memory: Memory,
   ) : SingleMemory.Memory {
     override fun read(
@@ -48,7 +56,7 @@ private class SingleMemoryImpl(
       memoryPointer: Int,
       bufferPointer: Int,
       bytesToRead: Int,
-    ): ByteArray = readBytes(store, memory, buffer, memoryPointer, bytesToRead, bufferPointer)
+    ): ByteArray = readBytes(memory, buffer, memoryPointer, bytesToRead, bufferPointer)
 
     override fun write(
       pointer: Int,
@@ -56,7 +64,7 @@ private class SingleMemoryImpl(
       bufferPointer: Int,
       bytesToWrite: Int,
     ) {
-      writeBytes(store, memory, pointer, buffer, bufferPointer, bytesToWrite)
+      writeBytes(memory, pointer, buffer, bufferPointer, bytesToWrite)
     }
   }
 }

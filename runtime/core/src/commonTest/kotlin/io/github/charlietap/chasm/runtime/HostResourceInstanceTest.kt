@@ -2,9 +2,9 @@ package io.github.charlietap.chasm.runtime
 
 import io.github.charlietap.chasm.fixture.runtime.instance.globalInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.tableInstance
-import io.github.charlietap.chasm.host.HostGlobal
-import io.github.charlietap.chasm.host.HostTable
 import io.github.charlietap.chasm.host.UnsafeHostApi
+import io.github.charlietap.chasm.runtime.host.HostGlobal
+import io.github.charlietap.chasm.runtime.host.HostTable
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals

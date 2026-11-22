@@ -1,18 +1,19 @@
 package io.github.charlietap.chasm.embedding.error
 
+import io.github.charlietap.chasm.reference.ExceptionReference
 import kotlin.jvm.JvmInline
 
-sealed interface ExecutionError<out Exception> {
+sealed interface ExecutionError {
 
     @JvmInline
-    value class Trapped(val trap: Trap) : InstantiationError<Nothing>, InvocationError<Nothing> {
+    value class Trapped(val trap: Trap) : InstantiationError, InvocationError {
 
         override fun toString(): String {
             return trap.toString()
         }
     }
 
-    data class Thrown<out Exception>(val exception: Exception) : InstantiationError<Exception>, InvocationError<Exception> {
+    data class Thrown(val exception: ExceptionReference) : InstantiationError, InvocationError {
 
         override fun toString(): String {
             return "uncaught exception $exception"
@@ -20,7 +21,7 @@ sealed interface ExecutionError<out Exception> {
     }
 
     @JvmInline
-    value class Unlinkable(val message: String) : InstantiationError<Nothing> {
+    value class Unlinkable(val message: String) : InstantiationError {
 
         override fun toString(): String {
             return message
@@ -28,7 +29,7 @@ sealed interface ExecutionError<out Exception> {
     }
 
     @JvmInline
-    value class Unsupported(val message: String) : InstantiationError<Nothing> {
+    value class Unsupported(val message: String) : InstantiationError {
 
         override fun toString(): String {
             return message
@@ -36,7 +37,7 @@ sealed interface ExecutionError<out Exception> {
     }
 
     @JvmInline
-    value class Rejected(val message: String) : InvocationError<Nothing> {
+    value class Rejected(val message: String) : InvocationError {
 
         override fun toString(): String {
             return message
@@ -44,9 +45,9 @@ sealed interface ExecutionError<out Exception> {
     }
 }
 
-sealed interface InstantiationError<out Exception> : ExecutionError<Exception>
+sealed interface InstantiationError : ExecutionError
 
-sealed interface InvocationError<out Exception> : ExecutionError<Exception>
+sealed interface InvocationError : ExecutionError
 
 sealed interface ModuleError {
 

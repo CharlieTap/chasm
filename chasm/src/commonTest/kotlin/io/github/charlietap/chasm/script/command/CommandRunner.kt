@@ -16,9 +16,9 @@ import io.github.charlietap.sweet.lib.command.ModuleDefinitionCommand
 import io.github.charlietap.sweet.lib.command.ModuleInstanceCommand
 import io.github.charlietap.sweet.lib.command.RegisterCommand
 
-typealias CommandRunner = (ScriptContext, Command) -> CommandResult
+typealias CommandRunner = suspend (ScriptContext, Command) -> CommandResult
 
-fun CommandRunner(
+suspend fun CommandRunner(
     context: ScriptContext,
     command: Command,
 ): CommandResult = CommandRunner(
@@ -39,7 +39,7 @@ fun CommandRunner(
     registerCommandRunner = ::RegisterCommandRunner,
 )
 
-private fun CommandRunner(
+private suspend fun CommandRunner(
     context: ScriptContext,
     command: Command,
     actionCommandRunner: ActionCommandRunner,

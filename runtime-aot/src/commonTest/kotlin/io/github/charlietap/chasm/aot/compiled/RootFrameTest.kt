@@ -1,28 +1,34 @@
 package io.github.charlietap.chasm.aot.compiled
 
-import io.github.charlietap.chasm.aot.instance
+import io.github.charlietap.chasm.InternalChasmApi
+import io.github.charlietap.chasm.aot.internal.AotModuleInstaller
 import io.github.charlietap.chasm.compiler.backend.jvm.JvmOptions
 import io.github.charlietap.chasm.config.GCStrategy
 import io.github.charlietap.chasm.config.GCThreshold
 import io.github.charlietap.chasm.config.StoreConfig
 import io.github.charlietap.chasm.embedding.function
+import io.github.charlietap.chasm.embedding.instance
+import io.github.charlietap.chasm.embedding.internal.StoreRuntime
+import io.github.charlietap.chasm.embedding.internal.interpreterEngine
 import io.github.charlietap.chasm.embedding.invoke
 import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.expect
-import io.github.charlietap.chasm.embedding.store
+import io.github.charlietap.chasm.embedding.value.NumberValue.I32
+import io.github.charlietap.chasm.embedding.value.NumberValue.I64
 import io.github.charlietap.chasm.host.HostFunction
-import io.github.charlietap.chasm.host.withGc
+import io.github.charlietap.chasm.host.collect
 import io.github.charlietap.chasm.host.writeI64
-import io.github.charlietap.chasm.runtime.value.NumberValue.I32
-import io.github.charlietap.chasm.runtime.value.NumberValue.I64
 import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.chasm.type.NumberType
 import io.github.charlietap.chasm.type.ResultType
 import io.github.charlietap.chasm.type.ValueType
+import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import io.github.charlietap.chasm.runtime.store.Store as RuntimeStore
 
+@OptIn(InternalChasmApi::class)
 class RootFrameTest {
 
     @Test
@@ -123,27 +129,27 @@ class RootFrameTest {
     private fun run(export: String): Map<Int?, List<Any>> {
         return listOf(null, FORCED_SPLIT).associateWith { split ->
 
-            val store = store(StoreConfig(gcStrategy = GCStrategy.TRADITIONAL, gcThreshold = GCThreshold.KB(64)))
+            val config = StoreConfig(gcStrategy = GCStrategy.TRADITIONAL, gcThreshold = GCThreshold.KB(64))
+            val runtime = RuntimeStore(config = config)
+            val store = interpreterEngine(StoreRuntime(runtime), AotModuleInstaller()).store
             val collectType = FunctionType(ResultType(emptyList()), ResultType(emptyList()))
-            val collect = function(store, collectType, HostFunction { _, _ -> withGc { collect() } })
+            val collectFunction = function(store, collectType, HostFunction { _, _ -> collect() })
             val liveType = FunctionType(ResultType(emptyList()), ResultType(listOf(ValueType.Number(NumberType.I64))))
-            val live = function(
+            val liveFunction = function(
                 store,
                 liveType,
                 HostFunction { _, results ->
-                    withGc {
-                        collect()
-                        results.writeI64(0, allocatedBytes)
-                    }
+                    collect()
+                    results.writeI64(0, runtime.heap.allocatedBytes)
                 },
             )
-            val imports = listOf(Import("env", "collect", collect), Import("env", "live", live))
+            val imports = listOf(Import("env", "collect", collectFunction), Import("env", "live", liveFunction))
 
-            val options = JvmOptions(packageName = "chasm.aot.roots", splitInstructions = split)
+            val options = JvmOptions(packageName = "chasm.aot.roots", splitInstructions = split, storeConfig = config)
             val compiled = generate(fixture("root_frames"), options).compiledModule()
 
-            val instance = instance(store, compiled, imports).expect("instantiates")
-            invoke(store, instance, export, emptyList()).expect(export)
+            val instance = runBlocking { instance(store, compiled, imports) }.expect("instantiates")
+            invoke(instance, export, emptyList()).expect(export)
         }
     }
 

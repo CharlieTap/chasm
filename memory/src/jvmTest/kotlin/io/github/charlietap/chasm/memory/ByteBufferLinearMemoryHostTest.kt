@@ -2,10 +2,6 @@ package io.github.charlietap.chasm.memory
 
 import io.github.charlietap.chasm.config.LinearMemoryConfig
 import io.github.charlietap.chasm.host.UnsafeHostApi
-import io.github.charlietap.chasm.host.readU16
-import io.github.charlietap.chasm.host.readU32
-import io.github.charlietap.chasm.host.readU64
-import io.github.charlietap.chasm.host.readU8
 import io.github.charlietap.chasm.memory.destruct.LinearMemoryDestructor
 import io.github.charlietap.chasm.memory.read.NullTerminatedStringReader
 import io.github.charlietap.chasm.memory.read.StringReader
@@ -197,20 +193,6 @@ class ByteBufferLinearMemoryHostTest {
             byteArrayOf(0x78, 0x56, 0x34, 0x12),
             memory.read(ByteArray(4), 7, 4),
         )
-    }
-
-    @Test
-    fun `reads unsigned values with inline conversions`() {
-        val memory = memory()
-        memory.writeI8(0, -1)
-        memory.writeI16(2, -1)
-        memory.writeI32(4, -1)
-        memory.writeI64(8, -1)
-
-        assertEquals(UByte.MAX_VALUE, memory.readU8(0))
-        assertEquals(UShort.MAX_VALUE, memory.readU16(2))
-        assertEquals(UInt.MAX_VALUE, memory.readU32(4))
-        assertEquals(ULong.MAX_VALUE, memory.readU64(8))
     }
 
     @Test

@@ -44,26 +44,48 @@ class GcCodegenTest {
     }
 
     @Test
-    fun `struct references still skip on the interpreter and AOT tiers`() {
+    fun `generates interpreter struct views`() {
+        assertModuleGenerates(
+            category = "gc",
+            module = "struct_views",
+            options = BindingOptions(
+                interfaceName = "StructViews",
+                packageName = PACKAGE_NAME,
+                config = CodegenConfig(runtime = CodegenRuntime.CHASM, executionTier = ExecutionTier.Interpreter()),
+            ),
+        )
+    }
+
+    @Test
+    fun `generates AOT struct views`() {
+        assertModuleGenerates(
+            category = "gc",
+            module = "struct_views",
+            options = BindingOptions(
+                interfaceName = "AotStructViews",
+                packageName = PACKAGE_NAME,
+                config = CodegenConfig(runtime = CodegenRuntime.CHASM, executionTier = ExecutionTier.Aot("com.test.aot.WasmModule")),
+            ),
+        )
+    }
+
+    @Test
+    fun `struct references skip on the portable VM`() {
 
         val info = moduleInfo(moduleBytes("struct_views")).expect("struct_views should decode")
-        val tiers = listOf(ExecutionTier.Interpreter(), ExecutionTier.Aot("com.test.aot.WasmModule"))
+        val logger = FakeLogger()
 
-        tiers.forEach { tier ->
+        val files = BindingGenerator(logger).generate(
+            info,
+            BindingOptions(
+                interfaceName = "Views",
+                packageName = PACKAGE_NAME,
+                config = codegenConfig(runtime = CodegenRuntime.PORTABLE_VM),
+            ),
+        )
 
-            val logger = FakeLogger()
-            val files = BindingGenerator(logger).generate(
-                info,
-                BindingOptions(
-                    interfaceName = "Views",
-                    packageName = PACKAGE_NAME,
-                    config = codegenConfig(runtime = CodegenRuntime.CHASM, executionTier = tier),
-                ),
-            )
-
-            logger.expectErrorLogCount(10)
-            assertFalse(files.first().toString().contains("StructReference"), tier::class.simpleName)
-        }
+        logger.expectErrorLogCount(10)
+        assertFalse(files.first().toString().contains("StructReference"))
     }
 
     @Test

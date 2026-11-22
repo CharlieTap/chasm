@@ -1,9 +1,4 @@
 public final class io/github/charlietap/chasm/jit/internal/JitEngineKt {
-	public static final fun _store (Lio/github/charlietap/chasm/config/StoreConfig;)Lio/github/charlietap/chasm/embedding/compiled/Store;
-}
-
-public final class io/github/charlietap/chasm/jit/internal/ModulesKt {
-	public static final fun _classicModule (Lio/github/charlietap/chasm/embedding/compiled/Module;)Lio/github/charlietap/chasm/embedding/shapes/Module;
-	public static final fun _compiledModule (Lio/github/charlietap/chasm/embedding/shapes/Module;)Lio/github/charlietap/chasm/embedding/compiled/Module;
+	public static final fun _jitStore (Lio/github/charlietap/chasm/config/StoreConfig;)Lio/github/charlietap/chasm/embedding/shapes/Store;
 }
 

@@ -1,8 +1,8 @@
 package io.github.charlietap.chasm.jit.internal
 
-import io.github.charlietap.chasm.embedding.compiled.value.ExecutionValue
-import io.github.charlietap.chasm.embedding.compiled.value.NumberValue
-import io.github.charlietap.chasm.embedding.compiled.value.ReferenceValue
+import io.github.charlietap.chasm.embedding.value.ExecutionValue
+import io.github.charlietap.chasm.embedding.value.NumberValue
+import io.github.charlietap.chasm.embedding.value.ReferenceValue
 import io.github.charlietap.chasm.reference.ArrayReference
 import io.github.charlietap.chasm.reference.ExceptionReference
 import io.github.charlietap.chasm.reference.FunctionReference
@@ -15,7 +15,6 @@ import io.github.charlietap.chasm.type.DefinedType
 import io.github.charlietap.chasm.type.HeapType
 import io.github.charlietap.chasm.type.NumberType
 import io.github.charlietap.chasm.type.ValueType
-import io.github.charlietap.chasm.runtime.value.NumberValue as RuntimeNumberValue
 
 internal class LaneValues {
 
@@ -69,17 +68,11 @@ internal class LaneValues {
     fun number(
         type: ValueType,
         value: ExecutionValue,
-    ): RuntimeNumberValue<*> {
+    ): Long {
 
         val numberType = requireNotNull((type as? ValueType.Number)?.numberType) { "$type is not a number type" }
-        val word = requireNotNull(word(numberType, value)) { "$value is not a $numberType" }
 
-        return when (numberType) {
-            NumberType.I32 -> RuntimeNumberValue.I32(word.toInt())
-            NumberType.I64 -> RuntimeNumberValue.I64(word)
-            NumberType.F32 -> RuntimeNumberValue.F32(Float.fromBits(word.toInt()))
-            NumberType.F64 -> RuntimeNumberValue.F64(Double.fromBits(word))
-        }
+        return requireNotNull(word(numberType, value)) { "$value is not a $numberType" }
     }
 
     fun reference(value: ExecutionValue): Any? {

@@ -23,6 +23,7 @@ import io.github.charlietap.sweet.lib.command.AssertMalformedCommand
 import io.github.charlietap.sweet.lib.command.Command
 import io.github.charlietap.sweet.lib.command.ModuleCommand
 import io.github.charlietap.sweet.lib.command.ModuleDefinitionCommand
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 
 class ChasmScriptRunner(
@@ -45,10 +46,10 @@ class ChasmScriptRunner(
     override fun run(): ScriptResult {
         val file = (directory + "/" + scriptFilename).readTextFromPath()
         val script = Json.decodeFromString<Script>(file)
-        return execute(script)
+        return runBlocking { execute(script) }
     }
 
-    private fun execute(script: Script): ScriptResult {
+    private suspend fun execute(script: Script): ScriptResult {
 
         val config = Config(
             runtimeConfig = RuntimeConfig(gcStrategy = GCStrategy.TRADITIONAL),

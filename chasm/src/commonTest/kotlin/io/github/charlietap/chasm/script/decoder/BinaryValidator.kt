@@ -6,22 +6,18 @@ import io.github.charlietap.chasm.embedding.component
 import io.github.charlietap.chasm.embedding.error.ModuleError
 import io.github.charlietap.chasm.embedding.module
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
-import io.github.charlietap.chasm.embedding.shapes.fold
 import io.github.charlietap.chasm.embedding.validate
 
-internal fun BinaryValidator(
+internal suspend fun BinaryValidator(
     bytes: ByteArray,
     moduleConfig: ModuleConfig,
 ): ChasmResult<Any, ModuleError> {
     return when (WasmLayerDecoder(bytes)) {
-        WasmLayer.Core -> module(bytes, moduleConfig).fold(
-            onSuccess = { module -> validate(module) },
-            onError = { error -> ChasmResult.Error(error) },
-        )
-        WasmLayer.Component -> component(bytes, ComponentConfig(moduleConfig)).fold(
-            onSuccess = { component -> validate(component) },
-            onError = { error -> ChasmResult.Error(error) },
-        )
+        WasmLayer.Core -> module(bytes, moduleConfig)
+        WasmLayer.Component -> when (val decoded = component(bytes, ComponentConfig(moduleConfig))) {
+            is ChasmResult.Success -> validate(decoded.result)
+            is ChasmResult.Error -> decoded
+        }
         null -> ChasmResult.Error(ModuleError.Malformed("invalid or unsupported WebAssembly binary layer"))
     }
 }

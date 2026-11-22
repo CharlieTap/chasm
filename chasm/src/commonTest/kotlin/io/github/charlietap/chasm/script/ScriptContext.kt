@@ -23,7 +23,7 @@ data class ScriptContext(
     fun registerImports(moduleName: String, instance: Instance) {
 
         val exports = exports(instance)
-        val imports = exports.map { export ->
+        val imports = exports.all.map { export ->
             Import(
                 moduleName,
                 export.name,

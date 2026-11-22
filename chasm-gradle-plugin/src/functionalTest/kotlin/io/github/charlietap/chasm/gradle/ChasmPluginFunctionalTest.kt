@@ -437,81 +437,6 @@ class ChasmPluginFunctionalTest {
     }
 
     @Test
-    fun `Chasm coroutine dependency follows suspending factory generation`() {
-        listOf(false, true).forEach { suspending ->
-            val project = project(
-                build = """
-                    import io.github.charlietap.chasm.gradle.CodegenConfig
-                    import io.github.charlietap.chasm.gradle.CodegenRuntime
-
-                    plugins {
-                        id("$pluginId")
-                        id("org.jetbrains.kotlin.jvm")
-                    }
-
-                    chasm {
-                        modules.create("RuntimeService") {
-                            packageName.set("test.chasm")
-                            codegenConfig.set(
-                                CodegenConfig(
-                                    generateSuspendingFactories = $suspending,
-                                    runtime = CodegenRuntime.CHASM,
-                                ),
-                            )
-                        }
-                    }
-                """,
-            )
-
-            val result = project.build("dependencies", "--configuration=implementation")
-            assertEquals(
-                suspending,
-                result.output.contains("io.github.charlietap.chasm:chasm-coroutines-jvm:"),
-            )
-        }
-    }
-
-    @Test
-    fun `multiplatform Chasm coroutine dependency follows suspending factory generation`() {
-        listOf(false, true).forEach { suspending ->
-            val project = project(
-                build = """
-                    import io.github.charlietap.chasm.gradle.CodegenConfig
-                    import io.github.charlietap.chasm.gradle.CodegenRuntime
-
-                    plugins {
-                        id("$pluginId")
-                        id("org.jetbrains.kotlin.multiplatform")
-                    }
-
-                    kotlin {
-                        jvm()
-                    }
-
-                    chasm {
-                        modules.create("RuntimeService") {
-                            packageName.set("test.chasm")
-                            codegenConfig.set(
-                                CodegenConfig(
-                                    generateSuspendingFactories = $suspending,
-                                    runtime = CodegenRuntime.CHASM,
-                                ),
-                            )
-                        }
-                    }
-                """,
-            )
-
-            val result = project.build("dependencies", "--configuration=commonMainImplementation")
-            assertEquals(
-                suspending,
-                result.output.contains("io.github.charlietap.chasm:chasm-coroutines:"),
-            )
-            assertFalse(result.output.contains("io.github.charlietap.chasm:chasm-coroutines-jvm:"))
-        }
-    }
-
-    @Test
     fun `runtime change invalidates generated output`() {
         fun build(runtime: String) = """
             import io.github.charlietap.chasm.gradle.CodegenConfig
@@ -656,11 +581,12 @@ class ChasmPluginFunctionalTest {
                 import io.github.charlietap.chasm.type.NumberType
                 import io.github.charlietap.chasm.type.ResultType
                 import io.github.charlietap.chasm.type.ValueType
+                import kotlinx.coroutines.runBlocking
                 import test.generated.directService
 
                 object Main {
                     @JvmStatic
-                    fun main(args: Array<String>) {
+                    fun main(args: Array<String>) = runBlocking {
                         val binary = requireNotNull(Main::class.java.getResourceAsStream("/module.wasm")).readBytes()
                         val events = mutableListOf<Int>()
                         val record = FunctionImport(
@@ -735,12 +661,13 @@ class ChasmPluginFunctionalTest {
                 import at.released.weh.filesystem.stdio.StdioSink
                 import at.released.weh.host.EmbedderHost
                 import kotlinx.io.Buffer
+                import kotlinx.coroutines.runBlocking
                 import kotlinx.io.readString
                 import test.generated.wasiService
 
                 object Main {
                     @JvmStatic
-                    fun main(args: Array<String>) {
+                    fun main(args: Array<String>) = runBlocking {
                         val binary = requireNotNull(Main::class.java.getResourceAsStream("/module.wasm")).readBytes()
                         val stdout = RecordingSinkProvider()
                         EmbedderHost { this.stdout = stdout }.use { host ->
@@ -784,7 +711,7 @@ class ChasmPluginFunctionalTest {
     }
 
     @Test
-    fun `suspending Chasm factory executes custom module and instance factories`() {
+    fun `Chasm factory executes custom module and instance factories`() {
         val project = project(
             build = """
                 import io.github.charlietap.chasm.gradle.CodegenConfig
@@ -801,14 +728,9 @@ class ChasmPluginFunctionalTest {
                 }
 
                 chasm {
-                    modules.create("SuspendingDirectService") {
+                    modules.create("CustomFactoryService") {
                         packageName.set("test.generated")
-                        codegenConfig.set(
-                            CodegenConfig(
-                                generateSuspendingFactories = true,
-                                runtime = CodegenRuntime.CHASM,
-                            ),
-                        )
+                        codegenConfig.set(CodegenConfig(runtime = CodegenRuntime.CHASM))
                     }
                 }
             """,
@@ -820,13 +742,13 @@ class ChasmPluginFunctionalTest {
             """
                 package test.consumer
 
-                import io.github.charlietap.chasm.coroutines.instance
-                import io.github.charlietap.chasm.coroutines.module
+                import io.github.charlietap.chasm.embedding.instance
+                import io.github.charlietap.chasm.embedding.module
                 import io.github.charlietap.chasm.embedding.shapes.Module
                 import io.github.charlietap.chasm.embedding.shapes.`expect`
                 import kotlinx.coroutines.runBlocking
                 import kotlinx.coroutines.yield
-                import test.generated.suspendingDirectService
+                import test.generated.customFactoryService
 
                 object Main {
                     @JvmStatic
@@ -836,7 +758,7 @@ class ChasmPluginFunctionalTest {
                         var instanceFactoryCalls = 0
                         var decodedModule: Module? = null
 
-                        val service = suspendingDirectService(
+                        val service = customFactoryService(
                             binary = binary,
                             moduleFactory = { bytes ->
                                 yield()
@@ -856,7 +778,7 @@ class ChasmPluginFunctionalTest {
                         check(moduleFactoryCalls == 1)
                         check(instanceFactoryCalls == 1)
                         check(service.answer() == 42)
-                        println("SUSPENDING_DIRECT_CHASM_OK")
+                        println("CUSTOM_FACTORY_CHASM_OK")
                     }
                 }
             """,
@@ -864,7 +786,7 @@ class ChasmPluginFunctionalTest {
 
         val result = project.build("run")
 
-        assertContains(result.output, "SUSPENDING_DIRECT_CHASM_OK")
+        assertContains(result.output, "CUSTOM_FACTORY_CHASM_OK")
     }
 
     @Test
@@ -1760,7 +1682,7 @@ class ChasmPluginFunctionalTest {
             import test.generated.PublicServiceImpl
             import test.generated.publicService
 
-            fun constructWithFactory(binary: ByteArray): PublicService = publicService(binary)
+            suspend fun constructWithFactory(binary: ByteArray): PublicService = publicService(binary)
 
             fun constructImplementation(
                 store: Store,

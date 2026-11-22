@@ -1,78 +1,60 @@
 package io.github.charlietap.chasm.embedding
 
-import io.github.charlietap.chasm.embedding.fixture.publicStore
-import io.github.charlietap.chasm.fixture.runtime.instance.dataInstance
-import io.github.charlietap.chasm.fixture.runtime.instance.elementInstance
-import io.github.charlietap.chasm.fixture.runtime.instance.functionInstance
-import io.github.charlietap.chasm.fixture.runtime.instance.globalInstance
-import io.github.charlietap.chasm.fixture.runtime.instance.memoryInstance
-import io.github.charlietap.chasm.fixture.runtime.instance.tableInstance
+import io.github.charlietap.chasm.embedding.fixture.INSTANCE_MODULE
+import io.github.charlietap.chasm.embedding.fixture.instantiate
+import io.github.charlietap.chasm.embedding.fixture.interpreterStore
 import io.github.charlietap.chasm.fixture.runtime.store
-import io.github.charlietap.chasm.fixture.runtime.value.hostReferenceValue
+import io.github.charlietap.chasm.fixture.type.functionType
+import io.github.charlietap.chasm.fixture.type.limits
 import io.github.charlietap.chasm.fixture.type.memoryType
-import io.github.charlietap.chasm.fixture.type.sharedStatus
-import io.github.charlietap.chasm.runtime.ext.toLong
-import io.github.charlietap.chasm.runtime.ext.toLongFromBoxed
-import io.github.charlietap.chasm.runtime.resource.drop.MemoryInstanceDropper
-import io.github.charlietap.chasm.runtime.value.ExecutionValue
+import io.github.charlietap.chasm.host.HostFunction
+import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 class DropStoreTest {
 
     @Test
-    fun `calling dropStore wipes all the associated state in the store`() {
+    fun `calling dropStore wipes all the associated state in the store`() = runTest {
 
-        val referenceValue = hostReferenceValue().toLong()
+        val runtime = store()
+        val store = interpreterStore(runtime)
+        function(store, functionType(), HostFunction { _, _ -> })
+        memory(store, memoryType(limits = limits(min = 1u)))
+        instantiate(store, INSTANCE_MODULE)
+        val data = runtime.data.toList()
+        val elements = runtime.elements.toList()
+        val globals = runtime.globals.toList()
+        val memories = runtime.memories.toList()
+        val tables = runtime.tables.toList()
 
-        val dataInstance = dataInstance(
-            bytes = ubyteArrayOf(1u, 2u),
-        )
-        val elementInstance = elementInstance(
-            elements = longArrayOf(referenceValue, referenceValue),
-        )
-        val globalInstance = globalInstance(
-            value = referenceValue,
-        )
-        val memoryInstance = memoryInstance(
-            type = memoryType(
-                shared = sharedStatus(),
-            ),
-        )
-        val tableInstance = tableInstance(
-            elements = longArrayOf(referenceValue, referenceValue),
-        )
+        dropStore(store)
 
-        val store = publicStore(
-            store(
-                data = mutableListOf(dataInstance),
-                elements = mutableListOf(elementInstance),
-                globals = mutableListOf(globalInstance),
-                memories = mutableListOf(memoryInstance),
-                tables = mutableListOf(tableInstance),
-                functions = mutableListOf(functionInstance()),
-            ),
-        )
+        data.forEach { instance -> assertContentEquals(ubyteArrayOf(), instance.bytes) }
+        elements.forEach { instance -> assertContentEquals(longArrayOf(), instance.elements) }
+        globals.forEach { instance -> assertEquals(0L, instance.value) }
+        memories.forEach { instance -> assertEquals(0uL, instance.type.limits.min) }
+        tables.forEach { instance -> assertContentEquals(longArrayOf(), instance.elements) }
+        assertEquals(2, memories.size)
+        assertEquals(0, runtime.data.size)
+        assertEquals(0, runtime.elements.size)
+        assertEquals(0, runtime.functions.size)
+        assertEquals(0, runtime.globals.size)
+        assertEquals(0, runtime.memories.size)
+        assertEquals(0, runtime.tables.size)
+    }
 
-        var memoryDropped = false
-        val memoryDropper: MemoryInstanceDropper = { _memoryInstance ->
-            assertEquals(memoryInstance, _memoryInstance)
-            memoryDropped = true
+    @Test
+    fun `a store can only be dropped once`() {
+
+        val store = interpreterStore()
+
+        dropStore(store)
+
+        assertFailsWith<IllegalStateException> {
+            dropStore(store)
         }
-
-        dropStore(store, memoryDropper)
-
-        assertEquals(true, memoryDropped)
-        assertContentEquals(ubyteArrayOf(), dataInstance.bytes)
-        assertContentEquals(longArrayOf(), elementInstance.elements)
-        assertEquals(ExecutionValue.Uninitialised.toLongFromBoxed(), globalInstance.value)
-        assertContentEquals(longArrayOf(), tableInstance.elements)
-        assertEquals(0, store.store.data.size)
-        assertEquals(0, store.store.elements.size)
-        assertEquals(0, store.store.functions.size)
-        assertEquals(0, store.store.globals.size)
-        assertEquals(0, store.store.memories.size)
-        assertEquals(0, store.store.tables.size)
     }
 }

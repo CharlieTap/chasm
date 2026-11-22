@@ -16,6 +16,7 @@ class ReferenceGlobal(
 class ReferenceTable(
     @JvmField var elements: Array<Any?>,
     @JvmField val instance: TableInstance,
+    @JvmField val trapOnGrowFailure: Boolean,
 ) {
     @JvmField var check: ReferenceCheck? = null
 

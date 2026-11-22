@@ -279,8 +279,8 @@ public final class io/github/charlietap/chasm/vm/Table {
 
 public final class io/github/charlietap/chasm/vm/ValueMapper {
 	public static final field INSTANCE Lio/github/charlietap/chasm/vm/ValueMapper;
-	public final fun from (Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Value;)Lio/github/charlietap/chasm/runtime/value/ExecutionValue;
-	public final fun to (Lio/github/charlietap/chasm/runtime/value/ExecutionValue;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Value;
+	public final fun from (Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Value;)Lio/github/charlietap/chasm/embedding/value/ExecutionValue;
+	public final fun to (Lio/github/charlietap/chasm/embedding/value/ExecutionValue;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Value;
 }
 
 public abstract interface class io/github/charlietap/chasm/vm/ValueType {

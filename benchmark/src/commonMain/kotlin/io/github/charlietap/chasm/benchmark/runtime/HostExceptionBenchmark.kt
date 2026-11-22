@@ -23,17 +23,17 @@ import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.fixture.type.i64ValueType
 import io.github.charlietap.chasm.fixture.type.resultType
 import io.github.charlietap.chasm.fixture.type.tagType
-import io.github.charlietap.chasm.host.HostException
-import io.github.charlietap.chasm.host.HostFunction
 import io.github.charlietap.chasm.host.ModuleIndex
-import io.github.charlietap.chasm.host.raise
-import io.github.charlietap.chasm.host.withExceptions
-import io.github.charlietap.chasm.host.withTag
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.CompiledCatch
 import io.github.charlietap.chasm.runtime.exception.ExceptionRegion
 import io.github.charlietap.chasm.runtime.exception.FunctionExceptionTable
+import io.github.charlietap.chasm.runtime.host.HostException
+import io.github.charlietap.chasm.runtime.host.RawHostFunction
+import io.github.charlietap.chasm.runtime.host.raise
+import io.github.charlietap.chasm.runtime.host.withExceptions
+import io.github.charlietap.chasm.runtime.host.withTag
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.instruction.OperandTransfer
@@ -111,7 +111,7 @@ class HostExceptionBenchmark : StabilizedBenchmark() {
         runtimeStore.heap.retain(exception.rawReference)
         val hostFunction = hostFunctionInstance(
             functionType = payloadFunctionType(),
-            function = HostFunction { parameters, _ ->
+            function = RawHostFunction { parameters, _ ->
                 withTag(ModuleIndex.TagIndex(0)) {
                     raise(parameters)
                 }
@@ -224,7 +224,7 @@ class HostExceptionBenchmark : StabilizedBenchmark() {
         val nested = escapingFunction(program, module, exception.rawReference)
         runtimeStore.functions.add(nested)
         val bridge = hostFunctionInstance(
-            function = HostFunction { _, _ ->
+            function = RawHostFunction { _, _ ->
                 val invocation = FunctionInvoker(config, runtimeStore, module, nested, emptyList())
                 check(invocation == Err(InvocationError.ThrownException))
                 withExceptions {

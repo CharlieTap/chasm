@@ -8,6 +8,10 @@ plugins {
 kotlin {
     android {
         namespace = "io.github.charlietap.chasm.runtime"
+        optimization {
+            consumerKeepRules.publish = true
+            consumerKeepRules.file("consumer-rules.pro")
+        }
     }
 
     sourceSets {
@@ -16,7 +20,7 @@ kotlin {
                 api(projects.config)
                 api(projects.moduleDeclarations)
                 api(projects.gc)
-                api(projects.host)
+                api(projects.runtime.host)
                 api(projects.runtime.encoding)
                 api(projects.runtime.type)
                 api(projects.runtime.value)

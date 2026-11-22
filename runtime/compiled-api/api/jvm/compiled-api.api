@@ -15,7 +15,6 @@ public final class io/github/charlietap/chasm/aot/Capabilities {
 
 public final class io/github/charlietap/chasm/aot/CompiledModule {
 	public final fun getCode ()Lio/github/charlietap/chasm/aot/internal/CompiledCode;
-	public final fun getDeclarations-d1pmJ48 ()Ljava/lang/Object;
 	public final fun getMetadata ()Lio/github/charlietap/chasm/aot/CompiledModuleMetadata;
 	public final fun getMetadataResult-d1pmJ48 ()Ljava/lang/Object;
 	public final fun getPackageName ()Ljava/lang/String;
@@ -94,39 +93,5 @@ public final class io/github/charlietap/chasm/aot/internal/TrapSitesKt {
 	public static final fun readTrapSites (Ljava/io/InputStream;)Lio/github/charlietap/chasm/aot/internal/TrapSites;
 	public static final fun trapSitesResource (Ljava/lang/String;)Ljava/lang/String;
 	public static final fun writeTrapSites (Ljava/io/OutputStream;Ljava/util/Map;)V
-}
-
-public abstract class io/github/charlietap/chasm/reference/ArrayReference : io/github/charlietap/chasm/reference/EqReference {
-	public fun <init> ()V
-}
-
-public abstract interface class io/github/charlietap/chasm/reference/EqReference : io/github/charlietap/chasm/reference/GcReference {
-}
-
-public abstract class io/github/charlietap/chasm/reference/ExceptionReference : io/github/charlietap/chasm/reference/GcReference {
-	public fun <init> ()V
-}
-
-public abstract class io/github/charlietap/chasm/reference/FunctionReference : io/github/charlietap/chasm/reference/GcReference {
-	public fun <init> ()V
-}
-
-public abstract interface class io/github/charlietap/chasm/reference/GcReference {
-}
-
-public final class io/github/charlietap/chasm/reference/I31Reference : io/github/charlietap/chasm/reference/EqReference {
-	public final field value I
-	public fun <init> (I)V
-	public fun equals (Ljava/lang/Object;)Z
-	public fun hashCode ()I
-	public fun toString ()Ljava/lang/String;
-}
-
-public abstract interface class io/github/charlietap/chasm/reference/ReferenceOwner {
-	public abstract fun owner ()Ljava/lang/Object;
-}
-
-public abstract class io/github/charlietap/chasm/reference/StructReference : io/github/charlietap/chasm/reference/EqReference {
-	public fun <init> ()V
 }
 
