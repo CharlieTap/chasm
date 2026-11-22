@@ -1,7 +1,6 @@
 package io.github.charlietap.chasm.embedding
 
 import io.github.charlietap.chasm.embedding.fixture.publicStore
-import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.fixture.runtime.instance.dataInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.elementInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.functionInstance
@@ -62,10 +61,8 @@ class DropStoreTest {
             memoryDropped = true
         }
 
-        val expected = ChasmResult.Success(Unit)
-        val actual = dropStore(store, memoryDropper)
+        dropStore(store, memoryDropper)
 
-        assertEquals(expected, actual)
         assertEquals(true, memoryDropped)
         assertContentEquals(ubyteArrayOf(), dataInstance.bytes)
         assertContentEquals(longArrayOf(), elementInstance.elements)

@@ -5,9 +5,9 @@ package io.github.charlietap.chasm.integration
 import com.goncalossilva.resources.Resource
 import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.config.RuntimeConfig
-import io.github.charlietap.chasm.embedding.error.ChasmError
+import io.github.charlietap.chasm.embedding.error.ExecutionError
 import io.github.charlietap.chasm.embedding.error.WasmFrame
-import io.github.charlietap.chasm.embedding.error.WasmTrap
+import io.github.charlietap.chasm.embedding.error.WasmStackTrace
 import io.github.charlietap.chasm.embedding.function
 import io.github.charlietap.chasm.embedding.instance
 import io.github.charlietap.chasm.embedding.invoke
@@ -39,15 +39,16 @@ class TrapDiagnosticsTest {
 
         val result = prepared.invoke(emptyList())
 
-        val trap = assertNotNull(assertIs<ChasmResult.Error<ChasmError.ExecutionError>>(result).error.trap)
-        assertEquals(3, trap.frames.size)
+        val error = assertIs<ChasmResult.Error<*>>(result).error
+        val stackTrace = assertNotNull(assertIs<ExecutionError.Trapped>(error).trap.stackTrace)
+        assertEquals(3, stackTrace.frames.size)
     }
 
     @Test
     fun `a module decoded from a stream reports frames without offsets`() {
         val fixture = Fixture(DIAGNOSTICS, streamed = true)
 
-        val trap = fixture.trap("nested_unreachable")
+        val stackTrace = fixture.stackTrace("nested_unreachable")
 
         assertEquals(
             listOf(
@@ -55,7 +56,7 @@ class TrapDiagnosticsTest {
                 WasmFrame(null, 2, null, null),
                 WasmFrame(null, 3, "nested_unreachable", null),
             ),
-            trap.frames,
+            stackTrace.frames,
         )
     }
 
@@ -66,10 +67,10 @@ class TrapDiagnosticsTest {
         // Replace the leaf's unreachable with nop; the shared binary now disagrees with the installed code.
         bytes[0x14f] = 0x01
 
-        val trap = fixture.trap("nested_unreachable")
+        val stackTrace = fixture.stackTrace("nested_unreachable")
 
-        assertNull(trap.frames.first().wasmOffset)
-        assertEquals(0x153, trap.frames[1].wasmOffset)
+        assertNull(stackTrace.frames.first().wasmOffset)
+        assertEquals(0x153, stackTrace.frames[1].wasmOffset)
     }
 
     private class Fixture(
@@ -93,10 +94,15 @@ class TrapDiagnosticsTest {
 
         fun invoke(name: String, vararg args: ExecutionValue) = invoke(store, instance, name, args.toList())
 
-        fun fail(name: String, vararg args: ExecutionValue): ChasmError.ExecutionError =
-            assertIs<ChasmResult.Error<ChasmError.ExecutionError>>(invoke(name, *args)).error
+        fun stackTrace(
+            name: String,
+            vararg args: ExecutionValue,
+        ): WasmStackTrace {
 
-        fun trap(name: String, vararg args: ExecutionValue): WasmTrap = assertNotNull(fail(name, *args).trap)
+            val error = assertIs<ChasmResult.Error<*>>(invoke(name, *args)).error
+
+            return assertNotNull(assertIs<ExecutionError.Trapped>(error).trap.stackTrace)
+        }
     }
 
     private companion object {

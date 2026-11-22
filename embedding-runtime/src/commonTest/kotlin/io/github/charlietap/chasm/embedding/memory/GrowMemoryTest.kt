@@ -2,7 +2,6 @@ package io.github.charlietap.chasm.embedding.memory
 
 import io.github.charlietap.chasm.embedding.fixture.publicMemory
 import io.github.charlietap.chasm.embedding.fixture.publicStore
-import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.fixture.runtime.instance.memoryAddress
 import io.github.charlietap.chasm.fixture.runtime.instance.memoryExternalValue
 import io.github.charlietap.chasm.fixture.runtime.instance.memoryInstance
@@ -32,7 +31,7 @@ class GrowMemoryTest {
         val address = memoryAddress()
         val memory = publicMemory(memoryExternalValue(address), store.store)
 
-        val expected = ChasmResult.Success(1)
+        val expected = 1
 
         val actual = growMemory(
             store = store,
@@ -60,7 +59,7 @@ class GrowMemoryTest {
         val address = memoryAddress()
         val memory = publicMemory(memoryExternalValue(address), store.store)
 
-        val expected = ChasmResult.Success(1)
+        val expected = 1
 
         val actual = growMemory(
             store = store,
@@ -87,7 +86,7 @@ class GrowMemoryTest {
         val address = memoryAddress()
         val memory = publicMemory(memoryExternalValue(address), store.store)
 
-        val expected = ChasmResult.Success(-1)
+        val expected = -1
 
         val actual = growMemory(
             store = store,
@@ -112,8 +111,8 @@ class GrowMemoryTest {
         val store = publicStore(store(memories = mutableListOf(instance)))
         val memory = publicMemory(memoryExternalValue(memoryAddress()), store.store)
 
-        assertEquals(ChasmResult.Success(-1), growMemory(store, memory, -1))
-        assertEquals(ChasmResult.Success(-1), growMemory(store, memory, Int.MAX_VALUE))
+        assertEquals(-1, growMemory(store, memory, -1))
+        assertEquals(-1, growMemory(store, memory, Int.MAX_VALUE))
 
         assertEquals(0, initialMemory.growCalls)
         assertEquals(1u, instance.type.limits.min)
@@ -131,7 +130,7 @@ class GrowMemoryTest {
             val store = publicStore(store(memories = mutableListOf(instance)))
             val memory = publicMemory(memoryExternalValue(memoryAddress()), store.store)
 
-            assertEquals(ChasmResult.Success(-1), growMemory(store, memory, 1))
+            assertEquals(-1, growMemory(store, memory, 1))
             assertEquals(1u, instance.type.limits.min)
             assertEquals(PAGE_SIZE, instance.size)
             assertSame(initialMemory, instance.data)

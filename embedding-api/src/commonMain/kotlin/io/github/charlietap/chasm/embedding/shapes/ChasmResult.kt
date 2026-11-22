@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.embedding.shapes
 
-import io.github.charlietap.chasm.embedding.error.ChasmError
 import io.github.charlietap.chasm.embedding.error.ExecutionError
 import io.github.charlietap.chasm.embedding.error.UncaughtWasmException
 import io.github.charlietap.chasm.embedding.error.WasmTrapException
@@ -66,14 +65,6 @@ private fun expectFailure(
     return when (error) {
         is ExecutionError.Trapped -> WasmTrapException(error.trap, "$message: ${error.trap}")
         is ExecutionError.Thrown<*> -> UncaughtWasmException(error.exception, "$message: uncaught exception ${error.exception}")
-        is ChasmError.ExecutionError -> {
-            val trap = error.trap?.toTrap()
-            if (trap != null) {
-                WasmTrapException(trap, "$message: $error\n$trap")
-            } else {
-                IllegalStateException("$message: $error")
-            }
-        }
         else -> IllegalStateException("$message: $error")
     }
 }

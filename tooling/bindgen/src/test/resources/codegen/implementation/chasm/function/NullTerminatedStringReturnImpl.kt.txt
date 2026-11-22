@@ -47,7 +47,7 @@ private class NullTerminatedStringReturnImpl(
     val args = emptyList<ExecutionValue>()
     val values = invokePreparedFunction(args).`expect`("Failed to invoke function invoke")
     val pointer = (values[0] as NumberValue.I32).value
-    val result = readNullTerminatedUtf8String(store, _memory, pointer).`expect`("Failed to read string result for invoke")
+    val result = readNullTerminatedUtf8String(store, _memory, pointer)
     return result
   }
 }

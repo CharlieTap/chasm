@@ -79,26 +79,18 @@ internal class RuntimeEmbeddingApi(
         return MemberName(EMBEDDING_PACKAGE, function.functionName)
     }
 
-    override fun storeControlCall(
-        call: CodeBlock,
-        failure: String,
-    ): CodeBlock {
-        return CodeBlock.of("%L.%M(%S)", call, CHASM_EXPECT, failure)
-    }
-
     override fun accessorCall(
         function: MemberName,
         arguments: CodeBlock,
-        failure: String,
     ): CodeBlock {
-        return CodeBlock.of("%M(store, %L).%M(%S)", function, arguments, CHASM_EXPECT, failure)
+        return CodeBlock.of("%M(store, %L)", function, arguments)
     }
 
     override fun writeNullTerminator(
         memory: String,
         pointer: CodeBlock,
     ): CodeBlock {
-        return accessorCall(writeBytes, CodeBlock.of("%L, %L, byteArrayOf(0)", memory, pointer), "Failed to write null terminator")
+        return accessorCall(writeBytes, CodeBlock.of("%L, %L, byteArrayOf(0)", memory, pointer))
     }
 
     override fun exportLookup(
@@ -118,10 +110,9 @@ internal class RuntimeEmbeddingApi(
     override fun globalRead(
         global: String,
         type: Type,
-        failure: String,
     ): CodeBlock {
 
-        val value = accessorCall(READ_GLOBAL, CodeBlock.of("%N", global), failure)
+        val value = accessorCall(READ_GLOBAL, CodeBlock.of("%N", global))
 
         return CodeBlock.of("(%L as %T).value", value, NUMBER_VALUE.nestedClass(numberValueName(type)))
     }
@@ -130,9 +121,8 @@ internal class RuntimeEmbeddingApi(
         global: String,
         type: Type,
         value: String,
-        failure: String,
     ): CodeBlock {
-        return accessorCall(WRITE_GLOBAL, CodeBlock.of("%N, %T(%L)", global, NUMBER_VALUE.nestedClass(numberValueName(type)), value), failure)
+        return accessorCall(WRITE_GLOBAL, CodeBlock.of("%N, %T(%L)", global, NUMBER_VALUE.nestedClass(numberValueName(type)), value))
     }
 }
 

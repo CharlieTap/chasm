@@ -2,15 +2,16 @@ package io.github.charlietap.chasm.compiled.script
 
 import io.github.charlietap.chasm.compiled.Compiler
 import io.github.charlietap.chasm.compiled.Instantiable
+import io.github.charlietap.chasm.compiled.ScriptFailure
 import io.github.charlietap.chasm.config.Config
 import io.github.charlietap.chasm.config.StoreConfig
-import io.github.charlietap.chasm.embedding.error.ChasmError
+import io.github.charlietap.chasm.embedding.error.InstantiationError
 import io.github.charlietap.chasm.embedding.exports
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.Instance
 import io.github.charlietap.chasm.embedding.shapes.Store
-import io.github.charlietap.chasm.embedding.shapes.flatMap
+import io.github.charlietap.chasm.runtime.value.ReferenceValue
 import io.github.charlietap.sweet.lib.SemanticPhase
 
 data class ScriptContext(
@@ -38,15 +39,25 @@ data class ScriptContext(
 
     fun compile(
         bytes: ByteArray,
-    ): ChasmResult<Instantiable, ChasmError> =
-        compiler(bytes, config.moduleConfig, storeConfig)
+    ): ChasmResult<Instantiable, ScriptFailure> {
+        return compiler(bytes, config.moduleConfig, storeConfig)
+    }
 
     fun instantiate(
         module: Instantiable,
-    ): ChasmResult<Instance, ChasmError> =
-        module(store, imports)
+    ): ChasmResult<Instance, InstantiationError<ReferenceValue.Exception>> {
+        return module(store, imports)
+    }
 
     fun instantiate(
         bytes: ByteArray,
-    ): ChasmResult<Instance, ChasmError> = compile(bytes).flatMap(::instantiate)
+    ): ChasmResult<Instance, ScriptFailure> {
+        return when (val compiled = compile(bytes)) {
+            is ChasmResult.Success -> when (val instantiated = instantiate(compiled.result)) {
+                is ChasmResult.Success -> instantiated
+                is ChasmResult.Error -> ChasmResult.Error(ScriptFailure.Execution(instantiated.error))
+            }
+            is ChasmResult.Error -> compiled
+        }
+    }
 }

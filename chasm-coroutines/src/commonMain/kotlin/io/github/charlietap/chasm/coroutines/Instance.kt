@@ -2,13 +2,14 @@ package io.github.charlietap.chasm.coroutines
 
 import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.config.RuntimeConfig
-import io.github.charlietap.chasm.embedding.error.ChasmError
+import io.github.charlietap.chasm.embedding.error.InstantiationError
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.Instance
 import io.github.charlietap.chasm.embedding.shapes.Module
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.parallel.coroutines.DefaultCoroutineParallelTaskExecutor
+import io.github.charlietap.chasm.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.embedding.internal._instance as internalInstance
 
 /**
@@ -41,7 +42,7 @@ suspend fun instance(
     module: Module,
     imports: List<Import>,
     config: RuntimeConfig = RuntimeConfig(),
-): ChasmResult<Instance, ChasmError.ExecutionError> {
+): ChasmResult<Instance, InstantiationError<ReferenceValue.Exception>> {
     return internalInstance(
         store = store,
         module = module,

@@ -3,7 +3,7 @@ package io.github.charlietap.chasm.embedding.internal
 import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.embedding.diagnostic.InterpreterTrapSource
-import io.github.charlietap.chasm.embedding.error.ChasmError
+import io.github.charlietap.chasm.embedding.error.InstantiationError
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.Instance
@@ -13,6 +13,7 @@ import io.github.charlietap.chasm.embedding.shapes._declarations
 import io.github.charlietap.chasm.embedding.shapes._module
 import io.github.charlietap.chasm.executor.instantiator.ParallelModuleInstantiator
 import io.github.charlietap.chasm.parallel.ParallelTaskExecutor
+import io.github.charlietap.chasm.runtime.value.ReferenceValue
 
 @InternalChasmApi
 suspend fun _instance(
@@ -21,8 +22,11 @@ suspend fun _instance(
     imports: List<Import>,
     config: RuntimeConfig,
     taskExecutor: ParallelTaskExecutor,
-): ChasmResult<Instance, ChasmError.ExecutionError> =
-    instantiate(
+): ChasmResult<Instance, InstantiationError<ReferenceValue.Exception>> {
+
+    require(!holdsManagedReferences(store)) { MIXED_STORE_ERROR }
+
+    return instantiate(
         store = store,
         imports = imports,
         config = config,
@@ -37,3 +41,4 @@ suspend fun _instance(
             codeInstaller = ParallelModuleCodeInstaller(module._module()),
         )
     }
+}

@@ -56,8 +56,8 @@ private class LengthPrefixedStringParamImpl(
   override fun invoke(`value`: String) {
     val valueBytes = value.encodeToByteArray()
     val valueAlloc = allocator.alloc(valueBytes.size + 4)
-    writeInt(store, _memory, valueAlloc, valueBytes.size).`expect`("Failed to write string length")
-    writeBytes(store, _memory, valueAlloc + 4, valueBytes).`expect`("Failed to write string")
+    writeInt(store, _memory, valueAlloc, valueBytes.size)
+    writeBytes(store, _memory, valueAlloc + 4, valueBytes)
     functionInputBuffer[0] = NumberValue.I32(valueAlloc)
     val args = functionInputBuffer1
     val values = invokePreparedFunction(args).`expect`("Failed to invoke function invoke")

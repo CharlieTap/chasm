@@ -3,7 +3,6 @@ package io.github.charlietap.chasm.compiled.corpus.step
 import io.github.charlietap.chasm.compiled.corpus.ext.string
 import io.github.charlietap.chasm.compiled.corpus.value.parseValue
 import io.github.charlietap.chasm.embedding.global.writeGlobal
-import io.github.charlietap.chasm.embedding.shapes.fold
 import io.github.charlietap.corpus.lib.CorpusResult
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonObject
@@ -18,8 +17,10 @@ internal fun GlobalWriteStepRunner(
     val global = context.setup.global(name) ?: return context.failure("global not found", name)
     val value = parseValue(step.getValue("value").jsonObject, context.captures)
 
-    return writeGlobal(context.setup.store, global, value).fold(
-        { CorpusResult.Success },
-        { error -> context.failure("global write failed", error.toString()) },
-    )
+    return try {
+        writeGlobal(context.setup.store, global, value)
+        CorpusResult.Success
+    } catch (failure: IllegalArgumentException) {
+        context.failure("global write failed", failure.message)
+    }
 }

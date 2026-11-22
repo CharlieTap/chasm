@@ -3,46 +3,6 @@ package io.github.charlietap.chasm.embedding.error
 import io.github.charlietap.chasm.InternalChasmApi
 import kotlin.jvm.JvmInline
 
-/**
- * A stack trace for Wasm code that failed. [frames] lists the most recent call
- * first. Very deep traces are shortened, and [omittedFrames] counts the calls
- * left out.
- */
-class WasmTrap
-    @InternalChasmApi
-    constructor(
-        val reason: TrapReason,
-        private val message: String,
-        val frames: List<WasmFrame>,
-        val omittedFrames: Int,
-        /** False if some of the earliest calls could not be recovered. */
-        val traceComplete: Boolean,
-        val memoryAccess: MemoryAccess?,
-        private val omissionIndex: Int,
-    ) {
-
-        @InternalChasmApi
-        constructor(trap: Trap) : this(
-            trap.reason,
-            trap.message,
-            checkNotNull(trap.stackTrace).frames,
-            checkNotNull(trap.stackTrace).omittedFrames,
-            checkNotNull(trap.stackTrace).complete,
-            trap.memoryAccess,
-            checkNotNull(trap.stackTrace).omissionIndex,
-        )
-
-        override fun toString(): String {
-            return toTrap().toString()
-        }
-
-        @OptIn(InternalChasmApi::class)
-        internal fun toTrap(): Trap {
-            val stackTrace = WasmStackTrace(frames, omittedFrames, traceComplete, omissionIndex)
-            return Trap(reason, message, memoryAccess, stackTrace)
-        }
-    }
-
 class WasmFrame
     @InternalChasmApi
     constructor(
@@ -165,7 +125,6 @@ value class TrapReason private constructor(val description: String) {
         val HOST_FUNCTION_FAILURE = TrapReason("host function failed")
         val MEMORY_LIMIT_EXCEEDED = TrapReason("memory limit exceeded")
         val TABLE_LIMIT_EXCEEDED = TrapReason("table limit exceeded")
-        val UNCAUGHT_EXCEPTION = TrapReason("uncaught exception")
         val OTHER = TrapReason("other")
     }
 }

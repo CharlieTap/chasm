@@ -2,9 +2,8 @@ package io.github.charlietap.chasm.embedding.internal
 
 import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.config.RuntimeConfig
-import io.github.charlietap.chasm.embedding.diagnostic.executionError
 import io.github.charlietap.chasm.embedding.diagnostic.executionTrap
-import io.github.charlietap.chasm.embedding.error.ChasmError
+import io.github.charlietap.chasm.embedding.error.ExecutionError
 import io.github.charlietap.chasm.embedding.error.Trap
 import io.github.charlietap.chasm.embedding.ext.owning
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
@@ -36,22 +35,22 @@ fun exportedFunction(
     store: Store,
     instance: Instance,
     name: String,
-): ChasmResult<ExportedFunction, ChasmError.ExecutionError> {
+): ChasmResult<ExportedFunction, ExecutionError.Rejected> {
 
     if (instance.instance.deallocated) {
-        return Error(ChasmError.ExecutionError(InvocationError.InvocationOfADeinstantiatedInstance.toString()))
+        return Error(ExecutionError.Rejected(InvocationError.InvocationOfADeinstantiatedInstance.toString()))
     }
 
     val extern = instance.exportsByName[name]
     val address = (extern as? ExternalValue.Function)?.address ?: return Error(
-        ChasmError.ExecutionError(InvocationError.FunctionNotFound(name).toString()),
+        ExecutionError.Rejected(InvocationError.FunctionNotFound(name).toString()),
     )
 
     return try {
         val runtime = store.owning(instance.store)
         Success(ExportedFunction(runtime, instance.instance, instance.config, address, runtime.function(address)))
     } catch (exception: InvocationException) {
-        Error(ChasmError.ExecutionError(exception.error.toString()))
+        Error(ExecutionError.Rejected(exception.error.toString()))
     }
 }
 
@@ -72,14 +71,6 @@ fun functionAddress(
     store.owning(function.store)
 
     return function.reference.address.address
-}
-
-@InternalChasmApi
-fun exportedError(
-    store: Store,
-    error: InvocationError,
-): ChasmError.ExecutionError {
-    return executionError(store, error)
 }
 
 @InternalChasmApi

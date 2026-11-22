@@ -53,7 +53,7 @@ private class MultipleMemoriesImpl(
       memoryPointer: Int,
       bufferPointer: Int,
       bytesToRead: Int,
-    ): ByteArray = readBytes(store, memory, buffer, memoryPointer, bytesToRead, bufferPointer).`expect`("Failed to read memory")
+    ): ByteArray = readBytes(store, memory, buffer, memoryPointer, bytesToRead, bufferPointer)
 
     override fun write(
       pointer: Int,
@@ -61,7 +61,7 @@ private class MultipleMemoriesImpl(
       bufferPointer: Int,
       bytesToWrite: Int,
     ) {
-      writeBytes(store, memory, pointer, buffer, bufferPointer, bytesToWrite).`expect`("Failed to write memory")
+      writeBytes(store, memory, pointer, buffer, bufferPointer, bytesToWrite)
     }
   }
 }

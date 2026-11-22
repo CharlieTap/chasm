@@ -1,7 +1,6 @@
 package io.github.charlietap.chasm.embedding
 
 import io.github.charlietap.chasm.config.RuntimeConfig
-import io.github.charlietap.chasm.embedding.error.ChasmError
 import io.github.charlietap.chasm.embedding.fixture.publicFunction
 import io.github.charlietap.chasm.embedding.fixture.publicGlobal
 import io.github.charlietap.chasm.embedding.fixture.publicImport
@@ -10,14 +9,15 @@ import io.github.charlietap.chasm.embedding.fixture.publicStore
 import io.github.charlietap.chasm.embedding.fixture.publicTable
 import io.github.charlietap.chasm.embedding.fixture.publicTag
 import io.github.charlietap.chasm.embedding.internal.instantiate
-import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 class ImportOwnershipTest {
 
     @Test
     fun `importables from another store are rejected before instantiation`() {
+
         val sourceStore = publicStore()
         val targetStore = publicStore()
         val importables = listOf(
@@ -27,19 +27,19 @@ class ImportOwnershipTest {
             publicTable(store = sourceStore.store),
             publicTag(store = sourceStore.store),
         )
-        val expected = ChasmResult.Error(
-            ChasmError.ExecutionError("Importable belongs to a different Store"),
-        )
 
         importables.forEach { importable ->
-            val actual = instantiate(
-                store = targetStore,
-                imports = listOf(publicImport(value = importable)),
-                config = RuntimeConfig(),
-                trapSource = { null },
-            ) { _, _, _ -> error("instantiation must not start") }
 
-            assertEquals(expected, actual)
+            val failure = assertFailsWith<IllegalArgumentException> {
+                instantiate(
+                    store = targetStore,
+                    imports = listOf(publicImport(value = importable)),
+                    config = RuntimeConfig(),
+                    trapSource = { null },
+                ) { _, _, _ -> error("instantiation must not start") }
+            }
+
+            assertEquals("Importable belongs to a different Store", failure.message)
         }
     }
 }

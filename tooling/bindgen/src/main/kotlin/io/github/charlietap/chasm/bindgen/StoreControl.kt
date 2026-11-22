@@ -12,7 +12,6 @@ internal class StoreControl(
     val parameters: List<ParameterSpec>,
     val returnType: TypeName,
     val function: StoreFunction,
-    val failure: String,
 ) {
     fun signature(): FunSpec.Builder = FunSpec.builder(name)
         .addParameters(parameters)
@@ -28,7 +27,6 @@ internal val CodegenConfig.storeControls: List<StoreControl>
                     parameters = listOf(ParameterSpec("units", LONG)),
                     returnType = UNIT,
                     function = StoreFunction.AddFuel,
-                    failure = "Failed to add fuel",
                 ),
             )
             add(
@@ -37,7 +35,6 @@ internal val CodegenConfig.storeControls: List<StoreControl>
                     parameters = emptyList(),
                     returnType = LONG,
                     function = StoreFunction.RemainingFuel,
-                    failure = "Failed to read fuel",
                 ),
             )
         }
@@ -48,7 +45,6 @@ internal val CodegenConfig.storeControls: List<StoreControl>
                     parameters = emptyList(),
                     returnType = BOOLEAN,
                     function = StoreFunction.Interrupt,
-                    failure = "Failed to interrupt",
                 ),
             )
         }

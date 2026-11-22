@@ -2,18 +2,16 @@ package io.github.charlietap.chasm.integration.test
 
 import com.goncalossilva.resources.Resource
 import io.github.charlietap.chasm.config.RuntimeConfig
-import io.github.charlietap.chasm.embedding.error.ChasmError
-import io.github.charlietap.chasm.embedding.error.WasmTrap
-import io.github.charlietap.chasm.embedding.shapes.ChasmResult
+import io.github.charlietap.chasm.embedding.error.WasmStackTrace
 import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.expect
 import io.github.charlietap.chasm.embedding.store
 import io.github.charlietap.chasm.integration.AotEngine
 import io.github.charlietap.chasm.integration.Engine
 import io.github.charlietap.chasm.integration.Interpreter
+import io.github.charlietap.chasm.integration.trapOf
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertIs
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
@@ -44,19 +42,19 @@ class MixedEngineTrapTest {
     }
 
     private fun assertSameTrap(
-        expected: WasmTrap,
-        actual: WasmTrap,
+        expected: WasmStackTrace,
+        actual: WasmStackTrace,
     ) {
-        assertTrue(expected.traceComplete)
+        assertTrue(expected.complete)
         assertEquals(expected.frames, actual.frames)
-        assertEquals(expected.traceComplete, actual.traceComplete)
+        assertEquals(expected.complete, actual.complete)
     }
 
     private fun trap(
         owner: Engine,
         caller: Engine,
         owned: String = OWNER,
-    ): WasmTrap {
+    ): WasmStackTrace {
         val store = store()
         val ownerInstance = owner.instantiate(bytes(owned), store, emptyList(), DIAGNOSTICS).expect("owner instantiates")
         val boom = owner.exports(ownerInstance).single { export -> export.name == "boom" }.value
@@ -65,8 +63,8 @@ class MixedEngineTrapTest {
 
         val result = caller.invoke(store, callerInstance, "call_owner", emptyList())
 
-        val error = assertIs<ChasmResult.Error<ChasmError.ExecutionError>>(result, "${owner.name()} owner, ${caller.name()} caller").error
-        return assertNotNull(error.trap, "${owner.name()} owner, ${caller.name()} caller")
+        val label = "${owner.name()} owner, ${caller.name()} caller"
+        return assertNotNull(trapOf(result, label).stackTrace, label)
     }
 
     private fun bytes(

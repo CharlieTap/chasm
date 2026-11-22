@@ -2,14 +2,13 @@ package io.github.charlietap.chasm.embedding.internal
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.fold
-import com.github.michaelbull.result.map
-import com.github.michaelbull.result.mapError
 import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.embedding.diagnostic.Instantiation
 import io.github.charlietap.chasm.embedding.diagnostic.TrapSource
-import io.github.charlietap.chasm.embedding.diagnostic.executionError
-import io.github.charlietap.chasm.embedding.error.ChasmError
+import io.github.charlietap.chasm.embedding.diagnostic.instantiationError
+import io.github.charlietap.chasm.embedding.diagnostic.pendingException
+import io.github.charlietap.chasm.embedding.error.InstantiationError
 import io.github.charlietap.chasm.embedding.ext.withStoreSettings
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Error
@@ -22,6 +21,7 @@ import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
+import io.github.charlietap.chasm.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.runtime.instance.Import as RuntimeImport
 import io.github.charlietap.chasm.runtime.store.Store as RuntimeStore
 
@@ -32,11 +32,15 @@ inline fun instantiate(
     config: RuntimeConfig,
     noinline trapSource: (ModuleInstance) -> TrapSource?,
     instantiator: (RuntimeConfig, RuntimeStore, List<RuntimeImport>) -> Result<ModuleInstance, ModuleTrapError>,
-): ChasmResult<Instance, ChasmError.ExecutionError> {
-    val runtime = liveRuntime(store) ?: return Error(ChasmError.ExecutionError(InvocationError.StoreDropped.toString()))
-    if (importsFromAnotherStore(store, imports)) {
-        return Error(ChasmError.ExecutionError("Importable belongs to a different Store"))
+): ChasmResult<Instance, InstantiationError<ReferenceValue.Exception>> {
+
+    val runtime = checkNotNull(liveRuntime(store)) { InvocationError.StoreDropped.toString() }
+    require(!importsFromAnotherStore(store, imports)) { "Importable belongs to a different Store" }
+
+    if (runtime.invocationDepth == 0) {
+        runtime.heap.clearPendingException()
     }
+
     val firstFunctionAddress = runtime.functions.size
     val effectiveConfig = config.withStoreSettings(runtime.config)
     val result = instantiator(effectiveConfig, runtime, runtimeImports(store, imports))
@@ -70,17 +74,22 @@ internal fun wrapInstantiationResult(
     store: Store,
     firstFunctionAddress: Int,
     trapSource: (ModuleInstance) -> TrapSource?,
-): ChasmResult<Instance, ChasmError.ExecutionError> =
-    result
-        .mapError { error -> executionError(store, error, Instantiation(firstFunctionAddress, trapSource)) }
-        .map { instance ->
-            if (config.debugInfo) store.diagnostics.register(trapSource(instance))
-            Instance(
-                config = config,
-                instance = instance,
-                store = store.store,
-            )
-        }.fold(::Success, ::Error)
+): ChasmResult<Instance, InstantiationError<ReferenceValue.Exception>> {
+    return result.fold(
+        success = { instance ->
+
+            if (config.debugInfo) {
+                store.diagnostics.register(trapSource(instance))
+            }
+
+            Success(Instance(config, instance, store.store))
+        },
+        failure = { error ->
+            val instantiation = Instantiation(firstFunctionAddress, trapSource)
+            Error(instantiationError(store, error, instantiation) { pendingException(store) })
+        },
+    )
+}
 
 @InternalChasmApi
 fun holdsManagedReferences(

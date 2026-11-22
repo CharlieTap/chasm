@@ -6,6 +6,7 @@ import io.github.charlietap.chasm.aot.instance
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.typeResolver
 import io.github.charlietap.chasm.compiled.Instantiable
+import io.github.charlietap.chasm.compiled.ScriptFailure
 import io.github.charlietap.chasm.compiled.script.ScriptModules
 import io.github.charlietap.chasm.compiler.backend.jvm.JvmModule
 import io.github.charlietap.chasm.compiler.backend.jvm.JvmOptions
@@ -16,7 +17,7 @@ import io.github.charlietap.chasm.compiler.backend.jvm.UnsupportedFunctions
 import io.github.charlietap.chasm.compiler.frontend.ModuleCompiler
 import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.config.StoreConfig
-import io.github.charlietap.chasm.embedding.error.ChasmError
+import io.github.charlietap.chasm.embedding.error.ExecutionError
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.map
 import io.github.charlietap.chasm.module.ModuleDeclarationsFactory
@@ -37,7 +38,7 @@ internal object AotCompiler {
 
     private val MEMORY: MemoryLowering = System.getProperty("chasm.test.aot.memory")?.let(MemoryLowering::valueOf) ?: JvmOptions().memory
 
-    private val compiled = ConcurrentHashMap<CompileKey, ChasmResult<CompiledModule, ChasmError>>()
+    private val compiled = ConcurrentHashMap<CompileKey, ChasmResult<CompiledModule, ScriptFailure>>()
 
     fun useTestStack() {
         CompiledStack.budgetSource = { CompiledStack.budgetFor(TEST_STACK_BYTES) }
@@ -47,19 +48,21 @@ internal object AotCompiler {
         bytes: ByteArray,
         config: ModuleConfig,
         storeConfig: StoreConfig,
-    ): ChasmResult<Instantiable, ChasmError> {
+    ): ChasmResult<Instantiable, ScriptFailure> {
+
         val options = JvmOptions(
             storeConfig = storeConfig,
             splitInstructions = SPLIT_INSTRUCTIONS,
             memory = MEMORY,
         )
+
         return compiled.getOrPut(CompileKey(ByteBuffer.wrap(bytes.copyOf()), config, options)) {
             when (val validated = ScriptModules.validate(bytes, config)) {
-                is ChasmResult.Error -> validated
+                is ChasmResult.Error -> ChasmResult.Error(ScriptFailure.Module(validated.error))
                 is ChasmResult.Success -> try {
                     ChasmResult.Success(lower(validated.result, options))
                 } catch (failure: IllegalStateException) {
-                    ChasmResult.Error(ChasmError.ExecutionError(failure.message ?: failure.toString()))
+                    ChasmResult.Error(ScriptFailure.Execution(ExecutionError.Unsupported(failure.message ?: failure.toString())))
                 }
             }
         }.map { module -> { store, imports -> instance(store, module, imports) } }

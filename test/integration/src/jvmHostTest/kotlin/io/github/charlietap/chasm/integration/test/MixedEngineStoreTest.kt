@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.integration.test
 import com.goncalossilva.resources.Resource
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.config.StoreConfig
+import io.github.charlietap.chasm.embedding.error.TrapReason
 import io.github.charlietap.chasm.embedding.function
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Import
@@ -17,6 +18,7 @@ import io.github.charlietap.chasm.host.writeI32
 import io.github.charlietap.chasm.integration.AotEngine
 import io.github.charlietap.chasm.integration.Engine
 import io.github.charlietap.chasm.integration.Interpreter
+import io.github.charlietap.chasm.integration.assertTrapped
 import io.github.charlietap.chasm.runtime.value.NumberValue
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -36,7 +38,7 @@ class MixedEngineStoreTest {
             val result = caller.invoke(store, callerInstance, "call_count", listOf(NumberValue.I32(10)))
 
             assertEquals(ChasmResult.Success(listOf(NumberValue.I32(0))), result, label(owner, caller))
-            assertEquals(ChasmResult.Success(88L), caller.remainingFuel(store), label(owner, caller))
+            assertEquals(88L, caller.remainingFuel(store), label(owner, caller))
         }
     }
 
@@ -55,7 +57,7 @@ class MixedEngineStoreTest {
 
             val result = caller.invoke(store, callerInstance, "interrupt_then_owner_spin", emptyList())
 
-            assertEquals(interrupted(), result, label(owner, caller))
+            assertTrapped(TrapReason.INTERRUPTED, result, label(owner, caller))
         }
     }
 

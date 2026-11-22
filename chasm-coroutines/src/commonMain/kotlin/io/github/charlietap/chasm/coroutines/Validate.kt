@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.coroutines
 
 import io.github.charlietap.chasm.InternalChasmApi
-import io.github.charlietap.chasm.embedding.error.ChasmError.ValidationError
+import io.github.charlietap.chasm.embedding.error.ModuleError
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Module
 import io.github.charlietap.chasm.parallel.coroutines.DefaultCoroutineParallelTaskExecutor
@@ -34,8 +34,9 @@ import io.github.charlietap.chasm.embedding.internal._validate as internalValida
 @OptIn(InternalChasmApi::class)
 suspend fun validate(
     module: Module,
-): ChasmResult<Module, ValidationError> =
-    internalValidate(
+): ChasmResult<Module, ModuleError.Invalid> {
+    return internalValidate(
         module = module,
         taskExecutor = DefaultCoroutineParallelTaskExecutor,
     )
+}

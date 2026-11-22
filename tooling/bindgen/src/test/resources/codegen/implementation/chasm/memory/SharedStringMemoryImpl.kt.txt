@@ -52,7 +52,7 @@ private class SharedStringMemoryImpl(
     val args = emptyList<ExecutionValue>()
     val values = readStringPreparedFunction(args).`expect`("Failed to invoke function readString")
     val pointer = (values[0] as NumberValue.I32).value
-    val result = readNullTerminatedUtf8String(store, _memory, pointer).`expect`("Failed to read string result for readString")
+    val result = readNullTerminatedUtf8String(store, _memory, pointer)
     return result
   }
 
@@ -65,7 +65,7 @@ private class SharedStringMemoryImpl(
       memoryPointer: Int,
       bufferPointer: Int,
       bytesToRead: Int,
-    ): ByteArray = readBytes(store, memory, buffer, memoryPointer, bytesToRead, bufferPointer).`expect`("Failed to read memory")
+    ): ByteArray = readBytes(store, memory, buffer, memoryPointer, bytesToRead, bufferPointer)
 
     override fun write(
       pointer: Int,
@@ -73,7 +73,7 @@ private class SharedStringMemoryImpl(
       bufferPointer: Int,
       bytesToWrite: Int,
     ) {
-      writeBytes(store, memory, pointer, buffer, bufferPointer, bytesToWrite).`expect`("Failed to write memory")
+      writeBytes(store, memory, pointer, buffer, bufferPointer, bytesToWrite)
     }
   }
 }

@@ -13,14 +13,14 @@ class EmbeddingExternInteropTest {
     fun `owned embedding extern passes through the existing invocation API`() = integrationTest(FIXTURE) {
         val runner = runner()
         val hostValue = HostValue("Midna")
-        val extern = runner.createExternRef(hostValue).expect("expected extern creation to succeed")
-        val argument = extern.asValue().expect("expected extern conversion to succeed")
+        val extern = runner.createExternRef(hostValue)
+        val argument = extern.asValue()
 
         val result = runner.invoke("identity", listOf(argument))
             .expect("expected extern identity invocation to succeed")
 
         assertEquals(listOf(argument), result, engine.name())
-        assertSame(hostValue, extern.hostValue().expect("expected extern observation to succeed"), engine.name())
+        assertSame(hostValue, extern.hostValue(), engine.name())
         extern.close()
     }
 

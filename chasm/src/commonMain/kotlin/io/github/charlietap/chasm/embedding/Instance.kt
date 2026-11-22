@@ -7,7 +7,7 @@ import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.declarations.ModuleDeclarations
 import io.github.charlietap.chasm.embedding.diagnostic.InterpreterTrapSource
 import io.github.charlietap.chasm.embedding.diagnostic.TrapSource
-import io.github.charlietap.chasm.embedding.error.ChasmError
+import io.github.charlietap.chasm.embedding.error.InstantiationError
 import io.github.charlietap.chasm.embedding.internal.MIXED_STORE_ERROR
 import io.github.charlietap.chasm.embedding.internal.ModuleCodeInstaller
 import io.github.charlietap.chasm.embedding.internal.holdsManagedReferences
@@ -21,6 +21,7 @@ import io.github.charlietap.chasm.embedding.shapes._declarations
 import io.github.charlietap.chasm.embedding.shapes._module
 import io.github.charlietap.chasm.executor.instantiator.ModuleCodeInstaller
 import io.github.charlietap.chasm.executor.instantiator.ModuleInstantiator
+import io.github.charlietap.chasm.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance as RuntimeModuleInstance
 
 fun instance(
@@ -28,15 +29,17 @@ fun instance(
     module: Module,
     imports: List<Import>,
     config: RuntimeConfig = RuntimeConfig(),
-): ChasmResult<Instance, ChasmError.ExecutionError> = instance(
-    store = store,
-    declarations = module._declarations(),
-    imports = imports,
-    config = config,
-    instantiator = ::ModuleInstantiator,
-    codeInstaller = ModuleCodeInstaller(module._module()),
-    trapSource = { instance -> InterpreterTrapSource(instance, module) },
-)
+): ChasmResult<Instance, InstantiationError<ReferenceValue.Exception>> {
+    return instance(
+        store = store,
+        declarations = module._declarations(),
+        imports = imports,
+        config = config,
+        instantiator = ::ModuleInstantiator,
+        codeInstaller = ModuleCodeInstaller(module._module()),
+        trapSource = { instance -> InterpreterTrapSource(instance, module) },
+    )
+}
 
 internal fun instance(
     store: Store,
@@ -46,11 +49,9 @@ internal fun instance(
     instantiator: ModuleInstantiator,
     codeInstaller: ModuleCodeInstaller,
     trapSource: (RuntimeModuleInstance) -> TrapSource?,
-): ChasmResult<Instance, ChasmError.ExecutionError> {
+): ChasmResult<Instance, InstantiationError<ReferenceValue.Exception>> {
 
-    if (holdsManagedReferences(store)) {
-        return ChasmResult.Error(ChasmError.ExecutionError(MIXED_STORE_ERROR))
-    }
+    require(!holdsManagedReferences(store)) { MIXED_STORE_ERROR }
 
     return instantiate(store, imports, config, trapSource) { effectiveConfig, runtime, runtimeImports ->
         instantiator(effectiveConfig, runtime, declarations, runtimeImports, codeInstaller)

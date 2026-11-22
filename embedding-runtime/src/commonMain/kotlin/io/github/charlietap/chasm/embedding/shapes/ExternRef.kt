@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.embedding.shapes
 
-import io.github.charlietap.chasm.embedding.error.ChasmError.ExecutionError
 import io.github.charlietap.chasm.host.HostExternReference
 import io.github.charlietap.chasm.host.HostExterns
 import io.github.charlietap.chasm.host.HostReferenceRoot
@@ -21,22 +20,27 @@ class ExternRef internal constructor(
 
     private var rootSlot = root.slot
 
-    fun asValue(): ChasmResult<ReferenceValue, ExecutionError> {
-        stateError()?.let { return ChasmResult.Error(it) }
+    fun asValue(): ReferenceValue {
+
+        checkUsable()
+
         if (rootSlot == NULL_ROOT_SLOT) {
-            return ChasmResult.Success(ReferenceValue.Null(AbstractHeapType.Extern))
+            return ReferenceValue.Null(AbstractHeapType.Extern)
         }
 
-        val reference = references.reference(HostReferenceRoot(rootSlot))
-        return ChasmResult.Success(reference.toReferenceValue())
+        return references.reference(HostReferenceRoot(rootSlot)).toReferenceValue()
     }
 
-    fun hostValue(): ChasmResult<Any?, ExecutionError> {
-        stateError()?.let { return ChasmResult.Error(it) }
-        if (rootSlot == NULL_ROOT_SLOT) return ChasmResult.Success(null)
+    fun hostValue(): Any? {
+
+        checkUsable()
+
+        if (rootSlot == NULL_ROOT_SLOT) {
+            return null
+        }
 
         val reference = HostExternReference(references.reference(HostReferenceRoot(rootSlot)))
-        return ChasmResult.Success(externs.value(reference))
+        return externs.value(reference)
     }
 
     override fun close() {
@@ -49,10 +53,9 @@ class ExternRef internal constructor(
         }
     }
 
-    private fun stateError(): ExecutionError? = when {
-        rootSlot == CLOSED_ROOT_SLOT -> ExecutionError("Extern reference has been closed")
-        owner.isDropped -> ExecutionError("Extern reference belongs to a dropped store")
-        else -> null
+    private fun checkUsable() {
+        check(rootSlot != CLOSED_ROOT_SLOT) { "Extern reference has been closed" }
+        check(!owner.isDropped) { "Extern reference belongs to a dropped store" }
     }
 
     internal companion object {
@@ -60,20 +63,10 @@ class ExternRef internal constructor(
     }
 }
 
-inline fun <reified T : Any> ExternRef.hostValueAs(): ChasmResult<T?, ExecutionError> =
-    when (val result = hostValue()) {
-        is ChasmResult.Success -> {
-            val value = result.result
-            if (value == null || value is T) {
-                ChasmResult.Success(value)
-            } else {
-                ChasmResult.Error(
-                    ExecutionError(
-                        "Expected extern host value ${T::class} but found ${value::class}",
-                    ),
-                )
-            }
-        }
-
-        is ChasmResult.Error -> result
+inline fun <reified T : Any> ExternRef.hostValueAs(): T? {
+    return when (val value = hostValue()) {
+        null -> null
+        is T -> value
+        else -> throw IllegalArgumentException("Expected extern host value ${T::class} but found ${value::class}")
     }
+}

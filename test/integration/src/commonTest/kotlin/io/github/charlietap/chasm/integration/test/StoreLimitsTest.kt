@@ -7,7 +7,7 @@ import io.github.charlietap.chasm.config.GCStrategy
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.config.StoreConfig
 import io.github.charlietap.chasm.config.StoreLimits
-import io.github.charlietap.chasm.embedding.error.ChasmError
+import io.github.charlietap.chasm.embedding.error.TrapReason
 import io.github.charlietap.chasm.embedding.function
 import io.github.charlietap.chasm.embedding.memory
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
@@ -21,9 +21,9 @@ import io.github.charlietap.chasm.fixture.type.resultType
 import io.github.charlietap.chasm.host.HostFunction
 import io.github.charlietap.chasm.integration.TestRunner
 import io.github.charlietap.chasm.integration.TestScope
+import io.github.charlietap.chasm.integration.assertTrapped
 import io.github.charlietap.chasm.integration.integrationTest
 import io.github.charlietap.chasm.integration.runner
-import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.value.NumberValue
 import io.github.charlietap.chasm.type.AddressType
 import io.github.charlietap.chasm.type.Limits
@@ -32,8 +32,6 @@ import io.github.charlietap.chasm.type.SharedStatus
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
-import kotlin.test.assertIs
-import kotlin.test.assertTrue
 
 class StoreLimitsTest {
 
@@ -41,7 +39,7 @@ class StoreLimitsTest {
     fun `retaining more than the gc heap limit traps and the store recovers once released`() = integrationTest(FIXTURE) {
         val runner = runner(store(StoreConfig(gcStrategy = GCStrategy.TRADITIONAL, limits = StoreLimits(gcHeapBytes = GC_HEAP_BYTES))))
 
-        assertEquals(trap(InvocationError.GuestHeapOutOfMemory), allocate(runner, "retain", 64), engine.name())
+        assertTrapped(TrapReason.GUEST_HEAP_EXHAUSTED, allocate(runner, "retain", 64), engine.name())
 
         runner.invoke("release").expect("release succeeds")
         assertEquals(ChasmResult.Success(emptyList()), allocate(runner, "retain", 8), engine.name())
@@ -58,9 +56,9 @@ class StoreLimitsTest {
     fun `arena traps once allocation since the last collection exceeds the gc heap limit`() = integrationTest(FIXTURE) {
         val runner = runner(store(StoreConfig(gcStrategy = GCStrategy.ARENA, limits = StoreLimits(gcHeapBytes = GC_HEAP_BYTES))))
 
-        assertEquals(trap(InvocationError.GuestHeapOutOfMemory), allocate(runner, "churn", 256), engine.name())
+        assertTrapped(TrapReason.GUEST_HEAP_EXHAUSTED, allocate(runner, "churn", 256), engine.name())
 
-        runner.gc().expect("collection succeeds")
+        runner.gc()
         assertEquals(ChasmResult.Success(emptyList()), allocate(runner, "churn", 8), engine.name())
     }
 
@@ -100,7 +98,7 @@ class StoreLimitsTest {
         val runner = runner(store(StoreConfig(limits = StoreLimits(memoryPages = 3, trapOnGrowFailure = true))))
 
         assertEquals(success(1), grow(runner, "memory-grow", 2), engine.name())
-        assertEquals(trap(InvocationError.MemoryGrowFailed), grow(runner, "memory-grow", 1), engine.name())
+        assertTrapped(TrapReason.MEMORY_GROW_FAILED, grow(runner, "memory-grow", 1), engine.name())
     }
 
     @Test
@@ -109,8 +107,8 @@ class StoreLimitsTest {
         val runner = runner(store)
         val memory = runner.exports().expect("exports").first { export -> export.name == "memory" }.value as Memory
 
-        assertEquals(ChasmResult.Success(-1), engine.growMemory(store, memory, 3), engine.name())
-        assertEquals(ChasmResult.Success(1), engine.growMemory(store, memory, 2), engine.name())
+        assertEquals(-1, engine.growMemory(store, memory, 3), engine.name())
+        assertEquals(1, engine.growMemory(store, memory, 2), engine.name())
     }
 
     @Test
@@ -118,8 +116,8 @@ class StoreLimitsTest {
         val store = store(StoreConfig(limits = StoreLimits(memoryPages = 3)))
         val memory = memory(store, MemoryType(AddressType.I32, Limits(5u), SharedStatus.Unshared))
 
-        assertEquals(ChasmResult.Success(-1), engine.growMemory(store, memory, 1), engine.name())
-        assertEquals(ChasmResult.Success(5), engine.growMemory(store, memory, 0), engine.name())
+        assertEquals(-1, engine.growMemory(store, memory, 1), engine.name())
+        assertEquals(5, engine.growMemory(store, memory, 0), engine.name())
     }
 
     @Test
@@ -128,8 +126,7 @@ class StoreLimitsTest {
 
         val result = runner(store).instance()
 
-        assertIs<ChasmResult.Error<ChasmError.ExecutionError>>(result, engine.name())
-        assertTrue(result.error.error.contains("MemoryLimitExceeded"), "${engine.name()}: ${result.error.error}")
+        assertTrapped(TrapReason.MEMORY_LIMIT_EXCEEDED, result, engine.name())
         assertEquals(0, store.store.memories.size, engine.name())
     }
 
@@ -145,7 +142,7 @@ class StoreLimitsTest {
     fun `table grow traps past the store limit when grow failures trap`() = integrationTest(FIXTURE) {
         val runner = runner(store(StoreConfig(limits = StoreLimits(tableElements = 4, trapOnGrowFailure = true))))
 
-        assertEquals(trap(InvocationError.TableGrowFailed), grow(runner, "table-grow", 4), engine.name())
+        assertTrapped(TrapReason.TABLE_GROW_FAILED, grow(runner, "table-grow", 4), engine.name())
     }
 
     @Test
@@ -154,8 +151,7 @@ class StoreLimitsTest {
 
         val result = runner(store).instance()
 
-        assertIs<ChasmResult.Error<ChasmError.ExecutionError>>(result, engine.name())
-        assertTrue(result.error.error.contains("TableLimitExceeded"), "${engine.name()}: ${result.error.error}")
+        assertTrapped(TrapReason.TABLE_LIMIT_EXCEEDED, result, engine.name())
         assertEquals(0, store.store.tables.size, engine.name())
     }
 
@@ -163,7 +159,7 @@ class StoreLimitsTest {
     fun `runaway recursion traps once the stack reaches the store limit and the store recovers`() = integrationTest(STACK_FIXTURE) {
         val runner = stackRunner(StoreConfig(limits = StoreLimits(stackBytes = STACK_BYTES)))
 
-        assertEquals(trap(InvocationError.CallStackExhausted), runner.invoke("runaway"), engine.name())
+        assertTrapped(TrapReason.CALL_STACK_EXHAUSTED, runner.invoke("runaway"), engine.name())
         assertEquals(success(100), recurse(runner, 100), engine.name())
     }
 
@@ -172,7 +168,7 @@ class StoreLimitsTest {
         val runner = stackRunner(StoreConfig(limits = StoreLimits(stackBytes = STACK_BYTES)))
 
         assertEquals(success(100), recurse(runner, 100), engine.name())
-        assertEquals(trap(InvocationError.CallStackExhausted), recurse(runner, 100_000), engine.name())
+        assertTrapped(TrapReason.CALL_STACK_EXHAUSTED, recurse(runner, 100_000), engine.name())
     }
 
     @Test
@@ -181,7 +177,7 @@ class StoreLimitsTest {
         val small = runner(store(StoreConfig(limits = StoreLimits(stackBytes = SMALL_STACK_BYTES))))
 
         assertEquals(success(DEEP_RECURSION), recurse(defaults, DEEP_RECURSION), engine.name())
-        assertEquals(trap(InvocationError.CallStackExhausted), recurse(small, DEEP_RECURSION), engine.name())
+        assertTrapped(TrapReason.CALL_STACK_EXHAUSTED, recurse(small, DEEP_RECURSION), engine.name())
     }
 
     @Test
@@ -189,14 +185,14 @@ class StoreLimitsTest {
         val runner = stackRunner(StoreConfig(limits = StoreLimits(stackBytes = 256)))
         val args = List(64) { index -> NumberValue.I64(index.toLong()) }
 
-        assertEquals(trap(InvocationError.CallStackExhausted), runner.invoke("wide", args), engine.name())
+        assertTrapped(TrapReason.CALL_STACK_EXHAUSTED, runner.invoke("wide", args), engine.name())
         assertEquals(ChasmResult.Success(emptyList()), runner.invoke("host", hostArguments()), engine.name())
     }
 
     @Test
     fun `a host function whose operands exceed the stack limit traps`() = integrationTest(STACK_FIXTURE) {
         val limited = stackRunner(StoreConfig(limits = StoreLimits(stackBytes = 32)))
-        assertEquals(trap(InvocationError.CallStackExhausted), limited.invoke("host", hostArguments()), engine.name())
+        assertTrapped(TrapReason.CALL_STACK_EXHAUSTED, limited.invoke("host", hostArguments()), engine.name())
 
         val runner = stackRunner(StoreConfig(limits = StoreLimits(stackBytes = 64)))
         assertEquals(ChasmResult.Success(emptyList()), runner.invoke("host", hostArguments()), engine.name())
@@ -238,10 +234,6 @@ class StoreLimitsTest {
     private fun success(
         value: Int,
     ) = ChasmResult.Success(listOf(NumberValue.I32(value)))
-
-    private fun trap(
-        error: InvocationError,
-    ) = ChasmResult.Error(ChasmError.ExecutionError(error.toString()))
 
     private companion object {
         const val FIXTURE = "store_limits"

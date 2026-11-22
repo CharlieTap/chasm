@@ -1,7 +1,6 @@
 package io.github.charlietap.chasm.vm
 
 import io.github.charlietap.chasm.embedding.dsl.hostFunction
-import io.github.charlietap.chasm.embedding.error.ChasmError
 import io.github.charlietap.chasm.embedding.function
 import io.github.charlietap.chasm.embedding.global.readGlobal
 import io.github.charlietap.chasm.embedding.global.writeGlobal
@@ -18,7 +17,6 @@ import io.github.charlietap.chasm.embedding.shapes.map
 import io.github.charlietap.chasm.embedding.store
 import io.github.charlietap.chasm.host.HostStack
 import io.github.charlietap.chasm.vm.WasmVirtualMachine.Result
-import io.github.charlietap.chasm.vm.WasmVirtualMachine.Result.Ok
 import io.github.charlietap.chasm.vm.WasmVirtualMachine.Value
 import kotlin.contextOf
 import io.github.charlietap.chasm.embedding.shapes.Function as ChasmFunction
@@ -29,10 +27,10 @@ import io.github.charlietap.chasm.embedding.shapes.Table as ChasmTable
 object NonJsVirtualMachine : WasmVirtualMachine {
 
     object ResultFactory {
-        fun <T, E : ChasmError> new(result: ChasmResult<T, E>): Result<T> {
+        fun <T> new(result: ChasmResult<T, *>): Result<T> {
             return when (result) {
                 is ChasmResult.Success -> Result.Ok(result.result)
-                is ChasmResult.Error -> Result.Error(result.error.error)
+                is ChasmResult.Error -> Result.Error(result.error.toString())
             }
         }
     }
@@ -43,7 +41,7 @@ object NonJsVirtualMachine : WasmVirtualMachine {
 
     override fun moduleDecode(binary: ByteArray): Result<Module> {
         val module = module(binary).expect("Failed to decode module")
-        return Ok(Module(module))
+        return Result.Ok(Module(module))
     }
 
     override fun moduleInstantiate(
@@ -53,7 +51,7 @@ object NonJsVirtualMachine : WasmVirtualMachine {
     ): Result<Instance> {
         val mappedImports = imports.map(ImportMapper::from)
         val instance = instance(store.reference, module.reference, mappedImports).expect("Failed to instantiate module")
-        return Ok(Instance(instance))
+        return Result.Ok(Instance(instance))
     }
 
     override fun allocateFunction(
@@ -76,7 +74,7 @@ object NonJsVirtualMachine : WasmVirtualMachine {
         }
 
         val result = function(store.reference, functionType, hostFunction)
-        return Ok(ExternalAddress.Function(result))
+        return Result.Ok(ExternalAddress.Function(result))
     }
 
     override fun exportFunction(
@@ -85,7 +83,7 @@ object NonJsVirtualMachine : WasmVirtualMachine {
     ): Result<Function> {
         val export = instance.reference.exports.firstOrNull { it.name == name }
         val function = (export?.value as? ChasmFunction)?.let(::Function)
-        return function?.let(::Ok) ?: Result.Error("Failed to find function export with name $name")
+        return function?.let { value -> Result.Ok(value) } ?: Result.Error("Failed to find function export with name $name")
     }
 
     override fun exportGlobal(
@@ -94,7 +92,7 @@ object NonJsVirtualMachine : WasmVirtualMachine {
     ): Result<Global> {
         val export = instance.reference.exports.firstOrNull { it.name == name }
         val global = (export?.value as? ChasmGlobal)?.let(::Global)
-        return global?.let(::Ok) ?: Result.Error("Failed to find global export with name $name")
+        return global?.let { value -> Result.Ok(value) } ?: Result.Error("Failed to find global export with name $name")
     }
 
     override fun exportMemory(
@@ -103,7 +101,7 @@ object NonJsVirtualMachine : WasmVirtualMachine {
     ): Result<Memory> {
         val export = instance.reference.exports.firstOrNull { it.name == name }
         val memory = (export?.value as? ChasmMemory)?.let(::Memory)
-        return memory?.let(::Ok) ?: Result.Error("Failed to find memory export with name $name")
+        return memory?.let { value -> Result.Ok(value) } ?: Result.Error("Failed to find memory export with name $name")
     }
 
     override fun exportTable(
@@ -112,7 +110,7 @@ object NonJsVirtualMachine : WasmVirtualMachine {
     ): Result<Table> {
         val export = instance.reference.exports.firstOrNull { it.name == name }
         val table = (export?.value as? ChasmTable)?.let(::Table)
-        return table?.let(::Ok) ?: Result.Error("Failed to find table export with name $name")
+        return table?.let { value -> Result.Ok(value) } ?: Result.Error("Failed to find table export with name $name")
     }
 
     override fun prepareFunction(
@@ -155,8 +153,9 @@ object NonJsVirtualMachine : WasmVirtualMachine {
         store: Store,
         global: Global,
     ): Result<Value> {
-        val result = readGlobal(store.reference, global.reference).map(ValueMapper::to)
-        return ResultFactory.new(result)
+        return catchingAccessorFailure {
+            ValueMapper.to(readGlobal(store.reference, global.reference))
+        }
     }
 
     override fun globalWrite(
@@ -164,8 +163,9 @@ object NonJsVirtualMachine : WasmVirtualMachine {
         global: Global,
         value: Value,
     ): Result<Unit> {
-        val result = writeGlobal(store.reference, global.reference, value.let(ValueMapper::from))
-        return ResultFactory.new(result)
+        return catchingAccessorFailure {
+            writeGlobal(store.reference, global.reference, ValueMapper.from(value))
+        }
     }
 
     override fun memoryReadBytes(
@@ -176,8 +176,9 @@ object NonJsVirtualMachine : WasmVirtualMachine {
         buffer: ByteArray,
         bufferPointer: Int,
     ): Result<ByteArray> {
-        val result = readBytes(store.reference, memory.reference, buffer, pointer, bytesToRead, bufferPointer)
-        return ResultFactory.new(result)
+        return catchingAccessorFailure {
+            readBytes(store.reference, memory.reference, buffer, pointer, bytesToRead, bufferPointer)
+        }
     }
 
     override fun memoryWriteBytes(
@@ -186,8 +187,9 @@ object NonJsVirtualMachine : WasmVirtualMachine {
         pointer: Int,
         bytes: ByteArray,
     ): Result<Unit> {
-        val result = writeBytes(store.reference, memory.reference, pointer, bytes)
-        return ResultFactory.new(result)
+        return catchingAccessorFailure {
+            writeBytes(store.reference, memory.reference, pointer, bytes)
+        }
     }
 
     override fun memoryWriteBytes(
@@ -198,8 +200,9 @@ object NonJsVirtualMachine : WasmVirtualMachine {
         bufferPointer: Int,
         bytesToWrite: Int,
     ): Result<Unit> {
-        val result = writeBytes(store.reference, memory.reference, pointer, buffer, bufferPointer, bytesToWrite)
-        return ResultFactory.new(result)
+        return catchingAccessorFailure {
+            writeBytes(store.reference, memory.reference, pointer, buffer, bufferPointer, bytesToWrite)
+        }
     }
 
     override fun memoryReadUtf8NullTerminatedUtf8String(
@@ -207,7 +210,20 @@ object NonJsVirtualMachine : WasmVirtualMachine {
         memory: Memory,
         pointer: Int,
     ): Result<String> {
-        val result = readNullTerminatedUtf8String(store.reference, memory.reference, pointer)
-        return ResultFactory.new(result)
+        return catchingAccessorFailure {
+            readNullTerminatedUtf8String(store.reference, memory.reference, pointer)
+        }
+    }
+
+    private inline fun <T> catchingAccessorFailure(access: () -> T): Result<T> {
+        return try {
+            Result.Ok(access())
+        } catch (failure: IndexOutOfBoundsException) {
+            Result.Error(failure.message.orEmpty())
+        } catch (failure: IllegalArgumentException) {
+            Result.Error(failure.message.orEmpty())
+        } catch (failure: IllegalStateException) {
+            Result.Error(failure.message.orEmpty())
+        }
     }
 }

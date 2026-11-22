@@ -8,7 +8,7 @@ import io.github.charlietap.chasm.aot.internal.compiledModule
 import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.declarations.ModuleDeclarations
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
-import io.github.charlietap.chasm.embedding.error.ChasmError
+import io.github.charlietap.chasm.embedding.error.ExecutionError
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.ModuleInfo
 import io.github.charlietap.chasm.module.ModuleDeclarationsFactory
@@ -47,13 +47,13 @@ class ModuleInfoTest {
     }
 
     @Test
-    fun `a declarations failure is returned as an execution error`() {
+    fun `a declarations failure is returned as unsupported`() {
         val module = compiledModule(FakeCode { throw IllegalStateException("broken declarations") })
 
         val result = moduleInfo(module)
 
         assertEquals(
-            ChasmResult.Error(ChasmError.ExecutionError("Compiled module rejected: broken declarations")),
+            ChasmResult.Error(ExecutionError.Unsupported("Compiled module rejected: broken declarations")),
             result,
         )
     }
@@ -66,7 +66,7 @@ class ModuleInfoTest {
         val result = moduleInfo(module)
 
         assertEquals(
-            ChasmResult.Error(ChasmError.ExecutionError("Compiled module rejected: $failure")),
+            ChasmResult.Error(ExecutionError.Unsupported("Compiled module rejected: $failure")),
             result,
         )
     }

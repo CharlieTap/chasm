@@ -41,23 +41,23 @@ private class NumericGlobalsImpl(
       (instance.exports.firstOrNull { export -> export.name == "int_value" }?.value as? Global) ?: error("Failed to find global export with name int_value")
 
   override val intValue: Int
-    get() = (readGlobal(store, _intValue).`expect`("Failed to read global int_value") as NumberValue.I32).value
+    get() = (readGlobal(store, _intValue) as NumberValue.I32).value
 
   private val _longValue: Global =
       (instance.exports.firstOrNull { export -> export.name == "long_value" }?.value as? Global) ?: error("Failed to find global export with name long_value")
 
   override val longValue: Long
-    get() = (readGlobal(store, _longValue).`expect`("Failed to read global long_value") as NumberValue.I64).value
+    get() = (readGlobal(store, _longValue) as NumberValue.I64).value
 
   private val _floatValue: Global =
       (instance.exports.firstOrNull { export -> export.name == "float_value" }?.value as? Global) ?: error("Failed to find global export with name float_value")
 
   override val floatValue: Float
-    get() = (readGlobal(store, _floatValue).`expect`("Failed to read global float_value") as NumberValue.F32).value
+    get() = (readGlobal(store, _floatValue) as NumberValue.F32).value
 
   private val _doubleValue: Global =
       (instance.exports.firstOrNull { export -> export.name == "double_value" }?.value as? Global) ?: error("Failed to find global export with name double_value")
 
   override val doubleValue: Double
-    get() = (readGlobal(store, _doubleValue).`expect`("Failed to read global double_value") as NumberValue.F64).value
+    get() = (readGlobal(store, _doubleValue) as NumberValue.F64).value
 }

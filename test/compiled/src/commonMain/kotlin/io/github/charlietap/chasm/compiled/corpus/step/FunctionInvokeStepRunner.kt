@@ -4,6 +4,8 @@ import io.github.charlietap.chasm.compiled.corpus.ext.array
 import io.github.charlietap.chasm.compiled.corpus.ext.string
 import io.github.charlietap.chasm.compiled.corpus.value.describeBits
 import io.github.charlietap.chasm.compiled.corpus.value.parseValue
+import io.github.charlietap.chasm.embedding.error.ExecutionError
+import io.github.charlietap.chasm.embedding.error.TrapReason
 import io.github.charlietap.chasm.embedding.invoke
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.runtime.ext.toLongFromBoxed
@@ -48,7 +50,7 @@ private fun FunctionInvokeStepRunner(
         is ChasmResult.Success -> invocation.result
         is ChasmResult.Error -> {
             if (trap != null) return CorpusResult.Success
-            exitFailure(context, invocation.error.toString(), hostEffects, expectedExitCode, hostEffectsVerifier)?.let { return it }
+            exitFailure(context, invocation.error, hostEffects, expectedExitCode, hostEffectsVerifier)?.let { return it }
             emptyList()
         }
     }
@@ -70,14 +72,14 @@ private fun FunctionInvokeStepRunner(
 
 private fun exitFailure(
     context: StepContext,
-    error: String,
+    error: ExecutionError<*>,
     hostEffects: JsonObject?,
     expectedExitCode: Int?,
     hostEffectsVerifier: HostEffectsVerifier,
 ): CorpusResult? {
-    val actualExitCode = error.hostFunctionExitCodeOrNull()
+    val actualExitCode = hostFunctionExitCodeOrNull(error)
     if (hostEffects == null || expectedExitCode == null || actualExitCode == null) {
-        return context.failure("function invocation failed", error)
+        return context.failure("function invocation failed", error.toString())
     }
     if (expectedExitCode != actualExitCode) {
         return context.failure(
@@ -125,12 +127,19 @@ private fun capturedOutput(
     return "stdout=$stdout stderr=$stderr"
 }
 
-private fun String.hostFunctionExitCodeOrNull(): Int? {
-    val start = indexOf(HOST_FUNCTION_ERROR_PREFIX).takeIf { it >= 0 } ?: return null
+private fun hostFunctionExitCodeOrNull(error: ExecutionError<*>): Int? {
+
+    val trap = (error as? ExecutionError.Trapped)?.trap ?: return null
+    if (trap.reason != TrapReason.HOST_FUNCTION_FAILURE) {
+        return null
+    }
+
+    val message = trap.message
+    val start = message.indexOf(HOST_FUNCTION_ERROR_PREFIX).takeIf { index -> index >= 0 } ?: return null
     val valueStart = start + HOST_FUNCTION_ERROR_PREFIX.length
-    val valueEnd = indexOf(")", valueStart).takeIf { it >= 0 } ?: return null
-    return substring(valueStart, valueEnd).toIntOrNull()
+    val valueEnd = message.indexOf(")", valueStart).takeIf { index -> index >= 0 } ?: return null
+    return message.substring(valueStart, valueEnd).toIntOrNull()
 }
 
-private const val HOST_FUNCTION_ERROR_PREFIX = "ExecutionError(error=HostFunctionError(error="
+private const val HOST_FUNCTION_ERROR_PREFIX = "HostFunctionError(error="
 private const val MAX_FAILURE_OUTPUT = 2048

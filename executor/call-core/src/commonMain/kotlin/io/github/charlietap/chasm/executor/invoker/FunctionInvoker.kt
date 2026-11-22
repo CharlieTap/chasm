@@ -85,7 +85,29 @@ inline fun FunctionInvoker(
     values: List<ExecutionValue>,
     crossinline wasmFunctionExecutor: WasmFunctionExecutor,
 ): Result<List<ExecutionValue>, InvocationError> {
-    store.heap.clearPendingException()
+
+    val invocationDepth = store.invocationDepth
+    if (invocationDepth == 0) {
+        store.heap.clearPendingException()
+    }
+
+    store.invocationDepth = invocationDepth + 1
+    return try {
+        invokeInterruptibly(config, store, instance, function, values, wasmFunctionExecutor)
+    } finally {
+        store.invocationDepth = invocationDepth
+    }
+}
+
+@PublishedApi
+internal inline fun invokeInterruptibly(
+    config: RuntimeConfig,
+    store: Store,
+    instance: ModuleInstance,
+    function: FunctionInstance,
+    values: List<ExecutionValue>,
+    crossinline wasmFunctionExecutor: WasmFunctionExecutor,
+): Result<List<ExecutionValue>, InvocationError> {
     val interrupt = store.interrupt
     if (!interrupt.enabled) return invokeFunction(config, store, instance, function, values, wasmFunctionExecutor)
 

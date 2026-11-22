@@ -2,7 +2,8 @@ package io.github.charlietap.chasm.integration
 
 import com.goncalossilva.resources.Resource
 import io.github.charlietap.chasm.config.RuntimeConfig
-import io.github.charlietap.chasm.embedding.error.ChasmError
+import io.github.charlietap.chasm.embedding.error.ExecutionError
+import io.github.charlietap.chasm.embedding.error.InstantiationError
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Export
 import io.github.charlietap.chasm.embedding.shapes.ExternRef
@@ -10,50 +11,50 @@ import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.Instance
 import io.github.charlietap.chasm.embedding.shapes.Memory
 import io.github.charlietap.chasm.embedding.shapes.Store
-import io.github.charlietap.chasm.embedding.shapes.flatMap
 import io.github.charlietap.chasm.embedding.shapes.map
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
+import io.github.charlietap.chasm.runtime.value.ReferenceValue
 
 interface TestRunner {
 
-    fun instance(): ChasmResult<Instance, ChasmError>
+    fun instance(): ChasmResult<Instance, InstantiationError<ReferenceValue.Exception>>
 
     fun invoke(
         name: String,
         arguments: List<ExecutionValue> = [],
-    ): ChasmResult<List<ExecutionValue>, ChasmError>
+    ): ChasmResult<List<ExecutionValue>, ExecutionError<ReferenceValue.Exception>>
 
-    fun exports(): ChasmResult<List<Export>, ChasmError>
+    fun exports(): ChasmResult<List<Export>, InstantiationError<ReferenceValue.Exception>>
 
-    fun gc(): ChasmResult<Unit, ChasmError>
+    fun gc()
 
     fun readBytes(
         memory: Memory,
         buffer: ByteArray,
         memoryPointer: Int,
         bytesToRead: Int,
-    ): ChasmResult<ByteArray, ChasmError>
+    ): ByteArray
 
     fun readUtf8String(
         memory: Memory,
         pointer: Int,
         stringLengthInBytes: Int,
-    ): ChasmResult<String, ChasmError>
+    ): String
 
     fun readNullTerminatedUtf8String(
         memory: Memory,
         pointer: Int,
-    ): ChasmResult<String, ChasmError>
+    ): String
 
     fun writeUtf8String(
         memory: Memory,
         pointer: Int,
         string: String,
-    ): ChasmResult<Unit, ChasmError>
+    )
 
     fun createExternRef(
         value: Any?,
-    ): ChasmResult<ExternRef, ChasmError>
+    ): ExternRef
 }
 
 class IntegrationTestRunner(
@@ -71,25 +72,28 @@ class IntegrationTestRunner(
         config,
     )
 
-    override fun instance(): ChasmResult<Instance, ChasmError> = instance
+    override fun instance(): ChasmResult<Instance, InstantiationError<ReferenceValue.Exception>> {
+        return instance
+    }
 
     override fun invoke(
         name: String,
         arguments: List<ExecutionValue>,
-    ): ChasmResult<List<ExecutionValue>, ChasmError> {
-        return instance.flatMap { instance ->
-            engine.invoke(store, instance, name, arguments)
+    ): ChasmResult<List<ExecutionValue>, ExecutionError<ReferenceValue.Exception>> {
+        return when (instance) {
+            is ChasmResult.Success -> engine.invoke(store, instance.result, name, arguments)
+            is ChasmResult.Error -> instance
         }
     }
 
-    override fun exports(): ChasmResult<List<Export>, ChasmError> {
+    override fun exports(): ChasmResult<List<Export>, InstantiationError<ReferenceValue.Exception>> {
         return instance.map { instance ->
             engine.exports(instance)
         }
     }
 
-    override fun gc(): ChasmResult<Unit, ChasmError> {
-        return engine.gc(store)
+    override fun gc() {
+        engine.gc(store)
     }
 
     override fun readBytes(
@@ -97,7 +101,7 @@ class IntegrationTestRunner(
         buffer: ByteArray,
         memoryPointer: Int,
         bytesToRead: Int,
-    ): ChasmResult<ByteArray, ChasmError> {
+    ): ByteArray {
         return engine.readBytes(store, memory, buffer, memoryPointer, bytesToRead)
     }
 
@@ -105,14 +109,14 @@ class IntegrationTestRunner(
         memory: Memory,
         pointer: Int,
         stringLengthInBytes: Int,
-    ): ChasmResult<String, ChasmError> {
+    ): String {
         return engine.readUtf8String(store, memory, pointer, stringLengthInBytes)
     }
 
     override fun readNullTerminatedUtf8String(
         memory: Memory,
         pointer: Int,
-    ): ChasmResult<String, ChasmError> {
+    ): String {
         return engine.readNullTerminatedUtf8String(store, memory, pointer)
     }
 
@@ -120,13 +124,13 @@ class IntegrationTestRunner(
         memory: Memory,
         pointer: Int,
         string: String,
-    ): ChasmResult<Unit, ChasmError> {
-        return engine.writeUtf8String(store, memory, pointer, string)
+    ) {
+        engine.writeUtf8String(store, memory, pointer, string)
     }
 
     override fun createExternRef(
         value: Any?,
-    ): ChasmResult<ExternRef, ChasmError> {
+    ): ExternRef {
         return engine.createExternRef(store, value)
     }
 

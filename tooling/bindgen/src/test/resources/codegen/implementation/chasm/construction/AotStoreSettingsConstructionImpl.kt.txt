@@ -24,7 +24,7 @@ public fun aotStoreSettingsConstruction(imports: List<CodegenImport> = emptyList
   val module = WasmModule.INSTANCE
   check(module.metadata.capabilities.stacktraces) { "com.test.aot.WasmModule was compiled without stack traces" }
   val store = store(module.metadata.storeConfig)
-  module.metadata.initialFuel?.let { fuel -> chasmAddFuel(store, fuel).`expect`("Failed to add fuel") }
+  module.metadata.initialFuel?.let { fuel -> chasmAddFuel(store, fuel) }
   val allocatedImports = allocateImports(store, imports)
   val instance = instance(store, module, allocatedImports).`expect`("Failed to instantiate module")
   return AotStoreSettingsConstructionImpl(store = store, instance = instance)
@@ -34,9 +34,9 @@ private class AotStoreSettingsConstructionImpl(
   private val store: Store,
   private val instance: Instance,
 ) : AotStoreSettingsConstruction {
-  override fun addFuel(units: Long): Unit = chasmAddFuel(store, units).`expect`("Failed to add fuel")
+  override fun addFuel(units: Long): Unit = chasmAddFuel(store, units)
 
-  override fun remainingFuel(): Long = chasmRemainingFuel(store).`expect`("Failed to read fuel")
+  override fun remainingFuel(): Long = chasmRemainingFuel(store)
 
-  override fun interrupt(): Boolean = chasmInterrupt(store).`expect`("Failed to interrupt")
+  override fun interrupt(): Boolean = chasmInterrupt(store)
 }

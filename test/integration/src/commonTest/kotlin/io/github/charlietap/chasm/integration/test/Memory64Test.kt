@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.integration.test
 
-import io.github.charlietap.chasm.embedding.error.ChasmError
+import io.github.charlietap.chasm.embedding.error.ExecutionError
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.integration.integrationTest
 import io.github.charlietap.chasm.integration.invoke
@@ -17,7 +17,7 @@ class Memory64Test {
             name = "memory64",
         )
 
-        val expected = ChasmError.ExecutionError(InstantiationError.UnsupportedMemory64Module.toString())
+        val expected = ExecutionError.Unsupported(InstantiationError.UnsupportedMemory64Module.toString())
         assertEquals(ChasmResult.Error(expected), actual, engine.name())
     }
 

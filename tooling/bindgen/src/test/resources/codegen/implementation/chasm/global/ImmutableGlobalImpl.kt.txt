@@ -38,5 +38,5 @@ private class ImmutableGlobalImpl(
       (instance.exports.firstOrNull { export -> export.name == "value" }?.value as? Global) ?: error("Failed to find global export with name value")
 
   override val `value`: Int
-    get() = (readGlobal(store, _value).`expect`("Failed to read global value") as NumberValue.I32).value
+    get() = (readGlobal(store, _value) as NumberValue.I32).value
 }

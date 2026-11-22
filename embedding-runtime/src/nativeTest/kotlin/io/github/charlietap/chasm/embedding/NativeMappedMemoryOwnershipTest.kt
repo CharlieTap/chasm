@@ -8,7 +8,6 @@ package io.github.charlietap.chasm.embedding
 import io.github.charlietap.chasm.embedding.fixture.publicInstance
 import io.github.charlietap.chasm.embedding.fixture.publicMemory
 import io.github.charlietap.chasm.embedding.fixture.publicStore
-import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Instance
 import io.github.charlietap.chasm.embedding.shapes.Memory
 import io.github.charlietap.chasm.fixture.runtime.instance.memoryAddress
@@ -44,7 +43,8 @@ class NativeMappedMemoryOwnershipTest {
             ),
         )
 
-        assertEquals(ChasmResult.Success(Unit), dropStore(store))
+        dropStore(store)
+
         assertEquals(0, first.byteSize)
         assertEquals(0, second.byteSize)
     }
@@ -63,12 +63,13 @@ class NativeMappedMemoryOwnershipTest {
             moduleInstance = moduleInstance(memAddresses = mutableListOf(memoryAddress(0))),
         )
 
-        assertEquals(ChasmResult.Success(Unit), dropInstance(store, importingInstance))
+        dropInstance(store, importingInstance)
+
         assertEquals(LinearMemory.PAGE_SIZE, backing.byteSize)
         backing.writeI32(7, 0x12345678)
         assertEquals(0x12345678, backing.readI32(7))
 
-        assertEquals(ChasmResult.Success(Unit), dropStore(store))
+        dropStore(store)
     }
 
     @Test
@@ -84,7 +85,7 @@ class NativeMappedMemoryOwnershipTest {
         assertEquals(42, backing.readI32(3))
         assertEquals(memoryExternalValue(memoryAddress(0)), graph.handle.reference)
 
-        assertEquals(ChasmResult.Success(Unit), dropStore(publicStore(internalStore)))
+        dropStore(publicStore(internalStore))
     }
 
     @Test
@@ -100,7 +101,7 @@ class NativeMappedMemoryOwnershipTest {
         assertEquals(42, backing.readI32(3))
         assertEquals(1, graph.handle.instance.memAddresses.size)
 
-        assertEquals(ChasmResult.Success(Unit), dropStore(publicStore(internalStore)))
+        dropStore(publicStore(internalStore))
     }
 
     @Test

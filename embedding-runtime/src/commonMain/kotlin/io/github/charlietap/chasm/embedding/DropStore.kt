@@ -1,15 +1,10 @@
 package io.github.charlietap.chasm.embedding
 
-import io.github.charlietap.chasm.embedding.error.ChasmError
-import io.github.charlietap.chasm.embedding.shapes.ChasmResult
-import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Success
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.runtime.resource.drop.MemoryInstanceDropper
 
-fun dropStore(
-    store: Store,
-): ChasmResult<Unit, ChasmError.ExecutionError> {
-    return dropStore(
+fun dropStore(store: Store) {
+    dropStore(
         store = store,
         memoryDropper = ::MemoryInstanceDropper,
     )
@@ -18,7 +13,7 @@ fun dropStore(
 internal fun dropStore(
     store: Store,
     memoryDropper: MemoryInstanceDropper,
-): ChasmResult<Unit, ChasmError.ExecutionError> {
+) {
 
     store.isDropped = true
     store.diagnostics.clear()
@@ -54,6 +49,4 @@ internal fun dropStore(
 
     store.heap.drop()
     store.referenceStorage = null
-
-    return Success(Unit)
 }

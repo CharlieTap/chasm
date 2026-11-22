@@ -48,8 +48,8 @@ private class LengthPrefixedStringReturnImpl(
     val args = emptyList<ExecutionValue>()
     val values = invokePreparedFunction(args).`expect`("Failed to invoke function invoke")
     val pointer = (values[0] as NumberValue.I32).value
-    val length = readInt(store, _memory, pointer).`expect`("Failed to read string length")
-    val result = readUtf8String(store, _memory, pointer + 4, length).`expect`("Failed to read string result for invoke")
+    val length = readInt(store, _memory, pointer)
+    val result = readUtf8String(store, _memory, pointer + 4, length)
     return result
   }
 }

@@ -49,7 +49,7 @@ private class PackedStringReturnImpl(
     val packed = (values[0] as NumberValue.I64).value
     val pointer = (packed ushr 32).toInt()
     val length = packed.toInt()
-    val result = readUtf8String(store, _memory, pointer, length).`expect`("Failed to read string result for invoke")
+    val result = readUtf8String(store, _memory, pointer, length)
     return result
   }
 }

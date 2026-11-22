@@ -7,7 +7,7 @@ import io.github.charlietap.chasm.aot.CompiledModule
 import io.github.charlietap.chasm.aot.instance
 import io.github.charlietap.chasm.compiler.backend.jvm.JvmModule
 import io.github.charlietap.chasm.compiler.backend.jvm.JvmOptions
-import io.github.charlietap.chasm.embedding.error.ChasmError
+import io.github.charlietap.chasm.embedding.error.ExecutionError
 import io.github.charlietap.chasm.embedding.exports
 import io.github.charlietap.chasm.embedding.invoke
 import io.github.charlietap.chasm.embedding.prepareFunction
@@ -30,6 +30,7 @@ import java.util.zip.CRC32
 import java.util.zip.ZipEntry
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertIs
 import kotlin.test.assertTrue
 
@@ -140,11 +141,12 @@ class CompiledModuleTest {
         )
 
         calls.forEach { result ->
-            assertEquals(ChasmResult.Error(ChasmError.ExecutionError(InvocationError.ForeignHandle.toString())), result)
+            assertEquals(ChasmResult.Error(ExecutionError.Rejected(InvocationError.ForeignHandle.toString())), result)
         }
-        val imported = instance(other, compiled, imports)
-        assertIs<ChasmResult.Error<*>>(imported)
-        assertTrue("different Store" in imported.error.toString(), imported.error.toString())
+        val imported = assertFailsWith<IllegalArgumentException> {
+            instance(other, compiled, imports)
+        }
+        assertTrue("different Store" in imported.message.orEmpty(), imported.message)
         assertEquals(listOf(I32(40)), invoke(owner, instance, "started", emptyList()).expect("started"))
     }
 
@@ -261,8 +263,9 @@ class CompiledModuleTest {
 
         val result = instance(store, starting, imports)
 
-        assertIs<ChasmResult.Error<ChasmError.ExecutionError>>(result)
-        val frames = checkNotNull(result.error.trap).frames
+        assertIs<ChasmResult.Error<*>>(result)
+        val trapped = assertIs<ExecutionError.Trapped>(result.error)
+        val frames = checkNotNull(trapped.trap.stackTrace).frames
         assertEquals(listOf(Triple("boom", "explode", 0)), frames.map { frame -> Triple(frame.moduleName, frame.functionName, frame.functionIndex) })
         assertTrue(frames.all { frame -> frame.wasmOffset == null })
     }
@@ -273,8 +276,9 @@ class CompiledModuleTest {
 
         val result = instance(store(), compiled, emptyList())
 
-        assertIs<ChasmResult.Error<ChasmError.ExecutionError>>(result)
-        val frames = checkNotNull(result.error.trap).frames
+        assertIs<ChasmResult.Error<*>>(result)
+        val trapped = assertIs<ExecutionError.Trapped>(result.error)
+        val frames = checkNotNull(trapped.trap.stackTrace).frames
         assertEquals(listOf("boom" to 0, "start" to 1), frames.map { frame -> frame.functionName to frame.functionIndex })
         assertTrue(frames.all { frame -> frame.wasmOffset == null })
     }

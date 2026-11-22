@@ -5,7 +5,7 @@ package io.github.charlietap.chasm.embedding
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.InternalChasmApi
-import io.github.charlietap.chasm.embedding.error.ChasmError
+import io.github.charlietap.chasm.embedding.error.ModuleError
 import io.github.charlietap.chasm.embedding.fixture.componentTypes
 import io.github.charlietap.chasm.embedding.fixture.publicComponent
 import io.github.charlietap.chasm.embedding.fixture.publicModule
@@ -61,7 +61,7 @@ class ValidateTest {
 
         val actual = validate(component, analyzer)
 
-        val expected = ChasmResult.Error(ChasmError.ValidationError(error.toString()))
+        val expected = ChasmResult.Error(ModuleError.Invalid(error.toString()))
         assertEquals(expected, actual)
     }
 
@@ -135,6 +135,6 @@ class ValidateTest {
 
         val actual = validate(module, validator)
 
-        assertEquals(ChasmResult.Error(ChasmError.ValidationError(TypeValidatorError.TypeMismatch.toString())), actual)
+        assertEquals(ChasmResult.Error(ModuleError.Invalid(TypeValidatorError.TypeMismatch.toString())), actual)
     }
 }

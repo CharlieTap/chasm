@@ -33,6 +33,8 @@ class Store(
 
     var compiledCallDepth: Int = 0
 
+    var invocationDepth: Int = 0
+
     var interpreter: NestedInterpreter? = null
 
     @JvmField

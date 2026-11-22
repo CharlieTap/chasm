@@ -55,7 +55,7 @@ private class PointerAndLengthStringParamImpl(
   override fun invoke(`value`: String) {
     val valueBytes = value.encodeToByteArray()
     val valueAlloc = allocator.alloc(valueBytes.size)
-    writeBytes(store, _memory, valueAlloc, valueBytes).`expect`("Failed to write string")
+    writeBytes(store, _memory, valueAlloc, valueBytes)
     functionInputBuffer[0] = NumberValue.I32(valueAlloc)
     functionInputBuffer[1] = NumberValue.I32(valueBytes.size)
     val args = functionInputBuffer2

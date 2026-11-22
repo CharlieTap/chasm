@@ -4,7 +4,6 @@ import io.github.charlietap.chasm.compiled.script.ScriptContext
 import io.github.charlietap.chasm.embedding.exports
 import io.github.charlietap.chasm.embedding.global.readGlobal
 import io.github.charlietap.chasm.embedding.shapes.Global
-import io.github.charlietap.chasm.embedding.shapes.fold
 import io.github.charlietap.sweet.lib.action.GetAction
 import io.github.charlietap.sweet.lib.command.Command
 
@@ -25,13 +24,5 @@ fun GetActionRunner(
             }?.value as? Global
     ) ?: return ActionResult.Failure(command, "exported global not found")
 
-    val result = readGlobal(context.store, global)
-
-    return result.fold(
-        { globalValue ->
-            ActionResult.Success(listOf(globalValue))
-        },
-    ) { error ->
-        ActionResult.Failure(command, "get action returned an error", error)
-    }
+    return ActionResult.Success(listOf(readGlobal(context.store, global)))
 }

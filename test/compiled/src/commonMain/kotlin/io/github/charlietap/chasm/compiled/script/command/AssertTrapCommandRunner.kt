@@ -3,7 +3,7 @@ package io.github.charlietap.chasm.compiled.script.command
 import io.github.charlietap.chasm.compiled.script.ScriptContext
 import io.github.charlietap.chasm.compiled.script.action.ActionResult
 import io.github.charlietap.chasm.compiled.script.action.ActionRunner
-import io.github.charlietap.chasm.embedding.error.ChasmError
+import io.github.charlietap.chasm.embedding.error.ExecutionError
 import io.github.charlietap.sweet.lib.command.AssertTrapCommand
 
 typealias AssertTrapCommandRunner = (ScriptContext, AssertTrapCommand) -> CommandResult
@@ -29,7 +29,7 @@ private fun AssertTrapCommandRunner(
         }
         is ActionResult.Failure -> {
 
-            if (result.error is ChasmError.ExecutionError) {
+            if (result.error is ExecutionError.Trapped) {
                 CommandResult.Success
             } else {
                 CommandResult.Failure(command, "expected trap but encountered error ${result.error} with reason ${result.reason}")

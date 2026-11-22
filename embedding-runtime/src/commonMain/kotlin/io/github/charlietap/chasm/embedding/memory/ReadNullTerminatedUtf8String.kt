@@ -1,14 +1,11 @@
 package io.github.charlietap.chasm.embedding.memory
 
 import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.fold
+import com.github.michaelbull.result.getOrElse
 import com.github.michaelbull.result.mapError
 import com.github.michaelbull.result.runCatching
-import io.github.charlietap.chasm.embedding.error.ChasmError
 import io.github.charlietap.chasm.embedding.ext.memory
-import io.github.charlietap.chasm.embedding.shapes.ChasmResult
-import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Error
-import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Success
+import io.github.charlietap.chasm.embedding.internal.throwAccessorFailure
 import io.github.charlietap.chasm.embedding.shapes.Memory
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.memory.read.NullTerminatedStringReader
@@ -20,15 +17,14 @@ fun readNullTerminatedUtf8String(
     store: Store,
     memory: Memory,
     pointer: Int,
-): ChasmResult<String, ChasmError.ExecutionError> =
-    readNullTerminatedUtf8String(
+): String {
+    return readNullTerminatedUtf8String(
         store = store,
         memory = memory,
         pointer = pointer,
         stringReader = ::NullTerminatedStringReader,
-    ).mapError(ModuleTrapError::toString)
-        .mapError(ChasmError::ExecutionError)
-        .fold(::Success, ::Error)
+    ).getOrElse(::throwAccessorFailure)
+}
 
 internal fun readNullTerminatedUtf8String(
     store: Store,
@@ -41,6 +37,7 @@ internal fun readNullTerminatedUtf8String(
 }.mapError { e ->
     when (e) {
         is InvocationException -> e.error
-        else -> InvocationError.MemoryOperationOutOfBounds
+        is IndexOutOfBoundsException -> InvocationError.MemoryOperationOutOfBounds
+        else -> throw e
     }
 }

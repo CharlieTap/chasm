@@ -435,7 +435,7 @@ final object io.github.charlietap.chasm.vm/NonJsVirtualMachine : io.github.charl
     final fun storeInit(): io.github.charlietap.chasm.vm/Store // io.github.charlietap.chasm.vm/NonJsVirtualMachine.storeInit|storeInit(){}[0]
 
     final object ResultFactory { // io.github.charlietap.chasm.vm/NonJsVirtualMachine.ResultFactory|null[0]
-        final fun <#A2: kotlin/Any?, #B2: io.github.charlietap.chasm.embedding.error/ChasmError> new(io.github.charlietap.chasm.embedding.shapes/ChasmResult<#A2, #B2>): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<#A2> // io.github.charlietap.chasm.vm/NonJsVirtualMachine.ResultFactory.new|new(io.github.charlietap.chasm.embedding.shapes.ChasmResult<0:0,0:1>){0§<kotlin.Any?>;1§<io.github.charlietap.chasm.embedding.error.ChasmError>}[0]
+        final fun <#A2: kotlin/Any?> new(io.github.charlietap.chasm.embedding.shapes/ChasmResult<#A2, *>): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<#A2> // io.github.charlietap.chasm.vm/NonJsVirtualMachine.ResultFactory.new|new(io.github.charlietap.chasm.embedding.shapes.ChasmResult<0:0,*>){0§<kotlin.Any?>}[0]
     }
 }
 

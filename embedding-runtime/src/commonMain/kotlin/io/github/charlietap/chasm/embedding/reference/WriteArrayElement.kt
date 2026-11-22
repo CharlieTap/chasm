@@ -1,14 +1,11 @@
 package io.github.charlietap.chasm.embedding.reference
 
 import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.fold
+import com.github.michaelbull.result.getOrElse
 import com.github.michaelbull.result.mapError
 import com.github.michaelbull.result.runCatching
-import io.github.charlietap.chasm.embedding.error.ChasmError
 import io.github.charlietap.chasm.embedding.ext.runtime
-import io.github.charlietap.chasm.embedding.shapes.ChasmResult
-import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Error
-import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Success
+import io.github.charlietap.chasm.embedding.internal.throwAccessorFailure
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.transform.FieldValueEncoder
 import io.github.charlietap.chasm.runtime.error.InvocationError
@@ -24,16 +21,15 @@ fun writeArrayElement(
     array: ReferenceValue.Array,
     index: Int,
     value: FieldValue,
-): ChasmResult<Unit, ChasmError.ExecutionError> =
+) {
     internalWriteArrayElement(
         store = store,
         array = array,
         index = index,
         value = value,
         fieldValueEncoder = ::FieldValueEncoder,
-    ).mapError(ModuleTrapError::toString)
-        .mapError(ChasmError::ExecutionError)
-        .fold(::Success, ::Error)
+    ).getOrElse(::throwAccessorFailure)
+}
 
 internal fun internalWriteArrayElement(
     store: Store,
@@ -57,6 +53,6 @@ internal fun internalWriteArrayElement(
 }.mapError { e ->
     when (e) {
         is InvocationException -> e.error
-        else -> InvocationError.ArrayFieldLookupFailed(index)
+        else -> throw e
     }
 }

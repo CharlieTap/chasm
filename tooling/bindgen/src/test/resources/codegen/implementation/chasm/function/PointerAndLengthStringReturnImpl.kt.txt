@@ -48,7 +48,7 @@ private class PointerAndLengthStringReturnImpl(
     val values = invokePreparedFunction(args).`expect`("Failed to invoke function invoke")
     val pointer = (values[0] as NumberValue.I32).value
     val length = (values[1] as NumberValue.I32).value
-    val result = readUtf8String(store, _memory, pointer, length).`expect`("Failed to read string result for invoke")
+    val result = readUtf8String(store, _memory, pointer, length)
     return result
   }
 }

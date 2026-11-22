@@ -1,14 +1,11 @@
 package io.github.charlietap.chasm.embedding.global
 
-import io.github.charlietap.chasm.embedding.error.ChasmError
 import io.github.charlietap.chasm.embedding.fixture.publicStore
-import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Global
 import io.github.charlietap.chasm.fixture.runtime.instance.globalAddress
 import io.github.charlietap.chasm.fixture.runtime.instance.globalExternalValue
 import io.github.charlietap.chasm.fixture.runtime.instance.globalInstance
 import io.github.charlietap.chasm.fixture.runtime.store
-import io.github.charlietap.chasm.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.runtime.value.NumberValue
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -24,13 +21,11 @@ class ReadGlobalTest {
         val address = globalAddress(0)
         val global = Global(globalExternalValue(address), store.store)
 
-        val expected: ChasmResult<ExecutionValue, ChasmError.ExecutionError> = ChasmResult.Success(NumberValue.I32(117))
-
         val actual = readGlobal(
             store = store,
             global = global,
         )
 
-        assertEquals(expected, actual)
+        assertEquals(NumberValue.I32(117), actual)
     }
 }

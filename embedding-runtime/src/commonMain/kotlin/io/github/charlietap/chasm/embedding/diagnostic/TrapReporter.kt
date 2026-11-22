@@ -3,36 +3,36 @@
 package io.github.charlietap.chasm.embedding.diagnostic
 
 import io.github.charlietap.chasm.InternalChasmApi
-import io.github.charlietap.chasm.embedding.error.ChasmError
 import io.github.charlietap.chasm.embedding.error.ExecutionError
 import io.github.charlietap.chasm.embedding.error.Trap
 import io.github.charlietap.chasm.embedding.error.TrapReason
 import io.github.charlietap.chasm.embedding.error.WasmFrame
 import io.github.charlietap.chasm.embedding.error.WasmStackTrace
-import io.github.charlietap.chasm.embedding.error.WasmTrap
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.runtime.diagnostic.TrapSnapshot
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
+import io.github.charlietap.chasm.runtime.ext.toReferenceValue
 import io.github.charlietap.chasm.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
-import io.github.charlietap.chasm.embedding.error.InstantiationError as CompiledInstantiationError
+import io.github.charlietap.chasm.runtime.value.ReferenceValue
+import io.github.charlietap.chasm.embedding.error.InstantiationError as EmbeddingInstantiationError
+import io.github.charlietap.chasm.embedding.error.InvocationError as EmbeddingInvocationError
 import io.github.charlietap.chasm.runtime.error.InstantiationError as RuntimeInstantiationError
 
-/**
- * A failure while resolving yields the error without a trap, never a
- * different error. [instantiation] describes an instantiation whose start
- * function trapped, before its instance could be registered.
- */
-internal fun executionError(
+internal fun invocationError(
     store: Store,
-    error: ModuleTrapError,
-    instantiation: Instantiation? = null,
-): ChasmError.ExecutionError {
-    val message = error.toString()
-    if (error !is InvocationError.Trapped) return ChasmError.ExecutionError(message)
-    return ChasmError.ExecutionError(message, reportedTrap(store, error, message, instantiation)?.let(::WasmTrap))
+    error: InvocationError,
+): EmbeddingInvocationError<ReferenceValue.Exception> {
+    return when (error) {
+        InvocationError.ThrownException -> ExecutionError.Thrown(pendingException(store))
+        else -> ExecutionError.Trapped(executionTrap(store, error))
+    }
+}
+
+internal fun pendingException(store: Store): ReferenceValue.Exception {
+    return store.store.heap.peekPendingExceptionReference().toReferenceValue() as ReferenceValue.Exception
 }
 
 internal fun executionTrap(
@@ -53,7 +53,7 @@ internal fun <E> instantiationError(
     error: ModuleTrapError,
     instantiation: Instantiation,
     thrown: () -> E,
-): CompiledInstantiationError<E> {
+): EmbeddingInstantiationError<E> {
 
     val cause = if (error is InvocationError.Trapped) error.error else error
 
@@ -175,32 +175,31 @@ private fun exportName(instance: ModuleInstance, address: Int): String? = instan
     (export.value as? ExternalValue.Function)?.address?.address == address
 }?.name?.name
 
-private fun reasonOf(error: InvocationError): TrapReason = when (error) {
-    InvocationError.Unreachable -> TrapReason.UNREACHABLE
-    InvocationError.MemoryOperationOutOfBounds -> TrapReason.MEMORY_OUT_OF_BOUNDS
-    InvocationError.CannotDivideIntegerByZero -> TrapReason.INTEGER_DIVIDE_BY_ZERO
-    InvocationError.IntegerOverflow -> TrapReason.INTEGER_OVERFLOW
-    InvocationError.ConvertOperationFailed -> TrapReason.INVALID_CONVERSION
-    InvocationError.TableOperationOutOfBounds -> TrapReason.TABLE_OUT_OF_BOUNDS
-    InvocationError.IndirectCallHasIncorrectFunctionType -> TrapReason.INDIRECT_CALL_TYPE_MISMATCH
-    InvocationError.NullReferenceExpected,
-    InvocationError.NonNullReferenceExpected,
-    InvocationError.UnexpectedReferenceValue,
-    InvocationError.IndirectCallOnANonFunctionReference,
-    -> TrapReason.NULL_REFERENCE
-    InvocationError.FailedToCastReference -> TrapReason.CAST_FAILURE
-    InvocationError.ArrayOperationOutOfBounds -> TrapReason.ARRAY_OUT_OF_BOUNDS
-    InvocationError.CallStackExhausted -> TrapReason.CALL_STACK_EXHAUSTED
-    InvocationError.GuestHeapOutOfMemory -> TrapReason.GUEST_HEAP_EXHAUSTED
-    InvocationError.MemoryGrowFailed -> TrapReason.MEMORY_GROW_FAILED
-    InvocationError.TableGrowFailed -> TrapReason.TABLE_GROW_FAILED
-    InvocationError.FuelExhausted -> TrapReason.FUEL_EXHAUSTED
-    InvocationError.Interrupted -> TrapReason.INTERRUPTED
-    is InvocationError.HostFunctionError,
-    is InvocationError.HostFunctionInconsistentWithType,
-    -> TrapReason.HOST_FUNCTION_FAILURE
-    InvocationError.ThrownException,
-    InvocationError.UncaughtException,
-    -> TrapReason.UNCAUGHT_EXCEPTION
-    else -> TrapReason.OTHER
+private fun reasonOf(error: InvocationError): TrapReason {
+    return when (error) {
+        InvocationError.Unreachable -> TrapReason.UNREACHABLE
+        InvocationError.MemoryOperationOutOfBounds -> TrapReason.MEMORY_OUT_OF_BOUNDS
+        InvocationError.CannotDivideIntegerByZero -> TrapReason.INTEGER_DIVIDE_BY_ZERO
+        InvocationError.IntegerOverflow -> TrapReason.INTEGER_OVERFLOW
+        InvocationError.ConvertOperationFailed -> TrapReason.INVALID_CONVERSION
+        InvocationError.TableOperationOutOfBounds -> TrapReason.TABLE_OUT_OF_BOUNDS
+        InvocationError.IndirectCallHasIncorrectFunctionType -> TrapReason.INDIRECT_CALL_TYPE_MISMATCH
+        InvocationError.NullReferenceExpected,
+        InvocationError.NonNullReferenceExpected,
+        InvocationError.UnexpectedReferenceValue,
+        InvocationError.IndirectCallOnANonFunctionReference,
+        -> TrapReason.NULL_REFERENCE
+        InvocationError.FailedToCastReference -> TrapReason.CAST_FAILURE
+        InvocationError.ArrayOperationOutOfBounds -> TrapReason.ARRAY_OUT_OF_BOUNDS
+        InvocationError.CallStackExhausted -> TrapReason.CALL_STACK_EXHAUSTED
+        InvocationError.GuestHeapOutOfMemory -> TrapReason.GUEST_HEAP_EXHAUSTED
+        InvocationError.MemoryGrowFailed -> TrapReason.MEMORY_GROW_FAILED
+        InvocationError.TableGrowFailed -> TrapReason.TABLE_GROW_FAILED
+        InvocationError.FuelExhausted -> TrapReason.FUEL_EXHAUSTED
+        InvocationError.Interrupted -> TrapReason.INTERRUPTED
+        is InvocationError.HostFunctionError,
+        is InvocationError.HostFunctionInconsistentWithType,
+        -> TrapReason.HOST_FUNCTION_FAILURE
+        else -> TrapReason.OTHER
+    }
 }

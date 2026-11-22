@@ -3,18 +3,18 @@ package io.github.charlietap.chasm.script.decoder
 import io.github.charlietap.chasm.config.ComponentConfig
 import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.embedding.component
-import io.github.charlietap.chasm.embedding.error.ChasmError.DecodeError
+import io.github.charlietap.chasm.embedding.error.ModuleError
 import io.github.charlietap.chasm.embedding.module
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 
-internal typealias BinaryDecoder = (ByteArray, ModuleConfig) -> ChasmResult<Any, DecodeError>
-internal typealias CoreBinaryDecoder = (ByteArray, ModuleConfig) -> ChasmResult<Any, DecodeError>
-internal typealias ComponentBinaryDecoder = (ByteArray, ComponentConfig) -> ChasmResult<Any, DecodeError>
+internal typealias BinaryDecoder = (ByteArray, ModuleConfig) -> ChasmResult<Any, ModuleError>
+internal typealias CoreBinaryDecoder = (ByteArray, ModuleConfig) -> ChasmResult<Any, ModuleError>
+internal typealias ComponentBinaryDecoder = (ByteArray, ComponentConfig) -> ChasmResult<Any, ModuleError>
 
 internal fun BinaryDecoder(
     bytes: ByteArray,
     moduleConfig: ModuleConfig,
-): ChasmResult<Any, DecodeError> {
+): ChasmResult<Any, ModuleError> {
     return BinaryDecoder(
         bytes,
         moduleConfig,
@@ -30,20 +30,24 @@ internal fun BinaryDecoder(
     layerDecoder: WasmLayerDecoder,
     coreBinaryDecoder: CoreBinaryDecoder,
     componentBinaryDecoder: ComponentBinaryDecoder,
-): ChasmResult<Any, DecodeError> {
+): ChasmResult<Any, ModuleError> {
     return when (layerDecoder(bytes)) {
         WasmLayer.Core -> coreBinaryDecoder(bytes, moduleConfig)
         WasmLayer.Component -> componentBinaryDecoder(bytes, ComponentConfig(moduleConfig))
-        null -> ChasmResult.Error(DecodeError("invalid or unsupported WebAssembly binary layer"))
+        null -> ChasmResult.Error(ModuleError.Malformed("invalid or unsupported WebAssembly binary layer"))
     }
 }
 
 private fun CoreBinaryDecoder(
     bytes: ByteArray,
     config: ModuleConfig,
-): ChasmResult<Any, DecodeError> = module(bytes, config)
+): ChasmResult<Any, ModuleError> {
+    return module(bytes, config)
+}
 
 private fun ComponentBinaryDecoder(
     bytes: ByteArray,
     config: ComponentConfig,
-): ChasmResult<Any, DecodeError> = component(bytes, config)
+): ChasmResult<Any, ModuleError> {
+    return component(bytes, config)
+}

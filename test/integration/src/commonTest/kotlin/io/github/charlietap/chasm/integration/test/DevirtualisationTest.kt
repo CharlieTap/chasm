@@ -6,7 +6,7 @@ import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.config.GCStrategy
 import io.github.charlietap.chasm.config.GCThreshold
 import io.github.charlietap.chasm.config.RuntimeConfig
-import io.github.charlietap.chasm.embedding.error.ChasmError
+import io.github.charlietap.chasm.embedding.error.ExecutionError
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.store
 import io.github.charlietap.chasm.integration.TestRunner
@@ -14,6 +14,7 @@ import io.github.charlietap.chasm.integration.integrationTest
 import io.github.charlietap.chasm.integration.runner
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.runtime.value.NumberValue
+import io.github.charlietap.chasm.runtime.value.ReferenceValue
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
@@ -73,11 +74,11 @@ class DevirtualisationTest {
     private fun dispatch(
         runner: TestRunner,
         selector: Int,
-    ): ChasmResult<List<ExecutionValue>, ChasmError> {
+    ): ChasmResult<List<ExecutionValue>, ExecutionError<ReferenceValue.Exception>> {
         return runner.invoke("dispatch", listOf(NumberValue.I32(selector), NumberValue.I32(6), NumberValue.I32(3)))
     }
 
-    private fun result(value: Int): ChasmResult<List<ExecutionValue>, ChasmError> {
+    private fun result(value: Int): ChasmResult<List<ExecutionValue>, ExecutionError<ReferenceValue.Exception>> {
         return ChasmResult.Success(listOf(NumberValue.I32(value)))
     }
 

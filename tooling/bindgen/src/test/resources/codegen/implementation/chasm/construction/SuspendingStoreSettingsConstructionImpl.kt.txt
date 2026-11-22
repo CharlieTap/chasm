@@ -30,7 +30,7 @@ public suspend fun suspendingStoreSettingsConstruction(
   instanceFactory: SuspendInstanceFactory? = null,
 ): SuspendingStoreSettingsConstruction {
   val store = store(StoreConfig(meterFuel = true, interruptible = true, gcStrategy = GCStrategy.TRADITIONAL, limits = StoreLimits(gcHeapBytes = 1_048_576L, memoryPages = 16, tableElements = 1_048_576, trapOnGrowFailure = true, stackBytes = 16_777_216L)))
-  chasmAddFuel(store, 1_000L).`expect`("Failed to add fuel")
+  chasmAddFuel(store, 1_000L)
   val module = moduleFactory?.invoke(binary) ?: module(binary).`expect`("Failed to decode binary")
   val allocatedImports = allocateImports(store, imports)
   val instance = instanceFactory?.invoke(store, module, allocatedImports) ?: instance(store, module, allocatedImports, RuntimeConfig(debugInfo = true)).`expect`("Failed to instantiate module")
@@ -41,9 +41,9 @@ private class SuspendingStoreSettingsConstructionImpl(
   private val store: Store,
   private val instance: Instance,
 ) : SuspendingStoreSettingsConstruction {
-  override fun addFuel(units: Long): Unit = chasmAddFuel(store, units).`expect`("Failed to add fuel")
+  override fun addFuel(units: Long): Unit = chasmAddFuel(store, units)
 
-  override fun remainingFuel(): Long = chasmRemainingFuel(store).`expect`("Failed to read fuel")
+  override fun remainingFuel(): Long = chasmRemainingFuel(store)
 
-  override fun interrupt(): Boolean = chasmInterrupt(store).`expect`("Failed to interrupt")
+  override fun interrupt(): Boolean = chasmInterrupt(store)
 }

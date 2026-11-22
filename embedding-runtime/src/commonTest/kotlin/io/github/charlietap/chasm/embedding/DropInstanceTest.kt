@@ -2,7 +2,6 @@ package io.github.charlietap.chasm.embedding
 
 import io.github.charlietap.chasm.embedding.fixture.publicInstance
 import io.github.charlietap.chasm.embedding.fixture.publicStore
-import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.fixture.runtime.instance.dataAddress
 import io.github.charlietap.chasm.fixture.runtime.instance.dataInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.elementAddress
@@ -82,10 +81,8 @@ class DropInstanceTest {
             moduleInstance = moduleInstance,
         )
 
-        val expected = ChasmResult.Success(Unit)
-        val actual = dropInstance(store, instance)
+        dropInstance(store, instance)
 
-        assertEquals(expected, actual)
         assertEquals(true, moduleInstance.deallocated)
         assertEquals(memoryInstance, store.store.memories.single())
         assertContentEquals(ubyteArrayOf(), dataInstance.bytes)
@@ -124,10 +121,8 @@ class DropInstanceTest {
             ),
         )
 
-        val expected = ChasmResult.Success(Unit)
-        val actual = dropInstance(store, instance)
+        dropInstance(store, instance)
 
-        assertEquals(expected, actual)
         assertEquals(true, instance.instance.deallocated)
         assertEquals(memoryInstance, store.store.memories.single())
     }

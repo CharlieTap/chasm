@@ -134,7 +134,7 @@ internal class ObjectCall(
 
             val exported = when (val lookup = exportedFunction(store, instance, name)) {
                 is ChasmResult.Success -> lookup.result
-                is ChasmResult.Error -> return ChasmResult.Error(ExecutionError.Rejected(lookup.error.error))
+                is ChasmResult.Error -> return lookup
             }
 
             val owner = managedStore.definedType(HostGcType(exported.function.rtt.value))

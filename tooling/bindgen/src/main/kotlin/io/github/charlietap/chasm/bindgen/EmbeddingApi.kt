@@ -64,15 +64,9 @@ internal interface EmbeddingApi {
 
     fun storeFunction(function: StoreFunction): MemberName
 
-    fun storeControlCall(
-        call: CodeBlock,
-        failure: String,
-    ): CodeBlock
-
     fun accessorCall(
         function: MemberName,
         arguments: CodeBlock,
-        failure: String,
     ): CodeBlock
 
     fun writeNullTerminator(
@@ -90,14 +84,12 @@ internal interface EmbeddingApi {
     fun globalRead(
         global: String,
         type: Type,
-        failure: String,
     ): CodeBlock
 
     fun globalWrite(
         global: String,
         type: Type,
         value: String,
-        failure: String,
     ): CodeBlock
 }
 

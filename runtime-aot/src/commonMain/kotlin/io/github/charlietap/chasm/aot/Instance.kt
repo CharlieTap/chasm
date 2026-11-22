@@ -5,10 +5,12 @@ import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.config.StoreConfig
 import io.github.charlietap.chasm.embedding.diagnostic.CompiledTrapSource
-import io.github.charlietap.chasm.embedding.error.ChasmError
+import io.github.charlietap.chasm.embedding.error.ExecutionError
+import io.github.charlietap.chasm.embedding.error.InstantiationError
 import io.github.charlietap.chasm.embedding.internal.MIXED_STORE_ERROR
 import io.github.charlietap.chasm.embedding.internal.holdsManagedReferences
 import io.github.charlietap.chasm.embedding.internal.instantiate
+import io.github.charlietap.chasm.embedding.internal.storeDropped
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Error
 import io.github.charlietap.chasm.embedding.shapes.Import
@@ -17,20 +19,23 @@ import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.executor.instantiator.ModuleInstantiator
 import io.github.charlietap.chasm.runtime.compiled.ModuleCodeInstallation
 import io.github.charlietap.chasm.runtime.compiled.ModuleCompiledFrames
+import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
+import io.github.charlietap.chasm.runtime.value.ReferenceValue
 
 @ExperimentalChasmApi
 fun instance(
     store: Store,
     module: CompiledModule,
     imports: List<Import>,
-): ChasmResult<Instance, ChasmError.ExecutionError> =
-    instance(
+): ChasmResult<Instance, InstantiationError<ReferenceValue.Exception>> {
+    return instance(
         store = store,
         module = module,
         imports = imports,
         instantiator = ::ModuleInstantiator,
     )
+}
 
 @OptIn(InternalChasmApi::class)
 internal inline fun instance(
@@ -38,16 +43,18 @@ internal inline fun instance(
     module: CompiledModule,
     imports: List<Import>,
     crossinline instantiator: ModuleInstantiator,
-): ChasmResult<Instance, ChasmError.ExecutionError> {
-    val metadata = module.metadataResult.getOrElse { failure -> return rejected(failure.message ?: failure.toString()) }
-    mismatch(metadata.capabilities, store.store.config)?.let { reason -> return rejected(reason) }
-    val declarations = module.declarations.getOrElse { failure -> return rejected(failure.message ?: failure.toString()) }
+): ChasmResult<Instance, InstantiationError<ReferenceValue.Exception>> {
+
+    check(!storeDropped(store)) { InvocationError.StoreDropped.toString() }
+    require(!holdsManagedReferences(store)) { MIXED_STORE_ERROR }
+
+    val metadata = module.metadataResult.getOrElse { failure -> return unsupported(failure.message ?: failure.toString()) }
+    mismatch(metadata.capabilities, store.store.config)?.let { reason -> return unsupported(reason) }
+    val declarations = module.declarations.getOrElse { failure -> return unsupported(failure.message ?: failure.toString()) }
     val trapSource = { instance: ModuleInstance ->
         CompiledTrapSource(instance, { declarations.names }) { function -> module.trapSites?.function(function) }
     }
-    if (holdsManagedReferences(store)) {
-        return ChasmResult.Error(ChasmError.ExecutionError(MIXED_STORE_ERROR))
-    }
+
     return instantiate(store, imports, runtimeConfig(metadata), trapSource) { effectiveConfig, runtime, runtimeImports ->
         instantiator(effectiveConfig, runtime, declarations, runtimeImports) { runtimeStore, instance, runtimeTypes, _ ->
             instance.compiledFrames = ModuleCompiledFrames(
@@ -60,9 +67,9 @@ internal inline fun instance(
     }
 }
 
-private fun rejected(
-    reason: String,
-): Error<ChasmError.ExecutionError> = Error(ChasmError.ExecutionError("Compiled module rejected: $reason"))
+private fun unsupported(reason: String): Error<ExecutionError.Unsupported> {
+    return Error(ExecutionError.Unsupported("Compiled module rejected: $reason"))
+}
 
 private fun mismatch(
     capabilities: Capabilities,

@@ -85,17 +85,9 @@ internal class CompiledEmbeddingApi(
         return MemberName(COMPILED_PACKAGE, function.functionName)
     }
 
-    override fun storeControlCall(
-        call: CodeBlock,
-        failure: String,
-    ): CodeBlock {
-        return call
-    }
-
     override fun accessorCall(
         function: MemberName,
         arguments: CodeBlock,
-        failure: String,
     ): CodeBlock {
         return CodeBlock.of("%M(%L)", function, arguments)
     }
@@ -119,7 +111,6 @@ internal class CompiledEmbeddingApi(
     override fun globalRead(
         global: String,
         type: Type,
-        failure: String,
     ): CodeBlock {
 
         val bits = CodeBlock.of("%M(%N)", READ_GLOBAL, global)
@@ -137,7 +128,6 @@ internal class CompiledEmbeddingApi(
         global: String,
         type: Type,
         value: String,
-        failure: String,
     ): CodeBlock {
 
         val bits = when (type) {

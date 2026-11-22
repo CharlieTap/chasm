@@ -110,8 +110,7 @@ private class DecodedModule(
         addStatement("val store = %M(%L)", api.storeFactory, storeConfig())
         val cpu = config.cpu
         if (cpu is CpuLimits.Metered) {
-            val call = CodeBlock.of("%M(store, %LL)", api.storeFunction(StoreFunction.AddFuel), cpu.fuel.units)
-            addStatement("%L", api.storeControlCall(call, "Failed to add fuel"))
+            addStatement("%M(store, %LL)", api.storeFunction(StoreFunction.AddFuel), cpu.fuel.units)
         }
         addStatement(
             "val module = moduleFactory?.invoke(binary) ?: %M(binary%L).%M(%S)",
@@ -180,10 +179,7 @@ private class CompiledModule(
             addStatement("check(!module.metadata.capabilities.stacktraces) { %S }", "${tier.compiledModule} was compiled with stack traces")
         }
         addStatement("val store = %M(module.metadata.storeConfig)", api.storeFactory)
-        addStatement(
-            "module.metadata.initialFuel?.let { fuel -> %L }",
-            api.storeControlCall(CodeBlock.of("%M(store, fuel)", api.storeFunction(StoreFunction.AddFuel)), "Failed to add fuel"),
-        )
+        addStatement("module.metadata.initialFuel?.let { fuel -> %M(store, fuel) }", api.storeFunction(StoreFunction.AddFuel))
     }.build()
 
     override fun instantiate(): CodeBlock = CodeBlock.builder()

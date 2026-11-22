@@ -2,7 +2,6 @@ package io.github.charlietap.chasm.embedding.reference
 
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.embedding.fixture.publicStore
-import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.transform.FieldValueDecoder
 import io.github.charlietap.chasm.fixture.runtime.value.bytePackedValue
 import io.github.charlietap.chasm.fixture.runtime.value.executionFieldValue
@@ -17,6 +16,7 @@ import io.github.charlietap.chasm.fixture.type.valueStorageType
 import io.github.charlietap.chasm.runtime.value.FieldValue
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 class ReadArrayElementTest {
 
@@ -65,16 +65,22 @@ class ReadArrayElementTest {
         val store = fixture.store
         val array = fixture.reference
 
-        val expected = ChasmResult.Success(
-            packedFieldValue(bytePackedValue(117L)),
-        )
-
         val actual = readArrayElement(
             store = store,
             array = array,
             index = 0,
         )
 
-        assertEquals(expected, actual)
+        assertEquals(packedFieldValue(bytePackedValue(117L)), actual)
+    }
+
+    @Test
+    fun `reading past the end of an array throws index out of bounds`() {
+
+        val fixture = arrayFieldTestFixture(arrayType(), longArrayOf(116L, 117L, 118L))
+
+        assertFailsWith<IndexOutOfBoundsException> {
+            readArrayElement(fixture.store, fixture.reference, 3)
+        }
     }
 }

@@ -8,7 +8,6 @@ import io.github.charlietap.chasm.compiled.corpus.value.parseIndex
 import io.github.charlietap.chasm.compiled.corpus.value.readLittleEndian
 import io.github.charlietap.chasm.compiled.corpus.value.toHex
 import io.github.charlietap.chasm.embedding.memory.readBytes
-import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Memory
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
@@ -41,9 +40,10 @@ internal fun MemoryReadStepRunner(
         ?: assertion["value"]?.jsonObject?.let(::encodeValueBytes)
         ?: return context.failure("unsupported memory assertion")
 
-    val actual = when (val result = readBytes(store, memory, ByteArray(expected.size), offset, expected.size)) {
-        is ChasmResult.Success -> result.result
-        is ChasmResult.Error -> return context.failure("memory read failed", result.error.toString())
+    val actual = try {
+        readBytes(store, memory, ByteArray(expected.size), offset, expected.size)
+    } catch (failure: IndexOutOfBoundsException) {
+        return context.failure("memory read failed", failure.message)
     }
 
     return if (expected.contentEquals(actual)) {
@@ -60,9 +60,10 @@ private fun readValue(
     type: String,
 ): ExecutionValue? {
     val size = if (type == "i64" || type == "f64") 8 else 4
-    val bytes = when (val result = readBytes(store, memory, ByteArray(size), offset, size)) {
-        is ChasmResult.Success -> result.result
-        is ChasmResult.Error -> return null
+    val bytes = try {
+        readBytes(store, memory, ByteArray(size), offset, size)
+    } catch (_: IndexOutOfBoundsException) {
+        return null
     }
     val bits = bytes.readLittleEndian()
     return when (type) {

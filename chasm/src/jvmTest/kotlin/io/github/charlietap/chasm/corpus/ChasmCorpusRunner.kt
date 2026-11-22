@@ -18,6 +18,8 @@ import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.coroutines.instance
 import io.github.charlietap.chasm.coroutines.module
 import io.github.charlietap.chasm.coroutines.validate
+import io.github.charlietap.chasm.embedding.error.ExecutionError
+import io.github.charlietap.chasm.embedding.error.TrapReason
 import io.github.charlietap.chasm.embedding.function
 import io.github.charlietap.chasm.embedding.global
 import io.github.charlietap.chasm.embedding.global.readGlobal
@@ -406,7 +408,7 @@ class ChasmCorpusRunner(
         val result = when (val invocation = invoke(store, setup.instance, function, params)) {
             is ChasmResult.Success -> invocation.result
             is ChasmResult.Error -> {
-                val actualExitCode = invocation.error.toString().hostFunctionExitCodeOrNull()
+                val actualExitCode = hostFunctionExitCodeOrNull(invocation.error)
                 if (trap != null) {
                     return CorpusResult.Success
                 } else if (expectedExitCode != null && actualExitCode != null) {
@@ -532,10 +534,12 @@ class ChasmCorpusRunner(
         val bytes = step["bytes"]?.let(::decodeBytes) ?: step["value"]?.jsonObject?.let(::encodeValueBytes)
             ?: return failure(fixture, context, "memory write requires bytes or value")
 
-        return writeBytes(store, memory, offset, bytes).fold(
-            { CorpusResult.Success },
-            { error -> failure(fixture, context, "memory write failed", error.toString()) },
-        )
+        return try {
+            writeBytes(store, memory, offset, bytes)
+            CorpusResult.Success
+        } catch (failure: IndexOutOfBoundsException) {
+            failure(fixture, context, "memory write failed", failure.message)
+        }
     }
 
     private fun runMemoryRead(
@@ -563,9 +567,10 @@ class ChasmCorpusRunner(
             ?: return failure(fixture, context, "unsupported memory assertion")
         val buffer = ByteArray(expected.size)
 
-        val actual = when (val result = readBytes(store, memory, buffer, offset, expected.size)) {
-            is ChasmResult.Success -> result.result
-            is ChasmResult.Error -> return failure(fixture, context, "memory read failed", result.error.toString())
+        val actual = try {
+            readBytes(store, memory, buffer, offset, expected.size)
+        } catch (failure: IndexOutOfBoundsException) {
+            return failure(fixture, context, "memory read failed", failure.message)
         }
 
         return if (expected.contentEquals(actual)) {
@@ -586,10 +591,7 @@ class ChasmCorpusRunner(
         val memory = resolveMemory(setup, step.stringOrDefault("memory", "memory"))
             ?: return failure(fixture, context, "memory not found", step["memory"]?.toString())
         val pagesToAdd = parseIndex(step.getValue("pages"), captures)
-        val actual = when (val result = growMemory(store, memory, pagesToAdd)) {
-            is ChasmResult.Success -> NumberValue.I32(result.result)
-            is ChasmResult.Error -> return failure(fixture, context, "memory grow failed", result.error.toString())
-        }
+        val actual = NumberValue.I32(growMemory(store, memory, pagesToAdd))
 
         step["capture"]?.jsonPrimitive?.contentOrNull?.let { capture ->
             captures[capture] = actual
@@ -618,10 +620,12 @@ class ChasmCorpusRunner(
             ?: return failure(fixture, context, "global not found", step.string("global"))
         val value = parseValue(step.getValue("value").jsonObject, captures)
 
-        return writeGlobal(store, global, value).fold(
-            { CorpusResult.Success },
-            { error -> failure(fixture, context, "global write failed", error.toString()) },
-        )
+        return try {
+            writeGlobal(store, global, value)
+            CorpusResult.Success
+        } catch (failure: IllegalArgumentException) {
+            failure(fixture, context, "global write failed", failure.message)
+        }
     }
 
     private fun runGlobalRead(
@@ -634,10 +638,7 @@ class ChasmCorpusRunner(
     ): CorpusResult {
         val global = resolveGlobal(setup, step.string("global"))
             ?: return failure(fixture, context, "global not found", step.string("global"))
-        val actual = when (val result = readGlobal(store, global)) {
-            is ChasmResult.Success -> result.result
-            is ChasmResult.Error -> return failure(fixture, context, "global read failed", result.error.toString())
-        }
+        val actual = readGlobal(store, global)
         val expected = parseValue(step.getValue("assert").jsonObject.getValue("value").jsonObject, captures)
 
         return if (expected.toLongFromBoxed() == actual.toLongFromBoxed()) {
@@ -749,9 +750,10 @@ class ChasmCorpusRunner(
     ): ExecutionValue? {
         val size = if (type == "i64" || type == "f64") 8 else 4
         val buffer = ByteArray(size)
-        val bytes = when (val result = readBytes(store, memory, buffer, offset, size)) {
-            is ChasmResult.Success -> result.result
-            is ChasmResult.Error -> return null
+        val bytes = try {
+            readBytes(store, memory, buffer, offset, size)
+        } catch (_: IndexOutOfBoundsException) {
+            return null
         }
         val bits = bytes.readLittleEndian()
         return when (type) {
@@ -840,12 +842,19 @@ class ChasmCorpusRunner(
         byte.toUByte().toString(16).padStart(2, '0')
     }
 
-    private fun String.hostFunctionExitCodeOrNull(): Int? {
-        val prefix = "ExecutionError(error=HostFunctionError(error="
-        val start = indexOf(prefix).takeIf { it >= 0 } ?: return null
+    private fun hostFunctionExitCodeOrNull(error: ExecutionError<*>): Int? {
+
+        val trap = (error as? ExecutionError.Trapped)?.trap ?: return null
+        if (trap.reason != TrapReason.HOST_FUNCTION_FAILURE) {
+            return null
+        }
+
+        val prefix = "HostFunctionError(error="
+        val message = trap.message
+        val start = message.indexOf(prefix).takeIf { index -> index >= 0 } ?: return null
         val valueStart = start + prefix.length
-        val valueEnd = indexOf(")", valueStart).takeIf { it >= 0 } ?: return null
-        return substring(valueStart, valueEnd).toIntOrNull()
+        val valueEnd = message.indexOf(")", valueStart).takeIf { index -> index >= 0 } ?: return null
+        return message.substring(valueStart, valueEnd).toIntOrNull()
     }
 
     private fun failure(

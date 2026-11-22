@@ -2,10 +2,10 @@ package io.github.charlietap.chasm.embedding
 
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.fold
-import com.github.michaelbull.result.mapError
-import io.github.charlietap.chasm.embedding.diagnostic.executionError
-import io.github.charlietap.chasm.embedding.error.ChasmError
+import io.github.charlietap.chasm.embedding.diagnostic.invocationError
+import io.github.charlietap.chasm.embedding.error.ExecutionError
 import io.github.charlietap.chasm.embedding.ext.owning
+import io.github.charlietap.chasm.embedding.internal.argumentMismatch
 import io.github.charlietap.chasm.embedding.internal.exportedFunction
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Error
@@ -20,12 +20,14 @@ import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.ext.function
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
+import io.github.charlietap.chasm.runtime.value.ReferenceValue
+import io.github.charlietap.chasm.embedding.error.InvocationError as EmbeddingInvocationError
 
 fun prepareFunction(
     store: Store,
     instance: Instance,
     name: String,
-): ChasmResult<PreparedFunction, ChasmError.ExecutionError> {
+): ChasmResult<PreparedFunction, ExecutionError.Rejected> {
 
     val exported = when (val result = exportedFunction(store, instance, name)) {
         is Success -> result.result
@@ -45,17 +47,33 @@ private fun invokePrepared(
     address: Address.Function,
     function: FunctionInstance,
     args: List<ExecutionValue>,
-): ChasmResult<List<ExecutionValue>, ChasmError.ExecutionError> {
+): ChasmResult<List<ExecutionValue>, EmbeddingInvocationError<ReferenceValue.Exception>> {
+
     if (instance.instance.deallocated) {
-        return Error(ChasmError.ExecutionError(InvocationError.InvocationOfADeinstantiatedInstance.toString()))
+        return Error(ExecutionError.Rejected(InvocationError.InvocationOfADeinstantiatedInstance.toString()))
     }
 
-    return try {
+    val runtime = try {
+
         val runtime = store.owning(instance.store)
-        if (runtime.function(address) !== function) throw InvocationException(InvocationError.FunctionLookupFailed(address))
+        if (runtime.function(address) !== function) {
+            throw InvocationException(InvocationError.FunctionLookupFailed(address))
+        }
+
+        runtime
+    } catch (exception: InvocationException) {
+        return Error(ExecutionError.Rejected(exception.error.toString()))
+    }
+
+    argumentMismatch(function.functionType, args)?.let { mismatch ->
+        return Error(ExecutionError.Rejected(mismatch))
+    }
+
+    val result = try {
         FunctionInvoker(instance.config, runtime, instance.instance, function, args)
     } catch (exception: InvocationException) {
         Err(exception.error)
-    }.mapError { error -> executionError(store, error) }
-        .fold(::Success, ::Error)
+    }
+
+    return result.fold(::Success) { error -> Error(invocationError(store, error)) }
 }

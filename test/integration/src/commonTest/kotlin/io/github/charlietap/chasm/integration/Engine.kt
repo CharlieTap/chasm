@@ -1,7 +1,8 @@
 package io.github.charlietap.chasm.integration
 
 import io.github.charlietap.chasm.config.RuntimeConfig
-import io.github.charlietap.chasm.embedding.error.ChasmError
+import io.github.charlietap.chasm.embedding.error.InstantiationError
+import io.github.charlietap.chasm.embedding.error.InvocationError
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Export
 import io.github.charlietap.chasm.embedding.shapes.ExternRef
@@ -10,6 +11,7 @@ import io.github.charlietap.chasm.embedding.shapes.Instance
 import io.github.charlietap.chasm.embedding.shapes.Memory
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
+import io.github.charlietap.chasm.runtime.value.ReferenceValue
 
 interface Engine {
 
@@ -20,14 +22,14 @@ interface Engine {
         store: Store,
         imports: List<Import>,
         config: RuntimeConfig,
-    ): ChasmResult<Instance, ChasmError>
+    ): ChasmResult<Instance, InstantiationError<ReferenceValue.Exception>>
 
     fun invoke(
         store: Store,
         instance: Instance,
         name: String,
         arguments: List<ExecutionValue>,
-    ): ChasmResult<List<ExecutionValue>, ChasmError>
+    ): ChasmResult<List<ExecutionValue>, InvocationError<ReferenceValue.Exception>>
 
     fun exports(
         instance: Instance,
@@ -35,30 +37,30 @@ interface Engine {
 
     fun gc(
         store: Store,
-    ): ChasmResult<Unit, ChasmError>
+    )
 
     fun addFuel(
         store: Store,
         units: Long,
-    ): ChasmResult<Unit, ChasmError>
+    )
 
     fun remainingFuel(
         store: Store,
-    ): ChasmResult<Long, ChasmError>
+    ): Long
 
     fun resetFuel(
         store: Store,
-    ): ChasmResult<Unit, ChasmError>
+    )
 
     fun interrupt(
         store: Store,
-    ): ChasmResult<Boolean, ChasmError>
+    ): Boolean
 
     fun growMemory(
         store: Store,
         memory: Memory,
         pagesToAdd: Int,
-    ): ChasmResult<Int, ChasmError>
+    ): Int
 
     fun readBytes(
         store: Store,
@@ -66,32 +68,32 @@ interface Engine {
         buffer: ByteArray,
         memoryPointer: Int,
         bytesToRead: Int,
-    ): ChasmResult<ByteArray, ChasmError>
+    ): ByteArray
 
     fun readUtf8String(
         store: Store,
         memory: Memory,
         pointer: Int,
         stringLengthInBytes: Int,
-    ): ChasmResult<String, ChasmError>
+    ): String
 
     fun readNullTerminatedUtf8String(
         store: Store,
         memory: Memory,
         pointer: Int,
-    ): ChasmResult<String, ChasmError>
+    ): String
 
     fun writeUtf8String(
         store: Store,
         memory: Memory,
         pointer: Int,
         string: String,
-    ): ChasmResult<Unit, ChasmError>
+    )
 
     fun createExternRef(
         store: Store,
         value: Any?,
-    ): ChasmResult<ExternRef, ChasmError>
+    ): ExternRef
 }
 
 expect val engines: Set<Engine>

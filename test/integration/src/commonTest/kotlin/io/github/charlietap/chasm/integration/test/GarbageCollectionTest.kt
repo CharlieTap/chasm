@@ -28,7 +28,7 @@ class GarbageCollectionTest {
 
         val allocatedBytesBeforeCollection = store.store.heap.allocatedGuestBytes()
 
-        runner.gc().expect("expected garbage collection to succeed")
+        runner.gc()
 
         assertTrue(store.store.heap.allocatedGuestBytes() < allocatedBytesBeforeCollection, engine.name())
         assertReachableObjects(runner)

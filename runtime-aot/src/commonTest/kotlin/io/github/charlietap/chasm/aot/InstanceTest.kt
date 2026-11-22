@@ -15,7 +15,8 @@ import io.github.charlietap.chasm.config.StoreConfig
 import io.github.charlietap.chasm.config.StoreLimits
 import io.github.charlietap.chasm.declarations.ModuleDeclarations
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
-import io.github.charlietap.chasm.embedding.error.ChasmError
+import io.github.charlietap.chasm.embedding.dropStore
+import io.github.charlietap.chasm.embedding.error.ExecutionError
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.store
 import io.github.charlietap.chasm.module.ModuleDeclarationsFactory
@@ -24,6 +25,7 @@ import io.github.charlietap.chasm.runtime.error.InstantiationError
 import io.github.charlietap.chasm.validator.WasmModuleValidator
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertIs
 import kotlin.test.assertSame
@@ -60,6 +62,19 @@ class InstanceTest {
     }
 
     @Test
+    fun `a dropped store is refused before the compiled module is checked`() {
+
+        val store = store(StoreConfig())
+        dropStore(store)
+
+        assertFailsWith<IllegalStateException> {
+            instance(store, compiledModule(FakeCode(meterFuel = true)), emptyList()) { _, _, _, _, _ ->
+                fail("a dropped store is never instantiated into")
+            }
+        }
+    }
+
+    @Test
     fun `a store that does not match the module's fuel and interrupt checks is rejected before instantiation`() {
         val cases = listOf(
             Triple(FakeCode(meterFuel = true), StoreConfig(), "the module was compiled with fuel checks but the store does not meter fuel"),
@@ -77,7 +92,7 @@ class InstanceTest {
         )
 
         cases.forEach { (code, config, reason) ->
-            assertEquals(rejected(reason), instantiateOnly(code, config), reason)
+            assertEquals(unsupported(reason), instantiateOnly(code, config), reason)
         }
     }
 
@@ -88,7 +103,7 @@ class InstanceTest {
         val result = instantiateOnly(code, StoreConfig())
 
         assertEquals(
-            rejected("the module was compiled for runtime ABI ${COMPILED_RUNTIME_ABI + 1} but this runtime supports $COMPILED_RUNTIME_ABI"),
+            unsupported("the module was compiled for runtime ABI ${COMPILED_RUNTIME_ABI + 1} but this runtime supports $COMPILED_RUNTIME_ABI"),
             result,
         )
     }
@@ -99,7 +114,7 @@ class InstanceTest {
 
         val result = instantiateOnly(code, StoreConfig())
 
-        assertEquals(rejected("the module was compiled for an older runtime"), result)
+        assertEquals(unsupported("the module was compiled for an older runtime"), result)
     }
 
     @Test
@@ -161,9 +176,9 @@ class InstanceTest {
         return result
     }
 
-    private fun rejected(
-        reason: String,
-    ) = ChasmResult.Error(ChasmError.ExecutionError("Compiled module rejected: $reason"))
+    private fun unsupported(reason: String): ChasmResult.Error<ExecutionError.Unsupported> {
+        return ChasmResult.Error(ExecutionError.Unsupported("Compiled module rejected: $reason"))
+    }
 
     private inner class FakeCode(
         private val abi: Int = COMPILED_RUNTIME_ABI,

@@ -10,7 +10,7 @@ import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
 import io.github.charlietap.chasm.decoder.error.ModuleDecoderError
-import io.github.charlietap.chasm.embedding.error.ChasmError.DecodeError
+import io.github.charlietap.chasm.embedding.error.ModuleError
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Error
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Success
@@ -25,12 +25,13 @@ import io.github.charlietap.chasm.declarations.moduleInfo as declarationsModuleI
 fun moduleInfo(
     bytes: ByteArray,
     config: ModuleConfig = ModuleConfig(),
-): ChasmResult<ModuleInfo, DecodeError> =
-    WasmModuleDecoder(config, bytes)
+): ChasmResult<ModuleInfo, ModuleError.Malformed> {
+    return WasmModuleDecoder(config, bytes)
         .mapError(ModuleDecoderError::toString)
         .andThen(::describe)
-        .mapError(::DecodeError)
+        .mapError(ModuleError::Malformed)
         .fold(::Success, ::Error)
+}
 
 private fun describe(
     module: Module,

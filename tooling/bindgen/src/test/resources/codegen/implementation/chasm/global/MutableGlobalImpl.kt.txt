@@ -39,8 +39,8 @@ private class MutableGlobalImpl(
       (instance.exports.firstOrNull { export -> export.name == "value" }?.value as? Global) ?: error("Failed to find global export with name value")
 
   override var `value`: Int
-    get() = (readGlobal(store, _value).`expect`("Failed to read global value") as NumberValue.I32).value
+    get() = (readGlobal(store, _value) as NumberValue.I32).value
     set(newValue) {
-      writeGlobal(store, _value, NumberValue.I32(newValue)).`expect`("Failed to write global value")
+      writeGlobal(store, _value, NumberValue.I32(newValue))
     }
 }

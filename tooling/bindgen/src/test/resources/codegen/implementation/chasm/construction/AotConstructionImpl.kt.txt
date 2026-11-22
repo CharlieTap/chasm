@@ -19,7 +19,7 @@ public fun aotConstruction(imports: List<CodegenImport> = emptyList()): AotConst
   val module = WasmModule.INSTANCE
   check(!module.metadata.capabilities.stacktraces) { "com.test.aot.WasmModule was compiled with stack traces" }
   val store = store(module.metadata.storeConfig)
-  module.metadata.initialFuel?.let { fuel -> chasmAddFuel(store, fuel).`expect`("Failed to add fuel") }
+  module.metadata.initialFuel?.let { fuel -> chasmAddFuel(store, fuel) }
   val allocatedImports = allocateImports(store, imports)
   val instance = instance(store, module, allocatedImports).`expect`("Failed to instantiate module")
   return AotConstructionImpl(store = store, instance = instance)

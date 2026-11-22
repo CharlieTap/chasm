@@ -438,6 +438,10 @@ class WasmHeap internal constructor(
         return reference
     }
 
+    fun peekPendingExceptionReference(): HostReference {
+        return pendingExceptionReference
+    }
+
     fun clearPendingException() {
         pendingExceptionReference = 0L
     }

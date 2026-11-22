@@ -5,7 +5,6 @@ import io.github.charlietap.chasm.compiled.corpus.value.describeBits
 import io.github.charlietap.chasm.compiled.corpus.value.parseIndex
 import io.github.charlietap.chasm.compiled.corpus.value.parseValue
 import io.github.charlietap.chasm.embedding.memory.growMemory
-import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.runtime.ext.toLongFromBoxed
 import io.github.charlietap.chasm.runtime.value.NumberValue
 import io.github.charlietap.corpus.lib.CorpusResult
@@ -23,10 +22,7 @@ internal fun MemoryGrowStepRunner(
     val memory = context.setup.memory(step.stringOrDefault("memory", "memory"))
         ?: return context.failure("memory not found", step["memory"]?.toString())
     val pages = parseIndex(step.getValue("pages"), context.captures)
-    val actual = when (val result = growMemory(context.setup.store, memory, pages)) {
-        is ChasmResult.Success -> NumberValue.I32(result.result)
-        is ChasmResult.Error -> return context.failure("memory grow failed", result.error.toString())
-    }
+    val actual = NumberValue.I32(growMemory(context.setup.store, memory, pages))
 
     step["capture"]?.jsonPrimitive?.contentOrNull?.let { capture ->
         context.captures[capture] = actual

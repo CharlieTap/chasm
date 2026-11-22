@@ -55,8 +55,8 @@ private class NullTerminatedStringParamImpl(
   override fun invoke(`value`: String) {
     val valueBytes = value.encodeToByteArray()
     val valueAlloc = allocator.alloc(valueBytes.size + 1)
-    writeBytes(store, _memory, valueAlloc, valueBytes).`expect`("Failed to write string")
-    writeBytes(store, _memory, valueAlloc + valueBytes.size, byteArrayOf(0)).`expect`("Failed to write null terminator")
+    writeBytes(store, _memory, valueAlloc, valueBytes)
+    writeBytes(store, _memory, valueAlloc + valueBytes.size, byteArrayOf(0))
     functionInputBuffer[0] = NumberValue.I32(valueAlloc)
     val args = functionInputBuffer1
     val values = invokePreparedFunction(args).`expect`("Failed to invoke function invoke")

@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.embedding.internal
 
 import io.github.charlietap.chasm.InternalChasmApi
-import io.github.charlietap.chasm.embedding.error.ChasmError.ValidationError
+import io.github.charlietap.chasm.embedding.error.ModuleError
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Module
 import io.github.charlietap.chasm.embedding.shapes._config
@@ -15,8 +15,11 @@ import io.github.charlietap.chasm.validator.ParallelWasmModuleValidator
 suspend fun _validate(
     module: Module,
     taskExecutor: ParallelTaskExecutor,
-): ChasmResult<Module, ValidationError> {
-    if (module._validated()) return ChasmResult.Success(module)
+): ChasmResult<Module, ModuleError.Invalid> {
+
+    if (module._validated()) {
+        return ChasmResult.Success(module)
+    }
 
     val result = ParallelWasmModuleValidator(
         config = module._config(),

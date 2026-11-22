@@ -1,14 +1,11 @@
 package io.github.charlietap.chasm.embedding.reference
 
 import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.fold
+import com.github.michaelbull.result.getOrElse
 import com.github.michaelbull.result.mapError
 import com.github.michaelbull.result.runCatching
-import io.github.charlietap.chasm.embedding.error.ChasmError
 import io.github.charlietap.chasm.embedding.ext.runtime
-import io.github.charlietap.chasm.embedding.shapes.ChasmResult
-import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Error
-import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Success
+import io.github.charlietap.chasm.embedding.internal.throwAccessorFailure
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.transform.FieldValueDecoder
 import io.github.charlietap.chasm.runtime.error.InvocationError
@@ -22,15 +19,14 @@ fun readStructField(
     store: Store,
     struct: ReferenceValue.Struct,
     index: Int,
-): ChasmResult<FieldValue, ChasmError.ExecutionError> =
-    internalReadStructField(
+): FieldValue {
+    return internalReadStructField(
         store = store,
         struct = struct,
         index = index,
         fieldValueDecoder = ::FieldValueDecoder,
-    ).mapError(ModuleTrapError::toString)
-        .mapError(ChasmError::ExecutionError)
-        .fold(::Success, ::Error)
+    ).getOrElse(::throwAccessorFailure)
+}
 
 internal fun internalReadStructField(
     store: Store,

@@ -1,15 +1,10 @@
 package io.github.charlietap.chasm.embedding.internal
 
 import com.github.michaelbull.result.fold
-import com.github.michaelbull.result.map
-import com.github.michaelbull.result.mapError
 import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.decoder.ParallelWasmModuleDecoder
-import io.github.charlietap.chasm.decoder.error.ModuleDecoderError
-import io.github.charlietap.chasm.embedding.error.ChasmError.DecodeError
-import io.github.charlietap.chasm.embedding.error.ChasmError.ModuleError
-import io.github.charlietap.chasm.embedding.error.ChasmError.ValidationError
+import io.github.charlietap.chasm.embedding.error.ModuleError
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Error
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Success
@@ -24,12 +19,15 @@ suspend fun _module(
     bytes: ByteArray,
     config: ModuleConfig,
     taskExecutor: ParallelTaskExecutor,
-): ChasmResult<Module, DecodeError> {
-    return ParallelWasmModuleDecoder(config, bytes, taskExecutor)
-        .mapError(ModuleDecoderError::toString)
-        .mapError(::DecodeError)
-        .map { internal -> _module(config, internal, bytes) }
-        .fold(::Success, ::Error)
+): ChasmResult<Module, ModuleError> {
+    return ParallelWasmModuleDecoder(config, bytes, taskExecutor).fold(
+        success = { internal ->
+            Success(_module(config, internal, bytes))
+        },
+        failure = { error ->
+            Error(ModuleError.Malformed(error.toString()))
+        },
+    )
 }
 
 @InternalChasmApi
@@ -39,14 +37,20 @@ suspend fun _module(
     taskExecutor: ParallelTaskExecutor,
     validate: Boolean,
 ): ChasmResult<Module, ModuleError> {
-    if (!validate) return _module(bytes, config, taskExecutor)
 
-    return WasmModuleFactory(config, bytes, taskExecutor)
-        .mapError { error ->
+    if (!validate) {
+        return _module(bytes, config, taskExecutor)
+    }
+
+    return WasmModuleFactory(config, bytes, taskExecutor).fold(
+        success = { internal ->
+            Success(_module(config, internal, bytes, validated = true))
+        },
+        failure = { error ->
             when (error) {
-                is ModuleFactoryError.Malformed -> DecodeError(error.error.toString())
-                is ModuleFactoryError.Invalid -> ValidationError(error.error.toString())
+                is ModuleFactoryError.Malformed -> Error(ModuleError.Malformed(error.error.toString()))
+                is ModuleFactoryError.Invalid -> Error(ModuleError.Invalid(error.error.toString()))
             }
-        }.map { internal -> _module(config, internal, bytes, validated = true) }
-        .fold(::Success, ::Error)
+        },
+    )
 }

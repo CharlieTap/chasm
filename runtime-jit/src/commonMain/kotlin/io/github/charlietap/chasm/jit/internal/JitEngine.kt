@@ -105,7 +105,7 @@ internal class JitEngine(
 
         live()
 
-        classicDropStore(classic).orThrow()
+        classicDropStore(classic)
         managedStore.drop()
     }
 
@@ -116,7 +116,7 @@ internal class JitEngine(
         live()
         check(!jit.module.deallocated) { "the instance has already been dropped" }
 
-        classicDropInstance(classic, jit.embedding).orThrow()
+        classicDropInstance(classic, jit.embedding)
     }
 
     override fun addFuel(fuel: Long) {
@@ -124,28 +124,28 @@ internal class JitEngine(
         live()
         require(fuel >= 0) { "negative fuel $fuel" }
 
-        classicAddFuel(classic, fuel).orThrow()
+        classicAddFuel(classic, fuel)
     }
 
     override fun resetFuel() {
 
         live()
 
-        classicResetFuel(classic).orThrow()
+        classicResetFuel(classic)
     }
 
     override fun remainingFuel(): Long {
 
         live()
 
-        return classicRemainingFuel(classic).orThrow()
+        return classicRemainingFuel(classic)
     }
 
     override fun interrupt(): Boolean {
 
         live()
 
-        return classicInterrupt(classic).orThrow()
+        return classicInterrupt(classic)
     }
 
     override fun collect() {
@@ -1006,12 +1006,5 @@ internal class JitEngine(
 
     private companion object {
         val NULL_REFERENCE = ReferenceValue.Null(AbstractHeapType.None)
-    }
-}
-
-private fun <T> ChasmResult<T, *>.orThrow(): T {
-    return when (this) {
-        is ChasmResult.Success -> result
-        is ChasmResult.Error -> throw IllegalStateException(error.toString())
     }
 }

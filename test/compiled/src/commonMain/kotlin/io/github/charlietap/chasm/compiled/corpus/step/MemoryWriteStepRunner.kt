@@ -5,7 +5,6 @@ import io.github.charlietap.chasm.compiled.corpus.value.decodeBytes
 import io.github.charlietap.chasm.compiled.corpus.value.encodeValueBytes
 import io.github.charlietap.chasm.compiled.corpus.value.parseIndex
 import io.github.charlietap.chasm.embedding.memory.writeBytes
-import io.github.charlietap.chasm.embedding.shapes.fold
 import io.github.charlietap.corpus.lib.CorpusResult
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonObject
@@ -23,8 +22,10 @@ internal fun MemoryWriteStepRunner(
         ?: step["value"]?.jsonObject?.let(::encodeValueBytes)
         ?: return context.failure("memory write requires bytes or value")
 
-    return writeBytes(context.setup.store, memory, offset, bytes).fold(
-        { CorpusResult.Success },
-        { error -> context.failure("memory write failed", error.toString()) },
-    )
+    return try {
+        writeBytes(context.setup.store, memory, offset, bytes)
+        CorpusResult.Success
+    } catch (failure: IndexOutOfBoundsException) {
+        context.failure("memory write failed", failure.message)
+    }
 }

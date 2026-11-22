@@ -1,7 +1,8 @@
 package io.github.charlietap.chasm.integration
 
 import io.github.charlietap.chasm.config.RuntimeConfig
-import io.github.charlietap.chasm.embedding.error.ChasmError
+import io.github.charlietap.chasm.embedding.error.InstantiationError
+import io.github.charlietap.chasm.embedding.error.InvocationError
 import io.github.charlietap.chasm.embedding.instance
 import io.github.charlietap.chasm.embedding.module
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
@@ -11,9 +12,11 @@ import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.Instance
 import io.github.charlietap.chasm.embedding.shapes.Memory
 import io.github.charlietap.chasm.embedding.shapes.Store
+import io.github.charlietap.chasm.embedding.shapes.expect
 import io.github.charlietap.chasm.embedding.shapes.flatMap
 import io.github.charlietap.chasm.embedding.validate
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
+import io.github.charlietap.chasm.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.embedding.addFuel as embeddingAddFuel
 import io.github.charlietap.chasm.embedding.exports as embeddingExports
 import io.github.charlietap.chasm.embedding.extern.createExternRef as embeddingCreateExternRef
@@ -30,58 +33,77 @@ import io.github.charlietap.chasm.embedding.resetFuel as embeddingResetFuel
 
 class Interpreter : Engine {
 
-    override fun name(): String = INTERPRETER
+    override fun name(): String {
+        return INTERPRETER
+    }
 
     override fun instantiate(
         bytes: ByteArray,
         store: Store,
         imports: List<Import>,
         config: RuntimeConfig,
-    ): ChasmResult<Instance, ChasmError> =
-        module(bytes)
-            .flatMap { module ->
-                validate(module)
-            }.flatMap { module ->
-                instance(store, module, imports, config)
-            }
+    ): ChasmResult<Instance, InstantiationError<ReferenceValue.Exception>> {
+
+        val module = module(bytes)
+            .flatMap { decoded -> validate(decoded) }
+            .expect("the module is valid")
+
+        return instance(store, module, imports, config)
+    }
 
     override fun invoke(
         store: Store,
         instance: Instance,
         name: String,
         arguments: List<ExecutionValue>,
-    ): ChasmResult<List<ExecutionValue>, ChasmError> = embeddingInvoke(store, instance, name, arguments)
+    ): ChasmResult<List<ExecutionValue>, InvocationError<ReferenceValue.Exception>> {
+        return embeddingInvoke(store, instance, name, arguments)
+    }
 
     override fun exports(
         instance: Instance,
-    ): List<Export> = embeddingExports(instance)
+    ): List<Export> {
+        return embeddingExports(instance)
+    }
 
     override fun gc(
         store: Store,
-    ): ChasmResult<Unit, ChasmError> = embeddingGc(store)
+    ) {
+        embeddingGc(store)
+    }
 
     override fun addFuel(
         store: Store,
         units: Long,
-    ): ChasmResult<Unit, ChasmError> = embeddingAddFuel(store, units)
+    ) {
+        embeddingAddFuel(store, units)
+    }
 
     override fun remainingFuel(
         store: Store,
-    ): ChasmResult<Long, ChasmError> = embeddingRemainingFuel(store)
+    ): Long {
+        return embeddingRemainingFuel(store)
+    }
 
     override fun resetFuel(
         store: Store,
-    ): ChasmResult<Unit, ChasmError> = embeddingResetFuel(store)
+    ) {
+        embeddingResetFuel(store)
+    }
 
     override fun interrupt(
         store: Store,
-    ): ChasmResult<Boolean, ChasmError> = embeddingInterrupt(store)
+    ): Boolean {
+        return embeddingInterrupt(store)
+    }
 
     override fun growMemory(
         store: Store,
         memory: Memory,
         pagesToAdd: Int,
-    ): ChasmResult<Int, ChasmError> = embeddingGrowMemory(store, memory, pagesToAdd)
+    ): Int {
+        return embeddingGrowMemory(store, memory, pagesToAdd)
+    }
 
     override fun readBytes(
         store: Store,
@@ -89,30 +111,40 @@ class Interpreter : Engine {
         buffer: ByteArray,
         memoryPointer: Int,
         bytesToRead: Int,
-    ): ChasmResult<ByteArray, ChasmError> = embeddingReadBytes(store, memory, buffer, memoryPointer, bytesToRead)
+    ): ByteArray {
+        return embeddingReadBytes(store, memory, buffer, memoryPointer, bytesToRead)
+    }
 
     override fun readUtf8String(
         store: Store,
         memory: Memory,
         pointer: Int,
         stringLengthInBytes: Int,
-    ): ChasmResult<String, ChasmError> = embeddingReadUtf8String(store, memory, pointer, stringLengthInBytes)
+    ): String {
+        return embeddingReadUtf8String(store, memory, pointer, stringLengthInBytes)
+    }
 
     override fun readNullTerminatedUtf8String(
         store: Store,
         memory: Memory,
         pointer: Int,
-    ): ChasmResult<String, ChasmError> = embeddingReadNullTerminatedUtf8String(store, memory, pointer)
+    ): String {
+        return embeddingReadNullTerminatedUtf8String(store, memory, pointer)
+    }
 
     override fun writeUtf8String(
         store: Store,
         memory: Memory,
         pointer: Int,
         string: String,
-    ): ChasmResult<Unit, ChasmError> = embeddingWriteUtf8String(store, memory, pointer, string)
+    ) {
+        embeddingWriteUtf8String(store, memory, pointer, string)
+    }
 
     override fun createExternRef(
         store: Store,
         value: Any?,
-    ): ChasmResult<ExternRef, ChasmError> = embeddingCreateExternRef(store, value)
+    ): ExternRef {
+        return embeddingCreateExternRef(store, value)
+    }
 }

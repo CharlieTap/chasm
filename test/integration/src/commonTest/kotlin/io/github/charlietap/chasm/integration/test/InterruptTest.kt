@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.integration.test
 
 import io.github.charlietap.chasm.config.StoreConfig
-import io.github.charlietap.chasm.embedding.error.ChasmError
+import io.github.charlietap.chasm.embedding.error.TrapReason
 import io.github.charlietap.chasm.embedding.function
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Import
@@ -14,34 +14,35 @@ import io.github.charlietap.chasm.host.HostFunction
 import io.github.charlietap.chasm.host.writeI32
 import io.github.charlietap.chasm.integration.TestRunner
 import io.github.charlietap.chasm.integration.TestScope
+import io.github.charlietap.chasm.integration.assertTrapped
 import io.github.charlietap.chasm.integration.integrationTest
 import io.github.charlietap.chasm.integration.runner
-import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.value.NumberValue
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertIs
+import kotlin.test.assertFailsWith
+import kotlin.test.assertNotNull
 
 class InterruptTest {
 
     @Test
-    fun `interrupting a store that is not interruptible returns an error`() = integrationTest(INTERRUPT_FIXTURE) {
+    fun `interrupting a store that is not interruptible throws`() = integrationTest(INTERRUPT_FIXTURE) {
         val (store, _) = interruptRunner(StoreConfig())
 
-        assertIs<ChasmResult.Error<*>>(engine.interrupt(store), engine.name())
+        assertFailsWith<IllegalStateException>(engine.name()) { engine.interrupt(store) }
     }
 
     @Test
     fun `an interrupt stops the running call at its next check`() = integrationTest(INTERRUPT_FIXTURE) {
         val (_, runner) = interruptRunner(StoreConfig(interruptible = true))
 
-        assertEquals(interrupted(), runner.invoke("interrupt_then_spin"), engine.name())
+        assertTrapped(TrapReason.INTERRUPTED, runner.invoke("interrupt_then_spin"), engine.name())
     }
 
     @Test
     fun `a call after an interrupted one runs`() = integrationTest(INTERRUPT_FIXTURE) {
         val (_, runner) = interruptRunner(StoreConfig(interruptible = true))
-        assertEquals(interrupted(), runner.invoke("interrupt_then_spin"), engine.name())
+        assertTrapped(TrapReason.INTERRUPTED, runner.invoke("interrupt_then_spin"), engine.name())
 
         assertEquals(ChasmResult.Success(listOf(NumberValue.I32(0))), count(runner, 3), engine.name())
     }
@@ -50,7 +51,7 @@ class InterruptTest {
     fun `an interrupt made while no call runs reports it and has no effect`() = integrationTest(INTERRUPT_FIXTURE) {
         val (store, runner) = interruptRunner(StoreConfig(interruptible = true))
 
-        assertEquals(ChasmResult.Success(false), engine.interrupt(store), engine.name())
+        assertEquals(false, engine.interrupt(store), engine.name())
         assertEquals(ChasmResult.Success(listOf(NumberValue.I32(0))), count(runner, 3), engine.name())
     }
 
@@ -58,8 +59,8 @@ class InterruptTest {
     fun `an interrupt lands at the next function entry and the next loop iteration`() = integrationTest(INTERRUPT_FIXTURE) {
         val (_, runner) = interruptRunner(StoreConfig(interruptible = true))
 
-        assertEquals(interrupted(), runner.invoke("interrupt_then_call"), engine.name())
-        assertEquals(interrupted(), runner.invoke("interrupt_then_spin"), engine.name())
+        assertTrapped(TrapReason.INTERRUPTED, runner.invoke("interrupt_then_call"), engine.name())
+        assertTrapped(TrapReason.INTERRUPTED, runner.invoke("interrupt_then_spin"), engine.name())
     }
 
     @Test
@@ -72,23 +73,23 @@ class InterruptTest {
         assertEquals(ChasmResult.Success(listOf(NumberValue.I32(0))), count(bothRunner, 3), engine.name())
         assertEquals(ChasmResult.Success(listOf(NumberValue.I32(0))), count(meteredRunner, 3), engine.name())
         assertEquals(engine.remainingFuel(metered), engine.remainingFuel(both), engine.name())
-        assertEquals(ChasmResult.Success(0L), engine.remainingFuel(both), engine.name())
+        assertEquals(0L, engine.remainingFuel(both), engine.name())
 
         engine.addFuel(both, 100)
-        assertEquals(fuelExhausted(), bothRunner.invoke("spin"), engine.name())
+        assertTrapped(TrapReason.FUEL_EXHAUSTED, bothRunner.invoke("spin"), engine.name())
         engine.addFuel(both, Long.MAX_VALUE)
-        assertEquals(interrupted(), bothRunner.invoke("interrupt_then_call"), engine.name())
+        assertTrapped(TrapReason.INTERRUPTED, bothRunner.invoke("interrupt_then_call"), engine.name())
     }
 
     @Test
     fun `a metered interruptible store traps on an interrupt or on running out of fuel`() = integrationTest(INTERRUPT_FIXTURE) {
         val (store, runner) = interruptRunner(StoreConfig(meterFuel = true, interruptible = true))
         engine.addFuel(store, Long.MAX_VALUE)
-        assertEquals(interrupted(), runner.invoke("interrupt_then_spin"), engine.name())
+        assertTrapped(TrapReason.INTERRUPTED, runner.invoke("interrupt_then_spin"), engine.name())
 
         val (metered, meteredRunner) = interruptRunner(StoreConfig(meterFuel = true, interruptible = true))
         engine.addFuel(metered, 100)
-        assertEquals(fuelExhausted(), meteredRunner.invoke("spin"), engine.name())
+        assertTrapped(TrapReason.FUEL_EXHAUSTED, meteredRunner.invoke("spin"), engine.name())
     }
 
     @Test
@@ -97,18 +98,18 @@ class InterruptTest {
         // Enough for the interrupting function's entry check, none for its loop's.
         engine.addFuel(store, 1)
 
-        assertEquals(interrupted(), runner.invoke("interrupt_then_spin"), engine.name())
+        assertTrapped(TrapReason.INTERRUPTED, runner.invoke("interrupt_then_spin"), engine.name())
     }
 
     @Test
     fun `an interrupt made during a call reports that it landed`() = integrationTest(INTERRUPT_FIXTURE) {
-        var interruptResult: ChasmResult<*, *>? = null
+        var interruptResult: Boolean? = null
         val (_, runner) = interruptRunner(StoreConfig(interruptible = true)) { store, _ ->
             interruptResult = engine.interrupt(store)
         }
 
-        assertEquals(interrupted(), runner.invoke("callback_then_spin"), engine.name())
-        assertEquals(ChasmResult.Success(true), interruptResult, engine.name())
+        assertTrapped(TrapReason.INTERRUPTED, runner.invoke("callback_then_spin"), engine.name())
+        assertEquals(true, interruptResult, engine.name())
     }
 
     @Test
@@ -118,8 +119,8 @@ class InterruptTest {
             callbackResult = runner.invoke("interrupt_then_spin")
         }
 
-        assertEquals(interrupted(), runner.invoke("callback_then_spin"), engine.name())
-        assertEquals(interrupted(), callbackResult, engine.name())
+        assertTrapped(TrapReason.INTERRUPTED, runner.invoke("callback_then_spin"), engine.name())
+        assertTrapped(TrapReason.INTERRUPTED, assertNotNull(callbackResult, engine.name()), engine.name())
     }
 
     @Test
@@ -131,20 +132,16 @@ class InterruptTest {
         }
 
         assertEquals(ChasmResult.Success(emptyList()), runner.invoke("callback"), engine.name())
-        assertEquals(interrupted(), callbackResult, engine.name())
+        assertTrapped(TrapReason.INTERRUPTED, assertNotNull(callbackResult, engine.name()), engine.name())
     }
 
     private fun count(
         runner: TestRunner,
         times: Int,
     ) = runner.invoke("count", listOf(NumberValue.I32(times)))
-
-    private fun fuelExhausted() = ChasmResult.Error(ChasmError.ExecutionError(InvocationError.FuelExhausted.toString()))
 }
 
 internal const val INTERRUPT_FIXTURE = "interrupt"
-
-internal fun interrupted() = ChasmResult.Error(ChasmError.ExecutionError(InvocationError.Interrupted.toString()))
 
 internal fun TestScope.interruptRunner(
     config: StoreConfig,

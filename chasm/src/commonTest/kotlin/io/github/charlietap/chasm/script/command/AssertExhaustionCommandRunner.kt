@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.script.command
 
-import io.github.charlietap.chasm.embedding.error.ChasmError
-import io.github.charlietap.chasm.runtime.error.InvocationError
+import io.github.charlietap.chasm.embedding.error.ExecutionError
+import io.github.charlietap.chasm.embedding.error.TrapReason
 import io.github.charlietap.chasm.script.ScriptContext
 import io.github.charlietap.chasm.script.action.ActionResult
 import io.github.charlietap.chasm.script.action.ActionRunner
@@ -29,7 +29,7 @@ fun AssertExhaustionCommandRunner(
         }
         is ActionResult.Failure -> {
             val error = result.error
-            if (error is ChasmError.ExecutionError && error.error == InvocationError.CallStackExhausted.toString()) {
+            if (error is ExecutionError.Trapped && error.trap.reason == TrapReason.CALL_STACK_EXHAUSTED) {
                 CommandResult.Success
             } else {
                 CommandResult.Failure(command, result.reason)

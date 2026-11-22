@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.embedding
 
-import io.github.charlietap.chasm.embedding.error.ChasmError
+import io.github.charlietap.chasm.embedding.error.ExecutionError
 import io.github.charlietap.chasm.embedding.fixture.publicInstance
 import io.github.charlietap.chasm.embedding.fixture.publicStore
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
@@ -65,7 +65,7 @@ class PrepareFunctionTest {
     fun `preparing a missing or non-function export returns FunctionNotFound`() {
         val name = "missing"
         val expected = ChasmResult.Error(
-            ChasmError.ExecutionError(InvocationError.FunctionNotFound(name).toString()),
+            ExecutionError.Rejected(InvocationError.FunctionNotFound(name).toString()),
         )
         val store = publicStore()
 
@@ -88,7 +88,7 @@ class PrepareFunctionTest {
             store = store.store,
         )
         val expected = ChasmResult.Error(
-            ChasmError.ExecutionError(InvocationError.InvocationOfADeinstantiatedInstance.toString()),
+            ExecutionError.Rejected(InvocationError.InvocationOfADeinstantiatedInstance.toString()),
         )
 
         assertEquals(expected, prepareFunction(store, instance, "function"))
@@ -110,7 +110,7 @@ class PrepareFunctionTest {
         dropInstance(store, instance)
 
         val expected = ChasmResult.Error(
-            ChasmError.ExecutionError(InvocationError.InvocationOfADeinstantiatedInstance.toString()),
+            ExecutionError.Rejected(InvocationError.InvocationOfADeinstantiatedInstance.toString()),
         )
         assertEquals(expected, prepared())
     }
@@ -130,7 +130,7 @@ class PrepareFunctionTest {
 
         dropStore(store)
 
-        val expected = ChasmResult.Error(ChasmError.ExecutionError(InvocationError.StoreDropped.toString()))
+        val expected = ChasmResult.Error(ExecutionError.Rejected(InvocationError.StoreDropped.toString()))
         assertEquals(expected, prepared())
 
         internalStore.functions += hostFunctionInstance { _, results -> results.writeI64(0, 9L) }

@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.integration.test
 
-import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Memory
 import io.github.charlietap.chasm.embedding.shapes.expect
 import io.github.charlietap.chasm.integration.TestRunner
@@ -24,7 +23,7 @@ class StringTest {
             stringLengthInBytes = expected.encodeToByteArray().size,
         )
 
-        assertEquals(ChasmResult.Success(expected), actual, engine.name())
+        assertEquals(expected, actual, engine.name())
     }
 
     @Test
@@ -46,7 +45,7 @@ class StringTest {
             stringLengthInBytes = expected.encodeToByteArray().size,
         )
 
-        assertEquals(ChasmResult.Success(expected), actual, engine.name())
+        assertEquals(expected, actual, engine.name())
     }
 
     @Test
@@ -61,7 +60,7 @@ class StringTest {
             pointer = 1,
         )
 
-        assertEquals(ChasmResult.Success(expected), actual, engine.name())
+        assertEquals(expected, actual, engine.name())
     }
 
     private fun TestRunner.memory(): Memory =

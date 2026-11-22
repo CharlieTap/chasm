@@ -11,7 +11,7 @@ import io.github.charlietap.chasm.ast.instruction.VectorInstruction
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.config.RuntimeConfig
-import io.github.charlietap.chasm.embedding.error.ChasmError
+import io.github.charlietap.chasm.embedding.error.ExecutionError
 import io.github.charlietap.chasm.embedding.invoke
 import io.github.charlietap.chasm.embedding.module
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
@@ -141,9 +141,9 @@ class ParallelInstantiationTest {
         )
 
         assertEquals(1, taskExecutor.executionCount)
-        val error = assertIs<ChasmResult.Error<ChasmError.ExecutionError>>(result)
+        val error = assertIs<ChasmResult.Error<ExecutionError.Unsupported>>(result)
         assertEquals(
-            ChasmError.ExecutionError(InstantiationError.UnsupportedThreadsModule.toString()),
+            ExecutionError.Unsupported(InstantiationError.UnsupportedThreadsModule.toString()),
             error.error,
         )
         assertEquals(0, store.store.program.size)

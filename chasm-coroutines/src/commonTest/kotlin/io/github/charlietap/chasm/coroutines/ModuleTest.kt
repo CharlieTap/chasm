@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.coroutines
 
-import io.github.charlietap.chasm.embedding.error.ChasmError
+import io.github.charlietap.chasm.embedding.error.ModuleError
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Module
 import kotlinx.coroutines.test.runTest
@@ -20,16 +20,16 @@ class ModuleTest {
     fun `reports an invalid module as a validation error`() = runTest {
         val actual = module(INVALID_MODULE, validate = true)
 
-        assertIs<ChasmResult.Error<ChasmError.ModuleError>>(actual)
-        assertIs<ChasmError.ValidationError>(actual.error)
+        assertIs<ChasmResult.Error<ModuleError>>(actual)
+        assertIs<ModuleError.Invalid>(actual.error)
     }
 
     @Test
     fun `reports a malformed module as a decode error`() = runTest {
         val actual = module(MALFORMED_MODULE, validate = true)
 
-        assertIs<ChasmResult.Error<ChasmError.ModuleError>>(actual)
-        assertIs<ChasmError.DecodeError>(actual.error)
+        assertIs<ChasmResult.Error<ModuleError>>(actual)
+        assertIs<ModuleError.Malformed>(actual.error)
     }
 
     @Test

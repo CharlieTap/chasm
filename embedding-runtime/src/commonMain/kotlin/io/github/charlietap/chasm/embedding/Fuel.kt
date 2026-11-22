@@ -1,8 +1,8 @@
 package io.github.charlietap.chasm.embedding
 
-import io.github.charlietap.chasm.embedding.error.ChasmError
-import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Store
+import io.github.charlietap.chasm.runtime.error.InvocationError
+import io.github.charlietap.chasm.runtime.store.Fuel
 
 /**
  * Adds [amount] units to a store created with `StoreConfig(meterFuel = true)`, saturating at
@@ -13,34 +13,30 @@ import io.github.charlietap.chasm.embedding.shapes.Store
 fun addFuel(
     store: Store,
     amount: Long,
-): ChasmResult<Unit, ChasmError.ExecutionError> {
-    val fuel = store.store.fuel
-    if (!fuel.metered) return unmeteredError()
-    if (amount < 0L) {
-        return ChasmResult.Error(ChasmError.ExecutionError("Fuel added must be non-negative"))
-    }
+) {
+
+    val fuel = meteredFuel(store)
+    require(amount >= 0L) { "Fuel added must be non-negative" }
 
     fuel.remaining += amount.coerceAtMost(Long.MAX_VALUE - fuel.remaining)
-    return ChasmResult.Success(Unit)
 }
 
 /** Empties a metered store's fuel; call it only while none of its calls run. */
-fun resetFuel(store: Store): ChasmResult<Unit, ChasmError.ExecutionError> {
-    val fuel = store.store.fuel
-    if (!fuel.metered) return unmeteredError()
-
-    fuel.remaining = 0L
-    return ChasmResult.Success(Unit)
+fun resetFuel(store: Store) {
+    meteredFuel(store).remaining = 0L
 }
 
 /** The fuel a metered store has left; call it only while none of its calls run. */
-fun remainingFuel(store: Store): ChasmResult<Long, ChasmError.ExecutionError> {
-    val fuel = store.store.fuel
-    if (!fuel.metered) return unmeteredError()
-
-    return ChasmResult.Success(fuel.remaining)
+fun remainingFuel(store: Store): Long {
+    return meteredFuel(store).remaining
 }
 
-private fun unmeteredError() = ChasmResult.Error(
-    ChasmError.ExecutionError("Fuel metering is not enabled for this store"),
-)
+private fun meteredFuel(store: Store): Fuel {
+
+    check(!store.isDropped) { InvocationError.StoreDropped.toString() }
+
+    val fuel = store.store.fuel
+    check(fuel.metered) { "Fuel metering is not enabled for this store" }
+
+    return fuel
+}

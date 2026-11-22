@@ -55,7 +55,7 @@ internal class ChasmClassImplementationGenerator {
         val call = CodeBlock.of("%N(%L)", control.function.alias, arguments.joinToCode())
         return control.signature()
             .addModifiers(KModifier.OVERRIDE)
-            .addStatement("return %L", api.storeControlCall(call, control.failure))
+            .addStatement("return %L", call)
             .build()
     }
 
@@ -126,7 +126,7 @@ internal class ChasmClassImplementationGenerator {
         wasmInterface.properties.forEach { property ->
             val proxy = property.implementation as GlobalProxy
             addProperty(importableProperty("_${property.name}", proxy.name, api.global, "global", "global", api))
-            addProperty(globalProperty(property, proxy, api))
+            addProperty(globalProperty(property, api))
         }
 
         wasmInterface.memories.filter { memory -> memory.exposed }.forEach { memory ->
@@ -157,7 +157,6 @@ internal class ChasmClassImplementationGenerator {
 
     private fun globalProperty(
         property: Property,
-        proxy: GlobalProxy,
         api: EmbeddingApi,
     ): PropertySpec {
         return PropertySpec.builder(property.name, property.type.asTypeName()).apply {
@@ -166,7 +165,7 @@ internal class ChasmClassImplementationGenerator {
             mutable(property.const.not())
             getter(
                 FunSpec.getterBuilder()
-                    .addStatement("return %L", api.globalRead("_${property.name}", property.type, "Failed to read global ${proxy.name}"))
+                    .addStatement("return %L", api.globalRead("_${property.name}", property.type))
                     .build(),
             )
 
@@ -174,7 +173,7 @@ internal class ChasmClassImplementationGenerator {
                 setter(
                     FunSpec.setterBuilder()
                         .addParameter("newValue", property.type.asTypeName())
-                        .addStatement("%L", api.globalWrite("_${property.name}", property.type, "newValue", "Failed to write global ${proxy.name}"))
+                        .addStatement("%L", api.globalWrite("_${property.name}", property.type, "newValue"))
                         .build(),
                 )
             }
@@ -250,7 +249,6 @@ internal class ChasmClassImplementationGenerator {
                         api.accessorCall(
                             api.writeInt,
                             CodeBlock.of("%L, %L, %L.size", DEFAULT_MEMORY_BACKING_NAME, allocation, bytes),
-                            "Failed to write string length",
                         ),
                     )
                     addStatement(
@@ -258,7 +256,6 @@ internal class ChasmClassImplementationGenerator {
                         api.accessorCall(
                             api.writeBytes,
                             CodeBlock.of("%L, %L + 4, %L", DEFAULT_MEMORY_BACKING_NAME, allocation, bytes),
-                            "Failed to write string",
                         ),
                     )
                 }
@@ -281,7 +278,6 @@ internal class ChasmClassImplementationGenerator {
             api.accessorCall(
                 api.writeBytes,
                 CodeBlock.of("%L, %L, %L", DEFAULT_MEMORY_BACKING_NAME, allocation, bytes),
-                "Failed to write string",
             ),
         )
     }
@@ -372,7 +368,6 @@ internal class ChasmClassImplementationGenerator {
 
         val callConvention = api.functionCallConvention
         val pointerResult = callConvention.result(function, 0, Scalar.Integer)
-        val failure = "Failed to read string result for ${function.name}"
 
         when (val encoding = requireNotNull(function.returns.stringEncodingStrategy)) {
             StringEncodingStrategy.POINTER_AND_LENGTH -> {
@@ -380,25 +375,25 @@ internal class ChasmClassImplementationGenerator {
                 addStatement("val length = %L", callConvention.result(function, 1, Scalar.Integer))
                 addStatement(
                     "val result = %L",
-                    api.accessorCall(api.readUtf8String, CodeBlock.of("%L, pointer, length", DEFAULT_MEMORY_BACKING_NAME), failure),
+                    api.accessorCall(api.readUtf8String, CodeBlock.of("%L, pointer, length", DEFAULT_MEMORY_BACKING_NAME)),
                 )
             }
             StringEncodingStrategy.NULL_TERMINATED -> {
                 addStatement("val pointer = %L", pointerResult)
                 addStatement(
                     "val result = %L",
-                    api.accessorCall(api.readNullTerminatedUtf8String, CodeBlock.of("%L, pointer", DEFAULT_MEMORY_BACKING_NAME), failure),
+                    api.accessorCall(api.readNullTerminatedUtf8String, CodeBlock.of("%L, pointer", DEFAULT_MEMORY_BACKING_NAME)),
                 )
             }
             StringEncodingStrategy.LENGTH_PREFIXED -> {
                 addStatement("val pointer = %L", pointerResult)
                 addStatement(
                     "val length = %L",
-                    api.accessorCall(api.readInt, CodeBlock.of("%L, pointer", DEFAULT_MEMORY_BACKING_NAME), "Failed to read string length"),
+                    api.accessorCall(api.readInt, CodeBlock.of("%L, pointer", DEFAULT_MEMORY_BACKING_NAME)),
                 )
                 addStatement(
                     "val result = %L",
-                    api.accessorCall(api.readUtf8String, CodeBlock.of("%L, pointer + 4, length", DEFAULT_MEMORY_BACKING_NAME), failure),
+                    api.accessorCall(api.readUtf8String, CodeBlock.of("%L, pointer + 4, length", DEFAULT_MEMORY_BACKING_NAME)),
                 )
             }
             StringEncodingStrategy.PACKED_POINTER_AND_LENGTH -> {
@@ -407,7 +402,7 @@ internal class ChasmClassImplementationGenerator {
                 addStatement("val length = packed.toInt()")
                 addStatement(
                     "val result = %L",
-                    api.accessorCall(api.readUtf8String, CodeBlock.of("%L, pointer, length", DEFAULT_MEMORY_BACKING_NAME), failure),
+                    api.accessorCall(api.readUtf8String, CodeBlock.of("%L, pointer, length", DEFAULT_MEMORY_BACKING_NAME)),
                 )
             }
             StringEncodingStrategy.GC_UTF16_ARRAY,
@@ -454,7 +449,6 @@ internal class ChasmClassImplementationGenerator {
                         api.accessorCall(
                             api.readBytes,
                             CodeBlock.of("memory, buffer, memoryPointer, bytesToRead, bufferPointer"),
-                            "Failed to read memory",
                         ),
                     ).build(),
             )
@@ -470,7 +464,6 @@ internal class ChasmClassImplementationGenerator {
                         api.accessorCall(
                             api.writeBytes,
                             CodeBlock.of("memory, pointer, buffer, bufferPointer, bytesToWrite"),
-                            "Failed to write memory",
                         ),
                     ).build(),
             )
