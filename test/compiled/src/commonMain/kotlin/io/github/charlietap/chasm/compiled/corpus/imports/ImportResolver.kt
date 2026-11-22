@@ -5,6 +5,7 @@ import at.released.weh.host.EmbedderHost
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
+import io.github.charlietap.chasm.compiled.corpus.CorpusTimingRecorder
 import io.github.charlietap.chasm.compiled.corpus.value.defaultValue
 import io.github.charlietap.chasm.compiled.corpus.value.parseFixtureValue
 import io.github.charlietap.chasm.compiled.corpus.wasi.WasiHostFactory
@@ -23,18 +24,20 @@ import io.github.charlietap.corpus.lib.fixture.Fixture
 import io.github.charlietap.corpus.lib.fixture.FixtureImport
 import io.github.charlietap.corpus.lib.fixture.FixtureTest
 
-internal typealias ImportResolver = (Fixture, Store, Module, FixtureTest?) -> Result<ImportResolution, CorpusResult>
+internal typealias ImportResolver = (Fixture, Store, Module, FixtureTest?, CorpusTimingRecorder) -> Result<ImportResolution, CorpusResult>
 
 internal fun ImportResolver(
     fixture: Fixture,
     store: Store,
     module: Module,
     test: FixtureTest?,
+    timings: CorpusTimingRecorder,
 ): Result<ImportResolution, CorpusResult> = ImportResolver(
     fixture = fixture,
     store = store,
     module = module,
     test = test,
+    timings = timings,
     wasiHostFactory = ::WasiHostFactory,
     stubFunctionFactory = ::StubFunctionFactory,
 )
@@ -44,6 +47,7 @@ private fun ImportResolver(
     store: Store,
     module: Module,
     test: FixtureTest?,
+    timings: CorpusTimingRecorder,
     wasiHostFactory: WasiHostFactory,
     stubFunctionFactory: StubFunctionFactory,
 ): Result<ImportResolution, CorpusResult> {
@@ -78,7 +82,7 @@ private fun ImportResolver(
         val fixtureImport = fixture.findImport(definition)
         when (val type = definition.type) {
             is ExternalType.Function -> {
-                val function = stubFunctionFactory(store, type.functionType, fixtureImport, captures)
+                val function = stubFunctionFactory(store, type.functionType, fixtureImport, captures, timings)
                 imports += Import(definition.moduleName, definition.entityName, function)
             }
             is ExternalType.Global -> {

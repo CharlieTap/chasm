@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.compiled.corpus.step
 
+import io.github.charlietap.chasm.compiled.corpus.CorpusTimingRecorder
 import io.github.charlietap.chasm.compiled.corpus.ext.string
 import io.github.charlietap.chasm.compiled.corpus.ext.stringOrDefault
 import io.github.charlietap.chasm.compiled.corpus.value.decodeBytes
@@ -28,7 +29,7 @@ internal fun MemoryReadStepRunner(
     val offset = parseIndex(step.getValue("offset"), context.captures)
 
     step["capture"]?.jsonObject?.let { capture ->
-        val value = readValue(store, memory, offset, capture.string("type"))
+        val value = readValue(context.timings, store, memory, offset, capture.string("type"))
             ?: return context.failure("memory capture failed")
         context.captures[capture.string("capture")] = value
         return CorpusResult.Success
@@ -40,8 +41,9 @@ internal fun MemoryReadStepRunner(
         ?: assertion["value"]?.jsonObject?.let(::encodeValueBytes)
         ?: return context.failure("unsupported memory assertion")
 
+    val buffer = ByteArray(expected.size)
     val actual = try {
-        readBytes(store, memory, ByteArray(expected.size), offset, expected.size)
+        context.timings.execute { readBytes(store, memory, buffer, offset, expected.size) }
     } catch (failure: IndexOutOfBoundsException) {
         return context.failure("memory read failed", failure.message)
     }
@@ -54,14 +56,16 @@ internal fun MemoryReadStepRunner(
 }
 
 private fun readValue(
+    timings: CorpusTimingRecorder,
     store: Store,
     memory: Memory,
     offset: Int,
     type: String,
 ): ExecutionValue? {
     val size = if (type == "i64" || type == "f64") 8 else 4
+    val buffer = ByteArray(size)
     val bytes = try {
-        readBytes(store, memory, ByteArray(size), offset, size)
+        timings.execute { readBytes(store, memory, buffer, offset, size) }
     } catch (_: IndexOutOfBoundsException) {
         return null
     }

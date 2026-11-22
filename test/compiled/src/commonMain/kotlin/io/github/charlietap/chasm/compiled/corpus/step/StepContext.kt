@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.compiled.corpus.step
 
+import io.github.charlietap.chasm.compiled.corpus.CorpusTimingRecorder
 import io.github.charlietap.chasm.compiled.corpus.failure
 import io.github.charlietap.chasm.compiled.corpus.instance.RuntimeSetup
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
@@ -11,6 +12,7 @@ internal data class StepContext(
     val location: String,
     val setup: RuntimeSetup,
     val captures: MutableMap<String, ExecutionValue>,
+    val timings: CorpusTimingRecorder,
 )
 
 internal fun StepContext.failure(

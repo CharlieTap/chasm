@@ -142,7 +142,7 @@ class ChasmCorpusRunner(
         if (fixture.tests.isEmpty()) {
             val setup = timings.instantiate {
                 val store = store()
-                instantiate(fixture, store, validated, null)
+                instantiate(fixture, store, validated, null, timings)
             }
             return setup.fold(
                 { setup ->
@@ -157,7 +157,7 @@ class ChasmCorpusRunner(
         fixture.tests.forEachIndexed { testIndex, test ->
             val (store, setupResult) = timings.instantiate {
                 val store = store()
-                store to instantiate(fixture, store, validated, test)
+                store to instantiate(fixture, store, validated, test, timings)
             }
             val setup = setupResult.fold(
                 { setup ->
@@ -171,16 +171,15 @@ class ChasmCorpusRunner(
 
                 val captures = mutableMapOf<String, ExecutionValue>()
                 test.steps.forEachIndexed { stepIndex, step ->
-                    val result = timings.execute {
-                        runStep(
-                            fixture = fixture,
-                            context = "test[$testIndex] step[$stepIndex]",
-                            store = store,
-                            setup = setup,
-                            captures = captures,
-                            step = step,
-                        )
-                    }
+                    val result = runStep(
+                        fixture = fixture,
+                        context = "test[$testIndex] step[$stepIndex]",
+                        store = store,
+                        setup = setup,
+                        captures = captures,
+                        step = step,
+                        timings = timings,
+                    )
                     if (result != CorpusResult.Success) return result
                 }
             } finally {
@@ -196,8 +195,9 @@ class ChasmCorpusRunner(
         store: Store,
         module: Module,
         test: FixtureTest?,
+        timings: CorpusTimingRecorder,
     ): RunnerResult<RuntimeSetup> {
-        val importResolution = when (val result = resolveImports(fixture, store, module, test)) {
+        val importResolution = when (val result = resolveImports(fixture, store, module, test, timings)) {
             is RunnerResult.Success -> result.value
             is RunnerResult.Error -> return RunnerResult.Error(result.error)
         }
@@ -232,6 +232,7 @@ class ChasmCorpusRunner(
         store: Store,
         module: Module,
         test: FixtureTest?,
+        timings: CorpusTimingRecorder,
     ): RunnerResult<ImportResolution> {
         val imports = mutableListOf<Import>()
         val memories = mutableMapOf<String, Memory>()
@@ -273,7 +274,8 @@ class ChasmCorpusRunner(
             when (val type = definition.type) {
                 is ExternalType.Function -> {
                     val fixtureImport = fixture.findImport(definition.moduleName, definition.entityName)
-                    fixtureImport?.stub?.capture?.let { capture ->
+                    val capture = fixtureImport?.stub?.capture
+                    if (capture != null) {
                         val existing = importCaptures[capture.name]
                         val maxCalls = capture.maxCalls ?: Int.MAX_VALUE
                         if (existing == null) {
@@ -282,20 +284,24 @@ class ChasmCorpusRunner(
                             existing.maxCalls = maxOf(existing.maxCalls, maxCalls)
                         }
                     }
+                    val trap = fixtureImport?.stub?.trap
+                    val defaults = defaultResults(type.functionType, fixtureImport).map { value -> value.toLongFromBoxed() }
                     imports += Import(
                         definition.moduleName,
                         definition.entityName,
                         function(store, type.functionType) { parameters, results ->
                             val stack = contextOf<HostStack>()
-                            val params = List(type.functionType.params.types.size) { index ->
-                                stack[parameters + index].toExecutionValue(type.functionType.params.types[index])
+                            if (capture != null) {
+                                timings.harness {
+                                    val params = List(type.functionType.params.types.size) { index ->
+                                        stack[parameters + index].toExecutionValue(type.functionType.params.types[index])
+                                    }
+                                    importCaptures.getValue(capture.name).append(capture, params)
+                                }
                             }
-                            fixtureImport?.stub?.capture?.let { capture ->
-                                importCaptures.getValue(capture.name).append(capture, params)
-                            }
-                            fixtureImport?.stub?.trap?.let(::error)
-                            defaultResults(type.functionType, fixtureImport).forEachIndexed { index, value ->
-                                stack[results + index] = value.toLongFromBoxed()
+                            trap?.let(::error)
+                            defaults.forEachIndexed { index, value ->
+                                stack[results + index] = value
                             }
                         },
                     )
@@ -374,14 +380,15 @@ class ChasmCorpusRunner(
         setup: RuntimeSetup,
         captures: MutableMap<String, ExecutionValue>,
         step: JsonObject,
+        timings: CorpusTimingRecorder,
     ): CorpusResult {
         return when (val type = step.string("type")) {
-            "function.invoke" -> runFunctionInvoke(fixture, context, store, setup, captures, step)
-            "memory.write" -> runMemoryWrite(fixture, context, store, setup, captures, step)
-            "memory.read" -> runMemoryRead(fixture, context, store, setup, captures, step)
-            "memory.grow" -> runMemoryGrow(fixture, context, store, setup, captures, step)
-            "global.write" -> runGlobalWrite(fixture, context, store, setup, captures, step)
-            "global.read" -> runGlobalRead(fixture, context, store, setup, captures, step)
+            "function.invoke" -> runFunctionInvoke(fixture, context, store, setup, captures, step, timings)
+            "memory.write" -> runMemoryWrite(fixture, context, store, setup, captures, step, timings)
+            "memory.read" -> runMemoryRead(fixture, context, store, setup, captures, step, timings)
+            "memory.grow" -> runMemoryGrow(fixture, context, store, setup, captures, step, timings)
+            "global.write" -> runGlobalWrite(fixture, context, store, setup, captures, step, timings)
+            "global.read" -> runGlobalRead(fixture, context, store, setup, captures, step, timings)
             "table.write", "table.read" -> CorpusResult.Skipped(fixture.name, "$type steps are not supported yet")
             else -> failure(fixture, context, "unsupported corpus step", type)
         }
@@ -394,6 +401,7 @@ class ChasmCorpusRunner(
         setup: RuntimeSetup,
         captures: MutableMap<String, ExecutionValue>,
         step: JsonObject,
+        timings: CorpusTimingRecorder,
     ): CorpusResult {
         val function = step.string("function")
         val functionType = setup.functionType(store, function)
@@ -405,7 +413,7 @@ class ChasmCorpusRunner(
         val hostEffects = step["host_effects"]?.jsonObject
         val expectedExitCode = hostEffects?.get("exit_code")?.jsonPrimitive?.intOrNull
 
-        val result = when (val invocation = invoke(store, setup.instance, function, params)) {
+        val result = when (val invocation = timings.execute { invoke(store, setup.instance, function, params) }) {
             is ChasmResult.Success -> invocation.result
             is ChasmResult.Error -> {
                 val actualExitCode = hostFunctionExitCodeOrNull(invocation.error)
@@ -527,6 +535,7 @@ class ChasmCorpusRunner(
         setup: RuntimeSetup,
         captures: MutableMap<String, ExecutionValue>,
         step: JsonObject,
+        timings: CorpusTimingRecorder,
     ): CorpusResult {
         val memory = resolveMemory(setup, step.stringOrDefault("memory", "memory"))
             ?: return failure(fixture, context, "memory not found", step["memory"]?.toString())
@@ -535,7 +544,7 @@ class ChasmCorpusRunner(
             ?: return failure(fixture, context, "memory write requires bytes or value")
 
         return try {
-            writeBytes(store, memory, offset, bytes)
+            timings.execute { writeBytes(store, memory, offset, bytes) }
             CorpusResult.Success
         } catch (failure: IndexOutOfBoundsException) {
             failure(fixture, context, "memory write failed", failure.message)
@@ -549,13 +558,14 @@ class ChasmCorpusRunner(
         setup: RuntimeSetup,
         captures: MutableMap<String, ExecutionValue>,
         step: JsonObject,
+        timings: CorpusTimingRecorder,
     ): CorpusResult {
         val memory = resolveMemory(setup, step.stringOrDefault("memory", "memory"))
             ?: return failure(fixture, context, "memory not found", step["memory"]?.toString())
         val offset = parseIndex(step.getValue("offset"), captures)
         val capture = step["capture"]?.jsonObject
         if (capture != null) {
-            val value = readMemoryValue(fixture, context, store, memory, offset, capture.string("type"))
+            val value = readMemoryValue(fixture, context, store, memory, offset, capture.string("type"), timings)
                 ?: return failure(fixture, context, "memory capture failed")
             captures[capture.string("capture")] = value
             return CorpusResult.Success
@@ -568,7 +578,7 @@ class ChasmCorpusRunner(
         val buffer = ByteArray(expected.size)
 
         val actual = try {
-            readBytes(store, memory, buffer, offset, expected.size)
+            timings.execute { readBytes(store, memory, buffer, offset, expected.size) }
         } catch (failure: IndexOutOfBoundsException) {
             return failure(fixture, context, "memory read failed", failure.message)
         }
@@ -587,11 +597,12 @@ class ChasmCorpusRunner(
         setup: RuntimeSetup,
         captures: MutableMap<String, ExecutionValue>,
         step: JsonObject,
+        timings: CorpusTimingRecorder,
     ): CorpusResult {
         val memory = resolveMemory(setup, step.stringOrDefault("memory", "memory"))
             ?: return failure(fixture, context, "memory not found", step["memory"]?.toString())
         val pagesToAdd = parseIndex(step.getValue("pages"), captures)
-        val actual = NumberValue.I32(growMemory(store, memory, pagesToAdd))
+        val actual = NumberValue.I32(timings.execute { growMemory(store, memory, pagesToAdd) })
 
         step["capture"]?.jsonPrimitive?.contentOrNull?.let { capture ->
             captures[capture] = actual
@@ -615,13 +626,14 @@ class ChasmCorpusRunner(
         setup: RuntimeSetup,
         captures: MutableMap<String, ExecutionValue>,
         step: JsonObject,
+        timings: CorpusTimingRecorder,
     ): CorpusResult {
         val global = resolveGlobal(setup, step.string("global"))
             ?: return failure(fixture, context, "global not found", step.string("global"))
         val value = parseValue(step.getValue("value").jsonObject, captures)
 
         return try {
-            writeGlobal(store, global, value)
+            timings.execute { writeGlobal(store, global, value) }
             CorpusResult.Success
         } catch (failure: IllegalArgumentException) {
             failure(fixture, context, "global write failed", failure.message)
@@ -635,10 +647,11 @@ class ChasmCorpusRunner(
         setup: RuntimeSetup,
         captures: MutableMap<String, ExecutionValue>,
         step: JsonObject,
+        timings: CorpusTimingRecorder,
     ): CorpusResult {
         val global = resolveGlobal(setup, step.string("global"))
             ?: return failure(fixture, context, "global not found", step.string("global"))
-        val actual = readGlobal(store, global)
+        val actual = timings.execute { readGlobal(store, global) }
         val expected = parseValue(step.getValue("assert").jsonObject.getValue("value").jsonObject, captures)
 
         return if (expected.toLongFromBoxed() == actual.toLongFromBoxed()) {
@@ -747,11 +760,12 @@ class ChasmCorpusRunner(
         memory: Memory,
         offset: Int,
         type: String,
+        timings: CorpusTimingRecorder,
     ): ExecutionValue? {
         val size = if (type == "i64" || type == "f64") 8 else 4
         val buffer = ByteArray(size)
         val bytes = try {
-            readBytes(store, memory, buffer, offset, size)
+            timings.execute { readBytes(store, memory, buffer, offset, size) }
         } catch (_: IndexOutOfBoundsException) {
             return null
         }
@@ -928,7 +942,9 @@ class ChasmCorpusRunner(
         private var decodeNanos: Long = 0
         private var validateNanos: Long = 0
         private var instantiateNanos: Long = 0
-        private var executeNanos: Long = 0
+        var executeNanos: Long = 0
+        var harnessNanos: Long = 0
+        var executeDepth: Int = 0
 
         suspend fun <T> decode(block: suspend () -> T): T = measureSuspending(block) { elapsed -> decodeNanos += elapsed }
 
@@ -936,14 +952,33 @@ class ChasmCorpusRunner(
 
         suspend fun <T> instantiate(block: suspend () -> T): T = measureSuspending(block) { elapsed -> instantiateNanos += elapsed }
 
-        fun <T> execute(block: () -> T): T = measure(block) { elapsed -> executeNanos += elapsed }
+        inline fun <T> execute(block: () -> T): T {
+            if (executeDepth > 0) {
+                return block()
+            }
+
+            executeDepth++
+            return try {
+                measure(block) { elapsed -> executeNanos += elapsed }
+            } finally {
+                executeDepth--
+            }
+        }
+
+        inline fun <T> harness(block: () -> T): T {
+            if (executeDepth == 0) {
+                return block()
+            }
+
+            return measure(block) { elapsed -> harnessNanos += elapsed }
+        }
 
         fun snapshot(totalNanos: Long) = CorpusTimings(
             totalNanos = totalNanos,
             decodeNanos = decodeNanos,
             validateNanos = validateNanos,
             instantiateNanos = instantiateNanos,
-            executeNanos = executeNanos,
+            executeNanos = executeNanos - harnessNanos,
         )
 
         private suspend fun <T> measureSuspending(
@@ -958,7 +993,7 @@ class ChasmCorpusRunner(
             }
         }
 
-        private fun <T> measure(
+        inline fun <T> measure(
             block: () -> T,
             record: (Long) -> Unit,
         ): T {

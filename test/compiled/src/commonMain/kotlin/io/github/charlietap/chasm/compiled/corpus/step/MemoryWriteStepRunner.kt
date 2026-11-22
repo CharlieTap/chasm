@@ -23,7 +23,7 @@ internal fun MemoryWriteStepRunner(
         ?: return context.failure("memory write requires bytes or value")
 
     return try {
-        writeBytes(context.setup.store, memory, offset, bytes)
+        context.timings.execute { writeBytes(context.setup.store, memory, offset, bytes) }
         CorpusResult.Success
     } catch (failure: IndexOutOfBoundsException) {
         context.failure("memory write failed", failure.message)

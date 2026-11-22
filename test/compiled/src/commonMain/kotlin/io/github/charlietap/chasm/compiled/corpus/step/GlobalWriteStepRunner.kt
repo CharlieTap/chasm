@@ -18,7 +18,7 @@ internal fun GlobalWriteStepRunner(
     val value = parseValue(step.getValue("value").jsonObject, context.captures)
 
     return try {
-        writeGlobal(context.setup.store, global, value)
+        context.timings.execute { writeGlobal(context.setup.store, global, value) }
         CorpusResult.Success
     } catch (failure: IllegalArgumentException) {
         context.failure("global write failed", failure.message)

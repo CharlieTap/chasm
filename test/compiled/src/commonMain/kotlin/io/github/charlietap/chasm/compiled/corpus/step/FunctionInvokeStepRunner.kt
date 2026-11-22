@@ -46,7 +46,7 @@ private fun FunctionInvokeStepRunner(
     val hostEffects = step["host_effects"]?.jsonObject
     val expectedExitCode = hostEffects?.get("exit_code")?.jsonPrimitive?.intOrNull
 
-    val results = when (val invocation = invoke(setup.store, setup.instance, function, params)) {
+    val results = when (val invocation = context.timings.execute { invoke(setup.store, setup.instance, function, params) }) {
         is ChasmResult.Success -> invocation.result
         is ChasmResult.Error -> {
             if (trap != null) return CorpusResult.Success

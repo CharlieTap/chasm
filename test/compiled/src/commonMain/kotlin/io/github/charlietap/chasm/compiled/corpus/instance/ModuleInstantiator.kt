@@ -37,7 +37,7 @@ private fun ModuleInstantiator(
     test: FixtureTest?,
     importResolver: ImportResolver,
 ): Result<RuntimeSetup, CorpusResult> {
-    val imports = importResolver(context.fixture, store, module.decoded, test).getOrElse { error -> return Err(error) }
+    val imports = importResolver(context.fixture, store, module.decoded, test, context.timings).getOrElse { error -> return Err(error) }
 
     return module.compiled(store, imports.imports).fold(
         { instance ->

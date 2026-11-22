@@ -10,7 +10,9 @@ internal class CorpusTimingRecorder {
     private var decodeNanos: Long = 0
     private var validateNanos: Long = 0
     private var instantiateNanos: Long = 0
-    private var executeNanos: Long = 0
+    var executeNanos: Long = 0
+    var harnessNanos: Long = 0
+    var executeDepth: Int = 0
 
     fun <T> decode(
         block: () -> T,
@@ -24,9 +26,30 @@ internal class CorpusTimingRecorder {
         block: () -> T,
     ): T = measure(block) { elapsed -> instantiateNanos += elapsed }
 
-    fun <T> execute(
+    inline fun <T> execute(
         block: () -> T,
-    ): T = measure(block) { elapsed -> executeNanos += elapsed }
+    ): T {
+        if (executeDepth > 0) {
+            return block()
+        }
+
+        executeDepth++
+        return try {
+            measure(block) { elapsed -> executeNanos += elapsed }
+        } finally {
+            executeDepth--
+        }
+    }
+
+    inline fun <T> harness(
+        block: () -> T,
+    ): T {
+        if (executeDepth == 0) {
+            return block()
+        }
+
+        return measure(block) { elapsed -> harnessNanos += elapsed }
+    }
 
     fun snapshot(
         totalNanos: Long,
@@ -35,10 +58,10 @@ internal class CorpusTimingRecorder {
         decodeNanos = decodeNanos,
         validateNanos = validateNanos,
         instantiateNanos = instantiateNanos,
-        executeNanos = executeNanos,
+        executeNanos = executeNanos - harnessNanos,
     )
 
-    private fun <T> measure(
+    inline fun <T> measure(
         block: () -> T,
         record: (Long) -> Unit,
     ): T {

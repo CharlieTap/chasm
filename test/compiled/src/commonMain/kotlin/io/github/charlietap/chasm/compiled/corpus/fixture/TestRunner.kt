@@ -42,9 +42,7 @@ private fun TestRunner(
 
         val captures = mutableMapOf<String, ExecutionValue>()
         test.value.steps.forEachIndexed { index, step ->
-            val result = timings.execute {
-                stepRunner(StepContext(context.fixture, "test[${test.index}] step[$index]", setup, captures), step)
-            }
+            val result = stepRunner(StepContext(context.fixture, "test[${test.index}] step[$index]", setup, captures, timings), step)
             if (result != CorpusResult.Success) return result
         }
         return CorpusResult.Success

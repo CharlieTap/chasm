@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.compiled.corpus.imports
 
+import io.github.charlietap.chasm.compiled.corpus.CorpusTimingRecorder
 import io.github.charlietap.chasm.compiled.corpus.value.defaultResults
 import io.github.charlietap.chasm.embedding.function
 import io.github.charlietap.chasm.embedding.shapes.Function
@@ -11,15 +12,17 @@ import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.corpus.lib.fixture.FixtureImport
 import kotlin.contextOf
 
-internal typealias StubFunctionFactory = (Store, FunctionType, FixtureImport?, MutableMap<String, ImportCapture>) -> Function
+internal typealias StubFunctionFactory = (Store, FunctionType, FixtureImport?, MutableMap<String, ImportCapture>, CorpusTimingRecorder) -> Function
 
 internal fun StubFunctionFactory(
     store: Store,
     type: FunctionType,
     import: FixtureImport?,
     captures: MutableMap<String, ImportCapture>,
+    timings: CorpusTimingRecorder,
 ): Function {
-    import?.stub?.capture?.let { capture ->
+    val capture = import?.stub?.capture
+    if (capture != null) {
         val maxCalls = capture.maxCalls ?: Int.MAX_VALUE
         val existing = captures[capture.name]
         if (existing == null) {
@@ -29,17 +32,22 @@ internal fun StubFunctionFactory(
         }
     }
 
+    val trap = import?.stub?.trap
+    val defaults = defaultResults(type, import).map { value -> value.toLongFromBoxed() }
+
     return function(store, type) { parameters, results ->
         val stack = contextOf<HostStack>()
-        val params = List(type.params.types.size) { index ->
-            stack[parameters + index].toExecutionValue(type.params.types[index])
+        if (capture != null) {
+            timings.harness {
+                val params = List(type.params.types.size) { index ->
+                    stack[parameters + index].toExecutionValue(type.params.types[index])
+                }
+                captures.getValue(capture.name).append(capture, params)
+            }
         }
-        import?.stub?.capture?.let { capture ->
-            captures.getValue(capture.name).append(capture, params)
-        }
-        import?.stub?.trap?.let(::error)
-        defaultResults(type, import).forEachIndexed { index, value ->
-            stack[results + index] = value.toLongFromBoxed()
+        trap?.let(::error)
+        defaults.forEachIndexed { index, value ->
+            stack[results + index] = value
         }
     }
 }

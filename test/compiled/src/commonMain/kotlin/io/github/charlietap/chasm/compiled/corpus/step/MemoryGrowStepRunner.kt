@@ -22,7 +22,7 @@ internal fun MemoryGrowStepRunner(
     val memory = context.setup.memory(step.stringOrDefault("memory", "memory"))
         ?: return context.failure("memory not found", step["memory"]?.toString())
     val pages = parseIndex(step.getValue("pages"), context.captures)
-    val actual = NumberValue.I32(growMemory(context.setup.store, memory, pages))
+    val actual = NumberValue.I32(context.timings.execute { growMemory(context.setup.store, memory, pages) })
 
     step["capture"]?.jsonPrimitive?.contentOrNull?.let { capture ->
         context.captures[capture] = actual

@@ -17,7 +17,7 @@ internal fun GlobalReadStepRunner(
 ): CorpusResult {
     val name = step.string("global")
     val global = context.setup.global(name) ?: return context.failure("global not found", name)
-    val actual = readGlobal(context.setup.store, global)
+    val actual = context.timings.execute { readGlobal(context.setup.store, global) }
     val expected = parseValue(step.getValue("assert").jsonObject.getValue("value").jsonObject, context.captures)
 
     return if (expected.toLongFromBoxed() == actual.toLongFromBoxed()) {
