@@ -3,10 +3,12 @@
 package com.test
 
 import io.github.charlietap.chasm.ExperimentalChasmApi
-import io.github.charlietap.chasm.config.GCStrategy
+import io.github.charlietap.chasm.config.Bytes
+import io.github.charlietap.chasm.config.CpuLimits
+import io.github.charlietap.chasm.config.Fuel
+import io.github.charlietap.chasm.config.Limits
+import io.github.charlietap.chasm.config.MemoryLimits
 import io.github.charlietap.chasm.config.RuntimeConfig
-import io.github.charlietap.chasm.config.StoreConfig
-import io.github.charlietap.chasm.config.StoreLimits
 import io.github.charlietap.chasm.embedding.codegen.CodegenImport
 import io.github.charlietap.chasm.embedding.codegen.allocateImports
 import io.github.charlietap.chasm.embedding.instance
@@ -37,11 +39,10 @@ public suspend fun storeSettingsConstruction(
     List<Import>,
   ) -> Instance)? = null,
 ): StoreSettingsConstruction {
-  val store = store(StoreConfig(meterFuel = true, interruptible = true, gcStrategy = GCStrategy.TRADITIONAL, limits = StoreLimits(gcHeapBytes = 1_048_576L, memoryPages = 16, tableElements = 1_048_576, trapOnGrowFailure = true, stackBytes = 16_777_216L)))
-  chasmAddFuel(store, 1_000L)
+  val store = store(RuntimeConfig(interrupts = true, stacktraces = true, limits = Limits(cpu = CpuLimits.Metered(Fuel(1_000L)), memory = MemoryLimits(linearMemory = Bytes(1_048_576L), gcHeap = Bytes(1_048_576L)))))
   val module = moduleFactory?.invoke(binary) ?: module(binary).`expect`("Failed to decode binary")
   val allocatedImports = allocateImports(store, imports)
-  val instance = instanceFactory?.invoke(store, module, allocatedImports) ?: instance(store, module, allocatedImports, RuntimeConfig(debugInfo = true)).`expect`("Failed to instantiate module")
+  val instance = instanceFactory?.invoke(store, module, allocatedImports) ?: instance(store, module, allocatedImports).`expect`("Failed to instantiate module")
   return StoreSettingsConstructionImpl(store = store, instance = instance)
 }
 

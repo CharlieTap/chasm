@@ -1,15 +1,11 @@
 package io.github.charlietap.chasm.tools.compilerbaseline
 
-import io.github.charlietap.chasm.config.GCStrategy
-import io.github.charlietap.chasm.config.RuntimeConfig
-
 fun main() {
     val resourceLoader = CompilerBaselineResourceLoader(
         classLoader = checkNotNull(Thread.currentThread().contextClassLoader),
     )
     val writer = compilerBaselineWriter(
         importResolver = EmptyCompilerBaselineImportResolver(),
-        runtimeConfig = RuntimeConfig(gcStrategy = GCStrategy.TRADITIONAL),
         stores = listOf(CompilerBaselineStore.CHECKPOINTS),
     )
     System.out.writer().use { output ->

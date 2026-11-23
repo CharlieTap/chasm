@@ -11,41 +11,52 @@ untrusted guest its own store.
 
 ```kotlin
 val store = store(
-    StoreConfig(
-        gcStrategy = GCStrategy.TRADITIONAL,
-        limits = StoreLimits(
-            gcHeapBytes = 64L * 1024 * 1024,
-            memoryPages = 1024,
-            tableElements = 100_000,
-            trapOnGrowFailure = true,
+    RuntimeConfig(
+        limits = Limits(
+            memory = MemoryLimits(
+                linearMemory = 1024.pages,
+                gcHeap = 64.MB,
+                tables = 1.MB,
+                onGrowthFailure = GrowthFailureStrategy.Trap,
+            ),
         ),
     ),
 )
 ```
 
+Limits are part of the `RuntimeConfig` every engine takes. The interpreter
+and the JIT take it when the store is created. An AOT module is compiled with
+its limits, and `store(module)` gives the store the limits the module was
+compiled with; see [Ahead-of-time compilation](./aot.md#settings).
+
+Sizes are `Bytes`, written with the extensions `bytes`, `KB`, `MB`, `GB` and
+`pages`, such as `64.MB` or `1024.pages`. A kilobyte is 1,024 bytes and a page
+is 64 KiB. A size cannot be negative.
+
 Every limit defaults to `null`, which leaves that resource bounded only by the
-module and the platform. The exception is `stackBytes` on Android; see
+module and the platform. An unset `stack` still has a cap; see
 [Stack](#stack).
 
-| Limit               | Bounds                            | When a guest exceeds it                                   |
-|---------------------|-----------------------------------|-----------------------------------------------------------|
-| `memoryPages`       | each linear memory, in 64 KiB pages | `memory.grow` returns -1                                |
-| `tableElements`     | each table, in elements           | `table.grow` returns -1                                   |
-| `gcHeapBytes`       | the store's GC heap, in bytes     | the allocation traps with `GuestHeapOutOfMemory`          |
-| `stackBytes`        | the stack of each call, in bytes  | the call traps with `CallStackExhausted`                  |
-| `trapOnGrowFailure` | —                                 | turns a failed `memory.grow` or `table.grow` into a trap  |
+| Limit             | Bounds                                    | When a guest exceeds it                                          |
+|-------------------|-------------------------------------------|------------------------------------------------------------------|
+| `linearMemory`    | each linear memory, in whole 64 KiB pages | `memory.grow` returns -1                                         |
+| `tables`          | each table, at eight bytes per element    | `table.grow` returns -1                                          |
+| `gcHeap`          | the store's GC heap (not on the JIT)      | the allocation traps with `GuestHeapOutOfMemory`                 |
+| `stack`           | the stack of each call                    | the call traps with `CallStackExhausted`                         |
+| `onGrowthFailure` | —                                         | `Trap` turns a failed `memory.grow` or `table.grow` into a trap  |
 
 ## Linear memory
 
-`memoryPages` caps every linear memory in the store. A memory can grow to the
-smaller of this cap and the maximum its module declares.
+`linearMemory` caps every linear memory in the store. A memory can grow to the
+smaller of this cap and the maximum its module declares. The cap counts whole
+pages: a size that is not a multiple of 64 KiB is rounded down.
 
 - Instantiating a module that defines a memory whose initial size exceeds the
   cap fails with `MemoryLimitExceeded`. The module leaves nothing behind in the
-  store.
+  store. An AOT module that defines such a memory fails to compile instead.
 - `memory.grow` past the cap returns -1, as it does past a declared maximum.
-- Memories created by the host with `memory` keep the initial size the host
-  asked for, but cannot grow past the cap.
+- Creating a memory with `memory` whose minimum exceeds the cap throws
+  `IllegalArgumentException`, and the store holds no new memory afterwards.
 - Growth requested by the host, through `growMemory` or from a host function,
   is subject to the same cap and returns -1 when it fails.
 
@@ -54,31 +65,48 @@ therefore hold up to the cap multiplied by its number of memories.
 
 ## Tables
 
-`tableElements` caps every table in the store, with the same rules as linear
-memory. A module that defines a table whose initial size exceeds the cap fails
-to instantiate with `TableLimitExceeded`, and `table.grow` past the cap
+`tables` caps every table in the store, with the same rules as linear memory.
+Every element counts as eight bytes, and a size that is not a multiple of eight
+is rounded down. A module that defines a table whose initial size exceeds the
+cap fails to instantiate with `TableLimitExceeded`, `table` throws
+`IllegalArgumentException` for such a table, and `table.grow` past the cap
 returns -1.
 
 ## GC heap
 
-`gcHeapBytes` caps the heap that holds the structs, arrays, and exceptions of
-every instance in the store. Every field and array element occupies eight
-bytes, packed `i8` and `i16` values included. The collection strategy decides
-how much garbage counts against the cap; see [the GC documentation](./gc.md#heap-limit).
+On the interpreter and on AOT, `gcHeap` caps the heap that holds the structs,
+arrays, and exceptions of every instance in the store. Every field and array
+element occupies eight bytes, packed `i8` and `i16` values included.
+Collection happens before an allocation is refused; see
+[the GC documentation](./gc.md#heap-limit).
+
+On the JIT, guest objects are ordinary JVM objects and `gcHeap` does not cap
+their total: it only refuses an allocation larger than the limit on its own,
+checked once per MiB the guest allocates; see
+[the GC documentation](./gc.md#on-the-jit).
 
 ## Stack
 
-`stackBytes` caps the stack of each call the host makes into the store. The
-stack holds the parameters, locals and operands of every active Wasm function,
-eight bytes each, plus a small record per call. A call that would push it past
-the cap traps with `CallStackExhausted`, which is how runaway recursion ends.
+`stack` caps the stack of each call the host makes into the store. A call that
+would push it past the cap traps with `CallStackExhausted`, which is how
+runaway recursion ends.
 
+On the interpreter, the stack holds the parameters, locals and operands of
+every active Wasm function, eight bytes each, plus a small record per call.
 A call made from inside a host function gets a stack of its own with the same
 cap. Chasm never lets a stack exceed 256 MiB, so `null`, or a larger value, has
 the effect of 256 MiB.
 
-On Android `stackBytes` defaults to 16 MiB, which keeps a runaway guest well
-inside a default app heap; elsewhere it defaults to `null`.
+Compiled code, on the JIT and on AOT, runs on the calling thread's stack. Each
+call, other than to a small leaf function, is charged an estimate of its
+frame's size in 32-byte units, and a call
+that takes the total past `stack` traps. The total is also capped at three
+quarters of a 1 MiB thread stack, whatever `stack` is set to.
+
+`stack` defaults to `null` on every platform. On Android an unset `stack` caps
+the stack at 16 MiB, which keeps a runaway guest well inside a default app
+heap. For linking AOT modules, an unset `stack` and an explicit `16.MB` are
+different settings; see [Ahead-of-time compilation](./aot.md#settings).
 
 ## Trapping on grow failure
 
@@ -87,10 +115,10 @@ returns -1, and Chasm does so by default. Many guests cannot recover from that:
 their allocator aborts or executes `unreachable`, and the host sees a trap that
 says nothing about the limit.
 
-With `trapOnGrowFailure = true`, a failed `memory.grow` or `table.grow` in guest
-code traps with `MemoryGrowFailed` or `TableGrowFailed` instead. With
-`RuntimeConfig.debugInfo` enabled, the trap reports `TrapReason.MEMORY_GROW_FAILED`
-or `TrapReason.TABLE_GROW_FAILED`. Growth requested by the host still returns
+With `onGrowthFailure = GrowthFailureStrategy.Trap`, a failed `memory.grow` or
+`table.grow` in guest code traps with `MemoryGrowFailed` or `TableGrowFailed`
+instead, and the trap reports `TrapReason.MEMORY_GROW_FAILED` or
+`TrapReason.TABLE_GROW_FAILED`. Growth requested by the host still returns
 -1, so the host can handle it.
 
 ## After a limit is hit
@@ -108,4 +136,6 @@ not a bound on total process memory. They do not count:
 - Temporary copies made while a memory, table, or heap grows.
 
 Running time is bounded separately: fuel and interrupts, configured with
-`StoreConfig.meterFuel` and `StoreConfig.interruptible`, stop long-running code.
+`Limits.cpu` and `RuntimeConfig.interrupts`, stop long-running code. With
+`cpu = CpuLimits.Metered(10_000_000.fuel)` the store starts with that much
+fuel, and `addFuel(store, amount)` tops it up.

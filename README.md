@@ -161,12 +161,22 @@ val store = io.github.charlietap.chasm.jit.store()
 val module = module(wasmFileAsByteArray).expect("Failed to decode module")
 
 // AOT: io.github.charlietap.chasm:runtime-aot, with the module compiled at build time
-val store = io.github.charlietap.chasm.aot.store()
-val module = io.github.charlietap.chasm.aot.compiledModule(ExampleModule.INSTANCE).expect("Failed to load module")
+val module = io.github.charlietap.chasm.aot.module(ExampleModule.COMPILED).expect("Failed to load module")
+val store = io.github.charlietap.chasm.aot.store(module)
 ```
 
 A store runs modules on one engine only, so a module made for one engine
 cannot be instantiated in a store of another.
+
+Every engine takes the same `RuntimeConfig`: stack traces, interrupts and
+the [resource limits](./docs/limits.md) a store enforces. The interpreter
+and the JIT take it when the store is created, `store(RuntimeConfig(...))`.
+An AOT module is compiled with it, so its store is made from the module.
+The interpreter and AOT keep WebAssembly GC objects in Chasm's own
+[collected heap](./docs/gc.md), while the JIT allocates them as ordinary
+JVM objects, so some limits behave differently there. Compiling modules
+ahead of time, and the contract the compiled classes keep, are described in
+[Ahead-of-time compilation](./docs/aot.md).
 
 ### Imports
 

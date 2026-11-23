@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.benchmark.memory
 
-import io.github.charlietap.chasm.config.LinearMemoryConfig
 import io.github.charlietap.chasm.memory.copy.LinearMemoryCopier
 import io.github.charlietap.chasm.memory.destruct.LinearMemoryDestructor
 import io.github.charlietap.chasm.memory.factory.LinearMemoryFactory
@@ -241,10 +240,6 @@ open class LinearMemoryLifecycleBenchmark {
         @Param("16", "256")
         final var initialPages = 16
 
-        @JvmField
-        @Param("false", "true")
-        final var prefault = false
-
         var memory: LinearMemory? = null
 
         @TearDown(Level.Invocation)
@@ -256,10 +251,7 @@ open class LinearMemoryLifecycleBenchmark {
 
     @Benchmark
     open fun construction(state: ConstructionState): Int {
-        val memory = LinearMemoryFactory(
-            LinearMemory.Pages(state.initialPages.toUInt()),
-            config = LinearMemoryConfig(prefault = state.prefault),
-        )
+        val memory = LinearMemoryFactory(LinearMemory.Pages(state.initialPages.toUInt()))
         state.memory = memory
         return memory.byteSize
     }
@@ -270,18 +262,11 @@ open class LinearMemoryLifecycleBenchmark {
         @Param("1", "256")
         final var pagesToAdd = 1
 
-        @JvmField
-        @Param("false", "true")
-        final var prefault = false
-
         lateinit var memory: LinearMemory
 
         @Setup(Level.Invocation)
         fun setup() {
-            memory = LinearMemoryFactory(
-                LinearMemory.Pages(ACCESS_PAGES.toUInt()),
-                config = LinearMemoryConfig(prefault = prefault),
-            )
+            memory = LinearMemoryFactory(LinearMemory.Pages(ACCESS_PAGES.toUInt()))
             memory.writeI32(0, 0x12345678)
         }
 
@@ -310,18 +295,11 @@ open class LinearMemoryDeferredPageBenchmark {
         @Param("1", "16", "256")
         final var pages = 16
 
-        @JvmField
-        @Param("false", "true")
-        final var prefault = false
-
         lateinit var memory: LinearMemory
 
         @Setup(Level.Invocation)
         fun setup() {
-            memory = LinearMemoryFactory(
-                LinearMemory.Pages(pages.toUInt()),
-                config = LinearMemoryConfig(prefault = prefault),
-            )
+            memory = LinearMemoryFactory(LinearMemory.Pages(pages.toUInt()))
         }
 
         @TearDown(Level.Invocation)
@@ -339,19 +317,14 @@ open class LinearMemoryDeferredPageBenchmark {
         @Param("65536", "1048576", "16777216")
         final var byteCount = 1_048_576
 
-        @JvmField
-        @Param("false", "true")
-        final var prefault = false
-
         lateinit var source: LinearMemory
         lateinit var destination: LinearMemory
 
         @Setup(Level.Invocation)
         fun setup() {
             val pages = LinearMemory.Pages((byteCount * 2 / LinearMemory.PAGE_SIZE).toUInt())
-            val config = LinearMemoryConfig(prefault = prefault)
-            source = LinearMemoryFactory(pages, config = config)
-            destination = LinearMemoryFactory(pages, config = config)
+            source = LinearMemoryFactory(pages)
+            destination = LinearMemoryFactory(pages)
             LinearMemoryFiller(source, 0, byteCount, 0x5A, source.byteSize)
             LinearMemoryFiller(destination, 0, byteCount, 0x5A, destination.byteSize)
         }

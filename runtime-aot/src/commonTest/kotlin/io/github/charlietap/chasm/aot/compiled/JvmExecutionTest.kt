@@ -1,6 +1,9 @@
 package io.github.charlietap.chasm.aot.compiled
 
 import io.github.charlietap.chasm.compiler.backend.jvm.JvmOptions
+import io.github.charlietap.chasm.compiler.backend.jvm.UnsupportedFunctions
+import io.github.charlietap.chasm.compiler.backend.jvm.size.BytecodeSize
+import io.github.charlietap.chasm.compiler.backend.jvm.size.DexUnitEstimate
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.value.NumberValue.F32
 import io.github.charlietap.chasm.embedding.value.NumberValue.F64
@@ -8,6 +11,7 @@ import io.github.charlietap.chasm.embedding.value.NumberValue.I32
 import io.github.charlietap.chasm.embedding.value.NumberValue.I64
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertIs
 import kotlin.test.assertTrue
 
@@ -70,14 +74,43 @@ class JvmExecutionTest {
     }
 
     @Test
-    fun `a function's own method budget takes the place of the module's`() {
+    fun `a smaller method size splits functions into more chunks`() {
         val bytes = fixture("huge")
         val interpreted = InterpretedFixture(bytes)
         val module = CompiledFixture(bytes)
-        val own = CompiledFixture(bytes, options = JvmOptions(functionMaxMethodBytes = mapOf(3 to 2_000)))
+        val smaller = CompiledFixture(bytes, options = JvmOptions(methodSize = BytecodeSize(2_000)))
 
-        assertTrue(chunks(own, function = 3) > chunks(module, function = 3))
-        listOf(1, 3).forEach { n -> assertEquals(interpreted.call("big", I32(n)), own.call("big", I32(n))) }
+        assertTrue(chunks(smaller, function = 3) > chunks(module, function = 3))
+        listOf(1, 3).forEach { n -> assertEquals(interpreted.call("big", I32(n)), smaller.call("big", I32(n))) }
+    }
+
+    @Test
+    fun `a function split into as many chunks as one dispatcher holds runs like the interpreter`() {
+        listOf(DexUnitEstimate(), BytecodeSize()).forEach { methodSize ->
+            val options = JvmOptions(methodSize = methodSize, splitInstructions = 1)
+            var lowered = 1
+            var refused = REFUSED_STEPS
+            while (refused - lowered > 1) {
+                val middle = (lowered + refused) / 2
+                val fits = runCatching { generate(longFunctionModule(middle), options) }.exceptionOrNull() !is UnsupportedFunctions
+                if (fits) {
+                    lowered = middle
+                } else {
+                    refused = middle
+                }
+            }
+
+            val bytes = longFunctionModule(lowered)
+            val interpreted = InterpretedFixture(bytes)
+            val compiled = CompiledFixture(bytes, options = options)
+
+            assertFailsWith<UnsupportedFunctions> { generate(longFunctionModule(lowered + 1), options) }
+            listOf(I32(0) to I32(1), I32(-100_000) to I32(1), I32(12_345) to I32(1)).forEach { (n, divisor) ->
+                assertEquals(interpreted.call("run", n, divisor), compiled.call("run", n, divisor), "$methodSize n = $n")
+            }
+            assertTrap(interpreted.invoke("run", I32(3), I32(0)))
+            assertTrap(compiled.invoke("run", I32(3), I32(0)))
+        }
     }
 
     private fun chunks(
@@ -102,7 +135,7 @@ class JvmExecutionTest {
         val functions = 25_000
         val compiled = CompiledFixture(manyFunctions(functions))
 
-        assertTrue(compiled.generated.classes.keys.count { name -> "/Install" in name } > 1)
+        assertTrue(compiled.generated.classes.keys.count { name -> "\$Install" in name } > 1)
         assertEquals(listOf(I32(0)), compiled.call("first"))
         assertEquals(listOf(I32(functions - 1)), compiled.call("last"))
     }
@@ -251,5 +284,6 @@ class JvmExecutionTest {
 
     private companion object {
         const val PAGE = 65_536
+        const val REFUSED_STEPS = 4_000
     }
 }

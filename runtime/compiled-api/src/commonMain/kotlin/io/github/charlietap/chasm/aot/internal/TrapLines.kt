@@ -18,7 +18,7 @@ class LineRange(
 )
 
 /**
- * The lines of a package's compiled methods after a shrinker renumbered
+ * The lines of a module's compiled methods after a shrinker renumbered
  * them, keyed by [trapLinesKey], mapped back to the lines Chasm gave them.
  */
 @InternalChasmApi
@@ -76,11 +76,11 @@ fun trapLinesKey(
 
 @InternalChasmApi
 fun trapLinesResource(
-    packagePath: String,
-): String = "$packagePath/lines.$TRAP_LINES_EXTENSION"
+    resourceRoot: String,
+): String = "$resourceRoot.$TRAP_LINES_EXTENSION"
 
 @InternalChasmApi
-const val TRAP_LINES_EXTENSION = "chasmlines"
+const val TRAP_LINES_EXTENSION = "lines"
 
 @InternalChasmApi
 fun writeTrapLines(

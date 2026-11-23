@@ -1,8 +1,10 @@
 package io.github.charlietap.chasm.jit
 
+import io.github.charlietap.chasm.config.Limits
+import io.github.charlietap.chasm.config.MemoryLimits
 import io.github.charlietap.chasm.config.RuntimeConfig
-import io.github.charlietap.chasm.config.StoreConfig
-import io.github.charlietap.chasm.config.StoreLimits
+import io.github.charlietap.chasm.config.bytes
+import io.github.charlietap.chasm.config.pages
 import io.github.charlietap.chasm.embedding.dsl.FunctionTypeBuilder
 import io.github.charlietap.chasm.embedding.error.ExecutionError
 import io.github.charlietap.chasm.embedding.error.InstantiationError
@@ -67,7 +69,7 @@ class InstantiationResultsTest {
     @Test
     fun tablesOverTheStoreLimitTrapWithTheLimitReason() {
 
-        val store = store(StoreConfig(limits = StoreLimits(tableElements = 16)))
+        val store = store(RuntimeConfig(limits = Limits(memory = MemoryLimits(tables = 128.bytes))))
 
         val error = assertIs<ExecutionError.Trapped>(failure(store, "instantiation_table_limit"))
 
@@ -77,7 +79,7 @@ class InstantiationResultsTest {
     @Test
     fun memoriesOverTheStoreLimitTrapWithTheLimitReason() {
 
-        val store = store(StoreConfig(limits = StoreLimits(memoryPages = 16)))
+        val store = store(RuntimeConfig(limits = Limits(memory = MemoryLimits(linearMemory = 16.pages))))
 
         val error = assertIs<ExecutionError.Trapped>(failure(store, "instantiation_memory_limit"))
 
@@ -193,7 +195,7 @@ class InstantiationResultsTest {
     @Test
     fun aTrappingStartFunctionReportsFramesWithDebugInfo() {
 
-        val result = runBlocking { instance(store(), load("instantiation_start_trap"), emptyList(), RuntimeConfig(debugInfo = true)) }
+        val result = runBlocking { instance(store(RuntimeConfig(stacktraces = true)), load("instantiation_start_trap"), emptyList()) }
         val error = assertIs<ExecutionError.Trapped>(assertIs<ChasmResult.Error<InstantiationError>>(result).error)
 
         val frames = checkNotNull(error.trap.stackTrace).frames

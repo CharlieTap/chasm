@@ -14,7 +14,7 @@ fun AssertMalformedCommandRunner(
     val moduleFilePath = context.binaryDirectory + "/" + command.filename
     val bytes = context.files(moduleFilePath)
 
-    return BinaryDecoder(bytes, context.config.moduleConfig).fold({
+    return BinaryDecoder(bytes, context.moduleConfig).fold({
         CommandResult.Failure(command, "malformed module was decoded when it should have failed")
     }) {
         CommandResult.Success

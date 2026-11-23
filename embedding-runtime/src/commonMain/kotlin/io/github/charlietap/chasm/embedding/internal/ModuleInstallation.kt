@@ -17,6 +17,8 @@ interface ModuleInstallation {
 
     fun external(importable: Importable): ExternalValue
 
+    fun config(storeConfig: RuntimeConfig): RuntimeConfig
+
     fun trapSource(instance: ModuleInstance): TrapSource?
 
     fun thrown(): ExceptionReference

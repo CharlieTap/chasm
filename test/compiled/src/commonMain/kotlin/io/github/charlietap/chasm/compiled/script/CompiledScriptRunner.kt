@@ -5,10 +5,11 @@ import io.github.charlietap.chasm.compiled.Compiler
 import io.github.charlietap.chasm.compiled.script.command.CommandResult
 import io.github.charlietap.chasm.compiled.script.command.CommandRunner
 import io.github.charlietap.chasm.compiled.script.host.HostModuleResolver
-import io.github.charlietap.chasm.config.Config
-import io.github.charlietap.chasm.config.GCStrategy
-import io.github.charlietap.chasm.config.StoreConfig
+import io.github.charlietap.chasm.config.ModuleConfig
+import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.embedding.dropStore
+import io.github.charlietap.chasm.embedding.shapes.Module
+import io.github.charlietap.chasm.embedding.shapes.expect
 import io.github.charlietap.sweet.lib.Script
 import io.github.charlietap.sweet.lib.ScriptResult
 import io.github.charlietap.sweet.lib.ScriptRunner
@@ -27,7 +28,7 @@ class CompiledScriptRunner(
     private val excludedLines: Set<Int> = emptySet(),
     private val compiler: Compiler,
     private val files: ScriptFileReader,
-    private val storeConfig: StoreConfig = StoreConfig(gcStrategy = GCStrategy.TRADITIONAL),
+    private val runtimeConfig: RuntimeConfig = RuntimeConfig(),
     private val commandRunner: CommandRunner = ::CommandRunner,
     private val hostModuleResolver: HostModuleResolver = ::HostModuleResolver,
 ) : ScriptRunner {
@@ -47,13 +48,13 @@ class CompiledScriptRunner(
         script: Script,
     ): ScriptResult {
 
-        val config = Config()
-        val store = store(storeConfig)
+        val hostModule = hostModuleResolver(runtimeConfig, compiler)
+        val store = store(hostModule)
         val context = ScriptContext(
-            config = config,
+            moduleConfig = ModuleConfig(),
             binaryDirectory = directory,
             phaseSupport = phaseSupport,
-            storeConfig = storeConfig,
+            runtimeConfig = runtimeConfig,
             compiler = compiler,
             files = files,
             store = store,
@@ -62,7 +63,7 @@ class CompiledScriptRunner(
         )
 
         try {
-            return execute(script, context)
+            return execute(script, context, hostModule)
         } finally {
             dropStore(store)
         }
@@ -71,10 +72,11 @@ class CompiledScriptRunner(
     private fun execute(
         script: Script,
         context: ScriptContext,
+        hostModule: Module,
     ): ScriptResult {
 
-        val hostModule = hostModuleResolver(context.store, context.storeConfig, context.compiler)
-        context.registerImports(HOST_MODULE_NAME, hostModule)
+        val hostInstance = context.instantiate(hostModule).expect("Failed to instantiate script host module")
+        context.registerImports(HOST_MODULE_NAME, hostInstance)
 
         script.commands.forEach { command ->
 

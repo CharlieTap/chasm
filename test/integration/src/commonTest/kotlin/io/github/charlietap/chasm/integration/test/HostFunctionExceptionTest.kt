@@ -20,31 +20,32 @@ class HostFunctionExceptionTest {
     @Test
     fun `can run a host function that throws an exception and return a chasm error`() = integrationTest(FIXTURE) {
 
-        val store = engine.store()
-
-        val functionType = functionType(
-            results = resultType(
-                listOf(
-                    i32ValueType(),
-                ),
-            ),
-        )
         val reason = "Fail gracefully"
-        val exception = HostFunctionException(reason)
-        val hostFunction = HostFunction { _, _ ->
-            throw exception
-        }
-        val functionExternal = function(store, functionType, hostFunction)
-        val functionImport = Import(
-            "env",
-            "host_function",
-            functionExternal,
-        )
-        val imports = listOf(
-            functionImport,
-        )
+        val runner = runner { store ->
 
-        val result = runner(store, imports).invoke(
+            val functionType = functionType(
+                results = resultType(
+                    listOf(
+                        i32ValueType(),
+                    ),
+                ),
+            )
+            val exception = HostFunctionException(reason)
+            val hostFunction = HostFunction { _, _ ->
+                throw exception
+            }
+            val functionExternal = function(store, functionType, hostFunction)
+            val functionImport = Import(
+                "env",
+                "host_function",
+                functionExternal,
+            )
+            listOf(
+                functionImport,
+            )
+        }
+
+        val result = runner.invoke(
             name = "call_host_function",
         )
 

@@ -120,7 +120,7 @@ internal inline fun AllocateModuleContents(
     }
 
     module.memories.forEach { memory ->
-        val address = memoryAllocator(store, memory, context.config.linearMemory)
+        val address = memoryAllocator(store, memory)
         instance.addMemoryAddress(address)
     }
 
@@ -177,13 +177,12 @@ internal fun checkStoreLimits(
     store: Store,
     module: ModuleDeclarations,
 ): Result<Unit, ModuleTrapError> {
-    val limits = store.config.limits
-    val memoryPages = limits.memoryPages
+    val memoryPages = store.memoryPageLimit
     if (memoryPages != null) {
         val exceeded = module.memories.any { memory -> memory.limits.min > memoryPages.toULong() }
         if (exceeded) return Err(InstantiationError.MemoryLimitExceeded(memoryPages))
     }
-    val tableElements = limits.tableElements
+    val tableElements = store.tableElementLimit
     if (tableElements != null) {
         val exceeded = module.tables.any { table -> table.type.limits.min > tableElements.toULong() }
         if (exceeded) return Err(InstantiationError.TableLimitExceeded(tableElements))

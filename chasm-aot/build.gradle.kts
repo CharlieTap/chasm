@@ -2,6 +2,7 @@ import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.build.config)
 
     alias(libs.plugins.conventions.kotlin)
     alias(libs.plugins.conventions.linting)
@@ -16,6 +17,11 @@ configure<PublishingConventionsExtension> {
 
 kotlinConventions {
     jvmBytecodeVersion.set(libs.versions.java.plugin.bytecode.version.map(String::toInt))
+}
+
+buildConfig {
+    packageName("io.github.charlietap.chasm.aot")
+    buildConfigField("VERSION", version.toString())
 }
 
 kotlin {
@@ -40,6 +46,12 @@ kotlin {
                 implementation(projects.stream)
                 implementation(projects.validator)
                 implementation(libs.result)
+            }
+        }
+        commonTest {
+            dependencies {
+                implementation(projects.embeddingModule)
+                implementation(libs.kotlinx.coroutines.test)
             }
         }
     }

@@ -5,7 +5,6 @@
 
 package io.github.charlietap.chasm.memory
 
-import io.github.charlietap.chasm.config.LinearMemoryConfig
 import io.github.charlietap.chasm.runtime.host.HostMemory
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
 import kotlinx.cinterop.ByteVar
@@ -41,7 +40,6 @@ internal class NativeMappedLinearMemory private constructor(
     internal val nativeBase: NativePtr = state.base.rawValue
 
     private val maximumByteSize: Int = state.maximumByteSize
-    private val prefault: Boolean = state.prefault
     private val commitMemory: (CPointer<ByteVar>, Int, Int) -> Unit = state.commitMemory
     private val releaseState: NativeMemoryReleaseState = state.releaseState
 
@@ -68,9 +66,6 @@ internal class NativeMappedLinearMemory private constructor(
 
         val bytesToCommit = nextByteSize.toInt() - previousByteSize
         commitMemory(base, previousByteSize, bytesToCommit)
-        if (prefault) {
-            memset(base + previousByteSize, 0, bytesToCommit.convert())
-        }
         byteSize = nextByteSize.toInt()
         return this
     }
@@ -295,10 +290,9 @@ internal class NativeMappedLinearMemory private constructor(
         internal fun create(
             pages: LinearMemory.Pages,
             maximumPages: LinearMemory.Pages? = null,
-            config: LinearMemoryConfig = LinearMemoryConfig(),
             operations: NativeVirtualMemoryOperations = systemNativeVirtualMemoryOperations,
         ): NativeMappedLinearMemory {
-            val state = createNativeMappedLinearMemoryState(pages, maximumPages, config, operations)
+            val state = createNativeMappedLinearMemoryState(pages, maximumPages, operations)
             return try {
                 NativeMappedLinearMemory(state)
             } catch (error: Throwable) {
@@ -360,7 +354,6 @@ private class NativeMappedLinearMemoryState(
     val base: CPointer<ByteVar>,
     val initialByteSize: Int,
     val maximumByteSize: Int,
-    val prefault: Boolean,
     val commitMemory: (CPointer<ByteVar>, Int, Int) -> Unit,
     val releaseState: NativeMemoryReleaseState,
 )
@@ -368,7 +361,6 @@ private class NativeMappedLinearMemoryState(
 private fun createNativeMappedLinearMemoryState(
     pages: LinearMemory.Pages,
     maximumPages: LinearMemory.Pages?,
-    config: LinearMemoryConfig,
     operations: NativeVirtualMemoryOperations,
 ): NativeMappedLinearMemoryState {
     check(Platform.isLittleEndian) {
@@ -399,14 +391,10 @@ private fun createNativeMappedLinearMemoryState(
 
     try {
         operations.commit(base, 0, initialByteSize)
-        if (config.prefault && initialByteSize != 0) {
-            memset(base, 0, initialByteSize.convert())
-        }
         return NativeMappedLinearMemoryState(
             base = base,
             initialByteSize = initialByteSize,
             maximumByteSize = maximumByteSize,
-            prefault = config.prefault,
             commitMemory = operations.commit,
             releaseState = releaseState,
         )

@@ -1,7 +1,5 @@
 package io.github.charlietap.chasm.tools.compilerbaseline
 
-import io.github.charlietap.chasm.config.GCStrategy
-import io.github.charlietap.chasm.config.RuntimeConfig
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -40,7 +38,6 @@ class ModuleCompilerBaselineGeneratorTest {
             importResolver = EmptyCompilerBaselineImportResolver(),
             moduleDecoder = ChasmModuleDecoder(),
             moduleInstantiator = ChasmModuleInstantiator(),
-            runtimeConfig = RuntimeConfig(gcStrategy = GCStrategy.TRADITIONAL),
             stores = CompilerBaselineStore.ALL,
         )
 

@@ -24,13 +24,13 @@ private fun FixtureRunner(
 ): CorpusResult {
     val fixture = context.fixture
     val timings = context.timings
-    val moduleConfig = context.config.moduleConfig
+    val moduleConfig = context.moduleConfig
 
     val decoded = timings.decode { ScriptModules.decode(bytes, moduleConfig) }
     if (decoded is ChasmResult.Error) return fixture.failure("decode", "failed to decode wasm", decoded.error.toString())
     if (context.phase == CorpusPhase.DECODING) return CorpusResult.Success
 
-    val module = when (val result = timings.validate { context.compiler(bytes, moduleConfig, context.storeConfig) }) {
+    val module = when (val result = timings.validate { context.compiler(bytes, moduleConfig, context.runtimeConfig) }) {
         is ChasmResult.Success -> result.result
         is ChasmResult.Error -> return fixture.failure("validate", "failed to validate wasm", result.error.toString())
     }

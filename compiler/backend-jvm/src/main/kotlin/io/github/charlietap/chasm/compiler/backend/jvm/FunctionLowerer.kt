@@ -104,7 +104,9 @@ private class FunctionLowering(
         References.none(frame.frameSlots)
     }
 
-    private val maxMethodBytes = module.options.functionMaxMethodBytes[function.index.index] ?: module.options.maxMethodBytes
+    private val methodSize = module.options.methodSize
+
+    private val limit = methodSize.limit
 
     private val inlineMemory = inlineMemory(function.instructions.indices)
 
@@ -143,17 +145,17 @@ private class FunctionLowering(
             SlotKinds.wide(frame.frameSlots)
         }
         val whole = whole(slotKinds)
-        val fits = whole?.node?.takeIf { node -> finish(node) <= maxMethodBytes }
+        val fits = whole?.node?.takeIf { node -> methodSize.of(node, finish(node)) <= limit }
         if (fits != null && module.options.splitInstructions == null) return listOf(GeneratedMethod(null, fits))
         val liveness = whole?.takeIf { lowered ->
             lowered.node.instructions.size().toLong() * ((lowered.locals.size + 63) / 64) <= MAX_LIVENESS_WORDS
         }?.let { lowered ->
             slotLiveness(lowered.node, lowered.locals, frame.frameSlots, function.instructions.size, lowered.context::placement)
         }
-        val offsets = whole?.let { lowered ->
-            IntArray(function.instructions.size + 1) { position -> lowered.context.placement(position).resolvedOffset() }
+        val before = whole?.let { lowered ->
+            methodSize.before(lowered.node, function.instructions.size, lowered.context::placement)
         }
-        return split(slotKinds, liveness, offsets)
+        return split(slotKinds, liveness, before)
     }
 
     private fun whole(
@@ -171,7 +173,7 @@ private class FunctionLowering(
     private fun split(
         slotKinds: SlotKinds,
         liveness: SlotLiveness?,
-        offsets: IntArray?,
+        before: IntArray?,
     ): List<GeneratedMethod> {
         val targets = function.jumpTargets()
         val size = function.instructions.size
@@ -187,14 +189,14 @@ private class FunctionLowering(
             val packed = ArrayList<Pair<IntRange, LoweredChunk>>()
             var start = from
             while (start < until) {
-                var limit = reach(offsets, start, until, budget)
+                var farthest = reach(before, start, until, budget)
                 while (true) {
-                    val end = if (limit == until) until else cheapestCut(crossings, start, limit, live)
+                    val end = if (farthest == until) until else cheapestCut(crossings, start, farthest, live)
                     val range = start until end
                     val entries = range.filter { position -> position == range.first || targets[position] }.toIntArray()
                     val first = chunk(range, entries, slotKinds, liveness, resetsSlots, budget)
-                    val attempt = if (first.chunk == null && end - start == 1 && budget < maxMethodBytes) {
-                        chunk(range, entries, slotKinds, liveness, resetsSlots, maxMethodBytes)
+                    val attempt = if (first.chunk == null && end - start == 1 && budget < limit) {
+                        chunk(range, entries, slotKinds, liveness, resetsSlots, limit)
                     } else {
                         first
                     }
@@ -210,14 +212,14 @@ private class FunctionLowering(
                     } else {
                         (end - start) / 2
                     }
-                    limit = start + fitting.coerceIn(1, end - start - 1)
+                    farthest = start + fitting.coerceIn(1, end - start - 1)
                 }
             }
             return packed
         }
 
         val packed = sortedMapOf<Int, Pair<IntRange, LoweredChunk>>()
-        pack(0, size, maxMethodBytes).forEach { piece -> packed[piece.first.first] = piece }
+        pack(0, size, limit).forEach { piece -> packed[piece.first.first] = piece }
         val chunks: List<Pair<IntRange, LoweredChunk>>
         var continuationIds: IntArray
         while (true) {
@@ -230,7 +232,7 @@ private class FunctionLowering(
             continuationIds = IntArray(size + 1) { position -> if (entered[position]) next++ else -1 }
             val lowered = packed.values.map { (range, _) ->
                 val entries = range.filter { position -> entered[position] }.toIntArray()
-                range to chunk(range, entries, slotKinds, liveness, resetsSlots, maxMethodBytes, continuationIds).chunk
+                range to chunk(range, entries, slotKinds, liveness, resetsSlots, limit, continuationIds).chunk
             }
             val outgrown = lowered.filter { (_, chunk) -> chunk == null }.map { (range, _) -> range }
             if (outgrown.isEmpty()) {
@@ -241,7 +243,7 @@ private class FunctionLowering(
                 val first = packed.getValue(range.first).second
                 if (range.count() == 1) throw Unsupported("instruction ${range.first} too large for a method")
                 packed.remove(range.first)
-                pack(range.first, range.last + 1, minOf(maxMethodBytes, first.length) - 1).forEach { piece -> packed[piece.first.first] = piece }
+                pack(range.first, range.last + 1, minOf(limit, first.length) - 1).forEach { piece -> packed[piece.first.first] = piece }
             }
         }
         val largestCost = chunks.maxOf { (_, chunk) -> chunk.frameCost }
@@ -257,26 +259,31 @@ private class FunctionLowering(
         val context = LowerContext(facts, slotKinds, locals, Emitter(dispatcher, locals.frameTypes))
         context.lowerDispatcher(methods, frameCost(locals) + largestCost + slotFrameCost, dynamic, resetsSlots)
         context.emit.removeDeadStores(locals.firstLocalAfterParameters)
-        if (finish(dispatcher) > MAX_SHORT_BRANCH_METHOD_BYTES) {
-            throw Unsupported("function needs ${chunks.size} chunks, more than one dispatcher holds")
+        val dispatcherBytes = finish(dispatcher)
+        if (dispatcherBytes > MAX_SHORT_BRANCH_METHOD_BYTES || methodSize.of(dispatcher, dispatcherBytes) > methodSize.dispatcherLimit) {
+            throw Unsupported("function needs ${chunks.size} chunks, more than one dispatcher of ${methodSize.describe(methodSize.dispatcherLimit)} holds")
         }
         return chunks.mapIndexed { index, (range, chunk) -> GeneratedMethod(owners[index], chunk.node, range.first) } +
             GeneratedMethod(null, dispatcher)
     }
 
     private fun reach(
-        offsets: IntArray?,
+        before: IntArray?,
         start: Int,
         until: Int,
         budget: Int,
     ): Int {
         val bound = minOf(until, start + (module.options.splitInstructions ?: until))
-        if (offsets == null) return minOf(bound, start + CHUNK_INSTRUCTIONS)
+        if (before == null) return minOf(bound, start + CHUNK_INSTRUCTIONS)
         var low = start + 1
         var high = bound
         while (low < high) {
             val middle = (low + high + 1) / 2
-            if (offsets[middle] - offsets[start] + CHUNK_OVERHEAD_BYTES <= budget) low = middle else high = middle - 1
+            if (before[middle] - before[start] + methodSize.chunkOverhead <= budget) {
+                low = middle
+            } else {
+                high = middle - 1
+            }
         }
         return low
     }
@@ -293,7 +300,7 @@ private class FunctionLowering(
                 instructions = 0
             }
             instructions += range.count()
-            chunkClassDescriptor(module.packagePath, function.index.index, group)
+            chunkClassDescriptor(module.entryPath, function.index.index, group)
         }
     }
 
@@ -303,7 +310,7 @@ private class FunctionLowering(
         slotKinds: SlotKinds,
         liveness: SlotLiveness?,
         resetsSlots: Boolean,
-        limit: Int,
+        budget: Int,
         continuationIds: IntArray? = null,
     ): ChunkAttempt {
         val inlineMemory = inlineMemory(range)
@@ -325,9 +332,13 @@ private class FunctionLowering(
         val context = LowerContext(facts, slotKinds, locals, Emitter(node, locals.frameTypes), chunk)
         context.lowerChunkBody()
         context.emit.removeDeadStores(locals.firstLocalAfterParameters)
-        val allowance = if (continuationIds == null) PADDING_PER_SWITCH * node.instructions.count { it is TableSwitchInsnNode || it is LookupSwitchInsnNode } else 0
-        val length = finish(node) + allowance
-        val lowered = if (length <= limit) {
+        val allowance = if (continuationIds == null) {
+            methodSize.switchAllowance * node.instructions.count { instruction -> instruction is TableSwitchInsnNode || instruction is LookupSwitchInsnNode }
+        } else {
+            0
+        }
+        val length = methodSize.of(node, finish(node)) + allowance
+        val lowered = if (length <= budget) {
             LoweredChunk(node, entries, exits, recorded.dynamicExits, frameCost(locals), length)
         } else {
             null
@@ -397,8 +408,6 @@ private class FunctionLowering(
     }
 }
 
-private fun Label.resolvedOffset(): Int = ((info as? LabelNode)?.label ?: this).offset
-
 private fun codeLength(
     node: MethodNode,
     end: Label,
@@ -450,9 +459,5 @@ private class ChunkAttempt(
 private const val CHUNK_INSTRUCTIONS = 2_000
 
 private const val MAX_LIVENESS_WORDS = 16_000_000L
-
-private const val CHUNK_OVERHEAD_BYTES = 512
-
-private const val PADDING_PER_SWITCH = 3
 
 private const val CHUNK_PLACEHOLDER = "chunk"

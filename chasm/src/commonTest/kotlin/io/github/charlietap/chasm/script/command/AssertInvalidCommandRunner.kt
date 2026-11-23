@@ -16,7 +16,7 @@ suspend fun AssertInvalidCommandRunner(
     val moduleFilePath = context.binaryDirectory + "/" + moduleFilename
     val bytes = moduleFilePath.readBytesFromPath()
 
-    return BinaryValidator(bytes, context.config.moduleConfig).fold({ _ ->
+    return BinaryValidator(bytes, context.moduleConfig).fold({ _ ->
         CommandResult.Failure(command, "invalid module was validated when it should have failed")
     }) {
         CommandResult.Success

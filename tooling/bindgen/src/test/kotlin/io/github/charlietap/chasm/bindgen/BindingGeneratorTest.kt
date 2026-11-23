@@ -1,6 +1,11 @@
 package io.github.charlietap.chasm.bindgen
 
-import io.github.charlietap.chasm.config.GCStrategy
+import io.github.charlietap.chasm.config.CpuLimits
+import io.github.charlietap.chasm.config.Limits
+import io.github.charlietap.chasm.config.MB
+import io.github.charlietap.chasm.config.MemoryLimits
+import io.github.charlietap.chasm.config.RuntimeConfig
+import io.github.charlietap.chasm.config.fuel
 import io.github.charlietap.chasm.fixture.chasm.embedding.exportDefinition
 import io.github.charlietap.chasm.fixture.chasm.embedding.importDefinition
 import io.github.charlietap.chasm.fixture.chasm.embedding.moduleInfo
@@ -88,12 +93,21 @@ class BindingGeneratorTest {
         val rejected = listOf(
             CodegenConfig(runtime = CodegenRuntime.PORTABLE_VM, executionTier = ExecutionTier.Jit()),
             CodegenConfig(runtime = CodegenRuntime.PORTABLE_VM, executionTier = ExecutionTier.Aot("com.example.aot.WasmModule")),
-            CodegenConfig(runtime = CodegenRuntime.PORTABLE_VM, cpu = CpuLimits.Metered(10.fuel)),
-            CodegenConfig(runtime = CodegenRuntime.PORTABLE_VM, memory = MemoryLimits.Constrained()),
-            CodegenConfig(runtime = CodegenRuntime.PORTABLE_VM, interrupts = true),
-            CodegenConfig(runtime = CodegenRuntime.PORTABLE_VM, stacktraces = true),
-            CodegenConfig(runtime = CodegenRuntime.PORTABLE_VM, gcStrategy = GCStrategy.TRADITIONAL),
+            CodegenConfig(runtime = CodegenRuntime.PORTABLE_VM, runtimeConfig = RuntimeConfig(limits = Limits(cpu = CpuLimits.Metered(10.fuel)))),
+            CodegenConfig(runtime = CodegenRuntime.PORTABLE_VM, runtimeConfig = RuntimeConfig(limits = Limits(memory = MemoryLimits(linearMemory = 1.MB)))),
+            CodegenConfig(runtime = CodegenRuntime.PORTABLE_VM, runtimeConfig = RuntimeConfig(interrupts = true)),
+            CodegenConfig(runtime = CodegenRuntime.PORTABLE_VM, runtimeConfig = RuntimeConfig(stacktraces = true)),
             CodegenConfig(runtime = CodegenRuntime.CHASM, executionTier = ExecutionTier.Aot("com.example.Outer\$Inner")),
+            CodegenConfig(
+                runtime = CodegenRuntime.CHASM,
+                executionTier = ExecutionTier.Aot("com.example.aot.WasmModule"),
+                runtimeConfig = RuntimeConfig(limits = Limits(memory = MemoryLimits(linearMemory = 1.MB))),
+            ),
+            CodegenConfig(
+                runtime = CodegenRuntime.CHASM,
+                executionTier = ExecutionTier.Aot("com.example.aot.WasmModule"),
+                runtimeConfig = RuntimeConfig(stacktraces = true),
+            ),
         )
 
         rejected.forEach { config ->
@@ -105,7 +119,7 @@ class BindingGeneratorTest {
 
     @Test
     fun `an export named like a store control fails generation`() {
-        val config = CodegenConfig(runtime = CodegenRuntime.CHASM, interrupts = true)
+        val config = CodegenConfig(runtime = CodegenRuntime.CHASM, runtimeConfig = RuntimeConfig(interrupts = true))
         val info = moduleInfo(exports = listOf(exportDefinition(name = "interrupt", type = functionExternalType())))
 
         val failure = assertFailsWith<IllegalArgumentException> {
@@ -117,7 +131,7 @@ class BindingGeneratorTest {
 
     @Test
     fun `an export named like a store control is fine when that control is off`() {
-        val config = CodegenConfig(runtime = CodegenRuntime.CHASM, cpu = CpuLimits.Metered(10.fuel))
+        val config = CodegenConfig(runtime = CodegenRuntime.CHASM, runtimeConfig = RuntimeConfig(limits = Limits(cpu = CpuLimits.Metered(10.fuel))))
         val info = moduleInfo(exports = listOf(exportDefinition(name = "interrupt", type = functionExternalType())))
 
         val files = BindingGenerator().generate(info, BindingOptions(interfaceName = "Service", packageName = "com.example", config = config))

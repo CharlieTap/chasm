@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.aot
 
 data class CompileError(
-    val error: String,
+    val message: String,
     val stage: Stage,
     val functions: List<Int> = emptyList(),
 ) {

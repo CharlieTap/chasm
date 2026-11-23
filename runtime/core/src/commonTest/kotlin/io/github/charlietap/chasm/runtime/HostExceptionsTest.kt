@@ -1,8 +1,5 @@
 package io.github.charlietap.chasm.runtime
 
-import io.github.charlietap.chasm.config.GCStrategy
-import io.github.charlietap.chasm.config.GCThreshold
-import io.github.charlietap.chasm.fixture.config.runtimeConfig
 import io.github.charlietap.chasm.fixture.runtime.stack.vstack
 import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.fixture.runtime.type.rtt
@@ -18,12 +15,17 @@ import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.runtime.store.withLiveStack
 import io.github.charlietap.chasm.runtime.type.RTT
 import io.github.charlietap.chasm.type.AbstractHeapType
+import io.github.charlietap.chasm.type.ArrayType
 import io.github.charlietap.chasm.type.CompositeType
+import io.github.charlietap.chasm.type.DefinedType
+import io.github.charlietap.chasm.type.FieldType
 import io.github.charlietap.chasm.type.FunctionType
+import io.github.charlietap.chasm.type.Mutability
 import io.github.charlietap.chasm.type.NumberType
 import io.github.charlietap.chasm.type.RecursiveType
 import io.github.charlietap.chasm.type.ReferenceType
 import io.github.charlietap.chasm.type.ResultType
+import io.github.charlietap.chasm.type.StorageType
 import io.github.charlietap.chasm.type.StructType
 import io.github.charlietap.chasm.type.SubType
 import io.github.charlietap.chasm.type.TagType
@@ -146,10 +148,13 @@ class HostExceptionsTest {
 
     @Test
     @OptIn(UnsafeHostApi::class)
-    fun `traditional collection sees references in the host stack payload`() {
+    fun `collection sees references in the host stack payload`() {
+
         val store = store()
         val runtimeType = store.heap.registerRuntimeType(emptyStructType())
         val struct = store.heap.allocateStruct(runtimeType, LongArray(0))
+        val garbageLength = 8 * 1024 * 1024 / Long.SIZE_BYTES
+        val garbage = store.heap.allocateArrayFilled(store.heap.registerRuntimeType(numberArrayType()), garbageLength, 0L)
         val tagAddress = store.heap.registerTag(
             rtt(1),
             tagTypeFixture(
@@ -159,14 +164,7 @@ class HostExceptionsTest {
             ),
         )
         val stack = vstack().apply { push(struct) }
-        val context = executionContextFixture(
-            vstack = stack,
-            store = store,
-            config = runtimeConfig(
-                gcStrategy = GCStrategy.TRADITIONAL,
-                gcThreshold = GCThreshold.KB(0),
-            ),
-        )
+        val context = executionContextFixture(vstack = stack, store = store)
         val marker = store.heap.beginScope()
 
         val exception = store.withLiveStack(stack) {
@@ -175,6 +173,7 @@ class HostExceptionsTest {
             }
         }
 
+        assertEquals(-1, store.heap.arrayRuntimeTypeIdOrNegative(garbage))
         assertNotEquals(-1, store.heap.structRuntimeTypeIdOrNegative(struct))
         assertEquals(struct, store.heap.readPayload(exception, 0))
         store.heap.endScope(marker)
@@ -195,6 +194,24 @@ class HostExceptionsTest {
             ),
         ),
     )[0]
+
+    private fun numberArrayType(): DefinedType {
+        return DefinedTypeFactory(
+            listOf(
+                RecursiveType(
+                    subTypes = listOf(
+                        SubType.Final(
+                            superTypes = emptyList(),
+                            compositeType = CompositeType.Array(
+                                ArrayType(FieldType(StorageType.Value(ValueType.Number(NumberType.I64)), Mutability.Var)),
+                            ),
+                        ),
+                    ),
+                    state = RecursiveType.State.SYNTAX,
+                ),
+            ),
+        )[0]
+    }
 
     private fun tagType(vararg parameters: ValueType) = TagType(
         attribute = TagType.Attribute.Exception,

@@ -25,6 +25,10 @@ internal class InterpreterModuleInstallation(
         return handles.external(importable)
     }
 
+    override fun config(storeConfig: RuntimeConfig): RuntimeConfig {
+        return installer.config(module, storeConfig)
+    }
+
     override fun trapSource(instance: ModuleInstance): TrapSource? {
         return installer.trapSource(module, instance)
     }

@@ -46,7 +46,7 @@ private class ManagedEntry {
             callObjects(context, context.instance, function, words, references, context.compiledCallDepth)
             if (context.compiledUnwinding) holdThrown(context, pending) else null
         } catch (exception: InvocationException) {
-            if (context.config.debugInfo) traceableTrap(store, context.vstack, exception, entryIp(function)) else exception.error
+            if (context.config.stacktraces) traceableTrap(store, context.vstack, exception, entryIp(function)) else exception.error
         } catch (_: ClassCastException) {
             InvocationError.FailedToCastReference
         } finally {

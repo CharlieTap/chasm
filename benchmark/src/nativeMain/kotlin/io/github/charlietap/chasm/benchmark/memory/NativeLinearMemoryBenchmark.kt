@@ -2,7 +2,6 @@ package io.github.charlietap.chasm.benchmark.memory
 
 import io.github.charlietap.chasm.benchmark.BenchmarkConfig
 import io.github.charlietap.chasm.benchmark.StabilizedBenchmark
-import io.github.charlietap.chasm.config.LinearMemoryConfig
 import io.github.charlietap.chasm.memory.ByteArrayLinearMemory
 import io.github.charlietap.chasm.memory.copy.LinearMemoryCopier
 import io.github.charlietap.chasm.memory.destruct.LinearMemoryDestructor
@@ -430,9 +429,6 @@ class NativeLinearMemoryLifecycleBenchmark : StabilizedBenchmark() {
     @Param(MAPPED, BYTE_ARRAY)
     var backend: String = ""
 
-    @Param("false", "true")
-    var prefault: Boolean = false
-
     @Param("1", "256")
     var pagesToAdd: Int = 0
 
@@ -440,11 +436,7 @@ class NativeLinearMemoryLifecycleBenchmark : StabilizedBenchmark() {
     fun construction(blackhole: Blackhole) {
         val pages = LinearMemory.Pages(16u)
         val memory = when (backend) {
-            MAPPED -> LinearMemoryFactory(
-                pages,
-                pages,
-                LinearMemoryConfig(prefault = prefault),
-            )
+            MAPPED -> LinearMemoryFactory(pages, pages)
             BYTE_ARRAY -> ByteArrayLinearMemory(pages)
             else -> error("Unknown backend: $backend")
         }
@@ -457,11 +449,7 @@ class NativeLinearMemoryLifecycleBenchmark : StabilizedBenchmark() {
         val initialPages = LinearMemory.Pages(16u)
         val maximumPages = LinearMemory.Pages((16 + pagesToAdd).toUInt())
         val memory = when (backend) {
-            MAPPED -> LinearMemoryFactory(
-                initialPages,
-                maximumPages,
-                LinearMemoryConfig(prefault = prefault),
-            )
+            MAPPED -> LinearMemoryFactory(initialPages, maximumPages)
             BYTE_ARRAY -> ByteArrayLinearMemory(initialPages)
             else -> error("Unknown backend: $backend")
         }

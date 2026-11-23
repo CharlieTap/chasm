@@ -1,8 +1,5 @@
 package io.github.charlietap.chasm.integration.test
 
-import io.github.charlietap.chasm.config.GCStrategy
-import io.github.charlietap.chasm.config.GCThreshold
-import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.embedding.collect
 import io.github.charlietap.chasm.embedding.function
 import io.github.charlietap.chasm.embedding.invoke
@@ -41,22 +38,18 @@ class LiveStackRootsTest {
 
     private fun assertOuterFrameSurvives(export: String): TestResult {
         return integrationTest(FIXTURE) {
-            STRATEGIES.forEach { strategy ->
 
-                val store = engine.store()
-                val scenario = OuterFrameScenario(store)
-                val runner = runner(
-                    store = store,
-                    imports = scenario.imports,
-                    config = RuntimeConfig(gcStrategy = strategy, gcThreshold = GCThreshold.KB(0)),
-                )
-                scenario.instance = runner.instance().expect("instantiates")
-
-                runner.invoke(export).expect(export)
-
-                assertSame(SENTINEL, scenario.checkedExtern, "${engine.name()} $strategy")
-                assertEquals(42, scenario.checkedField, "${engine.name()} $strategy")
+            lateinit var scenario: OuterFrameScenario
+            val runner = runner { store ->
+                scenario = OuterFrameScenario(store)
+                scenario.imports
             }
+            scenario.instance = runner.instance().expect("instantiates")
+
+            runner.invoke(export).expect(export)
+
+            assertSame(SENTINEL, scenario.checkedExtern, engine.name())
+            assertEquals(42, scenario.checkedField, engine.name())
         }
     }
 
@@ -104,7 +97,6 @@ class LiveStackRootsTest {
         const val SENTINEL_KEY = 7
 
         val SENTINEL = Any()
-        val STRATEGIES = listOf(GCStrategy.TRADITIONAL, GCStrategy.ARENA)
         val I32 = ValueType.Number(NumberType.I32)
         val EXTERN = ValueType.Reference(ReferenceType.RefNull(AbstractHeapType.Extern))
 

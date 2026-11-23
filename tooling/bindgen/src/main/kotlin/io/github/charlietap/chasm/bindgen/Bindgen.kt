@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.bindgen
 
 import com.squareup.kotlinpoet.FileSpec
+import io.github.charlietap.chasm.config.MemoryLimits
 import io.github.charlietap.chasm.embedding.shapes.ModuleInfo
 
 data class BindingOptions(
@@ -53,8 +54,11 @@ private class KotlinPoetBindingGenerator(
                 "Chasm's own runtime."
         }
         require(config.runtime == CodegenRuntime.CHASM || !config.usesStoreSettings) {
-            "cpu, memory, interrupts, stacktraces and gcStrategy require CodegenRuntime.CHASM because they " +
-                "configure Chasm's store."
+            "runtimeConfig requires CodegenRuntime.CHASM because it configures Chasm's store"
+        }
+        require(tier !is ExecutionTier.Aot || (config.runtimeConfig.limits.memory == MemoryLimits() && !config.runtimeConfig.stacktraces)) {
+            "an AOT module's runtime settings are fixed when it is compiled: set them in CompileConfig.runtime. " +
+                "For ExecutionTier.Aot, runtimeConfig may only set limits.cpu and interrupts, which shape the generated store controls"
         }
         val gcStringFunctions = options.functions.filter { function ->
             function.parameters.any { parameter -> parameter.stringEncodingStrategy.storedInGcArray } ||
@@ -75,7 +79,7 @@ private class KotlinPoetBindingGenerator(
         }
         if (tier is ExecutionTier.Aot) {
             require(QUALIFIED_CLASS_NAME.matches(tier.compiledModule)) {
-                "compiledModule must name a class as Kotlin source does, such as com.example.aot.WasmModule: " +
+                "compiledModule must name a class as Kotlin source does, such as com.example.parser.ParserModule: " +
                     "\"${tier.compiledModule}\" is not one."
             }
         }

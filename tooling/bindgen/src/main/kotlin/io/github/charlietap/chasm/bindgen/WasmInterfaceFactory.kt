@@ -451,7 +451,7 @@ internal class WasmInterfaceFactory(
     private val memoryBindingFactory: MemoryBindingFactory = MemoryBindingFactory(),
     private val allocatorValidator: AllocatorValidator = AllocatorValidator(),
     private val exportExcluder: ExportExcluder = ExportExcluder(),
-    private val callConvention: FunctionCallConvention = UnboxedFunctionCallConvention(),
+    private val callConvention: UnboxedFunctionCallConvention = UnboxedFunctionCallConvention(),
 ) {
     operator fun invoke(
         interfaceName: String,

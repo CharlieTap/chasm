@@ -17,12 +17,12 @@ suspend fun AssertUninstantiableCommandRunner(
     val moduleFilePath = context.binaryDirectory + "/" + command.filename
     val bytes = moduleFilePath.readBytesFromPath()
 
-    val module = when (val decoded = module(bytes, context.config.moduleConfig)) {
+    val module = when (val decoded = module(bytes, context.moduleConfig)) {
         is ChasmResult.Success -> decoded.result
         is ChasmResult.Error -> return CommandResult.Success
     }
 
-    return when (instance(context.store, module, context.imports, context.config.runtimeConfig)) {
+    return when (instance(context.store, module, context.imports)) {
         is ChasmResult.Success -> CommandResult.Failure(command, "instantiation succeeded when it shouldn't")
         is ChasmResult.Error -> CommandResult.Success
     }

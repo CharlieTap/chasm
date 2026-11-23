@@ -3,22 +3,34 @@
 package io.github.charlietap.chasm.aot.compiled
 
 import io.github.charlietap.chasm.InternalChasmApi
-import io.github.charlietap.chasm.aot.compiledModule
+import io.github.charlietap.chasm.aot.CompiledModule
+import io.github.charlietap.chasm.aot.internal.AotModule
+import io.github.charlietap.chasm.aot.internal.LineRange
+import io.github.charlietap.chasm.aot.internal.trapLinesKey
+import io.github.charlietap.chasm.aot.internal.trapLinesResource
+import io.github.charlietap.chasm.aot.internal.writeTrapLines
+import io.github.charlietap.chasm.aot.module
 import io.github.charlietap.chasm.aot.store
 import io.github.charlietap.chasm.compiler.backend.jvm.JvmModule
 import io.github.charlietap.chasm.compiler.backend.jvm.JvmOptions
+import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.embedding.error.ExecutionError
+import io.github.charlietap.chasm.embedding.error.WasmFrame
 import io.github.charlietap.chasm.embedding.exports
 import io.github.charlietap.chasm.embedding.instance
 import io.github.charlietap.chasm.embedding.invoke
+import io.github.charlietap.chasm.embedding.module
 import io.github.charlietap.chasm.embedding.prepareFunction
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.Module
+import io.github.charlietap.chasm.embedding.shapes.Store
+import io.github.charlietap.chasm.embedding.shapes._payload
 import io.github.charlietap.chasm.embedding.shapes.expect
 import io.github.charlietap.chasm.embedding.value.ExecutionValue
 import io.github.charlietap.chasm.embedding.value.NumberValue.I32
 import kotlinx.coroutines.runBlocking
+import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.net.URLClassLoader
 import java.nio.file.Files
@@ -33,7 +45,9 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertIs
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
+import io.github.charlietap.chasm.embedding.store as interpreterStore
 
 class CompiledModuleTest {
 
@@ -57,7 +71,7 @@ class CompiledModuleTest {
         val expected = calls.map { (name, arguments) -> interpreted.call(name, *arguments.toTypedArray<ExecutionValue>()) }
 
         repeat(2) {
-            val store = store()
+            val store = store(compiled)
             val instance = instance(store, compiled).expect("instantiates")
             calls.forEachIndexed { index, (name, arguments) ->
                 assertEquals(expected[index], invoke(instance, name, arguments).expect(name), name)
@@ -72,10 +86,12 @@ class CompiledModuleTest {
         val missing = CountingLoader(generated, null)
 
         repeat(2) {
-            instance(store(), present.compiledModule()).expect("instantiates")
-            val result = instance(store(), missing.compiledModule())
+            val presentModule = present.compiledModule()
+            instance(store(presentModule), presentModule).expect("instantiates")
+            val missingModule = missing.compiledModule()
+            val result = instance(store(missingModule), missingModule)
             assertIs<ChasmResult.Error<*>>(result)
-            assertTrue("data.chasmdata is missing" in result.error.toString(), result.error.toString())
+            assertTrue("WasmModule.chasmdata is missing" in result.error.toString(), result.error.toString())
         }
         assertEquals(2, present.reads)
         assertEquals(2, missing.reads)
@@ -85,9 +101,9 @@ class CompiledModuleTest {
     fun `a truncated data resource fails instantiation as unavailable data`() = runBlocking<Unit> {
         val generated = generate(fixture("declarations"))
         val data = generated.resources.getValue(checkNotNull(generated.module.data))
-        val truncated = CountingLoader(generated, data.copyOf(data.size - 1))
+        val truncated = CountingLoader(generated, data.copyOf(data.size - 1)).compiledModule()
 
-        val result = instance(store(), truncated.compiledModule())
+        val result = instance(store(truncated), truncated)
 
         assertIs<ChasmResult.Error<*>>(result)
         assertTrue("DataUnavailable" in result.error.toString(), result.error.toString())
@@ -105,7 +121,7 @@ class CompiledModuleTest {
         val threads = List(8) { thread ->
             Thread {
                 start.await()
-                val store = store()
+                val store = store(compiled)
                 val instance = runBlocking { instance(store, compiled) }.expect("instantiates")
                 results += invoke(instance, "add", listOf(I32(thread), I32(1))).expect("add")
             }.apply { start() }
@@ -120,7 +136,7 @@ class CompiledModuleTest {
     @Test
     fun `a prepared function runs compiled code each time it is called`() = runBlocking<Unit> {
         val compiled = generate(fixture("add")).compiledModule()
-        val store = store()
+        val store = store(compiled)
         val instance = instance(store, compiled).expect("instantiates")
         val add = prepareFunction(instance, "add").expect("prepares")
 
@@ -131,22 +147,22 @@ class CompiledModuleTest {
     @Test
     fun `an instance's exports are refused by another store`() = runBlocking<Unit> {
         val compiled = generate(fixture("declarations")).compiledModule()
-        val owner = store()
-        val other = store()
+        val owner = store(compiled)
+        val other = store(compiled)
         val instance = instance(owner, compiled).expect("instantiates")
         val imports = exports(instance).all.map { export -> Import("owner", export.name, export.value) }
 
         val imported = assertFailsWith<IllegalArgumentException> {
             instance(other, compiled, imports)
         }
-        assertTrue("different store" in imported.message.orEmpty(), imported.message)
+        assertEquals("the import owner.${imports.first().entityName} belongs to a different store", imported.message)
         assertEquals(listOf(I32(40)), invoke(instance, "started").expect("started"))
     }
 
     @Test
     fun `instances of one compiled module keep their own state`() = runBlocking<Unit> {
         val compiled = generate(fixture("declarations")).compiledModule()
-        val store = store()
+        val store = store(compiled)
 
         val first = instance(store, compiled).expect("first instantiates")
         val second = instance(store, compiled).expect("second instantiates")
@@ -159,41 +175,104 @@ class CompiledModuleTest {
 
     @Test
     fun `modules packaged together in a jar each find their own declarations`() = runBlocking<Unit> {
-        val jar = Files.createTempFile("compiled", ".jar")
-        val modules = listOf("add" to "chasm.aot.add", "declarations" to "chasm.aot.declarations").map { (fixture, packageName) ->
-            generate(fixture(fixture), JvmOptions(packageName = packageName))
+
+        val modules = listOf("add" to "chasm.aot.add.WasmModule", "declarations" to "chasm.aot.declarations.WasmModule").map { (fixture, entryClass) ->
+            generate(fixture(fixture), JvmOptions(entryClass = entryClass))
         }
-        JarOutputStream(Files.newOutputStream(jar)).use { output ->
-            modules.forEach { generated ->
-                generated.classes.forEach { (name, bytes) -> output.entry("$name.class", bytes) }
-                generated.resources.forEach { (path, bytes) -> output.entry(path, bytes) }
-            }
-        }
-        URLClassLoader(arrayOf(jar.toUri().toURL()), JvmModule::class.java.classLoader).use { loader ->
-            val (add, declarations) = modules.map { generated ->
-                compiledModule(generated.module.moduleClass, loader).expect("loads")
-            }
-            val store = store()
+
+        withJar(modules, stored = false) { (add, declarations) ->
+            val store = store(add)
             val addInstance = instance(store, add).expect("add instantiates")
             val declarationsInstance = instance(store, declarations).expect("declarations instantiates")
 
             assertEquals(listOf(I32(5)), invoke(addInstance, "add", listOf(I32(2), I32(3))).expect("add"))
             assertEquals(listOf(I32(40)), invoke(declarationsInstance, "started").expect("started"))
         }
-        Files.delete(jar)
+    }
+
+    @Test
+    fun `a trap in one of two modules sharing a package names that module's frames`() {
+
+        val expected = runBlocking {
+            sharedPackageTraps(interpreterStore(DIAGNOSTICS), module(fixture(BOOM)).expect("boom decodes"), module(fixture(CALLER)).expect("caller decodes"))
+        }
+        val modules = listOf(BOOM to "chasm.aot.shared.Boom", CALLER to "chasm.aot.shared.Caller").map { (fixture, entryClass) ->
+            generate(fixture(fixture), JvmOptions(entryClass = entryClass, runtime = DIAGNOSTICS))
+        }
+
+        withJar(modules, stored = false) { (boom, caller) ->
+
+            val actual = runBlocking { sharedPackageTraps(store(boom), boom, caller) }
+
+            assertEquals(listOf("explode"), expected.first.map { frame -> frame.functionName })
+            assertEquals(listOf("explode", "call_boom", "call_owner"), expected.second.map { frame -> frame.functionName })
+            assertEquals(expected.first.map(::named), actual.first.map(::named))
+            assertEquals(expected.second.map(::named), actual.second.map(::named))
+        }
+    }
+
+    @Test
+    fun `the post-shrink line table is read from the class path when assets hold none`() {
+
+        val generated = generate(fixture(BOOM), JvmOptions(entryClass = "chasm.aot.lines.Module", runtime = DIAGNOSTICS))
+        generated.resources[trapLinesResource("chasm/aot/lines/Module")] = linesTable(original = 7)
+
+        val trapLines = (generated.compiledModule()._payload() as AotModule).trapLines
+
+        assertEquals(7, checkNotNull(trapLines).original("Module\$Code0", "f0", 1))
+    }
+
+    @Test
+    fun `the post-shrink line table in assets is read before one on the class path`() {
+
+        val generated = generate(fixture(BOOM), JvmOptions(entryClass = "chasm.aot.lines.Module", runtime = DIAGNOSTICS))
+        generated.resources[trapLinesResource("chasm/aot/lines/Module")] = linesTable(original = 7)
+        generated.resources["assets/" + trapLinesResource("chasm/aot/lines/Module")] = linesTable(original = 9)
+
+        val trapLines = (generated.compiledModule()._payload() as AotModule).trapLines
+
+        assertEquals(9, checkNotNull(trapLines).original("Module\$Code0", "f0", 1))
+    }
+
+    private fun linesTable(original: Int): ByteArray {
+
+        val table = ByteArrayOutputStream()
+        writeTrapLines(table, mapOf(trapLinesKey("Module\$Code0", "f0") to listOf(LineRange(first = 1, last = 1, original = original, linear = false))))
+
+        return table.toByteArray()
+    }
+
+    private suspend fun sharedPackageTraps(
+        store: Store,
+        boom: Module,
+        caller: Module,
+    ): Pair<List<WasmFrame>, List<WasmFrame>> {
+
+        val boomInstance = instance(store, boom).expect("boom instantiates")
+        val explode = assertNotNull(exports(boomInstance).function("boom"))
+        val callerInstance = instance(store, caller, listOf(Import("owner", "boom", explode))).expect("caller instantiates")
+
+        val direct = assertIs<ExecutionError.Trapped>(assertIs<ChasmResult.Error<*>>(invoke(boomInstance, "boom")).error)
+        val called = assertIs<ExecutionError.Trapped>(assertIs<ChasmResult.Error<*>>(invoke(callerInstance, "call_owner")).error)
+
+        return checkNotNull(direct.trap.stackTrace).frames to checkNotNull(called.trap.stackTrace).frames
+    }
+
+    private fun named(frame: WasmFrame): Triple<String?, String?, Int> {
+        return Triple(frame.moduleName, frame.functionName, frame.functionIndex)
     }
 
     @Test
     fun `a module whose data is stored uncompressed in a jar reads it in place for each instance`() = runBlocking<Unit> {
         val bytes = fixture("declarations")
         val interpreted = InterpretedFixture(bytes)
-        val generated = generate(bytes, JvmOptions(packageName = "chasm.aot.stored"))
+        val generated = generate(bytes, JvmOptions(entryClass = "chasm.aot.stored.WasmModule"))
         val calls = listOf("active_data", "passive_data", "started")
         val expected = calls.map { name -> interpreted.call(name) }
 
-        withJar(generated, stored = true) { compiled ->
+        withJar(listOf(generated), stored = true) { (compiled) ->
             repeat(2) {
-                val store = store()
+                val store = store(compiled)
                 val instance = instance(store, compiled).expect("instantiates")
                 calls.forEachIndexed { index, name ->
                     assertEquals(expected[index], invoke(instance, name).expect(name), name)
@@ -204,12 +283,12 @@ class CompiledModuleTest {
 
     @Test
     fun `a truncated data resource stored uncompressed fails instantiation as unavailable data`() = runBlocking<Unit> {
-        val generated = generate(fixture("declarations"), JvmOptions(packageName = "chasm.aot.truncated"))
+        val generated = generate(fixture("declarations"), JvmOptions(entryClass = "chasm.aot.truncated.WasmModule"))
         val data = checkNotNull(generated.module.data)
         generated.resources[data] = generated.resources.getValue(data).copyOf(1)
 
-        withJar(generated, stored = true) { compiled ->
-            val result = instance(store(), compiled)
+        withJar(listOf(generated), stored = true) { (compiled) ->
+            val result = instance(store(compiled), compiled)
 
             assertIs<ChasmResult.Error<*>>(result)
             assertTrue("DataUnavailable" in result.error.toString(), result.error.toString())
@@ -217,18 +296,24 @@ class CompiledModuleTest {
     }
 
     private inline fun withJar(
-        generated: Generated,
+        modules: List<Generated>,
         stored: Boolean,
-        block: (Module) -> Unit,
+        block: (List<Module>) -> Unit,
     ) {
         val jar = Files.createTempFile("compiled", ".jar")
         JarOutputStream(Files.newOutputStream(jar)).use { output ->
-            generated.classes.forEach { (name, bytes) -> output.entry("$name.class", bytes) }
-            generated.resources.forEach { (path, bytes) -> output.entry(path, bytes, stored) }
+            modules.forEach { generated ->
+                generated.classes.forEach { (name, bytes) -> output.entry("$name.class", bytes) }
+                generated.resources.forEach { (path, bytes) -> output.entry(path, bytes, stored) }
+            }
         }
         try {
             URLClassLoader(arrayOf(jar.toUri().toURL()), JvmModule::class.java.classLoader).use { loader ->
-                block(compiledModule(generated.module.moduleClass, loader).expect("loads"))
+                block(
+                    modules.map { generated ->
+                        module(loader.loadClass(generated.module.moduleClass).getField("COMPILED").get(null) as CompiledModule).expect("loads")
+                    },
+                )
             }
         } finally {
             Files.delete(jar)
@@ -238,8 +323,8 @@ class CompiledModuleTest {
     @Test
     fun `a module whose name section does not decode instantiates without names`() = runBlocking<Unit> {
         val bytes = fixture("add") + byteArrayOf(0x00, 0x06, 0x04, 0x6E, 0x61, 0x6D, 0x65, 0x00)
-        val compiled = generate(bytes, JvmOptions(stacktraces = true)).compiledModule()
-        val store = store()
+        val compiled = generate(bytes, JvmOptions(runtime = DIAGNOSTICS)).compiledModule()
+        val store = store(compiled)
 
         val instance = instance(store, compiled).expect("instantiates")
 
@@ -248,9 +333,9 @@ class CompiledModuleTest {
 
     @Test
     fun `a trap in an imported start function is named by the module that defines it`() = runBlocking<Unit> {
-        val boom = generate(fixture("boom"), JvmOptions(packageName = "chasm.aot.boom", stacktraces = true)).compiledModule()
-        val starting = generate(fixture("imported_start"), JvmOptions(packageName = "chasm.aot.starting", stacktraces = true)).compiledModule()
-        val store = store()
+        val boom = generate(fixture("boom"), JvmOptions(entryClass = "chasm.aot.boom.WasmModule", runtime = DIAGNOSTICS)).compiledModule()
+        val starting = generate(fixture("imported_start"), JvmOptions(entryClass = "chasm.aot.starting.WasmModule", runtime = DIAGNOSTICS)).compiledModule()
+        val store = store(boom)
         val exporter = instance(store, boom).expect("boom instantiates")
         val imports = exports(exporter).all.map { export -> Import("boom", export.name, export.value) }
 
@@ -265,9 +350,9 @@ class CompiledModuleTest {
 
     @Test
     fun `a trap in a compiled start function names every frame`() = runBlocking<Unit> {
-        val compiled = generate(fixture("start_trap"), JvmOptions(stacktraces = true)).compiledModule()
+        val compiled = generate(fixture("start_trap"), JvmOptions(runtime = DIAGNOSTICS)).compiledModule()
 
-        val result = instance(store(), compiled)
+        val result = instance(store(compiled), compiled)
 
         assertIs<ChasmResult.Error<*>>(result)
         val trapped = assertIs<ExecutionError.Trapped>(result.error)
@@ -303,7 +388,9 @@ class CompiledModuleTest {
         private val counter = AtomicInteger()
         val reads: Int get() = counter.get()
 
-        fun compiledModule(): Module = compiledModule(loadClass(moduleClass)).expect("loads")
+        fun compiledModule(): Module {
+            return module(loadClass(moduleClass).getField("COMPILED").get(null) as CompiledModule).expect("loads")
+        }
 
         override fun findClass(
             name: String,
@@ -318,5 +405,11 @@ class CompiledModuleTest {
             counter.incrementAndGet()
             return data?.inputStream()
         }
+    }
+
+    private companion object {
+        const val BOOM = "boom"
+        const val CALLER = "trap_diagnostics_mixed"
+        val DIAGNOSTICS = RuntimeConfig(stacktraces = true)
     }
 }

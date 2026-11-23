@@ -5,9 +5,10 @@ package io.github.charlietap.chasm.embedding.internal
 import com.github.michaelbull.result.Result
 import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.config.RuntimeConfig
-import io.github.charlietap.chasm.config.StoreConfig
 import io.github.charlietap.chasm.embedding.diagnostic.InterpreterTrapSource
 import io.github.charlietap.chasm.embedding.diagnostic.TrapSource
+import io.github.charlietap.chasm.embedding.error.ExecutionError
+import io.github.charlietap.chasm.embedding.error.InstantiationError
 import io.github.charlietap.chasm.embedding.shapes.DecodedModule
 import io.github.charlietap.chasm.embedding.shapes.Module
 import io.github.charlietap.chasm.embedding.shapes._payload
@@ -20,22 +21,19 @@ import io.github.charlietap.chasm.runtime.store.Store as RuntimeStore
 
 internal class InterpreterModuleInstaller : ModuleInstaller {
 
-    override fun rejection(
-        module: Module,
-        store: StoreConfig,
-    ): String? {
+    override fun rejection(module: Module): InstantiationError? {
         return if (module._payload() is DecodedModule) {
             null
         } else {
-            "an interpreter store only instantiates modules decoded by module()"
+            ExecutionError.Unsupported("an interpreter store only instantiates modules decoded by module()")
         }
     }
 
     override fun config(
         module: Module,
-        requested: RuntimeConfig,
+        storeConfig: RuntimeConfig,
     ): RuntimeConfig {
-        return requested
+        return storeConfig
     }
 
     override fun trapSource(

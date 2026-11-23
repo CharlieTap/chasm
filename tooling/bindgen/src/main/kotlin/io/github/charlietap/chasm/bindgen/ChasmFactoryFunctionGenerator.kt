@@ -5,12 +5,15 @@ import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.LambdaTypeName
 import com.squareup.kotlinpoet.MemberName
 import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.joinToCode
-import io.github.charlietap.chasm.config.StoreLimits
+import io.github.charlietap.chasm.config.Bytes
+import io.github.charlietap.chasm.config.CpuLimits
+import io.github.charlietap.chasm.config.GrowthFailureStrategy
 
 internal class ChasmFactoryFunctionGenerator {
     operator fun invoke(
@@ -19,10 +22,9 @@ internal class ChasmFactoryFunctionGenerator {
         visibility: FactoryVisibility,
         linksWasiPreview1: Boolean,
         config: CodegenConfig,
-        api: EmbeddingApi,
     ): FunSpec {
 
-        val source = moduleSource(config, api)
+        val source = moduleSource(config)
         val visibilityModifier = when (visibility) {
             FactoryVisibility.INTERNAL -> KModifier.INTERNAL
             FactoryVisibility.PUBLIC -> KModifier.PUBLIC
@@ -36,7 +38,7 @@ internal class ChasmFactoryFunctionGenerator {
                 addParameter("wasiHost", WASI_EMBEDDER_HOST_CLASS_NAME)
             }
             addParameter(
-                ParameterSpec.builder("imports", List::class.asClassName().parameterizedBy(api.codegenImport))
+                ParameterSpec.builder("imports", List::class.asClassName().parameterizedBy(CHASM_CODEGEN_IMPORT_CLASS_NAME))
                     .defaultValue("emptyList()")
                     .build(),
             )
@@ -45,7 +47,7 @@ internal class ChasmFactoryFunctionGenerator {
 
             addCode(source.loadModule())
             if (linksWasiPreview1) {
-                addStatement("val explicitImports = %M(store, imports)", api.allocateImports)
+                addStatement("val explicitImports = %M(store, imports)", CHASM_ALLOCATE_IMPORTS_FUNCTION)
                 addStatement(
                     "val wasiImports = %T(store, module) { host = wasiHost }" +
                         ".buildRequired(providedImports = explicitImports)",
@@ -53,7 +55,7 @@ internal class ChasmFactoryFunctionGenerator {
                 )
                 addStatement("val allocatedImports = explicitImports + wasiImports")
             } else {
-                addStatement("val allocatedImports = %M(store, imports)", api.allocateImports)
+                addStatement("val allocatedImports = %M(store, imports)", CHASM_ALLOCATE_IMPORTS_FUNCTION)
             }
             addCode(source.instantiate())
             addStatement(
@@ -63,15 +65,12 @@ internal class ChasmFactoryFunctionGenerator {
         }.build()
     }
 
-    private fun moduleSource(
-        config: CodegenConfig,
-        api: EmbeddingApi,
-    ): ModuleSource {
+    private fun moduleSource(config: CodegenConfig): ModuleSource {
         return when (val tier = config.executionTier) {
-            is ExecutionTier.Aot -> CompiledModule(config, api, tier)
+            is ExecutionTier.Aot -> CompiledModule(tier)
             is ExecutionTier.Interpreter,
             is ExecutionTier.Jit,
-            -> DecodedModule(config, api)
+            -> DecodedModule(config)
         }
     }
 }
@@ -88,16 +87,15 @@ private interface ModuleSource {
 
 private class DecodedModule(
     private val config: CodegenConfig,
-    private val api: EmbeddingApi,
 ) : ModuleSource {
 
     override val inputs = listOf(ParameterSpec("binary", BYTE_ARRAY))
 
     override val factories = listOf(
-        ParameterSpec.builder("moduleFactory", api.moduleFactoryOverrideType.copy(nullable = true))
+        ParameterSpec.builder("moduleFactory", MODULE_FACTORY_OVERRIDE_TYPE.copy(nullable = true))
             .defaultValue("null")
             .build(),
-        ParameterSpec.builder("instanceFactory", api.instanceFactoryOverrideType.copy(nullable = true))
+        ParameterSpec.builder("instanceFactory", INSTANCE_FACTORY_OVERRIDE_TYPE.copy(nullable = true))
             .defaultValue("null")
             .build(),
     )
@@ -105,16 +103,10 @@ private class DecodedModule(
     override fun loadModule(): CodeBlock {
         return CodeBlock.builder().apply {
 
-            addStatement("val store = %M(%L)", api.storeFactory(config.executionTier), storeConfig())
-
-            val cpu = config.cpu
-            if (cpu is CpuLimits.Metered) {
-                addStatement("%M(store, %LL)", api.storeFunction(StoreFunction.AddFuel), cpu.fuel.units)
-            }
-
+            addStatement("val store = %M(%L)", chasmStoreFactory(config.executionTier), runtimeConfig())
             addStatement(
                 "val module = moduleFactory?.invoke(binary) ?: %M(binary).%M(%S)",
-                api.moduleFactory,
+                CHASM_MODULE_FUNCTION,
                 CHASM_EXPECT,
                 "Failed to decode binary",
             )
@@ -125,63 +117,64 @@ private class DecodedModule(
         return CodeBlock.builder()
             .addStatement(
                 "val instance = instanceFactory?.invoke(store, module, allocatedImports) ?: " +
-                    "%M(store, module, allocatedImports%L).%M(%S)",
-                api.instanceFactory,
-                runtimeConfig(),
+                    "%M(store, module, allocatedImports).%M(%S)",
+                CHASM_INSTANCE_FUNCTION,
                 CHASM_EXPECT,
                 "Failed to instantiate module",
             ).build()
     }
 
-    private fun storeConfig(): CodeBlock {
+    private fun runtimeConfig(): CodeBlock {
 
-        val memory = config.memory
+        val runtime = config.runtimeConfig
+        val cpu = runtime.limits.cpu
+        val memory = runtime.limits.memory
+
+        val memoryArguments = buildList {
+            memory.linearMemory?.let { size -> add(bytesArgument("linearMemory", size)) }
+            memory.gcHeap?.let { size -> add(bytesArgument("gcHeap", size)) }
+            memory.tables?.let { size -> add(bytesArgument("tables", size)) }
+            memory.stack?.let { size -> add(bytesArgument("stack", size)) }
+            if (memory.onGrowthFailure != GrowthFailureStrategy.Continue) {
+                add(CodeBlock.of("onGrowthFailure = %T.%L", CHASM_GROWTH_FAILURE_STRATEGY_CLASS_NAME, memory.onGrowthFailure.name))
+            }
+        }
+        val limitsArguments = buildList {
+            if (cpu is CpuLimits.Metered) {
+                add(CodeBlock.of("cpu = %T(%T(%LL))", CHASM_METERED_CLASS_NAME, CHASM_FUEL_CLASS_NAME, cpu.fuel.units))
+            }
+            if (memoryArguments.isNotEmpty()) {
+                add(CodeBlock.of("memory = %T(%L)", CHASM_MEMORY_LIMITS_CLASS_NAME, memoryArguments.joinToCode()))
+            }
+        }
         val arguments = buildList {
-            if (config.cpu is CpuLimits.Metered) {
-                add(CodeBlock.of("meterFuel = true"))
+            if (runtime.interrupts) {
+                add(CodeBlock.of("interrupts = true"))
             }
-            if (config.interrupts) {
-                add(CodeBlock.of("interruptible = true"))
+            if (runtime.stacktraces) {
+                add(CodeBlock.of("stacktraces = true"))
             }
-            config.gcStrategy?.let { strategy ->
-                add(CodeBlock.of("gcStrategy = %T.%L", CHASM_GC_STRATEGY_CLASS_NAME, strategy.name))
-            }
-            if (memory is MemoryLimits.Constrained) {
-                add(CodeBlock.of("limits = %L", storeLimits(memory.toStoreLimits())))
+            if (limitsArguments.isNotEmpty()) {
+                add(CodeBlock.of("limits = %T(%L)", CHASM_LIMITS_CLASS_NAME, limitsArguments.joinToCode()))
             }
         }
 
         return if (arguments.isEmpty()) {
             CodeBlock.of("")
         } else {
-            CodeBlock.of("%T(%L)", CHASM_STORE_CONFIG_CLASS_NAME, arguments.joinToCode())
+            CodeBlock.of("%T(%L)", CHASM_RUNTIME_CONFIG_CLASS_NAME, arguments.joinToCode())
         }
     }
 
-    private fun storeLimits(limits: StoreLimits): CodeBlock {
-        return CodeBlock.of(
-            "%T(gcHeapBytes = %LL, memoryPages = %L, tableElements = %L, trapOnGrowFailure = %L, stackBytes = %LL)",
-            CHASM_STORE_LIMITS_CLASS_NAME,
-            limits.gcHeapBytes,
-            limits.memoryPages,
-            limits.tableElements,
-            limits.trapOnGrowFailure,
-            limits.stackBytes,
-        )
-    }
-
-    private fun runtimeConfig(): CodeBlock {
-        return if (config.stacktraces) {
-            CodeBlock.of(", %T(debugInfo = true)", CHASM_RUNTIME_CONFIG_CLASS_NAME)
-        } else {
-            CodeBlock.of("")
-        }
+    private fun bytesArgument(
+        name: String,
+        size: Bytes,
+    ): CodeBlock {
+        return CodeBlock.of("%L = %T(%LL)", name, CHASM_BYTES_CLASS_NAME, size.value)
     }
 }
 
 private class CompiledModule(
-    private val config: CodegenConfig,
-    private val api: EmbeddingApi,
     private val tier: ExecutionTier.Aot,
 ) : ModuleSource {
 
@@ -196,25 +189,13 @@ private class CompiledModule(
         return CodeBlock.builder().apply {
 
             addStatement(
-                "val module = %M(%T.INSTANCE).%M(%S)",
-                api.compiledModuleFactory,
+                "val module = %M(%T.COMPILED).%M(%S)",
+                CHASM_COMPILED_MODULE_FUNCTION,
                 moduleClass,
                 CHASM_EXPECT,
                 "Failed to load ${tier.compiledModule}",
             )
-            addStatement("val metadata = %M(module)", api.compiledModuleMetadata)
-
-            if (config.stacktraces) {
-                addStatement("check(metadata.capabilities.stacktraces) { %S }", "${tier.compiledModule} was compiled without stack traces")
-            } else {
-                addStatement("check(!metadata.capabilities.stacktraces) { %S }", "${tier.compiledModule} was compiled with stack traces")
-            }
-
-            addStatement("val store = %M(metadata.storeConfig)", api.storeFactory(tier))
-            addStatement("val initialFuel = metadata.initialFuel")
-            beginControlFlow("if (initialFuel != null)")
-            addStatement("%M(store, initialFuel)", api.storeFunction(StoreFunction.AddFuel))
-            endControlFlow()
+            addStatement("val store = %M(module)", chasmStoreFactory(tier))
         }.build()
     }
 
@@ -222,7 +203,7 @@ private class CompiledModule(
         return CodeBlock.builder()
             .addStatement(
                 "val instance = %M(store, module, allocatedImports).%M(%S)",
-                api.instanceFactory,
+                CHASM_INSTANCE_FUNCTION,
                 CHASM_EXPECT,
                 "Failed to instantiate module",
             ).build()
@@ -230,9 +211,13 @@ private class CompiledModule(
 }
 
 internal val CHASM_RUNTIME_CONFIG_CLASS_NAME = ClassName("io.github.charlietap.chasm.config", "RuntimeConfig")
-internal val CHASM_STORE_CONFIG_CLASS_NAME = ClassName("io.github.charlietap.chasm.config", "StoreConfig")
-internal val CHASM_STORE_LIMITS_CLASS_NAME = ClassName("io.github.charlietap.chasm.config", "StoreLimits")
-internal val CHASM_GC_STRATEGY_CLASS_NAME = ClassName("io.github.charlietap.chasm.config", "GCStrategy")
+internal val CHASM_LIMITS_CLASS_NAME = ClassName("io.github.charlietap.chasm.config", "Limits")
+internal val CHASM_CPU_LIMITS_CLASS_NAME = ClassName("io.github.charlietap.chasm.config", "CpuLimits")
+internal val CHASM_METERED_CLASS_NAME = CHASM_CPU_LIMITS_CLASS_NAME.nestedClass("Metered")
+internal val CHASM_MEMORY_LIMITS_CLASS_NAME = ClassName("io.github.charlietap.chasm.config", "MemoryLimits")
+internal val CHASM_FUEL_CLASS_NAME = ClassName("io.github.charlietap.chasm.config", "Fuel")
+internal val CHASM_BYTES_CLASS_NAME = ClassName("io.github.charlietap.chasm.config", "Bytes")
+internal val CHASM_GROWTH_FAILURE_STRATEGY_CLASS_NAME = ClassName("io.github.charlietap.chasm.config", "GrowthFailureStrategy")
 internal val CHASM_EXPERIMENTAL_API_CLASS_NAME = ClassName("io.github.charlietap.chasm", "ExperimentalChasmApi")
 internal val OPT_IN_CLASS_NAME = ClassName("kotlin", "OptIn")
 internal val UNSAFE_HOST_API_CLASS_NAME = ClassName("io.github.charlietap.chasm.host", "UnsafeHostApi")
@@ -241,3 +226,13 @@ internal val WASI_PREVIEW1_BUILDER_CLASS_NAME =
     ClassName("at.released.weh.bindings.chasm.wasip1", "ChasmWasiPreview1Builder")
 
 internal val CHASM_EXPECT = MemberName("io.github.charlietap.chasm.embedding.shapes", "expect")
+
+private val MODULE_FACTORY_OVERRIDE_TYPE = LambdaTypeName.get(null, BYTE_ARRAY, returnType = CHASM_MODULE_CLASS_NAME)
+    .copy(suspending = true)
+private val INSTANCE_FACTORY_OVERRIDE_TYPE = LambdaTypeName.get(
+    null,
+    CHASM_STORE_CLASS_NAME,
+    CHASM_MODULE_CLASS_NAME,
+    List::class.asClassName().parameterizedBy(CHASM_IMPORT_CLASS_NAME),
+    returnType = CHASM_INSTANCE_CLASS_NAME,
+).copy(suspending = true)

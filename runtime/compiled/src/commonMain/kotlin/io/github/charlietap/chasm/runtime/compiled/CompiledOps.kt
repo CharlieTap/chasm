@@ -33,7 +33,7 @@ fun memoryGrow(
     pages: Int,
 ): Long {
     val previous = memory.grow(pages)
-    if (previous < 0 && context.store.config.limits.trapOnGrowFailure) {
+    if (previous < 0 && context.store.trapOnGrowthFailure) {
         throw InvocationException(InvocationError.MemoryGrowFailed)
     }
     return previous.toLong()
@@ -86,7 +86,7 @@ fun tableGrow(
     value: Long,
 ): Long {
     val previous = table.grow(count, value)
-    if (previous < 0 && context.store.config.limits.trapOnGrowFailure) {
+    if (previous < 0 && context.store.trapOnGrowthFailure) {
         throw InvocationException(InvocationError.TableGrowFailed)
     }
     return previous.toLong()

@@ -133,7 +133,7 @@ class StorageHandlesTest {
     }
 
     @Test
-    fun importsFromAnotherStoreAreRejectedBeforeCompiling() {
+    fun importsFromAnotherStoreAreRejected() {
 
         val store = store()
         val foreignTable = table(store(), TableType(AddressType.I32, ReferenceType.RefNull(AbstractHeapType.Func), Limits(2u)), null)

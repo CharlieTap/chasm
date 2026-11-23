@@ -115,7 +115,7 @@ class StructStoreTest {
 
     @Test
     fun `pressure reports managed heap words and falls after sweep`() {
-        assertEquals(false, Store().heap.shouldCollectGarbage(0))
+        assertEquals(0, Store().heap.allocatedGuestBytes())
 
         val store = Store()
         val runtimeType = store.heap.registerRuntimeTypes(
@@ -124,8 +124,6 @@ class StructStoreTest {
         store.heap.allocateStruct(runtimeType, longArrayOf(1, 2))
 
         assertEquals(16, store.heap.allocatedGuestBytes())
-        assertEquals(true, store.heap.shouldCollectGarbage(16))
-        assertEquals(false, store.heap.shouldCollectGarbage(17))
 
         store.heap.collectGarbage(store)
         assertEquals(0, store.heap.allocatedGuestBytes())

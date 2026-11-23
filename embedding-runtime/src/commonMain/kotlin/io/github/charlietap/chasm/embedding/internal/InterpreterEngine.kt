@@ -4,8 +4,6 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.fold
 import com.github.michaelbull.result.getOrElse
 import io.github.charlietap.chasm.InternalChasmApi
-import io.github.charlietap.chasm.config.LinearMemoryConfig
-import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.embedding.engine.Engine
 import io.github.charlietap.chasm.embedding.error.ExecutionError
 import io.github.charlietap.chasm.embedding.error.InstantiationError
@@ -131,14 +129,7 @@ class InterpreterEngine internal constructor(
     }
 
     override fun memory(type: MemoryType): Memory {
-        return memory(type, LinearMemoryConfig())
-    }
-
-    fun memory(
-        type: MemoryType,
-        config: LinearMemoryConfig,
-    ): Memory {
-        return handles.memory(storeRuntime.memory(type, config).address)
+        return handles.memory(storeRuntime.memory(type).address)
     }
 
     override fun global(
@@ -185,18 +176,16 @@ class InterpreterEngine internal constructor(
     override suspend fun instance(
         module: Module,
         imports: List<Import>,
-        config: RuntimeConfig,
     ): ChasmResult<Instance, InstantiationError> {
 
-        val runtime = storeRuntime.liveStore()
-        installer.rejection(module, runtime.config)?.let { reason ->
-            return ChasmResult.Error(ExecutionError.Unsupported(reason))
+        storeRuntime.liveStore()
+        installer.rejection(module)?.let { error ->
+            return ChasmResult.Error(error)
         }
 
         val result = storeRuntime.instantiate(
             engine = this,
             imports = imports,
-            config = installer.config(module, config),
             installation = InterpreterModuleInstallation(module, installer, handles, heldReferences, heap),
         )
 

@@ -4,8 +4,7 @@ package com.test
 
 import com.test.aot.WasmModule
 import io.github.charlietap.chasm.ExperimentalChasmApi
-import io.github.charlietap.chasm.aot.compiledModule
-import io.github.charlietap.chasm.aot.compiledModuleMetadata
+import io.github.charlietap.chasm.aot.module
 import io.github.charlietap.chasm.aot.store
 import io.github.charlietap.chasm.embedding.codegen.CodegenImport
 import io.github.charlietap.chasm.embedding.codegen.allocateImports
@@ -15,17 +14,10 @@ import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.shapes.`expect`
 import kotlin.OptIn
 import kotlin.collections.List
-import io.github.charlietap.chasm.embedding.addFuel as chasmAddFuel
 
 public suspend fun aotConstruction(imports: List<CodegenImport> = emptyList()): AotConstruction {
-  val module = compiledModule(WasmModule.INSTANCE).`expect`("Failed to load com.test.aot.WasmModule")
-  val metadata = compiledModuleMetadata(module)
-  check(!metadata.capabilities.stacktraces) { "com.test.aot.WasmModule was compiled with stack traces" }
-  val store = store(metadata.storeConfig)
-  val initialFuel = metadata.initialFuel
-  if (initialFuel != null) {
-    chasmAddFuel(store, initialFuel)
-  }
+  val module = module(WasmModule.COMPILED).`expect`("Failed to load com.test.aot.WasmModule")
+  val store = store(module)
   val allocatedImports = allocateImports(store, imports)
   val instance = instance(store, module, allocatedImports).`expect`("Failed to instantiate module")
   return AotConstructionImpl(store = store, instance = instance)

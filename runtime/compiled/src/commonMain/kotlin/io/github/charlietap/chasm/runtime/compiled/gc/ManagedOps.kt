@@ -65,7 +65,7 @@ private fun refillAllocation(
     meter.counted += ALLOCATION_INTERVAL - meter.remaining.toLong()
     meter.remaining = ALLOCATION_INTERVAL
 
-    val limit = store.config.limits.gcHeapBytes
+    val limit = store.gcHeapLimit
     if (limit != null && bytes > limit) guestHeapExhausted()
     if (hasHeadroom(overdraft)) return
 

@@ -6,9 +6,8 @@ public final class io/github/charlietap/chasm/embedding/ComponentKt {
 }
 
 public final class io/github/charlietap/chasm/embedding/StoreKt {
-	public static final fun memory (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/type/MemoryType;Lio/github/charlietap/chasm/config/LinearMemoryConfig;)Lio/github/charlietap/chasm/embedding/shapes/Memory;
-	public static final fun store (Lio/github/charlietap/chasm/config/StoreConfig;)Lio/github/charlietap/chasm/embedding/shapes/Store;
-	public static synthetic fun store$default (Lio/github/charlietap/chasm/config/StoreConfig;ILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/Store;
+	public static final fun store (Lio/github/charlietap/chasm/config/RuntimeConfig;)Lio/github/charlietap/chasm/embedding/shapes/Store;
+	public static synthetic fun store$default (Lio/github/charlietap/chasm/config/RuntimeConfig;ILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/Store;
 }
 
 public final class io/github/charlietap/chasm/embedding/ValidateKt {

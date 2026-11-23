@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.integration
 
+import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.embedding.error.ExecutionError
 import io.github.charlietap.chasm.embedding.error.InstantiationError
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
@@ -15,6 +16,8 @@ interface TestRunner {
 
     val store: Store
 
+    val config: RuntimeConfig
+
     suspend fun instance(): ChasmResult<Instance, InstantiationError>
 
     fun invoke(
@@ -27,6 +30,7 @@ interface TestRunner {
 
 class IntegrationTestRunner(
     override val store: Store,
+    override val config: RuntimeConfig,
     private val instance: ChasmResult<Instance, InstantiationError>,
 ) : TestRunner {
 

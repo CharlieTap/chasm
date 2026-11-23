@@ -18,19 +18,19 @@ import java.io.Reader
  * What an Android app's modules compiled with trap diagnostics need to say
  * where a trap happened once R8 has shrunk the app. R8 renumbers the lines of
  * the methods it keeps, and [mapping], the mapping file it wrote, maps them
- * back. Returns a table for each package holding such modules, keyed by the
- * path the app's assets must carry it at.
+ * back. Returns a table for each such module, keyed by the path the app's
+ * assets must carry it at.
  */
 fun retraceTrapLines(
     mapping: Reader,
 ): Map<String, ByteArray> {
-    val packages = HashMap<String, MutableMap<String, List<LineRange>>>()
+    val modules = HashMap<String, MutableMap<String, List<LineRange>>>()
     var mapped: MappedClass? = null
 
     fun finish() {
         val finished = mapped?.takeIf(MappedClass::compiled) ?: return
-        // A package's table is written even when empty: without one, renumbered lines would be read as Chasm's own.
-        packages.getOrPut(finished.packagePath, ::HashMap).putAll(finished.methods())
+        // A module's table is written even when empty: without one, renumbered lines would be read as Chasm's own.
+        modules.getOrPut(finished.resourceRoot, ::HashMap).putAll(finished.methods())
     }
     // Only classes named as Chasm names its compiled code are read; every other class's lines are skipped.
     mapping.buffered().lineSequence().forEach { line ->
@@ -40,16 +40,17 @@ fun retraceTrapLines(
             line[start] == '#' -> mapped?.comment(line)
             start == 0 -> {
                 finish()
-                mapped = CLASS.matchEntire(line)
-                    ?.takeIf { match -> compiledClassName(match.groupValues[1].substringAfterLast('.')) }
-                    ?.let { match -> MappedClass(match.groupValues[1], match.groupValues[2]) }
+                mapped = CLASS.matchEntire(line)?.let { match ->
+                    val (original, residual) = match.destructured
+                    COMPILED_CLASS.matchEntire(original)?.let { compiled -> MappedClass(original, residual, compiled.groupValues[1]) }
+                }
             }
             else -> mapped?.member(line)
         }
     }
     finish()
-    return packages.entries.associate { (packagePath, methods) ->
-        trapLinesResource(packagePath) to ByteArrayOutputStream().also { stream -> writeTrapLines(stream, methods) }.toByteArray()
+    return modules.entries.associate { (resourceRoot, methods) ->
+        trapLinesResource(resourceRoot) to ByteArrayOutputStream().also { stream -> writeTrapLines(stream, methods) }.toByteArray()
     }
 }
 
@@ -58,12 +59,13 @@ fun retraceTrapLines(
 private class MappedClass(
     private val original: String,
     residual: String,
+    entryClass: String,
 ) {
     private val residualName = residual.substringAfterLast('.')
     private var members = 0
     private val groups = ArrayList<Group>()
 
-    val packagePath: String = original.substringBeforeLast('.', "").replace('.', '/')
+    val resourceRoot: String = entryClass.replace('.', '/')
 
     // Only classes Chasm compiled with trap diagnostics carry its source file name, which R8 records before members.
     var compiled = false
@@ -129,10 +131,7 @@ private class MappedClass(
     }
 }
 
-private fun compiledClassName(
-    simpleName: String,
-): Boolean = simpleName.startsWith(CODE_CLASS_PREFIX) || simpleName.startsWith(CHUNK_CLASS_PREFIX)
-
+private val COMPILED_CLASS = Regex("""^(.+)\$(?:$CODE_CLASS_PREFIX\d+|$CHUNK_CLASS_PREFIX\d+\$\d+)$""")
 private val CLASS = Regex("""^(\S+) -> (\S+):$""")
 private val METHOD = Regex("""^\s+(?:(\d+):(\d+):)?\S+ (\S+?)\([^)]*\)(?::(\d+)(?::(\d+))?)? -> (\S+)$""")
 private const val SOURCE_FILE_ID = "\"id\":\"sourceFile\""

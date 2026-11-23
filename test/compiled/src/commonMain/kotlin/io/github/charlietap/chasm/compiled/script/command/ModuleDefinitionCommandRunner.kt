@@ -19,10 +19,10 @@ fun ModuleDefinitionCommandRunner(
     val bytes = context.files(moduleFilePath)
 
     val result = when (context.phaseSupport) {
-        SemanticPhase.DECODING -> return BinaryDecoder(bytes, context.config.moduleConfig).fold(
+        SemanticPhase.DECODING -> return BinaryDecoder(bytes, context.moduleConfig).fold(
             { CommandResult.Success },
         ) { CommandResult.Failure(command, "Failed to decode module definition: $it") }
-        SemanticPhase.VALIDATION -> BinaryValidator(bytes, context.config.moduleConfig)
+        SemanticPhase.VALIDATION -> BinaryValidator(bytes, context.moduleConfig)
         SemanticPhase.EXECUTION -> context.compile(bytes).map { module ->
             context.modules[null] = module
             command.name?.let {

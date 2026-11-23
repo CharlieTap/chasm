@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.runtime.resource.allocation
 
-import io.github.charlietap.chasm.config.LinearMemoryConfig
 import io.github.charlietap.chasm.fixture.runtime.instance.memoryInstance
 import io.github.charlietap.chasm.fixture.runtime.memory.linearMemory
 import io.github.charlietap.chasm.fixture.runtime.store
@@ -12,7 +11,6 @@ import io.github.charlietap.chasm.runtime.instance.MemoryInstance
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 class MemoryAllocatorTest {
 
@@ -30,10 +28,9 @@ class MemoryAllocatorTest {
         val type = memoryType(limits = limits)
 
         val memory = linearMemory()
-        val memoryFactory: LinearMemoryFactory = { pages, maximumPages, config ->
+        val memoryFactory: LinearMemoryFactory = { pages, maximumPages ->
             assertEquals(LinearMemory.Pages(min.toUInt()), pages)
             assertEquals(LinearMemory.Pages(maximum.toUInt()), maximumPages)
-            assertTrue(config.prefault)
             memory
         }
 
@@ -45,7 +42,6 @@ class MemoryAllocatorTest {
         val address = MemoryAllocator(
             store = store,
             type = type,
-            config = LinearMemoryConfig(prefault = true),
             memoryFactory = memoryFactory,
         )
 

@@ -3,7 +3,7 @@ package io.github.charlietap.chasm.executor.invoker
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.getError
-import io.github.charlietap.chasm.config.StoreConfig
+import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.executor.invoker.compiled.CompiledFunctionInstallation
 import io.github.charlietap.chasm.executor.invoker.compiled.callFunction
 import io.github.charlietap.chasm.executor.invoker.compiled.installCompiledFunctions
@@ -98,7 +98,7 @@ class CompiledExecutionTest {
         val store = store(program = Program())
         val function = compiledFunction(store) { _, _, _ -> throw GuestHeapOutOfMemoryException("full") }
 
-        val actual = FunctionInvoker(runtimeConfig(debugInfo = true), store, function.module, function, listOf(I32(41)))
+        val actual = FunctionInvoker(runtimeConfig(stacktraces = true), store, function.module, function, listOf(I32(41)))
 
         val trapped = assertIs<InvocationError.Trapped>(actual.getError())
         assertEquals(InvocationError.GuestHeapOutOfMemory, trapped.error)
@@ -106,7 +106,7 @@ class CompiledExecutionTest {
 
     @Test
     fun `an interrupt requested before the outermost call is cleared and the depth restored`() {
-        val store = store(program = Program(), config = StoreConfig(interruptible = true))
+        val store = store(program = Program(), config = RuntimeConfig(interrupts = true))
         store.interrupt.requested = true
         var seen: Pair<Boolean, Int>? = null
         val function = compiledFunction(store) { context, frame, fp ->

@@ -2,24 +2,28 @@ package io.github.charlietap.chasm.aot
 
 import com.github.michaelbull.result.getOrThrow
 import io.github.charlietap.chasm.InternalChasmApi
+import io.github.charlietap.chasm.aot.compiled.fixture
+import io.github.charlietap.chasm.aot.compiled.generate
 import io.github.charlietap.chasm.aot.internal.COMPILED_RUNTIME_ABI
-import io.github.charlietap.chasm.aot.internal.CompiledCode
-import io.github.charlietap.chasm.aot.internal.UNSET
 import io.github.charlietap.chasm.aot.internal.UNSET_LONG
-import io.github.charlietap.chasm.config.GCStrategy
-import io.github.charlietap.chasm.config.GCThreshold
+import io.github.charlietap.chasm.compiler.backend.jvm.JvmOptions
+import io.github.charlietap.chasm.config.Bytes
+import io.github.charlietap.chasm.config.Limits
+import io.github.charlietap.chasm.config.MemoryLimits
 import io.github.charlietap.chasm.config.ModuleConfig
-import io.github.charlietap.chasm.config.StoreConfig
-import io.github.charlietap.chasm.config.StoreLimits
+import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.declarations.ModuleDeclarations
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
 import io.github.charlietap.chasm.embedding.dropStore
 import io.github.charlietap.chasm.embedding.error.ExecutionError
 import io.github.charlietap.chasm.embedding.error.ModuleError
+import io.github.charlietap.chasm.embedding.error.TrapReason
 import io.github.charlietap.chasm.embedding.instance
+import io.github.charlietap.chasm.embedding.invoke
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Module
 import io.github.charlietap.chasm.embedding.shapes.expect
+import io.github.charlietap.chasm.embedding.value.NumberValue.I32
 import io.github.charlietap.chasm.module.ModuleDeclarationsFactory
 import io.github.charlietap.chasm.runtime.compiled.CodeInstallation
 import io.github.charlietap.chasm.validator.WasmModuleValidator
@@ -39,183 +43,109 @@ class InstanceTest {
 
     @Test
     fun `a module is instantiated from its declarations into the store`() = runBlocking<Unit> {
-        val code = FakeCode()
 
-        val result = instance(store(StoreConfig()), module(code))
+        val compiled = FakeCompiledModule()
+        val module = loaded(compiled)
+
+        val result = instance(store(module), module)
 
         assertIs<ChasmResult.Success<*>>(result)
-        assertTrue(code.declarationsBuilt)
+        assertTrue(compiled.declarationsBuilt)
+        assertTrue(compiled.installed)
     }
 
     @Test
     fun `a dropped store is refused before the compiled module is checked`() = runBlocking<Unit> {
 
-        val store = store(StoreConfig())
+        val store = store(loaded(FakeCompiledModule()))
         dropStore(store)
 
         assertFailsWith<IllegalStateException> {
-            instance(store, module(FakeCode(meterFuel = true)))
-        }
-    }
-
-    @Test
-    fun `a store that does not match the module's fuel and interrupt checks is rejected before instantiation`() = runBlocking<Unit> {
-        val cases = listOf(
-            Triple(FakeCode(meterFuel = true), StoreConfig(), "the module was compiled with fuel checks but the store does not meter fuel"),
-            Triple(FakeCode(), StoreConfig(meterFuel = true), "the store meters fuel but the module was compiled without fuel checks"),
-            Triple(
-                FakeCode(interruptible = true),
-                StoreConfig(),
-                "the module was compiled with interrupt checks but the store is not interruptible",
-            ),
-            Triple(
-                FakeCode(),
-                StoreConfig(interruptible = true),
-                "the store is interruptible but the module was compiled without interrupt checks",
-            ),
-        )
-
-        cases.forEach { (code, config, reason) ->
-            val result = instance(store(config), module(code))
-
-            assertEquals(ChasmResult.Error(ExecutionError.Unsupported("Compiled module rejected: $reason")), result, reason)
-            assertFalse(code.installed, "a rejected module was installed")
+            instance(store, loaded(FakeCompiledModule(fuel = 10)))
         }
     }
 
     @Test
     fun `a module compiled for another runtime is rejected before anything else is read from it`() {
-        val code = FakeCode(abi = COMPILED_RUNTIME_ABI + 1, readOnlyAbi = true)
 
-        val result = compiledModule(fakeModuleClass(code))
+        val compiled = FakeCompiledModule(abi = COMPILED_RUNTIME_ABI + 1, readOnlyAbi = true)
+
+        val result = module(compiled)
 
         assertEquals(
             malformed("the module was compiled for runtime ABI ${COMPILED_RUNTIME_ABI + 1} but this runtime supports $COMPILED_RUNTIME_ABI"),
             result,
         )
-        assertFalse(code.declarationsBuilt, "a rejected module built its declarations")
+        assertFalse(compiled.declarationsBuilt, "a rejected module built its declarations")
     }
 
     @Test
     fun `a module compiled before its metadata existed is rejected`() {
-        val code = FakeCode(missingAbi = true)
 
-        val result = compiledModule(fakeModuleClass(code))
+        val compiled = FakeCompiledModule(missingAbi = true)
+
+        val result = module(compiled)
 
         assertEquals(malformed("the module was compiled for an older runtime"), result)
-        assertFalse(code.declarationsBuilt, "a rejected module built its declarations")
+        assertFalse(compiled.declarationsBuilt, "a rejected module built its declarations")
     }
 
     @Test
-    fun `a class that is not on the class path is rejected`() {
-        val result = compiledModule("chasm.aot.missing.WasmModule", InstanceTest::class.java.classLoader)
+    fun `a module whose settings are out of range is rejected`() {
 
-        assertEquals(malformed("chasm.aot.missing.WasmModule is not on the class path"), result)
-    }
+        val modules = listOf(
+            FakeCompiledModule(fuel = -2),
+            FakeCompiledModule(linearMemoryBytes = -2),
+            FakeCompiledModule(gcHeapBytes = -2),
+            FakeCompiledModule(tableBytes = -2),
+            FakeCompiledModule(stackBytes = -2),
+        )
 
-    @Test
-    fun `a class without a compiled module instance is rejected`() {
-        val result = compiledModule(String::class.java)
-
-        assertEquals(malformed("java.lang.String is not a compiled module class"), result)
-    }
-
-    @Test
-    fun `a class whose compiled module instance is not static is rejected`() {
-
-        val moduleClass = InstanceFieldModuleClass::class.java
-
-        val result = compiledModule(moduleClass)
-
-        assertEquals(malformed("${moduleClass.name} is not a compiled module class"), result)
-    }
-
-    @Test
-    fun `a class whose initializer fails is rejected`() {
-
-        val moduleClass = FailingModuleClass::class.java
-
-        val fromClass = compiledModule(moduleClass)
-        val fromName = compiledModule(moduleClass.name, moduleClass.classLoader)
-
-        listOf(fromClass, fromName).forEach { result ->
-            val error = assertIs<ChasmResult.Error<ModuleError>>(result).error
-            val message = assertIs<ModuleError.Malformed>(error).message
-            assertTrue(message.startsWith("Compiled module rejected: ${moduleClass.name} could not be initialised"), message)
+        modules.forEach { compiled ->
+            assertEquals(malformed("the module's settings are invalid"), module(compiled))
+            assertFalse(compiled.declarationsBuilt, "a rejected module built its declarations")
         }
     }
 
     @Test
-    fun `the metadata reads back what the module was built with`() {
-        val code = FakeCode(
-            meterFuel = true,
-            stacktraces = true,
-            initialFuel = 42,
-            gcStrategy = 1,
-            gcThresholdKind = 1,
-            gcThresholdValue = 512,
-            gcHeapBytes = 1024,
-            memoryPages = 3,
-            stackBytes = 4096,
-        )
+    fun `an unset stack limit gives the store the platform default`() = runBlocking<Unit> {
 
-        val metadata = compiledModuleMetadata(module(code))
+        val defaults = generate(fixture(LIMITS)).compiledModule()
+        val small = generate(fixture(LIMITS), JvmOptions(runtime = RuntimeConfig(limits = Limits(memory = MemoryLimits(stack = Bytes(SMALL_STACK_BYTES)))))).compiledModule()
+        val deep = listOf(I32(DEEP_RECURSION))
 
-        assertEquals(Capabilities(meterFuel = true, interruptible = false, stacktraces = true), metadata.capabilities)
-        assertEquals(42L, metadata.initialFuel)
-        assertEquals(COMPILED_RUNTIME_ABI, metadata.runtimeAbi)
-        assertEquals(
-            StoreConfig(
-                meterFuel = true,
-                gcStrategy = GCStrategy.TRADITIONAL,
-                gcThreshold = GCThreshold.KB(512),
-                limits = StoreLimits(gcHeapBytes = 1024, memoryPages = 3, stackBytes = 4096),
-            ),
-            metadata.storeConfig,
-        )
+        val unset = invoke(instance(store(defaults), defaults).expect("instantiates"), "recurse", deep)
+        val limited = invoke(instance(store(small), small).expect("instantiates"), "recurse", deep)
+
+        assertEquals(ChasmResult.Success(listOf(I32(DEEP_RECURSION))), unset)
+        val trapped = assertIs<ExecutionError.Trapped>(assertIs<ChasmResult.Error<*>>(limited).error)
+        assertEquals(TrapReason.CALL_STACK_EXHAUSTED, trapped.trap.reason)
     }
 
-    @Test
-    fun `an unset stack limit reads back as the platform default`() {
-        val metadata = compiledModuleMetadata(module(FakeCode()))
-
-        assertEquals(null, metadata.initialFuel)
-        assertEquals(StoreLimits().stackBytes, metadata.storeConfig.limits.stackBytes)
-        assertEquals(null, metadata.storeConfig.gcStrategy)
-        assertEquals(null, metadata.storeConfig.gcThreshold)
+    private fun loaded(compiled: FakeCompiledModule): Module {
+        return module(compiled).expect("loads")
     }
-
-    private fun module(
-        code: FakeCode,
-    ): Module = compiledModule(fakeModuleClass(code)).expect("loads")
 
     private fun malformed(reason: String): ChasmResult.Error<ModuleError.Malformed> {
         return ChasmResult.Error(ModuleError.Malformed("Compiled module rejected: $reason"))
     }
 
-    private inner class FakeCode(
+    private inner class FakeCompiledModule(
         private val abi: Int = COMPILED_RUNTIME_ABI,
         private val readOnlyAbi: Boolean = false,
         private val missingAbi: Boolean = false,
-        private val meterFuel: Boolean = false,
-        private val interruptible: Boolean = false,
-        private val stacktraces: Boolean = false,
-        private val initialFuel: Long = UNSET_LONG,
-        private val gcStrategy: Int = UNSET,
-        private val gcThresholdKind: Int = UNSET,
-        private val gcThresholdValue: Int = UNSET,
+        private val fuel: Long = UNSET_LONG,
+        private val linearMemoryBytes: Long = UNSET_LONG,
         private val gcHeapBytes: Long = UNSET_LONG,
-        private val memoryPages: Int = UNSET,
+        private val tableBytes: Long = UNSET_LONG,
         private val stackBytes: Long = UNSET_LONG,
-    ) : CompiledCode {
+    ) : CompiledModule {
 
         var declarationsBuilt = false
 
         var installed = false
 
-        override fun install(
-            installation: CodeInstallation,
-        ) {
+        override fun install(installation: CodeInstallation) {
             installed = true
         }
 
@@ -224,44 +154,74 @@ class InstanceTest {
             return emptyDeclarations
         }
 
-        override fun trapSitesResource(): String? = null
+        override fun resourceRoot(): String {
+            return "chasm/aot/FakeModule"
+        }
 
-        override fun runtimeAbi(): Int = if (missingAbi) throw AbstractMethodError("runtimeAbi") else abi
+        override fun runtimeAbi(): Int {
 
-        override fun meterFuel(): Boolean = metadata { meterFuel }
+            if (missingAbi) {
+                throw AbstractMethodError("runtimeAbi")
+            }
 
-        override fun interruptible(): Boolean = metadata { interruptible }
+            return abi
+        }
 
-        override fun stacktraces(): Boolean = metadata { stacktraces }
+        override fun interrupts(): Boolean {
+            return setting { false }
+        }
 
-        override fun initialFuel(): Long = metadata { initialFuel }
+        override fun stacktraces(): Boolean {
+            return setting { false }
+        }
 
-        override fun gcStrategy(): Int = metadata { gcStrategy }
+        override fun fuel(): Long {
+            return setting { fuel }
+        }
 
-        override fun gcThresholdKind(): Int = metadata { gcThresholdKind }
+        override fun linearMemoryBytes(): Long {
+            return setting { linearMemoryBytes }
+        }
 
-        override fun gcThresholdValue(): Int = metadata { gcThresholdValue }
+        override fun gcHeapBytes(): Long {
+            return setting { gcHeapBytes }
+        }
 
-        override fun gcHeapBytes(): Long = metadata { gcHeapBytes }
+        override fun tableBytes(): Long {
+            return setting { tableBytes }
+        }
 
-        override fun memoryPages(): Int = metadata { memoryPages }
+        override fun stackBytes(): Long {
+            return setting { stackBytes }
+        }
 
-        override fun tableElements(): Int = metadata { UNSET }
+        override fun trapOnGrowthFailure(): Boolean {
+            return setting { false }
+        }
 
-        override fun trapOnGrowFailure(): Boolean = metadata { false }
+        private inline fun <T> setting(value: () -> T): T {
 
-        override fun stackBytes(): Long = metadata { stackBytes }
+            if (readOnlyAbi) {
+                fail("only the runtime ABI may be read from a module for another runtime")
+            }
 
-        private inline fun <T> metadata(
-            value: () -> T,
-        ): T = if (readOnlyAbi) fail("only the runtime ABI may be read from a module for another runtime") else value()
+            return value()
+        }
     }
 
     private fun emptyModuleDeclarations(): ModuleDeclarations {
+
         val bytes = byteArrayOf(0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00)
         val config = ModuleConfig()
         val module = WasmModuleDecoder(config, bytes).getOrThrow { IllegalStateException(it.toString()) }
         val validated = WasmModuleValidator(config, module).getOrThrow { IllegalStateException(it.toString()) }
+
         return ModuleDeclarationsFactory(validated)
+    }
+
+    private companion object {
+        const val LIMITS = "limits"
+        const val SMALL_STACK_BYTES = 4L * 1024L
+        const val DEEP_RECURSION = 1_000
     }
 }

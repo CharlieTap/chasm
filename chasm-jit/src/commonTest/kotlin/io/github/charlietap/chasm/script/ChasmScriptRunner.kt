@@ -3,9 +3,7 @@
 package io.github.charlietap.chasm.script
 
 import io.github.charlietap.chasm.InternalChasmApi
-import io.github.charlietap.chasm.config.Config
-import io.github.charlietap.chasm.config.GCStrategy
-import io.github.charlietap.chasm.config.RuntimeConfig
+import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.embedding.shapes.Instance
 import io.github.charlietap.chasm.embedding.shapes.Module
 import io.github.charlietap.chasm.embedding.shapes.Store
@@ -51,11 +49,8 @@ class ChasmScriptRunner(
 
     private fun execute(script: Script): ScriptResult {
 
-        val config = Config(
-            runtimeConfig = RuntimeConfig(gcStrategy = GCStrategy.TRADITIONAL),
-        )
         val context = ScriptContext(
-            config = config,
+            moduleConfig = ModuleConfig(),
             binaryDirectory = directory,
             phaseSupport = phaseSupport,
             store = store,

@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.memory
 
-import io.github.charlietap.chasm.config.LinearMemoryConfig
 import io.github.charlietap.chasm.host.UnsafeHostApi
 import io.github.charlietap.chasm.runtime.host.ByteBufferHostMemory
 import io.github.charlietap.chasm.runtime.host.HostMemory
@@ -8,7 +7,6 @@ import io.github.charlietap.chasm.runtime.memory.LinearMemory
 import io.github.charlietap.chasm.runtime.memory.OutOfMemoryError
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
-import java.nio.MappedByteBuffer
 import java.nio.channels.FileChannel
 import java.nio.channels.FileChannel.MapMode.READ_WRITE
 import java.nio.file.FileAlreadyExistsException
@@ -33,14 +31,12 @@ internal const val MAX_JVM_MEMORY_BYTES = MAX_JVM_MEMORY_PAGES * LinearMemory.PA
 class ByteBufferLinearMemory(
     pages: LinearMemory.Pages,
     maximumPages: LinearMemory.Pages? = null,
-    config: LinearMemoryConfig = LinearMemoryConfig(),
 ) : LinearMemory, ByteBufferHostMemory {
 
     internal var mapping: ByteBuffer
         private set
 
     private var maximumByteSize: Long
-    private var prefault: Boolean
     private var logicalMemory: ByteBuffer
     private var copySource: ByteBuffer
 
@@ -65,9 +61,6 @@ class ByteBufferLinearMemory(
 
         try {
             initialMapping = mapBackingFile(initialMaximumByteSize)
-            if (config.prefault) {
-                prefaultRange(initialMapping, 0, initialByteSize)
-            }
             initialLogicalMemory = bufferForSize(initialMapping, initialByteSize)
         } catch (error: PlatformOutOfMemoryError) {
             throw OutOfMemoryError(error.message, error)
@@ -75,7 +68,6 @@ class ByteBufferLinearMemory(
 
         mapping = initialMapping
         maximumByteSize = initialMaximumByteSize.toLong()
-        prefault = config.prefault
         logicalMemory = initialLogicalMemory
         copySource = duplicate(logicalMemory)
     }
@@ -98,9 +90,6 @@ class ByteBufferLinearMemory(
         }
 
         try {
-            if (prefault) {
-                prefaultRange(mapping, previousByteSize, (nextByteSize - previousByteSize).toInt())
-            }
             replaceLogicalMemory(bufferForSize(mapping, nextByteSize.toInt()))
         } catch (error: PlatformOutOfMemoryError) {
             throw OutOfMemoryError(error.message, error)
@@ -238,7 +227,6 @@ class ByteBufferLinearMemory(
         val empty = ByteBuffer.allocateDirect(0).order(ByteOrder.LITTLE_ENDIAN)
         mapping = empty
         maximumByteSize = 0
-        prefault = false
         replaceLogicalMemory(empty)
     }
 
@@ -362,11 +350,5 @@ class ByteBufferLinearMemory(
         ): ByteBuffer = mapping
             .slice(0, byteSize)
             .order(ByteOrder.LITTLE_ENDIAN)
-
-        private fun prefaultRange(mapping: ByteBuffer, offset: Int, byteCount: Int) {
-            if (byteCount > 0 && mapping is MappedByteBuffer) {
-                mapping.slice(offset, byteCount).load()
-            }
-        }
     }
 }

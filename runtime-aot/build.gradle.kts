@@ -40,10 +40,6 @@ kotlin {
     @OptIn(ExperimentalAbiValidation::class)
     abiValidation()
 
-    compilerOptions {
-        optIn.add("io.github.charlietap.chasm.ExperimentalChasmApi")
-    }
-
     sourceSets {
         commonMain {
             dependencies {
@@ -80,6 +76,12 @@ kotlin {
                 implementation(libs.kotlinx.serialization)
                 implementation(libs.sweet.lib)
                 implementation(libs.wasi.emscripten.host.chasm.wasip1.kmp)
+            }
+        }
+
+        jvmTest {
+            dependencies {
+                implementation(projects.chasmAot)
             }
         }
     }

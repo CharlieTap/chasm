@@ -4,43 +4,34 @@ package io.github.charlietap.chasm.compiler.backend.jvm
 
 import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.aot.internal.COMPILED_RUNTIME_ABI
-import io.github.charlietap.chasm.aot.internal.UNSET
 import io.github.charlietap.chasm.aot.internal.UNSET_LONG
-import io.github.charlietap.chasm.aot.internal.gcStrategyCode
-import io.github.charlietap.chasm.aot.internal.gcThresholdKind
-import io.github.charlietap.chasm.aot.internal.gcThresholdValue
-import io.github.charlietap.chasm.aot.internal.trapSitesResource
 import io.github.charlietap.chasm.compiler.backend.abi.CODE_INSTALLATION
 import io.github.charlietap.chasm.compiler.backend.abi.INSTALL
 import io.github.charlietap.chasm.compiler.backend.abi.internalName
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.BUILD_DECLARATIONS
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.CLASS_FILE_VERSION
-import io.github.charlietap.chasm.compiler.backend.jvm.abi.COMPILED_CODE
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.COMPILED_MODULE
-import io.github.charlietap.chasm.compiler.backend.jvm.abi.COMPILED_MODULE_FACTORY
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.DATA_SOURCE
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.DATA_SOURCE_TYPE
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.INSTALLS_PER_METHOD
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.MAX_FANOUT
+import io.github.charlietap.chasm.compiler.backend.jvm.abi.META_FUEL
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.META_GC_HEAP_BYTES
-import io.github.charlietap.chasm.compiler.backend.jvm.abi.META_GC_STRATEGY
-import io.github.charlietap.chasm.compiler.backend.jvm.abi.META_GC_THRESHOLD_KIND
-import io.github.charlietap.chasm.compiler.backend.jvm.abi.META_GC_THRESHOLD_VALUE
-import io.github.charlietap.chasm.compiler.backend.jvm.abi.META_INITIAL_FUEL
-import io.github.charlietap.chasm.compiler.backend.jvm.abi.META_INTERRUPTIBLE
-import io.github.charlietap.chasm.compiler.backend.jvm.abi.META_MEMORY_PAGES
-import io.github.charlietap.chasm.compiler.backend.jvm.abi.META_METER_FUEL
+import io.github.charlietap.chasm.compiler.backend.jvm.abi.META_INTERRUPTS
+import io.github.charlietap.chasm.compiler.backend.jvm.abi.META_LINEAR_MEMORY_BYTES
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.META_STACKTRACES
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.META_STACK_BYTES
-import io.github.charlietap.chasm.compiler.backend.jvm.abi.META_TABLE_ELEMENTS
-import io.github.charlietap.chasm.compiler.backend.jvm.abi.META_TRAP_ON_GROW_FAILURE
+import io.github.charlietap.chasm.compiler.backend.jvm.abi.META_TABLE_BYTES
+import io.github.charlietap.chasm.compiler.backend.jvm.abi.META_TRAP_ON_GROWTH_FAILURE
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.MODULE_DECLARATIONS
+import io.github.charlietap.chasm.compiler.backend.jvm.abi.RESOURCE_ROOT
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.RUNTIME_ABI
-import io.github.charlietap.chasm.compiler.backend.jvm.abi.TRAP_SITES_RESOURCE
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.installClassDescriptor
 import io.github.charlietap.chasm.compiler.backend.jvm.declarations.DECLARATIONS_BUILDER
 import io.github.charlietap.chasm.compiler.backend.jvm.declarations.DECLARE
 import io.github.charlietap.chasm.compiler.backend.jvm.declarations.DECLARE_DESCRIPTOR
+import io.github.charlietap.chasm.config.CpuLimits
+import io.github.charlietap.chasm.config.GrowthFailureStrategy
 import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes
@@ -71,23 +62,16 @@ internal fun ModuleClassLowerer(
         owner,
         null,
         ModuleLowering.OBJECT,
-        arrayOf(internalName(COMPILED_CODE)),
+        arrayOf(internalName(COMPILED_MODULE)),
     )
-    writer.visitField(Opcodes.ACC_PUBLIC or Opcodes.ACC_STATIC or Opcodes.ACC_FINAL, INSTANCE_FIELD, COMPILED_MODULE, null, null).visitEnd()
+    writer.visitField(Opcodes.ACC_PUBLIC or Opcodes.ACC_STATIC or Opcodes.ACC_FINAL, COMPILED_FIELD, moduleDescriptor, null, null).visitEnd()
 
     writer.visitMethod(Opcodes.ACC_STATIC, "<clinit>", "()V", null, null).apply {
         visitCode()
         visitTypeInsn(Opcodes.NEW, owner)
         visitInsn(Opcodes.DUP)
         visitMethodInsn(Opcodes.INVOKESPECIAL, owner, "<init>", "()V", false)
-        visitMethodInsn(
-            Opcodes.INVOKESTATIC,
-            internalName(COMPILED_MODULE_FACTORY.owner),
-            COMPILED_MODULE_FACTORY.name,
-            COMPILED_MODULE_FACTORY.descriptor,
-            false,
-        )
-        visitFieldInsn(Opcodes.PUTSTATIC, owner, INSTANCE_FIELD, COMPILED_MODULE)
+        visitFieldInsn(Opcodes.PUTSTATIC, owner, COMPILED_FIELD, moduleDescriptor)
         visitInsn(Opcodes.RETURN)
         visitMaxs(0, 0)
         visitEnd()
@@ -127,24 +111,24 @@ internal fun ModuleClassLowerer(
     }
 
     // The path is written here because a shrinker may rename the classes it is derived from.
-    writer.visitMethod(Opcodes.ACC_PUBLIC, TRAP_SITES_RESOURCE, "()Ljava/lang/String;", null, null).apply {
+    writer.visitMethod(Opcodes.ACC_PUBLIC, RESOURCE_ROOT, "()Ljava/lang/String;", null, null).apply {
         visitCode()
-        if (module.options.stacktraces) visitLdcInsn(trapSitesResource(module.packagePath)) else visitInsn(Opcodes.ACONST_NULL)
+        visitLdcInsn(module.entryPath)
         visitInsn(Opcodes.ARETURN)
         visitMaxs(0, 0)
         visitEnd()
     }
 
-    writeMetadata(writer, module.options)
+    writeSettings(writer, module.options)
 
     val chunks = entries.chunked(INSTALLS_PER_METHOD)
-    val chunkClasses = chunks.indices.map { chunk -> installClassDescriptor(module.packagePath, chunk) }
+    val chunkClasses = chunks.indices.map { chunk -> installClassDescriptor(module.entryPath, chunk) }
     val chunkDescriptor = "($CODE_INSTALLATION$binding)V"
     var installers = chunkClasses.map(::internalName)
     var groups = 0
     while (installers.size > MAX_FANOUT) {
         installers = installers.chunked(MAX_FANOUT).map { members ->
-            val group = "${module.packagePath}/InstallGroup${groups++}"
+            val group = "${module.entryPath}\$InstallGroup${groups++}"
             output.classFile(group, installGroupClass(group, members, chunkDescriptor))
             group
         }
@@ -193,25 +177,23 @@ internal fun ModuleClassLowerer(
     }
 }
 
-private fun writeMetadata(
+private fun writeSettings(
     writer: ClassWriter,
     options: JvmOptions,
 ) {
-    val store = options.storeConfig
-    val limits = store.limits
+
+    val runtime = options.runtime
+    val memory = runtime.limits.memory
+
     writer.constant(RUNTIME_ABI, COMPILED_RUNTIME_ABI)
-    writer.constant(META_METER_FUEL, store.meterFuel)
-    writer.constant(META_INTERRUPTIBLE, store.interruptible)
-    writer.constant(META_STACKTRACES, options.stacktraces)
-    writer.constant(META_INITIAL_FUEL, options.initialFuel ?: UNSET_LONG)
-    writer.constant(META_GC_STRATEGY, gcStrategyCode(store.gcStrategy))
-    writer.constant(META_GC_THRESHOLD_KIND, gcThresholdKind(store.gcThreshold))
-    writer.constant(META_GC_THRESHOLD_VALUE, gcThresholdValue(store.gcThreshold))
-    writer.constant(META_GC_HEAP_BYTES, limits.gcHeapBytes ?: UNSET_LONG)
-    writer.constant(META_MEMORY_PAGES, limits.memoryPages ?: UNSET)
-    writer.constant(META_TABLE_ELEMENTS, limits.tableElements ?: UNSET)
-    writer.constant(META_TRAP_ON_GROW_FAILURE, limits.trapOnGrowFailure)
-    writer.constant(META_STACK_BYTES, limits.stackBytes ?: UNSET_LONG)
+    writer.constant(META_INTERRUPTS, runtime.interrupts)
+    writer.constant(META_STACKTRACES, runtime.stacktraces)
+    writer.constant(META_FUEL, (runtime.limits.cpu as? CpuLimits.Metered)?.fuel?.units ?: UNSET_LONG)
+    writer.constant(META_LINEAR_MEMORY_BYTES, memory.linearMemory?.value ?: UNSET_LONG)
+    writer.constant(META_GC_HEAP_BYTES, memory.gcHeap?.value ?: UNSET_LONG)
+    writer.constant(META_TABLE_BYTES, memory.tables?.value ?: UNSET_LONG)
+    writer.constant(META_STACK_BYTES, memory.stack?.value ?: UNSET_LONG)
+    writer.constant(META_TRAP_ON_GROWTH_FAILURE, memory.onGrowthFailure == GrowthFailureStrategy.Trap)
 }
 
 private fun ClassWriter.constant(
@@ -268,4 +250,4 @@ private fun installGroupClass(
 
 private const val INSTALL_CHUNK = "install"
 
-private const val INSTANCE_FIELD = "INSTANCE"
+private const val COMPILED_FIELD = "COMPILED"

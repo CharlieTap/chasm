@@ -79,7 +79,6 @@ class ModuleCompilerBaselineGenerator(
             schemaVersion = SCHEMA_VERSION,
             modules = stores.map { configuration ->
                 val store = Store(config = configuration.config)
-                store.fuel.remaining = Long.MAX_VALUE
                 val imports = importResolver.resolve(module, store)
                 val instance = moduleInstantiator.instantiate(runtimeConfig, store, module, cir, imports).unwrap()
                 CompilerBaselineModule(

@@ -1,7 +1,5 @@
 package io.github.charlietap.chasm.tools.compilerbaseline
 
-import io.github.charlietap.chasm.config.GCStrategy
-import io.github.charlietap.chasm.config.RuntimeConfig
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -19,7 +17,6 @@ class CompilerBaselineDeterminismTest {
         val output = StringBuilder()
         compilerBaselineWriter(
             importResolver = EmptyCompilerBaselineImportResolver(),
-            runtimeConfig = RuntimeConfig(gcStrategy = GCStrategy.TRADITIONAL),
         ).write(
             CompilerBaselineFixture("contrived", resourceLoader.read("compiler-baseline/contrived.wasm")),
             output,

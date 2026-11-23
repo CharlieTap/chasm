@@ -1,6 +1,9 @@
 package io.github.charlietap.chasm.embedding
 
-import io.github.charlietap.chasm.config.StoreConfig
+import io.github.charlietap.chasm.config.CpuLimits
+import io.github.charlietap.chasm.config.Limits
+import io.github.charlietap.chasm.config.RuntimeConfig
+import io.github.charlietap.chasm.config.fuel
 import io.github.charlietap.chasm.embedding.error.ExecutionError
 import io.github.charlietap.chasm.embedding.error.TrapReason
 import io.github.charlietap.chasm.embedding.fixture.INSTANCE_MODULE
@@ -92,6 +95,6 @@ class FuelTest {
     }
 
     private fun meteredStore(): Store {
-        return interpreterStore(store(config = StoreConfig(meterFuel = true)))
+        return interpreterStore(store(config = RuntimeConfig(limits = Limits(cpu = CpuLimits.Metered(0.fuel)))))
     }
 }

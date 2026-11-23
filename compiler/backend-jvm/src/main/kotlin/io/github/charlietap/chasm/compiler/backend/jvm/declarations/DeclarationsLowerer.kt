@@ -18,12 +18,12 @@ internal typealias DeclarationsLowerer = (List<BuilderCall>, String, JvmOutput) 
 
 internal fun DeclarationsLowerer(
     calls: List<BuilderCall>,
-    packagePath: String,
+    entryPath: String,
     output: JvmOutput,
 ): List<String> {
     var classes = 0
 
-    fun nextClass(): String = "$packagePath/Declare${classes++}"
+    fun nextClass(): String = "$entryPath\$Declare${classes++}"
 
     var level = batchCallsByBytecodeBudget(calls).map { chunk ->
         val owner = nextClass()

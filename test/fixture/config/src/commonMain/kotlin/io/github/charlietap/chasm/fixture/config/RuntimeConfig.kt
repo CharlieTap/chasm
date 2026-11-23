@@ -1,18 +1,14 @@
 package io.github.charlietap.chasm.fixture.config
 
-import io.github.charlietap.chasm.config.GCStrategy
-import io.github.charlietap.chasm.config.GCThreshold
-import io.github.charlietap.chasm.config.LinearMemoryConfig
+import io.github.charlietap.chasm.config.Limits
 import io.github.charlietap.chasm.config.RuntimeConfig
 
 fun runtimeConfig(
-    debugInfo: Boolean = false,
-    gcStrategy: GCStrategy = GCStrategy.ARENA,
-    gcThreshold: GCThreshold = GCThreshold.MB(8),
-    linearMemory: LinearMemoryConfig = LinearMemoryConfig(),
+    interrupts: Boolean = false,
+    stacktraces: Boolean = false,
+    limits: Limits = Limits(),
 ) = RuntimeConfig(
-    debugInfo = debugInfo,
-    gcStrategy = gcStrategy,
-    gcThreshold = gcThreshold,
-    linearMemory = linearMemory,
+    interrupts = interrupts,
+    stacktraces = stacktraces,
+    limits = limits,
 )

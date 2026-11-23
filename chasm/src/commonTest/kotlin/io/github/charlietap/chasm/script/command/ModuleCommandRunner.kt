@@ -24,14 +24,14 @@ suspend fun ModuleCommandRunner(
     val bytes = moduleFilePath.readBytesFromPath()
 
     val result = when (context.phaseSupport) {
-        SemanticPhase.DECODING -> return BinaryDecoder(bytes, context.config.moduleConfig).fold(
+        SemanticPhase.DECODING -> return BinaryDecoder(bytes, context.moduleConfig).fold(
             { CommandResult.Success },
         ) { CommandResult.Failure(command, "Failed to decode module: $it") }
 
-        SemanticPhase.VALIDATION -> BinaryValidator(bytes, context.config.moduleConfig)
+        SemanticPhase.VALIDATION -> BinaryValidator(bytes, context.moduleConfig)
 
-        SemanticPhase.EXECUTION -> when (val decoded = module(bytes, context.config.moduleConfig)) {
-            is ChasmResult.Success -> instance(context.store, decoded.result, context.imports, context.config.runtimeConfig)
+        SemanticPhase.EXECUTION -> when (val decoded = module(bytes, context.moduleConfig)) {
+            is ChasmResult.Success -> instance(context.store, decoded.result, context.imports)
                 .map { instance ->
                     context.instances[null] = instance
                     command.name?.let {

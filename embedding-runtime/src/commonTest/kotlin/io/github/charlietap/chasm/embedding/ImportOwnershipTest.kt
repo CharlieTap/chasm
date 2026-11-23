@@ -42,7 +42,7 @@ class ImportOwnershipTest {
                 instance(targetStore, module, listOf(Import("env", "memory", importable)))
             }
 
-            assertEquals("an import belongs to a different store", failure.message)
+            assertEquals("the import env.memory belongs to a different store", failure.message)
         }
         assertEquals(0, targetRuntime.memories.size)
     }

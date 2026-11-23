@@ -15,7 +15,6 @@ import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.execution.NestedInterpreter
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.program.EXIT_IP
-import io.github.charlietap.chasm.runtime.resource.gc.GarbageCollector
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
@@ -25,20 +24,6 @@ fun WasmFunctionExecutor(
     store: Store,
     function: FunctionInstance.WasmFunction,
     values: List<ExecutionValue>,
-): Result<List<Long>, InvocationError> = WasmFunctionExecutor(
-    config = config,
-    store = store,
-    function = function,
-    values = values,
-    garbageCollector = ::GarbageCollector,
-)
-
-fun WasmFunctionExecutor(
-    config: RuntimeConfig,
-    store: Store,
-    function: FunctionInstance.WasmFunction,
-    values: List<ExecutionValue>,
-    garbageCollector: GarbageCollector,
 ): Result<List<Long>, InvocationError> {
     val interpreter = store.interpreter
     if (interpreter == null && function.callStrategy.compiledEntry == null) return Err(InvocationError.InterpreterUnavailable)
@@ -48,7 +33,6 @@ fun WasmFunctionExecutor(
         instance = function,
         values = values,
         nested = interpreter,
-        garbageCollector = garbageCollector,
         run = { entryIp, context -> runEntry(interpreter, config, entryIp, context) },
         trap = { exception, vstack -> entryTrap(config, store, vstack, exception) },
     )
@@ -71,7 +55,6 @@ fun RawWasmFunctionExecutor(
         store = store,
         instance = function,
         nested = interpreter,
-        garbageCollector = ::GarbageCollector,
         arguments = { vstack ->
             var index = 0
             while (index < parameterCount) {
@@ -99,7 +82,7 @@ private fun runEntry(
 ) {
     when {
         interpreter != null -> interpreter.interpret(entryIp, context)
-        config.debugInfo -> runCompiledTraceable(entryIp, context)
+        config.stacktraces -> runCompiledTraceable(entryIp, context)
         else -> runCompiled(entryIp, context)
     }
 }
@@ -110,7 +93,7 @@ private fun entryTrap(
     vstack: ValueStack,
     exception: InvocationException,
 ): InvocationError {
-    return if (config.debugInfo) traceableTrap(store, vstack, exception) else exception.error
+    return if (config.stacktraces) traceableTrap(store, vstack, exception) else exception.error
 }
 
 private fun runCompiled(

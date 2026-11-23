@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.embedding.fixture
 
-import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.embedding.diagnostic.TrapSource
 import io.github.charlietap.chasm.embedding.instance
 import io.github.charlietap.chasm.embedding.internal.StoreRuntime
@@ -30,7 +29,6 @@ internal suspend fun instantiate(
     store: Store,
     bytes: ByteArray,
     imports: List<Import> = emptyList(),
-    config: RuntimeConfig = RuntimeConfig(),
 ): Instance {
-    return instance(store, decodedModule(bytes), imports, config).expect("the fixture module instantiates")
+    return instance(store, decodedModule(bytes), imports).expect("the fixture module instantiates")
 }

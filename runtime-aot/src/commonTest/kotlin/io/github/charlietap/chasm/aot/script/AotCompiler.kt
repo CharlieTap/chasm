@@ -1,7 +1,8 @@
 package io.github.charlietap.chasm.aot.script
 
 import com.github.michaelbull.result.fold
-import io.github.charlietap.chasm.aot.compiledModule
+import io.github.charlietap.chasm.aot.CompiledModule
+import io.github.charlietap.chasm.aot.module
 import io.github.charlietap.chasm.ast.module.typeResolver
 import io.github.charlietap.chasm.compiled.ScriptFailure
 import io.github.charlietap.chasm.compiled.script.ScriptModules
@@ -13,7 +14,7 @@ import io.github.charlietap.chasm.compiler.backend.jvm.ModuleLowerer
 import io.github.charlietap.chasm.compiler.backend.jvm.UnsupportedFunctions
 import io.github.charlietap.chasm.compiler.frontend.ModuleCompiler
 import io.github.charlietap.chasm.config.ModuleConfig
-import io.github.charlietap.chasm.config.StoreConfig
+import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.embedding.error.ExecutionError
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Module
@@ -45,11 +46,11 @@ internal object AotCompiler {
     fun compile(
         bytes: ByteArray,
         config: ModuleConfig,
-        storeConfig: StoreConfig,
+        storeConfig: RuntimeConfig,
     ): ChasmResult<Module, ScriptFailure> {
 
         val options = JvmOptions(
-            storeConfig = storeConfig,
+            runtime = storeConfig,
             splitInstructions = SPLIT_INSTRUCTIONS,
             memory = MEMORY,
         )
@@ -68,7 +69,7 @@ internal object AotCompiler {
 
     private fun load(
         moduleClass: Class<*>,
-    ): ChasmResult<Module, ScriptFailure> = when (val loaded = compiledModule(moduleClass)) {
+    ): ChasmResult<Module, ScriptFailure> = when (val loaded = module(moduleClass.getField("COMPILED").get(null) as CompiledModule)) {
         is ChasmResult.Success -> loaded
         is ChasmResult.Error -> ChasmResult.Error(ScriptFailure.Module(loaded.error))
     }

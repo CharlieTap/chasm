@@ -33,68 +33,69 @@ class ImportTest {
     @Test
     fun `can run a wasm file with all types of import and return a correct result`() = integrationTest(FIXTURE) {
 
-        val store = engine.store()
+        val runner = runner { store ->
 
-        val functionType = functionType(
-            params = resultType(
-                listOf(
-                    i32ValueType(),
+            val functionType = functionType(
+                params = resultType(
+                    listOf(
+                        i32ValueType(),
+                    ),
                 ),
-            ),
-        )
-        val hostFunction = HostFunction { _, _ -> }
-        val functionExternal = function(store, functionType, hostFunction)
-        val functionImport = Import(
-            "env",
-            "function",
-            functionExternal,
-        )
+            )
+            val hostFunction = HostFunction { _, _ -> }
+            val functionExternal = function(store, functionType, hostFunction)
+            val functionImport = Import(
+                "env",
+                "function",
+                functionExternal,
+            )
 
-        val globalType = globalType(i32ValueType(), constMutability())
-        val globalExternal = global(store, globalType, NumberValue.I32(117))
-        val globalImport = Import(
-            "env",
-            "global",
-            globalExternal,
-        )
+            val globalType = globalType(i32ValueType(), constMutability())
+            val globalExternal = global(store, globalType, NumberValue.I32(117))
+            val globalImport = Import(
+                "env",
+                "global",
+                globalExternal,
+            )
 
-        val memoryType = memoryType(i32AddressType(), limits(1u))
-        val memoryExternal = memory(store, memoryType)
+            val memoryType = memoryType(i32AddressType(), limits(1u))
+            val memoryExternal = memory(store, memoryType)
 
-        val memoryImport = Import(
-            "env",
-            "memory",
-            memoryExternal,
-        )
+            val memoryImport = Import(
+                "env",
+                "memory",
+                memoryExternal,
+            )
 
-        val tableType = tableType(i32AddressType(), refNullReferenceType(AbstractHeapType.Func), limits(1u))
-        val tableExternal = table(store, tableType, null)
-        val tableImport = Import(
-            "env",
-            "table",
-            tableExternal,
-        )
+            val tableType = tableType(i32AddressType(), refNullReferenceType(AbstractHeapType.Func), limits(1u))
+            val tableExternal = table(store, tableType, null)
+            val tableImport = Import(
+                "env",
+                "table",
+                tableExternal,
+            )
 
-        val tagFunctionType = functionType(
-            params = resultType(listOf(i32ValueType())),
-        )
-        val tagType = tagType(exceptionAttribute(), 0, tagFunctionType)
-        val tagExternal = tag(store, tagType)
-        val tagImport = Import(
-            "env",
-            "tag",
-            tagExternal,
-        )
+            val tagFunctionType = functionType(
+                params = resultType(listOf(i32ValueType())),
+            )
+            val tagType = tagType(exceptionAttribute(), 0, tagFunctionType)
+            val tagExternal = tag(store, tagType)
+            val tagImport = Import(
+                "env",
+                "tag",
+                tagExternal,
+            )
 
-        val imports = listOf(
-            functionImport,
-            globalImport,
-            memoryImport,
-            tableImport,
-            tagImport,
-        )
+            listOf(
+                functionImport,
+                globalImport,
+                memoryImport,
+                tableImport,
+                tagImport,
+            )
+        }
 
-        val result = runner(store, imports).invoke(
+        val result = runner.invoke(
             name = "import",
         )
 

@@ -18,12 +18,12 @@ fun AssertUnlinkableCommandRunner(
     val moduleFilePath = context.binaryDirectory + "/" + command.filename
     val bytes = moduleFilePath.readBytesFromPath()
 
-    val module = when (val decoded = runBlocking { module(bytes, context.config.moduleConfig, validate = true) }) {
+    val module = when (val decoded = runBlocking { module(bytes, context.moduleConfig, validate = true) }) {
         is ChasmResult.Success -> decoded.result
         is ChasmResult.Error -> return CommandResult.Failure(command, "the unlinkable module failed to load: ${decoded.error}")
     }
 
-    return when (val instantiated = runBlocking { instance(context.store, module, context.imports, context.config.runtimeConfig) }) {
+    return when (val instantiated = runBlocking { instance(context.store, module, context.imports) }) {
         is ChasmResult.Success -> CommandResult.Failure(command, "the unlinkable module was instantiated")
         is ChasmResult.Error -> if (instantiated.error is ExecutionError.Unlinkable) {
             CommandResult.Success

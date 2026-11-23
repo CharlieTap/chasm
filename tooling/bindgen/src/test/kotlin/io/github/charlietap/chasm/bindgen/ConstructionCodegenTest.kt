@@ -10,7 +10,12 @@ import io.github.charlietap.chasm.bindgen.fixture.memoryBinding
 import io.github.charlietap.chasm.bindgen.fixture.property
 import io.github.charlietap.chasm.bindgen.fixture.stringScalarType
 import io.github.charlietap.chasm.bindgen.fixture.wasmInterface
-import io.github.charlietap.chasm.config.GCStrategy
+import io.github.charlietap.chasm.config.CpuLimits
+import io.github.charlietap.chasm.config.Limits
+import io.github.charlietap.chasm.config.MB
+import io.github.charlietap.chasm.config.MemoryLimits
+import io.github.charlietap.chasm.config.RuntimeConfig
+import io.github.charlietap.chasm.config.fuel
 import io.github.charlietap.chasm.fixture.type.i32ValueType
 import kotlin.test.Test
 import kotlin.test.assertContains
@@ -59,6 +64,16 @@ class ConstructionCodegenTest {
     )
 
     @Test
+    fun `generates AOT construction with store controls`() = assertConstruction(
+        scenario = "AotStoreControlsConstruction",
+        config = codegenConfig(
+            executionTier = ExecutionTier.Aot("com.test.aot.WasmModule"),
+            runtimeConfig = RuntimeConfig(interrupts = true, limits = Limits(cpu = CpuLimits.Metered(1_000.fuel))),
+        ),
+        runtimes = listOf(CodegenRuntime.CHASM),
+    )
+
+    @Test
     fun `generates AOT construction from a compiled module bridge object`() = assertConstruction(
         scenario = "AotBridgeConstruction",
         config = codegenConfig(executionTier = ExecutionTier.Aot("com.test.AotBridgeConstructionCompiledModule")),
@@ -76,13 +91,6 @@ class ConstructionCodegenTest {
     fun `generates JIT construction with store settings`() = assertConstruction(
         scenario = "JitStoreSettingsConstruction",
         config = storeSettings(ExecutionTier.Jit()),
-        runtimes = listOf(CodegenRuntime.CHASM),
-    )
-
-    @Test
-    fun `generates AOT construction with store settings`() = assertConstruction(
-        scenario = "AotStoreSettingsConstruction",
-        config = storeSettings(ExecutionTier.Aot("com.test.aot.WasmModule")),
         runtimes = listOf(CodegenRuntime.CHASM),
     )
 
@@ -205,11 +213,14 @@ class ConstructionCodegenTest {
         executionTier: ExecutionTier,
     ) = codegenConfig(
         executionTier = executionTier,
-        cpu = CpuLimits.Metered(1_000.fuel),
-        memory = MemoryLimits.Constrained(linearMemory = 1.MB, gcHeap = 1.MB),
-        interrupts = true,
-        stacktraces = true,
-        gcStrategy = GCStrategy.TRADITIONAL,
+        runtimeConfig = RuntimeConfig(
+            interrupts = true,
+            stacktraces = true,
+            limits = Limits(
+                cpu = CpuLimits.Metered(1_000.fuel),
+                memory = MemoryLimits(linearMemory = 1.MB, gcHeap = 1.MB),
+            ),
+        ),
     )
 
     private fun assertConstruction(

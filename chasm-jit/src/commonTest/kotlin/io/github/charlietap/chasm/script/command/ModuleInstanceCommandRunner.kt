@@ -14,7 +14,7 @@ fun ModuleInstanceCommandRunner(
 ): CommandResult {
 
     val module = context.modules[command.module] ?: return CommandResult.Failure(command, "Failed to lookup module in context")
-    val result = runBlocking { instance(context.store, module, context.imports, context.config.runtimeConfig) }
+    val result = runBlocking { instance(context.store, module, context.imports) }
 
     return result.fold(
         { instance ->

@@ -1,7 +1,12 @@
 package io.github.charlietap.chasm.embedding
 
+import io.github.charlietap.chasm.config.CpuLimits
+import io.github.charlietap.chasm.config.Limits
+import io.github.charlietap.chasm.config.MemoryLimits
 import io.github.charlietap.chasm.config.RuntimeConfig
-import io.github.charlietap.chasm.config.StoreConfig
+import io.github.charlietap.chasm.config.bytes
+import io.github.charlietap.chasm.config.fuel
+import io.github.charlietap.chasm.config.pages
 import io.github.charlietap.chasm.embedding.error.ExecutionError
 import io.github.charlietap.chasm.embedding.fixture.INSTANCE_MODULE
 import io.github.charlietap.chasm.embedding.fixture.decodedModule
@@ -48,6 +53,21 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
 class StoreAccessTest {
+
+    @Test
+    fun `a host-created memory or table above the store's limit is refused and allocates nothing`() {
+
+        val runtime = store(config = RuntimeConfig(limits = Limits(memory = MemoryLimits(linearMemory = 2.pages, tables = 16.bytes))))
+        val store = interpreterStore(runtime)
+
+        assertFailsWith<IllegalArgumentException> { memory(store, memoryType(limits = limits(min = 3u))) }
+        assertFailsWith<IllegalArgumentException> {
+            table(store, tableType(referenceType = refNullReferenceType(), limits = limits(min = 3u)), null)
+        }
+
+        assertEquals(0, runtime.memories.size)
+        assertEquals(0, runtime.tables.size)
+    }
 
     @Test
     fun `handles from another store are refused`() {
@@ -118,13 +138,13 @@ class StoreAccessTest {
         assertFailsWith<IllegalStateException> { dropInstance(instance) }
         assertFailsWith<IllegalStateException> { memory(store, memoryType()) }
         assertFailsWith<IllegalStateException> { global(store, globalType(), NumberValue.I32(0)) }
-        assertFailsWith<IllegalStateException> { instance(store, module, emptyList(), RuntimeConfig()) }
+        assertFailsWith<IllegalStateException> { instance(store, module, emptyList()) }
     }
 
     @Test
     fun `collect and fuel calls on a dropped store throw illegal state`() {
 
-        val store = interpreterStore(store(config = StoreConfig(meterFuel = true, interruptible = true)))
+        val store = interpreterStore(store(config = RuntimeConfig(interrupts = true, limits = Limits(cpu = CpuLimits.Metered(0.fuel)))))
 
         dropStore(store)
 

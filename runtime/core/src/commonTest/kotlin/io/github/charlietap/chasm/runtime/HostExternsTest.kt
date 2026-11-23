@@ -1,9 +1,7 @@
 package io.github.charlietap.chasm.runtime
 
-import io.github.charlietap.chasm.config.GCStrategy
-import io.github.charlietap.chasm.config.RuntimeConfig
-import io.github.charlietap.chasm.fixture.config.runtimeConfig
 import io.github.charlietap.chasm.runtime.encoder.ReferenceValueEncoder
+import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.host.HostExternKind
 import io.github.charlietap.chasm.runtime.host.HostExternReference
 import io.github.charlietap.chasm.runtime.store.Store
@@ -79,10 +77,7 @@ class HostExternsTest {
     @Test
     fun `extern allocation pressure reclaims dead slots`() {
         val store = Store()
-        val context = executionContext(
-            store = store,
-            config = RuntimeConfig(gcStrategy = GCStrategy.MANUAL),
-        )
+        val context = executionContext(store)
 
         fun createUnrooted(value: Any): HostExternReference {
             val marker = store.heap.beginScope()
@@ -112,8 +107,7 @@ class HostExternsTest {
         context.vstack.pop()
     }
 
-    private fun executionContext(
-        store: Store,
-        config: RuntimeConfig = runtimeConfig(),
-    ) = executionContextFixture(store = store, config = config)
+    private fun executionContext(store: Store): ExecutionContext {
+        return executionContextFixture(store = store)
+    }
 }

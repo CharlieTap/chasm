@@ -6,6 +6,7 @@ import com.squareup.kotlinpoet.LONG
 import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.UNIT
+import io.github.charlietap.chasm.config.CpuLimits
 
 internal class StoreControl(
     val name: String,
@@ -20,7 +21,7 @@ internal class StoreControl(
 
 internal val CodegenConfig.storeControls: List<StoreControl>
     get() = buildList {
-        if (cpu is CpuLimits.Metered) {
+        if (runtimeConfig.limits.cpu is CpuLimits.Metered) {
             add(
                 StoreControl(
                     name = "addFuel",
@@ -38,7 +39,7 @@ internal val CodegenConfig.storeControls: List<StoreControl>
                 ),
             )
         }
-        if (interrupts) {
+        if (runtimeConfig.interrupts) {
             add(
                 StoreControl(
                     name = "interrupt",
@@ -49,3 +50,12 @@ internal val CodegenConfig.storeControls: List<StoreControl>
             )
         }
     }
+
+internal enum class StoreFunction(
+    val functionName: String,
+    val alias: String,
+) {
+    AddFuel("addFuel", "chasmAddFuel"),
+    RemainingFuel("remainingFuel", "chasmRemainingFuel"),
+    Interrupt("interrupt", "chasmInterrupt"),
+}

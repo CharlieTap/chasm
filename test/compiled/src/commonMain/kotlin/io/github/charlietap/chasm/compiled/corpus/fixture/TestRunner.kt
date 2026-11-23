@@ -33,7 +33,7 @@ private fun TestRunner(
 ): CorpusResult {
     val timings = context.timings
     val setup = timings.instantiate {
-        moduleInstantiator(context, context.storeFactory(context.storeConfig), module, test?.value)
+        moduleInstantiator(context, context.storeFactory(module), module, test?.value)
     }.getOrElse { error -> return error }
     timings.moduleBuildCount++
 

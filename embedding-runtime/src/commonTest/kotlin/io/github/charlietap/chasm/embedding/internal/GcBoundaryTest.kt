@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.embedding.internal
 
-import io.github.charlietap.chasm.config.GCStrategy
-import io.github.charlietap.chasm.config.GCThreshold
+import io.github.charlietap.chasm.config.Bytes
+import io.github.charlietap.chasm.config.MemoryLimits
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.embedding.collect
 import io.github.charlietap.chasm.embedding.error.ExecutionError
@@ -30,6 +30,7 @@ import io.github.charlietap.chasm.host.HostFunction
 import io.github.charlietap.chasm.host.readReference
 import io.github.charlietap.chasm.host.writeReference
 import io.github.charlietap.chasm.reference.StructReference
+import io.github.charlietap.chasm.runtime.type.RTT
 import io.github.charlietap.chasm.type.AbstractHeapType
 import io.github.charlietap.chasm.type.AddressType
 import io.github.charlietap.chasm.type.CompositeType
@@ -53,9 +54,9 @@ import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
-import kotlin.test.assertNotEquals
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
+import io.github.charlietap.chasm.config.Limits as RuntimeLimits
 
 class GcBoundaryTest {
 
@@ -151,26 +152,24 @@ class GcBoundaryTest {
     }
 
     @Test
-    fun `host allocation inside a call collects under the instance's traditional strategy`() = runTest {
+    fun `host allocation inside a call collects when the heap is full`() = runTest {
 
-        val runtime = store()
+        val runtime = store(config = RuntimeConfig(limits = RuntimeLimits(memory = MemoryLimits(gcHeap = Bytes(GC_HEAP_BYTES)))))
         val store = interpreterStore(runtime)
         val externref = ReferenceType.RefNull(AbstractHeapType.Extern)
         val table = table(store, TableType(AddressType.I32, externref, Limits(2u)), null)
         val arrayType = registerArrayType(runtime, FieldType(StorageType.Value(ValueType.Number(NumberType.I64)), Mutability.Var))
+        runtime.heap.allocateArrayFilled(RTT(arrayType.id), 1, 0L)
         val words = mutableListOf<Long>()
         val burn = HostFunction { _, _ ->
             writeTable(table, 0, "released")
             words += runtime.tables.single().elements[0]
             writeTable(table, 0, null)
-            repeat(ALLOCATIONS) {
-                allocateNumericArray(store, arrayType, ARRAY_LENGTH, 0L)
-            }
+            allocateNumericArray(store, arrayType, ARRAY_LENGTH, 0L)
             writeTable(table, 1, "replacement")
             words += runtime.tables.single().elements[1]
         }
-        val config = RuntimeConfig(gcStrategy = GCStrategy.TRADITIONAL, gcThreshold = GCThreshold.KB(1))
-        val instance = boundaryInstance(store, burn = burn, config = config)
+        val instance = boundaryInstance(store, burn = burn)
 
         invoke(instance, "call_burn").expect("call_burn runs")
 
@@ -178,30 +177,29 @@ class GcBoundaryTest {
     }
 
     @Test
-    fun `host allocation inside a call does not collect under the instance's arena strategy`() = runTest {
+    fun `host allocation inside a call collects once the heap passes the collection threshold`() = runTest {
 
         val runtime = store()
         val store = interpreterStore(runtime)
         val externref = ReferenceType.RefNull(AbstractHeapType.Extern)
         val table = table(store, TableType(AddressType.I32, externref, Limits(2u)), null)
         val arrayType = registerArrayType(runtime, FieldType(StorageType.Value(ValueType.Number(NumberType.I64)), Mutability.Var))
+        val garbage = runtime.heap.allocateArrayFilled(RTT(arrayType.id), COLLECTION_THRESHOLD_LENGTH, 0L)
         val words = mutableListOf<Long>()
         val burn = HostFunction { _, _ ->
             writeTable(table, 0, "released")
             words += runtime.tables.single().elements[0]
             writeTable(table, 0, null)
-            repeat(ALLOCATIONS) {
-                allocateNumericArray(store, arrayType, ARRAY_LENGTH, 0L)
-            }
+            allocateNumericArray(store, arrayType, ARRAY_LENGTH, 0L)
             writeTable(table, 1, "replacement")
             words += runtime.tables.single().elements[1]
         }
-        val config = RuntimeConfig(gcStrategy = GCStrategy.ARENA, gcThreshold = GCThreshold.KB(1))
-        val instance = boundaryInstance(store, burn = burn, config = config)
+        val instance = boundaryInstance(store, burn = burn)
 
         invoke(instance, "call_burn").expect("call_burn runs")
 
-        assertNotEquals(words[0], words[1])
+        assertEquals(-1, runtime.heap.arrayRuntimeTypeIdOrNegative(garbage))
+        assertEquals(words[0], words[1])
     }
 
     private suspend fun externalizedPoint(
@@ -221,7 +219,6 @@ class GcBoundaryTest {
         echo: HostFunction = HostFunction { parameters, results -> results.writeReference(0, parameters.readReference(0)) },
         makePoint: HostFunction = HostFunction { _, results -> results.writeReference(0, null) },
         burn: HostFunction = HostFunction { _, _ -> },
-        config: RuntimeConfig = RuntimeConfig(),
     ): Instance {
 
         val externref = ValueType.Reference(ReferenceType.RefNull(AbstractHeapType.Extern))
@@ -232,7 +229,7 @@ class GcBoundaryTest {
             Import("host", "burn", function(store, FunctionType(ResultType(emptyList()), ResultType(emptyList())), burn)),
         )
 
-        return instantiate(store, GC_BOUNDARY_MODULE, imports, config)
+        return instantiate(store, GC_BOUNDARY_MODULE, imports)
     }
 
     private fun pointType(): DefinedType {
@@ -248,7 +245,8 @@ class GcBoundaryTest {
         const val OTHER = 1
         const val ROUNDS = 100
         const val DEEP_LOCALS = 200
-        const val ALLOCATIONS = 64
         const val ARRAY_LENGTH = 64
+        const val GC_HEAP_BYTES = 16L * 1024L
+        const val COLLECTION_THRESHOLD_LENGTH = 8 * 1024 * 1024 / Long.SIZE_BYTES
     }
 }

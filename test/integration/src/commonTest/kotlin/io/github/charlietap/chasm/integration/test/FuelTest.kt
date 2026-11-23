@@ -1,6 +1,9 @@
 package io.github.charlietap.chasm.integration.test
 
-import io.github.charlietap.chasm.config.StoreConfig
+import io.github.charlietap.chasm.config.CpuLimits
+import io.github.charlietap.chasm.config.Limits
+import io.github.charlietap.chasm.config.RuntimeConfig
+import io.github.charlietap.chasm.config.fuel
 import io.github.charlietap.chasm.embedding.addFuel
 import io.github.charlietap.chasm.embedding.error.ExecutionError
 import io.github.charlietap.chasm.embedding.error.TrapReason
@@ -150,13 +153,13 @@ class FuelTest {
 
     @Test
     fun `a looping start function exhausts fuel during instantiation`() = integrationTest(START_FIXTURE) {
-        val store = engine.store(StoreConfig(meterFuel = true))
-        addFuel(store, 1_000)
-
-        val runner = runner(store)
+        val runner = runner(METERED) { store ->
+            addFuel(store, 1_000)
+            []
+        }
 
         assertTrapped(TrapReason.FUEL_EXHAUSTED, runner.instance(), engine.name())
-        assertEquals(0L, remainingFuel(store), engine.name())
+        assertEquals(0L, remainingFuel(runner.store), engine.name())
     }
 
     @Test
@@ -188,9 +191,9 @@ class FuelTest {
 
     private suspend fun TestScope.instantiate(meterFuel: Boolean): Pair<Store, TestRunner> {
 
-        val store = engine.store(StoreConfig(meterFuel = meterFuel))
+        val runner = runner(if (meterFuel) METERED else RuntimeConfig())
 
-        return store to runner(store)
+        return runner.store to runner
     }
 
     private fun count(
@@ -205,5 +208,6 @@ class FuelTest {
         const val START_FIXTURE = "fuel_start"
         const val PARALLEL_FIXTURE = "fuel_parallel"
         const val PARALLEL_FUNCTIONS = 400
+        val METERED = RuntimeConfig(limits = Limits(cpu = CpuLimits.Metered(0.fuel)))
     }
 }

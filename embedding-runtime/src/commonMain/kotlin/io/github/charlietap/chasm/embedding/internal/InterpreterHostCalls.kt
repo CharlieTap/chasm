@@ -23,7 +23,6 @@ internal class InterpreterHostCallAdapters(
     private val codec: ReferenceCodec,
     private val lanes: ReferenceLanes,
     private val resources: InterpreterHostResources,
-    private val callConfig: HostCallConfig,
 ) : HostCallAdapters {
 
     override fun adapt(
@@ -35,9 +34,9 @@ internal class InterpreterHostCallAdapters(
         val resultSlots = codec.slots(type.results.types)
 
         return if (parameterSlots.isEmpty && resultSlots.isEmpty) {
-            NumericHostCall(function, resources, callConfig)
+            NumericHostCall(function, resources)
         } else {
-            ReferenceHostCall(function, parameterSlots, resultSlots, codec, lanes, resources, callConfig)
+            ReferenceHostCall(function, parameterSlots, resultSlots, codec, lanes, resources)
         }
     }
 }
@@ -45,7 +44,6 @@ internal class InterpreterHostCallAdapters(
 internal class NumericHostCall(
     private val function: HostFunction,
     private val resources: InterpreterHostResources,
-    private val callConfig: HostCallConfig,
 ) : RawHostFunction {
 
     context(stack: HostStack, module: RawHostModuleInstance, raw: RawHostResources)
@@ -55,15 +53,9 @@ internal class NumericHostCall(
     ) {
 
         val context = raw as ExecutionContext
-        val previousConfig = callConfig.current
-        callConfig.current = context.config
 
-        try {
-            context(stack, NO_REFERENCES, resources.module(module, context), resources) {
-                function.invoke(parameters, results)
-            }
-        } finally {
-            callConfig.current = previousConfig
+        context(stack, NO_REFERENCES, resources.module(module, context), resources) {
+            function.invoke(parameters, results)
         }
     }
 
@@ -79,7 +71,6 @@ internal class ReferenceHostCall(
     private val codec: ReferenceCodec,
     private val lanes: ReferenceLanes,
     private val resources: InterpreterHostResources,
-    private val callConfig: HostCallConfig,
 ) : RawHostFunction {
 
     context(stack: HostStack, module: RawHostModuleInstance, raw: RawHostResources)
@@ -92,8 +83,6 @@ internal class ReferenceHostCall(
         val parametersEnd = parameters + parameterSlots.valueCount
         val resultsEnd = results + resultSlots.valueCount
         val lane = lanes.acquire(maxOf(parametersEnd, resultsEnd))
-        val previousConfig = callConfig.current
-        callConfig.current = context.config
 
         try {
             decodeParameters(stack, lane, parameters)
@@ -106,7 +95,6 @@ internal class ReferenceHostCall(
         } finally {
             lane.fill(null, parameters, parametersEnd)
             lane.fill(null, results, resultsEnd)
-            callConfig.current = previousConfig
             lanes.release()
         }
     }

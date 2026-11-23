@@ -13,11 +13,11 @@ kotlin {
         api(projects.compiler.backendAbi)
         api(projects.config)
         api(projects.moduleDeclarations)
+        api(libs.asm)
+        api(libs.asm.tree)
 
         implementation(projects.compiler.backendAnalysis)
         implementation(projects.runtime.compiledApi)
-        implementation(libs.asm)
-        implementation(libs.asm.tree)
 
         testImplementation(projects.compiler.frontend)
         testImplementation(projects.decoder)

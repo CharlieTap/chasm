@@ -4,8 +4,6 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import io.github.charlietap.chasm.InternalChasmApi
-import io.github.charlietap.chasm.config.GCStrategy
-import io.github.charlietap.chasm.config.GCThreshold
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.executor.invoker.WasmFunctionExecutor
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.EndFunctionDispatcher
@@ -23,14 +21,10 @@ import io.github.charlietap.chasm.fixture.runtime.instruction.operandTransfer
 import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.fixture.runtime.type.rtt
 import io.github.charlietap.chasm.fixture.runtime.value.i32
-import io.github.charlietap.chasm.fixture.type.definedType
-import io.github.charlietap.chasm.fixture.type.finalSubType
 import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.fixture.type.i32ValueType
 import io.github.charlietap.chasm.fixture.type.i64ValueType
-import io.github.charlietap.chasm.fixture.type.recursiveType
 import io.github.charlietap.chasm.fixture.type.resultType
-import io.github.charlietap.chasm.fixture.type.structCompositeType
 import io.github.charlietap.chasm.fixture.type.tagType
 import io.github.charlietap.chasm.gc.GuestHeapOutOfMemoryException
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
@@ -39,13 +33,11 @@ import io.github.charlietap.chasm.runtime.host.HostException
 import io.github.charlietap.chasm.runtime.host.RawHostFunction
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.program.Program
-import io.github.charlietap.chasm.runtime.resource.gc.GarbageCollector
 import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
-import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
 
 class InterpreterTest {
@@ -233,137 +225,14 @@ class InterpreterTest {
         assertEquals(Ok(listOf(41L, 42L)), actual)
     }
 
-    @Test
-    fun `collects garbage after the invocation frame has been removed`() {
-
-        val store = store(program = Program())
-        val result = allocateUnreachableGuestObject(store)
-        val dead = allocateUnreachableGuestObject(store)
-        val entryIp = store.program.append(
-            arrayOf(
-                DispatchableInstruction { vstack, _, nextIp ->
-                    vstack.setFrameSlot(0, result)
-                    vstack.setFrameSlot(2, dead)
-                    nextIp
-                },
-                EndFunctionDispatcher(resultCount = 1, activationHeaderSlot = 1),
-            ),
-        )
-        val function = wasmFunctionInstance(
-            module = moduleInstance(),
-            functionType = functionType(
-                results = resultType(listOf(i32ValueType())),
-            ),
-            function = runtimeFunction(
-                body = runtimeExpression(entryIp),
-                frameSlots = 3,
-            ),
-        )
-
-        val actual = interpret(
-            config = RuntimeConfig(
-                gcStrategy = GCStrategy.ARENA,
-                gcThreshold = GCThreshold.KB(0),
-            ),
-            store = store,
-            instance = function,
-            values = emptyList(),
-        )
-
-        assertEquals(Ok(listOf(result)), actual)
-        assertNotEquals(-1, store.heap.structRuntimeTypeIdOrNegative(result))
-        assertEquals(-1, store.heap.structRuntimeTypeIdOrNegative(dead))
-    }
-
-    @Test
-    fun `manual and traditional strategies do not collect after invocation`() {
-        val program = Program()
-        val entryIp = program.append(
-            arrayOf(
-                EndFunctionDispatcher(resultCount = 0, activationHeaderSlot = 0),
-            ),
-        )
-        val module = moduleInstance()
-        val function = wasmFunctionInstance(
-            module = module,
-            function = runtimeFunction(body = runtimeExpression(entryIp)),
-        )
-        val store = store(program = program)
-        allocateUnreachableGuestObject(store)
-        var collected = false
-        val collector: GarbageCollector = { _ ->
-            collected = true
-            Ok(Unit)
-        }
-
-        for (strategy in listOf(GCStrategy.MANUAL, GCStrategy.TRADITIONAL)) {
-            val actual = interpret(
-                config = RuntimeConfig(
-                    gcStrategy = strategy,
-                    gcThreshold = GCThreshold.KB(0),
-                ),
-                store = store,
-                instance = function,
-                values = emptyList(),
-                garbageCollector = collector,
-            )
-
-            assertEquals(Ok(emptyList()), actual)
-        }
-        assertFalse(collected)
-    }
-
-    @Test
-    fun `collector failure is returned`() {
-        val program = Program()
-        val entryIp = program.append(
-            arrayOf(EndFunctionDispatcher(resultCount = 0, activationHeaderSlot = 0)),
-        )
-        val function = wasmFunctionInstance(
-            module = moduleInstance(),
-            function = runtimeFunction(body = runtimeExpression(entryIp)),
-        )
-        val store = store(program = program)
-        allocateUnreachableGuestObject(store)
-        val failure = InvocationError.GarbageCollectionFailed("injected")
-
-        val actual = interpret(
-            config = RuntimeConfig(
-                gcStrategy = GCStrategy.ARENA,
-                gcThreshold = GCThreshold.KB(0),
-            ),
-            store = store,
-            instance = function,
-            values = emptyList(),
-            garbageCollector = { _ -> Err(failure) },
-        )
-
-        assertEquals(Err(failure), actual)
-    }
-
     @OptIn(InternalChasmApi::class)
     private fun interpret(
         config: RuntimeConfig,
         store: Store,
         instance: FunctionInstance.WasmFunction,
         values: List<ExecutionValue>,
-        garbageCollector: GarbageCollector = ::GarbageCollector,
     ): Result<List<Long>, InvocationError> {
         store.interpreter = Interpreter
-        return WasmFunctionExecutor(config, store, instance, values, garbageCollector)
-    }
-
-    private fun allocateUnreachableGuestObject(store: Store): Long {
-
-        val types = listOf(
-            definedType(
-                recursiveType = recursiveType(
-                    subTypes = listOf(finalSubType(compositeType = structCompositeType())),
-                ),
-            ),
-        )
-        val runtimeType = store.heap.registerRuntimeTypes(types)[0]
-
-        return store.heap.allocateStruct(runtimeType, LongArray(0))
+        return WasmFunctionExecutor(config, store, instance, values)
     }
 }

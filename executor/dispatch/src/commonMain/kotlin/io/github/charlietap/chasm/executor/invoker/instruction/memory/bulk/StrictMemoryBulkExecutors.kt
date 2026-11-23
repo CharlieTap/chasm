@@ -18,7 +18,7 @@ internal inline fun executeMemoryGrow(
     memory: MemoryInstance,
 ) {
     val previousSize = memory.grow(pagesToAdd)
-    if (previousSize < 0 && context.store.config.limits.trapOnGrowFailure) {
+    if (previousSize < 0 && context.store.trapOnGrowthFailure) {
         throw InvocationException(InvocationError.MemoryGrowFailed)
     }
     vstack.setFrameSlot(destinationSlot, previousSize.toLong())

@@ -27,8 +27,8 @@ public final class io/github/charlietap/chasm/embedding/StoreControlKt {
 	public static final fun function (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/type/FunctionType;Lio/github/charlietap/chasm/host/HostFunction;)Lio/github/charlietap/chasm/embedding/shapes/Function;
 	public static final fun functionReference (Lio/github/charlietap/chasm/embedding/shapes/Function;)Lio/github/charlietap/chasm/reference/FunctionReference;
 	public static final fun global (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/type/GlobalType;Lio/github/charlietap/chasm/embedding/value/ExecutionValue;)Lio/github/charlietap/chasm/embedding/shapes/Global;
-	public static final fun instance (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Module;Ljava/util/List;Lio/github/charlietap/chasm/config/RuntimeConfig;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static synthetic fun instance$default (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Module;Ljava/util/List;Lio/github/charlietap/chasm/config/RuntimeConfig;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static final fun instance (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Module;Ljava/util/List;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun instance$default (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Module;Ljava/util/List;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 	public static final fun interrupt (Lio/github/charlietap/chasm/embedding/shapes/Store;)Z
 	public static final fun memory (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/type/MemoryType;)Lio/github/charlietap/chasm/embedding/shapes/Memory;
 	public static final fun remainingFuel (Lio/github/charlietap/chasm/embedding/shapes/Store;)J
@@ -289,7 +289,7 @@ public abstract interface class io/github/charlietap/chasm/embedding/engine/Engi
 	public abstract fun growMemory (Lio/github/charlietap/chasm/embedding/shapes/Memory;I)I
 	public abstract fun growTable (Lio/github/charlietap/chasm/embedding/shapes/Table;ILjava/lang/Object;)I
 	public abstract fun hasPending ()Z
-	public abstract fun instance (Lio/github/charlietap/chasm/embedding/shapes/Module;Ljava/util/List;Lio/github/charlietap/chasm/config/RuntimeConfig;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun instance (Lio/github/charlietap/chasm/embedding/shapes/Module;Ljava/util/List;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun interrupt ()Z
 	public abstract fun invoke (Lio/github/charlietap/chasm/embedding/shapes/PreparedFunction;Ljava/util/List;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 	public abstract fun invokeUnboxed (Lio/github/charlietap/chasm/embedding/shapes/PreparedFunction;[J[Ljava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;

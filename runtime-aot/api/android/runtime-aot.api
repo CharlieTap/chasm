@@ -1,12 +1,8 @@
-public final class io/github/charlietap/chasm/aot/CompiledModulesKt {
-	public static final fun compiledModule (Lio/github/charlietap/chasm/aot/CompiledModule;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
-	public static final fun compiledModule (Ljava/lang/Class;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
-	public static final fun compiledModule (Ljava/lang/String;Ljava/lang/ClassLoader;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
-	public static final fun compiledModuleMetadata (Lio/github/charlietap/chasm/embedding/shapes/Module;)Lio/github/charlietap/chasm/aot/CompiledModuleMetadata;
+public final class io/github/charlietap/chasm/aot/ModuleKt {
+	public static final fun module (Lio/github/charlietap/chasm/aot/CompiledModule;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 }
 
 public final class io/github/charlietap/chasm/aot/StoreKt {
-	public static final fun store (Lio/github/charlietap/chasm/config/StoreConfig;)Lio/github/charlietap/chasm/embedding/shapes/Store;
-	public static synthetic fun store$default (Lio/github/charlietap/chasm/config/StoreConfig;ILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/Store;
+	public static final fun store (Lio/github/charlietap/chasm/embedding/shapes/Module;)Lio/github/charlietap/chasm/embedding/shapes/Store;
 }
 

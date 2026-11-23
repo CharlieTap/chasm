@@ -15,11 +15,11 @@ class TrapLinesTest {
             LineRange(first = 10, last = 19, original = 40, linear = true),
         )
 
-        assertEquals(3, lines.original("Code0", "f1", 5))
-        assertEquals(42, lines.original("Code0", "f1", 12))
-        assertEquals(59, lines.original("Code0", "f1", 29))
-        assertEquals(-1, lines.original("Code0", "f1", 30))
-        assertEquals(-1, lines.original("Code0", "f1", 0))
+        assertEquals(3, lines.original("Module\$Code0", "f1", 5))
+        assertEquals(42, lines.original("Module\$Code0", "f1", 12))
+        assertEquals(59, lines.original("Module\$Code0", "f1", 29))
+        assertEquals(-1, lines.original("Module\$Code0", "f1", 30))
+        assertEquals(-1, lines.original("Module\$Code0", "f1", 0))
     }
 
     @Test
@@ -29,13 +29,13 @@ class TrapLinesTest {
             LineRange(first = 1, last = 10, original = 30, linear = false),
         )
 
-        assertEquals(30, lines.original("Code0", "f1", 3))
-        assertEquals(70, lines.original("Code0", "f1", 7))
-        assertEquals(70, lines.original("Code0", "f1", 12))
-        assertEquals(-1, lines.original("Code0", "f1", 16))
+        assertEquals(30, lines.original("Module\$Code0", "f1", 3))
+        assertEquals(70, lines.original("Module\$Code0", "f1", 7))
+        assertEquals(70, lines.original("Module\$Code0", "f1", 12))
+        assertEquals(-1, lines.original("Module\$Code0", "f1", 16))
     }
 
     private fun lines(
         vararg ranges: LineRange,
-    ) = TrapLines(mapOf(trapLinesKey("Code0", "f1") to ranges.toList()))
+    ) = TrapLines(mapOf(trapLinesKey("Module\$Code0", "f1") to ranges.toList()))
 }

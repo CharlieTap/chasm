@@ -4,5 +4,5 @@ import io.github.charlietap.chasm.aot.CompileTarget
 
 actual val engines: Set<Engine> = setOf(
     Interpreter(),
-    Aot { target(CompileTarget.ANDROID) },
+    Aot(CompileTarget.ANDROID),
 )

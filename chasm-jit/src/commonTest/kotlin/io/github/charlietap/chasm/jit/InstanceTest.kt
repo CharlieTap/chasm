@@ -3,9 +3,6 @@
 package io.github.charlietap.chasm.jit
 
 import io.github.charlietap.chasm.ExperimentalChasmApi
-import io.github.charlietap.chasm.config.GCStrategy
-import io.github.charlietap.chasm.config.GCThreshold
-import io.github.charlietap.chasm.config.StoreConfig
 import io.github.charlietap.chasm.embedding.instance
 import io.github.charlietap.chasm.embedding.invoke
 import io.github.charlietap.chasm.embedding.module
@@ -43,7 +40,7 @@ class InstanceTest {
     @Test
     fun referencesSwappedAcrossSelfTailCallsSurviveCollections() {
 
-        val store = store(StoreConfig(gcStrategy = GCStrategy.TRADITIONAL, gcThreshold = GCThreshold.KB(64)))
+        val store = store()
         val module = runBlocking { module(fixture("restart"), validate = true) }.expect("module")
         val instance = runBlocking { instance(store, module, emptyList()) }.expect("instance")
 

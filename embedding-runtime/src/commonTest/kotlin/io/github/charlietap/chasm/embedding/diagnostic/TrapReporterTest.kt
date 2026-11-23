@@ -14,6 +14,7 @@ import io.github.charlietap.chasm.embedding.instance
 import io.github.charlietap.chasm.embedding.invoke
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Store
+import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.runtime.diagnostic.TrapSnapshot
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import kotlinx.coroutines.test.runTest
@@ -41,8 +42,8 @@ class TrapReporterTest {
     @Test
     fun `a trap with debug info names frames by their export when the module has no trap source`() = runTest {
 
-        val store = interpreterStore()
-        val instance = instantiate(store, TRAPS_MODULE, config = DEBUG_INFO)
+        val store = interpreterStore(store(config = DEBUG_INFO))
+        val instance = instantiate(store, TRAPS_MODULE)
 
         val trap = trap(invoke(instance, "nested"))
 
@@ -59,7 +60,7 @@ class TrapReporterTest {
     fun `a trap with debug info names frames from the instance's trap source`() = runTest {
 
         val store = namedStore()
-        val instance = instantiate(store, TRAPS_MODULE, config = DEBUG_INFO)
+        val instance = instantiate(store, TRAPS_MODULE)
 
         val trap = trap(invoke(instance, "nested"))
 
@@ -75,7 +76,7 @@ class TrapReporterTest {
     fun `an out of bounds access traps with the memory reason`() = runTest {
 
         val store = namedStore()
-        val instance = instantiate(store, TRAPS_MODULE, config = DEBUG_INFO)
+        val instance = instantiate(store, TRAPS_MODULE)
 
         val trap = trap(invoke(instance, "out_of_bounds"))
 
@@ -88,7 +89,7 @@ class TrapReporterTest {
 
         val store = namedStore()
 
-        val result = instance(store, decodedModule(START_TRAP_MODULE), emptyList(), DEBUG_INFO)
+        val result = instance(store, decodedModule(START_TRAP_MODULE), emptyList())
 
         val trap = trap(result)
         assertEquals(TrapReason.UNREACHABLE, trap.reason)
@@ -96,7 +97,7 @@ class TrapReporterTest {
     }
 
     private fun namedStore(): Store {
-        return interpreterStore(trapSource = { instance -> NamedTrapSource(instance) })
+        return interpreterStore(store(config = DEBUG_INFO), trapSource = { instance -> NamedTrapSource(instance) })
     }
 
     private fun trap(result: ChasmResult<*, *>): Trap {
@@ -129,6 +130,6 @@ class TrapReporterTest {
 
     private companion object {
         const val MODULE_NAME = "diagnostics"
-        val DEBUG_INFO = RuntimeConfig(debugInfo = true)
+        val DEBUG_INFO = RuntimeConfig(stacktraces = true)
     }
 }

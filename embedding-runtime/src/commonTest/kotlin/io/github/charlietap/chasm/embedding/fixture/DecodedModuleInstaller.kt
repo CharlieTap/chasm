@@ -7,8 +7,8 @@ import io.github.charlietap.chasm.compiler.backend.chasm.ParallelModuleLinker
 import io.github.charlietap.chasm.compiler.frontend.CompilationError
 import io.github.charlietap.chasm.compiler.frontend.ParallelModuleCompiler
 import io.github.charlietap.chasm.config.RuntimeConfig
-import io.github.charlietap.chasm.config.StoreConfig
 import io.github.charlietap.chasm.embedding.diagnostic.TrapSource
+import io.github.charlietap.chasm.embedding.error.ExecutionError
 import io.github.charlietap.chasm.embedding.internal.ModuleInstaller
 import io.github.charlietap.chasm.embedding.shapes.DecodedModule
 import io.github.charlietap.chasm.embedding.shapes.Module
@@ -18,6 +18,7 @@ import io.github.charlietap.chasm.parallel.coroutines.DefaultCoroutineParallelTa
 import io.github.charlietap.chasm.runtime.error.InstantiationError
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
+import io.github.charlietap.chasm.embedding.error.InstantiationError as EmbeddingInstantiationError
 import io.github.charlietap.chasm.runtime.instance.Import as RuntimeImport
 import io.github.charlietap.chasm.runtime.store.Store as RuntimeStore
 
@@ -25,22 +26,19 @@ internal class DecodedModuleInstaller(
     private val trapSource: (ModuleInstance) -> TrapSource?,
 ) : ModuleInstaller {
 
-    override fun rejection(
-        module: Module,
-        store: StoreConfig,
-    ): String? {
+    override fun rejection(module: Module): EmbeddingInstantiationError? {
         return if (module._payload() is DecodedModule) {
             null
         } else {
-            "an interpreter store only instantiates modules decoded by module()"
+            ExecutionError.Unsupported("an interpreter store only instantiates modules decoded by module()")
         }
     }
 
     override fun config(
         module: Module,
-        requested: RuntimeConfig,
+        storeConfig: RuntimeConfig,
     ): RuntimeConfig {
-        return requested
+        return storeConfig
     }
 
     override fun trapSource(

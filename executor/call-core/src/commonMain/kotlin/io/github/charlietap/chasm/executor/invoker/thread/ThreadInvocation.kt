@@ -4,7 +4,6 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.InternalChasmApi
-import io.github.charlietap.chasm.config.GCStrategy
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.executor.invoker.diagnostic.TrapSnapshot
 import io.github.charlietap.chasm.executor.invoker.function.initializeLocals
@@ -15,7 +14,6 @@ import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.execution.NestedInterpreter
 import io.github.charlietap.chasm.runtime.ext.toLongFromBoxed
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
-import io.github.charlietap.chasm.runtime.resource.gc.GarbageCollector
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.runtime.store.withLiveStack
@@ -28,7 +26,6 @@ inline fun ThreadInvocation(
     instance: FunctionInstance.WasmFunction,
     values: List<ExecutionValue>,
     nested: NestedInterpreter?,
-    crossinline garbageCollector: GarbageCollector,
     crossinline run: (Int, ExecutionContext) -> Unit,
     crossinline trap: (InvocationException, ValueStack) -> InvocationError,
 ): Result<List<Long>, InvocationError> {
@@ -37,7 +34,6 @@ inline fun ThreadInvocation(
         store = store,
         instance = instance,
         nested = nested,
-        garbageCollector = garbageCollector,
         arguments = { vstack ->
             values.forEachIndexed { index, value ->
                 vstack.setFrameSlot(index, value.toLongFromBoxed())
@@ -54,13 +50,11 @@ inline fun ThreadInvocation(
 }
 
 @InternalChasmApi
-@Suppress("DEPRECATION")
 inline fun <R> ThreadInvocation(
     config: RuntimeConfig,
     store: Store,
     instance: FunctionInstance.WasmFunction,
     nested: NestedInterpreter?,
-    crossinline garbageCollector: GarbageCollector,
     crossinline arguments: (ValueStack) -> Unit,
     crossinline run: (Int, ExecutionContext) -> Unit,
     crossinline trap: (InvocationException, ValueStack) -> InvocationError,
@@ -98,13 +92,6 @@ inline fun <R> ThreadInvocation(
 
         if (vstack.fp != ROOT_FP || vstack.sp != resultCount) {
             Err(InvocationError.ProgramFinishedInconsistentState).bind<Unit>()
-        }
-
-        if (
-            config.gcStrategy == GCStrategy.ARENA &&
-            context.heap.shouldCollectGarbage(config.gcThreshold.bytes)
-        ) {
-            garbageCollector(store).bind()
         }
     }
 

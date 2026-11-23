@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.runtime.heap
 
-import io.github.charlietap.chasm.config.GCStrategy
 import io.github.charlietap.chasm.gc.AllocationAvailability
 import io.github.charlietap.chasm.gc.GarbageCollectedHeap
 import io.github.charlietap.chasm.gc.GcHostReferenceMarker
@@ -71,6 +70,10 @@ class WasmHeap internal constructor(
     private var exceptionDescriptorKeys = IntArray(0)
 
     private var nextAutomaticGcThresholdWords = 0L
+    private val collectionFloorWords = minOf(
+        bytesToWordsCeiling(COLLECTION_THRESHOLD_BYTES),
+        garbageCollectedHeap.maximumPayloadWords(),
+    )
 
     private var scopedRoots = LongArray(0)
     private var scopedRootTop = 0
@@ -1096,26 +1099,15 @@ class WasmHeap internal constructor(
         pendingExceptionReference = 0L
     }
 
-    fun shouldCollectGarbage(thresholdBytes: Long): Boolean {
-        val allocatedWords = garbageCollectedHeap.allocatedPayloadWords()
-        val floorWords = minOf(
-            bytesToWordsCeiling(thresholdBytes),
-            garbageCollectedHeap.maximumPayloadWords(),
-        )
-        return allocatedWords != 0L && allocatedWords >= floorWords
-    }
-
     fun prepareStructAllocation(
         store: Store,
         runtimeType: RTT,
-        thresholdBytes: Long,
     ) {
         val descriptorKey = structDescriptorKey(runtimeType)
         prepareAllocation(
             store = store,
             pendingSlotWords = garbageCollectedHeap.fixedAllocationSlotWords(descriptorKey),
             availability = garbageCollectedHeap.fixedAllocationAvailability(descriptorKey),
-            thresholdBytes = thresholdBytes,
         )
     }
 
@@ -1123,70 +1115,47 @@ class WasmHeap internal constructor(
         store: Store,
         runtimeType: RTT,
         length: Int,
-        thresholdBytes: Long,
     ) {
         val descriptorKey = arrayDescriptorKey(runtimeType)
         prepareAllocation(
             store = store,
             pendingSlotWords = garbageCollectedHeap.arrayAllocationSlotWords(descriptorKey, length),
             availability = garbageCollectedHeap.arrayAllocationAvailability(descriptorKey, length),
-            thresholdBytes = thresholdBytes,
         )
     }
 
     fun prepareExceptionAllocation(
         store: Store,
         tagAddress: Address.Tag,
-        thresholdBytes: Long,
     ) {
         val descriptorKey = exceptionDescriptorKey(tagAddress)
         prepareAllocation(
             store = store,
             pendingSlotWords = garbageCollectedHeap.fixedAllocationSlotWords(descriptorKey),
             availability = garbageCollectedHeap.fixedAllocationAvailability(descriptorKey),
-            thresholdBytes = thresholdBytes,
         )
     }
 
-    @Suppress("DEPRECATION")
     private fun prepareStructAllocation(
         context: ExecutionContext,
         runtimeType: RTT,
     ) {
-        if (context.config.gcStrategy != GCStrategy.TRADITIONAL) return
-        prepareStructAllocation(
-            store = context.store,
-            runtimeType = runtimeType,
-            thresholdBytes = context.config.gcThreshold.bytes,
-        )
+        prepareStructAllocation(context.store, runtimeType)
     }
 
-    @Suppress("DEPRECATION")
     private fun prepareArrayAllocation(
         context: ExecutionContext,
         runtimeType: RTT,
         length: Int,
     ) {
-        if (context.config.gcStrategy != GCStrategy.TRADITIONAL) return
-        prepareArrayAllocation(
-            store = context.store,
-            runtimeType = runtimeType,
-            length = length,
-            thresholdBytes = context.config.gcThreshold.bytes,
-        )
+        prepareArrayAllocation(context.store, runtimeType, length)
     }
 
-    @Suppress("DEPRECATION")
     private fun prepareExceptionAllocation(
         context: ExecutionContext,
         tagAddress: Address.Tag,
     ) {
-        if (context.config.gcStrategy != GCStrategy.TRADITIONAL) return
-        prepareExceptionAllocation(
-            store = context.store,
-            tagAddress = tagAddress,
-            thresholdBytes = context.config.gcThreshold.bytes,
-        )
+        prepareExceptionAllocation(context.store, tagAddress)
     }
 
     private fun visitGcRoots(store: Store, rootMarker: GcRootMarker) {
@@ -1272,17 +1241,16 @@ class WasmHeap internal constructor(
         store: Store,
         pendingSlotWords: Int,
         availability: AllocationAvailability,
-        thresholdBytes: Long,
     ) {
-        val maximumWords = garbageCollectedHeap.maximumPayloadWords()
-        val floorWords = minOf(bytesToWordsCeiling(thresholdBytes), maximumWords)
-        val thresholdWords = maxOf(floorWords, nextAutomaticGcThresholdWords)
+
+        if (availability == AllocationAvailability.REUSABLE) return
+
+        val thresholdWords = maxOf(collectionFloorWords, nextAutomaticGcThresholdWords)
         val projectedWords = saturatingAdd(
             garbageCollectedHeap.allocatedPayloadWords(),
             pendingSlotWords.toLong(),
         )
         val thresholdCrossed = projectedWords >= thresholdWords
-        if (availability == AllocationAvailability.REUSABLE) return
 
         if (availability != AllocationAvailability.EXHAUSTED && !thresholdCrossed) return
         try {
@@ -1592,6 +1560,7 @@ class WasmHeap internal constructor(
         if (value > Long.MAX_VALUE / 2L) Long.MAX_VALUE else value * 2L
 
     private companion object {
+        const val COLLECTION_THRESHOLD_BYTES = 8L * 1024 * 1024
         const val MINIMUM_EXTERN_COLLECTION_THRESHOLD = 64
         const val MINIMUM_ROOT_REGISTRY_CAPACITY = 4
         const val NO_SLOT = -1

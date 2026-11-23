@@ -43,8 +43,8 @@ internal class ModuleLowering(
         MemoryLowering.BYTE_BUFFER -> InlineMemory.BUFFER
         MemoryLowering.UNSAFE -> InlineMemory.UNSAFE
     }.takeIf { declarations.memoryCount > 0 }
-    val packagePath = options.packageName.replace('.', '/')
-    val bindingType = bindingClassDescriptor(packagePath)
+    val entryPath = options.entryClass.replace('.', '/')
+    val bindingType = bindingClassDescriptor(entryPath)
 
     val batches: List<List<CirFunction>> = functionBatches(code.functions, BATCH_INSTRUCTIONS, BATCH_FUNCTIONS)
 
@@ -55,7 +55,7 @@ internal class ModuleLowering(
     init {
         code.functions.forEach { function ->
             val type = declarations.functionType(function.index)
-            val signature = signatures.getOrPut(typedCall("", type).descriptor) { signatureClassDescriptor(packagePath, signatures.size) }
+            val signature = signatures.getOrPut(typedCall("", type).descriptor) { signatureClassDescriptor(entryPath, signatures.size) }
             typedMethods.getOrPut(signature) { typedCall(signature, type) }
         }
     }
@@ -77,7 +77,7 @@ internal class ModuleLowering(
     fun functionMethod(
         index: FunctionIndex,
     ): MethodRef =
-        functionMethod(codeClassDescriptor(packagePath, batchOf.getValue(index.index)), bindingType, index.index, declarations.functionType(index))
+        functionMethod(codeClassDescriptor(entryPath, batchOf.getValue(index.index)), bindingType, index.index, declarations.functionType(index))
 
     fun methodsClass(
         owner: String,

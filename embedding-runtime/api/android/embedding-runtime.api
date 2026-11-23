@@ -28,10 +28,6 @@ public abstract interface class io/github/charlietap/chasm/embedding/diagnostic/
 	public abstract fun getInstance ()Lio/github/charlietap/chasm/runtime/instance/ModuleInstance;
 }
 
-public final class io/github/charlietap/chasm/embedding/ext/RuntimeConfigExtKt {
-	public static final fun withStoreSettings (Lio/github/charlietap/chasm/config/RuntimeConfig;Lio/github/charlietap/chasm/config/StoreConfig;)Lio/github/charlietap/chasm/config/RuntimeConfig;
-}
-
 public final class io/github/charlietap/chasm/embedding/internal/InstantiatedModule {
 	public fun <init> (Lio/github/charlietap/chasm/config/RuntimeConfig;Lio/github/charlietap/chasm/runtime/instance/ModuleInstance;)V
 	public final fun component1 ()Lio/github/charlietap/chasm/config/RuntimeConfig;
@@ -74,13 +70,12 @@ public final class io/github/charlietap/chasm/embedding/internal/InterpreterEngi
 	public fun growMemory (Lio/github/charlietap/chasm/embedding/shapes/Memory;I)I
 	public fun growTable (Lio/github/charlietap/chasm/embedding/shapes/Table;ILjava/lang/Object;)I
 	public fun hasPending ()Z
-	public fun instance (Lio/github/charlietap/chasm/embedding/shapes/Module;Ljava/util/List;Lio/github/charlietap/chasm/config/RuntimeConfig;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun instance (Lio/github/charlietap/chasm/embedding/shapes/Module;Ljava/util/List;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun interrupt ()Z
 	public fun invoke (Lio/github/charlietap/chasm/embedding/shapes/PreparedFunction;Ljava/util/List;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 	public fun invokeUnboxed (Lio/github/charlietap/chasm/embedding/shapes/PreparedFunction;[J[Ljava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 	public fun isSubtype-hm7B2HE (II)Z
 	public fun memory (Lio/github/charlietap/chasm/type/MemoryType;)Lio/github/charlietap/chasm/embedding/shapes/Memory;
-	public final fun memory (Lio/github/charlietap/chasm/type/MemoryType;Lio/github/charlietap/chasm/config/LinearMemoryConfig;)Lio/github/charlietap/chasm/embedding/shapes/Memory;
 	public fun memoryByteSize (Lio/github/charlietap/chasm/embedding/shapes/Memory;)I
 	public fun moveMemory (Lio/github/charlietap/chasm/embedding/shapes/Memory;ILio/github/charlietap/chasm/embedding/shapes/Memory;II)V
 	public fun payloadSize (Lio/github/charlietap/chasm/reference/ExceptionReference;)I
@@ -149,6 +144,7 @@ public final class io/github/charlietap/chasm/embedding/internal/InterpreterEngi
 }
 
 public abstract interface class io/github/charlietap/chasm/embedding/internal/ModuleInstallation {
+	public abstract fun config (Lio/github/charlietap/chasm/config/RuntimeConfig;)Lio/github/charlietap/chasm/config/RuntimeConfig;
 	public abstract fun external (Lio/github/charlietap/chasm/embedding/shapes/Importable;)Lio/github/charlietap/chasm/runtime/instance/ExternalValue;
 	public abstract fun instantiate-MJidatI (Lio/github/charlietap/chasm/config/RuntimeConfig;Lio/github/charlietap/chasm/runtime/store/Store;Ljava/util/List;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun thrown ()Lio/github/charlietap/chasm/reference/ExceptionReference;
@@ -158,7 +154,7 @@ public abstract interface class io/github/charlietap/chasm/embedding/internal/Mo
 public abstract interface class io/github/charlietap/chasm/embedding/internal/ModuleInstaller {
 	public abstract fun config (Lio/github/charlietap/chasm/embedding/shapes/Module;Lio/github/charlietap/chasm/config/RuntimeConfig;)Lio/github/charlietap/chasm/config/RuntimeConfig;
 	public abstract fun instantiate-iWd_AH8 (Lio/github/charlietap/chasm/embedding/shapes/Module;Lio/github/charlietap/chasm/config/RuntimeConfig;Lio/github/charlietap/chasm/runtime/store/Store;Ljava/util/List;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public abstract fun rejection (Lio/github/charlietap/chasm/embedding/shapes/Module;Lio/github/charlietap/chasm/config/StoreConfig;)Ljava/lang/String;
+	public abstract fun rejection (Lio/github/charlietap/chasm/embedding/shapes/Module;)Lio/github/charlietap/chasm/embedding/error/InstantiationError;
 	public abstract fun trapSource (Lio/github/charlietap/chasm/embedding/shapes/Module;Lio/github/charlietap/chasm/runtime/instance/ModuleInstance;)Lio/github/charlietap/chasm/embedding/diagnostic/TrapSource;
 }
 
@@ -170,11 +166,11 @@ public final class io/github/charlietap/chasm/embedding/internal/StoreRuntime {
 	public final fun function-Fz5DH0s (Lio/github/charlietap/chasm/type/FunctionType;Lio/github/charlietap/chasm/runtime/host/RawHostFunction;)I
 	public final fun getDropped ()Z
 	public final fun global-Dd94Mww (Lio/github/charlietap/chasm/type/GlobalType;J)I
-	public final fun instantiate (Lio/github/charlietap/chasm/embedding/engine/Engine;Ljava/util/List;Lio/github/charlietap/chasm/config/RuntimeConfig;Lio/github/charlietap/chasm/embedding/internal/ModuleInstallation;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun instantiate (Lio/github/charlietap/chasm/embedding/engine/Engine;Ljava/util/List;Lio/github/charlietap/chasm/embedding/internal/ModuleInstallation;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun interrupt ()Z
 	public final fun invocationError (Lio/github/charlietap/chasm/runtime/error/InvocationError;Lkotlin/jvm/functions/Function0;)Lio/github/charlietap/chasm/embedding/error/InvocationError;
 	public final fun liveStore ()Lio/github/charlietap/chasm/runtime/store/Store;
-	public final fun memory-KySJaqA (Lio/github/charlietap/chasm/type/MemoryType;Lio/github/charlietap/chasm/config/LinearMemoryConfig;)I
+	public final fun memory-L1YCOFg (Lio/github/charlietap/chasm/type/MemoryType;)I
 	public final fun register (Lio/github/charlietap/chasm/embedding/diagnostic/TrapSource;)V
 	public final fun remainingFuel ()J
 	public final fun resetFuel ()V

@@ -3,7 +3,6 @@ package io.github.charlietap.chasm.embedding.internal
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.fold
 import io.github.charlietap.chasm.InternalChasmApi
-import io.github.charlietap.chasm.config.LinearMemoryConfig
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.embedding.diagnostic.Instantiation
 import io.github.charlietap.chasm.embedding.diagnostic.TrapSource
@@ -14,7 +13,6 @@ import io.github.charlietap.chasm.embedding.diagnostic.invocationError
 import io.github.charlietap.chasm.embedding.engine.Engine
 import io.github.charlietap.chasm.embedding.error.InstantiationError
 import io.github.charlietap.chasm.embedding.error.Trap
-import io.github.charlietap.chasm.embedding.ext.withStoreSettings
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.Importable
@@ -110,11 +108,15 @@ class StoreRuntime(
         return HostFunctionAllocator(liveStore(), type, function)
     }
 
-    fun memory(
-        type: MemoryType,
-        config: LinearMemoryConfig,
-    ): ExternalValue.Memory {
-        return ExternalValue.Memory(MemoryAllocator(liveStore(), type, config))
+    fun memory(type: MemoryType): ExternalValue.Memory {
+
+        val runtime = liveStore()
+        val limit = runtime.memoryPageLimit
+        require(limit == null || type.limits.min <= limit.toULong()) {
+            "the memory starts at ${type.limits.min} pages, above the store's limit of ${runtime.config.limits.memory.linearMemory}"
+        }
+
+        return ExternalValue.Memory(MemoryAllocator(runtime, type))
     }
 
     fun global(
@@ -128,7 +130,14 @@ class StoreRuntime(
         type: TableType,
         value: Long,
     ): ExternalValue.Table {
-        return ExternalValue.Table(TableAllocator(liveStore(), type, value))
+
+        val runtime = liveStore()
+        val limit = runtime.tableElementLimit
+        require(limit == null || type.limits.min <= limit.toULong()) {
+            "the table starts at ${type.limits.min} elements, above the store's limit of ${runtime.config.limits.memory.tables}"
+        }
+
+        return ExternalValue.Table(TableAllocator(runtime, type, value))
     }
 
     fun tag(type: TagType): ExternalValue.Tag {
@@ -142,31 +151,33 @@ class StoreRuntime(
     suspend fun instantiate(
         engine: Engine,
         imports: List<Import>,
-        config: RuntimeConfig,
         installation: ModuleInstallation,
     ): ChasmResult<InstantiatedModule, InstantiationError> {
 
         val runtime = liveStore()
-        require(imports.all { import -> import.value._engine() === engine }) { "an import belongs to a different store" }
+        imports.forEach { import ->
+            require(import.value._engine() === engine) { "the import ${import.moduleName}.${import.entityName} belongs to a different store" }
+        }
 
         if (runtime.invocationDepth == 0) {
             runtime.heap.clearPendingException()
         }
 
         val firstFunctionAddress = runtime.functions.size
-        val effectiveConfig = config.withStoreSettings(runtime.config)
         val runtimeImports = imports.map { import ->
             RuntimeImport(import.moduleName, import.entityName, installation.external(import.value))
         }
 
-        return installation.instantiate(effectiveConfig, runtime, runtimeImports).fold(
+        val config = installation.config(runtime.config)
+
+        return installation.instantiate(config, runtime, runtimeImports).fold(
             success = { instance ->
 
-                if (effectiveConfig.debugInfo) {
+                if (config.stacktraces) {
                     diagnostics.register(installation.trapSource(instance))
                 }
 
-                ChasmResult.Success(InstantiatedModule(effectiveConfig, instance))
+                ChasmResult.Success(InstantiatedModule(config, instance))
             },
             failure = { error ->
                 val instantiation = Instantiation(firstFunctionAddress, installation::trapSource)

@@ -1,9 +1,7 @@
 package io.github.charlietap.chasm.jit.internal
 
 import io.github.charlietap.chasm.InternalChasmApi
-import io.github.charlietap.chasm.config.LinearMemoryConfig
 import io.github.charlietap.chasm.config.RuntimeConfig
-import io.github.charlietap.chasm.config.StoreConfig
 import io.github.charlietap.chasm.embedding.compiled.ManagedEngine
 import io.github.charlietap.chasm.embedding.error.ExecutionError
 import io.github.charlietap.chasm.embedding.error.InstantiationError
@@ -72,7 +70,7 @@ import io.github.charlietap.chasm.runtime.error.InvocationError as RuntimeInvoca
 import io.github.charlietap.chasm.runtime.store.Store as RuntimeStore
 
 @InternalChasmApi
-fun _jitStore(config: StoreConfig): Store {
+fun _jitStore(config: RuntimeConfig): Store {
     return JitEngine(StoreRuntime(RuntimeStore(config = config))).store
 }
 
@@ -170,7 +168,7 @@ internal class JitEngine(
 
         requireLiveStore()
 
-        return memoryAt(storeRuntime.memory(type, LinearMemoryConfig()).address)
+        return memoryAt(storeRuntime.memory(type).address)
     }
 
     override fun global(
@@ -228,18 +226,13 @@ internal class JitEngine(
     override suspend fun instance(
         module: Module,
         imports: List<Import>,
-        config: RuntimeConfig,
     ): ChasmResult<Instance, InstantiationError> {
 
         requireLiveStore()
 
         val decoded = module._payload() as? DecodedModule ?: return ChasmResult.Error(ExecutionError.Unsupported(UNSUPPORTED_MODULE))
 
-        imports.forEach { import ->
-            require(import.value._engine() === this) { "the import ${import.moduleName}.${import.entityName} belongs to a different store" }
-        }
-
-        return when (val result = instantiator.instantiate(decoded, imports, config)) {
+        return when (val result = instantiator.instantiate(decoded, imports, storeRuntime.liveStore().config)) {
             is ChasmResult.Success -> {
                 val instance = instanceOf(result.result.instance)
                 prepareExports(jit(instance))

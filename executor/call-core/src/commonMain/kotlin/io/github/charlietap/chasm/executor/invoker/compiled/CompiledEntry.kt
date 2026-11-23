@@ -107,7 +107,7 @@ private class CompiledEntry(
         exception: InvocationException,
         context: ExecutionContext,
         fp: Int,
-    ): InvocationException = if (context.config.debugInfo) exception.leftCompiledEntry(fp, entryIp) else exception
+    ): InvocationException = if (context.config.stacktraces) exception.leftCompiledEntry(fp, entryIp) else exception
 
     private fun resumeUnwinding(
         vstack: ValueStack,

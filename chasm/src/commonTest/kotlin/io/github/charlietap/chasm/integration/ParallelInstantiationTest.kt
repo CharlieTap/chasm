@@ -70,13 +70,11 @@ class ParallelInstantiationTest {
             serialStore.store,
             module,
             emptyList(),
-            RuntimeConfig(),
         ).expect("expected fixture to instantiate serially")
         val parallelInstance = instance(
             parallelStore.store,
             module,
             emptyList(),
-            RuntimeConfig(),
         ).expect("expected fixture to instantiate in parallel")
 
         assertEquals(1, parallelExecutor.executionCount)
@@ -111,7 +109,6 @@ class ParallelInstantiationTest {
                         store.store,
                         module,
                         emptyList(),
-                        RuntimeConfig(),
                     ).expect("expected fixture to instantiate in parallel")
                     assertEquals(1, taskExecutor.executionCount)
                     invoke(instance, "allocate")
@@ -139,7 +136,6 @@ class ParallelInstantiationTest {
             store.store,
             module,
             emptyList(),
-            RuntimeConfig(),
         )
 
         assertEquals(1, taskExecutor.executionCount)

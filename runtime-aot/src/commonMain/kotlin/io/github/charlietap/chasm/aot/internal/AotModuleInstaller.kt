@@ -4,12 +4,13 @@ package io.github.charlietap.chasm.aot.internal
 
 import com.github.michaelbull.result.Result
 import io.github.charlietap.chasm.InternalChasmApi
-import io.github.charlietap.chasm.aot.Capabilities
-import io.github.charlietap.chasm.aot.CompiledModuleMetadata
+import io.github.charlietap.chasm.config.Bytes
+import io.github.charlietap.chasm.config.CpuLimits
 import io.github.charlietap.chasm.config.RuntimeConfig
-import io.github.charlietap.chasm.config.StoreConfig
 import io.github.charlietap.chasm.embedding.diagnostic.CompiledTrapSource
 import io.github.charlietap.chasm.embedding.diagnostic.TrapSource
+import io.github.charlietap.chasm.embedding.error.ExecutionError
+import io.github.charlietap.chasm.embedding.error.InstantiationError
 import io.github.charlietap.chasm.embedding.internal.ModuleInstaller
 import io.github.charlietap.chasm.embedding.shapes.Module
 import io.github.charlietap.chasm.embedding.shapes._payload
@@ -22,24 +23,49 @@ import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.instance.Import as RuntimeImport
 import io.github.charlietap.chasm.runtime.store.Store as RuntimeStore
 
-internal class AotModuleInstaller : ModuleInstaller {
+internal class AotModuleInstaller(
+    private val first: AotModule,
+) : ModuleInstaller {
 
-    override fun rejection(
-        module: Module,
-        store: StoreConfig,
-    ): String? {
+    override fun rejection(module: Module): InstantiationError? {
 
         val payload = module._payload() as? AotModule
-            ?: return "an AOT store only instantiates modules loaded by compiledModule()"
+            ?: return ExecutionError.Unsupported("an AOT store only instantiates modules loaded by module(CompiledModule)")
 
-        return mismatch(payload.metadata.capabilities, store)?.let { reason -> "Compiled module rejected: $reason" }
+        if (payload === first) {
+            return null
+        }
+
+        val moduleConfig = payload.config
+        val storeConfig = first.config
+        val moduleMemory = moduleConfig.limits.memory
+        val storeMemory = storeConfig.limits.memory
+        val difference = when {
+            moduleConfig.limits.cpu != storeConfig.limits.cpu ->
+                "fuel ${fuel(moduleConfig.limits.cpu)} but the store has fuel ${fuel(storeConfig.limits.cpu)}"
+            moduleConfig.interrupts != storeConfig.interrupts ->
+                "interrupts ${moduleConfig.interrupts} but the store has interrupts ${storeConfig.interrupts}"
+            moduleMemory.linearMemory != storeMemory.linearMemory ->
+                "linearMemory ${bytes(moduleMemory.linearMemory)} but the store allows ${bytes(storeMemory.linearMemory)}"
+            moduleMemory.gcHeap != storeMemory.gcHeap ->
+                "gcHeap ${bytes(moduleMemory.gcHeap)} but the store allows ${bytes(storeMemory.gcHeap)}"
+            moduleMemory.tables != storeMemory.tables ->
+                "tables ${bytes(moduleMemory.tables)} but the store allows ${bytes(storeMemory.tables)}"
+            moduleMemory.stack != storeMemory.stack ->
+                "stack ${moduleMemory.stack ?: "default"} but the store allows ${storeMemory.stack ?: "default"}"
+            moduleMemory.onGrowthFailure != storeMemory.onGrowthFailure ->
+                "onGrowthFailure ${moduleMemory.onGrowthFailure} but the store has onGrowthFailure ${storeMemory.onGrowthFailure}"
+            else -> return null
+        }
+
+        return ExecutionError.Unlinkable("the module was compiled with $difference")
     }
 
     override fun config(
         module: Module,
-        requested: RuntimeConfig,
+        storeConfig: RuntimeConfig,
     ): RuntimeConfig {
-        return runtimeConfig((module._payload() as AotModule).metadata)
+        return (module._payload() as AotModule).config
     }
 
     override fun trapSource(
@@ -50,7 +76,7 @@ internal class AotModuleInstaller : ModuleInstaller {
         val payload = module._payload() as AotModule
 
         return CompiledTrapSource(instance, { payload.declarations.names }) { function ->
-            payload.compiled.trapSites?.function(function)
+            payload.trapSites?.function(function)
         }
     }
 
@@ -67,44 +93,26 @@ internal class AotModuleInstaller : ModuleInstaller {
         return ModuleInstantiator(config, runtime, payload.declarations, imports) { runtimeStore, instance, runtimeTypes, _ ->
 
             instance.compiledFrames = ModuleCompiledFrames(
-                packageName = compiled.packageName,
-                chunkStarts = { function -> compiled.trapSites?.function(function)?.chunkStarts },
+                classPrefix = payload.classPrefix,
+                chunkStarts = { function -> payload.trapSites?.function(function)?.chunkStarts },
                 originalLine = { className, methodName, line ->
-                    compiled.trapLines?.original(className.substringAfterLast('.'), methodName, line) ?: line
+                    payload.trapLines?.original(className.substringAfterLast('.'), methodName, line) ?: line
                 },
                 entryClass = compiledEntryClass,
             )
 
-            ModuleCodeInstallation(compiled.code::install, runtimeStore, payload.declarations.functionTypeIndices.size, instance, runtimeTypes)
+            ModuleCodeInstallation(compiled::install, runtimeStore, payload.declarations.functionTypeIndices.size, instance, runtimeTypes)
         }
     }
 
-    private fun mismatch(
-        capabilities: Capabilities,
-        store: StoreConfig,
-    ): String? {
-        return when {
-            capabilities.meterFuel && !store.meterFuel ->
-                "the module was compiled with fuel checks but the store does not meter fuel"
-            !capabilities.meterFuel && store.meterFuel ->
-                "the store meters fuel but the module was compiled without fuel checks"
-            capabilities.interruptible && !store.interruptible ->
-                "the module was compiled with interrupt checks but the store is not interruptible"
-            !capabilities.interruptible && store.interruptible ->
-                "the store is interruptible but the module was compiled without interrupt checks"
-            else -> null
+    private fun fuel(cpu: CpuLimits): String {
+        return when (cpu) {
+            is CpuLimits.Metered -> cpu.fuel.units.toString()
+            CpuLimits.Unmetered -> "unmetered"
         }
     }
 
-    @Suppress("DEPRECATION")
-    private fun runtimeConfig(metadata: CompiledModuleMetadata): RuntimeConfig {
-
-        val defaults = RuntimeConfig()
-
-        return RuntimeConfig(
-            debugInfo = metadata.capabilities.stacktraces,
-            gcStrategy = metadata.storeConfig.gcStrategy ?: defaults.gcStrategy,
-            gcThreshold = metadata.storeConfig.gcThreshold ?: defaults.gcThreshold,
-        )
+    private fun bytes(value: Bytes?): String {
+        return value?.toString() ?: "no limit"
     }
 }

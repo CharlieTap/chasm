@@ -34,7 +34,7 @@ data class ExecutionContext(
     @JvmField
     var compiledStackLimit: Int = minOf(
         CompiledStack.budget.toLong(),
-        store.config.limits.stackBytes?.div(CompiledStack.UNIT_BYTES) ?: Long.MAX_VALUE,
+        store.stackBytes?.div(CompiledStack.UNIT_BYTES) ?: Long.MAX_VALUE,
     ).toInt()
 
     @JvmField

@@ -78,7 +78,7 @@ class TrapDiagnosticsTest {
         streamed: Boolean = false,
         bytes: ByteArray = Resource(FIXTURE).readBytes(),
     ): Fixture {
-        val store = store()
+        val store = store(config)
         val hostFunction = HostFunction { _, _ -> throw HostFunctionException("host failed") }
         val import = Import("env", "host_fail", function(store, functionType(), hostFunction))
         val module = if (streamed) {
@@ -86,7 +86,7 @@ class TrapDiagnosticsTest {
         } else {
             module(bytes).expect("decode")
         }
-        val instance = instance(store, module, listOf(import), config).expect("instantiate")
+        val instance = instance(store, module, listOf(import)).expect("instantiate")
 
         return Fixture(instance)
     }
@@ -110,6 +110,6 @@ class TrapDiagnosticsTest {
 
     private companion object {
         const val FIXTURE = "integration/trap_diagnostics.wasm"
-        val DIAGNOSTICS = RuntimeConfig(debugInfo = true)
+        val DIAGNOSTICS = RuntimeConfig(stacktraces = true)
     }
 }

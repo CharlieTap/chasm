@@ -19,9 +19,13 @@ import io.github.charlietap.chasm.embedding.value.NumberValue
 import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.host.HostFunction
 import io.github.charlietap.chasm.host.HostFunctionException
+import io.github.charlietap.chasm.integration.EXCLUSIONS
+import io.github.charlietap.chasm.integration.INTERPRETER
+import io.github.charlietap.chasm.integration.JIT
 import io.github.charlietap.chasm.integration.TestRunner
 import io.github.charlietap.chasm.integration.TestScope
 import io.github.charlietap.chasm.integration.integrationTest
+import io.github.charlietap.chasm.integration.join
 import io.github.charlietap.chasm.integration.runner
 import io.github.charlietap.chasm.integration.trapOf
 import io.github.charlietap.chasm.runtime.error.InvocationError
@@ -214,14 +218,13 @@ class TrapDiagnosticsTest {
 
     @Test
     fun `a trap in a call a host function makes back into the module reports the frames of that call`() = integrationTest(FIXTURE) {
-        val store = engine.store()
         lateinit var runner: TestRunner
         var inner: ChasmResult<*, *>? = null
         val hostFunction = HostFunction { _, _ ->
             inner = runner.invoke("nested_unreachable")
             throw HostFunctionException("host failed")
         }
-        runner = runner(store, listOf(Import("env", "host_fail", function(store, functionType(), hostFunction))), DIAGNOSTICS)
+        runner = runner(config = DIAGNOSTICS) { store -> listOf(Import("env", "host_fail", function(store, functionType(), hostFunction))) }
 
         val outer = tracedTrap(runner, "call_host")
 
@@ -315,14 +318,52 @@ class TrapDiagnosticsTest {
 
     @Test
     fun `an imported start function is not attributed to the module being instantiated`() = integrationTest(START_IMPORT_FIXTURE) {
-        val store = engine.store()
-        val owner = runner(store, script = START_OWNER_FIXTURE)
+        val owner = runner(config = DIAGNOSTICS, script = START_OWNER_FIXTURE)
         val boom = assertNotNull(owner.exports().expect("owner exports").function("boom"), engine.name())
 
-        val result = runner(store, listOf(Import("owner", "boom", boom)), DIAGNOSTICS).invoke("not_executed")
+        val result = join(owner, script, listOf(Import("owner", "boom", boom))).invoke("not_executed")
+
+        val trap = trapOf(result, engine.name())
+        assertEquals(listOf(WasmFrame("owner", 0, "boom", 0x21)), trap.frames(), engine.name())
+    }
+
+    @Test
+    fun `a traced AOT module joined to an untraced store reports its own frames`() = integrationTest(START_IMPORT_FIXTURE, AOT_ONLY) {
+        val owner = runner(script = START_OWNER_FIXTURE)
+        val boom = assertNotNull(owner.exports().expect("owner exports").function("boom"), engine.name())
+
+        val result = join(owner, script, listOf(Import("owner", "boom", boom)), DIAGNOSTICS).invoke("not_executed")
 
         val trap = trapOf(result, engine.name())
         assertEquals(listOf(WasmFrame(null, 0, "boom", null)), trap.frames(), engine.name())
+    }
+
+    @Test
+    fun `an untraced AOT module joined to a traced store reports no frames`() = integrationTest(START_IMPORT_FIXTURE, AOT_ONLY) {
+        val owner = runner(config = DIAGNOSTICS, script = START_OWNER_FIXTURE)
+        val boom = assertNotNull(owner.exports().expect("owner exports").function("boom"), engine.name())
+
+        val result = join(owner, script, listOf(Import("owner", "boom", boom)), RuntimeConfig()).invoke("not_executed")
+
+        val trap = trapOf(result, engine.name())
+        assertNull(trap.stackTrace, engine.name())
+    }
+
+    @Test
+    fun `stack traces are a store setting`() = integrationTest(FIXTURE) {
+        val runner = fixture(RuntimeConfig(stacktraces = true))
+
+        val trap = tracedTrap(runner, "nested_unreachable")
+
+        assertEquals(
+            listOf(
+                frame(1, "leaf", 0x14f),
+                frame(2, "middle", 0x153),
+                frame(3, "nested_unreachable", 0x158),
+            ),
+            trap.frames(),
+            engine.name(),
+        )
     }
 
     @Test
@@ -339,10 +380,16 @@ class TrapDiagnosticsTest {
         config: RuntimeConfig,
         imports: Boolean = true,
     ): TestRunner {
-        val store = engine.store()
+
         val hostFunction = HostFunction { _, _ -> throw HostFunctionException("host failed") }
-        val import = Import("env", "host_fail", function(store, functionType(), hostFunction))
-        return runner(store, if (imports) listOf(import) else emptyList(), config)
+
+        return runner(config = config) { store ->
+            if (imports) {
+                listOf(Import("env", "host_fail", function(store, functionType(), hostFunction)))
+            } else {
+                emptyList()
+            }
+        }
     }
 
     private fun TestScope.trapOf(
@@ -399,6 +446,7 @@ class TrapDiagnosticsTest {
         const val START_OWNER_FIXTURE = "trap_diagnostics_start_owner"
         const val START_IMPORT_FIXTURE = "trap_diagnostics_start_import"
         const val PAGE_SIZE = 65536L
-        val DIAGNOSTICS = RuntimeConfig(debugInfo = true)
+        val DIAGNOSTICS = RuntimeConfig(stacktraces = true)
+        val AOT_ONLY = EXCLUSIONS + mapOf(INTERPRETER to setOf(START_IMPORT_FIXTURE), JIT to setOf(START_IMPORT_FIXTURE))
     }
 }

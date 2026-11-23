@@ -1,7 +1,9 @@
 package io.github.charlietap.chasm.integration.test
 
-import io.github.charlietap.chasm.config.StoreConfig
-import io.github.charlietap.chasm.config.StoreLimits
+import io.github.charlietap.chasm.config.GrowthFailureStrategy
+import io.github.charlietap.chasm.config.Limits
+import io.github.charlietap.chasm.config.MemoryLimits
+import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.embedding.error.ExecutionError
 import io.github.charlietap.chasm.embedding.error.TrapReason
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
@@ -20,7 +22,7 @@ class StoreLimitsJvmTest {
 
     @Test
     fun `table grow returns minus one when the platform cannot allocate the table`() = integrationTest(FIXTURE) {
-        val runner = runner(engine.store(StoreConfig()))
+        val runner = runner(RuntimeConfig())
 
         assertEquals(success(-1), grow(runner, Int.MAX_VALUE - 1), engine.name())
         assertEquals(success(1), grow(runner, 0), engine.name())
@@ -28,7 +30,7 @@ class StoreLimitsJvmTest {
 
     @Test
     fun `table grow traps when the platform cannot allocate the table and grow failures trap`() = integrationTest(FIXTURE) {
-        val runner = runner(engine.store(StoreConfig(limits = StoreLimits(trapOnGrowFailure = true))))
+        val runner = runner(RuntimeConfig(limits = Limits(memory = MemoryLimits(onGrowthFailure = GrowthFailureStrategy.Trap))))
 
         assertTrapped(TrapReason.TABLE_GROW_FAILED, grow(runner, Int.MAX_VALUE - 1), engine.name())
         assertEquals(success(1), grow(runner, 0), engine.name())

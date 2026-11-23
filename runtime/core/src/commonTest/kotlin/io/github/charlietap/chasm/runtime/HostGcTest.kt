@@ -1,11 +1,8 @@
 package io.github.charlietap.chasm.runtime
 
-import io.github.charlietap.chasm.config.GCStrategy
-import io.github.charlietap.chasm.config.GCThreshold
-import io.github.charlietap.chasm.config.RuntimeConfig
-import io.github.charlietap.chasm.fixture.config.runtimeConfig
 import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.host.HostGcType
+import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.host.HostGc
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.store.Store
@@ -121,14 +118,7 @@ class HostGcTest {
         val store = Store()
         val runtimeTypes = store.heap.registerRuntimeTypes(hostTypes())
         val module = ModuleInstance(runtimeTypes)
-        val context = executionContext(
-            store,
-            module,
-            RuntimeConfig(
-                gcStrategy = GCStrategy.TRADITIONAL,
-                gcThreshold = GCThreshold.KB(0),
-            ),
-        )
+        val context = executionContext(store, module)
         val child = store.heap.allocateStruct(runtimeTypes[EMPTY_STRUCT_TYPE_INDEX], longArrayOf())
         val callbackMarker = store.heap.beginScope(5)
 
@@ -138,14 +128,18 @@ class HostGcTest {
             assertEquals(runtimeTypes[REFERENCE_ARRAY_TYPE_INDEX].value, resolved.id)
             assertEquals(true, gc.isSubtype(resolved, resolved))
 
+            val arrayGarbage = store.heap.allocateArrayFilled(runtimeTypes[NUMBER_ARRAY_TYPE_INDEX], GARBAGE_LENGTH, 0L)
             val array = gc.allocateArray(resolved, longArrayOf(child))
+            assertEquals(-1, store.heap.arrayRuntimeTypeIdOrNegative(arrayGarbage))
             assertEquals(child, gc.readArrayElement(array, 0))
             assertNotEquals(-1, store.heap.structRuntimeTypeIdOrNegative(child))
 
+            val structGarbage = store.heap.allocateArrayFilled(runtimeTypes[NUMBER_ARRAY_TYPE_INDEX], GARBAGE_LENGTH, 0L)
             val struct = gc.allocateStruct(
                 HostGcType(runtimeTypes[STRUCT_TYPE_INDEX].value),
                 longArrayOf(7, child, 11),
             )
+            assertEquals(-1, store.heap.arrayRuntimeTypeIdOrNegative(structGarbage))
             assertEquals(child, gc.readStructField(struct, 1))
 
             val emptyStruct = gc.allocateStruct(
@@ -179,8 +173,9 @@ class HostGcTest {
     private fun executionContext(
         store: Store,
         module: ModuleInstance = moduleInstance(),
-        config: RuntimeConfig = runtimeConfig(),
-    ) = executionContextFixture(store = store, instance = module, config = config)
+    ): ExecutionContext {
+        return executionContextFixture(store = store, instance = module)
+    }
 
     private companion object {
         const val EMPTY_STRUCT_TYPE_INDEX = 0
@@ -188,6 +183,7 @@ class HostGcTest {
         const val NUMBER_ARRAY_TYPE_INDEX = 2
         const val REFERENCE_ARRAY_TYPE_INDEX = 3
         const val PACKED_ARRAY_TYPE_INDEX = 4
+        const val GARBAGE_LENGTH = 8 * 1024 * 1024 / Long.SIZE_BYTES
 
         fun hostTypes(): List<DefinedType> = DefinedTypeFactory(
             listOf(

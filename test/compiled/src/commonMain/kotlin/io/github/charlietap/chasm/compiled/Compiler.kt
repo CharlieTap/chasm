@@ -1,14 +1,14 @@
 package io.github.charlietap.chasm.compiled
 
 import io.github.charlietap.chasm.config.ModuleConfig
-import io.github.charlietap.chasm.config.StoreConfig
+import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.embedding.error.InstantiationError
 import io.github.charlietap.chasm.embedding.error.ModuleError
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Module
 import kotlin.jvm.JvmInline
 
-typealias Compiler = (ByteArray, ModuleConfig, StoreConfig) -> ChasmResult<Module, ScriptFailure>
+typealias Compiler = (ByteArray, ModuleConfig, RuntimeConfig) -> ChasmResult<Module, ScriptFailure>
 
 sealed interface ScriptFailure {
 

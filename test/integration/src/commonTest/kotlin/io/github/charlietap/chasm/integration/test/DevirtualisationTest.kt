@@ -1,10 +1,9 @@
 package io.github.charlietap.chasm.integration.test
 
-import io.github.charlietap.chasm.config.GCStrategy
-import io.github.charlietap.chasm.config.GCThreshold
+import io.github.charlietap.chasm.config.Bytes
+import io.github.charlietap.chasm.config.Limits
+import io.github.charlietap.chasm.config.MemoryLimits
 import io.github.charlietap.chasm.config.RuntimeConfig
-import io.github.charlietap.chasm.config.StoreConfig
-import io.github.charlietap.chasm.config.StoreLimits
 import io.github.charlietap.chasm.embedding.error.ExecutionError
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.value.ExecutionValue
@@ -58,8 +57,7 @@ class DevirtualisationTest {
 
     @Test
     fun `a reference held across allocating devirtualised calls survives collection`() = integrationTest(FIXTURE) {
-        val store = engine.store(StoreConfig(limits = StoreLimits(gcHeapBytes = ALLOCATIONS * ALLOCATION_BYTES / 2L)))
-        val runner = runner(store, config = RuntimeConfig(gcStrategy = GCStrategy.TRADITIONAL, gcThreshold = GCThreshold.KB(0)))
+        val runner = runner(RuntimeConfig(limits = Limits(memory = MemoryLimits(gcHeap = Bytes(ALLOCATIONS * ALLOCATION_BYTES / 2L)))))
 
         val retained = runner.invoke("retained", listOf(NumberValue.I32(1), NumberValue.I32(ALLOCATIONS)))
 

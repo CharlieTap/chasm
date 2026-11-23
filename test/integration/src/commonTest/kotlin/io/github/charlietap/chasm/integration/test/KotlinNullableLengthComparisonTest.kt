@@ -15,23 +15,24 @@ class KotlinNullableLengthComparisonTest {
     @Test
     fun `can invoke checkLen from the Kotlin nullable length comparison artifact`() = integrationTest(FIXTURE) {
 
-        val store = engine.store()
-        val imports = imports(store) {
-            function {
-                moduleName = "wasi_snapshot_preview1"
-                entityName = "random_get"
-                type {
-                    params {
-                        i32()
-                        i32()
+        val runner = runner { store ->
+            imports(store) {
+                function {
+                    moduleName = "wasi_snapshot_preview1"
+                    entityName = "random_get"
+                    type {
+                        params {
+                            i32()
+                            i32()
+                        }
+                        results { i32() }
                     }
-                    results { i32() }
+                    reference { _, results -> results.writeI32(0, 0) }
                 }
-                reference { _, results -> results.writeI32(0, 0) }
             }
         }
 
-        val result = runner(store, imports).invoke(
+        val result = runner.invoke(
             name = "checkLen",
         )
 

@@ -1,7 +1,6 @@
 package io.github.charlietap.chasm.embedding.engine
 
 import io.github.charlietap.chasm.InternalChasmApi
-import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.embedding.error.ExecutionError
 import io.github.charlietap.chasm.embedding.error.InstantiationError
 import io.github.charlietap.chasm.embedding.error.InvocationError
@@ -71,7 +70,6 @@ interface Engine {
     suspend fun instance(
         module: Module,
         imports: List<Import>,
-        config: RuntimeConfig,
     ): ChasmResult<Instance, InstantiationError>
 
     fun exports(instance: Instance): Exports

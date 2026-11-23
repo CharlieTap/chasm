@@ -6,7 +6,6 @@
 
 package io.github.charlietap.chasm.memory
 
-import io.github.charlietap.chasm.config.LinearMemoryConfig
 import io.github.charlietap.chasm.memory.copy.LinearMemoryCopier
 import io.github.charlietap.chasm.memory.destruct.LinearMemoryDestructor
 import io.github.charlietap.chasm.memory.fill.LinearMemoryFiller
@@ -99,19 +98,6 @@ class NativeMappedLinearMemoryHostTest {
         assertEquals(0, empty.byteSize)
         assertSame(empty, empty.grow(0))
         assertFailsWith<IllegalArgumentException> { empty.grow(1) }
-    }
-
-    @Test
-    fun `honors prefault during construction and growth`() {
-        val memory = NativeMappedLinearMemory.create(
-            pages = LinearMemory.Pages(1u),
-            maximumPages = LinearMemory.Pages(2u),
-            config = LinearMemoryConfig(prefault = true),
-        ).also(memories::add)
-
-        assertTrue(memory.read(ByteArray(PAGE_SIZE), 0, PAGE_SIZE).all { it == 0.toByte() })
-        memory.grow(1)
-        assertTrue(memory.read(ByteArray(PAGE_SIZE), PAGE_SIZE, PAGE_SIZE).all { it == 0.toByte() })
     }
 
     @Test

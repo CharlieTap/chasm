@@ -15,42 +15,42 @@ import io.github.charlietap.chasm.runtime.compiled.TRAP_DIAGNOSTICS_SOURCE_FILE
 import io.github.charlietap.chasm.type.FunctionType
 
 internal fun bindingClassDescriptor(
-    packagePath: String,
-) = "L$packagePath/Binding;"
+    entryPath: String,
+) = "L$entryPath\$Binding;"
 
 internal fun codeClassDescriptor(
-    packagePath: String,
+    entryPath: String,
     batch: Int,
-) = "L$packagePath/$CODE_CLASS_PREFIX$batch;"
+) = "L$entryPath\$$CODE_CLASS_PREFIX$batch;"
 
 internal fun chunkClassDescriptor(
-    packagePath: String,
+    entryPath: String,
     index: Int,
     group: Int,
-) = "L$packagePath/$CHUNK_CLASS_PREFIX$index\$$group;"
+) = "L$entryPath\$$CHUNK_CLASS_PREFIX$index\$$group;"
 
 internal fun entriesClassDescriptor(
-    packagePath: String,
+    entryPath: String,
     group: Int,
-) = "L$packagePath/Entries$group;"
+) = "L$entryPath\$Entries$group;"
 
 internal fun signatureClassDescriptor(
-    packagePath: String,
+    entryPath: String,
     index: Int,
-) = "L$packagePath/Sig$index;"
+) = "L$entryPath\$Sig$index;"
 
 internal fun moduleClassDescriptor(
-    packagePath: String,
-) = "L$packagePath/WasmModule;"
+    entryPath: String,
+) = "L$entryPath;"
 
 internal fun dataResource(
-    packagePath: String,
-) = "$packagePath/data.$DATA_EXTENSION"
+    entryPath: String,
+) = "$entryPath.$DATA_EXTENSION"
 
 internal fun installClassDescriptor(
-    packagePath: String,
+    entryPath: String,
     chunk: Int,
-) = "L$packagePath/Install$chunk;"
+) = "L$entryPath\$Install$chunk;"
 
 internal fun functionName(
     index: Int,

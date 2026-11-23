@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.embedding
 
-import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.embedding.error.InstantiationError
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Function
@@ -56,9 +55,8 @@ suspend fun instance(
     store: Store,
     module: Module,
     imports: List<Import> = emptyList(),
-    config: RuntimeConfig = RuntimeConfig(),
 ): ChasmResult<Instance, InstantiationError> {
-    return store.engine.instance(module, imports, config)
+    return store.engine.instance(module, imports)
 }
 
 fun function(

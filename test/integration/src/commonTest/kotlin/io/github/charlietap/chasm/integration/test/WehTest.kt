@@ -13,267 +13,268 @@ class WehTest {
     @Test
     fun `can run a function from the weh demo`() = integrationTest(FIXTURE) {
 
-        val store = engine.store()
-        val imports = imports(store) {
-            function {
-                moduleName = "wasi_snapshot_preview1"
-                entityName = "fd_write"
-                type {
-                    params {
-                        i32()
-                        i32()
-                        i32()
-                        i32()
+        val runner = runner { store ->
+            imports(store) {
+                function {
+                    moduleName = "wasi_snapshot_preview1"
+                    entityName = "fd_write"
+                    type {
+                        params {
+                            i32()
+                            i32()
+                            i32()
+                            i32()
+                        }
+                        results {
+                            i32()
+                        }
                     }
-                    results {
-                        i32()
-                    }
+                    reference { _, _ -> }
                 }
-                reference { _, _ -> }
-            }
-            function {
-                moduleName = "wasi_snapshot_preview1"
-                entityName = "random_get"
-                type {
-                    params {
-                        i32()
-                        i32()
+                function {
+                    moduleName = "wasi_snapshot_preview1"
+                    entityName = "random_get"
+                    type {
+                        params {
+                            i32()
+                            i32()
+                        }
+                        results {
+                            i32()
+                        }
                     }
-                    results {
-                        i32()
-                    }
+                    reference { _, _ -> }
                 }
-                reference { _, _ -> }
-            }
-            function {
-                moduleName = "wasi_snapshot_preview1"
-                entityName = "clock_time_get"
-                type {
-                    params {
-                        i32()
-                        i64()
-                        i32()
+                function {
+                    moduleName = "wasi_snapshot_preview1"
+                    entityName = "clock_time_get"
+                    type {
+                        params {
+                            i32()
+                            i64()
+                            i32()
+                        }
+                        results {
+                            i32()
+                        }
                     }
-                    results {
-                        i32()
-                    }
+                    reference { _, _ -> }
                 }
-                reference { _, _ -> }
-            }
-            function {
-                moduleName = "wasi_snapshot_preview1"
-                entityName = "poll_oneoff"
-                type {
-                    params {
-                        i32()
-                        i32()
-                        i32()
-                        i32()
+                function {
+                    moduleName = "wasi_snapshot_preview1"
+                    entityName = "poll_oneoff"
+                    type {
+                        params {
+                            i32()
+                            i32()
+                            i32()
+                            i32()
+                        }
+                        results {
+                            i32()
+                        }
                     }
-                    results {
-                        i32()
-                    }
+                    reference { _, _ -> }
                 }
-                reference { _, _ -> }
-            }
-            function {
-                moduleName = "wasi_snapshot_preview1"
-                entityName = "clock_time_get"
-                type {
-                    params {
-                        i32()
-                        i64()
-                        i32()
+                function {
+                    moduleName = "wasi_snapshot_preview1"
+                    entityName = "clock_time_get"
+                    type {
+                        params {
+                            i32()
+                            i64()
+                            i32()
+                        }
+                        results {
+                            i32()
+                        }
                     }
-                    results {
-                        i32()
-                    }
+                    reference { _, _ -> }
                 }
-                reference { _, _ -> }
-            }
-            function {
-                moduleName = "wasi_snapshot_preview1"
-                entityName = "proc_exit"
-                type {
-                    params {
-                        i32()
+                function {
+                    moduleName = "wasi_snapshot_preview1"
+                    entityName = "proc_exit"
+                    type {
+                        params {
+                            i32()
+                        }
+                        results { }
                     }
-                    results { }
+                    reference { _, _ -> }
                 }
-                reference { _, _ -> }
-            }
-            function {
-                moduleName = "wasi_snapshot_preview1"
-                entityName = "fd_write"
-                type {
-                    params {
-                        i32()
-                        i32()
-                        i32()
-                        i32()
+                function {
+                    moduleName = "wasi_snapshot_preview1"
+                    entityName = "fd_write"
+                    type {
+                        params {
+                            i32()
+                            i32()
+                            i32()
+                            i32()
+                        }
+                        results {
+                            i32()
+                        }
                     }
-                    results {
-                        i32()
-                    }
+                    reference { _, _ -> }
                 }
-                reference { _, _ -> }
-            }
-            function {
-                moduleName = "wasi_snapshot_preview1"
-                entityName = "clock_time_get"
-                type {
-                    params {
-                        i32()
-                        i64()
-                        i32()
+                function {
+                    moduleName = "wasi_snapshot_preview1"
+                    entityName = "clock_time_get"
+                    type {
+                        params {
+                            i32()
+                            i64()
+                            i32()
+                        }
+                        results {
+                            i32()
+                        }
                     }
-                    results {
-                        i32()
-                    }
+                    reference { _, _ -> }
                 }
-                reference { _, _ -> }
-            }
-            function {
-                moduleName = "wasi_snapshot_preview1"
-                entityName = "args_sizes_get"
-                type {
-                    params {
-                        i32()
-                        i32()
+                function {
+                    moduleName = "wasi_snapshot_preview1"
+                    entityName = "args_sizes_get"
+                    type {
+                        params {
+                            i32()
+                            i32()
+                        }
+                        results {
+                            i32()
+                        }
                     }
-                    results {
-                        i32()
-                    }
+                    reference { _, _ -> }
                 }
-                reference { _, _ -> }
-            }
-            function {
-                moduleName = "wasi_snapshot_preview1"
-                entityName = "args_get"
-                type {
-                    params {
-                        i32()
-                        i32()
+                function {
+                    moduleName = "wasi_snapshot_preview1"
+                    entityName = "args_get"
+                    type {
+                        params {
+                            i32()
+                            i32()
+                        }
+                        results {
+                            i32()
+                        }
                     }
-                    results {
-                        i32()
-                    }
+                    reference { _, _ -> }
                 }
-                reference { _, _ -> }
-            }
-            function {
-                moduleName = "wasi_snapshot_preview1"
-                entityName = "fd_prestat_get"
-                type {
-                    params {
-                        i32()
-                        i32()
+                function {
+                    moduleName = "wasi_snapshot_preview1"
+                    entityName = "fd_prestat_get"
+                    type {
+                        params {
+                            i32()
+                            i32()
+                        }
+                        results {
+                            i32()
+                        }
                     }
-                    results {
-                        i32()
-                    }
+                    reference { _, _ -> }
                 }
-                reference { _, _ -> }
-            }
-            function {
-                moduleName = "wasi_snapshot_preview1"
-                entityName = "fd_prestat_dir_name"
-                type {
-                    params {
-                        i32()
-                        i32()
-                        i32()
+                function {
+                    moduleName = "wasi_snapshot_preview1"
+                    entityName = "fd_prestat_dir_name"
+                    type {
+                        params {
+                            i32()
+                            i32()
+                            i32()
+                        }
+                        results {
+                            i32()
+                        }
                     }
-                    results {
-                        i32()
-                    }
+                    reference { _, _ -> }
                 }
-                reference { _, _ -> }
-            }
-            function {
-                moduleName = "wasi_snapshot_preview1"
-                entityName = "path_open"
-                type {
-                    params {
-                        i32()
-                        i32()
-                        i32()
-                        i32()
-                        i32()
-                        i64()
-                        i64()
-                        i32()
-                        i32()
+                function {
+                    moduleName = "wasi_snapshot_preview1"
+                    entityName = "path_open"
+                    type {
+                        params {
+                            i32()
+                            i32()
+                            i32()
+                            i32()
+                            i32()
+                            i64()
+                            i64()
+                            i32()
+                            i32()
+                        }
+                        results {
+                            i32()
+                        }
                     }
-                    results {
-                        i32()
-                    }
+                    reference { _, _ -> }
                 }
-                reference { _, _ -> }
-            }
-            function {
-                moduleName = "wasi_snapshot_preview1"
-                entityName = "fd_filestat_get"
-                type {
-                    params {
-                        i32()
-                        i32()
+                function {
+                    moduleName = "wasi_snapshot_preview1"
+                    entityName = "fd_filestat_get"
+                    type {
+                        params {
+                            i32()
+                            i32()
+                        }
+                        results {
+                            i32()
+                        }
                     }
-                    results {
-                        i32()
-                    }
+                    reference { _, _ -> }
                 }
-                reference { _, _ -> }
-            }
-            function {
-                moduleName = "wasi_snapshot_preview1"
-                entityName = "fd_seek"
-                type {
-                    params {
-                        i32()
-                        i64()
-                        i32()
-                        i32()
+                function {
+                    moduleName = "wasi_snapshot_preview1"
+                    entityName = "fd_seek"
+                    type {
+                        params {
+                            i32()
+                            i64()
+                            i32()
+                            i32()
+                        }
+                        results {
+                            i32()
+                        }
                     }
-                    results {
-                        i32()
-                    }
+                    reference { _, _ -> }
                 }
-                reference { _, _ -> }
-            }
-            function {
-                moduleName = "wasi_snapshot_preview1"
-                entityName = "fd_pread"
-                type {
-                    params {
-                        i32()
-                        i32()
-                        i32()
-                        i64()
-                        i32()
+                function {
+                    moduleName = "wasi_snapshot_preview1"
+                    entityName = "fd_pread"
+                    type {
+                        params {
+                            i32()
+                            i32()
+                            i32()
+                            i64()
+                            i32()
+                        }
+                        results {
+                            i32()
+                        }
                     }
-                    results {
-                        i32()
-                    }
+                    reference { _, _ -> }
                 }
-                reference { _, _ -> }
-            }
-            function {
-                moduleName = "wasi_snapshot_preview1"
-                entityName = "fd_close"
-                type {
-                    params {
-                        i32()
+                function {
+                    moduleName = "wasi_snapshot_preview1"
+                    entityName = "fd_close"
+                    type {
+                        params {
+                            i32()
+                        }
+                        results {
+                            i32()
+                        }
                     }
-                    results {
-                        i32()
-                    }
+                    reference { _, _ -> }
                 }
-                reference { _, _ -> }
             }
         }
 
-        val actual = runner(store, imports).invoke(
+        val actual = runner.invoke(
             name = "dummy",
         )
 

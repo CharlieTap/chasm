@@ -10,11 +10,10 @@ fun interpreterEngine(
 
     val heap = storeRuntime.runtime().heap
     val binding = EngineBinding()
-    val callConfig = HostCallConfig()
     val heldReferences = HeldReferenceTable(binding)
     val codec = InterpreterReferenceCodec(binding, storeRuntime, heldReferences, heap)
     val handles = InterpreterHandles(binding, storeRuntime, codec)
-    val allocator = EmbeddingAllocator(storeRuntime, callConfig)
+    val allocator = EmbeddingAllocator(storeRuntime)
     val resources = InterpreterHostResources(binding, handles)
 
     val engine = InterpreterEngine(
@@ -26,7 +25,7 @@ fun interpreterEngine(
         codec = codec,
         handles = handles,
         values = BoxedValues(),
-        hostCalls = InterpreterHostCallAdapters(codec, ReferenceLanes(), resources, callConfig),
+        hostCalls = InterpreterHostCallAdapters(codec, ReferenceLanes(), resources),
         globals = InterpreterGlobals(handles, codec, heap),
         tables = InterpreterTables(handles, codec, heap),
         structs = InterpreterStructs(codec, heldReferences, allocator, heap),

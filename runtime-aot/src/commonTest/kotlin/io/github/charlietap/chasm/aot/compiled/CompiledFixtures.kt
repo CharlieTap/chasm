@@ -1,7 +1,8 @@
 package io.github.charlietap.chasm.aot.compiled
 
 import com.github.michaelbull.result.getOrThrow
-import io.github.charlietap.chasm.aot.compiledModule
+import io.github.charlietap.chasm.aot.CompiledModule
+import io.github.charlietap.chasm.aot.module
 import io.github.charlietap.chasm.aot.store
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.typeResolver
@@ -11,7 +12,6 @@ import io.github.charlietap.chasm.compiler.backend.jvm.JvmOutput
 import io.github.charlietap.chasm.compiler.backend.jvm.ModuleLowerer
 import io.github.charlietap.chasm.compiler.frontend.ModuleCompiler
 import io.github.charlietap.chasm.config.ModuleConfig
-import io.github.charlietap.chasm.config.StoreConfig
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
 import io.github.charlietap.chasm.embedding.instance
 import io.github.charlietap.chasm.embedding.invoke
@@ -40,6 +40,59 @@ internal fun fixture(
 ): ByteArray =
     checkNotNull(Generated::class.java.classLoader.getResourceAsStream("fixtures/$name.wasm")) { "missing fixture $name" }
         .use { it.readBytes() }
+
+internal fun longFunctionModule(steps: Int): ByteArray {
+
+    val body = ArrayList<Byte>()
+    body.bytes(0x00, 0x20, 0x00, 0x41, 0x01, 0x20, 0x01, 0x6e, 0x6a, 0x21, 0x00)
+    repeat(steps) { step ->
+        if (step % 8 == 7) {
+            body.bytes(0x20, 0x00, 0x41, 0x00, 0x48, 0x04, 0x40, 0x20, 0x00, 0x41, 0x03, 0x6a, 0x21, 0x00, 0x0b)
+        } else {
+            body.bytes(0x20, 0x00, 0x41, step % 5 + 1, 0x6a, 0x21, 0x00)
+        }
+    }
+    body.bytes(0x20, 0x00, 0x0b)
+
+    val module = ArrayList<Byte>()
+    module.bytes(0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00)
+    module.section(1, listOf(0x01, 0x60, 0x02, 0x7f, 0x7f, 0x01, 0x7f).map(Int::toByte))
+    module.section(3, listOf<Byte>(0x01, 0x00))
+    module.section(7, listOf(0x01, 0x03, 'r'.code, 'u'.code, 'n'.code, 0x00, 0x00).map(Int::toByte))
+    module.section(
+        10,
+        ArrayList<Byte>().apply {
+            bytes(0x01)
+            leb(body.size)
+            addAll(body)
+        },
+    )
+
+    return module.toByteArray()
+}
+
+private fun ArrayList<Byte>.bytes(vararg values: Int) {
+    values.forEach { value -> add(value.toByte()) }
+}
+
+private fun ArrayList<Byte>.leb(value: Int) {
+
+    var rest = value
+    do {
+        val low = rest and 0x7f
+        rest = rest ushr 7
+        add((if (rest != 0) low or 0x80 else low).toByte())
+    } while (rest != 0)
+}
+
+private fun ArrayList<Byte>.section(
+    id: Int,
+    content: List<Byte>,
+) {
+    bytes(id)
+    leb(content.size)
+    addAll(content)
+}
 
 private fun decodeModule(
     bytes: ByteArray,
@@ -76,8 +129,9 @@ internal class Generated : JvmOutput {
         return result
     }
 
-    fun compiledModule(): EmbeddingModule =
-        compiledModule(GeneratedClassLoader(this).loadClass(module.moduleClass)).expect("loads")
+    fun compiledModule(): EmbeddingModule {
+        return module(GeneratedClassLoader(this).loadClass(module.moduleClass).getField("COMPILED").get(null) as CompiledModule).expect("loads")
+    }
 }
 
 internal fun generate(
@@ -146,12 +200,12 @@ internal class InterpretedFixture(
 
 internal class CompiledFixture(
     bytes: ByteArray,
-    storeConfig: StoreConfig = StoreConfig(),
-    options: JvmOptions = JvmOptions(storeConfig = storeConfig),
+    options: JvmOptions = JvmOptions(),
 ) {
     val generated = generate(bytes, options)
-    val store: Store = store(storeConfig)
-    val instance: Instance = runBlocking { instance(store, generated.compiledModule()) }.expect("instantiates")
+    val module: EmbeddingModule = generated.compiledModule()
+    val store: Store = store(module)
+    val instance: Instance = runBlocking { instance(store, module) }.expect("instantiates")
 
     fun invoke(
         name: String,

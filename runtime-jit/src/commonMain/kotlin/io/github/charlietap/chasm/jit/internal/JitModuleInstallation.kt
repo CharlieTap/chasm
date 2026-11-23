@@ -30,12 +30,12 @@ internal class JitModuleInstallation(
     private val shapes: StoreShapes,
     private val managedStore: ManagedStore,
     private val handles: JitHandles,
-    debugInfo: Boolean,
+    stacktraces: Boolean,
 ) : ModuleInstallation {
 
     private val declarations = module.declarations
 
-    private val diagnostics = if (debugInfo) {
+    private val diagnostics = if (stacktraces) {
         JitTrapDiagnostics(module.binary, module.config, compilation.chunkStarts)
     } else {
         null
@@ -48,6 +48,10 @@ internal class JitModuleInstallation(
             is JitGlobal -> ExternalValue.Global(payload.address)
             else -> payload as ExternalValue
         }
+    }
+
+    override fun config(storeConfig: RuntimeConfig): RuntimeConfig {
+        return storeConfig
     }
 
     override fun trapSource(instance: ModuleInstance): TrapSource {
@@ -81,7 +85,7 @@ internal class JitModuleInstallation(
     ): Result<Unit, ModuleTrapError> {
 
         instance.compiledFrames = ModuleCompiledFrames(
-            packageName = compilation.packageName,
+            classPrefix = "${compilation.packageName}.",
             chunkStarts = { function -> compilation.chunkStarts[function] },
             originalLine = { _, _, line -> line },
             entryClass = managedEntryClass,

@@ -9,13 +9,11 @@ import kotlin.reflect.KClass
 
 @InternalChasmApi
 class ModuleCompiledFrames(
-    packageName: String,
+    private val classPrefix: String,
     private val chunkStarts: (function: Int) -> IntArray?,
     private val originalLine: (className: String, methodName: String, line: Int) -> Int,
     private val entryClass: KClass<*>,
 ) : CompiledFrames {
-
-    private val classPrefix = "$packageName."
 
     override fun function(
         className: String,

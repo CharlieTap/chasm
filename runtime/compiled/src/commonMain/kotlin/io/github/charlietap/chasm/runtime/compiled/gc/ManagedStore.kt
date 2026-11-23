@@ -85,7 +85,7 @@ class ManagedStore(
             ReferenceTable(
                 Array(table.elements.size) { index -> decodeReference(table.elements[index]) },
                 table,
-                store.config.limits.trapOnGrowFailure,
+                store.trapOnGrowthFailure,
             )
         }
         check(!storage.released) { "the table's instance has been dropped" }

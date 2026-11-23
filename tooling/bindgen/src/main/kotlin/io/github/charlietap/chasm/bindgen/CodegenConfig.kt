@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.bindgen
 
-import io.github.charlietap.chasm.config.GCStrategy
+import io.github.charlietap.chasm.config.RuntimeConfig
 
 /** The runtime targeted by generated module bindings. */
 enum class CodegenRuntime {
@@ -62,16 +62,8 @@ data class CodegenConfig(
     val runtime: CodegenRuntime = CodegenRuntime.PORTABLE_VM,
     val wasi: WasiLinking = WasiLinking.DISABLED,
     val executionTier: ExecutionTier = ExecutionTier.Interpreter(),
-    val cpu: CpuLimits = CpuLimits.Unmetered(),
-    val memory: MemoryLimits = MemoryLimits.Unconstrained(),
-    val interrupts: Boolean = false,
-    val stacktraces: Boolean = false,
-    val gcStrategy: GCStrategy? = null,
+    val runtimeConfig: RuntimeConfig = RuntimeConfig(),
 )
 
 internal val CodegenConfig.usesStoreSettings: Boolean
-    get() = cpu is CpuLimits.Metered ||
-        memory is MemoryLimits.Constrained ||
-        interrupts ||
-        stacktraces ||
-        gcStrategy != null
+    get() = runtimeConfig != RuntimeConfig()

@@ -134,9 +134,9 @@ class FunctionReferenceTest {
     @Test
     fun trapsThroughCallRefNameTheFunction() {
 
-        val debugStore = store()
+        val debugStore = store(RuntimeConfig(stacktraces = true))
         val debugExporter = instantiate(debugStore, "modules/function_exporter.wasm", emptyList())
-        val debugImporter = instantiate(debugStore, "modules/function_importer.wasm", imports(debugStore, debugExporter), RuntimeConfig(debugInfo = true))
+        val debugImporter = instantiate(debugStore, "modules/function_importer.wasm", imports(debugStore, debugExporter))
         val result = invoke(debugImporter, "call_boom", listOf(I32(1)))
 
         val error = assertIs<ChasmResult.Error<*>>(result).error
@@ -224,12 +224,11 @@ class FunctionReferenceTest {
         store: Store,
         resource: String,
         imports: List<Import>,
-        config: RuntimeConfig = RuntimeConfig(),
     ): Instance {
 
         val module = runBlocking { module(resourceBytes(resource), validate = true) }.expect("module")
 
-        return runBlocking { instance(store, module, imports, config) }.expect("instance")
+        return runBlocking { instance(store, module, imports) }.expect("instance")
     }
 
     private fun imports(

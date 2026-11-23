@@ -8,10 +8,11 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.getError
 import com.github.michaelbull.result.getOrElse
 import com.github.michaelbull.result.mapError
-import io.github.charlietap.chasm.ExperimentalChasmApi
 import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.aot.CompileError.Stage
 import io.github.charlietap.chasm.aot.internal.COMPILED_RUNTIME_ABI
+import io.github.charlietap.chasm.aot.internal.trapLinesResource
+import io.github.charlietap.chasm.aot.internal.trapSitesResource
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.typeResolver
 import io.github.charlietap.chasm.compiler.backend.jvm.ClassTooLarge
@@ -20,14 +21,21 @@ import io.github.charlietap.chasm.compiler.backend.jvm.JvmOutput
 import io.github.charlietap.chasm.compiler.backend.jvm.MemoryLowering
 import io.github.charlietap.chasm.compiler.backend.jvm.ModuleLowerer
 import io.github.charlietap.chasm.compiler.backend.jvm.UnsupportedFunctions
+import io.github.charlietap.chasm.compiler.backend.jvm.size.BytecodeSize
+import io.github.charlietap.chasm.compiler.backend.jvm.size.DexUnitEstimate
 import io.github.charlietap.chasm.compiler.frontend.ModuleCompiler
 import io.github.charlietap.chasm.compiler.frontend.UncompilableFunctions
+import io.github.charlietap.chasm.config.Bytes
+import io.github.charlietap.chasm.config.CpuLimits
+import io.github.charlietap.chasm.config.MemoryLimits
 import io.github.charlietap.chasm.config.ModuleConfig
-import io.github.charlietap.chasm.config.StoreLimits
+import io.github.charlietap.chasm.declarations.moduleInfo
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
+import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.module.ModuleDeclarationsFactory
 import io.github.charlietap.chasm.stream.SourceReader
 import io.github.charlietap.chasm.validator.WasmModuleValidator
+import java.io.ByteArrayOutputStream
 import java.io.FilterInputStream
 import java.io.IOException
 import java.io.InputStream
@@ -38,13 +46,16 @@ import java.nio.channels.FileChannel
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
+import java.security.DigestInputStream
+import java.security.MessageDigest
 
 fun compile(
     input: Path,
-    output: CompileOutput,
+    output: ClassOutput,
     config: CompileConfig,
-): CompileResult {
-    if (config.stacktraces) {
+): ChasmResult<CompiledModuleInfo, CompileError> {
+
+    if (config.runtime.stacktraces) {
         val bytes = try {
             Files.readAllBytes(input)
         } catch (failure: IOException) {
@@ -52,14 +63,21 @@ fun compile(
         }
         return compile(bytes, output, config)
     }
+
     val channel = try {
         FileChannel.open(input, StandardOpenOption.READ)
     } catch (failure: IOException) {
         return error(Stage.INPUT, "cannot read $input: ${failure.message}")
     }
+
     return try {
         channel.use {
-            compile(output, config, streamSource { Channels.newInputStream(channel.position(0)).buffered() })
+
+            val digest = MessageDigest.getInstance("SHA-256")
+            DigestInputStream(Channels.newInputStream(channel), digest).transferTo(OutputStream.nullOutputStream())
+
+            val source = streamSource { Channels.newInputStream(channel.position(0)).buffered() }
+            compile(output, config, source, null, digest.digest().toHexString())
         }
     } catch (failure: IOException) {
         error(Stage.INPUT, "cannot read $input: ${failure.message}")
@@ -68,28 +86,34 @@ fun compile(
 
 fun compile(
     input: ByteArray,
-    output: CompileOutput,
+    output: ClassOutput,
     config: CompileConfig,
-): CompileResult = compile(output, config, byteArraySource(input), input)
+): ChasmResult<CompiledModuleInfo, CompileError> {
+    val sourceHash = MessageDigest.getInstance("SHA-256").digest(input).toHexString()
+    return compile(output, config, byteArraySource(input), input, sourceHash)
+}
 
 private fun compile(
-    output: CompileOutput,
+    output: ClassOutput,
     config: CompileConfig,
     source: ModuleSource,
-    binary: ByteArray? = null,
-): CompileResult =
-    compile(
+    binary: ByteArray?,
+    sourceHash: String,
+): ChasmResult<CompiledModuleInfo, CompileError> {
+    return compile(
         output = output,
         config = config,
         source = source,
         binary = binary,
+        sourceHash = sourceHash,
         validator = ::WasmModuleValidator,
         moduleCompiler = { module, types ->
+            val runtime = config.runtime
             ModuleCompiler(
                 module = module,
                 types = types,
-                recordProvenance = config.stacktraces,
-                devirtualiseIndirectCalls = !config.stacktraces && !config.storeConfig.meterFuel && !config.storeConfig.interruptible,
+                recordProvenance = runtime.stacktraces,
+                devirtualiseIndirectCalls = !runtime.stacktraces && runtime.limits.cpu !is CpuLimits.Metered && !runtime.interrupts,
             )
         },
         uncompilableFunctions = ::UncompilableFunctions,
@@ -97,45 +121,78 @@ private fun compile(
         trapSitesFactory = ::TrapSitesFactory,
         moduleLowerer = ::ModuleLowerer,
     )
+}
 
 internal inline fun compile(
-    output: CompileOutput,
+    output: ClassOutput,
     config: CompileConfig,
     noinline source: ModuleSource,
     binary: ByteArray?,
+    sourceHash: String,
     crossinline validator: WasmModuleValidator,
     crossinline moduleCompiler: ModuleCompiler,
     crossinline uncompilableFunctions: UncompilableFunctions,
     crossinline declarationsFactory: ModuleDeclarationsFactory,
     crossinline trapSitesFactory: TrapSitesFactory,
     crossinline moduleLowerer: ModuleLowerer,
-): CompileResult {
-    val options = jvmOptions(config).getOrElse { failure -> return CompileResult.Error(failure) }
-    val sink = output.sink()
-    val result = try {
-        val decoded = decodeForCompilation(config.moduleConfig, source).getOrElse { failure -> return CompileResult.Error(failure) }
-        val module = validator(config.moduleConfig, decoded).getOrElse { failure ->
+): ChasmResult<CompiledModuleInfo, CompileError> {
+
+    val options = jvmOptions(config).getOrElse { failure -> return ChasmResult.Error(failure) }
+    val staged = when (output) {
+        is MemoryClassOutput -> output.staging
+        is StagedClassOutput -> output
+        else -> null
+    }
+
+    val result: ChasmResult<CompiledModuleInfo, CompileError> = try {
+
+        val moduleConfig = ModuleConfig()
+        val decoded = decodeForCompilation(moduleConfig, source).getOrElse { failure -> return ChasmResult.Error(failure) }
+        val module = validator(moduleConfig, decoded).getOrElse { failure ->
             return error(Stage.VALIDATION, failure.toString())
         }
-        exceededLimit(module, config.storeConfig.limits)?.let { reason -> return error(Stage.CONFIGURATION, reason) }
+        exceededLimit(module, config.runtime.limits.memory)?.let { reason -> return error(Stage.CONFIGURATION, reason) }
+
         val types = module.typeResolver()
         val code = moduleCompiler(module, types).getOrElse { failure ->
             val functions = uncompilableFunctions(module, types)
             val reasons = functions.entries.joinToString { (index, reason) -> "$index ($reason)" }
             return error(Stage.GENERATION, "cannot compile functions: ${reasons.ifEmpty { failure.toString() }}", functions.keys.toList())
         }
-        val sites = if (config.stacktraces && binary != null) trapSitesFactory(config.moduleConfig, binary, module, code) else emptyMap()
-        val generated = moduleLowerer(module, code, options, CompileOutputAdapter(sink), declarationsFactory(module), sites)
-        val files = guardOutput { sink.commit() }
-        CompileResult.Success(
-            CompiledModuleArtifact(
-                moduleClassName = generated.moduleClass,
-                metadata = metadata(config),
-                dataResourcePath = generated.data,
-                files = files,
-                shrinkerRules = shrinkerRules(generated.moduleClass, config),
+
+        val sites = if (config.runtime.stacktraces && binary != null) trapSitesFactory(moduleConfig, binary, module, code) else emptyMap()
+        val declarations = declarationsFactory(module)
+        val adapter = ClassOutputAdapter(output)
+        val _ = moduleLowerer(module, code, options, adapter, declarations, sites)
+
+        val rules = shrinkerRules(config)
+        if (rules.isNotEmpty()) {
+            adapter.resource("META-INF/proguard/${config.className}.pro") { stream -> stream.write(rules.encodeToByteArray()) }
+        }
+        guardOutput { staged?.commit() }
+
+        val info = moduleInfo(declarations)
+        val resourceRoot = config.className.replace('.', '/')
+        ChasmResult.Success(
+            CompiledModuleInfo(
+                config = config,
+                imports = info.imports,
+                exports = info.exports,
+                runtimeAbi = COMPILED_RUNTIME_ABI,
+                compilerVersion = BuildConfig.VERSION,
+                sourceHash = sourceHash,
+                diagnostics = if (config.runtime.stacktraces) {
+                    Diagnostics(trapSitesResource(resourceRoot), trapLinesResource(resourceRoot))
+                } else {
+                    null
+                },
+                classes = adapter.classes.toList(),
+                resources = adapter.resources.toList(),
+                shrinkerRules = rules,
             ),
         )
+    } catch (limit: JarEntryLimitExceeded) {
+        error(Stage.OUTPUT, "the module needs more than 65,534 jar entries, which one jar cannot hold: write it with ClassOutput.directory(...)")
     } catch (unsupported: UnsupportedFunctions) {
         error(Stage.GENERATION, unsupported.message.orEmpty(), unsupported.reasons.keys.toList())
     } catch (tooLarge: ClassTooLarge) {
@@ -145,47 +202,40 @@ internal inline fun compile(
     } catch (failure: OutputFailure) {
         error(Stage.OUTPUT, "cannot write the compiled module: ${failure.cause?.message}")
     } catch (failure: Throwable) {
-        sink.discard()
+        staged?.discard()
         throw failure
     }
-    if (result is CompileResult.Error) sink.discard()
+
+    if (result is ChasmResult.Error) {
+        staged?.discard()
+    }
     return result
 }
 
 private fun exceededLimit(
     module: Module,
-    limits: StoreLimits,
+    limits: MemoryLimits,
 ): String? {
-    val memoryPages = limits.memoryPages?.toULong()
-    val tableElements = limits.tableElements?.toULong()
+
+    val linearMemory = limits.linearMemory
+    val tables = limits.tables
+
     module.memories.forEachIndexed { index, memory ->
         val pages = memory.type.limits.min
-        if (memoryPages != null && pages > memoryPages) {
-            return "memory $index starts at $pages pages, above the store's limit of $memoryPages pages"
+        if (linearMemory != null && pages > (linearMemory.value / Bytes.PAGE).toULong()) {
+            return "memory $index starts at $pages pages, above the limit of $linearMemory"
         }
     }
+
     module.tables.forEachIndexed { index, table ->
         val elements = table.type.limits.min
-        if (tableElements != null && elements > tableElements) {
-            return "table $index starts at $elements elements, above the store's limit of $tableElements elements"
+        if (tables != null && elements > (tables.value / TABLE_ELEMENT_BYTES).toULong()) {
+            return "table $index starts at $elements elements, above the limit of $tables"
         }
     }
+
     return null
 }
-
-@OptIn(ExperimentalChasmApi::class)
-private fun metadata(
-    config: CompileConfig,
-): CompiledModuleMetadata = CompiledModuleMetadata(
-    capabilities = Capabilities(
-        meterFuel = config.storeConfig.meterFuel,
-        interruptible = config.storeConfig.interruptible,
-        stacktraces = config.stacktraces,
-    ),
-    storeConfig = config.storeConfig,
-    initialFuel = config.initialFuel,
-    runtimeAbi = COMPILED_RUNTIME_ABI,
-)
 
 internal typealias ModuleSource = (ModuleConfig) -> Result<Module, CompileError>
 
@@ -221,33 +271,25 @@ private fun streamSource(
 private fun jvmOptions(
     config: CompileConfig,
 ): Result<JvmOptions, CompileError> {
-    if (!isPackageName(config.packageName)) {
-        return Err(CompileError("\"${config.packageName}\" is not a Java package name", Stage.CONFIGURATION))
+
+    if (!isClassName(config.className)) {
+        return Err(CompileError("\"${config.className}\" is not a Java class name", Stage.CONFIGURATION))
     }
-    if (config.initialFuel != null && !config.storeConfig.meterFuel) {
-        return Err(CompileError("initialFuel needs a store that meters fuel", Stage.CONFIGURATION))
-    }
-    if (config.initialFuel != null && config.initialFuel < 0) {
-        return Err(CompileError("initialFuel must not be negative, not ${config.initialFuel}", Stage.CONFIGURATION))
-    }
-    return try {
-        Ok(
-            JvmOptions(
-                packageName = config.packageName,
-                storeConfig = config.storeConfig,
-                initialFuel = config.initialFuel,
-                memory = when (config.target) {
-                    CompileTarget.JVM -> MemoryLowering.BYTE_BUFFER
-                    CompileTarget.ANDROID -> MemoryLowering.UNSAFE
-                },
-                stacktraces = config.stacktraces,
-                maxMethodBytes = config.maxMethodBytes,
-                functionMaxMethodBytes = config.functionMaxMethodBytes,
-            ),
-        )
-    } catch (invalid: IllegalArgumentException) {
-        Err(CompileError(invalid.message.orEmpty(), Stage.CONFIGURATION))
-    }
+
+    return Ok(
+        JvmOptions(
+            entryClass = config.className,
+            runtime = config.runtime,
+            memory = when (config.target) {
+                CompileTarget.JVM -> MemoryLowering.BYTE_BUFFER
+                CompileTarget.ANDROID -> MemoryLowering.UNSAFE
+            },
+            methodSize = when (config.target) {
+                CompileTarget.JVM -> BytecodeSize()
+                CompileTarget.ANDROID -> DexUnitEstimate()
+            },
+        ),
+    )
 }
 
 private class ReadGuard(
@@ -277,22 +319,35 @@ private class ReadGuard(
     }
 }
 
-internal class CompileOutputAdapter(
-    private val sink: OutputSink,
+internal class ClassOutputAdapter(
+    private val output: ClassOutput,
 ) : JvmOutput {
+
+    val classes = ArrayList<String>()
+    val resources = ArrayList<String>()
 
     override fun classFile(
         internalName: String,
         bytes: ByteArray,
-    ) = guardOutput { sink.classFile(internalName, bytes) }
+    ) {
+
+        val className = internalName.replace('/', '.')
+        guardOutput { output.classFile(className, bytes) }
+
+        classes += className
+    }
 
     override fun <T> resource(
         path: String,
         write: (OutputStream) -> T,
-    ): T = guardOutput {
-        val results = ArrayList<T>(1)
-        sink.resource(path) { stream -> results += write(stream) }
-        results.single()
+    ): T {
+
+        val buffer = ByteArrayOutputStream()
+        val result = guardOutput { write(buffer) }
+        guardOutput { output.resource(path, buffer.toByteArray()) }
+
+        resources += path
+        return result
     }
 }
 
@@ -380,16 +435,20 @@ private fun error(
     stage: Stage,
     message: String,
     functions: List<Int> = emptyList(),
-) = CompileResult.Error(CompileError(message, stage, functions))
+): ChasmResult.Error<CompileError> {
+    return ChasmResult.Error(CompileError(message, stage, functions))
+}
 
-private fun isPackageName(
+private fun isClassName(
     name: String,
 ): Boolean = name.split('.').all { segment ->
     segment.isNotEmpty() &&
         (segment[0].isJavaIdentifierStart()) &&
-        segment.all { character -> character.isJavaIdentifierPart() } &&
+        segment.all { character -> character.isJavaIdentifierPart() && character != '$' } &&
         segment !in JAVA_KEYWORDS
 }
+
+private const val TABLE_ELEMENT_BYTES = 8L
 
 private val JAVA_KEYWORDS = setOf(
     "abstract",

@@ -8,7 +8,10 @@ import io.github.charlietap.chasm.cir.FunctionIndex
 import io.github.charlietap.chasm.cir.TypeIndex
 import io.github.charlietap.chasm.compiler.backend.chasm.link.LinkContext
 import io.github.charlietap.chasm.compiler.backend.chasm.link.createLinkContext
-import io.github.charlietap.chasm.config.StoreConfig
+import io.github.charlietap.chasm.config.CpuLimits
+import io.github.charlietap.chasm.config.Limits
+import io.github.charlietap.chasm.config.RuntimeConfig
+import io.github.charlietap.chasm.config.fuel
 import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.runtime.store.Fuel
@@ -81,7 +84,8 @@ class FunctionLayoutTest {
         val function = function(size = 6, checkpoints = intArrayOf(0, 3))
         for (meterFuel in listOf(false, true)) {
             for (interruptible in listOf(false, true)) {
-                val store = store(config = StoreConfig(meterFuel = meterFuel, interruptible = interruptible))
+                val cpu = if (meterFuel) CpuLimits.Metered(0.fuel) else CpuLimits.Unmetered
+                val store = store(config = RuntimeConfig(interrupts = interruptible, limits = Limits(cpu = cpu)))
                 val layout = FunctionLayout(function, store)
                 val context = createLinkContext(store, moduleInstance(), emptyList())
                 context.beginFunction(entryIp = 0, function = function)

@@ -4,8 +4,6 @@ import com.github.michaelbull.result.getOrThrow
 import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.aot.compiled.fixture
 import io.github.charlietap.chasm.aot.internal.COMPILED_RUNTIME_ABI
-import io.github.charlietap.chasm.aot.internal.CompiledCode
-import io.github.charlietap.chasm.aot.internal.UNSET
 import io.github.charlietap.chasm.aot.internal.UNSET_LONG
 import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.declarations.ModuleDeclarations
@@ -29,7 +27,7 @@ class ModuleInfoTest {
     @Test
     fun `module info contains the compiled module's imports and exports`() {
         val declarations = declarations(fixture("call_add"))
-        val module = compiledModule(fakeModuleClass(FakeCode { declarations })).expect("loads")
+        val module = module(FakeCompiledModule { declarations }).expect("loads")
 
         val info = moduleInfo(module)
 
@@ -41,7 +39,7 @@ class ModuleInfoTest {
     @Test
     fun `module info is empty for a module without imports or exports`() {
         val declarations = declarations(byteArrayOf(0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00))
-        val module = compiledModule(fakeModuleClass(FakeCode { declarations })).expect("loads")
+        val module = module(FakeCompiledModule { declarations }).expect("loads")
 
         val info = moduleInfo(module)
 
@@ -50,7 +48,7 @@ class ModuleInfoTest {
 
     @Test
     fun `a declarations failure rejects the module as malformed`() {
-        val result = compiledModule(fakeModuleClass(FakeCode { throw IllegalStateException("broken declarations") }))
+        val result = module(FakeCompiledModule { throw IllegalStateException("broken declarations") })
 
         assertEquals(
             ChasmResult.Error(ModuleError.Malformed("Compiled module rejected: broken declarations")),
@@ -62,7 +60,7 @@ class ModuleInfoTest {
     fun `a declarations failure without a message uses its string representation`() {
         val failure = IllegalStateException()
 
-        val result = compiledModule(fakeModuleClass(FakeCode { throw failure }))
+        val result = module(FakeCompiledModule { throw failure })
 
         assertEquals(
             ChasmResult.Error(ModuleError.Malformed("Compiled module rejected: $failure")),
@@ -79,42 +77,56 @@ class ModuleInfoTest {
         return ModuleDeclarationsFactory(validated)
     }
 
-    private class FakeCode(
+    private class FakeCompiledModule(
         private val declarations: () -> ModuleDeclarations,
-    ) : CompiledCode {
+    ) : CompiledModule {
 
-        override fun buildDeclarations(): ModuleDeclarations = declarations()
+        override fun buildDeclarations(): ModuleDeclarations {
+            return declarations()
+        }
 
-        override fun install(
-            installation: CodeInstallation,
-        ) = fail("module info does not install code")
+        override fun install(installation: CodeInstallation) {
+            fail("module info does not install code")
+        }
 
-        override fun trapSitesResource(): String? = fail("module info does not read trap sites")
+        override fun resourceRoot(): String {
+            return "chasm/aot/FakeModule"
+        }
 
-        override fun runtimeAbi(): Int = COMPILED_RUNTIME_ABI
+        override fun runtimeAbi(): Int {
+            return COMPILED_RUNTIME_ABI
+        }
 
-        override fun meterFuel(): Boolean = false
+        override fun interrupts(): Boolean {
+            return false
+        }
 
-        override fun interruptible(): Boolean = false
+        override fun stacktraces(): Boolean {
+            return false
+        }
 
-        override fun stacktraces(): Boolean = false
+        override fun fuel(): Long {
+            return UNSET_LONG
+        }
 
-        override fun initialFuel(): Long = UNSET_LONG
+        override fun linearMemoryBytes(): Long {
+            return UNSET_LONG
+        }
 
-        override fun gcStrategy(): Int = UNSET
+        override fun gcHeapBytes(): Long {
+            return UNSET_LONG
+        }
 
-        override fun gcThresholdKind(): Int = UNSET
+        override fun tableBytes(): Long {
+            return UNSET_LONG
+        }
 
-        override fun gcThresholdValue(): Int = UNSET
+        override fun stackBytes(): Long {
+            return UNSET_LONG
+        }
 
-        override fun gcHeapBytes(): Long = UNSET_LONG
-
-        override fun memoryPages(): Int = UNSET
-
-        override fun tableElements(): Int = UNSET
-
-        override fun trapOnGrowFailure(): Boolean = false
-
-        override fun stackBytes(): Long = UNSET_LONG
+        override fun trapOnGrowthFailure(): Boolean {
+            return false
+        }
     }
 }

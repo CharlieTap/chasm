@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.integration.test
 
-import io.github.charlietap.chasm.config.StoreConfig
+import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.embedding.error.TrapReason
 import io.github.charlietap.chasm.embedding.interrupt
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
@@ -23,7 +23,7 @@ class InterruptThreadTest {
         val started = CountDownLatch(1)
         val abandoned = AtomicBoolean(false)
         val (store, runner) = interruptRunner(
-            StoreConfig(interruptible = true),
+            RuntimeConfig(interrupts = true),
             keepRunning = {
                 started.countDown()
                 !abandoned.get()

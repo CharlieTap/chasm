@@ -17,11 +17,11 @@ class TrapSites(
 
 @InternalChasmApi
 fun trapSitesResource(
-    packagePath: String,
-): String = "$packagePath/sites.$TRAP_SITES_EXTENSION"
+    resourceRoot: String,
+): String = "$resourceRoot.$TRAP_SITES_EXTENSION"
 
 @InternalChasmApi
-const val TRAP_SITES_EXTENSION = "chasmsites"
+const val TRAP_SITES_EXTENSION = "sites"
 
 @InternalChasmApi
 fun writeTrapSites(

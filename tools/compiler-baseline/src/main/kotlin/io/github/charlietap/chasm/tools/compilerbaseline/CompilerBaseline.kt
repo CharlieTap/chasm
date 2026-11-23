@@ -1,6 +1,9 @@
 package io.github.charlietap.chasm.tools.compilerbaseline
 
-import io.github.charlietap.chasm.config.StoreConfig
+import io.github.charlietap.chasm.config.CpuLimits
+import io.github.charlietap.chasm.config.Limits
+import io.github.charlietap.chasm.config.RuntimeConfig
+import io.github.charlietap.chasm.config.fuel
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
@@ -45,18 +48,20 @@ data class CompilerBaselineFixture(
 
 data class CompilerBaselineStore(
     val suffix: String?,
-    val config: StoreConfig,
+    val config: RuntimeConfig,
 ) {
     companion object {
-        val DEFAULT = CompilerBaselineStore(suffix = null, config = StoreConfig())
+        private val METERED = Limits(cpu = CpuLimits.Metered(Long.MAX_VALUE.fuel))
 
-        val CHECKPOINTS = CompilerBaselineStore(suffix = null, config = StoreConfig(meterFuel = true, interruptible = true))
+        val DEFAULT = CompilerBaselineStore(suffix = null, config = RuntimeConfig())
+
+        val CHECKPOINTS = CompilerBaselineStore(suffix = null, config = RuntimeConfig(interrupts = true, limits = METERED))
 
         val ALL = listOf(
-            CompilerBaselineStore("default", StoreConfig()),
-            CompilerBaselineStore("fuel", StoreConfig(meterFuel = true)),
-            CompilerBaselineStore("interrupt", StoreConfig(interruptible = true)),
-            CompilerBaselineStore("fuel_interrupt", StoreConfig(meterFuel = true, interruptible = true)),
+            CompilerBaselineStore("default", RuntimeConfig()),
+            CompilerBaselineStore("fuel", RuntimeConfig(limits = METERED)),
+            CompilerBaselineStore("interrupt", RuntimeConfig(interrupts = true)),
+            CompilerBaselineStore("fuel_interrupt", RuntimeConfig(interrupts = true, limits = METERED)),
         )
     }
 }

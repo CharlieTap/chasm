@@ -17,9 +17,9 @@ class MixedEngineStoreTest {
     fun `an interpreter store rejects a compiled module`() = runTest {
         val aot = Aot()
         val interpreter = Interpreter()
-        val module = aot.module(bytes(), aot.store(), RuntimeConfig())
+        val module = aot.module(bytes(), RuntimeConfig())
 
-        val result = instance(interpreter.store(), module)
+        val result = instance(interpreter.store(module, RuntimeConfig()), module)
 
         assertIs<ExecutionError.Unsupported>(assertIs<ChasmResult.Error<*>>(result).error)
     }
@@ -28,9 +28,10 @@ class MixedEngineStoreTest {
     fun `an aot store rejects a decoded module`() = runTest {
         val aot = Aot()
         val interpreter = Interpreter()
-        val module = interpreter.module(bytes(), interpreter.store(), RuntimeConfig())
+        val compiled = aot.module(bytes(), RuntimeConfig())
+        val decoded = interpreter.module(bytes(), RuntimeConfig())
 
-        val result = instance(aot.store(), module)
+        val result = instance(aot.store(compiled, RuntimeConfig()), decoded)
 
         assertIs<ExecutionError.Unsupported>(assertIs<ChasmResult.Error<*>>(result).error)
     }

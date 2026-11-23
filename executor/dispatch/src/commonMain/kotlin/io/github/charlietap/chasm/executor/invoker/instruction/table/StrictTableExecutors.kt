@@ -53,7 +53,7 @@ internal fun executeTableGrow(
     destinationSlot: Int,
 ) {
     val previousSize = table.grow(elementsToAdd, referenceValue)
-    if (previousSize < 0 && context.store.config.limits.trapOnGrowFailure) {
+    if (previousSize < 0 && context.store.trapOnGrowthFailure) {
         throw InvocationException(InvocationError.TableGrowFailed)
     }
     vstack.setFrameSlot(destinationSlot, previousSize.toLong())

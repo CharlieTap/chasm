@@ -4,9 +4,9 @@ import io.github.charlietap.chasm.aot.store
 import io.github.charlietap.chasm.compiled.Compiler
 import io.github.charlietap.chasm.compiled.corpus.fixture.FixtureContext
 import io.github.charlietap.chasm.compiled.corpus.fixture.FixtureRunner
-import io.github.charlietap.chasm.config.Config
-import io.github.charlietap.chasm.config.GCStrategy
-import io.github.charlietap.chasm.config.StoreConfig
+import io.github.charlietap.chasm.config.ModuleConfig
+import io.github.charlietap.chasm.config.RuntimeConfig
+import io.github.charlietap.chasm.embedding.shapes.Module
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.corpus.lib.CorpusExecution
 import io.github.charlietap.corpus.lib.CorpusFileReader
@@ -18,9 +18,9 @@ import kotlin.time.TimeSource
 class CompiledCorpusRunner(
     private val fileReader: CorpusFileReader,
     private val compiler: Compiler,
-    private val config: Config = Config(),
-    private val storeConfig: StoreConfig = StoreConfig(gcStrategy = GCStrategy.TRADITIONAL),
-    private val storeFactory: (StoreConfig) -> Store = ::store,
+    private val moduleConfig: ModuleConfig = ModuleConfig(),
+    private val runtimeConfig: RuntimeConfig = RuntimeConfig(),
+    private val storeFactory: (Module) -> Store = ::store,
 ) : CorpusRunner {
 
     override fun readText(
@@ -40,7 +40,7 @@ class CompiledCorpusRunner(
         val start = TimeSource.Monotonic.markNow()
         val bytes = readBytes("$corpusRoot/${fixture.version ?: "1.0"}/${fixture.path}")
         timings.binarySizeBytes = bytes.size.toLong()
-        val result = FixtureRunner(FixtureContext(fixture, phase, config, storeConfig, storeFactory, timings, compiler), bytes)
+        val result = FixtureRunner(FixtureContext(fixture, phase, moduleConfig, runtimeConfig, storeFactory, timings, compiler), bytes)
         return CorpusExecution(
             result = result,
             timings = timings.snapshot(start.elapsedNow().inWholeNanoseconds),

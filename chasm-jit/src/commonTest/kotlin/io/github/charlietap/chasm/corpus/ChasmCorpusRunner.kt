@@ -1,8 +1,6 @@
 package io.github.charlietap.chasm.corpus
 
-import io.github.charlietap.chasm.config.Config
-import io.github.charlietap.chasm.config.GCStrategy
-import io.github.charlietap.chasm.config.RuntimeConfig
+import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.embedding.error.ModuleError
 import io.github.charlietap.chasm.embedding.exports
 import io.github.charlietap.chasm.embedding.function
@@ -74,9 +72,7 @@ import kotlin.time.TimeSource
 
 class ChasmCorpusRunner(
     private val fileReader: CorpusFileReader,
-    private val config: Config = Config(
-        runtimeConfig = RuntimeConfig(gcStrategy = GCStrategy.TRADITIONAL),
-    ),
+    private val moduleConfig: ModuleConfig = ModuleConfig(),
 ) : CorpusRunner {
 
     override fun readText(path: String): String = fileReader.readText(path)
@@ -113,7 +109,7 @@ class ChasmCorpusRunner(
         timings.binarySizeBytes = bytes.size.toLong()
         val validated = when (
             val result = timings.decode {
-                module(bytes, config.moduleConfig, validate = phase != CorpusPhase.DECODING)
+                module(bytes, moduleConfig, validate = phase != CorpusPhase.DECODING)
             }
         ) {
             is ChasmResult.Success -> result.result
@@ -180,7 +176,7 @@ class ChasmCorpusRunner(
             is RunnerResult.Error -> return RunnerResult.Error(result.error)
         }
 
-        return instance(store, module, importResolution.imports, config.runtimeConfig).fold(
+        return instance(store, module, importResolution.imports).fold(
             { instance ->
                 val exports = exports(instance)
                 val exportedMemory = exports.all.firstNotNullOfOrNull { export -> export.value as? Memory }

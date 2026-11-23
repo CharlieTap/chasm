@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.embedding
 
-import io.github.charlietap.chasm.config.StoreConfig
+import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.embedding.error.ExecutionError
 import io.github.charlietap.chasm.embedding.error.TrapReason
 import io.github.charlietap.chasm.embedding.fixture.INTERRUPT_MODULE
@@ -35,7 +35,7 @@ class InterruptTest {
     @Test
     fun `interrupting a store with no call running has no effect`() {
 
-        val store = interpreterStore(store(config = StoreConfig(interruptible = true)))
+        val store = interpreterStore(store(config = RuntimeConfig(interrupts = true)))
 
         assertFalse(interrupt(store))
     }
@@ -43,7 +43,7 @@ class InterruptTest {
     @Test
     fun `a call interrupted while it runs traps`() = runTest {
 
-        val store = interpreterStore(store(config = StoreConfig(interruptible = true)))
+        val store = interpreterStore(store(config = RuntimeConfig(interrupts = true)))
         val requested = mutableListOf<Boolean>()
         val hostFunction = HostFunction { _, _ ->
             requested += interrupt(contextOf<HostResources>().store)

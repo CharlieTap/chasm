@@ -3,8 +3,6 @@ package io.github.charlietap.chasm.executor.instantiator.runtime.allocation
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.value.NameValue
-import io.github.charlietap.chasm.config.LinearMemoryConfig
-import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.executor.instantiator.allocation.ModuleAllocator
 import io.github.charlietap.chasm.fixture.ast.module.export
 import io.github.charlietap.chasm.fixture.ast.module.functionExportDescriptor
@@ -26,41 +24,6 @@ import kotlin.test.assertTrue
 class ModuleAllocatorTest {
 
     @Test
-    fun passesLinearMemoryConfigToMemoryAllocation() {
-        val linearMemoryConfig = LinearMemoryConfig(prefault = true)
-        val module = moduleDeclarations(memories = listOf(memoryType()))
-        val context = instantiationContext(
-            module = module,
-            config = RuntimeConfig(linearMemory = linearMemoryConfig),
-        )
-        val instance = moduleInstance()
-        var called = false
-
-        val result = ModuleAllocator(
-            context = context,
-            instance = instance,
-            tableInitValues = longArrayOf(),
-            constantExpressionEvaluator = { _, _, _, _ -> error("unexpected expression evaluation") },
-            tableAllocator = { _, _, _ -> error("unexpected table allocation") },
-            memoryAllocator = { _, _, actualConfig ->
-                assertEquals(linearMemoryConfig, actualConfig)
-                called = true
-                Address.Memory(7)
-            },
-            tagAllocator = { _, _, _ -> error("unexpected tag allocation") },
-            globalAllocator = { _, _, _ -> error("unexpected global allocation") },
-            elementAllocator = { _, _, _ -> error("unexpected element allocation") },
-            dataAllocator = { _, _ -> error("unexpected data allocation") },
-            codeInstaller = { _, _, _, _ -> Ok(Unit) },
-            exportAllocator = { _, _ -> error("unexpected export allocation") },
-        )
-
-        assertEquals(Ok(instance), result)
-        assertTrue(called)
-        assertContentEquals(listOf(Address.Memory(7)), instance.memAddresses)
-    }
-
-    @Test
     fun evaluatesEachElementInitializerOnce() {
         val module = moduleDeclarations(
             elementSegments = listOf(
@@ -79,7 +42,7 @@ class ModuleAllocatorTest {
             tableInitValues = longArrayOf(),
             constantExpressionEvaluator = { _, _, _, _ -> Ok((++evaluationCount).toLong()) },
             tableAllocator = { _, _, _ -> error("unexpected table allocation") },
-            memoryAllocator = { _, _, _ -> error("unexpected memory allocation") },
+            memoryAllocator = { _, _ -> error("unexpected memory allocation") },
             tagAllocator = { _, _, _ -> error("unexpected tag allocation") },
             globalAllocator = { _, _, _ -> error("unexpected global allocation") },
             elementAllocator = { _, _, values ->
@@ -114,7 +77,7 @@ class ModuleAllocatorTest {
             tableInitValues = longArrayOf(),
             constantExpressionEvaluator = { _, _, _, _ -> error("unexpected expression evaluation") },
             tableAllocator = { _, _, _ -> error("unexpected table allocation") },
-            memoryAllocator = { _, _, _ ->
+            memoryAllocator = { _, _ ->
                 steps.add("memory")
                 Address.Memory(0)
             },
@@ -134,6 +97,7 @@ class ModuleAllocatorTest {
 
         assertEquals(Ok(instance), result)
         assertEquals(listOf("memory", "install", "export $descriptor"), steps)
+        assertEquals(listOf(Address.Memory(0)), instance.memAddresses.toList())
         assertEquals("memory", instance.exports.single().name.name)
     }
 
@@ -152,7 +116,7 @@ class ModuleAllocatorTest {
             tableInitValues = longArrayOf(),
             constantExpressionEvaluator = { _, _, _, _ -> error("unexpected expression evaluation") },
             tableAllocator = { _, _, _ -> error("unexpected table allocation") },
-            memoryAllocator = { _, _, _ -> error("unexpected memory allocation") },
+            memoryAllocator = { _, _ -> error("unexpected memory allocation") },
             tagAllocator = { _, _, _ -> error("unexpected tag allocation") },
             globalAllocator = { _, _, _ -> error("unexpected global allocation") },
             elementAllocator = { _, _, _ -> error("unexpected element allocation") },

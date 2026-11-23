@@ -2,9 +2,7 @@ package io.github.charlietap.chasm.tools.compilerbaseline
 
 import com.github.michaelbull.result.unwrap
 import io.github.charlietap.chasm.compiler.frontend.ModuleCompiler
-import io.github.charlietap.chasm.config.GCStrategy
 import io.github.charlietap.chasm.config.ModuleConfig
-import io.github.charlietap.chasm.config.RuntimeConfig
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonArray
@@ -71,7 +69,6 @@ class ContrivedCompilerBaselineTest {
             importResolver = EmptyCompilerBaselineImportResolver(),
             moduleDecoder = ChasmModuleDecoder(),
             moduleInstantiator = ChasmModuleInstantiator(),
-            runtimeConfig = RuntimeConfig(gcStrategy = GCStrategy.TRADITIONAL),
         ).generate(CompilerBaselineFixture(name = "contrived", bytes = bytes)).modules.single()
         val functions = module.functions.associateBy(CompilerBaselineFunction::name)
 
@@ -120,7 +117,6 @@ class ContrivedCompilerBaselineTest {
         importResolver = EmptyCompilerBaselineImportResolver(),
         moduleDecoder = ChasmModuleDecoder(),
         moduleInstantiator = ChasmModuleInstantiator(),
-        runtimeConfig = RuntimeConfig(gcStrategy = GCStrategy.TRADITIONAL),
     ).generate(CompilerBaselineFixture(name = "contrived", bytes = bytes)).modules.single()
 
     private fun cirTags(): Map<String, List<String>> = cirFunctions().mapValues { (_, function) ->

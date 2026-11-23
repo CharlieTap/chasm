@@ -3,8 +3,10 @@ package io.github.charlietap.chasm.benchmark.coremark
 import com.goncalossilva.resources.Resource
 import io.github.charlietap.chasm.benchmark.BenchmarkMode
 import io.github.charlietap.chasm.benchmark.BenchmarkStabilizer
-import io.github.charlietap.chasm.config.StoreConfig
-import io.github.charlietap.chasm.embedding.addFuel
+import io.github.charlietap.chasm.config.CpuLimits
+import io.github.charlietap.chasm.config.Limits
+import io.github.charlietap.chasm.config.RuntimeConfig
+import io.github.charlietap.chasm.config.fuel
 import io.github.charlietap.chasm.embedding.dsl.imports
 import io.github.charlietap.chasm.embedding.instance
 import io.github.charlietap.chasm.embedding.invoke
@@ -26,13 +28,14 @@ fun main(
 
 internal fun runCoremark(
     args: Array<String>,
-    benchmark: (StoreConfig) -> Unit,
+    benchmark: (RuntimeConfig) -> Unit,
 ) {
+    val metered = Limits(cpu = CpuLimits.Metered(Long.MAX_VALUE.fuel))
     val config = when (val name = args.firstOrNull() ?: "plain") {
-        "plain" -> StoreConfig()
-        "fuel" -> StoreConfig(meterFuel = true)
-        "interrupt" -> StoreConfig(interruptible = true)
-        "fuel+interrupt" -> StoreConfig(meterFuel = true, interruptible = true)
+        "plain" -> RuntimeConfig()
+        "fuel" -> RuntimeConfig(limits = metered)
+        "interrupt" -> RuntimeConfig(interrupts = true)
+        "fuel+interrupt" -> RuntimeConfig(interrupts = true, limits = metered)
         else -> error("Unknown store configuration: $name")
     }
     val topology = BenchmarkStabilizer.topology()
@@ -54,12 +57,11 @@ internal fun runCoremark(
     }
 }
 
-class CoremarkBenchmark(private val config: StoreConfig = StoreConfig()) {
+class CoremarkBenchmark(private val config: RuntimeConfig = RuntimeConfig()) {
 
     fun run() {
         val bytes = Resource(FILE_DIR + "coremark.wasm").readBytes()
         val store = store(config)
-        if (config.meterFuel) addFuel(store, Long.MAX_VALUE)
 
         val imports = imports(store) {
             function {

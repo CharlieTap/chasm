@@ -2,8 +2,8 @@ package io.github.charlietap.chasm.compiled.script
 
 import io.github.charlietap.chasm.compiled.Compiler
 import io.github.charlietap.chasm.compiled.ScriptFailure
-import io.github.charlietap.chasm.config.Config
-import io.github.charlietap.chasm.config.StoreConfig
+import io.github.charlietap.chasm.config.ModuleConfig
+import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.embedding.error.InstantiationError
 import io.github.charlietap.chasm.embedding.exports
 import io.github.charlietap.chasm.embedding.instance
@@ -16,10 +16,10 @@ import io.github.charlietap.sweet.lib.SemanticPhase
 import kotlinx.coroutines.runBlocking
 
 data class ScriptContext(
-    val config: Config,
+    val moduleConfig: ModuleConfig,
     val binaryDirectory: String,
     val phaseSupport: SemanticPhase,
-    val storeConfig: StoreConfig,
+    val runtimeConfig: RuntimeConfig,
     val compiler: Compiler,
     val files: ScriptFileReader,
     val store: Store,
@@ -41,7 +41,7 @@ data class ScriptContext(
     fun compile(
         bytes: ByteArray,
     ): ChasmResult<Module, ScriptFailure> {
-        return compiler(bytes, config.moduleConfig, storeConfig)
+        return compiler(bytes, moduleConfig, runtimeConfig)
     }
 
     fun instantiate(

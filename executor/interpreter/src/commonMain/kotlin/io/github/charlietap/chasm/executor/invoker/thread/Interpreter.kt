@@ -12,7 +12,7 @@ object Interpreter : NestedInterpreter {
     override fun interpret(
         entryIp: Int,
         context: ExecutionContext,
-    ) = if (context.config.debugInfo) dispatchTraceable(entryIp, context) else dispatch(entryIp, context)
+    ) = if (context.config.stacktraces) dispatchTraceable(entryIp, context) else dispatch(entryIp, context)
 }
 
 // Keep dispatch separate so HotSpot OSR need not preserve invocation setup

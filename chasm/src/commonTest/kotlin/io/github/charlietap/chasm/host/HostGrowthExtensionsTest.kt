@@ -1,8 +1,12 @@
 package io.github.charlietap.chasm.host
 
 import com.goncalossilva.resources.Resource
-import io.github.charlietap.chasm.config.StoreConfig
-import io.github.charlietap.chasm.config.StoreLimits
+import io.github.charlietap.chasm.config.GrowthFailureStrategy
+import io.github.charlietap.chasm.config.Limits
+import io.github.charlietap.chasm.config.MemoryLimits
+import io.github.charlietap.chasm.config.RuntimeConfig
+import io.github.charlietap.chasm.config.bytes
+import io.github.charlietap.chasm.config.pages
 import io.github.charlietap.chasm.embedding.exports
 import io.github.charlietap.chasm.embedding.function
 import io.github.charlietap.chasm.embedding.instance
@@ -38,7 +42,7 @@ class HostGrowthExtensionsTest {
                 byteSizes += byteSize
             }
         }
-        val instance = growthInstance(FILE_HOST_GROWTH, StoreConfig(), hostFunction)
+        val instance = growthInstance(FILE_HOST_GROWTH, RuntimeConfig(), hostFunction)
 
         invoke(instance, "run").expect("the host function grows the memory")
 
@@ -63,7 +67,7 @@ class HostGrowthExtensionsTest {
                 sizes += size
             }
         }
-        val instance = growthInstance(FILE_HOST_GROWTH, StoreConfig(), hostFunction)
+        val instance = growthInstance(FILE_HOST_GROWTH, RuntimeConfig(), hostFunction)
         val table = exports(instance).table("table")!!
         writeTable(table, 0, SEVEN)
         writeTable(table, 1, NINE)
@@ -86,7 +90,7 @@ class HostGrowthExtensionsTest {
                 byteSizes += byteSize
             }
         }
-        val config = StoreConfig(limits = StoreLimits(memoryPages = 2, trapOnGrowFailure = true))
+        val config = RuntimeConfig(limits = Limits(memory = MemoryLimits(linearMemory = 2.pages, onGrowthFailure = GrowthFailureStrategy.Trap)))
         val instance = growthInstance(FILE_HOST_GROWTH_LIMITS, config, hostFunction)
 
         invoke(instance, "run").expect("the host function grows the memory")
@@ -108,7 +112,7 @@ class HostGrowthExtensionsTest {
                 sizes += size
             }
         }
-        val config = StoreConfig(limits = StoreLimits(tableElements = 3, trapOnGrowFailure = true))
+        val config = RuntimeConfig(limits = Limits(memory = MemoryLimits(tables = 24.bytes, onGrowthFailure = GrowthFailureStrategy.Trap)))
         val instance = growthInstance(FILE_HOST_GROWTH_LIMITS, config, hostFunction)
         val table = exports(instance).table("table")!!
         writeTable(table, 0, SEVEN)
@@ -123,7 +127,7 @@ class HostGrowthExtensionsTest {
 
     private suspend fun growthInstance(
         file: String,
-        config: StoreConfig,
+        config: RuntimeConfig,
         hostFunction: HostFunction,
     ): Instance {
         val store = store(config)

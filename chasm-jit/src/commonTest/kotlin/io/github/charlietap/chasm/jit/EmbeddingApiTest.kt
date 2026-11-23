@@ -3,7 +3,9 @@
 package io.github.charlietap.chasm.jit
 
 import io.github.charlietap.chasm.InternalChasmApi
-import io.github.charlietap.chasm.config.StoreConfig
+import io.github.charlietap.chasm.config.CpuLimits
+import io.github.charlietap.chasm.config.RuntimeConfig
+import io.github.charlietap.chasm.config.fuel
 import io.github.charlietap.chasm.embedding.addFuel
 import io.github.charlietap.chasm.embedding.collect
 import io.github.charlietap.chasm.embedding.dropInstance
@@ -120,6 +122,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertIs
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
+import io.github.charlietap.chasm.config.Limits as RuntimeLimits
 
 class EmbeddingApiTest {
 
@@ -245,7 +248,7 @@ class EmbeddingApiTest {
     @Test
     fun fuelIsMeteredThroughStoreControl() {
 
-        val store = store(StoreConfig(meterFuel = true))
+        val store = store(RuntimeConfig(limits = RuntimeLimits(cpu = CpuLimits.Metered(0.fuel))))
 
         addFuel(store, 1_000)
         val added = remainingFuel(store)
@@ -260,7 +263,7 @@ class EmbeddingApiTest {
     @Test
     fun interruptsStopRunningGuests() {
 
-        val store = store(StoreConfig(interruptible = true))
+        val store = store(RuntimeConfig(interrupts = true))
         val instance = instantiate(store)
         var result: ChasmResult<List<ExecutionValue>, *>? = null
         val guest = Thread { result = invoke(instance, "spin") }

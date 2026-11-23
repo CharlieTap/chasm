@@ -1,8 +1,8 @@
 package io.github.charlietap.chasm.compiler.backend.jvm.abi
 
-internal const val DEFAULT_METHOD_BYTE_BUDGET = 8_000
+internal const val HOTSPOT_METHOD_BYTES = 8_000
 
-internal const val MIN_METHOD_BYTES = 1_000
+internal const val ART_ESTIMATED_METHOD_UNITS = 5_150
 
 internal const val MAX_SHORT_BRANCH_METHOD_BYTES = 32_767
 

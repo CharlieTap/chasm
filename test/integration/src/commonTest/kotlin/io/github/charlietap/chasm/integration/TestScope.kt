@@ -1,7 +1,6 @@
 package io.github.charlietap.chasm.integration
 
 import com.goncalossilva.resources.Resource
-import io.github.charlietap.chasm.config.GCStrategy
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.embedding.error.ExecutionError
 import io.github.charlietap.chasm.embedding.error.InstantiationError
@@ -23,16 +22,29 @@ class IntegrationTestScope(
 ) : TestScope
 
 suspend fun TestScope.runner(
-    store: Store = engine.store(),
-    imports: List<Import> = [],
-    config: RuntimeConfig = RuntimeConfig(gcStrategy = GCStrategy.TRADITIONAL),
+    config: RuntimeConfig = RuntimeConfig(),
     script: String = this.script,
+    imports: (Store) -> List<Import> = { [] },
 ): TestRunner {
 
     val bytes = Resource("$FILE_DIR$script.wasm").readBytes()
-    val module = engine.module(bytes, store, config)
+    val module = engine.module(bytes, config)
+    val store = engine.store(module, config)
 
-    return IntegrationTestRunner(store, instance(store, module, imports, config))
+    return IntegrationTestRunner(store, config, instance(store, module, imports(store)))
+}
+
+suspend fun TestScope.join(
+    runner: TestRunner,
+    script: String,
+    imports: List<Import> = [],
+    config: RuntimeConfig = runner.config,
+): TestRunner {
+
+    val bytes = Resource("$FILE_DIR$script.wasm").readBytes()
+    val module = engine.module(bytes, config)
+
+    return IntegrationTestRunner(runner.store, config, instance(runner.store, module, imports))
 }
 
 suspend fun TestScope.invoke(

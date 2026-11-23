@@ -29,7 +29,9 @@ import io.github.charlietap.chasm.integration.TestRunner
 import io.github.charlietap.chasm.integration.TestScope
 import io.github.charlietap.chasm.integration.assertTrapped
 import io.github.charlietap.chasm.integration.integrationTest
+import io.github.charlietap.chasm.integration.join
 import io.github.charlietap.chasm.integration.runner
+import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.type.AbstractHeapType
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -90,12 +92,13 @@ class ExecutionErrorTest {
     @Test
     fun `instantiating into a dropped store throws`() = integrationTest(FIXTURE) {
 
-        val store = engine.store()
-        dropStore(store)
+        val runner = runner()
+        dropStore(runner.store)
 
-        assertFailsWith<IllegalStateException>(engine.name()) {
-            runner(store)
+        val failure = assertFailsWith<IllegalStateException>(engine.name()) {
+            join(runner, script)
         }
+        assertEquals(InvocationError.StoreDropped.toString(), failure.message, engine.name())
     }
 
     @Test
@@ -109,9 +112,10 @@ class ExecutionErrorTest {
     @Test
     fun `a failing host function traps with a host function failure`() = integrationTest(FIXTURE) {
 
-        val store = engine.store()
-        val failing = function(store, functionType(), HostFunction { _, _ -> throw HostFunctionException("observe failed") })
-        val runner = runner(store, listOf(Import("env", "observe", failing)))
+        val runner = runner { store ->
+            val failing = function(store, functionType(), HostFunction { _, _ -> throw HostFunctionException("observe failed") })
+            listOf(Import("env", "observe", failing))
+        }
 
         val result = runner.invoke("catch", listOf(ReferenceValue.Null(AbstractHeapType.Exception)))
 
@@ -192,26 +196,29 @@ class ExecutionErrorTest {
     @Test
     fun `a host function keeps an exception thrown by a nested call across another nested call`() = integrationTest(HOST_FIXTURE) {
 
-        val store = engine.store()
         lateinit var instance: Instance
-        val nested = function(
-            store,
-            functionType(results = resultType(listOf(i32ValueType()))),
-            HostFunction { _, results ->
+        val runner = runner { store ->
 
-                val error = errorOf(invoke(instance, "throw", listOf(NumberValue.I32(42))))
-                val exception = assertIs<ExecutionError.Thrown>(error).exception
+            val nested = function(
+                store,
+                functionType(results = resultType(listOf(i32ValueType()))),
+                HostFunction { _, results ->
 
-                assertEquals(ChasmResult.Success(emptyList<ExecutionValue>()), invoke(instance, "noop"))
+                    val error = errorOf(invoke(instance, "throw", listOf(NumberValue.I32(42))))
+                    val exception = assertIs<ExecutionError.Thrown>(error).exception
 
-                val caught = assertIs<ChasmResult.Success<List<ExecutionValue>>>(
-                    invoke(instance, "catch", listOf(ReferenceValue.Exception(exception))),
-                )
-                results.writeI32(0, assertIs<NumberValue.I32>(caught.result.single()).value)
-            },
-        )
-        val escape = function(store, functionType(), HostFunction { _, _ -> })
-        val runner = runner(store, listOf(Import("env", "nested", nested), Import("env", "escape", escape)))
+                    assertEquals(ChasmResult.Success(emptyList<ExecutionValue>()), invoke(instance, "noop"))
+
+                    val caught = assertIs<ChasmResult.Success<List<ExecutionValue>>>(
+                        invoke(instance, "catch", listOf(ReferenceValue.Exception(exception))),
+                    )
+                    results.writeI32(0, assertIs<NumberValue.I32>(caught.result.single()).value)
+                },
+            )
+            val escape = function(store, functionType(), HostFunction { _, _ -> })
+
+            listOf(Import("env", "nested", nested), Import("env", "escape", escape))
+        }
         instance = runner.instance().expect("instance")
 
         val result = runner.invoke("call_nested")
@@ -222,17 +229,20 @@ class ExecutionErrorTest {
     @Test
     fun `an exception a host function throws escapes the invocation`() = integrationTest(HOST_FIXTURE) {
 
-        val store = engine.store()
         lateinit var memory: Memory
-        val nested = function(store, functionType(results = resultType(listOf(i32ValueType()))), HostFunction { _, _ -> })
-        val escape = function(
-            store,
-            functionType(),
-            HostFunction { _, _ ->
-                readInt(memory, PAGE_SIZE * 2)
-            },
-        )
-        val runner = runner(store, listOf(Import("env", "nested", nested), Import("env", "escape", escape)))
+        val runner = runner { store ->
+
+            val nested = function(store, functionType(results = resultType(listOf(i32ValueType()))), HostFunction { _, _ -> })
+            val escape = function(
+                store,
+                functionType(),
+                HostFunction { _, _ ->
+                    readInt(memory, PAGE_SIZE * 2)
+                },
+            )
+
+            listOf(Import("env", "nested", nested), Import("env", "escape", escape))
+        }
         memory = assertNotNull(runner.exports().expect("exports").memory("memory"))
 
         assertFailsWith<IndexOutOfBoundsException>(engine.name()) {
@@ -244,16 +254,18 @@ class ExecutionErrorTest {
         pendingDuringCallback: MutableList<Boolean> = mutableListOf(),
     ): Pair<Store, TestRunner> {
 
-        val store = engine.store()
-        val observe = function(
-            store,
-            functionType(),
-            HostFunction { _, _ ->
-                pendingDuringCallback.add(hasPending)
-            },
-        )
+        val runner = runner { store ->
+            val observe = function(
+                store,
+                functionType(),
+                HostFunction { _, _ ->
+                    pendingDuringCallback.add(hasPending)
+                },
+            )
+            listOf(Import("env", "observe", observe))
+        }
 
-        return store to runner(store, listOf(Import("env", "observe", observe)))
+        return runner.store to runner
     }
 
     private fun errorOf(result: ChasmResult<*, *>): Any? {

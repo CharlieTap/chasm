@@ -1,16 +1,12 @@
-@file:OptIn(ExperimentalChasmApi::class)
-
 package io.github.charlietap.chasm.benchmark.coremark
 
 import com.goncalossilva.resources.Resource
-import io.github.charlietap.chasm.ExperimentalChasmApi
+import io.github.charlietap.chasm.aot.ClassOutput
 import io.github.charlietap.chasm.aot.CompileConfig
-import io.github.charlietap.chasm.aot.CompileOutput
+import io.github.charlietap.chasm.aot.CompiledModule
 import io.github.charlietap.chasm.aot.compile
-import io.github.charlietap.chasm.aot.compiledModule
-import io.github.charlietap.chasm.aot.expect
+import io.github.charlietap.chasm.aot.module
 import io.github.charlietap.chasm.aot.store
-import io.github.charlietap.chasm.embedding.addFuel
 import io.github.charlietap.chasm.embedding.function
 import io.github.charlietap.chasm.embedding.instance
 import io.github.charlietap.chasm.embedding.invoke
@@ -27,21 +23,22 @@ import io.github.charlietap.chasm.type.NumberType
 import io.github.charlietap.chasm.type.ResultType
 import io.github.charlietap.chasm.type.ValueType
 import kotlinx.coroutines.runBlocking
+import java.net.URLClassLoader
+import java.nio.file.Files
 import kotlin.time.Clock
 
 fun main(
     args: Array<String>,
 ) = runCoremark(args) { config ->
     val bytes = Resource("benchmark/coremark.wasm").readBytes()
-    val output = CompileOutput.Memory()
-    val compileConfig = CompileConfig("chasm.benchmark.coremark") {
-        store(config)
-    }
-    val module = compiledModule(output.load(compile(bytes, output, compileConfig).expect("CoreMark compiles")))
-        .expect("CoreMark loads")
+    val classes = Files.createTempDirectory("coremark")
+    val compileConfig = CompileConfig("chasm.benchmark.coremark.CoremarkModule", runtime = config)
+    val info = compile(bytes, ClassOutput.directory(classes), compileConfig).expect("CoreMark compiles")
+    val loader = URLClassLoader(arrayOf(classes.toUri().toURL()), CompiledModule::class.java.classLoader)
+    val compiled = loader.loadClass(info.config.className).getField("COMPILED").get(null) as CompiledModule
+    val module = module(compiled).expect("CoreMark loads")
 
-    val store = store(config)
-    if (config.meterFuel) addFuel(store, Long.MAX_VALUE)
+    val store = store(module)
     val clock = HostFunction { _, results -> results.writeI64(0, Clock.System.now().toEpochMilliseconds()) }
     val clockType = FunctionType(ResultType(emptyList()), ResultType(listOf(ValueType.Number(NumberType.I64))))
     val imports = listOf(Import("env", "clock_ms", function(store, clockType, clock)))

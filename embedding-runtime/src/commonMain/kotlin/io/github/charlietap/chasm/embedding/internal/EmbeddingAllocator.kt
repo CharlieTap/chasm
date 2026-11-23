@@ -1,10 +1,7 @@
 package io.github.charlietap.chasm.embedding.internal
 
-import io.github.charlietap.chasm.config.GCStrategy
-import io.github.charlietap.chasm.config.GCThreshold
 import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.runtime.type.RTT
-import io.github.charlietap.chasm.runtime.store.Store as RuntimeStore
 
 internal interface GcAllocator {
 
@@ -34,7 +31,6 @@ internal interface GcAllocator {
 
 internal class EmbeddingAllocator(
     private val store: StoreRuntime,
-    private val callConfig: HostCallConfig,
 ) : GcAllocator {
 
     override fun struct(
@@ -43,11 +39,7 @@ internal class EmbeddingAllocator(
     ): Long {
 
         val runtime = store.liveStore()
-        val threshold = collectionThreshold(runtime)
-
-        if (threshold != null) {
-            runtime.heap.prepareStructAllocation(runtime, type, threshold)
-        }
+        runtime.heap.prepareStructAllocation(runtime, type)
 
         return runtime.heap.allocateStruct(type, fields)
     }
@@ -59,11 +51,7 @@ internal class EmbeddingAllocator(
     ): Long {
 
         val runtime = store.liveStore()
-        val threshold = collectionThreshold(runtime)
-
-        if (threshold != null) {
-            runtime.heap.prepareArrayAllocation(runtime, type, length, threshold)
-        }
+        runtime.heap.prepareArrayAllocation(runtime, type, length)
 
         return runtime.heap.allocateArrayFilled(type, length, value)
     }
@@ -76,11 +64,7 @@ internal class EmbeddingAllocator(
     ): Long {
 
         val runtime = store.liveStore()
-        val threshold = collectionThreshold(runtime)
-
-        if (threshold != null) {
-            runtime.heap.prepareArrayAllocation(runtime, type, count, threshold)
-        }
+        runtime.heap.prepareArrayAllocation(runtime, type, count)
 
         return runtime.heap.allocateArrayFromElements(type, elements, offset, count)
     }
@@ -91,31 +75,8 @@ internal class EmbeddingAllocator(
     ): Long {
 
         val runtime = store.liveStore()
-        val threshold = collectionThreshold(runtime)
-
-        if (threshold != null) {
-            runtime.heap.prepareExceptionAllocation(runtime, tag, threshold)
-        }
+        runtime.heap.prepareExceptionAllocation(runtime, tag)
 
         return runtime.heap.allocateException(tag, payload)
-    }
-
-    @Suppress("DEPRECATION")
-    private fun collectionThreshold(runtime: RuntimeStore): Long? {
-
-        val config = callConfig.current
-        if (runtime.invocationDepth == 0 || config == null) {
-            return (runtime.config.gcThreshold ?: DEFAULT_THRESHOLD).bytes
-        }
-
-        if (config.gcStrategy != GCStrategy.TRADITIONAL) {
-            return null
-        }
-
-        return config.gcThreshold.bytes
-    }
-
-    private companion object {
-        val DEFAULT_THRESHOLD = GCThreshold.MB(8)
     }
 }

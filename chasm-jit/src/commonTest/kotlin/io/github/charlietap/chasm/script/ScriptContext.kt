@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.script
 
-import io.github.charlietap.chasm.config.Config
+import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.embedding.exports
 import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.Instance
@@ -9,7 +9,7 @@ import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.sweet.lib.SemanticPhase
 
 data class ScriptContext(
-    val config: Config,
+    val moduleConfig: ModuleConfig,
     val binaryDirectory: String,
     val phaseSupport: SemanticPhase,
     val store: Store,

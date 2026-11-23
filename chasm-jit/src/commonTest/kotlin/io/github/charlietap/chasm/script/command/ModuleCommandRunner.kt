@@ -25,15 +25,15 @@ fun ModuleCommandRunner(
     val bytes = moduleFilePath.readBytesFromPath()
 
     val result = when (context.phaseSupport) {
-        SemanticPhase.DECODING -> return BinaryDecoder(bytes, context.config.moduleConfig).fold(
+        SemanticPhase.DECODING -> return BinaryDecoder(bytes, context.moduleConfig).fold(
             { CommandResult.Success },
         ) { CommandResult.Failure(command, "Failed to decode module: $it") }
 
-        SemanticPhase.VALIDATION -> BinaryValidator(bytes, context.config.moduleConfig)
+        SemanticPhase.VALIDATION -> BinaryValidator(bytes, context.moduleConfig)
 
-        SemanticPhase.EXECUTION -> runBlocking { module(bytes, context.config.moduleConfig, validate = true) }
+        SemanticPhase.EXECUTION -> runBlocking { module(bytes, context.moduleConfig, validate = true) }
             .flatMap { module ->
-                runBlocking { instance(context.store, module, context.imports, context.config.runtimeConfig) }
+                runBlocking { instance(context.store, module, context.imports) }
                     .map { instance ->
                         context.instances[null] = instance
                         command.name?.let {

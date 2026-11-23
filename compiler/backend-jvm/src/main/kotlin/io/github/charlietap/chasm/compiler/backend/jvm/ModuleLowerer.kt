@@ -91,7 +91,7 @@ internal inline fun ModuleLowerer(
     crossinline moduleClassLowerer: ModuleClassLowerer,
 ): JvmModule = try {
     val lowering = ModuleLowering(module, code, options)
-    val packagePath = lowering.packagePath
+    val entryPath = lowering.entryPath
     val reasons = LinkedHashMap<Int, String>()
     val chunkStarts = HashMap<Int, IntArray>()
     var entries: MutableList<InstalledEntry> = ArrayList()
@@ -103,7 +103,7 @@ internal inline fun ModuleLowerer(
         var next = 0
         var weight = 0L
         lowering.batches.forEachIndexed { batch, batchFunctions ->
-            val owner = codeClassDescriptor(packagePath, batch)
+            val owner = codeClassDescriptor(entryPath, batch)
             val methods = ArrayList<MethodNode>()
             for (function in batchFunctions) {
                 while (
@@ -161,7 +161,7 @@ internal inline fun ModuleLowerer(
         entries = ArrayList()
         val entryClasses = groups.mapIndexed { number, group ->
             val first = group.first()
-            val entry = entriesClassDescriptor(packagePath, number)
+            val entry = entriesClassDescriptor(entryPath, number)
             group.forEachIndexed { id, function -> entries += InstalledEntry(function.index.index, entry, if (group.size == 1) -1 else id) }
             val type = lowering.declarations.functionType(first.index)
             val signature = checkNotNull(lowering.signature(type))
@@ -177,22 +177,22 @@ internal inline fun ModuleLowerer(
         pool?.shutdownNow()
     }
     bindingLowerer(lowering, output)
-    val dataResourcePath = dataResource(packagePath).takeIf { declarations.dataSegments.isNotEmpty() }
+    val dataResourcePath = dataResource(entryPath).takeIf { declarations.dataSegments.isNotEmpty() }
     val calls = if (dataResourcePath != null) {
         output.resource(dataResourcePath) { stream -> declarationCallGenerator(declarations, stream) }
     } else {
         declarationCallGenerator(declarations, OutputStream.nullOutputStream())
     }
-    val declarationClasses = declarationsLowerer(calls, packagePath, output)
+    val declarationClasses = declarationsLowerer(calls, entryPath, output)
     if (options.stacktraces) {
         val sites = code.functions.associate { function ->
             val index = function.index.index
             val sites = trapSites[index] ?: FunctionTrapSites(IntArray(0), IntArray(0))
             index to sites.withChunkStarts(chunkStarts[index] ?: IntArray(0))
         }
-        output.resource(trapSitesResource(packagePath)) { stream -> writeTrapSites(stream, sites) }
+        output.resource(trapSitesResource(entryPath)) { stream -> writeTrapSites(stream, sites) }
     }
-    val moduleDescriptor = moduleClassDescriptor(packagePath)
+    val moduleDescriptor = moduleClassDescriptor(entryPath)
     moduleClassLowerer(lowering, moduleDescriptor, declarationClasses, dataResourcePath, entries, output)
     JvmModule(internalName(moduleDescriptor).replace('/', '.'), dataResourcePath)
 } catch (tooLarge: ClassTooLargeException) {
