@@ -51,6 +51,7 @@ class DeclarationsBuilder {
     private var strings: Array<String>? = null
 
     private val groups = ArrayList<RecursiveType>()
+    private val groupKeys = ArrayList<String?>()
     private val definedTypes = ArrayList<DefinedType>()
 
     private val imports = ArrayList<Import>()
@@ -108,6 +109,7 @@ class DeclarationsBuilder {
     ) {
         val group = RecursiveType(emptyList(), RecursiveType.State.CLOSED)
         groups += group
+        groupKeys += null
         repeat(members) { member ->
             definedTypes += DefinedType(group, member, definedTypes.size)
         }
@@ -120,6 +122,14 @@ class DeclarationsBuilder {
         val group = groups[index]
         check(group.subTypes.isEmpty()) { "group $index already has its body" }
         group.subTypes = popList(members)
+    }
+
+    fun groupKey(
+        index: Int,
+        key: String,
+    ) {
+        check(groupKeys[index] == null) { "group $index already has its key" }
+        groupKeys[index] = key
     }
 
     fun abstractHeapType(
@@ -535,6 +545,11 @@ class DeclarationsBuilder {
                 trapNames = Array(trapNameStrings.size) { position -> string(trapNameStrings[position]) },
             )
         }
+        val rttKeys = if (groupKeys.all { key -> key != null }) {
+            groups.flatMapIndexed { index, group -> List(group.subTypes.size) { member -> "${groupKeys[index]}_$member" } }
+        } else {
+            emptyList()
+        }
         return ModuleDeclarations(
             definedTypes = definedTypes,
             imports = imports,
@@ -549,6 +564,7 @@ class DeclarationsBuilder {
             dataSegments = dataSegments,
             names = names,
             dataSource = dataSource,
+            rttKeys = rttKeys,
         )
     }
 

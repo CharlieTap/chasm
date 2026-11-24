@@ -10,6 +10,9 @@ import io.github.charlietap.chasm.compiler.backend.abi.MethodRef
 import io.github.charlietap.chasm.compiler.backend.abi.Resource
 import io.github.charlietap.chasm.compiler.backend.analysis.ModuleAnalysis
 import io.github.charlietap.chasm.compiler.backend.analysis.ModuleIndexSpaces
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.ReferenceTests
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.ShapeLayouts
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.ShapeSizes
 import io.github.charlietap.chasm.compiler.backend.dex.abi.DexReferences
 import io.github.charlietap.chasm.compiler.backend.dex.abi.FunctionSignature
 import io.github.charlietap.chasm.compiler.backend.dex.abi.Invocation
@@ -18,7 +21,6 @@ import io.github.charlietap.chasm.compiler.backend.dex.abi.typedCall
 import io.github.charlietap.chasm.compiler.backend.dex.analysis.CostFamilies
 import io.github.charlietap.chasm.compiler.backend.dex.binding.BatchConstants
 import io.github.charlietap.chasm.compiler.backend.dex.binding.BindingLayout
-import io.github.charlietap.chasm.compiler.backend.dex.gc.GcLayouts
 import io.github.charlietap.dexter.ClassBuilder
 import io.github.charlietap.dexter.ClassType
 import io.github.charlietap.dexter.DexFile
@@ -41,7 +43,9 @@ internal class ModuleLowering(
     val layout: BindingLayout get() = plan.layout
     val packagePath: String get() = plan.packagePath
     val referenceDescriptor: String get() = plan.referenceDescriptor
-    val gc: GcLayouts get() = plan.gc
+    val gc: ShapeLayouts get() = plan.gc
+    val shapeSizes: ShapeSizes get() = plan.shapeSizes
+    val referenceTests: ReferenceTests get() = plan.referenceTests
     val inlineMemory: MemoryIndex? get() = plan.inlineMemory
     val batches: List<List<CirFunction>> get() = plan.batches
 

@@ -12,6 +12,9 @@ import io.github.charlietap.chasm.compiler.backend.analysis.ModuleAnalysis
 import io.github.charlietap.chasm.compiler.backend.analysis.ModuleIndexSpaces
 import io.github.charlietap.chasm.compiler.backend.analysis.analyzeModule
 import io.github.charlietap.chasm.compiler.backend.analysis.functionBatches
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.ReferenceTests
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.ShapeLayouts
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.ShapeSizes
 import io.github.charlietap.chasm.compiler.backend.dex.abi.BATCH_FUNCTIONS
 import io.github.charlietap.chasm.compiler.backend.dex.abi.BATCH_INSTRUCTIONS
 import io.github.charlietap.chasm.compiler.backend.dex.abi.DexReferences
@@ -21,18 +24,21 @@ import io.github.charlietap.chasm.compiler.backend.dex.abi.codeClass
 import io.github.charlietap.chasm.compiler.backend.dex.abi.functionMethod
 import io.github.charlietap.chasm.compiler.backend.dex.abi.signatureClass
 import io.github.charlietap.chasm.compiler.backend.dex.binding.BindingLayout
-import io.github.charlietap.chasm.compiler.backend.dex.gc.GcLayouts
+import io.github.charlietap.chasm.compiler.backend.dex.gc.StructuralShapeNames
+import io.github.charlietap.chasm.runtime.execution.ARRAY_OVERHEAD
 
 internal class ModulePlan(
     val module: Module,
     code: CirModule,
     val options: DexOptions,
     val declarations: ModuleIndexSpaces = ModuleIndexSpaces(module),
-    val analysis: ModuleAnalysis = analyzeModule(module, code, declarations, OBJECT_TYPE),
+    val analysis: ModuleAnalysis = analyzeModule(code, declarations, OBJECT_TYPE),
 ) {
 
     val referenceDescriptor = OBJECT_TYPE
-    val gc = GcLayouts(module.definedTypes)
+    val gc = ShapeLayouts(module.definedTypes, StructuralShapeNames())
+    val shapeSizes = ShapeSizes(ARRAY_OVERHEAD)
+    val referenceTests = ReferenceTests(module.definedTypes)
 
     val layout = BindingLayout(declarations, analysis)
     val packagePath = options.packageName.replace('.', '/')

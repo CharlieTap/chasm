@@ -19,3 +19,7 @@ fun numberFieldError(index: Int): IllegalArgumentException {
 fun ownerCollectedError(): IllegalStateException {
     return IllegalStateException("the store of this reference is no longer alive")
 }
+
+fun laneError(lane: Int): IndexOutOfBoundsException {
+    return IndexOutOfBoundsException("lane $lane does not exist")
+}

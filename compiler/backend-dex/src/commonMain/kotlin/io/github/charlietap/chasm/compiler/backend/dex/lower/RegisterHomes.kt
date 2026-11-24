@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.compiler.backend.dex.lower
 
-import io.github.charlietap.chasm.compiler.backend.dex.analysis.SlotKindFlow
+import io.github.charlietap.chasm.compiler.backend.analysis.SlotKindFlow
 
 internal class RegisterHomes(
     val flow: SlotKindFlow,

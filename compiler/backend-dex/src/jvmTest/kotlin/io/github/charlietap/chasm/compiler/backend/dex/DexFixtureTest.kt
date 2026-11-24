@@ -1,8 +1,8 @@
 package io.github.charlietap.chasm.compiler.backend.dex
 
-import io.github.charlietap.chasm.compiler.backend.dex.gc.GcLayouts
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.ShapeLayouts
 import io.github.charlietap.chasm.compiler.backend.dex.gc.ShapeAccessorDex
-import io.github.charlietap.chasm.compiler.backend.dex.gc.ShapeField
+import io.github.charlietap.chasm.compiler.backend.dex.gc.StructuralShapeNames
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
@@ -41,9 +41,9 @@ class DexFixtureTest {
     @Test
     fun `struct accessors fixture generates shape accessors`() {
 
-        val layouts = GcLayouts(decodeModule(fixture("struct_accessors")).definedTypes)
+        val layouts = ShapeLayouts(decodeModule(fixture("struct_accessors")).definedTypes, StructuralShapeNames())
         val writer = ShapeAccessorDex()
-        val structs = layouts.structs.map { shape -> writer.struct(shape.className, shape.fields.map { field -> ShapeField(field.owner, field.name, field.descriptor) }) }
+        val structs = layouts.structs.map { shape -> writer.struct(shape.className, shape.fields) }
         val arrays = layouts.arrays.map { shape -> writer.array(shape.className, shape.data.descriptor) }
 
         assertGolden("struct_accessors_shapes.smali", renderSmali(structs + arrays))

@@ -4,6 +4,7 @@ package io.github.charlietap.chasm.compiler.backend.jvm.abi
 
 import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.compiler.backend.abi.MethodRef
+import io.github.charlietap.chasm.compiler.backend.abi.OBJECT_TYPE
 import io.github.charlietap.chasm.compiler.backend.abi.returnDescriptor
 import io.github.charlietap.chasm.compiler.backend.abi.staticParameters
 import io.github.charlietap.chasm.compiler.backend.jvm.DATA_EXTENSION
@@ -52,6 +53,19 @@ internal fun installClassDescriptor(
     chunk: Int,
 ) = "L$entryPath\$Install$chunk;"
 
+internal fun structsClassDescriptor(
+    entryPath: String,
+    group: Int,
+): String {
+    return "L$entryPath\$Structs$group;"
+}
+
+internal fun constantsClassDescriptor(entryPath: String): String {
+    return "L$entryPath\$Constants;"
+}
+
+internal const val INITIALIZE_CONSTANTS = "initialize"
+
 internal fun functionName(
     index: Int,
 ) = "$FUNCTION_METHOD_PREFIX$index"
@@ -62,7 +76,7 @@ internal fun functionMethod(
     index: Int,
     type: FunctionType,
 ) =
-    MethodRef(owner, functionName(index), staticParameters(type, binding), returnDescriptor(type))
+    MethodRef(owner, functionName(index), staticParameters(type, binding, OBJECT_TYPE), returnDescriptor(type, OBJECT_TYPE))
 
 internal const val TYPED_CALL = "typed"
 

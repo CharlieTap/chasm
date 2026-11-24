@@ -11,8 +11,10 @@ import io.github.charlietap.chasm.compiler.backend.abi.internalName
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.BUILD_DECLARATIONS
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.CLASS_FILE_VERSION
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.COMPILED_MODULE
+import io.github.charlietap.chasm.compiler.backend.jvm.abi.COMPILED_MODULE_STRUCTS
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.DATA_SOURCE
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.DATA_SOURCE_TYPE
+import io.github.charlietap.chasm.compiler.backend.jvm.abi.INITIALIZE_CONSTANTS
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.INSTALLS_PER_METHOD
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.MAX_FANOUT
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.META_FUEL
@@ -26,6 +28,7 @@ import io.github.charlietap.chasm.compiler.backend.jvm.abi.META_TRAP_ON_GROWTH_F
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.MODULE_DECLARATIONS
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.RESOURCE_ROOT
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.RUNTIME_ABI
+import io.github.charlietap.chasm.compiler.backend.jvm.abi.constantsClassDescriptor
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.installClassDescriptor
 import io.github.charlietap.chasm.compiler.backend.jvm.declarations.DECLARATIONS_BUILDER
 import io.github.charlietap.chasm.compiler.backend.jvm.declarations.DECLARE
@@ -37,7 +40,7 @@ import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Type
 
-internal typealias ModuleClassLowerer = (ModuleLowering, String, List<String>, String?, List<InstalledEntry>, JvmOutput) -> Unit
+internal typealias ModuleClassLowerer = (ModuleLowering, String, List<String>, String?, List<InstalledEntry>, ModuleStructsLowerer, JvmOutput) -> Unit
 
 internal class InstalledEntry(
     val function: Int,
@@ -51,6 +54,7 @@ internal fun ModuleClassLowerer(
     declarationClasses: List<String>,
     dataResourcePath: String?,
     entries: List<InstalledEntry>,
+    structsLowerer: ModuleStructsLowerer,
     output: JvmOutput,
 ) {
     val writer = supportClassWriter()
@@ -62,7 +66,7 @@ internal fun ModuleClassLowerer(
         owner,
         null,
         ModuleLowering.OBJECT,
-        arrayOf(internalName(COMPILED_MODULE)),
+        arrayOf(internalName(COMPILED_MODULE), internalName(COMPILED_MODULE_STRUCTS)),
     )
     writer.visitField(Opcodes.ACC_PUBLIC or Opcodes.ACC_STATIC or Opcodes.ACC_FINAL, COMPILED_FIELD, moduleDescriptor, null, null).visitEnd()
 
@@ -121,6 +125,8 @@ internal fun ModuleClassLowerer(
 
     writeSettings(writer, module.options)
 
+    structsLowerer(module, writer, output)
+
     val chunks = entries.chunked(INSTALLS_PER_METHOD)
     val chunkClasses = chunks.indices.map { chunk -> installClassDescriptor(module.entryPath, chunk) }
     val chunkDescriptor = "($CODE_INSTALLATION$binding)V"
@@ -144,6 +150,11 @@ internal fun ModuleClassLowerer(
             visitVarInsn(Opcodes.ALOAD, 1)
             visitVarInsn(Opcodes.ALOAD, 2)
             visitMethodInsn(Opcodes.INVOKESTATIC, installer, INSTALL_CHUNK, chunkDescriptor, false)
+        }
+        if (module.constants.needed) {
+            visitVarInsn(Opcodes.ALOAD, 1)
+            visitVarInsn(Opcodes.ALOAD, 2)
+            visitMethodInsn(Opcodes.INVOKESTATIC, internalName(constantsClassDescriptor(module.entryPath)), INITIALIZE_CONSTANTS, chunkDescriptor, false)
         }
         visitInsn(Opcodes.RETURN)
         visitMaxs(0, 0)

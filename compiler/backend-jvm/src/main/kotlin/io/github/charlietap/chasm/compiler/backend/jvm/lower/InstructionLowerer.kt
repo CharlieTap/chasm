@@ -11,7 +11,6 @@ import io.github.charlietap.chasm.cir.ReferenceInstruction
 import io.github.charlietap.chasm.cir.TableInstruction
 import io.github.charlietap.chasm.cir.VariableInstruction
 import io.github.charlietap.chasm.compiler.backend.abi.UNREACHABLE
-import io.github.charlietap.chasm.compiler.backend.analysis.form.helperCall
 
 internal fun lowerInstruction(
     instruction: Instruction,
@@ -24,7 +23,7 @@ internal fun lowerInstruction(
         is ControlInstruction -> lowerControlInstruction(instruction, context)
         is AdminInstruction -> lowerAdminInstruction(instruction, context)
         is MemoryInstruction -> lowerMemoryInstruction(instruction, context)
-        is TableInstruction -> context.lowerHelperCall(instruction.helperCall() ?: unsupported(instruction))
+        is TableInstruction -> lowerTableInstruction(instruction, context)
         is ReferenceInstruction -> lowerReferenceInstruction(instruction, context)
         is AggregateInstruction -> lowerAggregateInstruction(instruction, context)
     }
@@ -50,23 +49,23 @@ internal fun LowerContext.lowerFunctionBody(
 }
 
 internal fun LowerContext.lowerPositions(positions: IntRange) {
-
     for (position in positions) {
+
         enterInstruction(position)
         val label = placement(position)
         emit.place(label)
         markSite(position, label)
-        lowerInstruction(function.instructions[position], this)
-    }
 
-    roots.enterColdCode()
+        if (slotKindFlow.reached(position)) {
+            lowerInstruction(function.instructions[position], this)
+        } else if (slotKindFlow.leader(position) || position == positions.first) {
+            trapUnreachable()
+        }
+    }
 }
 
 internal fun LowerContext.lowerOutOfLine() {
-    outOfLine.forEach { path ->
-        roots.enterColdCode()
-        path()
-    }
+    outOfLine.forEach { path -> path() }
 }
 
 private fun LowerContext.trapUnreachable() = trap(UNREACHABLE)

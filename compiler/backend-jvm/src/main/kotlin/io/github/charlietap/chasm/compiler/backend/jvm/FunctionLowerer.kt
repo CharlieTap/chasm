@@ -4,13 +4,12 @@ import io.github.charlietap.chasm.cir.CirFunction
 import io.github.charlietap.chasm.compiler.backend.abi.MethodRef
 import io.github.charlietap.chasm.compiler.backend.abi.Resource
 import io.github.charlietap.chasm.compiler.backend.analysis.NarrowHomeMismatch
-import io.github.charlietap.chasm.compiler.backend.analysis.References
 import io.github.charlietap.chasm.compiler.backend.analysis.SlotKinds
-import io.github.charlietap.chasm.compiler.backend.analysis.analyzeReferences
 import io.github.charlietap.chasm.compiler.backend.analysis.analyzeSlotKinds
 import io.github.charlietap.chasm.compiler.backend.analysis.cheapestCut
 import io.github.charlietap.chasm.compiler.backend.analysis.form.InstructionForms
 import io.github.charlietap.chasm.compiler.backend.analysis.frameFacts
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.UnsupportedShape
 import io.github.charlietap.chasm.compiler.backend.analysis.instructionTable
 import io.github.charlietap.chasm.compiler.backend.analysis.jumpTargets
 import io.github.charlietap.chasm.compiler.backend.analysis.loopCrossings
@@ -82,6 +81,8 @@ internal fun FunctionLowerer(
         FunctionResult.Lowered(methods, lowering.resources)
     } catch (unsupported: Unsupported) {
         FunctionResult.Rejected(unsupported.message ?: "unsupported")
+    } catch (unsupported: UnsupportedShape) {
+        FunctionResult.Rejected(unsupported.message ?: "unsupported")
     }
 }
 
@@ -96,13 +97,9 @@ private class FunctionLowering(
 
     private val parameterCount = frame.type.params.types.size
 
-    private val table by lazy(LazyThreadSafetyMode.NONE) { instructionTable(forms) }
+    private val table = instructionTable(forms, objectReferences = true)
 
-    private val references = if (module.analysis.publishesRegisters) {
-        analyzeReferences(table, function, frame.type, frame.frameSlots, module.analysis)
-    } else {
-        References.none(frame.frameSlots)
-    }
+    private val slotKindFlow = module.slotKindAnalyzer.analyze(function, table, frame, BooleanArray(frame.frameSlots) { true })
 
     private val methodSize = module.options.methodSize
 
@@ -116,7 +113,7 @@ private class FunctionLowering(
         function.redundantBoundsChecks(table)
     }
 
-    private val facts = FunctionFacts(module, function, frame, references, checkedAccesses)
+    private val facts = FunctionFacts(module, function, frame, slotKindFlow, checkedAccesses)
 
     private fun inlineMemory(
         positions: IntRange,
@@ -139,7 +136,6 @@ private class FunctionLowering(
                 frameSlots = frame.frameSlots,
                 localTypes = frame.localTypes,
                 initialValues = frame.initialValues,
-                references = references,
             )
         } else {
             SlotKinds.wide(frame.frameSlots)
@@ -161,7 +157,7 @@ private class FunctionLowering(
     private fun whole(
         slotKinds: SlotKinds,
     ): Whole? {
-        val locals = Locals(module.bindingType, method.parameters.drop(3), slotKinds, frame.frameSlots, inlineMemory = inlineMemory)
+        val locals = Locals(module.bindingType, method.parameters.drop(3), slotKinds, slotKindFlow, frame.frameSlots, inlineMemory = inlineMemory)
         if (locals.size > MAX_LOCALS) return null
         val node = methodNode(method.name, method.descriptor)
         val context = LowerContext(facts, slotKinds, locals, Emitter(node, locals.frameTypes))
@@ -253,7 +249,7 @@ private class FunctionLowering(
             ChunkMethod(range.first, range.last + 1, chunk.node.name, owners[index] ?: method.owner, chunk.entries.size)
         }
         val dynamic = chunks.flatMap { (_, chunk) -> chunk.dynamicExits.asList() }.distinct().associateWith { position -> continuationIds[position] }
-        val locals = Locals(module.bindingType, method.parameters.drop(3), slotKinds, frame.frameSlots, slots = IntArray(0))
+        val locals = Locals(module.bindingType, method.parameters.drop(3), slotKinds, slotKindFlow, frame.frameSlots, slots = IntArray(0))
         val dispatcher = methodNode(method.name, method.descriptor)
         val slotFrameCost = (frame.frameSlots * 8 + 31) / 32
         val context = LowerContext(facts, slotKinds, locals, Emitter(dispatcher, locals.frameTypes))
@@ -318,7 +314,7 @@ private class FunctionLowering(
         val used = recorded.used
         val exits = recorded.exits
         val slots = used.indices.filter { used[it] }.toIntArray()
-        val locals = Locals(module.bindingType, CHUNK_ARGUMENTS, slotKinds, frame.frameSlots, slots = slots, inlineMemory = inlineMemory)
+        val locals = Locals(module.bindingType, CHUNK_ARGUMENTS, slotKinds, slotKindFlow, frame.frameSlots, slots = slots, inlineMemory = inlineMemory)
         if (locals.size > MAX_LOCALS) return ChunkAttempt(null, 0)
         val reloads = liveness?.let { live ->
             BooleanArray(frame.frameSlots) { slot -> used[slot] && entries.any { entry -> live.isLive(entry, slot) } }
@@ -347,8 +343,7 @@ private class FunctionLowering(
     }
 
     private fun resetsSlots(liveness: SlotLiveness?): Boolean {
-        return liveness == null || module.analysis.mayCollect[function.index.index] ||
-            (parameterCount until frame.frameSlots).any { slot -> liveness.isLive(0, slot) }
+        return liveness == null || (parameterCount until frame.frameSlots).any { slot -> liveness.isLive(0, slot) }
     }
 
     private val recordings = HashMap<IntRange, Recording>()
@@ -362,7 +357,7 @@ private class FunctionLowering(
         resetsSlots: Boolean,
     ): Recording {
         val used = BooleanArray(frame.frameSlots)
-        val recording = Locals(module.bindingType, CHUNK_ARGUMENTS, slotKinds, frame.frameSlots, recording = used, inlineMemory = inlineMemory)
+        val recording = Locals(module.bindingType, CHUNK_ARGUMENTS, slotKinds, slotKindFlow, frame.frameSlots, recording = used, inlineMemory = inlineMemory)
         val node = methodNode("recording", "()V")
         val chunk = Chunk(range.first, range.last + 1, entries, resetsSlots = resetsSlots)
         LowerContext(facts, slotKinds, recording, Emitter(node, recording.frameTypes), chunk).lowerChunkBody()

@@ -13,6 +13,11 @@ public abstract interface class io/github/charlietap/chasm/aot/CompiledModule {
 	public abstract fun trapOnGrowthFailure ()Z
 }
 
+public abstract interface class io/github/charlietap/chasm/aot/CompiledModuleStructs {
+	public abstract fun newStruct (ILjava/lang/Object;)Ljava/lang/Object;
+	public abstract fun structLanes ()[J
+}
+
 public final class io/github/charlietap/chasm/aot/internal/CompiledRuntimeAbiKt {
 	public static final field COMPILED_RUNTIME_ABI I
 	public static final field UNSET_LONG J

@@ -16,7 +16,7 @@ import io.github.charlietap.chasm.compiler.backend.abi.UNWINDING_FIELD
 import io.github.charlietap.chasm.compiler.backend.abi.WASM_EXCEPTION_REFERENCES
 import io.github.charlietap.chasm.compiler.backend.abi.WASM_EXCEPTION_TYPE
 import io.github.charlietap.chasm.compiler.backend.abi.WASM_EXCEPTION_WORDS
-import io.github.charlietap.chasm.compiler.backend.dex.analysis.SlotKindFlow
+import io.github.charlietap.chasm.compiler.backend.analysis.SlotKindFlow
 import io.github.charlietap.chasm.type.ValueType
 import io.github.charlietap.dexter.ArrayKind
 import io.github.charlietap.dexter.Cond

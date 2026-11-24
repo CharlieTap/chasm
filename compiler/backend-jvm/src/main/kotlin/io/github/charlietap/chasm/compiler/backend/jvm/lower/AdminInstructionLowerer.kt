@@ -3,7 +3,6 @@ package io.github.charlietap.chasm.compiler.backend.jvm.lower
 import io.github.charlietap.chasm.cir.AdminInstruction
 import io.github.charlietap.chasm.cir.InstructionIndex
 import io.github.charlietap.chasm.cir.ReferenceType
-import io.github.charlietap.chasm.compiler.backend.abi.CAST_MATCHES
 import io.github.charlietap.chasm.compiler.backend.abi.FUEL_AND_INTERRUPT_CHECK
 import io.github.charlietap.chasm.compiler.backend.abi.FUEL_CHECK
 import io.github.charlietap.chasm.compiler.backend.abi.INTERRUPT_CHECK
@@ -165,11 +164,15 @@ private fun LowerContext.castBranch(
     matches: Boolean,
     target: InstructionIndex,
 ) {
-    pushContext()
-    pushLong(reference)
-    pushResource(Resource.TypeTest(type))
-    emit.invokeStatic(CAST_MATCHES)
-    emit.jump(if (matches) Opcodes.IFNE else Opcodes.IFEQ, label(target))
+
+    if (matches) {
+        return branchOnType(reference, type, label(target))
+    }
+
+    val matched = emit.label()
+    branchOnType(reference, type, matched)
+    emit.jump(Opcodes.GOTO, label(target))
+    emit.place(matched)
 }
 
 internal fun LowerContext.branchTo(

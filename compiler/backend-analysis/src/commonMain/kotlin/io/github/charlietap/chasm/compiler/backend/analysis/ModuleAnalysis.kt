@@ -1,7 +1,5 @@
 package io.github.charlietap.chasm.compiler.backend.analysis
 
-import io.github.charlietap.chasm.ast.module.Import
-import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.cir.CirFunction
 import io.github.charlietap.chasm.cir.CirModule
 import io.github.charlietap.chasm.cir.ControlInstruction
@@ -10,7 +8,6 @@ import io.github.charlietap.chasm.cir.TypeIndex
 import io.github.charlietap.chasm.compiler.backend.abi.MAX_PARAMETERS
 import io.github.charlietap.chasm.compiler.backend.abi.signatureKey
 import io.github.charlietap.chasm.type.AbstractHeapType
-import io.github.charlietap.chasm.type.CompositeType
 import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.chasm.type.ReferenceType
 import io.github.charlietap.chasm.type.ValueType
@@ -20,10 +17,8 @@ class ModuleAnalysis(
     val hasTailCalls: Boolean,
     val usesExceptions: Boolean,
     val mayGrowMemory: BooleanArray,
-    val mayCollect: BooleanArray,
     val mayUnwind: BooleanArray,
     val requestsTailCall: BooleanArray,
-    val publishesRegisters: Boolean,
     val bridgedFunctions: FunctionCensus,
     val referencedFunctions: FunctionCensus,
 )
@@ -54,16 +49,14 @@ class FunctionCensus(
 }
 
 fun analyzeModule(
-    module: Module,
     code: CirModule,
     declarations: ModuleIndexSpaces,
     referenceDescriptor: String = "J",
 ): ModuleAnalysis {
-    return analyzeModule(module, code, declarations, code.functions.map { function -> functionSummary(function, declarations) }, referenceDescriptor)
+    return analyzeModule(code, declarations, code.functions.map { function -> functionSummary(function, declarations) }, referenceDescriptor)
 }
 
 fun analyzeModule(
-    module: Module,
     code: CirModule,
     declarations: ModuleIndexSpaces,
     summaries: List<FunctionSummary>,
@@ -93,10 +86,8 @@ fun analyzeModule(
         hasTailCalls = effects.requestsTailCall.any { requests -> requests },
         usesExceptions = summaries.any(FunctionSummary::usesExceptions),
         mayGrowMemory = effects.mayGrowMemory,
-        mayCollect = effects.mayCollect,
         mayUnwind = effects.mayUnwind,
         requestsTailCall = effects.requestsTailCall,
-        publishesRegisters = module.mayHoldCollectableReferences() || summaries.any(FunctionSummary::catchesExceptionReference),
         bridgedFunctions = FunctionCensus(bridged),
         referencedFunctions = FunctionCensus(referenced),
     )
@@ -115,6 +106,12 @@ fun Instruction.isTailCall(): Boolean = this is ControlInstruction.ReturnCall ||
     this is ControlInstruction.ReturnCallIndirectI || this is ControlInstruction.ReturnCallIndirectS ||
     this is ControlInstruction.ReturnCallRefS
 
+/** Whether [this] is a tail call by [function] to itself outside any try region, [region], which lowers to a jump. */
+fun Instruction.isSelfTailCall(
+    function: CirFunction,
+    region: Int,
+): Boolean = this is ControlInstruction.ReturnCall && this.function == function.index && region < 0
+
 internal fun Instruction.isCall(): Boolean {
     return isTailCall() || this is ControlInstruction.Call ||
         this is ControlInstruction.CallIndirectI || this is ControlInstruction.CallIndirectS ||
@@ -126,18 +123,6 @@ fun CirFunction.isLeaf(): Boolean {
 }
 
 fun Instruction.raisesException(): Boolean = this is ControlInstruction.Throw || this is ControlInstruction.ThrowRefS
-
-fun Module.mayHoldCollectableReferences(): Boolean {
-    val compositeTypes = definedTypes.map { type -> type.asSubType.compositeType }
-    if (compositeTypes.any { it !is CompositeType.Function }) return true
-    val signatures = compositeTypes.filterIsInstance<CompositeType.Function>().flatMap { function ->
-        function.functionType.params.types + function.functionType.results.types
-    }
-    val locals = functions.flatMap { function -> function.locals.map { it.type } }
-    val globals = globals.map { it.type.valueType } + imports.mapNotNull { (it.descriptor as? Import.Descriptor.Global)?.type?.valueType }
-    val tables = tables.map { it.type.referenceType } + imports.mapNotNull { (it.descriptor as? Import.Descriptor.Table)?.type?.referenceType }
-    return (signatures + locals + globals).any(::collectable) || tables.any(::collectable) || tags.isNotEmpty()
-}
 
 fun collectable(
     type: ValueType,

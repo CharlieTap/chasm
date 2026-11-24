@@ -1,0 +1,24 @@
+0 S_I_IR 24 open i0 r0 i1
+1 S_I_RR 24 open i0 r0
+2 S_I_RR_II 32 open i0 r0 i1,i2
+3 S_I_RR_II 32 open i0 r0 i1,i2 r1
+4 S_I_II_IR 32 open i0 i1 i2,i3
+5 S_I_II_II_II_T1 48 open i0 i1 i2 i3 i4 i5 i6,i7
+6 S_I_II_II_II_T2 56 open i0 i1 i2 i3 i4 i5 i6 i7,i8
+7 S_I_II_II_II_X 192 final i0 i1 i2 i3 i4 i5 i6 i7 i8 i9 i10 i11 i12 i13 i14 i15 i16 i17 i18 i19 i20 i21 i22,xi0
+8 S_I_II_II_II_X 208 final i0 i1 i2 i3 i4 i5 i6 i7 i8 i9 i10 i11 i12 i13 i14 i15 i16 i17 i18 i19 i20 i21 i22 xi0 xr0
+9 S_I_II_II_II_X 216 final i0 i1 i2 i3 i4 i5 i6 i7 i8 i9 i10 i11 i12 i13 i14 i15 i16 i17 i18 i19 i20 i21 i22,xi0 xr0 xi1
+10 S_I 16 open
+11 S_I 16 open i0
+12 S_I_II_II 32 open i0 i1 i2 i3,i4
+13 S_I_RR 24 open r0 i0
+14 S_I_RR_II 32 open r0 i0 i1,i2
+15 S_R_RR_RR_RR_X 200 final r0 r1 r2 r3 r4 r5 r6 r7 r8 r9 r10 r11 r12 r13 r14 r15 r16 r17 r18 r19 r20 r21 r22 xr0 xr1
+16 I8Array 0
+17 I16Array 1
+18 I32Array 2
+19 I64Array 3
+20 F32Array 2
+21 F64Array 3
+22 RefArray 2
+23 unsupported

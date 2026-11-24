@@ -3,13 +3,15 @@ package io.github.charlietap.chasm.compiler.backend.jvm.lower
 import io.github.charlietap.chasm.cir.CirFunction
 import io.github.charlietap.chasm.cir.InstructionIndex
 import io.github.charlietap.chasm.compiler.backend.abi.MethodRef
+import io.github.charlietap.chasm.compiler.backend.abi.OBJECT_TYPE
 import io.github.charlietap.chasm.compiler.backend.abi.Resource
 import io.github.charlietap.chasm.compiler.backend.abi.returnDescriptor
 import io.github.charlietap.chasm.compiler.backend.abi.takesArgumentArray
+import io.github.charlietap.chasm.compiler.backend.abi.takesReferenceArray
 import io.github.charlietap.chasm.compiler.backend.abi.valueDescriptor
 import io.github.charlietap.chasm.compiler.backend.analysis.FrameFacts
 import io.github.charlietap.chasm.compiler.backend.analysis.ModuleIndexSpaces
-import io.github.charlietap.chasm.compiler.backend.analysis.References
+import io.github.charlietap.chasm.compiler.backend.analysis.SlotKindFlow
 import io.github.charlietap.chasm.compiler.backend.analysis.SlotKinds
 import io.github.charlietap.chasm.compiler.backend.analysis.innermostRegions
 import io.github.charlietap.chasm.compiler.backend.analysis.isLeaf
@@ -25,7 +27,7 @@ internal class FunctionFacts(
     val module: ModuleLowering,
     val function: CirFunction,
     val frame: FrameFacts,
-    val references: References,
+    val slotKindFlow: SlotKindFlow,
     val checkedAccesses: BooleanArray,
 ) {
     val innermostRegion = innermostRegions(function.exceptions?.regions.orEmpty(), function.instructions.size)
@@ -50,31 +52,29 @@ internal class LowerContext(
     val module: ModuleLowering get() = facts.module
     val function: CirFunction get() = facts.function
     val frame: FrameFacts get() = facts.frame
-    val references: References get() = facts.references
+    val slotKindFlow: SlotKindFlow get() = facts.slotKindFlow
     val checkedAccesses: BooleanArray get() = facts.checkedAccesses
     val declarations: ModuleIndexSpaces get() = module.declarations
     val type: FunctionType get() = frame.type
     val parameterCount = type.params.types.size
     val resultCount = type.results.types.size
-    val parameterDescriptors = type.params.types.map(::valueDescriptor)
+    val parameterDescriptors = type.params.types.map { parameter -> valueDescriptor(parameter, OBJECT_TYPE) }
 
     val argumentArray = takesArgumentArray(type)
 
-    val resultDescriptor = returnDescriptor(type)
+    val referenceArray = takesReferenceArray(type, OBJECT_TYPE)
 
-    val roots = RootFrame(references, locals, emit, chunk != null)
+    val resultDescriptor = returnDescriptor(type, OBJECT_TYPE)
 
     var position = SlotKinds.PROLOGUE
         private set
 
     fun enterPrologue() {
         position = SlotKinds.PROLOGUE
-        roots.enterPrologue()
     }
 
     fun enterInstruction(position: Int) {
         this.position = position
-        roots.enterInstruction(position)
     }
 
     private val firstPosition = chunk?.start ?: 0

@@ -17,7 +17,7 @@ internal fun LowerContext.lowerHelperCall(
             is HelperArgument.Encoded -> pushLong(argument.operand)
         }
     }
-    emit.invokeStatic(call.method)
+    emit.invokeStatic(checkNotNull(call.method) { "the helper form has no runtime call" })
     val destination = call.destination
     if (destination != null) storeLong(destination)
     if (call.growsMemory) refreshMemory()

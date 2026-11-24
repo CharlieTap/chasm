@@ -64,7 +64,20 @@ class GcCodegenTest {
             options = BindingOptions(
                 interfaceName = "AotStructViews",
                 packageName = PACKAGE_NAME,
-                config = CodegenConfig(runtime = CodegenRuntime.CHASM, executionTier = ExecutionTier.Aot("com.test.aot.WasmModule")),
+                config = AOT_CONFIG,
+            ),
+        )
+    }
+
+    @Test
+    fun `generates AOT struct views over inherited and spilled lanes`() {
+        assertModuleGenerates(
+            category = "gc",
+            module = "struct_storage",
+            options = BindingOptions(
+                interfaceName = "AotStructStorage",
+                packageName = PACKAGE_NAME,
+                config = AOT_CONFIG,
             ),
         )
     }
@@ -104,7 +117,22 @@ class GcCodegenTest {
     }
 
     @Test
-    fun `strings over GC arrays require the JIT`() {
+    fun `generates AOT strings over GC arrays`() {
+        assertModuleGenerates(
+            category = "gc",
+            module = "gc_strings",
+            options = BindingOptions(
+                interfaceName = "AotGcStrings",
+                packageName = PACKAGE_NAME,
+                config = AOT_CONFIG,
+                functions = gcStringFunctions(),
+                ignoredExports = setOf("nullable_result"),
+            ),
+        )
+    }
+
+    @Test
+    fun `strings over GC arrays require a managed tier`() {
 
         val info = moduleInfo(moduleBytes("gc_strings")).expect("gc_strings should decode")
         val config = codegenConfig(runtime = CodegenRuntime.CHASM)
@@ -260,6 +288,7 @@ class GcCodegenTest {
     private companion object {
         const val PACKAGE_NAME = "com.test"
         val JIT_CONFIG = CodegenConfig(runtime = CodegenRuntime.CHASM, executionTier = ExecutionTier.Jit())
+        val AOT_CONFIG = CodegenConfig(runtime = CodegenRuntime.CHASM, executionTier = ExecutionTier.Aot("com.test.aot.WasmModule"))
         val GC_STRING_EXPORTS = setOf("echo_utf16", "echo_utf8", "utf16_length", "nullable_utf16", "frozen", "nullable_result")
     }
 }

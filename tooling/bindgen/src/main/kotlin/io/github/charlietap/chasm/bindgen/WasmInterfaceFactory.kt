@@ -4,6 +4,7 @@ import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.NameAllocator
 import io.github.charlietap.chasm.bindgen.ext.asType
 import io.github.charlietap.chasm.bindgen.ext.asValue
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.RttKeys
 import io.github.charlietap.chasm.embedding.shapes.FunctionNameData
 import io.github.charlietap.chasm.embedding.shapes.ModuleInfo
 import io.github.charlietap.chasm.runtime.type.ExternalType
@@ -468,6 +469,11 @@ internal class WasmInterfaceFactory(
         val gcTypes = GcTypeResolver(
             interfaceClassName = ClassName(packageName, interfaceName),
             mapsReferences = config.runtime == CodegenRuntime.CHASM,
+            storagePlanner = if (config.executionTier is ExecutionTier.Aot) {
+                StoragePlansStructViewStoragePlanner(RttKeys(emptyList()))
+            } else {
+                null
+            },
         )
         val functions = mutableListOf<Function>()
         val properties = mutableListOf<Property>()

@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.bindgen
 
 import com.squareup.kotlinpoet.ClassName
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.Lane
 import io.github.charlietap.chasm.type.PackedType
 import io.github.charlietap.chasm.type.ValueType
 
@@ -31,7 +32,34 @@ internal data class StructViewField(
 internal data class StructView(
     val className: ClassName,
     val fields: List<StructViewField>,
+    val storage: StructViewStorage? = null,
 )
+
+internal data class StructViewStorage(
+    val storageClass: ClassName,
+    val check: RttCheck,
+    val fieldLanes: List<FieldLanes>,
+)
+
+internal data class RttCheck(
+    val key: String,
+    val depth: Int,
+    val final: Boolean,
+)
+
+internal sealed interface FieldLanes
+
+internal data class NumberLanes(
+    val lanes: List<Lane>,
+    val packedType: PackedType?,
+) : FieldLanes
+
+internal data class DefinedReferenceLane(
+    val lane: Lane,
+    val check: RttCheck,
+) : FieldLanes
+
+internal data class AbstractReferenceLane(val lane: Lane) : FieldLanes
 
 internal sealed interface ParameterStringEncoding
 

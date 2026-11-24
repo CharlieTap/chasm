@@ -15,13 +15,13 @@ import io.github.charlietap.chasm.compiler.backend.abi.UNSAFE_GET_LONG
 import io.github.charlietap.chasm.compiler.backend.abi.UNSAFE_PUT_INT
 import io.github.charlietap.chasm.compiler.backend.abi.UNSAFE_PUT_LONG
 import io.github.charlietap.chasm.compiler.backend.abi.memoryAccess
+import io.github.charlietap.chasm.compiler.backend.analysis.SlotKindFlow
 import io.github.charlietap.chasm.compiler.backend.analysis.form.BulkMemory
 import io.github.charlietap.chasm.compiler.backend.analysis.form.MemoryAccess
 import io.github.charlietap.chasm.compiler.backend.analysis.form.MemoryOperation
 import io.github.charlietap.chasm.compiler.backend.analysis.form.Operand
 import io.github.charlietap.chasm.compiler.backend.analysis.form.bulk
 import io.github.charlietap.chasm.compiler.backend.analysis.form.slot
-import io.github.charlietap.chasm.compiler.backend.dex.analysis.SlotKindFlow
 import io.github.charlietap.chasm.type.NumberType
 import io.github.charlietap.dexter.ArrayKind
 import io.github.charlietap.dexter.BinaryOp

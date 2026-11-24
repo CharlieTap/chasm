@@ -27,6 +27,9 @@ import io.github.charlietap.chasm.compiler.backend.abi.REFERENCE_GLOBAL_VALUE
 import io.github.charlietap.chasm.compiler.backend.abi.REFERENCE_SEGMENT
 import io.github.charlietap.chasm.compiler.backend.abi.REFERENCE_STORAGE_ELEMENTS
 import io.github.charlietap.chasm.compiler.backend.abi.REFERENCE_TABLE
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.ArrayShape
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.ConstantExpressions
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.ShapeLayouts
 import io.github.charlietap.chasm.compiler.backend.dex.abi.method
 import io.github.charlietap.chasm.compiler.backend.dex.abi.referenceType
 import io.github.charlietap.chasm.compiler.backend.dex.abi.valueType
@@ -51,15 +54,12 @@ import io.github.charlietap.dexter.Reg
 
 internal class ConstantsWriter(
     private val module: Module,
-    private val layouts: GcLayouts,
+    private val layouts: ShapeLayouts,
+    private val expressions: ConstantExpressions,
 ) {
     private val importedGlobals = module.imports.mapNotNull { import -> (import.descriptor as? Import.Descriptor.Global)?.type }
     private val importedTables = module.imports.count { import -> import.descriptor is Import.Descriptor.Table }
     private val globalTypes = importedGlobals.map { type -> type.valueType } + module.globals.map { global -> global.type.valueType }
-
-    val needed: Boolean = module.globals.any { global -> global.type.valueType is ValueType.Reference && needsCode(global.initExpression) } ||
-        module.tables.any { table -> needsCode(table.initExpression) } ||
-        module.elementSegments.any { segment -> segment.initExpressions.any(::needsCode) }
 
     fun write(
         file: DexFile,
@@ -70,20 +70,14 @@ internal class ConstantsWriter(
         val builder = file.addClass(type, DexType.Object, CONSUMER, access = ClassAccess.PublicFinal)
         val initializers = ArrayList<DexMethod>()
 
-        module.globals.forEachIndexed { defined, global ->
-            if (global.type.valueType is ValueType.Reference && needsCode(global.initExpression)) {
-                initializers += globalInitializer(builder, type, importedGlobals.size + defined, global.initExpression)
-            }
+        expressions.globals.forEach { defined ->
+            initializers += globalInitializer(builder, type, importedGlobals.size + defined, module.globals[defined].initExpression)
         }
-        module.tables.forEachIndexed { defined, table ->
-            if (needsCode(table.initExpression)) {
-                initializers += tableInitializer(builder, type, importedTables + defined, table.initExpression)
-            }
+        expressions.tables.forEach { defined ->
+            initializers += tableInitializer(builder, type, importedTables + defined, module.tables[defined].initExpression)
         }
-        module.elementSegments.forEachIndexed { index, segment ->
-            if (segment.initExpressions.any(::needsCode)) {
-                initializers += elementInitializer(builder, type, index, segment.initExpressions)
-            }
+        expressions.elements.forEach { index ->
+            initializers += elementInitializer(builder, type, index, module.elementSegments[index].initExpressions)
         }
 
         builder.beginConstructor(DexConstructor(type), registerCount = 1).apply {
@@ -193,22 +187,6 @@ internal class ConstantsWriter(
         code.finish()
 
         return method
-    }
-
-    private fun needsCode(expression: Expression): Boolean {
-        return expression.instructions.any { instruction ->
-            when (instruction) {
-                is AggregateInstruction.StructNew,
-                is AggregateInstruction.StructNewDefault,
-                is AggregateInstruction.ArrayNew,
-                is AggregateInstruction.ArrayNewDefault,
-                is AggregateInstruction.ArrayNewFixed,
-                AggregateInstruction.RefI31,
-                -> true
-                is VariableInstruction.GlobalGet -> globalTypes[instruction.globalIdx.idx.toInt()] is ValueType.Reference
-                else -> false
-            }
-        }
     }
 
     private fun registersFor(expression: Expression): Int {

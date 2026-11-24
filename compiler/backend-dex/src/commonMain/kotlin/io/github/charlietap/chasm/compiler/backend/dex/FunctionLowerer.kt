@@ -3,6 +3,10 @@ package io.github.charlietap.chasm.compiler.backend.dex
 import io.github.charlietap.chasm.cir.CirFunction
 import io.github.charlietap.chasm.compiler.backend.abi.CONTEXT_TYPE
 import io.github.charlietap.chasm.compiler.backend.abi.MethodRef
+import io.github.charlietap.chasm.compiler.backend.analysis.DataflowSlotKindAnalyzer
+import io.github.charlietap.chasm.compiler.backend.analysis.SlotKindAnalyzer
+import io.github.charlietap.chasm.compiler.backend.analysis.SlotKindFlow
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.UnsupportedShape
 import io.github.charlietap.chasm.compiler.backend.dex.abi.ART_MAX_COMPILED_REGISTERS
 import io.github.charlietap.chasm.compiler.backend.dex.abi.BINDING_TYPE
 import io.github.charlietap.chasm.compiler.backend.dex.abi.CHUNK_CODE_UNITS
@@ -10,11 +14,8 @@ import io.github.charlietap.chasm.compiler.backend.dex.abi.CHUNK_INSTRUCTIONS
 import io.github.charlietap.chasm.compiler.backend.dex.abi.HUGE_METHOD_CODE_UNITS
 import io.github.charlietap.chasm.compiler.backend.dex.abi.MAX_REGISTERS
 import io.github.charlietap.chasm.compiler.backend.dex.abi.chunkName
-import io.github.charlietap.chasm.compiler.backend.dex.analysis.DataflowSlotKindAnalyzer
 import io.github.charlietap.chasm.compiler.backend.dex.analysis.FunctionAnalysis
 import io.github.charlietap.chasm.compiler.backend.dex.analysis.MemoryMode
-import io.github.charlietap.chasm.compiler.backend.dex.analysis.SlotKindAnalyzer
-import io.github.charlietap.chasm.compiler.backend.dex.analysis.SlotKindFlow
 import io.github.charlietap.chasm.compiler.backend.dex.analysis.analyzeFunction
 import io.github.charlietap.chasm.compiler.backend.dex.analysis.estimateDexSize
 import io.github.charlietap.chasm.compiler.backend.dex.analysis.functionFacts
@@ -130,10 +131,10 @@ internal class FunctionLowering(
             return Attempt.TooLarge(inlinedAccesses = false, homes = reusable)
         }
 
-        val firstTemporary = if (module.analysis.usesExceptions) facts.frameSlots else facts.firstTemporary
-        val initialised = BooleanArray(facts.frameSlots) { slot -> slot < firstTemporary }
+        val firstTemporary = if (module.analysis.usesExceptions) facts.frame.frameSlots else facts.frame.firstTemporary
+        val initialised = BooleanArray(facts.frame.frameSlots) { slot -> slot < firstTemporary }
         val homes = reusable?.takeIf { candidate -> candidate.reusableFor(initialised) }
-            ?: RegisterHomes(slotKindAnalyzer.analyze(function, facts, initialised), initialised)
+            ?: RegisterHomes(slotKindAnalyzer.analyze(function, facts.table, facts.frame, initialised), initialised)
 
         while (true) {
 
@@ -159,6 +160,9 @@ internal class FunctionLowering(
             } catch (unsupported: Unsupported) {
                 body.abort()
                 return Attempt.Rejected(unsupported.message ?: "unsupported")
+            } catch (unsupported: UnsupportedShape) {
+                body.abort()
+                return Attempt.Rejected(unsupported.message ?: "unsupported")
             } catch (_: DexterMethodTooLargeException) {
                 return Attempt.TooLarge(inlinedAccesses = analysis.usesInlineMemory, homes = homes)
             }
@@ -177,11 +181,11 @@ internal class FunctionLowering(
 
         val starts = ArrayList<Int>()
         val orphans = ArrayList<Int>()
-        val initialised = BooleanArray(facts.frameSlots) { true }
+        val initialised = BooleanArray(facts.frame.frameSlots) { true }
         val estimate = if (module.options.splitInstructions != null) null else whole?.estimate ?: estimateDexSize(module, function, analysis)
         val splitFacts = SplitFacts(function, facts, estimate)
         val homes = reusable?.takeIf { candidate -> candidate.reusableFor(initialised) }
-            ?: RegisterHomes(slotKindAnalyzer.analyze(function, facts, initialised), initialised)
+            ?: RegisterHomes(slotKindAnalyzer.analyze(function, facts.table, facts.frame, initialised), initialised)
 
         while (true) {
 
@@ -196,11 +200,13 @@ internal class FunctionLowering(
                 return Attempt.Refused("managed references need register homes: ${mismatch.message}")
             } catch (unsupported: Unsupported) {
                 return Attempt.Refused(unsupported.message ?: "unsupported")
+            } catch (unsupported: UnsupportedShape) {
+                return Attempt.Refused(unsupported.message ?: "unsupported")
             }
 
             val table = dispatchTable(chunks, splitFacts)
             val registers = dispatcherRegisters(analysis)
-            val slotFrameCost = (facts.frameSlots * 8 + 31) / 32
+            val slotFrameCost = (facts.frame.frameSlots * 8 + 31) / 32
             val cost = frameCost(registers) + chunks.maxOf { chunk -> chunk.cost } + slotFrameCost
             module.constants.beginMethod()
             val body = code.beginStaticMethod(method, registers.count, MemberAccess.Public, HUGE_METHOD_CODE_UNITS)
@@ -345,7 +351,7 @@ private fun functionRegisters(
     val window = facts.window
 
     return Registers(
-        frameSlots = facts.frameSlots,
+        frameSlots = facts.frame.frameSlots,
         temporaries = window.temporaries,
         windowWords = window.windowWords,
         parameterWords = facts.signature.argumentWords,

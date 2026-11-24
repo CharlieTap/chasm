@@ -1,5 +1,6 @@
 -keep class io.github.charlietap.chasm.runtime.compiled.Compiled* { public static *; }
--keep class io.github.charlietap.chasm.runtime.compiled.BindingEntry { public <fields>; public <init>(...); public void callObjects(...); }
+-keep class io.github.charlietap.chasm.runtime.compiled.ObjectEntry { public void callObjects(...); }
+-keep class io.github.charlietap.chasm.runtime.compiled.BindingEntry { public <fields>; public <init>(...); }
 -keep class io.github.charlietap.chasm.runtime.compiled.CodeInstallation { public *; }
 -keep interface io.github.charlietap.chasm.runtime.function.CompiledFunction { *; }
 -keep class io.github.charlietap.chasm.runtime.execution.ExecutionContext { public <fields>; }

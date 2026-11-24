@@ -9,11 +9,6 @@ const val GLOBAL_INSTANCE = "Lio/github/charlietap/chasm/runtime/instance/Global
 const val DATA_INSTANCE = "Lio/github/charlietap/chasm/runtime/instance/DataInstance;"
 const val ELEMENT_INSTANCE = "Lio/github/charlietap/chasm/runtime/instance/ElementInstance;"
 
-val EXCEPTION_CARRIERS = listOf(
-    "Lio/github/charlietap/chasm/runtime/exception/InvocationException;",
-    "Lio/github/charlietap/chasm/runtime/exception/HostRaisedWasmException;",
-)
-
 const val STACK_LIMIT_FIELD = "compiledStackLimit"
 
 const val CALL_DEPTH_FIELD = "compiledCallDepth"
@@ -23,9 +18,6 @@ const val UNWINDING_FIELD = "compiledUnwinding"
 const val PENDING_TAIL_FIELD = "pendingTailFunction"
 
 const val REFERENCE_TYPE_TEST = OBJECT_TYPE
-
-const val REFERENCE_TAG_MASK = 0xFF
-const val REFERENCE_NULL_TAG = 1
 
 const val MAX_UNCHARGED_LEAF_FRAME_COST = 64
 
@@ -52,7 +44,6 @@ private class Owner(
 private val compiledRuntime = Owner("Lio/github/charlietap/chasm/runtime/compiled/CompiledRuntime;")
 private val compiledCalls = Owner("Lio/github/charlietap/chasm/runtime/compiled/CompiledCalls;")
 private val compiledExceptions = Owner("Lio/github/charlietap/chasm/runtime/compiled/CompiledExceptions;")
-private val compiledGc = Owner("Lio/github/charlietap/chasm/runtime/compiled/CompiledGc;")
 private val compiledOps = Owner("Lio/github/charlietap/chasm/runtime/compiled/CompiledOps;")
 private val compiledNumerics = Owner("Lio/github/charlietap/chasm/runtime/compiled/CompiledNumerics;")
 private val compiledMemory = Owner("Lio/github/charlietap/chasm/runtime/compiled/CompiledMemory;")
@@ -123,68 +114,16 @@ fun memoryAccess(
 
 val OPEN_FRAME = compiledCalls.method("openFrame", CONTEXT_TYPE, "I", returns = "J")
 val FRAME = compiledCalls.method("frame", CONTEXT_TYPE, returns = "[J")
-val OPEN_ROOTS = compiledCalls.method("openRoots", CONTEXT_TYPE, "I", returns = "J")
-val CLEAR_ROOTS = compiledCalls.method("clearRoots", CONTEXT_TYPE, "I", "I", returns = "V")
 val CLOSE_FRAME = compiledCalls.method("closeFrame", CONTEXT_TYPE, "J", returns = "V")
 val SAVE_STACK = compiledCalls.method("saveStack", CONTEXT_TYPE, returns = "J")
-val BRIDGE_CALL = compiledCalls.method("call", CONTEXT_TYPE, MODULE_INSTANCE, FUNCTION_INSTANCE, "[J", "I", returns = "V")
-val BRIDGE_CALL_INDIRECT =
-    compiledCalls.method("callIndirect", CONTEXT_TYPE, MODULE_INSTANCE, TABLE_INSTANCE, "I", "I", "[J", "I", returns = "V")
-val BRIDGE_CALL_REF = compiledCalls.method("callRef", CONTEXT_TYPE, MODULE_INSTANCE, "J", "[J", "I", returns = "V")
-val INDIRECT_TARGET = compiledCalls.method("indirectTarget", CONTEXT_TYPE, TABLE_INSTANCE, "I", "I", returns = OBJECT_TYPE)
-val REF_TARGET = compiledCalls.method("refTarget", CONTEXT_TYPE, "J", returns = OBJECT_TYPE)
-val TAIL_CALL = compiledCalls.method("tailCall", CONTEXT_TYPE, MODULE_INSTANCE, FUNCTION_INSTANCE, "[J", returns = "V")
-val TAIL_CALL_INDIRECT =
-    compiledCalls.method("tailCallIndirect", CONTEXT_TYPE, MODULE_INSTANCE, TABLE_INSTANCE, "I", "I", "[J", returns = "V")
-val TAIL_CALL_REF = compiledCalls.method("tailCallRef", CONTEXT_TYPE, MODULE_INSTANCE, "J", "[J", returns = "V")
-val COMPLETE_TAIL_CALL = compiledCalls.method("completeTailCall", CONTEXT_TYPE, "[J", "I", returns = "V")
 val RAISE_UNWINDING = compiledCalls.method("raiseUnwinding", CONTEXT_TYPE, returns = "V")
 
-val THROW_TAG = compiledExceptions.method("throwTag", CONTEXT_TYPE, "I", "I", returns = "V")
-val THROW_REF = compiledExceptions.method("throwRef", CONTEXT_TYPE, "J", returns = "V")
-val PENDING_TAG = compiledExceptions.method("pendingTag", CONTEXT_TYPE, returns = "I")
-val TAKE_EXCEPTION = compiledExceptions.method("takeException", CONTEXT_TYPE, "[J", "I", returns = "J")
 val WASM_EXCEPTION = compiledExceptions.method("wasmException", THROWABLE, returns = THROWABLE)
-
-val CAST_MATCHES = compiledGc.method("castMatches", CONTEXT_TYPE, "J", OBJECT_TYPE, returns = "Z")
-val STRUCT_GET = compiledGc.method("structGet", CONTEXT_TYPE, "J", "I", returns = "J")
-val STRUCT_SET = compiledGc.method("structSet", CONTEXT_TYPE, "J", "I", "J", returns = "V")
-val STRUCT_GET_STRUCT_GET = compiledGc.method("structGetStructGet", CONTEXT_TYPE, "J", "I", "I", returns = "J")
-val STRUCT_NEW = compiledGc.method("structNew", CONTEXT_TYPE, "I", "[J", returns = "J")
-val STRUCT_NEW_DEFAULT = compiledGc.method("structNewDefault", CONTEXT_TYPE, "I", "[J", returns = "J")
-val ARRAY_GET = compiledGc.method("arrayGet", CONTEXT_TYPE, "J", "I", returns = "J")
-val ARRAY_SET = compiledGc.method("arraySet", CONTEXT_TYPE, "J", "I", "J", returns = "V")
-val ARRAY_LEN = compiledGc.method("arrayLen", CONTEXT_TYPE, "J", returns = "J")
-val ARRAY_COPY = compiledGc.method("arrayCopy", CONTEXT_TYPE, "J", "I", "J", "I", "I", returns = "V")
-val ARRAY_NEW_DEFAULT = compiledGc.method("arrayNewDefault", CONTEXT_TYPE, "I", "I", "J", returns = "J")
-val REF_CAST_STRUCT_GET = compiledGc.method("refCastStructGet", CONTEXT_TYPE, "J", REFERENCE_TYPE_TEST, "I", returns = "J")
-val REF_CAST = compiledGc.method("refCast", CONTEXT_TYPE, "J", REFERENCE_TYPE_TEST, returns = "J")
-val REF_TEST = compiledGc.method("refTest", CONTEXT_TYPE, "J", REFERENCE_TYPE_TEST, returns = "J")
-val REF_I31 = compiledGc.method("refI31", "I", returns = "J")
-val I31_GET_SIGNED = compiledGc.method("i31GetSigned", "J", returns = "J")
-val I31_GET_UNSIGNED = compiledGc.method("i31GetUnsigned", "J", returns = "J")
 
 val MEMORY_SIZE_PAGES = compiledOps.method("memorySize", MEMORY_INSTANCE, returns = "J")
 val MEMORY_GROW = compiledOps.method("memoryGrow", CONTEXT_TYPE, MEMORY_INSTANCE, "I", returns = "J")
 val MEMORY_INIT = compiledOps.method("memoryInit", MEMORY_INSTANCE, DATA_INSTANCE, "I", "I", "I", returns = "V")
 val DATA_DROP = compiledOps.method("dataDrop", DATA_INSTANCE, returns = "V")
-val TABLE_GET = compiledOps.method("tableGet", TABLE_INSTANCE, "I", returns = "J")
-val TABLE_SET = compiledOps.method("tableSet", TABLE_INSTANCE, "I", "J", returns = "V")
-val TABLE_SIZE = compiledOps.method("tableSize", TABLE_INSTANCE, returns = "J")
-val TABLE_GROW = compiledOps.method("tableGrow", CONTEXT_TYPE, TABLE_INSTANCE, "I", "J", returns = "J")
-val TABLE_FILL = compiledOps.method("tableFill", TABLE_INSTANCE, "I", "J", "I", returns = "V")
-val TABLE_COPY = compiledOps.method("tableCopy", TABLE_INSTANCE, TABLE_INSTANCE, "I", "I", "I", returns = "V")
-val TABLE_INIT = compiledOps.method("tableInit", TABLE_INSTANCE, ELEMENT_INSTANCE, "I", "I", "I", returns = "V")
-val ELEM_DROP = compiledOps.method("elemDrop", ELEMENT_INSTANCE, returns = "V")
-val ARRAY_NEW = compiledOps.method("arrayNew", CONTEXT_TYPE, "I", "I", "J", returns = "J")
-val ARRAY_NEW_FIXED = compiledOps.method("arrayNewFixed", CONTEXT_TYPE, "I", "[J", "I", returns = "J")
-val ARRAY_NEW_DATA = compiledOps.method("arrayNewData", CONTEXT_TYPE, "I", DATA_INSTANCE, "I", "I", "I", returns = "J")
-val ARRAY_NEW_ELEMENT = compiledOps.method("arrayNewElement", CONTEXT_TYPE, "I", ELEMENT_INSTANCE, "I", "I", returns = "J")
-val ARRAY_FILL = compiledOps.method("arrayFill", CONTEXT_TYPE, "J", "I", "J", "I", returns = "V")
-val ARRAY_INIT_DATA = compiledOps.method("arrayInitData", CONTEXT_TYPE, "J", "I", DATA_INSTANCE, "I", "I", "I", returns = "V")
-val ARRAY_INIT_ELEMENT = compiledOps.method("arrayInitElement", CONTEXT_TYPE, "J", "I", ELEMENT_INSTANCE, "I", "I", returns = "V")
-val ANY_CONVERT_EXTERN = compiledOps.method("anyConvertExtern", "J", returns = "J")
-val EXTERN_CONVERT_ANY = compiledOps.method("externConvertAny", "J", returns = "J")
 
 val I64_MUL_WIDE_HIGH_S = compiledNumerics.method("i64MulWideHighS", "J", "J", returns = "J")
 val I64_MUL_WIDE_HIGH_U = compiledNumerics.method("i64MulWideHighU", "J", "J", returns = "J")
@@ -295,6 +234,17 @@ const val REFERENCE_TABLE = "Lio/github/charlietap/chasm/runtime/compiled/gc/Ref
 const val REFERENCE_SEGMENT = "Lio/github/charlietap/chasm/runtime/compiled/gc/ReferenceSegment;"
 const val REFERENCE_GLOBAL_VALUE = "value"
 const val REFERENCE_STORAGE_ELEMENTS = "elements"
+const val COMPILED_STRUCT = "Lio/github/charlietap/chasm/runtime/compiled/gc/CompiledStruct;"
+const val COMPILED_ARRAY = "Lio/github/charlietap/chasm/runtime/compiled/gc/CompiledArray;"
+const val RTT_TYPE = "Lio/github/charlietap/chasm/runtime/compiled/gc/Rtt;"
+const val RTT_ARRAY_TYPE = "[Lio/github/charlietap/chasm/runtime/compiled/gc/Rtt;"
+const val COMPILED_RTT_FIELD = "rtt"
+const val RTT_SUPERTYPES_FIELD = "supertypes"
+const val RTT_DEPTH_FIELD = "depth"
+const val STORAGE_ARRAY_DATA_FIELD = "data"
+const val SPILLED_INTS_FIELD = "spilledInts"
+const val SPILLED_REFERENCES_FIELD = "spilledReferences"
+const val I31_VALUE_FIELD = "value"
 const val WASM_EXCEPTION_TYPE = "Lio/github/charlietap/chasm/runtime/compiled/gc/WasmException;"
 const val WASM_EXCEPTION_WORDS = "words"
 const val WASM_EXCEPTION_REFERENCES = "references"

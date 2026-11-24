@@ -5,8 +5,8 @@ import io.github.charlietap.chasm.cir.AdminInstruction
 import io.github.charlietap.chasm.cir.CirFunction
 import io.github.charlietap.chasm.cir.Instruction
 import io.github.charlietap.chasm.cir.InstructionIndex
-import io.github.charlietap.chasm.compiler.backend.dex.analysis.DataflowSlotKindAnalyzer
-import io.github.charlietap.chasm.compiler.backend.dex.analysis.SlotKindFlow
+import io.github.charlietap.chasm.compiler.backend.analysis.DataflowSlotKindAnalyzer
+import io.github.charlietap.chasm.compiler.backend.analysis.SlotKindFlow
 import io.github.charlietap.chasm.compiler.backend.dex.analysis.functionFacts
 import io.github.charlietap.chasm.compiler.backend.dex.lower.RegisterHomes
 import io.github.charlietap.chasm.compiler.frontend.ModuleCompiler
@@ -203,7 +203,7 @@ class SlotKindFlowTest {
     }
 
     private fun frameSlots(function: Int): Int {
-        return functionFacts(lowering, code.functions[function]).frameSlots
+        return functionFacts(lowering, code.functions[function]).frame.frameSlots
     }
 
     private fun flow(function: Int): SlotKindFlow {
@@ -214,7 +214,7 @@ class SlotKindFlowTest {
 
         val facts = functionFacts(lowering, function)
 
-        return DataflowSlotKindAnalyzer().analyze(function, facts, BooleanArray(facts.frameSlots) { true })
+        return DataflowSlotKindAnalyzer().analyze(function, facts.table, facts.frame, BooleanArray(facts.frame.frameSlots) { true })
     }
 
     private fun SlotKindFlow.kindBefore(

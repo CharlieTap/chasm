@@ -30,5 +30,5 @@ kotlin {
 
 configure<PublishingConventionsExtension> {
     name = "embedding-compiled"
-    description = "Zero-copy access to GC arrays and table elements on Chasm's JIT engine, for embedders and host functions"
+    description = "Zero-copy access to GC arrays and table elements, for embedders and host functions"
 }

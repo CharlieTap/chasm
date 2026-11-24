@@ -22,6 +22,7 @@ kotlin {
         testImplementation(projects.compiler.frontend)
         testImplementation(projects.decoder)
         testImplementation(projects.module)
+        testImplementation(projects.runtime.compiled)
         testImplementation(projects.validator)
         testImplementation(libs.asm.analysis)
         testImplementation(libs.result)

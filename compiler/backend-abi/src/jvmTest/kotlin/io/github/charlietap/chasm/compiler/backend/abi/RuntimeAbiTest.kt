@@ -1,7 +1,5 @@
 package io.github.charlietap.chasm.compiler.backend.abi
 
-import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_MASK
-import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_NULL
 import java.lang.reflect.Modifier
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -69,9 +67,22 @@ class RuntimeAbiTest {
     }
 
     @Test
-    fun `compiled code tests for a null reference with the runtime's tag and mask`() {
-        assertEquals(RV_TYPE_MASK, REFERENCE_TAG_MASK.toLong())
-        assertEquals(RV_TYPE_NULL, REFERENCE_NULL_TAG.toLong())
+    fun `compiled objects and their RTTs have the fields compiled code reads`() {
+
+        val fields = listOf(
+            Triple(COMPILED_STRUCT, COMPILED_RTT_FIELD, RTT_TYPE),
+            Triple(COMPILED_ARRAY, COMPILED_RTT_FIELD, RTT_TYPE),
+            Triple(RTT_TYPE, RTT_SUPERTYPES_FIELD, RTT_ARRAY_TYPE),
+            Triple(RTT_TYPE, RTT_DEPTH_FIELD, "I"),
+            Triple(I31_REFERENCE, I31_VALUE_FIELD, "I"),
+        )
+
+        fields.forEach { (owner, name, type) ->
+            val field = Class.forName(binaryName(owner)).getField(name)
+            assertTrue(Modifier.isPublic(field.modifiers), name)
+            assertFalse(Modifier.isStatic(field.modifiers), name)
+            assertEquals(type, descriptor(field.type), name)
+        }
     }
 
     private fun methods(

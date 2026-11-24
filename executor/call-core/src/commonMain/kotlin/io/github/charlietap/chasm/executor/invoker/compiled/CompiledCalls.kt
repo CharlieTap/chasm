@@ -7,15 +7,10 @@ import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.HostRaisedWasmException
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.runtime.ext.element
-import io.github.charlietap.chasm.runtime.ext.function
-import io.github.charlietap.chasm.runtime.ext.toFunctionAddress
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
-import io.github.charlietap.chasm.runtime.instance.TableInstance
 import io.github.charlietap.chasm.runtime.program.EXIT_IP
 import io.github.charlietap.chasm.runtime.stack.activationHeader
-import io.github.charlietap.chasm.runtime.type.RTT
 import io.github.charlietap.chasm.type.AbstractHeapType
 import io.github.charlietap.chasm.type.ValueType
 
@@ -140,20 +135,6 @@ internal inline fun copySlots(
 }
 
 private const val SMALL_COPY = 16
-
-fun resolveIndirectFunction(
-    context: ExecutionContext,
-    table: TableInstance,
-    type: RTT,
-    elementIndex: Int,
-): FunctionInstance {
-    val address = table.element(elementIndex).toFunctionAddress()
-    val function = context.store.function(address)
-    if (!context.heap.matchesRuntimeType(function.rtt, type)) {
-        throw InvocationException(InvocationError.IndirectCallHasIncorrectFunctionType)
-    }
-    return function
-}
 
 fun requestTailCall(
     context: ExecutionContext,

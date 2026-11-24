@@ -30,5 +30,13 @@ kotlin {
                 implementation(libs.wasi.emscripten.host.chasm.wasip1.kmp)
             }
         }
+
+        jvmTest {
+            dependencies {
+                implementation(projects.compiler.backendAnalysis)
+                implementation(projects.runtime.compiled)
+                implementation(libs.asm.util)
+            }
+        }
     }
 }

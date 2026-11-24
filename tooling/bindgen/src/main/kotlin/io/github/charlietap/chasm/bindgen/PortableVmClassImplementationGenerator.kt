@@ -223,7 +223,7 @@ internal class FunctionProxyImplementationGenerator(
 
                 StringEncodingStrategy.GC_UTF16_ARRAY,
                 StringEncodingStrategy.GC_UTF8_ARRAY,
-                -> error("GC array strings require ExecutionTier.Jit")
+                -> error("GC array strings require ExecutionTier.Jit or ExecutionTier.Aot")
             }
             if (param.stringAllocationStrategy?.freeAfterCall == true) {
                 allocationsToFree.add(allocVar)
@@ -289,7 +289,7 @@ internal class FunctionProxyImplementationGenerator(
 
                         StringEncodingStrategy.GC_UTF16_ARRAY,
                         StringEncodingStrategy.GC_UTF8_ARRAY,
-                        -> error("GC array strings require ExecutionTier.Jit")
+                        -> error("GC array strings require ExecutionTier.Jit or ExecutionTier.Aot")
                     }
                 } else {
                     addStatement(

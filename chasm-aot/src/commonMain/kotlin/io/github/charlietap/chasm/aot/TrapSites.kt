@@ -10,8 +10,8 @@ import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.decoder.WasmFunctionBodyOffsets
 import io.github.charlietap.chasm.runtime.compiled.CHUNK_CLASS_PREFIX
 import io.github.charlietap.chasm.runtime.compiled.CODE_CLASS_PREFIX
-import io.github.charlietap.chasm.runtime.compiled.COMPILED_ENTRY_CLASS
 import io.github.charlietap.chasm.runtime.compiled.FUNCTION_METHOD_PREFIX
+import io.github.charlietap.chasm.runtime.compiled.MANAGED_ENTRY_CLASS
 import io.github.charlietap.chasm.runtime.diagnostic.FunctionTrapSites
 
 // A shrinker that renames the compiled function methods or drops their line numbers leaves traps unattributable, and one
@@ -26,7 +26,7 @@ internal fun shrinkerRules(config: CompileConfig): String {
     return """
         -keepattributes LineNumberTable
         -keep class $entry${'$'}$CODE_CLASS_PREFIX*, $entry${'$'}$CHUNK_CLASS_PREFIX* { static *** $FUNCTION_METHOD_PREFIX*(...); }
-        -keep,allowobfuscation,allowshrinking class $COMPILED_ENTRY_CLASS { *** invoke(...); }
+        -keep,allowobfuscation,allowshrinking class $MANAGED_ENTRY_CLASS { *** enter(...); }
         """.trimIndent() + "\n"
 }
 

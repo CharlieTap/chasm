@@ -34,19 +34,59 @@ class UnloadingTest {
             val config = CompileConfig(ENTRY_CLASS, CompileTarget.JVM, RuntimeConfig(stacktraces = true))
             compile(fixture("declarations"), ClassOutput.jar(jar), config).expect("compiles")
 
-            val loaderReference = loadInvokeAndDrop(jar)
-
-            var attempts = 0
-            while (loaderReference.get() != null && attempts < GC_ATTEMPTS) {
-                System.gc()
-                Thread.sleep(GC_PAUSE_MILLIS)
-                attempts++
-            }
-
-            assertNull(loaderReference.get(), "the module's class loader is still reachable after $attempts collections")
+            assertCollected(loadInvokeAndDrop(jar))
         } finally {
             directory.toFile().deleteRecursively()
         }
+    }
+
+    @Test
+    fun `a compiled module with GC types is collected once its store and loader are dropped`() {
+
+        val directory = Files.createTempDirectory("unloading")
+        val jar = directory.resolve("managed_objects.jar")
+
+        try {
+
+            val config = CompileConfig(GC_ENTRY_CLASS, CompileTarget.JVM, RuntimeConfig())
+            compile(fixture("managed_objects"), ClassOutput.jar(jar), config).expect("compiles")
+
+            assertCollected(loadAllocateAndDrop(jar))
+        } finally {
+            directory.toFile().deleteRecursively()
+        }
+    }
+
+    private fun assertCollected(loaderReference: WeakReference<ClassLoader>) {
+
+        var attempts = 0
+        while (loaderReference.get() != null && attempts < GC_ATTEMPTS) {
+            System.gc()
+            Thread.sleep(GC_PAUSE_MILLIS)
+            attempts++
+        }
+
+        assertNull(loaderReference.get(), "the module's class loader is still reachable after $attempts collections")
+    }
+
+    private fun loadAllocateAndDrop(jar: Path): WeakReference<ClassLoader> {
+
+        val loader = URLClassLoader(arrayOf(jar.toUri().toURL()), CompiledModule::class.java.classLoader)
+        val compiled = loader.loadClass(GC_ENTRY_CLASS).getField("COMPILED").get(null) as CompiledModule
+        val module = module(compiled).expect("loads")
+        val store = store(module)
+        val instance = runBlocking { instance(store, module) }.expect("instantiates")
+
+        val point = invoke(instance, "make_point", listOf(I32(4), I32(5))).expect("make_point").single()
+        invoke(instance, "keep", listOf(point)).expect("keep")
+        val kept = invoke(instance, "kept").expect("kept").single()
+
+        assertEquals(listOf(I32(4)), invoke(instance, "x", listOf(kept)).expect("x"))
+
+        dropStore(store)
+        loader.close()
+
+        return WeakReference(loader)
     }
 
     private fun loadInvokeAndDrop(jar: Path): WeakReference<ClassLoader> {
@@ -76,6 +116,7 @@ class UnloadingTest {
 
     private companion object {
         const val ENTRY_CLASS = "chasm.aot.unloading.WasmModule"
+        const val GC_ENTRY_CLASS = "chasm.aot.unloading.gc.WasmModule"
         const val GC_ATTEMPTS = 20
         const val GC_PAUSE_MILLIS = 50L
     }

@@ -37,9 +37,8 @@ import io.github.charlietap.chasm.compiler.backend.abi.Resource
 import io.github.charlietap.chasm.compiler.backend.analysis.form.Operand
 import io.github.charlietap.chasm.compiler.backend.analysis.form.immediate
 import io.github.charlietap.chasm.compiler.backend.analysis.form.slot
-import io.github.charlietap.chasm.compiler.backend.dex.gc.ArrayShape
-import io.github.charlietap.chasm.compiler.backend.dex.gc.GcField
-import io.github.charlietap.chasm.compiler.backend.dex.gc.StructShape
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.ArrayShape
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.ShapeField
 import io.github.charlietap.chasm.runtime.execution.ARRAY_OVERHEAD
 import io.github.charlietap.chasm.runtime.execution.maximumArrayLength
 import io.github.charlietap.dexter.ArrayKind
@@ -141,7 +140,7 @@ private fun LowerContext.structNew(
 ) {
 
     val shape = module.gc.struct(type.index)
-    chargeAllocation(structBytes(shape))
+    chargeAllocation(module.shapeSizes.structBytes(shape))
     emit.newInstance(Registers.OBJECT, shape.className)
     emit.invokeConstructor(shape.className, Registers.OBJECT)
 
@@ -266,7 +265,7 @@ private fun LowerContext.arrayNewFixed(
 
     val shape = module.gc.array(type.index)
     val element = shape.data.descriptor.substring(1)
-    chargeAllocation((size shl elementShift(element)) + ARRAY_OVERHEAD)
+    chargeAllocation(module.shapeSizes.arrayBytes(size, module.shapeSizes.arrayShift(shape)))
     emit.const(Registers.I1, size)
     emit.newArray(Registers.SECOND_OBJECT, Registers.I1, shape.data.descriptor)
 
@@ -284,7 +283,7 @@ private fun LowerContext.chargeArray(
     length: Int,
 ) {
 
-    val shift = elementShift(shape.data.descriptor.substring(1))
+    val shift = module.shapeSizes.arrayShift(shape)
     val exhausted = trapLabel(GUEST_HEAP_EXHAUSTED)
     emit.branchZero(Cond.Lt, length, exhausted)
     emit.const(Registers.W0 + 1, maximumArrayLength(shift))
@@ -314,37 +313,6 @@ private fun LowerContext.chargeRegister(
     emit.invoke(REFILL_ALLOCATION, Registers.CONTEXT, bytesRegister)
     emit.place(charged)
 }
-
-private fun structBytes(
-    shape: StructShape,
-): Int {
-    val fields = shape.fields.sumOf { field -> descriptorBytes(field.descriptor) }
-    return (OBJECT_HEADER_BYTES + fields + 7) and 7.inv()
-}
-
-private fun elementShift(
-    element: String,
-): Int {
-    return when (descriptorBytes(element)) {
-        1 -> 0
-        2 -> 1
-        8 -> 3
-        else -> 2
-    }
-}
-
-private fun descriptorBytes(
-    descriptor: String,
-): Int {
-    return when (descriptor) {
-        "B" -> 1
-        "C" -> 2
-        "J", "D" -> 8
-        else -> 4
-    }
-}
-
-private const val OBJECT_HEADER_BYTES = 8
 
 private const val I31_BYTES = 16
 
@@ -402,7 +370,7 @@ private fun LowerContext.arraySet(
 
 private fun LowerContext.loadArrayData(
     addressSlot: Int,
-    data: GcField,
+    data: ShapeField,
     index: Operand,
 ) {
     loadReference(Registers.OBJECT, addressSlot)
@@ -615,7 +583,7 @@ private fun LowerContext.receiver(
 
 private fun LowerContext.getFieldValue(
     receiverRegister: Int,
-    field: GcField,
+    field: ShapeField,
     destination: Int,
     signed: Boolean?,
 ) {
@@ -649,7 +617,7 @@ private fun LowerContext.getFieldValue(
 
 private fun LowerContext.putFieldValue(
     receiverRegister: Int,
-    field: GcField,
+    field: ShapeField,
     value: Operand,
 ) {
     val register = loadStorage(field.descriptor, value, Registers.SECOND_OBJECT)

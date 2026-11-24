@@ -102,7 +102,7 @@ internal fun estimateDexSize(
         helper += helperFamily.helper + HELPER_TARGET * targets + HELPER_TRANSFER * transfers
     }
 
-    val frameSlots = analysis.facts.frameSlots
+    val frameSlots = analysis.facts.frame.frameSlots
     val inline = prefix[instructions.size] + INLINE_FRAME_SLOT * frameSlots + INLINE_CONSTANT
     val helperTotal = helper + HELPER_FRAME_SLOT * frameSlots + HELPER_CONSTANT
 

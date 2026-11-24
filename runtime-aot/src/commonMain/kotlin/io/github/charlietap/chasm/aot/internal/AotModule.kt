@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.aot.internal
 
 import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.aot.CompiledModule
+import io.github.charlietap.chasm.aot.CompiledModuleStructs
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.declarations.ModuleDeclarations
 
@@ -14,6 +15,10 @@ internal class AotModule(
 ) {
 
     val classPrefix = "${resourceRoot.replace('/', '.')}\$"
+
+    val structLayouts: CompiledStructLayouts by lazy {
+        CompiledStructLayouts(declarations.definedTypes, compiled as CompiledModuleStructs)
+    }
 
     val trapSites: TrapSites? by lazy {
 

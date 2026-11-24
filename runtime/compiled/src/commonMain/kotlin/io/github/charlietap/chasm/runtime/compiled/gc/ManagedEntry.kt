@@ -1,5 +1,7 @@
 package io.github.charlietap.chasm.runtime.compiled.gc
 
+import io.github.charlietap.chasm.executor.invoker.compiled.closeFrame
+import io.github.charlietap.chasm.executor.invoker.compiled.saveStack
 import io.github.charlietap.chasm.executor.invoker.thread.traceableTrap
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
@@ -41,14 +43,21 @@ private class ManagedEntry {
             interrupt.depth = depth + 1
         }
 
+        val stack = saveStack(context)
+
         return try {
             context.compiledCallDepth = store.compiledCallDepth
             callObjects(context, context.instance, function, words, references, context.compiledCallDepth)
             if (context.compiledUnwinding) holdThrown(context, pending) else null
         } catch (exception: InvocationException) {
+            closeFrame(context, stack)
             if (context.config.stacktraces) traceableTrap(store, context.vstack, exception, entryIp(function)) else exception.error
         } catch (_: ClassCastException) {
+            closeFrame(context, stack)
             InvocationError.FailedToCastReference
+        } catch (failure: Throwable) {
+            closeFrame(context, stack)
+            throw failure
         } finally {
             if (interrupt.enabled) {
                 interrupt.depth = depth

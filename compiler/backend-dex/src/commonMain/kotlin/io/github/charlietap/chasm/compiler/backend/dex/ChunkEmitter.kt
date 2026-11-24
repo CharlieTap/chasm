@@ -53,7 +53,7 @@ internal class ProbingChunkEmitter(
         val start = planned.start
         val end = planned.end
         val entries = planned.entries
-        val frameSlots = analysis.facts.frameSlots
+        val frameSlots = analysis.facts.frame.frameSlots
         val continuations = splitFacts.continuations
         val dexMethod = module.references.of(method)
 
@@ -115,7 +115,7 @@ internal class ProbingChunkEmitter(
         end: Int,
     ): BooleanArray {
 
-        val written = BooleanArray(analysis.facts.frameSlots)
+        val written = BooleanArray(analysis.facts.frame.frameSlots)
         val table = analysis.facts.table
         for (index in table.writes.start[start] until table.writes.start[end]) written[table.writes.slots[index]] = true
 
@@ -169,7 +169,7 @@ internal fun chunkRegisters(
     val window = analysis.facts.window
 
     return Registers(
-        frameSlots = analysis.facts.frameSlots,
+        frameSlots = analysis.facts.frame.frameSlots,
         temporaries = window.temporaries,
         windowWords = window.windowWords,
         parameterWords = 3,

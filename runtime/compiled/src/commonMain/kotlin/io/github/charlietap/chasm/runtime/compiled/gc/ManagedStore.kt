@@ -22,14 +22,12 @@ import java.util.concurrent.ConcurrentHashMap
 
 class ManagedStore(
     private val store: Store,
-    accessors: ShapeAccessors,
-) : ReferenceStorage, ShapeRegistry {
+    gcTypes: (ManagedStore) -> GcTypes,
+) : ReferenceStorage {
 
     private val globals = IdentityHashMap<GlobalInstance, ReferenceGlobal>()
     private val tables = IdentityHashMap<TableInstance, ReferenceTable>()
     private val segments = IdentityHashMap<ElementInstance, ReferenceSegment>()
-    private val shapes = ConcurrentHashMap<Int, Class<*>>()
-    private val types = ConcurrentHashMap<Class<*>, Int>()
     private val definedTypes = ConcurrentHashMap<Int, DefinedType>()
 
     lateinit var engine: Engine
@@ -38,15 +36,15 @@ class ManagedStore(
 
     val checks = StoreReferenceChecks(this, functions, store)
 
-    val layouts = ReflectedShapeLayouts(this, store.heap, checks, accessors)
+    val types = gcTypes(this)
 
     val allocator = ManagedAllocator(store)
 
     val pending = PendingExceptionSlot()
 
     val objects = ManagedObjects(
-        structs = StructOperations(layouts, allocator),
-        arrays = ArrayOperations(layouts, allocator),
+        structs = StructOperations(types.layouts, allocator),
+        arrays = ArrayOperations(types.layouts, allocator),
         exceptions = ExceptionOperations(store, checks, pending),
         tables = TableOperations(checks),
         globals = GlobalOperations(checks),
@@ -137,38 +135,17 @@ class ManagedStore(
         tables.clear()
         segments.clear()
         pending.clear()
+        types.drop()
     }
 
     fun register(
         type: Int,
         definedType: DefinedType,
-        shape: Class<*>?,
     ) {
-
         definedTypes.putIfAbsent(type, definedType)
-
-        if (shape != null) {
-            shapes.putIfAbsent(type, shape)
-            types.putIfAbsent(shape, type)
-        }
     }
 
-    override fun shape(type: HostGcType): Class<*>? {
-        return shapes[type.id]
-    }
-
-    override fun definedType(type: HostGcType): DefinedType? {
+    fun definedType(type: HostGcType): DefinedType? {
         return definedTypes[type.id]
-    }
-
-    override fun type(value: Any): Int {
-
-        var shape: Class<*>? = value.javaClass
-        while (shape != null) {
-            types[shape]?.let { type -> return type }
-            shape = shape.superclass
-        }
-
-        return -1
     }
 }

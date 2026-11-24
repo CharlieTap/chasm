@@ -127,3 +127,19 @@ internal class Generated : JvmOutput {
         return result
     }
 }
+
+internal class GeneratedClassLoader(
+    private val generated: Generated,
+) : ClassLoader(Generated::class.java.classLoader) {
+
+    override fun findClass(name: String): Class<*> {
+        val bytes = generated.classes[name.replace('.', '/')] ?: throw ClassNotFoundException(name)
+        return defineClass(name, bytes, 0, bytes.size)
+    }
+
+    fun verifyEveryClass() {
+        generated.classes.keys.forEach { name ->
+            Class.forName(name.replace('/', '.'), true, this)
+        }
+    }
+}

@@ -21,6 +21,7 @@ class ModuleDeclarations(
     val dataSegments: List<DataSegmentDeclaration>,
     val names: ModuleNames,
     val dataSource: DataSource? = null,
+    val rttKeys: List<String> = emptyList(),
 ) {
 
     override fun equals(

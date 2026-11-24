@@ -720,8 +720,8 @@ public final class io/github/charlietap/chasm/declarations/GlobalDeclaration {
 }
 
 public final class io/github/charlietap/chasm/declarations/ModuleDeclarations {
-	public synthetic fun <init> (Ljava/util/List;Ljava/util/List;[ILjava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Lio/github/charlietap/chasm/ast/module/Index$FunctionIndex;Ljava/util/List;Ljava/util/List;Lio/github/charlietap/chasm/declarations/ModuleNames;Lio/github/charlietap/chasm/declarations/DataSource;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public synthetic fun <init> (Ljava/util/List;Ljava/util/List;[ILjava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Lio/github/charlietap/chasm/ast/module/Index$FunctionIndex;Ljava/util/List;Ljava/util/List;Lio/github/charlietap/chasm/declarations/ModuleNames;Lio/github/charlietap/chasm/declarations/DataSource;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (Ljava/util/List;Ljava/util/List;[ILjava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Lio/github/charlietap/chasm/ast/module/Index$FunctionIndex;Ljava/util/List;Ljava/util/List;Lio/github/charlietap/chasm/declarations/ModuleNames;Lio/github/charlietap/chasm/declarations/DataSource;Ljava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (Ljava/util/List;Ljava/util/List;[ILjava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Lio/github/charlietap/chasm/ast/module/Index$FunctionIndex;Ljava/util/List;Ljava/util/List;Lio/github/charlietap/chasm/declarations/ModuleNames;Lio/github/charlietap/chasm/declarations/DataSource;Ljava/util/List;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getDataSegments ()Ljava/util/List;
 	public final fun getDataSource ()Lio/github/charlietap/chasm/declarations/DataSource;
@@ -733,6 +733,7 @@ public final class io/github/charlietap/chasm/declarations/ModuleDeclarations {
 	public final fun getImports ()Ljava/util/List;
 	public final fun getMemories ()Ljava/util/List;
 	public final fun getNames ()Lio/github/charlietap/chasm/declarations/ModuleNames;
+	public final fun getRttKeys ()Ljava/util/List;
 	public final fun getStartFunction-uQUp_Tg ()Lio/github/charlietap/chasm/ast/module/Index$FunctionIndex;
 	public final fun getTables ()Ljava/util/List;
 	public final fun getTags ()Ljava/util/List;
@@ -838,6 +839,7 @@ public final class io/github/charlietap/chasm/declarations/construction/Declarat
 	public final fun globalType (Z)V
 	public final fun group (I)V
 	public final fun groupBody (II)V
+	public final fun groupKey (ILjava/lang/String;)V
 	public final fun i32Const (I)V
 	public final fun i64Const (J)V
 	public final fun importFunction (III)V

@@ -8,6 +8,7 @@ import io.github.charlietap.chasm.executor.invoker.compiled.CompiledFunctionInst
 import io.github.charlietap.chasm.executor.invoker.compiled.installCompiledFunctions
 import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.runtime.compiled.gc.ManagedStore
+import io.github.charlietap.chasm.runtime.compiled.gc.Rtt
 import io.github.charlietap.chasm.runtime.error.InstantiationError
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
@@ -35,8 +36,9 @@ fun ModuleCodeInstallation(
     definedFunctions: Int,
     instance: ModuleInstance,
     runtimeTypes: RuntimeTypeMap,
+    rtts: List<Rtt>,
 ): Result<Unit, ModuleTrapError> {
-    val installation = Installation(store, definedFunctions, instance, runtimeTypes)
+    val installation = Installation(store, definedFunctions, instance, runtimeTypes, rtts)
     try {
         install(installation)
     } catch (failure: IllegalArgumentException) {
@@ -58,6 +60,7 @@ private class Installation(
     definedFunctions: Int,
     override val instance: ModuleInstance,
     private val runtimeTypes: RuntimeTypeMap,
+    private val rtts: List<Rtt>,
 ) : CodeInstallation() {
 
     private val importedFunctions = instance.functionAddresses.size - definedFunctions
@@ -113,6 +116,10 @@ private class Installation(
 
     override fun managedFunction(index: Int): Any {
         return managedStore().functions.at(instance.functionAddresses[index].address)
+    }
+
+    override fun rtt(index: Int): Any {
+        return rtts[index]
     }
 
     override fun typeTest(

@@ -43,7 +43,7 @@ internal fun LowerContext.ret(
             }
         }
         else -> {
-            val types = facts.type.results.types
+            val types = facts.frame.type.results.types
             val referenceResults = types.any { type -> type is ValueType.Reference }
             emit.const(Registers.I0, resultCount)
             emit.newArray(Registers.OBJECT, Registers.I0, "[J")
@@ -151,7 +151,7 @@ internal fun LowerContext.returnCode(
 private fun LowerContext.chunkReturn(
     results: List<Operand>,
 ) {
-    val types = facts.type.results.types
+    val types = facts.frame.type.results.types
     if (types.any { type -> type is ValueType.Reference }) {
         if (types.any { type -> type !is ValueType.Reference }) {
             emit.invoke(FRAME, Registers.CONTEXT)

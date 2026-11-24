@@ -4,7 +4,7 @@ import io.github.charlietap.chasm.compiler.backend.abi.FRAME
 import io.github.charlietap.chasm.compiler.backend.abi.Resource
 import io.github.charlietap.chasm.compiler.backend.abi.UNREACHABLE
 import io.github.charlietap.chasm.compiler.backend.abi.UNSAFE_TYPE
-import io.github.charlietap.chasm.compiler.backend.dex.analysis.SlotKindFlow
+import io.github.charlietap.chasm.compiler.backend.analysis.SlotKindFlow
 import io.github.charlietap.dexter.ArrayKind
 
 internal fun LowerContext.lowerChunkBody() {

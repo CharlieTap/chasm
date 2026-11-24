@@ -82,6 +82,7 @@ public final class io/github/charlietap/chasm/bindgen/CodegenRuntime : java/lang
 }
 
 public abstract interface class io/github/charlietap/chasm/bindgen/ExecutionTier {
+	public abstract fun getManaged ()Z
 }
 
 public final class io/github/charlietap/chasm/bindgen/ExecutionTier$Aot : io/github/charlietap/chasm/bindgen/ExecutionTier {
@@ -91,16 +92,19 @@ public final class io/github/charlietap/chasm/bindgen/ExecutionTier$Aot : io/git
 	public static synthetic fun copy$default (Lio/github/charlietap/chasm/bindgen/ExecutionTier$Aot;Ljava/lang/String;ILjava/lang/Object;)Lio/github/charlietap/chasm/bindgen/ExecutionTier$Aot;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getCompiledModule ()Ljava/lang/String;
+	public fun getManaged ()Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
 public final class io/github/charlietap/chasm/bindgen/ExecutionTier$Interpreter : io/github/charlietap/chasm/bindgen/ExecutionTier {
 	public fun <init> ()V
+	public fun getManaged ()Z
 }
 
 public final class io/github/charlietap/chasm/bindgen/ExecutionTier$Jit : io/github/charlietap/chasm/bindgen/ExecutionTier {
 	public fun <init> ()V
+	public fun getManaged ()Z
 }
 
 public final class io/github/charlietap/chasm/bindgen/ExportedAllocator {

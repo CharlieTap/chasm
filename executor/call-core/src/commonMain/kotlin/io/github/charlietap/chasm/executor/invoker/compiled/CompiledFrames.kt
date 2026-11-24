@@ -18,24 +18,6 @@ fun openFrame(
     return (fp.toLong() shl 32) or (sp.toLong() and 0xFFFF_FFFFL)
 }
 
-fun openRoots(
-    context: ExecutionContext,
-    size: Int,
-): Long {
-    val saved = openFrame(context, size)
-    clearRoots(context, saved.toInt(), size)
-    return saved
-}
-
-@OptIn(UnsafeHostApi::class)
-fun clearRoots(
-    context: ExecutionContext,
-    start: Int,
-    size: Int,
-) {
-    context.vstack.unsafeElements().fill(0L, start, start + size)
-}
-
 fun closeFrame(
     context: ExecutionContext,
     saved: Long,

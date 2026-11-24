@@ -20,6 +20,7 @@ import io.github.charlietap.chasm.compiler.backend.abi.STRUCT_ACCESSOR_READ_BITS
 import io.github.charlietap.chasm.compiler.backend.abi.STRUCT_ACCESSOR_READ_REFERENCE
 import io.github.charlietap.chasm.compiler.backend.abi.STRUCT_ACCESSOR_WRITE_BITS
 import io.github.charlietap.chasm.compiler.backend.abi.STRUCT_ACCESSOR_WRITE_REFERENCE
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.ShapeField
 import io.github.charlietap.chasm.compiler.backend.dex.abi.method
 import io.github.charlietap.chasm.compiler.backend.dex.abi.referenceType
 import io.github.charlietap.chasm.compiler.backend.dex.abi.valueType
@@ -39,12 +40,6 @@ import io.github.charlietap.dexter.Label
 import io.github.charlietap.dexter.LiteralOp
 import io.github.charlietap.dexter.Reg
 
-class ShapeField(
-    val owner: String,
-    val name: String,
-    val descriptor: String,
-)
-
 class ShapeAccessorDex {
 
     fun struct(
@@ -55,16 +50,14 @@ class ShapeAccessorDex {
         val dexter = Dexter()
         val file = dexter.beginFile()
         val type = ClassType(shapeDescriptor)
-        val gcFields = fields.map { field -> GcField(field.owner, field.name, field.descriptor) }
-        val shape = StructShape(shapeDescriptor, null, true, gcFields)
-        val dexFields = gcFields.map { gcField -> DexField(ClassType(gcField.owner), gcField.name, valueType(gcField.descriptor)) }
+        val dexFields = fields.map { field -> DexField(ClassType(field.owner), field.name, valueType(field.descriptor)) }
         val accessorType = accessorType(type)
         val accessor = accessorClass(file, accessorType, STRUCT_ACCESSOR)
 
-        writeReadBits(accessor, accessorType, type, shape, dexFields)
-        writeReadReference(accessor, accessorType, type, shape, dexFields)
-        writeWriteBits(accessor, accessorType, type, shape, dexFields)
-        writeWriteReference(accessor, accessorType, type, shape, dexFields)
+        writeReadBits(accessor, accessorType, type, fields, dexFields)
+        writeReadReference(accessor, accessorType, type, fields, dexFields)
+        writeWriteBits(accessor, accessorType, type, fields, dexFields)
+        writeWriteReference(accessor, accessorType, type, fields, dexFields)
         writeNewStruct(accessor, accessorType, type)
 
         return file.finish()
@@ -112,7 +105,7 @@ class ShapeAccessorDex {
         builder: ClassBuilder,
         accessorType: ClassType,
         type: ClassType,
-        shape: StructShape,
+        fields: List<ShapeField>,
         dexFields: List<DexField>,
     ) {
 
@@ -122,15 +115,15 @@ class ShapeAccessorDex {
         code.checkCast(struct, type)
         val cases = switchOnFieldIndex(code, index, dexFields.size)
 
-        shape.fields.forEachIndexed { position, gcField ->
+        fields.forEachIndexed { position, field ->
 
             val dexField = dexFields[position]
             code.bind(cases[position])
 
-            if (holdsReference(gcField)) {
+            if (holdsReference(field)) {
                 throwFieldError(code, CREATE_REFERENCE_FIELD_ERROR, index)
             } else {
-                when (gcField.descriptor) {
+                when (field.descriptor) {
                     "J" -> {
                         code.getField(WIDE_RESULT, struct, dexField)
                     }
@@ -165,7 +158,7 @@ class ShapeAccessorDex {
         builder: ClassBuilder,
         accessorType: ClassType,
         type: ClassType,
-        shape: StructShape,
+        fields: List<ShapeField>,
         dexFields: List<DexField>,
     ) {
 
@@ -175,11 +168,11 @@ class ShapeAccessorDex {
         code.checkCast(struct, type)
         val cases = switchOnFieldIndex(code, index, dexFields.size)
 
-        shape.fields.forEachIndexed { position, gcField ->
+        fields.forEachIndexed { position, field ->
 
             code.bind(cases[position])
 
-            if (holdsReference(gcField)) {
+            if (holdsReference(field)) {
                 code.getField(RESULT, struct, dexFields[position])
                 code.returnValue(RESULT)
             } else {
@@ -193,7 +186,7 @@ class ShapeAccessorDex {
         builder: ClassBuilder,
         accessorType: ClassType,
         type: ClassType,
-        shape: StructShape,
+        fields: List<ShapeField>,
         dexFields: List<DexField>,
     ) {
 
@@ -204,15 +197,15 @@ class ShapeAccessorDex {
         code.checkCast(struct, type)
         val cases = switchOnFieldIndex(code, index, dexFields.size)
 
-        shape.fields.forEachIndexed { position, gcField ->
+        fields.forEachIndexed { position, field ->
 
             val dexField = dexFields[position]
             code.bind(cases[position])
 
-            if (holdsReference(gcField)) {
+            if (holdsReference(field)) {
                 throwFieldError(code, CREATE_REFERENCE_FIELD_ERROR, index)
             } else {
-                when (gcField.descriptor) {
+                when (field.descriptor) {
                     "J" -> {
                         code.putField(value, struct, dexField)
                     }
@@ -242,7 +235,7 @@ class ShapeAccessorDex {
         builder: ClassBuilder,
         accessorType: ClassType,
         type: ClassType,
-        shape: StructShape,
+        fields: List<ShapeField>,
         dexFields: List<DexField>,
     ) {
 
@@ -253,13 +246,13 @@ class ShapeAccessorDex {
         code.checkCast(struct, type)
         val cases = switchOnFieldIndex(code, index, dexFields.size)
 
-        shape.fields.forEachIndexed { position, gcField ->
+        fields.forEachIndexed { position, field ->
 
             code.bind(cases[position])
 
-            if (holdsReference(gcField)) {
+            if (holdsReference(field)) {
                 code.moveObject(RESULT, value)
-                code.checkCast(RESULT, referenceType(gcField.descriptor))
+                code.checkCast(RESULT, referenceType(field.descriptor))
                 code.putField(RESULT, struct, dexFields[position])
                 code.returnVoid()
             } else {
@@ -340,8 +333,8 @@ class ShapeAccessorDex {
         code.throwValue(RESULT)
     }
 
-    private fun holdsReference(gcField: GcField): Boolean {
-        return gcField.descriptor.startsWith("L") || gcField.descriptor.startsWith("[")
+    private fun holdsReference(field: ShapeField): Boolean {
+        return field.descriptor.startsWith("L") || field.descriptor.startsWith("[")
     }
 
     private companion object {

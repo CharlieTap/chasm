@@ -1,11 +1,14 @@
 package com.test
 
-import io.github.charlietap.chasm.embedding.reference.readStructField
-import io.github.charlietap.chasm.embedding.reference.readStructReference
-import io.github.charlietap.chasm.embedding.reference.writeStructField
 import io.github.charlietap.chasm.embedding.reference.writeStructReference
 import io.github.charlietap.chasm.reference.ArrayReference
 import io.github.charlietap.chasm.reference.StructReference
+import io.github.charlietap.chasm.runtime.compiled.gc.CompiledArray
+import io.github.charlietap.chasm.runtime.compiled.gc.CompiledStruct
+import io.github.charlietap.chasm.runtime.compiled.gc.storage.S_I
+import io.github.charlietap.chasm.runtime.compiled.gc.storage.S_I_II_II_RR_T3
+import io.github.charlietap.chasm.runtime.compiled.gc.storage.S_I_RR
+import io.github.charlietap.chasm.runtime.compiled.gc.storage.S_R
 import kotlin.Any
 import kotlin.Double
 import kotlin.Float
@@ -48,7 +51,13 @@ public interface AotStructViews {
     public val reference: StructReference,
   ) {
     public val f0: Int
-      get() = readStructField(reference, 0).toInt()
+      get() = storage().i0
+
+    private fun storage(): S_I {
+      val struct = reference as S_I
+      require(struct.rtt.key === "7cd61ed60e3e32738fd5976a89584478_0") { "the struct is not a Struct1" }
+      return struct
+    }
   }
 
   @JvmInline
@@ -56,55 +65,73 @@ public interface AotStructViews {
     public val reference: StructReference,
   ) {
     public var f0: Int
-      get() = readStructField(reference, 0).toInt()
+      get() = storage().i0
       set(newValue) {
-        writeStructField(reference, 0, newValue.toLong())
+        storage().i0 = newValue
       }
 
     public val f1: Long
-      get() = readStructField(reference, 1)
+      get() {
+        val storage = storage()
+        return (storage.i1.toLong() and 0xFFFFFFFFL) or (storage.i2.toLong() shl 32)
+      }
 
     public var f2: Float
-      get() = Float.fromBits(readStructField(reference, 2).toInt())
+      get() = Float.fromBits(storage().i3)
       set(newValue) {
-        writeStructField(reference, 2, newValue.toRawBits().toLong())
+        storage().i3 = newValue.toRawBits()
       }
 
     public val f3: Double
-      get() = Double.fromBits(readStructField(reference, 3))
+      get() {
+        val storage = storage()
+        return Double.fromBits((storage.i4.toLong() and 0xFFFFFFFFL) or (storage.i5.toLong() shl 32))
+      }
 
     public var f4: Int
-      get() = readStructField(reference, 4).toInt()
+      get() = storage().i6
       set(newValue) {
-        writeStructField(reference, 4, newValue.toLong())
+        storage().i6 = newValue and 0xFF
       }
 
     public val f5: Int
-      get() = readStructField(reference, 5).toInt()
+      get() = storage().i7
 
     public var f6: Struct2?
-      get() = (readStructReference(reference, 6) as StructReference?)?.let { structReference -> Struct2(structReference) }
+      get() = (storage().r0 as StructReference?)?.let { structReference -> Struct2(structReference) }
       set(newValue) {
-        writeStructReference(reference, 6, newValue?.reference)
+        val storage = storage()
+        val value = newValue?.reference as CompiledStruct?
+        require(value == null || (value.rtt.engine === storage.rtt.engine && value.rtt.key === "819217506f258f9b84be8103ddce7039_0")) { "the value does not match the type of field 6" }
+        storage.r0 = value
       }
 
     public val f7: Struct1
-      get() = Struct1(readStructReference(reference, 7) as StructReference)
+      get() = Struct1(storage().r1 as StructReference)
 
     public var f8: ArrayReference?
-      get() = readStructReference(reference, 8) as ArrayReference?
+      get() = storage().r2 as ArrayReference?
       set(newValue) {
-        writeStructReference(reference, 8, newValue)
+        val storage = storage()
+        val value = newValue as CompiledArray?
+        require(value == null || (value.rtt.engine === storage.rtt.engine && value.rtt.key === "d41b1e114550bc6268fd098530145f24_0")) { "the value does not match the type of field 8" }
+        storage.r2 = value
       }
 
     public val f9: ArrayReference
-      get() = readStructReference(reference, 9) as ArrayReference
+      get() = storage().r3 as ArrayReference
 
     public var f10: Any?
-      get() = readStructReference(reference, 10)
+      get() = storage().r4
       set(newValue) {
         writeStructReference(reference, 10, newValue)
       }
+
+    private fun storage(): S_I_II_II_RR_T3 {
+      val struct = reference as S_I_II_II_RR_T3
+      require(struct.rtt.key === "819217506f258f9b84be8103ddce7039_0") { "the struct is not a Struct2" }
+      return struct
+    }
   }
 
   @JvmInline
@@ -112,7 +139,13 @@ public interface AotStructViews {
     public val reference: StructReference,
   ) {
     public val f0: Struct4?
-      get() = (readStructReference(reference, 0) as StructReference?)?.let { structReference -> Struct4(structReference) }
+      get() = (storage().r0 as StructReference?)?.let { structReference -> Struct4(structReference) }
+
+    private fun storage(): S_R {
+      val struct = reference as S_R
+      require(struct.rtt.key === "096a44471f338e8b50afd7453b79f0b4_0") { "the struct is not a Struct3" }
+      return struct
+    }
   }
 
   @JvmInline
@@ -120,12 +153,21 @@ public interface AotStructViews {
     public val reference: StructReference,
   ) {
     public var f0: Struct3?
-      get() = (readStructReference(reference, 0) as StructReference?)?.let { structReference -> Struct3(structReference) }
+      get() = (storage().r0 as StructReference?)?.let { structReference -> Struct3(structReference) }
       set(newValue) {
-        writeStructReference(reference, 0, newValue?.reference)
+        val storage = storage()
+        val value = newValue?.reference as CompiledStruct?
+        require(value == null || (value.rtt.engine === storage.rtt.engine && value.rtt.key === "096a44471f338e8b50afd7453b79f0b4_0")) { "the value does not match the type of field 0" }
+        storage.r0 = value
       }
 
     public val f1: Int
-      get() = readStructField(reference, 1).toInt()
+      get() = storage().i0
+
+    private fun storage(): S_I_RR {
+      val struct = reference as S_I_RR
+      require(struct.rtt.key === "096a44471f338e8b50afd7453b79f0b4_1") { "the struct is not a Struct4" }
+      return struct
+    }
   }
 }

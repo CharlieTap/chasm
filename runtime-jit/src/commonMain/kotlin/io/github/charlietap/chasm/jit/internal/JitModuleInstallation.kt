@@ -6,6 +6,11 @@ import io.github.charlietap.chasm.declarations.ModuleNames
 import io.github.charlietap.chasm.embedding.diagnostic.CompiledTrapSource
 import io.github.charlietap.chasm.embedding.diagnostic.TrapSource
 import io.github.charlietap.chasm.embedding.internal.ModuleInstallation
+import io.github.charlietap.chasm.embedding.managed.ManagedGlobal
+import io.github.charlietap.chasm.embedding.managed.ManagedInstances
+import io.github.charlietap.chasm.embedding.managed.ManagedMemory
+import io.github.charlietap.chasm.embedding.managed.ManagedTable
+import io.github.charlietap.chasm.embedding.managed.runStartFunction
 import io.github.charlietap.chasm.embedding.shapes.DecodedModule
 import io.github.charlietap.chasm.embedding.shapes.Importable
 import io.github.charlietap.chasm.embedding.shapes._payload
@@ -29,7 +34,8 @@ internal class JitModuleInstallation(
     private val compilation: JitCompilation,
     private val shapes: StoreShapes,
     private val managedStore: ManagedStore,
-    private val handles: JitHandles,
+    private val shapeTypes: ShapeClassTypes,
+    private val instances: ManagedInstances,
     stacktraces: Boolean,
 ) : ModuleInstallation {
 
@@ -43,9 +49,9 @@ internal class JitModuleInstallation(
 
     override fun external(importable: Importable): ExternalValue {
         return when (val payload = importable._payload()) {
-            is JitMemory -> ExternalValue.Memory(payload.address)
-            is JitTable -> ExternalValue.Table(payload.address)
-            is JitGlobal -> ExternalValue.Global(payload.address)
+            is ManagedMemory -> ExternalValue.Memory(payload.address)
+            is ManagedTable -> ExternalValue.Table(payload.address)
+            is ManagedGlobal -> ExternalValue.Global(payload.address)
             else -> payload as ExternalValue
         }
     }
@@ -97,6 +103,7 @@ internal class JitModuleInstallation(
             definedFunctions = declarations.functionTypeIndices.size,
             instance = instance,
             runtimeTypes = runtimeTypes,
+            rtts = emptyList(),
         )
     }
 
@@ -107,11 +114,18 @@ internal class JitModuleInstallation(
     ) {
 
         declarations.definedTypes.forEachIndexed { index, definedType ->
+
+            val type = instance.runtimeTypes[index].value
             val shape = compilation.shapeTypes.getOrNull(index)?.let(shapes::loadClass)
-            managedStore.register(instance.runtimeTypes[index].value, definedType, shape)
+
+            managedStore.register(type, definedType)
+
+            if (shape != null) {
+                shapeTypes.register(type, shape)
+            }
         }
 
-        handles.installed(instance, config)
+        instances.installed(instance, config)
         compilation.install(installation)
     }
 

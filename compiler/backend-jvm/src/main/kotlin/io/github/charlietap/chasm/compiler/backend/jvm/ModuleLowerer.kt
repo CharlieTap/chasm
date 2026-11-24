@@ -68,10 +68,12 @@ fun ModuleLowerer(
         functionLowerer = ::FunctionLowerer,
         signatureLowerer = ::SignatureLowerer,
         entryLowerer = ::EntryLowerer,
+        constantsLowerer = ::ConstantsLowerer,
         bindingLowerer = ::BindingLowerer,
         declarationCallGenerator = ::DeclarationCallGenerator,
         declarationsLowerer = ::DeclarationsLowerer,
         moduleClassLowerer = ::ModuleClassLowerer,
+        structsLowerer = ::ModuleStructsLowerer,
     )
 
 internal inline fun ModuleLowerer(
@@ -85,10 +87,12 @@ internal inline fun ModuleLowerer(
     crossinline functionLowerer: FunctionLowerer,
     crossinline signatureLowerer: SignatureLowerer,
     crossinline entryLowerer: EntryLowerer,
+    crossinline constantsLowerer: ConstantsLowerer,
     crossinline bindingLowerer: BindingLowerer,
     crossinline declarationCallGenerator: DeclarationCallGenerator,
     crossinline declarationsLowerer: DeclarationsLowerer,
     crossinline moduleClassLowerer: ModuleClassLowerer,
+    noinline structsLowerer: ModuleStructsLowerer,
 ): JvmModule = try {
     val lowering = ModuleLowering(module, code, options)
     val entryPath = lowering.entryPath
@@ -176,6 +180,7 @@ internal inline fun ModuleLowerer(
     } finally {
         pool?.shutdownNow()
     }
+    constantsLowerer(lowering, module, output)
     bindingLowerer(lowering, output)
     val dataResourcePath = dataResource(entryPath).takeIf { declarations.dataSegments.isNotEmpty() }
     val calls = if (dataResourcePath != null) {
@@ -193,7 +198,7 @@ internal inline fun ModuleLowerer(
         output.resource(trapSitesResource(entryPath)) { stream -> writeTrapSites(stream, sites) }
     }
     val moduleDescriptor = moduleClassDescriptor(entryPath)
-    moduleClassLowerer(lowering, moduleDescriptor, declarationClasses, dataResourcePath, entries, output)
+    moduleClassLowerer(lowering, moduleDescriptor, declarationClasses, dataResourcePath, entries, structsLowerer, output)
     JvmModule(internalName(moduleDescriptor).replace('/', '.'), dataResourcePath)
 } catch (tooLarge: ClassTooLargeException) {
     throw ClassTooLarge(

@@ -1,0 +1,72 @@
+@file:OptIn(ExperimentalChasmApi::class)
+
+package com.test
+
+import com.test.aot.WasmModule
+import io.github.charlietap.chasm.ExperimentalChasmApi
+import io.github.charlietap.chasm.aot.module
+import io.github.charlietap.chasm.aot.store
+import io.github.charlietap.chasm.embedding.codegen.CodegenImport
+import io.github.charlietap.chasm.embedding.codegen.allocateImports
+import io.github.charlietap.chasm.embedding.instance
+import io.github.charlietap.chasm.embedding.invokeUnboxed
+import io.github.charlietap.chasm.embedding.prepareFunction
+import io.github.charlietap.chasm.embedding.shapes.Instance
+import io.github.charlietap.chasm.embedding.shapes.PreparedFunction
+import io.github.charlietap.chasm.embedding.shapes.Store
+import io.github.charlietap.chasm.embedding.shapes.`expect`
+import io.github.charlietap.chasm.reference.StructReference
+import kotlin.Any
+import kotlin.Array
+import kotlin.Int
+import kotlin.LongArray
+import kotlin.OptIn
+import kotlin.collections.List
+
+public suspend fun aotStructStorage(imports: List<CodegenImport> = emptyList()): AotStructStorage {
+  val module = module(WasmModule.COMPILED).`expect`("Failed to load com.test.aot.WasmModule")
+  val store = store(module)
+  val allocatedImports = allocateImports(store, imports)
+  val instance = instance(store, module, allocatedImports).`expect`("Failed to instantiate module")
+  return AotStructStorageImpl(store = store, instance = instance)
+}
+
+private class AotStructStorageImpl(
+  private val store: Store,
+  private val instance: Instance,
+) : AotStructStorage {
+  private val makeDerivedPreparedFunction: PreparedFunction =
+      prepareFunction(instance, "make_derived").`expect`("Failed to prepare function make_derived")
+
+  private val makeWidePreparedFunction: PreparedFunction =
+      prepareFunction(instance, "make_wide").`expect`("Failed to prepare function make_wide")
+
+  private val makeDerivedWords: LongArray = LongArray(1)
+
+  private val makeDerivedReferences: Array<Any?> = arrayOfNulls<Any>(1)
+
+  private val makeWideWords: LongArray = LongArray(1)
+
+  private val makeWideReferences: Array<Any?> = arrayOfNulls<Any>(1)
+
+  override fun makeDerived(p0: Int): AotStructStorage.Struct2 {
+    try {
+      makeDerivedWords[0] = p0.toLong()
+      makeDerivedPreparedFunction.invokeUnboxed(makeDerivedWords, makeDerivedReferences).`expect`("Failed to invoke function makeDerived")
+      val result = AotStructStorage.Struct2(makeDerivedReferences[0] as StructReference)
+      return result
+    } finally {
+      makeDerivedReferences[0] = null
+    }
+  }
+
+  override fun makeWide(): AotStructStorage.Struct3 {
+    try {
+      makeWidePreparedFunction.invokeUnboxed(makeWideWords, makeWideReferences).`expect`("Failed to invoke function makeWide")
+      val result = AotStructStorage.Struct3(makeWideReferences[0] as StructReference)
+      return result
+    } finally {
+      makeWideReferences[0] = null
+    }
+  }
+}

@@ -43,6 +43,7 @@ kotlin {
                 implementation(projects.compiler.backendDex)
                 implementation(projects.compiler.frontend)
                 implementation(projects.decoder)
+                implementation(projects.embeddingManaged)
                 implementation(projects.embeddingRuntime)
                 implementation(projects.executor.callCore)
                 implementation(projects.executor.instantiator)

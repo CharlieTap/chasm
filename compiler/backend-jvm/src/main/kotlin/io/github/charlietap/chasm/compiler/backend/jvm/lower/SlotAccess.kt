@@ -4,7 +4,9 @@ import io.github.charlietap.chasm.compiler.backend.abi.DOUBLE_TO_RAW_LONG_BITS
 import io.github.charlietap.chasm.compiler.backend.abi.FLOAT_TO_RAW_INT_BITS
 import io.github.charlietap.chasm.compiler.backend.abi.INT_BITS_TO_FLOAT
 import io.github.charlietap.chasm.compiler.backend.abi.LONG_BITS_TO_DOUBLE
+import io.github.charlietap.chasm.compiler.backend.abi.NULL_REFERENCE
 import io.github.charlietap.chasm.compiler.backend.analysis.NarrowHomeMismatch
+import io.github.charlietap.chasm.compiler.backend.analysis.SlotKindFlow
 import io.github.charlietap.chasm.compiler.backend.analysis.SlotKinds
 import io.github.charlietap.chasm.compiler.backend.analysis.form.Operand
 import io.github.charlietap.chasm.type.NumberType
@@ -199,13 +201,36 @@ private fun LowerContext.storeOwnLong(
             emit.invokeStatic(LONG_BITS_TO_DOUBLE)
             emit.store(Opcodes.DSTORE, local)
         }
-        else -> {
-            emit.store(Opcodes.LSTORE, local)
-            if (roots.publishes(slot)) {
-                roots.publish(slot)
-            }
-        }
+        else -> emit.store(Opcodes.LSTORE, local)
     }
+}
+
+internal fun LowerContext.pushObject(
+    operand: Operand,
+) {
+    when (operand) {
+        is Operand.Immediate -> emit.insn(Opcodes.ACONST_NULL)
+        is Operand.Slot -> emit.load(Opcodes.ALOAD, locals.objectSlot(operand.slot))
+    }
+}
+
+internal fun LowerContext.storeObject(
+    slot: Int,
+) = emit.store(Opcodes.ASTORE, locals.objectSlot(slot))
+
+internal fun LowerContext.pushReceiver(
+    slot: Int,
+    owner: String,
+) = pushCheckedReceiver(locals.objectSlot(slot), owner)
+
+internal fun LowerContext.pushCheckedReceiver(
+    local: Int,
+    owner: String,
+) {
+    emit.load(Opcodes.ALOAD, local)
+    emit.jump(Opcodes.IFNULL, trapLabel(NULL_REFERENCE))
+    emit.load(Opcodes.ALOAD, local)
+    emit.type(Opcodes.CHECKCAST, owner)
 }
 
 internal fun LowerContext.storeFloat(
@@ -253,6 +278,20 @@ internal fun LowerContext.copyToSlot(
     source: Operand,
 ) {
     if (source is Operand.Slot && source.slot == destination) return
+    val kind = copiedKind(destination)
+    if (copiesObject(destination, source, kind)) {
+        pushObject(source)
+        storeObject(destination)
+    }
+    if (copiesNumber(destination, source, kind)) {
+        copyNumber(destination, source)
+    }
+}
+
+private fun LowerContext.copyNumber(
+    destination: Int,
+    source: Operand,
+) {
     copyOwn(destination, source)
     if (source !is Operand.Slot) return
     val float = locals.floatShadow(destination)
@@ -308,13 +347,73 @@ internal fun LowerContext.parallelCopy(
     sources: List<Operand>,
     destinations: List<Int>,
 ) {
+
+    val kinds = destinations.map { destination -> copiedKind(destination) }
     val moves = sources.indices.filter { index ->
         val source = sources[index]
-        !(source is Operand.Slot && source.slot == destinations[index])
+        !(source is Operand.Slot && source.slot == destinations[index]) && kinds[index] != SlotKindFlow.UNDEFINED
     }
     if (moves.size == 1) return copyToSlot(destinations[moves[0]], sources[moves[0]])
-    moves.forEach { index -> pushCopySource(destinations[index], sources[index]) }
-    moves.asReversed().forEach { index -> storeCopyDestination(destinations[index]) }
+
+    moves.forEach { index ->
+        val destination = destinations[index]
+        val source = sources[index]
+        if (copiesNumber(destination, source, kinds[index])) {
+            pushCopySource(destination, source)
+        }
+        if (copiesObject(destination, source, kinds[index])) {
+            pushObject(source)
+        }
+    }
+    moves.asReversed().forEach { index ->
+        val destination = destinations[index]
+        val source = sources[index]
+        if (copiesObject(destination, source, kinds[index])) {
+            storeObject(destination)
+        }
+        if (copiesNumber(destination, source, kinds[index])) {
+            storeCopyDestination(destination)
+        }
+    }
+}
+
+private fun LowerContext.copiedKind(
+    destination: Int,
+): Byte {
+
+    if (position == SlotKinds.PROLOGUE) {
+        return slotKindFlow.entryKind(destination)
+    }
+
+    val kind = slotKindFlow.written(position, destination)
+    check(kind != SlotKindFlow.NONE) { "slot $destination is not written at $position" }
+
+    return kind
+}
+
+private fun LowerContext.copiesObject(
+    destination: Int,
+    source: Operand,
+    kind: Byte,
+): Boolean {
+    return when (kind) {
+        SlotKindFlow.UNDEFINED -> false
+        SlotKindFlow.OBJECT -> true
+        SlotKindFlow.CONFLICT -> locals.holdsObject(destination) && (source !is Operand.Slot || locals.holdsObject(source.slot))
+        else -> source is Operand.Immediate && !locals.holdsNumber(destination)
+    }
+}
+
+private fun LowerContext.copiesNumber(
+    destination: Int,
+    source: Operand,
+    kind: Byte,
+): Boolean {
+    return when (kind) {
+        SlotKindFlow.UNDEFINED, SlotKindFlow.OBJECT -> false
+        SlotKindFlow.CONFLICT -> locals.holdsNumber(destination) && (source !is Operand.Slot || locals.holdsNumber(source.slot))
+        else -> source is Operand.Slot || locals.holdsNumber(destination)
+    }
 }
 
 private fun LowerContext.pushCopySource(

@@ -9,28 +9,36 @@ import io.github.charlietap.chasm.compiler.backend.abi.UNREACHABLE
 import io.github.charlietap.chasm.compiler.backend.analysis.SlotKinds
 import org.objectweb.asm.Opcodes
 
-internal val CHUNK_ARGUMENTS = listOf("I", "I")
+internal val CHUNK_ARGUMENTS = listOf("I", "I", "[Ljava/lang/Object;")
 
 internal fun chunkDescriptor(
     binding: String,
-) = "(${binding}Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;III)I"
+) = "(${binding}Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;III[Ljava/lang/Object;)I"
 
 internal fun LowerContext.lowerChunkBody() {
     val chunk = checkNotNull(chunk)
     enterPrologue()
     initializeScratch()
     emit.long(0L)
-    emit.store(Opcodes.LSTORE, locals.rootsSaved)
+    emit.store(Opcodes.LSTORE, locals.frameSaved)
     emit.load(Opcodes.ILOAD, locals.argumentLocals[0])
-    emit.store(Opcodes.ISTORE, locals.rootBase)
+    emit.store(Opcodes.ISTORE, locals.frameBase)
+    emit.load(Opcodes.ALOAD, locals.argumentLocals[2])
+    emit.store(Opcodes.ASTORE, locals.objectFrame)
     val reloaded = reloadedSlots(chunk)
-    roots.initialize(references.writesThrough || reloaded.isNotEmpty())
+    if (reloaded.any { slot -> locals.holdsNumber(slot) }) {
+        pushContext()
+        emit.invokeStatic(FRAME)
+    } else {
+        emit.insn(Opcodes.ACONST_NULL)
+    }
+    emit.store(Opcodes.ASTORE, locals.frameArray)
     if (function.exceptions != null) {
-        emit.load(Opcodes.ILOAD, locals.rootBase)
+        emit.load(Opcodes.ILOAD, locals.frameBase)
         emit.insn(Opcodes.I2L)
         emit.int(32)
         emit.insn(Opcodes.LSHL)
-        emit.load(Opcodes.ILOAD, locals.rootBase)
+        emit.load(Opcodes.ILOAD, locals.frameBase)
         emit.int(frame.frameSlots)
         emit.insn(Opcodes.IADD)
         emit.insn(Opcodes.I2L)
@@ -84,7 +92,16 @@ private fun LowerContext.loadSlots(
     locals.heldSlots.forEach { slot -> if (reloads != null && !reloads[slot]) initialize(slot, frame.initialValues[slot]) }
 
     for (slot in reloaded) {
-        emit.load(Opcodes.ALOAD, locals.rootsArray)
+        if (locals.holdsObject(slot)) {
+            emit.load(Opcodes.ALOAD, locals.objectFrame)
+            emit.int(slot)
+            emit.insn(Opcodes.AALOAD)
+            emit.store(Opcodes.ASTORE, locals.objectSlot(slot))
+        }
+        if (!locals.holdsNumber(slot)) {
+            continue
+        }
+        emit.load(Opcodes.ALOAD, locals.frameArray)
         frameIndex(slot)
         emit.insn(Opcodes.LALOAD)
         val local = locals.slot(slot)
@@ -120,12 +137,21 @@ private fun LowerContext.lowerExits() {
     emit.place(chunk.spill)
     val spills = chunk.spills
     val spilled = locals.heldSlots.filter { slot -> spills == null || spills[slot] }
-    if (spilled.isNotEmpty()) {
+    if (spilled.any { slot -> locals.holdsNumber(slot) }) {
         pushContext()
         emit.invokeStatic(FRAME)
         emit.store(Opcodes.ASTORE, locals.scratchValues)
     }
     for (slot in spilled) {
+        if (locals.holdsObject(slot)) {
+            emit.load(Opcodes.ALOAD, locals.objectFrame)
+            emit.int(slot)
+            emit.load(Opcodes.ALOAD, locals.objectSlot(slot))
+            emit.insn(Opcodes.AASTORE)
+        }
+        if (!locals.holdsNumber(slot)) {
+            continue
+        }
         emit.load(Opcodes.ALOAD, locals.scratchValues)
         frameIndex(slot)
         val local = locals.slot(slot)
@@ -154,7 +180,7 @@ private fun LowerContext.lowerExits() {
 private fun LowerContext.frameIndex(
     slot: Int,
 ) {
-    emit.load(Opcodes.ILOAD, locals.rootBase)
+    emit.load(Opcodes.ILOAD, locals.frameBase)
     emit.int(slot)
     emit.insn(Opcodes.IADD)
 }

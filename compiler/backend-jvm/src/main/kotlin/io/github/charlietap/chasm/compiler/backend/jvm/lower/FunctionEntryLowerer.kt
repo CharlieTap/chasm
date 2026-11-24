@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.compiler.backend.jvm.lower
 import io.github.charlietap.chasm.compiler.backend.abi.CALL_STACK_EXHAUSTED
 import io.github.charlietap.chasm.compiler.backend.abi.CONTEXT_TYPE
 import io.github.charlietap.chasm.compiler.backend.abi.MAX_UNCHARGED_LEAF_FRAME_COST
+import io.github.charlietap.chasm.compiler.backend.abi.OBJECT_TYPE
 import io.github.charlietap.chasm.compiler.backend.abi.SAVE_STACK
 import io.github.charlietap.chasm.compiler.backend.abi.STACK_LIMIT_FIELD
 import io.github.charlietap.chasm.compiler.backend.analysis.SlotKinds
@@ -14,14 +15,18 @@ internal fun LowerContext.lowerPrologue(
 ) {
     enterPrologue()
     initializeScratch()
-    roots.open()
-    for (slot in 0 until parameterCount) initializeShadows(slot, 0L)
+    emit.long(0L)
+    emit.store(Opcodes.LSTORE, locals.frameSaved)
+    emit.int(0)
+    emit.store(Opcodes.ISTORE, locals.frameBase)
+    emit.insn(Opcodes.ACONST_NULL)
+    emit.store(Opcodes.ASTORE, locals.frameArray)
+    for (slot in 0 until parameterCount) {
+        initialize(slot, 0L)
+    }
     parameterDescriptors.forEachIndexed { index, descriptor ->
         if (argumentArray) {
-            emit.load(Opcodes.ALOAD, locals.parameterLocals[0])
-            emit.int(index)
-            emit.insn(Opcodes.LALOAD)
-            return@forEachIndexed storeLong(index)
+            return@forEachIndexed storeArgument(index, descriptor)
         }
         val local = locals.parameterLocals[index]
         when (descriptor) {
@@ -36,6 +41,10 @@ internal fun LowerContext.lowerPrologue(
             "D" -> {
                 emit.load(Opcodes.DLOAD, local)
                 storeDouble(index)
+            }
+            OBJECT_TYPE -> {
+                emit.load(Opcodes.ALOAD, local)
+                storeObject(index)
             }
             else -> {
                 emit.load(Opcodes.LLOAD, local)
@@ -52,6 +61,23 @@ internal fun LowerContext.lowerPrologue(
     if (!facts.isLeaf || frameCost > MAX_UNCHARGED_LEAF_FRAME_COST) {
         chargeStackBudget(frameCost)
     }
+}
+
+private fun LowerContext.storeArgument(
+    index: Int,
+    descriptor: String,
+) {
+    if (descriptor == OBJECT_TYPE) {
+        emit.load(Opcodes.ALOAD, locals.parameterLocals[1])
+        emit.int(index)
+        emit.insn(Opcodes.AALOAD)
+        storeObject(index)
+        return
+    }
+    emit.load(Opcodes.ALOAD, locals.parameterLocals[0])
+    emit.int(index)
+    emit.insn(Opcodes.LALOAD)
+    storeLong(index)
 }
 
 internal fun LowerContext.chargeStackBudget(frameCost: Int) {
@@ -83,10 +109,14 @@ internal fun LowerContext.initializeScratch() {
     emit.store(Opcodes.ISTORE, locals.exitPosition)
     emit.long(0L)
     emit.store(Opcodes.LSTORE, locals.stackSaved)
-    emit.insn(Opcodes.ACONST_NULL)
-    emit.store(Opcodes.ASTORE, locals.scratchValues)
-    emit.insn(Opcodes.ACONST_NULL)
-    emit.store(Opcodes.ASTORE, locals.scratchObject)
+    listOf(locals.scratchValues, locals.scratchReferences, locals.scratchObject, locals.scratchRtt, locals.objectFrame).forEach { local ->
+        emit.insn(Opcodes.ACONST_NULL)
+        emit.store(Opcodes.ASTORE, local)
+    }
+    locals.storageArrayScratches.forEach { local ->
+        emit.insn(Opcodes.ACONST_NULL)
+        emit.store(Opcodes.ASTORE, local)
+    }
     initializeMemory()
 }
 
@@ -94,6 +124,13 @@ internal fun LowerContext.initialize(
     slot: Int,
     bits: Long,
 ) {
+    if (locals.holdsObject(slot)) {
+        emit.insn(Opcodes.ACONST_NULL)
+        emit.store(Opcodes.ASTORE, locals.objectSlot(slot))
+    }
+    if (!locals.holdsNumber(slot)) {
+        return
+    }
     val local = locals.slot(slot)
     when (locals.kind(slot)) {
         SlotKinds.INT -> {

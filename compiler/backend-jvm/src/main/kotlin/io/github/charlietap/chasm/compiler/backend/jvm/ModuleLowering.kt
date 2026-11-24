@@ -5,13 +5,20 @@ import io.github.charlietap.chasm.cir.CirFunction
 import io.github.charlietap.chasm.cir.CirModule
 import io.github.charlietap.chasm.cir.FunctionIndex
 import io.github.charlietap.chasm.compiler.backend.abi.MethodRef
+import io.github.charlietap.chasm.compiler.backend.abi.OBJECT_TYPE
 import io.github.charlietap.chasm.compiler.backend.abi.internalName
 import io.github.charlietap.chasm.compiler.backend.abi.returnDescriptor
 import io.github.charlietap.chasm.compiler.backend.abi.staticParameters
+import io.github.charlietap.chasm.compiler.backend.analysis.DataflowSlotKindAnalyzer
 import io.github.charlietap.chasm.compiler.backend.analysis.ModuleAnalysis
 import io.github.charlietap.chasm.compiler.backend.analysis.ModuleIndexSpaces
+import io.github.charlietap.chasm.compiler.backend.analysis.SlotKindAnalyzer
 import io.github.charlietap.chasm.compiler.backend.analysis.analyzeModule
 import io.github.charlietap.chasm.compiler.backend.analysis.functionBatches
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.ConstantExpressions
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.ReferenceTests
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.STORAGE_FAMILY
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.StoragePlans
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.BATCH_FUNCTIONS
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.BATCH_INSTRUCTIONS
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.CLASS_FILE_VERSION
@@ -22,7 +29,9 @@ import io.github.charlietap.chasm.compiler.backend.jvm.abi.codeClassDescriptor
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.functionMethod
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.signatureClassDescriptor
 import io.github.charlietap.chasm.compiler.backend.jvm.binding.BindingLayout
+import io.github.charlietap.chasm.compiler.backend.jvm.gc.RttTests
 import io.github.charlietap.chasm.compiler.backend.jvm.lower.InlineMemory
+import io.github.charlietap.chasm.type.DefinedType
 import io.github.charlietap.chasm.type.FunctionType
 import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.Opcodes
@@ -34,8 +43,15 @@ internal class ModuleLowering(
     val options: JvmOptions,
 ) {
     val declarations = ModuleIndexSpaces(module)
-    val analysis: ModuleAnalysis = analyzeModule(module, code, declarations)
+    val analysis: ModuleAnalysis = analyzeModule(code, declarations, OBJECT_TYPE)
     val layout = BindingLayout()
+
+    val definedTypes: List<DefinedType> = module.definedTypes
+    val storagePlans = StoragePlans(module.definedTypes, STORAGE_FAMILY)
+    val constants = ConstantExpressions(module)
+    val referenceTests = ReferenceTests(module.definedTypes)
+    val rttTests = RttTests(module.definedTypes)
+    val slotKindAnalyzer: SlotKindAnalyzer = DataflowSlotKindAnalyzer()
 
     val inlineMemory: InlineMemory? = when (options.memory) {
         MemoryLowering.HELPERS -> null
@@ -68,7 +84,7 @@ internal class ModuleLowering(
         signature: String,
         type: FunctionType,
     ): MethodRef =
-        MethodRef(signature, TYPED_CALL, staticParameters(type, bindingType).drop(1), returnDescriptor(type))
+        MethodRef(signature, TYPED_CALL, staticParameters(type, bindingType, OBJECT_TYPE).drop(1), returnDescriptor(type, OBJECT_TYPE))
 
     private val batchOf = HashMap<Int, Int>().apply {
         batches.forEachIndexed { batch, functions -> functions.forEach { function -> put(function.index.index, batch) } }

@@ -7,6 +7,7 @@ import io.github.charlietap.chasm.cir.CirFunction
 import io.github.charlietap.chasm.compiler.backend.analysis.ModuleIndexSpaces
 import io.github.charlietap.chasm.compiler.backend.analysis.SlotReadVisitor
 import io.github.charlietap.chasm.compiler.backend.analysis.SlotWriteVisitor
+import io.github.charlietap.chasm.compiler.backend.analysis.basicBlocks
 import io.github.charlietap.chasm.compiler.backend.analysis.fallsThrough
 import io.github.charlietap.chasm.compiler.backend.analysis.form.InstructionForms
 import io.github.charlietap.chasm.compiler.backend.analysis.form.Operand

@@ -1,0 +1,16 @@
+package com.test
+
+import kotlin.Int
+import kotlin.String
+
+public interface AotGcStrings {
+  public fun echoUtf16(`value`: String): String
+
+  public fun echoUtf8(`value`: String): String
+
+  public fun utf16Length(offset: Int, `value`: String): Int
+
+  public fun nullableUtf16(`value`: String): Int
+
+  public fun frozen(`value`: String): String
+}

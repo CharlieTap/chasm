@@ -287,7 +287,7 @@ class CompileTest {
 
         assertEquals(Opcodes.ACC_PUBLIC or Opcodes.ACC_STATIC or Opcodes.ACC_FINAL, field.access)
         assertEquals("Ltest/entry/Module;", field.desc)
-        assertEquals(listOf(Type.getInternalName(CompiledModule::class.java)), entry.interfaces)
+        assertEquals(listOf(Type.getInternalName(CompiledModule::class.java), Type.getInternalName(CompiledModuleStructs::class.java)), entry.interfaces)
         assertEquals(listOf("test/entry/Module.<init>"), calls)
     }
 
@@ -486,7 +486,7 @@ class CompileTest {
         assertEquals(decoded.exports, fromBytes.exports)
         assertEquals(sha256, fromBytes.sourceHash)
         assertEquals(sha256, fromFile.sourceHash)
-        assertEquals(2, fromBytes.runtimeAbi)
+        assertEquals(3, fromBytes.runtimeAbi)
         assertTrue(fromBytes.compilerVersion.isNotBlank())
         assertEquals(null, fromBytes.diagnostics)
         assertEquals(Diagnostics("test/info/traced/Module.sites", "test/info/traced/Module.lines"), traced.diagnostics)
@@ -701,8 +701,8 @@ class CompileTest {
         assertEquals(
             "-keepattributes LineNumberTable\n" +
                 "-keep class test.rules.Module\$Code*, test.rules.Module\$Chunks* { static *** f*(...); }\n" +
-                "-keep,allowobfuscation,allowshrinking class io.github.charlietap.chasm.executor.invoker.compiled.CompiledEntry " +
-                "{ *** invoke(...); }\n",
+                "-keep,allowobfuscation,allowshrinking class io.github.charlietap.chasm.runtime.compiled.gc.ManagedEntry " +
+                "{ *** enter(...); }\n",
             info.shrinkerRules,
         )
     }

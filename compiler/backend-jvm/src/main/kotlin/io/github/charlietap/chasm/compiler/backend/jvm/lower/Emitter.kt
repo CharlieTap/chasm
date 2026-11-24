@@ -1,9 +1,11 @@
 package io.github.charlietap.chasm.compiler.backend.jvm.lower
 
 import io.github.charlietap.chasm.compiler.backend.abi.MethodRef
+import io.github.charlietap.chasm.compiler.backend.abi.OBJECT_TYPE
 import io.github.charlietap.chasm.compiler.backend.abi.internalName
 import io.github.charlietap.chasm.compiler.backend.jvm.removeDeadStores
 import org.objectweb.asm.Label
+import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.MethodNode
 
@@ -184,7 +186,17 @@ internal class Emitter(
         type: String,
     ) = code { visitor.visitTypeInsn(opcode, internalName(type)) }
 
-    fun newLongArray() = code { visitor.visitIntInsn(Opcodes.NEWARRAY, Opcodes.T_LONG) }
+    fun newLongArray() {
+        newArray(Opcodes.T_LONG)
+    }
+
+    fun newArray(elementType: Int) {
+        code { visitor.visitIntInsn(Opcodes.NEWARRAY, elementType) }
+    }
+
+    fun newObjectArray() {
+        type(Opcodes.ANEWARRAY, OBJECT_TYPE)
+    }
 
     fun jump(
         opcode: Int,
@@ -225,6 +237,10 @@ internal class Emitter(
     ) {
         pendingLine = line
         pendingLineStart = start
+    }
+
+    fun visit(instructions: MethodVisitor.() -> Unit) {
+        code { visitor.instructions() }
     }
 
     fun removeDeadStores(firstLocalAfterParameters: Int) {

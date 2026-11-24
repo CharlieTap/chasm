@@ -8,7 +8,7 @@ import io.github.charlietap.chasm.compiler.backend.abi.Resource
 import io.github.charlietap.chasm.compiler.backend.abi.STACK_LIMIT_FIELD
 import io.github.charlietap.chasm.compiler.backend.abi.UNSAFE_TYPE
 import io.github.charlietap.chasm.compiler.backend.abi.takesReferenceArray
-import io.github.charlietap.chasm.compiler.backend.dex.analysis.SlotKindFlow
+import io.github.charlietap.chasm.compiler.backend.analysis.SlotKindFlow
 import io.github.charlietap.chasm.type.ValueType
 import io.github.charlietap.dexter.ArrayKind
 import io.github.charlietap.dexter.BinaryOp
@@ -72,8 +72,8 @@ internal fun LowerContext.chargeStackBudget(
 
 private fun LowerContext.receiveParameters() {
     if (argumentArray) {
-        val types = facts.type.params.types
-        val referenceArray = takesReferenceArray(facts.type, module.referenceDescriptor)
+        val types = facts.frame.type.params.types
+        val referenceArray = takesReferenceArray(facts.frame.type, module.referenceDescriptor)
         for (index in 0 until parameterCount) {
             if (referenceArray && types[index] is ValueType.Reference) {
                 emit.moveObject(Registers.SECOND_OBJECT, registers.parameter(1))
@@ -124,8 +124,8 @@ private fun LowerContext.receiveParameters() {
 
 internal fun LowerContext.initializeLocals() {
 
-    val initial = facts.initialValues
-    val firstTemporary = if (module.analysis.usesExceptions) frameSlots else facts.firstTemporary
+    val initial = facts.frame.initialValues
+    val firstTemporary = if (module.analysis.usesExceptions) frameSlots else facts.frame.firstTemporary
 
     var zeroed = false
     for (slot in parameterCount until frameSlots) {

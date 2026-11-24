@@ -25,7 +25,7 @@ sealed interface ReferenceCheck {
 }
 
 class StoreReferenceChecks(
-    private val registry: ShapeRegistry,
+    private val managedStore: ManagedStore,
     private val functions: ManagedFunctions,
     private val store: Store,
 ) : ReferenceChecks {
@@ -49,7 +49,7 @@ class StoreReferenceChecks(
     override fun owned(value: Any): Boolean {
         return when (value) {
             is ManagedFunction -> functions.owns(value)
-            is ManagedStruct, is ManagedArray -> registry.type(value) >= 0
+            is ManagedStruct, is ManagedArray -> managedStore.types.type(value) >= 0
             is WasmException -> value.store === store
             else -> true
         }
@@ -59,7 +59,7 @@ class StoreReferenceChecks(
         nullable: Boolean,
         type: DefinedType,
     ): ReferenceCheck {
-        return DefinedReferenceCheck(nullable, store.heap.registerRuntimeType(type), registry, functions, store.heap)
+        return DefinedReferenceCheck(nullable, store.heap.registerRuntimeType(type), managedStore.types, functions, store.heap)
     }
 
     private fun member(
@@ -102,7 +102,7 @@ private class AbstractReferenceCheck(
 private class DefinedReferenceCheck(
     private val nullable: Boolean,
     private val expected: RTT,
-    private val registry: ShapeRegistry,
+    private val types: GcTypes,
     private val functions: ManagedFunctions,
     private val heap: WasmHeap,
 ) : ReferenceCheck {
@@ -115,7 +115,7 @@ private class DefinedReferenceCheck(
 
         val actual = when (value) {
             is ManagedFunction -> if (functions.owns(value)) value.rtt else return false
-            is ManagedStruct, is ManagedArray -> registry.type(value)
+            is ManagedStruct, is ManagedArray -> types.type(value)
             else -> return false
         }
 

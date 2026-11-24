@@ -1,8 +1,6 @@
 package io.github.charlietap.chasm.compiler.backend.jvm.lower
 
 import io.github.charlietap.chasm.cir.NumericCondition
-import io.github.charlietap.chasm.compiler.backend.abi.REFERENCE_NULL_TAG
-import io.github.charlietap.chasm.compiler.backend.abi.REFERENCE_TAG_MASK
 import io.github.charlietap.chasm.compiler.backend.analysis.form.Comparison
 import io.github.charlietap.chasm.compiler.backend.analysis.form.ConditionForm
 import io.github.charlietap.chasm.compiler.backend.analysis.form.Operand
@@ -178,11 +176,14 @@ internal fun LowerContext.branchOnNull(
     isNull: Boolean,
     target: Label,
 ) {
-    pushInt(reference)
-    emit.int(REFERENCE_TAG_MASK)
-    emit.insn(Opcodes.IAND)
-    emit.int(REFERENCE_NULL_TAG)
-    emit.jump(if (isNull) Opcodes.IF_ICMPEQ else Opcodes.IF_ICMPNE, target)
+    if (reference is Operand.Immediate) {
+        if (isNull) {
+            emit.jump(Opcodes.GOTO, target)
+        }
+        return
+    }
+    pushObject(reference)
+    emit.jump(if (isNull) Opcodes.IFNULL else Opcodes.IFNONNULL, target)
 }
 
 internal inline fun LowerContext.booleanResult(

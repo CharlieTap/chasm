@@ -16,9 +16,9 @@ const val CODE_CLASS_PREFIX = "Code"
 @InternalChasmApi
 const val CHUNK_CLASS_PREFIX = "Chunks"
 
-// The interpreter's entry into compiled code as the shrinker rules name it, before any renaming.
+// The managed engine's entry into compiled code as the shrinker rules name it, before any renaming.
 @InternalChasmApi
-const val COMPILED_ENTRY_CLASS = "io.github.charlietap.chasm.executor.invoker.compiled.CompiledEntry"
+const val MANAGED_ENTRY_CLASS = "io.github.charlietap.chasm.runtime.compiled.gc.ManagedEntry"
 
 // The source file classes compiled with trap diagnostics name, which tells them apart from classes that share their names.
 @InternalChasmApi

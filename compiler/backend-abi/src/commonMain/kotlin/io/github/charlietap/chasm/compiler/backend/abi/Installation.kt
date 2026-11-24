@@ -4,9 +4,9 @@ import io.github.charlietap.chasm.cir.HeapType
 
 const val COMPILED_FUNCTION = "Lio/github/charlietap/chasm/runtime/function/CompiledFunction;"
 const val CODE_INSTALLATION = "Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;"
+const val OBJECT_ENTRY = "Lio/github/charlietap/chasm/runtime/compiled/ObjectEntry;"
 
-val ENTRY_INVOKE = MethodRef(COMPILED_FUNCTION, "invoke", listOf(CONTEXT_TYPE, "[J", "I"), "V")
-val ENTRY_CALL = MethodRef(COMPILED_FUNCTION, "call", listOf(CONTEXT_TYPE, "[J", "I"), "V")
+val ENTRY_CALL_OBJECTS = MethodRef(OBJECT_ENTRY, "callObjects", listOf(CONTEXT_TYPE, "[J", "[Ljava/lang/Object;", "I"), "V")
 
 val INSTALL = MethodRef(CODE_INSTALLATION, "install", listOf("I", COMPILED_FUNCTION), "V")
 val INSTALLATION_INSTANCE = MethodRef(CODE_INSTALLATION, "getInstance", emptyList(), MODULE_INSTANCE)
@@ -23,6 +23,7 @@ val INSTALLATION_RUNTIME_TYPE = installationAccessor("runtimeType", "I")
 val INSTALLATION_TAG_ADDRESS = installationAccessor("tagAddress", "I")
 val INSTALLATION_FUNCTION_REFERENCE = installationAccessor("functionReference", "J")
 val INSTALLATION_MANAGED_FUNCTION = installationAccessor("managedFunction", OBJECT_TYPE)
+val INSTALLATION_RTT = installationAccessor("rtt", OBJECT_TYPE)
 val INSTALLATION_TYPE_TEST = MethodRef(CODE_INSTALLATION, "typeTest", listOf("Z", "I"), OBJECT_TYPE)
 
 fun installationAccessor(
@@ -41,6 +42,7 @@ fun installationAccessor(
     is Resource.ReferenceGlobal -> INSTALLATION_REFERENCE_GLOBAL
     is Resource.ReferenceTable -> INSTALLATION_REFERENCE_TABLE
     is Resource.ReferenceSegment -> INSTALLATION_REFERENCE_SEGMENT
+    is Resource.Rtt -> INSTALLATION_RTT
     else -> null
 }
 
@@ -60,6 +62,7 @@ fun installationIndex(
     is Resource.ReferenceGlobal -> resource.index
     is Resource.ReferenceTable -> resource.index
     is Resource.ReferenceSegment -> resource.index
+    is Resource.Rtt -> resource.typeIndex
     else -> error("$resource is not read by index from the installation")
 }
 

@@ -11,6 +11,9 @@ import io.github.charlietap.chasm.compiler.backend.abi.SHAPE_OWNER_CLASS
 import io.github.charlietap.chasm.compiler.backend.abi.SHAPE_OWNER_ENGINE
 import io.github.charlietap.chasm.compiler.backend.abi.WEAK_REFERENCE_GET
 import io.github.charlietap.chasm.compiler.backend.abi.WEAK_REFERENCE_TYPE
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.ArrayShape
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.ShapeLayouts
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.StructShape
 import io.github.charlietap.chasm.compiler.backend.dex.abi.method
 import io.github.charlietap.chasm.compiler.backend.dex.abi.referenceType
 import io.github.charlietap.chasm.compiler.backend.dex.abi.valueType
@@ -30,7 +33,7 @@ internal class ShapeWriter {
 
     fun write(
         file: DexFile,
-        layouts: GcLayouts,
+        layouts: ShapeLayouts,
     ) {
 
         if (layouts.structs.isEmpty() && layouts.arrays.isEmpty()) {
@@ -50,10 +53,10 @@ internal class ShapeWriter {
         val type = ClassType(shape.className)
         val superclass = ClassType(shape.parent?.className ?: MANAGED_STRUCT)
         val builder = file.addClass(type, superclass, access = access(shape.final))
-        val dexFields = shape.fields.map { gcField -> DexField(ClassType(gcField.owner), gcField.name, valueType(gcField.descriptor)) }
+        val dexFields = shape.fields.map { field -> DexField(ClassType(field.owner), field.name, valueType(field.descriptor)) }
 
         shape.fields.zip(dexFields)
-            .filter { (gcField, _) -> gcField.owner == shape.className }
+            .filter { (field, _) -> field.owner == shape.className }
             .forEach { (_, dexField) -> builder.addInstanceField(dexField) }
 
         val code = builder.beginConstructor(DexConstructor(type), registerCount = 1)

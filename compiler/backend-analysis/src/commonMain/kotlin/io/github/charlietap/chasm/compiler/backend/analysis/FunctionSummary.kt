@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.compiler.backend.analysis
 
-import io.github.charlietap.chasm.cir.AggregateInstruction
 import io.github.charlietap.chasm.cir.CirFunction
 import io.github.charlietap.chasm.cir.ControlInstruction
 import io.github.charlietap.chasm.cir.MemoryInstruction
@@ -10,7 +9,6 @@ class FunctionSummary internal constructor(
     internal val requestsTailCall: Boolean,
     internal val usesExceptions: Boolean,
     internal val mayGrowMemory: Boolean,
-    internal val mayCollect: Boolean,
     internal val mayUnwind: Boolean,
     internal val catchesExceptionReference: Boolean,
     internal val directCallees: IntArray,
@@ -27,7 +25,6 @@ fun functionSummary(
     var requestsTailCall = false
     var raisesException = false
     var mayGrowMemory = false
-    var mayCollect = false
     var mayUnwind = false
     val callees = IntCollector()
     val indirectTypes = IntCollector()
@@ -49,10 +46,8 @@ fun functionSummary(
                     callee != null -> callees.add(callee)
                     instruction.callsUnknownFunction() -> {
                         mayGrowMemory = true
-                        mayCollect = true
                         mayUnwind = true
                     }
-                    instruction.allocatesGuestObject() -> mayCollect = true
                 }
                 when (instruction) {
                     is ControlInstruction.Call -> if (declarations.isImported(instruction.function)) bridged.add(instruction.function.index)
@@ -62,7 +57,6 @@ fun functionSummary(
                 instruction.indirectCallTypeIndex()?.let { type -> indirectTypes.add(type.index) }
             }
             is MemoryInstruction -> if (instruction.growsMemory()) mayGrowMemory = true
-            is AggregateInstruction -> if (instruction.allocatesGuestObject()) mayCollect = true
             is ReferenceInstruction.RefFuncS -> referenced.add(instruction.function.index)
             else -> Unit
         }
@@ -72,7 +66,6 @@ fun functionSummary(
         requestsTailCall = requestsTailCall,
         usesExceptions = function.exceptions != null || raisesException,
         mayGrowMemory = mayGrowMemory,
-        mayCollect = mayCollect,
         mayUnwind = mayUnwind,
         catchesExceptionReference = function.exceptions?.regions.orEmpty().any { region -> region.catches.any { handler -> handler.exceptionReference } },
         directCallees = callees.toArray(),

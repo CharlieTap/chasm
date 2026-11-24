@@ -9,32 +9,16 @@ import io.github.charlietap.chasm.cir.MemoryInstruction
 import io.github.charlietap.chasm.cir.TableIndex
 import io.github.charlietap.chasm.cir.TableInstruction
 import io.github.charlietap.chasm.cir.TypeIndex
-import io.github.charlietap.chasm.compiler.backend.abi.ANY_CONVERT_EXTERN
-import io.github.charlietap.chasm.compiler.backend.abi.ARRAY_FILL
-import io.github.charlietap.chasm.compiler.backend.abi.ARRAY_INIT_DATA
-import io.github.charlietap.chasm.compiler.backend.abi.ARRAY_INIT_ELEMENT
-import io.github.charlietap.chasm.compiler.backend.abi.ARRAY_NEW
-import io.github.charlietap.chasm.compiler.backend.abi.ARRAY_NEW_DATA
-import io.github.charlietap.chasm.compiler.backend.abi.ARRAY_NEW_ELEMENT
 import io.github.charlietap.chasm.compiler.backend.abi.DATA_DROP
 import io.github.charlietap.chasm.compiler.backend.abi.DATA_INSTANCE
 import io.github.charlietap.chasm.compiler.backend.abi.ELEMENT_INSTANCE
-import io.github.charlietap.chasm.compiler.backend.abi.ELEM_DROP
-import io.github.charlietap.chasm.compiler.backend.abi.EXTERN_CONVERT_ANY
 import io.github.charlietap.chasm.compiler.backend.abi.MEMORY_GROW
 import io.github.charlietap.chasm.compiler.backend.abi.MEMORY_INIT
 import io.github.charlietap.chasm.compiler.backend.abi.MEMORY_INSTANCE
 import io.github.charlietap.chasm.compiler.backend.abi.MEMORY_SIZE_PAGES
 import io.github.charlietap.chasm.compiler.backend.abi.MethodRef
 import io.github.charlietap.chasm.compiler.backend.abi.Resource
-import io.github.charlietap.chasm.compiler.backend.abi.TABLE_COPY
-import io.github.charlietap.chasm.compiler.backend.abi.TABLE_FILL
-import io.github.charlietap.chasm.compiler.backend.abi.TABLE_GET
-import io.github.charlietap.chasm.compiler.backend.abi.TABLE_GROW
-import io.github.charlietap.chasm.compiler.backend.abi.TABLE_INIT
 import io.github.charlietap.chasm.compiler.backend.abi.TABLE_INSTANCE
-import io.github.charlietap.chasm.compiler.backend.abi.TABLE_SET
-import io.github.charlietap.chasm.compiler.backend.abi.TABLE_SIZE
 
 sealed interface HelperArgument {
     val words: Int get() = 1
@@ -62,7 +46,7 @@ sealed interface HelperArgument {
 }
 
 class HelperCall(
-    val method: MethodRef,
+    val method: MethodRef?,
     val arguments: List<HelperArgument>,
     val destination: Int?,
     val growsMemory: Boolean = false,
@@ -95,11 +79,11 @@ private fun MemoryInstruction.memoryHelperCall(): HelperCall? = when (val i = th
 }
 
 private fun TableInstruction.tableHelperCall(): HelperCall? = when (val i = this) {
-    is TableInstruction.TableGetI -> HelperCall(TABLE_GET, listOf(table(i.table), int(immediate(i.elementIndex))), i.destinationSlot, producesReference = true)
-    is TableInstruction.TableGetS -> HelperCall(TABLE_GET, listOf(table(i.table), int(slot(i.elementIndexSlot))), i.destinationSlot, producesReference = true)
-    is TableInstruction.TableSetSi -> HelperCall(TABLE_SET, listOf(table(i.table), int(immediate(i.elementIndex)), long(slot(i.valueSlot))), null)
-    is TableInstruction.TableSetSs -> HelperCall(TABLE_SET, listOf(table(i.table), int(slot(i.elementIndexSlot)), long(slot(i.valueSlot))), null)
-    is TableInstruction.TableSizeS -> HelperCall(TABLE_SIZE, listOf(table(i.table)), i.destinationSlot)
+    is TableInstruction.TableGetI -> HelperCall(null, listOf(table(i.table), int(immediate(i.elementIndex))), i.destinationSlot, producesReference = true)
+    is TableInstruction.TableGetS -> HelperCall(null, listOf(table(i.table), int(slot(i.elementIndexSlot))), i.destinationSlot, producesReference = true)
+    is TableInstruction.TableSetSi -> HelperCall(null, listOf(table(i.table), int(immediate(i.elementIndex)), long(slot(i.valueSlot))), null)
+    is TableInstruction.TableSetSs -> HelperCall(null, listOf(table(i.table), int(slot(i.elementIndexSlot)), long(slot(i.valueSlot))), null)
+    is TableInstruction.TableSizeS -> HelperCall(null, listOf(table(i.table)), i.destinationSlot)
     is TableInstruction.TableGrowIs -> tableGrow(i.table, immediate(i.elementsToAdd), i.referenceValueSlot, i.destinationSlot)
     is TableInstruction.TableGrowSs -> tableGrow(i.table, slot(i.elementsToAddSlot), i.referenceValueSlot, i.destinationSlot)
     is TableInstruction.TableFillIsi -> tableFill(i.table, immediate(i.tableOffset), i.fillValueSlot, immediate(i.elementsToFill))
@@ -122,7 +106,7 @@ private fun TableInstruction.tableHelperCall(): HelperCall? = when (val i = this
     is TableInstruction.TableInitSis -> tableInit(i.table, i.element, immediate(i.segmentOffset), slot(i.tableOffsetSlot), slot(i.elementsToInitialiseSlot))
     is TableInstruction.TableInitSsi -> tableInit(i.table, i.element, slot(i.segmentOffsetSlot), immediate(i.tableOffset), slot(i.elementsToInitialiseSlot))
     is TableInstruction.TableInitSss -> tableInit(i.table, i.element, slot(i.segmentOffsetSlot), slot(i.tableOffsetSlot), slot(i.elementsToInitialiseSlot))
-    is TableInstruction.ElemDrop -> HelperCall(ELEM_DROP, listOf(element(i.element)), null)
+    is TableInstruction.ElemDrop -> HelperCall(null, listOf(element(i.element)), null)
     else -> null
 }
 
@@ -188,9 +172,9 @@ private fun AggregateInstruction.aggregateHelperCall(): HelperCall? = when (val 
     is AggregateInstruction.ArrayInitElementSss ->
         arrayInitElement(i.addressSlot, slot(i.destinationOffsetSlot), i.element, slot(i.sourceOffsetSlot), slot(i.elementsToCopySlot))
     is AggregateInstruction.AnyConvertExternS ->
-        HelperCall(ANY_CONVERT_EXTERN, listOf(long(slot(i.valueSlot))), i.destinationSlot, producesReference = true)
+        HelperCall(null, listOf(long(slot(i.valueSlot))), i.destinationSlot, producesReference = true)
     is AggregateInstruction.ExternConvertAnyS ->
-        HelperCall(EXTERN_CONVERT_ANY, listOf(long(slot(i.valueSlot))), i.destinationSlot, producesReference = true)
+        HelperCall(null, listOf(long(slot(i.valueSlot))), i.destinationSlot, producesReference = true)
     else -> null
 }
 
@@ -240,7 +224,7 @@ private fun tableGrow(
     valueSlot: Int,
     destination: Int,
 ) =
-    HelperCall(TABLE_GROW, listOf(HelperArgument.Context, table(table), int(count), long(slot(valueSlot))), destination)
+    HelperCall(null, listOf(HelperArgument.Context, table(table), int(count), long(slot(valueSlot))), destination)
 
 private fun tableFill(
     table: TableIndex,
@@ -248,7 +232,7 @@ private fun tableFill(
     valueSlot: Int,
     count: Operand,
 ) =
-    HelperCall(TABLE_FILL, listOf(table(table), int(offset), long(slot(valueSlot)), int(count)), null)
+    HelperCall(null, listOf(table(table), int(offset), long(slot(valueSlot)), int(count)), null)
 
 private fun tableCopy(
     source: TableIndex,
@@ -257,7 +241,7 @@ private fun tableCopy(
     destinationOffset: Operand,
     count: Operand,
 ) =
-    HelperCall(TABLE_COPY, listOf(table(source), table(destination), int(sourceOffset), int(destinationOffset), int(count)), null)
+    HelperCall(null, listOf(table(source), table(destination), int(sourceOffset), int(destinationOffset), int(count)), null)
 
 private fun tableInit(
     table: TableIndex,
@@ -266,7 +250,7 @@ private fun tableInit(
     tableOffset: Operand,
     count: Operand,
 ) =
-    HelperCall(TABLE_INIT, listOf(table(table), element(element), int(segmentOffset), int(tableOffset), int(count)), null)
+    HelperCall(null, listOf(table(table), element(element), int(segmentOffset), int(tableOffset), int(count)), null)
 
 private fun arrayNew(
     type: TypeIndex,
@@ -274,7 +258,7 @@ private fun arrayNew(
     value: Operand,
     destination: Int,
 ) = HelperCall(
-    ARRAY_NEW,
+    null,
     listOf(HelperArgument.Context, HelperArgument.RuntimeType(type), int(size), long(value)),
     destination,
     producesReference = true,
@@ -288,7 +272,7 @@ private fun arrayNewData(
     fieldWidth: Int,
     destination: Int,
 ) = HelperCall(
-    ARRAY_NEW_DATA,
+    null,
     listOf(HelperArgument.Context, HelperArgument.RuntimeType(type), data(data), int(sourceOffset), int(length), int(immediate(fieldWidth))),
     destination,
     producesReference = true,
@@ -301,7 +285,7 @@ private fun arrayNewElement(
     length: Operand,
     destination: Int,
 ) = HelperCall(
-    ARRAY_NEW_ELEMENT,
+    null,
     listOf(HelperArgument.Context, HelperArgument.RuntimeType(type), element(element), int(sourceOffset), int(length)),
     destination,
     producesReference = true,
@@ -313,7 +297,7 @@ private fun arrayFill(
     value: Operand,
     count: Operand,
 ) =
-    HelperCall(ARRAY_FILL, listOf(HelperArgument.Context, long(slot(addressSlot)), int(offset), long(value), int(count)), null)
+    HelperCall(null, listOf(HelperArgument.Context, long(slot(addressSlot)), int(offset), long(value), int(count)), null)
 
 private fun arrayInitData(
     addressSlot: Int,
@@ -324,7 +308,7 @@ private fun arrayInitData(
     fieldWidth: Int,
 ) =
     HelperCall(
-        ARRAY_INIT_DATA,
+        null,
         listOf(
             HelperArgument.Context,
             long(slot(addressSlot)),
@@ -345,7 +329,7 @@ private fun arrayInitElement(
     count: Operand,
 ) =
     HelperCall(
-        ARRAY_INIT_ELEMENT,
+        null,
         listOf(HelperArgument.Context, long(slot(addressSlot)), int(destinationOffset), element(element), int(sourceOffset), int(count)),
         null,
     )

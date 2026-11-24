@@ -1,21 +1,15 @@
 package io.github.charlietap.chasm.compiler.backend.dex.lower
 
-import io.github.charlietap.chasm.cir.AbstractHeapType
-import io.github.charlietap.chasm.cir.HeapType
 import io.github.charlietap.chasm.cir.ReferenceInstruction
 import io.github.charlietap.chasm.cir.ReferenceType
 import io.github.charlietap.chasm.compiler.backend.abi.CAST_FAILED
-import io.github.charlietap.chasm.compiler.backend.abi.EQ_REFERENCE
 import io.github.charlietap.chasm.compiler.backend.abi.FUNCTION_MATCHES
-import io.github.charlietap.chasm.compiler.backend.abi.I31_REFERENCE
-import io.github.charlietap.chasm.compiler.backend.abi.MANAGED_ARRAY
 import io.github.charlietap.chasm.compiler.backend.abi.MANAGED_FUNCTION
-import io.github.charlietap.chasm.compiler.backend.abi.MANAGED_STRUCT
 import io.github.charlietap.chasm.compiler.backend.abi.NULL_REFERENCE
 import io.github.charlietap.chasm.compiler.backend.abi.Resource
 import io.github.charlietap.chasm.compiler.backend.abi.SAME_I31
-import io.github.charlietap.chasm.compiler.backend.abi.WASM_EXCEPTION_TYPE
 import io.github.charlietap.chasm.compiler.backend.analysis.form.slot
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.ReferenceTest
 import io.github.charlietap.dexter.Cond
 import io.github.charlietap.dexter.Label
 
@@ -109,33 +103,22 @@ internal fun LowerContext.branchOnType(
     val fails = emit.freshLabel()
     emit.branchZero(Cond.Eq, reference, if (type.nullable) matches else fails)
 
-    when (val heap = type.heapType) {
-        is HeapType.Abstract -> when (heap.type) {
-            AbstractHeapType.Any -> {
-                branchOnInstance(reference, MANAGED_FUNCTION, fails)
-                emit.gotoLabel(matches)
-            }
-            AbstractHeapType.Extern -> emit.gotoLabel(matches)
-            AbstractHeapType.Eq -> branchOnInstance(reference, EQ_REFERENCE, matches)
-            AbstractHeapType.Struct -> branchOnInstance(reference, MANAGED_STRUCT, matches)
-            AbstractHeapType.Array -> branchOnInstance(reference, MANAGED_ARRAY, matches)
-            AbstractHeapType.I31 -> branchOnInstance(reference, I31_REFERENCE, matches)
-            AbstractHeapType.Func -> branchOnInstance(reference, MANAGED_FUNCTION, matches)
-            AbstractHeapType.Exception -> branchOnInstance(reference, WASM_EXCEPTION_TYPE, matches)
-            AbstractHeapType.None, AbstractHeapType.NoFunc, AbstractHeapType.NoExtern, AbstractHeapType.NoException -> Unit
+    when (val test = module.referenceTests.test(type.heapType)) {
+        ReferenceTest.Always -> emit.gotoLabel(matches)
+        ReferenceTest.Never -> Unit
+        ReferenceTest.NotFunction -> {
+            branchOnInstance(reference, MANAGED_FUNCTION, fails)
+            emit.gotoLabel(matches)
         }
-        is HeapType.Concrete -> {
-            val index = heap.type.index
-            if (module.gc.isFunction(index)) {
-                emit.moveObject(Registers.THIRD_OBJECT, reference)
-                loadValueInt(Registers.I1, Resource.RuntimeType(index))
-                emit.moveObject(reference, Registers.THIRD_OBJECT)
-                emit.invoke(FUNCTION_MATCHES, Registers.CONTEXT, reference, Registers.I1)
-                emit.moveResult(Registers.I0)
-                emit.branchZero(Cond.Ne, Registers.I0, matches)
-            } else {
-                branchOnInstance(reference, module.gc.typeDescriptor(index), matches)
-            }
+        is ReferenceTest.InstanceOf -> branchOnInstance(reference, test.descriptor, matches)
+        is ReferenceTest.Defined -> branchOnInstance(reference, module.gc.typeDescriptor(test.typeIndex), matches)
+        is ReferenceTest.FunctionType -> {
+            emit.moveObject(Registers.THIRD_OBJECT, reference)
+            loadValueInt(Registers.I1, Resource.RuntimeType(test.typeIndex))
+            emit.moveObject(reference, Registers.THIRD_OBJECT)
+            emit.invoke(FUNCTION_MATCHES, Registers.CONTEXT, reference, Registers.I1)
+            emit.moveResult(Registers.I0)
+            emit.branchZero(Cond.Ne, Registers.I0, matches)
         }
     }
 

@@ -95,6 +95,10 @@ sealed interface Resource {
     data class RuntimeType(
         val typeIndex: Int,
     ) : Resource
+
+    data class Rtt(
+        val typeIndex: Int,
+    ) : Resource
 }
 
 val Resource.isValue: Boolean

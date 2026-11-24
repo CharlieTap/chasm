@@ -15,6 +15,7 @@ import io.github.charlietap.chasm.compiler.backend.abi.installationIndex
 import io.github.charlietap.chasm.compiler.backend.abi.internalName
 import io.github.charlietap.chasm.compiler.backend.abi.packLongs
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.CLASS_FILE_VERSION
+import io.github.charlietap.chasm.compiler.backend.jvm.binding.bindingDescriptor
 import io.github.charlietap.chasm.compiler.backend.jvm.binding.bindingPartField
 import io.github.charlietap.chasm.compiler.backend.jvm.binding.bindingPartType
 import org.objectweb.asm.MethodVisitor
@@ -124,13 +125,17 @@ private fun MethodVisitor.loadResource(
         }
     }
     installation(accessor)
+    val descriptor = bindingDescriptor(resource)
+    if (accessor.returns != descriptor) {
+        visitTypeInsn(Opcodes.CHECKCAST, internalName(descriptor))
+    }
 }
 
 private fun MethodVisitor.installation(
     accessor: MethodRef,
 ) = visitMethodInsn(Opcodes.INVOKEVIRTUAL, internalName(accessor.owner), accessor.name, accessor.descriptor, false)
 
-private fun MethodVisitor.pushLongs(
+internal fun MethodVisitor.pushLongs(
     values: LongArray,
 ) {
     if (values.size > INLINE_LONGS) {

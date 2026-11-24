@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.compiler.backend.jvm.declarations
 import io.github.charlietap.chasm.ast.module.Import
 import io.github.charlietap.chasm.ast.module.toInt
 import io.github.charlietap.chasm.compiler.backend.abi.packLongs
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.RttKeys
 import io.github.charlietap.chasm.declarations.ConstantExpression
 import io.github.charlietap.chasm.declarations.ConstantInstruction
 import io.github.charlietap.chasm.declarations.DataPayload
@@ -145,10 +146,12 @@ private class DeclarationCallWriter(
                 "type $index is out of its group's order"
             }
         }
+        val keys = RttKeys(declarations.definedTypes)
         groups.forEach { group -> call("group", group.subTypes.size) }
         groups.forEachIndexed { index, group ->
             group.subTypes.forEach(::subType)
             call("groupBody", index, group.subTypes.size)
+            call("groupKey", index, keys.groupKey(group))
         }
     }
 

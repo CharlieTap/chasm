@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.compiler.backend.jvm.abi
 
 import io.github.charlietap.chasm.aot.CompiledModule
+import io.github.charlietap.chasm.aot.CompiledModuleStructs
 import io.github.charlietap.chasm.compiler.backend.abi.CODE_INSTALLATION
 import io.github.charlietap.chasm.compiler.backend.abi.CONTEXT_TYPE
 import io.github.charlietap.chasm.compiler.backend.abi.GLOBAL_INSTANCE
@@ -12,6 +13,9 @@ import org.objectweb.asm.Type
 internal const val CLASS_FILE_VERSION = 55
 
 internal val COMPILED_MODULE: String = Type.getDescriptor(CompiledModule::class.java)
+internal val COMPILED_MODULE_STRUCTS: String = Type.getDescriptor(CompiledModuleStructs::class.java)
+internal val MODULE_STRUCT_LANES = MethodRef(COMPILED_MODULE_STRUCTS, "structLanes", emptyList(), "[J")
+internal val MODULE_NEW_STRUCT = MethodRef(COMPILED_MODULE_STRUCTS, "newStruct", listOf("I", OBJECT_TYPE), OBJECT_TYPE)
 internal const val STACK_OVERFLOW = "Ljava/lang/StackOverflowError;"
 internal const val THROWABLE = "Ljava/lang/Throwable;"
 

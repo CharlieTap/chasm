@@ -94,10 +94,10 @@ private fun LowerContext.storeParameters() {
         frameIndex(Registers.I2, 0)
         emit.const(Registers.I3, parameterCount)
         emit.invoke(ARRAYCOPY, Registers.W1, Registers.I0, Registers.OBJECT, Registers.I2, Registers.I3)
-        if (!takesReferenceArray(facts.type, module.referenceDescriptor)) return
+        if (!takesReferenceArray(facts.frame.type, module.referenceDescriptor)) return
         emit.moveObject(Registers.W1, registers.parameter(1))
         emit.moveObject(Registers.SECOND_OBJECT, registers.objectFrame)
-        facts.type.params.types.forEachIndexed { index, type ->
+        facts.frame.type.params.types.forEachIndexed { index, type ->
             if (type !is ValueType.Reference) return@forEachIndexed
             emit.const(Registers.I1, index)
             emit.arrayGet(ArrayKind.Object, Registers.THIRD_OBJECT, Registers.W1, Registers.I1)
@@ -161,7 +161,7 @@ private fun LowerContext.returnFromFrame() {
     emit.newArray(Registers.W2, Registers.I3, "[J")
     emit.const(Registers.I0, 0)
     emit.invoke(ARRAYCOPY, Registers.OBJECT, Registers.I2, Registers.W2, Registers.I0, Registers.I3)
-    val types = facts.type.results.types
+    val types = facts.frame.type.results.types
     if (types.any { type -> type is ValueType.Reference }) {
         emit.const(Registers.I0, resultCount)
         emit.invoke(RESULT_REFERENCES, Registers.CONTEXT, Registers.I0)

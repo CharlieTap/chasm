@@ -51,6 +51,7 @@ kotlin {
         commonTest {
             dependencies {
                 implementation(projects.embeddingModule)
+                implementation(projects.runtime.compiled)
                 implementation(libs.kotlinx.coroutines.test)
             }
         }

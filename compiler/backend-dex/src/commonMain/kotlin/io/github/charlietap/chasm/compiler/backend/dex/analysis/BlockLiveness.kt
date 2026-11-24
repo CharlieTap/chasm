@@ -2,8 +2,10 @@ package io.github.charlietap.chasm.compiler.backend.dex.analysis
 
 import io.github.charlietap.chasm.cir.AdminInstruction
 import io.github.charlietap.chasm.cir.CirFunction
+import io.github.charlietap.chasm.compiler.backend.analysis.BasicBlocks
 import io.github.charlietap.chasm.compiler.backend.analysis.InstructionTable
 import io.github.charlietap.chasm.compiler.backend.analysis.SlotWriteTable
+import io.github.charlietap.chasm.compiler.backend.analysis.basicBlocks
 import io.github.charlietap.chasm.compiler.backend.analysis.clearBit
 import io.github.charlietap.chasm.compiler.backend.analysis.hasBit
 import io.github.charlietap.chasm.compiler.backend.analysis.orInto

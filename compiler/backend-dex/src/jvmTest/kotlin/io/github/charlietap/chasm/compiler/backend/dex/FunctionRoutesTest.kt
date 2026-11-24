@@ -8,13 +8,13 @@ import com.github.michaelbull.result.getOrThrow
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.cir.CirFunction
 import io.github.charlietap.chasm.cir.CirModule
+import io.github.charlietap.chasm.compiler.backend.analysis.DataflowSlotKindAnalyzer
+import io.github.charlietap.chasm.compiler.backend.analysis.SlotKindAnalyzer
+import io.github.charlietap.chasm.compiler.backend.analysis.SlotKindFlow
 import io.github.charlietap.chasm.compiler.backend.dex.abi.dexType
 import io.github.charlietap.chasm.compiler.backend.dex.abi.method
 import io.github.charlietap.chasm.compiler.backend.dex.abi.referenceType
 import io.github.charlietap.chasm.compiler.backend.dex.abi.valueType
-import io.github.charlietap.chasm.compiler.backend.dex.analysis.DataflowSlotKindAnalyzer
-import io.github.charlietap.chasm.compiler.backend.dex.analysis.SlotKindAnalyzer
-import io.github.charlietap.chasm.compiler.backend.dex.analysis.SlotKindFlow
 import io.github.charlietap.chasm.compiler.backend.dex.analysis.functionFacts
 import io.github.charlietap.chasm.compiler.backend.dex.lower.MissingHome
 import io.github.charlietap.chasm.compiler.backend.dex.lower.RegisterHomes
@@ -151,8 +151,8 @@ class FunctionRoutesTest {
         (0..expected.size).forEach { chunk -> assertTrue("f$FRAME\$c$chunk" in names) }
 
         val facts = functionFacts(ModuleLowering(module, code, FORCED), function)
-        val initialised = BooleanArray(facts.frameSlots) { true }
-        val pinned = RegisterHomes(DataflowSlotKindAnalyzer().analyze(function, facts, initialised), initialised).also { analysed -> analysed.pinConflict(0) }
+        val initialised = BooleanArray(facts.frame.frameSlots) { true }
+        val pinned = RegisterHomes(DataflowSlotKindAnalyzer().analyze(function, facts.table, facts.frame, initialised), initialised).also { analysed -> analysed.pinConflict(0) }
         assertRecovered(generated, upFront(function, pinned), function, orphans = 1, chunks = expected.size)
     }
 
@@ -218,12 +218,12 @@ class FunctionRoutesTest {
         lowering: ModuleLowering,
         function: CirFunction,
     ): Int {
-        return functionFacts(lowering, function).frameSlots
+        return functionFacts(lowering, function).frame.frameSlots
     }
 
     private fun recording(flows: MutableList<SlotKindFlow>): SlotKindAnalyzer {
-        return SlotKindAnalyzer { function, facts, initialised ->
-            DataflowSlotKindAnalyzer().analyze(function, facts, initialised).also { flow -> flows += flow }
+        return SlotKindAnalyzer { function, table, frame, initialised ->
+            DataflowSlotKindAnalyzer().analyze(function, table, frame, initialised).also { flow -> flows += flow }
         }
     }
 

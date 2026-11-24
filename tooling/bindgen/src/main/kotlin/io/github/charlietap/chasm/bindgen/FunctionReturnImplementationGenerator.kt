@@ -103,7 +103,7 @@ internal class StringFunctionReturnImplementationGenerator(
         StringEncodingStrategy.PACKED_POINTER_AND_LENGTH -> packedStringStrategy(function)
         StringEncodingStrategy.GC_UTF16_ARRAY,
         StringEncodingStrategy.GC_UTF8_ARRAY,
-        -> error("GC array strings require ExecutionTier.Jit")
+        -> error("GC array strings require ExecutionTier.Jit or ExecutionTier.Aot")
     }
 }
 

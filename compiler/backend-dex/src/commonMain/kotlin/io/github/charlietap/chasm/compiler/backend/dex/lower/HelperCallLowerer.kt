@@ -26,7 +26,7 @@ internal fun LowerContext.lowerHelperCall(
         }
         word += argument.words
     }
-    emit.invokeRange(call.method, window, word)
+    emit.invokeRange(checkNotNull(call.method) { "the helper form has no runtime call" }, window, word)
 
     val destination = call.destination
     if (destination == null) {

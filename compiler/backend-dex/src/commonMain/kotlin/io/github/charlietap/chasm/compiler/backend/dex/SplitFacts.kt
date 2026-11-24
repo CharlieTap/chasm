@@ -25,7 +25,7 @@ internal class SplitFacts(
 
     val ranked = continuations.count { id -> id >= 0 }
 
-    val graph = livenessGraph(facts.table, function, facts.frameSlots)
+    val graph = livenessGraph(facts.table, function, facts.frame.frameSlots)
 
     val liveness = functionLiveness(function, graph)
 

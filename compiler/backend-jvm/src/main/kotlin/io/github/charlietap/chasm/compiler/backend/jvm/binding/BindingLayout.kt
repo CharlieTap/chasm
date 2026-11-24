@@ -4,9 +4,14 @@ import io.github.charlietap.chasm.compiler.backend.abi.DATA_INSTANCE
 import io.github.charlietap.chasm.compiler.backend.abi.ELEMENT_INSTANCE
 import io.github.charlietap.chasm.compiler.backend.abi.FUNCTION_INSTANCE
 import io.github.charlietap.chasm.compiler.backend.abi.GLOBAL_INSTANCE
+import io.github.charlietap.chasm.compiler.backend.abi.MANAGED_FUNCTION
 import io.github.charlietap.chasm.compiler.backend.abi.MEMORY_INSTANCE
 import io.github.charlietap.chasm.compiler.backend.abi.MODULE_INSTANCE
 import io.github.charlietap.chasm.compiler.backend.abi.OBJECT_TYPE
+import io.github.charlietap.chasm.compiler.backend.abi.REFERENCE_GLOBAL
+import io.github.charlietap.chasm.compiler.backend.abi.REFERENCE_SEGMENT
+import io.github.charlietap.chasm.compiler.backend.abi.REFERENCE_TABLE
+import io.github.charlietap.chasm.compiler.backend.abi.RTT_TYPE
 import io.github.charlietap.chasm.compiler.backend.abi.Resource
 import io.github.charlietap.chasm.compiler.backend.abi.TABLE_INSTANCE
 import io.github.charlietap.chasm.compiler.backend.abi.UNSAFE_TYPE
@@ -44,9 +49,12 @@ internal class BindingLayout {
             is Resource.Longs -> "longs$index"
             is Resource.FunctionReference -> "reference${resource.index}"
             is Resource.FunctionObject -> "functionObject${resource.index}"
-            is Resource.ReferenceGlobal, is Resource.ReferenceTable, is Resource.ReferenceSegment -> error("$resource has no binding field")
+            is Resource.ReferenceGlobal -> "referenceGlobal${resource.index}"
+            is Resource.ReferenceTable -> "referenceTable${resource.index}"
+            is Resource.ReferenceSegment -> "referenceSegment${resource.index}"
             is Resource.TagAddress -> "tag${resource.index}"
             is Resource.RuntimeType -> "type${resource.typeIndex}"
+            is Resource.Rtt -> "rtt${resource.typeIndex}"
             Resource.Unsafe -> "unsafe"
             Resource.ByteArrayBase -> "byteArrayBase"
             is Resource.ExceptionTable -> error("$resource has no binding field")
@@ -104,12 +112,16 @@ internal fun bindingDescriptor(
     is Resource.TypeTest -> OBJECT_TYPE
     is Resource.Longs -> "[J"
     is Resource.FunctionReference -> "J"
-    is Resource.FunctionObject -> FUNCTION_INSTANCE
+    is Resource.FunctionObject -> MANAGED_FUNCTION
+    is Resource.ReferenceGlobal -> REFERENCE_GLOBAL
+    is Resource.ReferenceTable -> REFERENCE_TABLE
+    is Resource.ReferenceSegment -> REFERENCE_SEGMENT
     is Resource.TagAddress -> "I"
     is Resource.RuntimeType -> "I"
+    is Resource.Rtt -> RTT_TYPE
     Resource.Unsafe -> UNSAFE_TYPE
     Resource.ByteArrayBase -> "J"
-    is Resource.ExceptionTable, is Resource.ReferenceGlobal, is Resource.ReferenceTable, is Resource.ReferenceSegment -> error("$resource has no binding field")
+    is Resource.ExceptionTable -> error("$resource has no binding field")
 }
 
 internal const val PENDING_OWNER = "chasm/PendingBinding"

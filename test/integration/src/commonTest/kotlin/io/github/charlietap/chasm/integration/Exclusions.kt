@@ -9,5 +9,5 @@ val EXCLUSIONS: Map<String, Set<String>> = mapOf(
 )
 
 fun excludingManagedHeaps(script: String): Map<String, Set<String>> {
-    return EXCLUSIONS + (JIT to setOf(script))
+    return EXCLUSIONS + (JIT to setOf(script)) + (AOT to EXCLUSIONS.getValue(AOT) + script)
 }

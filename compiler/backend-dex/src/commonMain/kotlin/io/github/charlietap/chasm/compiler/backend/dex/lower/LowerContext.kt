@@ -29,8 +29,8 @@ internal class LowerContext(
     val declarations: ModuleIndexSpaces get() = module.declarations
     val facts: FunctionFacts get() = analysis.facts
     val forms: InstructionForms get() = facts.table.forms
-    val type: FunctionType get() = facts.type
-    val frameSlots: Int get() = facts.frameSlots
+    val type: FunctionType get() = facts.frame.type
+    val frameSlots: Int get() = facts.frame.frameSlots
     val parameterCount = type.params.types.size
     val resultCount = type.results.types.size
 
@@ -41,7 +41,7 @@ internal class LowerContext(
 
     val resultDescriptor: String get() = facts.signature.resultDescriptor
 
-    val kinds = SlotKindCursor(homes, facts.frameSlots)
+    val kinds = SlotKindCursor(homes, facts.frame.frameSlots)
 
     val position: Int get() = kinds.position
 

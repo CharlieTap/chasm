@@ -79,7 +79,6 @@ fun analyzeSlotKinds(
     frameSlots: Int,
     localTypes: Array<ValueType?>,
     initialValues: LongArray,
-    references: References,
     floatingHome: (Int) -> Boolean = { true },
 ): SlotKinds {
     val function = forms.function
@@ -102,21 +101,41 @@ fun analyzeSlotKinds(
         written[slot] = written[slot] or WRITE_OTHER
     }
 
-    parameters.forEachIndexed { index, type -> write(SlotKinds.PROLOGUE, index, writeFlag(type)) }
-    initialValues.forEachIndexed { slot, value -> if (value.toInt().toLong() != value) other(slot) }
+    parameters.forEachIndexed { index, type ->
+        if (type !is ValueType.Reference) {
+            write(SlotKinds.PROLOGUE, index, writeFlag(type))
+        }
+    }
+    initialValues.forEachIndexed { slot, value ->
+        if (localTypes[slot] !is ValueType.Reference && value.toInt().toLong() != value) {
+            other(slot)
+        }
+    }
     function.exceptions?.regions?.forEach { region -> region.catches.forEach { handler -> handler.payloadSlots.forEach(::other) } }
-    references.slots.forEach(::other)
     var position = 0
     val visitor = object : SlotWriteVisitor {
         override fun value(
             slot: Int,
             type: ValueType,
-        ) = write(position, slot, writeFlag(type))
+        ) {
+            if (type !is ValueType.Reference) {
+                write(position, slot, writeFlag(type))
+            }
+        }
 
         override fun opaque(
             slot: Int,
             reference: Boolean,
-        ) = other(slot)
+        ) = Unit
+
+        override fun helperResult(
+            slot: Int,
+            reference: Boolean,
+        ) {
+            if (!reference) {
+                other(slot)
+            }
+        }
 
         override fun copy(
             source: Operand,

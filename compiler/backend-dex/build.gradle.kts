@@ -15,8 +15,8 @@ kotlin {
                 api(projects.ast)
                 api(projects.cir)
                 api(projects.compiler.backendAbi)
+                api(projects.compiler.backendAnalysis)
                 api(projects.libs.parallel)
-                implementation(projects.compiler.backendAnalysis)
 
                 implementation(projects.runtime.core)
                 implementation(libs.dexter)

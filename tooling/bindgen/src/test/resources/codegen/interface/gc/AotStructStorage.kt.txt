@@ -1,0 +1,252 @@
+package com.test
+
+import io.github.charlietap.chasm.reference.ArrayReference
+import io.github.charlietap.chasm.reference.StructReference
+import io.github.charlietap.chasm.runtime.compiled.gc.CompiledArray
+import io.github.charlietap.chasm.runtime.compiled.gc.CompiledStruct
+import io.github.charlietap.chasm.runtime.compiled.gc.storage.S_I
+import io.github.charlietap.chasm.runtime.compiled.gc.storage.S_I_II_II_II_X
+import io.github.charlietap.chasm.runtime.compiled.gc.storage.S_I_RR
+import kotlin.Double
+import kotlin.Int
+import kotlin.Long
+import kotlin.jvm.JvmInline
+
+public interface AotStructStorage {
+  public fun makeDerived(p0: Int): Struct2
+
+  public fun makeWide(): Struct3
+
+  @JvmInline
+  public value class Struct1(
+    public val reference: StructReference,
+  ) {
+    public var f0: Int
+      get() = storage().i0
+      set(newValue) {
+        storage().i0 = newValue
+      }
+
+    private fun storage(): S_I {
+      val struct = reference as S_I
+      require(struct.rtt.supertypes[0].key === "61c363bddcc3f2bdf003efba6c189cdb_0") { "the struct is not a Struct1" }
+      return struct
+    }
+  }
+
+  @JvmInline
+  public value class Struct2(
+    public val reference: StructReference,
+  ) {
+    public var f0: Int
+      get() = storage().i0
+      set(newValue) {
+        storage().i0 = newValue
+      }
+
+    public var f1: Struct1?
+      get() = (storage().r0 as StructReference?)?.let { structReference -> Struct1(structReference) }
+      set(newValue) {
+        val storage = storage()
+        val value = newValue?.reference as CompiledStruct?
+        require(value == null || (value.rtt.engine === storage.rtt.engine && value.rtt.supertypes[0].key === "61c363bddcc3f2bdf003efba6c189cdb_0")) { "the value does not match the type of field 1" }
+        storage.r0 = value
+      }
+
+    public var f2: ArrayReference?
+      get() = storage().r1 as ArrayReference?
+      set(newValue) {
+        val storage = storage()
+        val value = newValue as CompiledArray?
+        require(value == null || (value.rtt.engine === storage.rtt.engine && value.rtt.key === "d41b1e114550bc6268fd098530145f24_0")) { "the value does not match the type of field 2" }
+        storage.r1 = value
+      }
+
+    private fun storage(): S_I_RR {
+      val struct = reference as S_I_RR
+      require(struct.rtt.key === "6fe64d8df90743c86f696316fe26dd7f_0") { "the struct is not a Struct2" }
+      return struct
+    }
+  }
+
+  @JvmInline
+  public value class Struct3(
+    public val reference: StructReference,
+  ) {
+    public var f0: Int
+      get() = storage().i0
+      set(newValue) {
+        storage().i0 = newValue
+      }
+
+    public var f1: Int
+      get() = storage().i1
+      set(newValue) {
+        storage().i1 = newValue
+      }
+
+    public var f2: Int
+      get() = storage().i2
+      set(newValue) {
+        storage().i2 = newValue
+      }
+
+    public var f3: Int
+      get() = storage().i3
+      set(newValue) {
+        storage().i3 = newValue
+      }
+
+    public var f4: Int
+      get() = storage().i4
+      set(newValue) {
+        storage().i4 = newValue
+      }
+
+    public var f5: Int
+      get() = storage().i5
+      set(newValue) {
+        storage().i5 = newValue
+      }
+
+    public var f6: Int
+      get() = storage().i6
+      set(newValue) {
+        storage().i6 = newValue
+      }
+
+    public var f7: Int
+      get() = storage().i7
+      set(newValue) {
+        storage().i7 = newValue
+      }
+
+    public var f8: Int
+      get() = storage().i8
+      set(newValue) {
+        storage().i8 = newValue
+      }
+
+    public var f9: Int
+      get() = storage().i9
+      set(newValue) {
+        storage().i9 = newValue
+      }
+
+    public var f10: Int
+      get() = storage().i10
+      set(newValue) {
+        storage().i10 = newValue
+      }
+
+    public var f11: Int
+      get() = storage().i11
+      set(newValue) {
+        storage().i11 = newValue
+      }
+
+    public var f12: Int
+      get() = storage().i12
+      set(newValue) {
+        storage().i12 = newValue
+      }
+
+    public var f13: Int
+      get() = storage().i13
+      set(newValue) {
+        storage().i13 = newValue
+      }
+
+    public var f14: Int
+      get() = storage().i14
+      set(newValue) {
+        storage().i14 = newValue
+      }
+
+    public var f15: Int
+      get() = storage().i15
+      set(newValue) {
+        storage().i15 = newValue
+      }
+
+    public var f16: Int
+      get() = storage().i16
+      set(newValue) {
+        storage().i16 = newValue
+      }
+
+    public var f17: Int
+      get() = storage().i17
+      set(newValue) {
+        storage().i17 = newValue
+      }
+
+    public var f18: Int
+      get() = storage().i18
+      set(newValue) {
+        storage().i18 = newValue
+      }
+
+    public var f19: Int
+      get() = storage().i19
+      set(newValue) {
+        storage().i19 = newValue
+      }
+
+    public var f20: Int
+      get() = storage().i20
+      set(newValue) {
+        storage().i20 = newValue
+      }
+
+    public var f21: Int
+      get() = storage().i21
+      set(newValue) {
+        storage().i21 = newValue
+      }
+
+    public var f22: Long
+      get() {
+        val storage = storage()
+        return (storage.i22.toLong() and 0xFFFFFFFFL) or (storage.spilledInts!![0].toLong() shl 32)
+      }
+      set(newValue) {
+        val storage = storage()
+        storage.i22 = newValue.toInt()
+        storage.spilledInts!![0] = (newValue ushr 32).toInt()
+      }
+
+    public var f23: Int
+      get() = storage().spilledInts!![1]
+      set(newValue) {
+        storage().spilledInts!![1] = newValue and 0xFF
+      }
+
+    public var f24: Double
+      get() {
+        val storage = storage()
+        return Double.fromBits((storage.spilledInts!![2].toLong() and 0xFFFFFFFFL) or (storage.spilledInts!![3].toLong() shl 32))
+      }
+      set(newValue) {
+        val storage = storage()
+        val bits = newValue.toRawBits()
+        storage.spilledInts!![2] = bits.toInt()
+        storage.spilledInts!![3] = (bits ushr 32).toInt()
+      }
+
+    public var f25: Struct1?
+      get() = (storage().spilledReferences!![0] as StructReference?)?.let { structReference -> Struct1(structReference) }
+      set(newValue) {
+        val storage = storage()
+        val value = newValue?.reference as CompiledStruct?
+        require(value == null || (value.rtt.engine === storage.rtt.engine && value.rtt.supertypes[0].key === "61c363bddcc3f2bdf003efba6c189cdb_0")) { "the value does not match the type of field 25" }
+        storage.spilledReferences!![0] = value
+      }
+
+    private fun storage(): S_I_II_II_II_X {
+      val struct = reference as S_I_II_II_II_X
+      require(struct.rtt.key === "645e8592eed8a3568d889f070a5c5bff_0") { "the struct is not a Struct3" }
+      return struct
+    }
+  }
+}

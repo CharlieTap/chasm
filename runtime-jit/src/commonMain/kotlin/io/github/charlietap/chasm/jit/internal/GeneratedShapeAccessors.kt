@@ -2,8 +2,8 @@ package io.github.charlietap.chasm.jit.internal
 
 import dalvik.system.InMemoryDexClassLoader
 import io.github.charlietap.chasm.compiler.backend.abi.ACCESSOR_CLASS_SUFFIX
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.ShapeField
 import io.github.charlietap.chasm.compiler.backend.dex.gc.ShapeAccessorDex
-import io.github.charlietap.chasm.compiler.backend.dex.gc.ShapeField
 import io.github.charlietap.chasm.runtime.compiled.gc.ArrayAccessor
 import io.github.charlietap.chasm.runtime.compiled.gc.ShapeAccessors
 import io.github.charlietap.chasm.runtime.compiled.gc.StructAccessor

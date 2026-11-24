@@ -64,8 +64,8 @@ private class KotlinPoetBindingGenerator(
             function.parameters.any { parameter -> parameter.stringEncodingStrategy.storedInGcArray } ||
                 function.returnType.stringEncodingStrategy.storedInGcArray
         }
-        require(tier is ExecutionTier.Jit || gcStringFunctions.isEmpty()) {
-            "StringEncodingStrategy.GC_UTF16_ARRAY and GC_UTF8_ARRAY require ExecutionTier.Jit, but " +
+        require(tier.managed || gcStringFunctions.isEmpty()) {
+            "StringEncodingStrategy.GC_UTF16_ARRAY and GC_UTF8_ARRAY require ExecutionTier.Jit or ExecutionTier.Aot, but " +
                 "${gcStringFunctions.joinToString { function -> function.name }} use them."
         }
         val freedGcStringFunctions = options.functions.filter { function ->

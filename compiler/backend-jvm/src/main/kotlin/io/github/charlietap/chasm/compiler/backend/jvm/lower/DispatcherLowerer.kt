@@ -10,10 +10,13 @@ import io.github.charlietap.chasm.compiler.backend.abi.FRAME
 import io.github.charlietap.chasm.compiler.backend.abi.INT_BITS_TO_FLOAT
 import io.github.charlietap.chasm.compiler.backend.abi.LONG_BITS_TO_DOUBLE
 import io.github.charlietap.chasm.compiler.backend.abi.MethodRef
+import io.github.charlietap.chasm.compiler.backend.abi.OBJECT_TYPE
 import io.github.charlietap.chasm.compiler.backend.abi.OPEN_FRAME
+import io.github.charlietap.chasm.compiler.backend.abi.RESULT_REFERENCES
 import io.github.charlietap.chasm.compiler.backend.abi.Resource
 import io.github.charlietap.chasm.compiler.backend.abi.UNREACHABLE
 import io.github.charlietap.chasm.runtime.compiled.CHUNK_METHOD_SEPARATOR
+import io.github.charlietap.chasm.type.ValueType
 import org.objectweb.asm.Opcodes
 
 internal class ChunkMethod(
@@ -32,10 +35,11 @@ internal fun LowerContext.lowerDispatcher(
 ) {
     initializeScratch()
     emit.long(0L)
-    emit.store(Opcodes.LSTORE, locals.rootsSaved)
+    emit.store(Opcodes.LSTORE, locals.frameSaved)
     emit.int(0)
-    emit.store(Opcodes.ISTORE, locals.rootBase)
-    roots.initialize(loadArray = false)
+    emit.store(Opcodes.ISTORE, locals.frameBase)
+    emit.insn(Opcodes.ACONST_NULL)
+    emit.store(Opcodes.ASTORE, locals.frameArray)
 
     chargeStackBudget(frameCost)
 
@@ -43,27 +47,47 @@ internal fun LowerContext.lowerDispatcher(
     emit.int(frame.frameSlots)
     emit.invokeStatic(OPEN_FRAME)
     emit.insn(Opcodes.DUP2)
-    emit.store(Opcodes.LSTORE, locals.rootsSaved)
+    emit.store(Opcodes.LSTORE, locals.frameSaved)
     emit.insn(Opcodes.L2I)
-    emit.store(Opcodes.ISTORE, locals.rootBase)
+    emit.store(Opcodes.ISTORE, locals.frameBase)
     pushContext()
     emit.invokeStatic(FRAME)
     emit.store(Opcodes.ASTORE, locals.scratchValues)
+    if (locals.holdsObjects) {
+        emit.int(frame.frameSlots)
+        emit.newObjectArray()
+        emit.store(Opcodes.ASTORE, locals.objectFrame)
+    }
     if (argumentArray) {
         emit.load(Opcodes.ALOAD, locals.parameterLocals[0])
         emit.int(0)
         emit.load(Opcodes.ALOAD, locals.scratchValues)
-        emit.load(Opcodes.ILOAD, locals.rootBase)
+        emit.load(Opcodes.ILOAD, locals.frameBase)
+        emit.int(parameterCount)
+        emit.invokeStatic(ARRAYCOPY)
+    }
+    if (argumentArray && referenceArray) {
+        emit.load(Opcodes.ALOAD, locals.parameterLocals[1])
+        emit.int(0)
+        emit.load(Opcodes.ALOAD, locals.objectFrame)
+        emit.int(0)
         emit.int(parameterCount)
         emit.invokeStatic(ARRAYCOPY)
     }
     if (!argumentArray) {
         parameterDescriptors.forEachIndexed { index, descriptor ->
+            val local = locals.parameterLocals[index]
+            if (descriptor == OBJECT_TYPE) {
+                emit.load(Opcodes.ALOAD, locals.objectFrame)
+                emit.int(index)
+                emit.load(Opcodes.ALOAD, local)
+                emit.insn(Opcodes.AASTORE)
+                return@forEachIndexed
+            }
             emit.load(Opcodes.ALOAD, locals.scratchValues)
-            emit.load(Opcodes.ILOAD, locals.rootBase)
+            emit.load(Opcodes.ILOAD, locals.frameBase)
             emit.int(index)
             emit.insn(Opcodes.IADD)
-            val local = locals.parameterLocals[index]
             when (descriptor) {
                 "I" -> emit.load(Opcodes.ILOAD, local)
                 "F" -> emit.load(Opcodes.FLOAD, local)
@@ -113,9 +137,10 @@ internal fun LowerContext.lowerDispatcher(
         emit.load(Opcodes.ALOAD, Locals.BINDING)
         pushContext()
         emit.load(Opcodes.ILOAD, Locals.DEPTH)
-        emit.load(Opcodes.ILOAD, locals.rootBase)
+        emit.load(Opcodes.ILOAD, locals.frameBase)
         emit.load(Opcodes.ILOAD, continuation)
-        emit.invokeStatic(MethodRef(chunk.owner, chunk.name, listOf(module.bindingType, CONTEXT_TYPE, "I", "I", "I"), "I"))
+        emit.load(Opcodes.ALOAD, locals.objectFrame)
+        emit.invokeStatic(MethodRef(chunk.owner, chunk.name, listOf(module.bindingType, CONTEXT_TYPE, "I") + CHUNK_ARGUMENTS, "I"))
         emit.store(Opcodes.ISTORE, continuation)
         emit.jump(Opcodes.GOTO, loop)
     }
@@ -162,19 +187,42 @@ private fun LowerContext.returnFromFrame() {
             emit.insn(Opcodes.RETURN)
         }
         "[J" -> {
+            val types = type.results.types
+            if (types.any { result -> result is ValueType.Reference }) {
+                pushContext()
+                emit.int(resultCount)
+                emit.invokeStatic(RESULT_REFERENCES)
+                emit.store(Opcodes.ASTORE, locals.scratchReferences)
+            }
             emit.int(resultCount)
             emit.newLongArray()
             emit.store(Opcodes.ASTORE, locals.scratchObject)
-            for (index in 0 until resultCount) {
-                emit.load(Opcodes.ALOAD, locals.scratchObject)
-                emit.type(Opcodes.CHECKCAST, "[J")
-                emit.int(index)
-                frameValue(index)
-                emit.insn(Opcodes.LASTORE)
+            types.forEachIndexed { index, result ->
+                if (result is ValueType.Reference) {
+                    emit.load(Opcodes.ALOAD, locals.scratchReferences)
+                    emit.int(index)
+                    emit.load(Opcodes.ALOAD, locals.objectFrame)
+                    emit.int(index)
+                    emit.insn(Opcodes.AALOAD)
+                    emit.insn(Opcodes.AASTORE)
+                } else {
+                    emit.load(Opcodes.ALOAD, locals.scratchObject)
+                    emit.type(Opcodes.CHECKCAST, "[J")
+                    emit.int(index)
+                    frameValue(index)
+                    emit.insn(Opcodes.LASTORE)
+                }
             }
             closeFrame()
             emit.load(Opcodes.ALOAD, locals.scratchObject)
             emit.type(Opcodes.CHECKCAST, "[J")
+            emit.insn(Opcodes.ARETURN)
+        }
+        OBJECT_TYPE -> {
+            closeFrame()
+            emit.load(Opcodes.ALOAD, locals.objectFrame)
+            emit.int(0)
+            emit.insn(Opcodes.AALOAD)
             emit.insn(Opcodes.ARETURN)
         }
         else -> {
@@ -204,7 +252,7 @@ private fun LowerContext.frameValue(
     slot: Int,
 ) {
     emit.load(Opcodes.ALOAD, locals.scratchValues)
-    emit.load(Opcodes.ILOAD, locals.rootBase)
+    emit.load(Opcodes.ILOAD, locals.frameBase)
     emit.int(slot)
     emit.insn(Opcodes.IADD)
     emit.insn(Opcodes.LALOAD)
@@ -212,7 +260,7 @@ private fun LowerContext.frameValue(
 
 private fun LowerContext.closeFrame() {
     pushContext()
-    emit.load(Opcodes.LLOAD, locals.rootsSaved)
+    emit.load(Opcodes.LLOAD, locals.frameSaved)
     emit.invokeStatic(CLOSE_FRAME)
 }
 

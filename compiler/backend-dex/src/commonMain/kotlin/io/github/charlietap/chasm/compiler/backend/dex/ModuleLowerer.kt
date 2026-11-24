@@ -4,6 +4,8 @@ import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.cir.CirFunction
 import io.github.charlietap.chasm.cir.CirModule
 import io.github.charlietap.chasm.compiler.backend.abi.binaryName
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.ConstantExpressions
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.UnsupportedShape
 import io.github.charlietap.chasm.compiler.backend.dex.abi.FunctionSignature
 import io.github.charlietap.chasm.compiler.backend.dex.abi.codeClass
 import io.github.charlietap.chasm.compiler.backend.dex.abi.constantsClass
@@ -59,6 +61,8 @@ internal fun ModuleLowerer(
     } catch (tooLarge: DexterException) {
         throw DexTooLarge(tooLarge.message ?: tooLarge.toString(), tooLarge)
     } catch (unsupported: Unsupported) {
+        throw UnsupportedModule(unsupported.message.orEmpty())
+    } catch (unsupported: UnsupportedShape) {
         throw UnsupportedModule(unsupported.message.orEmpty())
     }
 }
@@ -177,9 +181,11 @@ private fun finishFiles(
     val installer = installClass(plan.packagePath)
     val installFile = codeAndEntryFile ?: dexter.beginFile()
     val installEntries = installLowerer(installFile, installer, bound, ordered)
-    val constantsWriter = ConstantsWriter(plan.module, plan.gc)
-    val constants = if (constantsWriter.needed) constantsClass(plan.packagePath) else null
-    if (constants != null) constantsWriter.write(installFile, constants)
+    val constantExpressions = ConstantExpressions(plan.module)
+    val constants = if (constantExpressions.needed) constantsClass(plan.packagePath) else null
+    if (constants != null) {
+        ConstantsWriter(plan.module, plan.gc, constantExpressions).write(installFile, constants)
+    }
     dex += installFile.finish()
 
     val splitStarts = HashMap<Int, IntArray>()

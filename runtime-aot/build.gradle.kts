@@ -35,6 +35,10 @@ kotlin {
     android {
         namespace = "io.github.charlietap.chasm.aot"
         withHostTest {}
+        optimization {
+            consumerKeepRules.publish = true
+            consumerKeepRules.file("consumer-rules.pro")
+        }
     }
 
     @OptIn(ExperimentalAbiValidation::class)
@@ -47,6 +51,7 @@ kotlin {
                 api(projects.embeddingApi)
                 api(projects.runtime.compiledApi)
 
+                implementation(projects.embeddingManaged)
                 implementation(projects.embeddingRuntime)
                 implementation(projects.moduleDeclarations)
                 implementation(projects.runtime.compiled)
@@ -62,6 +67,7 @@ kotlin {
         commonTest {
             dependencies {
                 implementation(projects.chasm)
+                implementation(projects.embeddingCompiled)
                 implementation(projects.test.compiled)
                 implementation(projects.compiler.backendJvm)
                 implementation(projects.compiler.frontend)

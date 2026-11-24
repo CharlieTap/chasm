@@ -1,9 +1,9 @@
 package io.github.charlietap.chasm.compiler.backend.dex.lower
 
+import io.github.charlietap.chasm.compiler.backend.analysis.SlotKindFlow
 import io.github.charlietap.chasm.compiler.backend.analysis.form.Comparison
 import io.github.charlietap.chasm.compiler.backend.analysis.form.Operand
 import io.github.charlietap.chasm.compiler.backend.analysis.form.Ordering
-import io.github.charlietap.chasm.compiler.backend.dex.analysis.SlotKindFlow
 import io.github.charlietap.chasm.type.NumberType
 import io.github.charlietap.dexter.BinaryOp
 import io.github.charlietap.dexter.CompareOp

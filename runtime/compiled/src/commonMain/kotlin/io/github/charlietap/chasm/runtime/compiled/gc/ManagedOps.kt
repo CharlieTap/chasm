@@ -6,7 +6,7 @@ import io.github.charlietap.chasm.executor.invoker.compiled.COMPILED_CALL_COST
 import io.github.charlietap.chasm.executor.invoker.compiled.INTERPRETED_CALL_COST
 import io.github.charlietap.chasm.host.HostFunctionException
 import io.github.charlietap.chasm.reference.I31Reference
-import io.github.charlietap.chasm.runtime.compiled.BindingEntry
+import io.github.charlietap.chasm.runtime.compiled.ObjectEntry
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.HostRaisedWasmException
 import io.github.charlietap.chasm.runtime.exception.InvocationException
@@ -236,7 +236,7 @@ private fun callObjectsUntilDone(
     var objects = references
     while (true) {
         val compiled = (target as? FunctionInstance.WasmFunction)?.callStrategy?.compiledEntry
-        if (compiled is BindingEntry) {
+        if (compiled is ObjectEntry) {
             compiled.callObjects(context, words, objects, depth + COMPILED_CALL_COST)
             if (context.compiledUnwinding) return
         } else {

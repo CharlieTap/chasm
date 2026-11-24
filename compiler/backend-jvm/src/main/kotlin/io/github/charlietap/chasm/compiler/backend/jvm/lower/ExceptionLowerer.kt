@@ -3,18 +3,20 @@ package io.github.charlietap.chasm.compiler.backend.jvm.lower
 import io.github.charlietap.chasm.cir.TagIndex
 import io.github.charlietap.chasm.compiler.backend.abi.CLOSE_FRAME
 import io.github.charlietap.chasm.compiler.backend.abi.CONTEXT_TYPE
-import io.github.charlietap.chasm.compiler.backend.abi.FRAME
-import io.github.charlietap.chasm.compiler.backend.abi.OPEN_FRAME
-import io.github.charlietap.chasm.compiler.backend.abi.PENDING_TAG
+import io.github.charlietap.chasm.compiler.backend.abi.PENDING_EXCEPTION_TAG
 import io.github.charlietap.chasm.compiler.backend.abi.RAISE_UNWINDING
+import io.github.charlietap.chasm.compiler.backend.abi.RETHROW_EXCEPTION
 import io.github.charlietap.chasm.compiler.backend.abi.Resource
-import io.github.charlietap.chasm.compiler.backend.abi.TAKE_EXCEPTION
-import io.github.charlietap.chasm.compiler.backend.abi.THROW_REF
-import io.github.charlietap.chasm.compiler.backend.abi.THROW_TAG
+import io.github.charlietap.chasm.compiler.backend.abi.TAKE_MANAGED_EXCEPTION
+import io.github.charlietap.chasm.compiler.backend.abi.THROW_EXCEPTION
 import io.github.charlietap.chasm.compiler.backend.abi.UNWINDING_FIELD
 import io.github.charlietap.chasm.compiler.backend.abi.WASM_EXCEPTION
+import io.github.charlietap.chasm.compiler.backend.abi.WASM_EXCEPTION_REFERENCES
+import io.github.charlietap.chasm.compiler.backend.abi.WASM_EXCEPTION_TYPE
+import io.github.charlietap.chasm.compiler.backend.abi.WASM_EXCEPTION_WORDS
 import io.github.charlietap.chasm.compiler.backend.analysis.form.slot
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.THROWABLE
+import io.github.charlietap.chasm.type.ValueType
 import org.objectweb.asm.Label
 import org.objectweb.asm.Opcodes
 
@@ -40,28 +42,28 @@ internal fun LowerContext.lowerThrow(
     tag: TagIndex,
     firstPayloadSlot: Int,
 ) {
-    val fields = declarations.tagFieldCount(tag)
-    pushContext()
-    emit.int(firstPayloadSlot + fields)
-    emit.invokeStatic(OPEN_FRAME)
-    emit.store(Opcodes.LSTORE, locals.scratchLong[0])
-    for (field in 0 until fields) {
-        pushContext()
-        emit.invokeStatic(FRAME)
-        emit.load(Opcodes.LLOAD, locals.scratchLong[0])
-        emit.insn(Opcodes.L2I)
-        emit.int(firstPayloadSlot + field)
-        emit.insn(Opcodes.IADD)
-        pushLong(slot(firstPayloadSlot + field))
-        emit.insn(Opcodes.LASTORE)
+
+    val fields = declarations.tagFieldTypes(tag)
+    newLanes(fields.size, references = fields.any { field -> field is ValueType.Reference })
+    fields.forEachIndexed { index, field ->
+        if (field is ValueType.Reference) {
+            emit.load(Opcodes.ALOAD, locals.scratchReferences)
+            emit.int(index)
+            pushObject(slot(firstPayloadSlot + index))
+            emit.insn(Opcodes.AASTORE)
+        } else {
+            emit.load(Opcodes.ALOAD, locals.scratchValues)
+            emit.int(index)
+            pushLong(slot(firstPayloadSlot + index))
+            emit.insn(Opcodes.LASTORE)
+        }
     }
+
     pushContext()
     pushResource(Resource.TagAddress(tag.index))
-    emit.int(firstPayloadSlot)
-    emit.invokeStatic(THROW_TAG)
-    pushContext()
-    emit.load(Opcodes.LLOAD, locals.scratchLong[0])
-    emit.invokeStatic(CLOSE_FRAME)
+    emit.load(Opcodes.ALOAD, locals.scratchValues)
+    emit.load(Opcodes.ALOAD, locals.scratchReferences)
+    emit.invokeStatic(THROW_EXCEPTION)
     emit.jump(Opcodes.GOTO, unwindTarget(position))
 }
 
@@ -69,8 +71,8 @@ internal fun LowerContext.lowerThrowRef(
     exceptionSlot: Int,
 ) {
     pushContext()
-    pushLong(slot(exceptionSlot))
-    emit.invokeStatic(THROW_REF)
+    pushObject(slot(exceptionSlot))
+    emit.invokeStatic(RETHROW_EXCEPTION)
     emit.jump(Opcodes.GOTO, unwindTarget(position))
 }
 
@@ -118,9 +120,8 @@ private fun LowerContext.emitMatcher(
     val current = regions[region]
     emit.place(entry)
     refreshMemory()
-    roots.refresh()
     pushContext()
-    emit.invokeStatic(PENDING_TAG)
+    emit.invokeStatic(PENDING_EXCEPTION_TAG)
     emit.store(Opcodes.ISTORE, locals.scratchInt)
     current.catches.forEach { handler ->
         val next = emit.label()
@@ -130,70 +131,36 @@ private fun LowerContext.emitMatcher(
             pushResource(Resource.TagAddress(tag.index))
             emit.jump(Opcodes.IF_ICMPNE, next)
         }
-        val slots = handler.payloadSlots
-        val fields = if (tag == null) 0 else slots.size - if (handler.exceptionReference) 1 else 0
-        if (references.writesThrough) {
-            clearDiscardedRoots(handler.stackSlots, slots)
-        }
-        emit.int(maxOf(fields, 1))
-        emit.newLongArray()
-        emit.store(Opcodes.ASTORE, locals.scratchValues)
         pushContext()
-        emit.load(Opcodes.ALOAD, locals.scratchValues)
-        emit.int(fields)
-        emit.invokeStatic(TAKE_EXCEPTION)
-        if (handler.exceptionReference) storeLong(slots.last()) else emit.insn(Opcodes.POP2)
-        for (field in 0 until fields) {
-            emit.load(Opcodes.ALOAD, locals.scratchValues)
-            emit.int(field)
-            emit.insn(Opcodes.LALOAD)
-            storeLong(slots[field])
+        emit.invokeStatic(TAKE_MANAGED_EXCEPTION)
+        emit.store(Opcodes.ASTORE, locals.scratchObject)
+
+        val slots = handler.payloadSlots
+        if (handler.exceptionReference) {
+            emit.load(Opcodes.ALOAD, locals.scratchObject)
+            storeObject(slots.last())
+        }
+        val fields = if (tag == null) emptyList() else declarations.tagFieldTypes(tag)
+        fields.forEachIndexed { field, type ->
+            emit.load(Opcodes.ALOAD, locals.scratchObject)
+            emit.type(Opcodes.CHECKCAST, WASM_EXCEPTION_TYPE)
+            if (type is ValueType.Reference) {
+                emit.getField(WASM_EXCEPTION_TYPE, WASM_EXCEPTION_REFERENCES, OBJECT_ARRAY)
+                emit.int(field)
+                emit.insn(Opcodes.AALOAD)
+                storeObject(slots[field])
+            } else {
+                emit.getField(WASM_EXCEPTION_TYPE, WASM_EXCEPTION_WORDS, "[J")
+                emit.int(field)
+                emit.insn(Opcodes.LALOAD)
+                storeLong(slots[field])
+            }
         }
         emit.jump(Opcodes.GOTO, label(handler.target))
         emit.place(next)
     }
     val parent = current.parent
     emit.jump(Opcodes.GOTO, if (parent == null) propagation() else matcher(parent))
-}
-
-private fun LowerContext.clearDiscardedRoots(
-    stackSlots: Int,
-    payload: IntArray,
-) {
-
-    if (chunk == null) {
-        val slots = references.slots
-        val found = slots.binarySearch(stackSlots)
-        val first = if (found >= 0) found else -found - 1
-        if (first < slots.size) {
-            roots.clear(first, slots.size - first)
-        }
-        return
-    }
-
-    if (stackSlots >= frame.frameSlots) {
-        return
-    }
-    roots.clear(stackSlots, frame.frameSlots - stackSlots)
-    if (locals.isRecording) {
-        return
-    }
-
-    val inPayload = if (payload.any { slot -> slot >= stackSlots }) {
-        BooleanArray(frame.frameSlots).also { members -> payload.forEach { slot -> members[slot] = true } }
-    } else {
-        null
-    }
-
-    locals.heldSlots.forEach { slot ->
-
-        if (slot < stackSlots || !references.isReference[slot] || inPayload?.get(slot) == true) {
-            return@forEach
-        }
-
-        emit.long(0L)
-        emit.store(Opcodes.LSTORE, locals.slot(slot))
-    }
 }
 
 private fun LowerContext.emitPropagation(
@@ -203,6 +170,7 @@ private fun LowerContext.emitPropagation(
     pushContext()
     emit.int(1)
     emit.putField(CONTEXT_TYPE, UNWINDING_FIELD, "Z")
-    roots.close()
     returnNothing()
 }
+
+private const val OBJECT_ARRAY = "[Ljava/lang/Object;"

@@ -60,6 +60,7 @@ include(":decoder")
 
 include(":embedding-api")
 include(":embedding-compiled")
+include(":embedding-managed")
 include(":embedding-module")
 include(":embedding-runtime")
 

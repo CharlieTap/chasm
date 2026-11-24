@@ -7,6 +7,7 @@ import io.github.charlietap.chasm.compiler.backend.analysis.FunctionSummary
 import io.github.charlietap.chasm.compiler.backend.analysis.ModuleIndexSpaces
 import io.github.charlietap.chasm.compiler.backend.analysis.analyzeModule
 import io.github.charlietap.chasm.compiler.backend.analysis.functionSummary
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.UnsupportedShape
 import io.github.charlietap.chasm.compiler.backend.dex.binding.boundResources
 import io.github.charlietap.chasm.compiler.backend.dex.lower.Unsupported
 import io.github.charlietap.chasm.parallel.EarliestFailure
@@ -62,7 +63,7 @@ internal suspend fun ParallelModuleLowerer(
 
         val declarations = ModuleIndexSpaces(module)
         val summaries = summarizeFunctions(code, declarations, taskExecutor, workers)
-        val plan = ModulePlan(module, code, options, declarations, analyzeModule(module, code, declarations, summaries, OBJECT_TYPE))
+        val plan = ModulePlan(module, code, options, declarations, analyzeModule(code, declarations, summaries, OBJECT_TYPE))
 
         try {
             lowerFiles(plan, partitionedLayout(plan), taskExecutor, workers, claimOrder, functionLowerer, entryLowerer, installLowerer)
@@ -73,6 +74,8 @@ internal suspend fun ParallelModuleLowerer(
             lowerFiles(plan, filePerBatchLayout(plan), taskExecutor, workers, claimOrder, functionLowerer, entryLowerer, installLowerer)
         }
     } catch (unsupported: Unsupported) {
+        throw UnsupportedModule(unsupported.message.orEmpty())
+    } catch (unsupported: UnsupportedShape) {
         throw UnsupportedModule(unsupported.message.orEmpty())
     }
 }

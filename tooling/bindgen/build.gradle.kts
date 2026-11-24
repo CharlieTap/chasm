@@ -31,6 +31,7 @@ kotlin {
         api(projects.embeddingApi)
         api(libs.kotlin.poet)
 
+        implementation(projects.compiler.backendAnalysis)
         implementation(projects.decoder)
         implementation(projects.module)
         implementation(projects.moduleDeclarations)
