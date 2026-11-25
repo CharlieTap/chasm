@@ -3,13 +3,11 @@ package io.github.charlietap.chasm.compiler.backend.jvm
 import io.github.charlietap.chasm.compiler.backend.abi.BYTE_ARRAY_BASE
 import io.github.charlietap.chasm.compiler.backend.abi.CODE_INSTALLATION
 import io.github.charlietap.chasm.compiler.backend.abi.INSTALLATION_INSTANCE
-import io.github.charlietap.chasm.compiler.backend.abi.INSTALLATION_TYPE_TEST
 import io.github.charlietap.chasm.compiler.backend.abi.MethodRef
 import io.github.charlietap.chasm.compiler.backend.abi.Resource
 import io.github.charlietap.chasm.compiler.backend.abi.UNPACK_LONGS
 import io.github.charlietap.chasm.compiler.backend.abi.UNSAFE_INSTANCE
 import io.github.charlietap.chasm.compiler.backend.abi.UNSAFE_TYPE
-import io.github.charlietap.chasm.compiler.backend.abi.heapTypeNumber
 import io.github.charlietap.chasm.compiler.backend.abi.installationAccessor
 import io.github.charlietap.chasm.compiler.backend.abi.installationIndex
 import io.github.charlietap.chasm.compiler.backend.abi.internalName
@@ -113,11 +111,6 @@ private fun MethodVisitor.loadResource(
     visitVarInsn(Opcodes.ALOAD, 1)
     val accessor = when (resource) {
         Resource.Instance -> return installation(INSTALLATION_INSTANCE)
-        is Resource.TypeTest -> {
-            visitInsn(if (resource.type.nullable) Opcodes.ICONST_1 else Opcodes.ICONST_0)
-            pushInt(heapTypeNumber(resource.type.heapType))
-            INSTALLATION_TYPE_TEST
-        }
         else -> {
             val accessor = installationAccessor(resource) ?: error("$resource has no binding field")
             pushInt(installationIndex(resource))

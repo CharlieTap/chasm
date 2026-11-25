@@ -1,5 +1,8 @@
+@file:OptIn(InternalChasmApi::class)
+
 package io.github.charlietap.chasm.compiled
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.compiler.backend.abi.binaryName
 import io.github.charlietap.chasm.compiler.backend.analysis.gc.STORAGE_FAMILY
 import io.github.charlietap.chasm.runtime.compiled.gc.CompiledStruct

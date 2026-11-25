@@ -1,12 +1,15 @@
 package io.github.charlietap.chasm.compiler.frontend
 
 import com.github.michaelbull.result.Err
+import com.github.michaelbull.result.Result
+import com.github.michaelbull.result.getOrThrow
 import com.github.michaelbull.result.unwrapError
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
 import io.github.charlietap.chasm.ast.instruction.Expression
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.typeResolver
+import io.github.charlietap.chasm.cir.CirModule
 import io.github.charlietap.chasm.fixture.ast.module.function
 import io.github.charlietap.chasm.fixture.ast.module.module
 import io.github.charlietap.chasm.fixture.type.definedType
@@ -19,6 +22,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertSame
+import kotlin.test.assertTrue
 import kotlin.test.fail
 
 class ParallelModuleCompilerTest {
@@ -55,6 +59,35 @@ class ParallelModuleCompilerTest {
         }
 
         assertSame(failure, thrown)
+    }
+
+    @Test
+    fun `a module compiled on one worker records provenance when asked`() = runTest {
+
+        val compiled = compileRecordingProvenance(CompilationMode.SERIAL).getOrThrow { error -> IllegalStateException(error.toString()) }
+
+        assertTrue(compiled.functions.all { function -> function.provenance != null })
+    }
+
+    @Test
+    fun `a module compiled on several workers records provenance when asked`() = runTest {
+
+        val compiled = compileRecordingProvenance(CompilationMode.PARALLEL).getOrThrow { error -> IllegalStateException(error.toString()) }
+
+        assertTrue(compiled.functions.all { function -> function.provenance != null })
+    }
+
+    private suspend fun compileRecordingProvenance(mode: CompilationMode): Result<CirModule, CompilationError> {
+        return ParallelModuleCompiler(
+            module = module,
+            types = module.typeResolver(),
+            taskExecutor = SequentialTaskExecutor(),
+            mode = mode,
+            availableProcessors = 2,
+            policy = ParallelismPolicy(minimumWork = 0, workPerWorker = 1),
+            devirtualiseIndirectCalls = false,
+            recordProvenance = true,
+        )
     }
 
     private suspend fun compile(

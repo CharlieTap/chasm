@@ -1,4 +1,0 @@
-public final class io/github/charlietap/chasm/jit/internal/JitStoreKt {
-	public static final fun _jitStore (Lio/github/charlietap/chasm/config/RuntimeConfig;)Lio/github/charlietap/chasm/embedding/shapes/Store;
-}
-

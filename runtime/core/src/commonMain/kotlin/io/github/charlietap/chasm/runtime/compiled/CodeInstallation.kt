@@ -67,11 +67,6 @@ abstract class CodeInstallation protected constructor() {
 
     abstract fun rtt(index: Int): Any
 
-    abstract fun typeTest(
-        nullable: Boolean,
-        heapType: Int,
-    ): Any
-
     abstract fun install(
         index: Int,
         entry: CompiledFunction,

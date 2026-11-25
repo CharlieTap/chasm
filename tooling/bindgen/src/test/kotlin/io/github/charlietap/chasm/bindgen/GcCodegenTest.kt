@@ -12,14 +12,14 @@ import kotlin.test.assertFalse
 class GcCodegenTest {
 
     @Test
-    fun `generates JIT struct views`() {
+    fun `generates loaded compiled struct views`() {
         assertModuleGenerates(
             category = "gc",
             module = "struct_views",
             options = BindingOptions(
-                interfaceName = "JitStructViews",
+                interfaceName = "LoadedStructViews",
                 packageName = PACKAGE_NAME,
-                config = JIT_CONFIG,
+                config = LOADED_CONFIG,
             ),
         )
     }
@@ -33,9 +33,9 @@ class GcCodegenTest {
             category = "gc",
             module = "skipped_views",
             options = BindingOptions(
-                interfaceName = "JitSkippedViews",
+                interfaceName = "LoadedSkippedViews",
                 packageName = PACKAGE_NAME,
-                config = JIT_CONFIG,
+                config = LOADED_CONFIG,
             ),
             logger = logger,
         )
@@ -57,27 +57,27 @@ class GcCodegenTest {
     }
 
     @Test
-    fun `generates AOT struct views`() {
+    fun `generates compiled struct views`() {
         assertModuleGenerates(
             category = "gc",
             module = "struct_views",
             options = BindingOptions(
-                interfaceName = "AotStructViews",
+                interfaceName = "CompiledStructViews",
                 packageName = PACKAGE_NAME,
-                config = AOT_CONFIG,
+                config = GENERATED_CONFIG,
             ),
         )
     }
 
     @Test
-    fun `generates AOT struct views over inherited and spilled lanes`() {
+    fun `generates compiled struct views over inherited and spilled lanes`() {
         assertModuleGenerates(
             category = "gc",
             module = "struct_storage",
             options = BindingOptions(
-                interfaceName = "AotStructStorage",
+                interfaceName = "CompiledStructStorage",
                 packageName = PACKAGE_NAME,
-                config = AOT_CONFIG,
+                config = GENERATED_CONFIG,
             ),
         )
     }
@@ -102,29 +102,14 @@ class GcCodegenTest {
     }
 
     @Test
-    fun `generates JIT strings over GC arrays`() {
+    fun `generates compiled strings over GC arrays`() {
         assertModuleGenerates(
             category = "gc",
             module = "gc_strings",
             options = BindingOptions(
-                interfaceName = "JitGcStrings",
+                interfaceName = "CompiledGcStrings",
                 packageName = PACKAGE_NAME,
-                config = JIT_CONFIG,
-                functions = gcStringFunctions(),
-                ignoredExports = setOf("nullable_result"),
-            ),
-        )
-    }
-
-    @Test
-    fun `generates AOT strings over GC arrays`() {
-        assertModuleGenerates(
-            category = "gc",
-            module = "gc_strings",
-            options = BindingOptions(
-                interfaceName = "AotGcStrings",
-                packageName = PACKAGE_NAME,
-                config = AOT_CONFIG,
+                config = GENERATED_CONFIG,
                 functions = gcStringFunctions(),
                 ignoredExports = setOf("nullable_result"),
             ),
@@ -173,7 +158,7 @@ class GcCodegenTest {
                 BindingOptions(
                     interfaceName = "Strings",
                     packageName = PACKAGE_NAME,
-                    config = JIT_CONFIG,
+                    config = LOADED_CONFIG,
                     functions = listOf(function),
                 ),
             )
@@ -198,7 +183,7 @@ class GcCodegenTest {
             BindingOptions(
                 interfaceName = "Strings",
                 packageName = PACKAGE_NAME,
-                config = JIT_CONFIG,
+                config = LOADED_CONFIG,
                 functions = listOf(function),
                 ignoredExports = GC_STRING_EXPORTS - "echo_utf16",
             ),
@@ -228,7 +213,7 @@ class GcCodegenTest {
             BindingOptions(
                 interfaceName = "Strings",
                 packageName = PACKAGE_NAME,
-                config = JIT_CONFIG,
+                config = LOADED_CONFIG,
                 functions = listOf(function),
                 ignoredExports = GC_STRING_EXPORTS - "nullable_result",
             ),
@@ -287,8 +272,11 @@ class GcCodegenTest {
 
     private companion object {
         const val PACKAGE_NAME = "com.test"
-        val JIT_CONFIG = CodegenConfig(runtime = CodegenRuntime.CHASM, executionTier = ExecutionTier.Jit())
-        val AOT_CONFIG = CodegenConfig(runtime = CodegenRuntime.CHASM, executionTier = ExecutionTier.Aot("com.test.aot.WasmModule"))
+        val LOADED_CONFIG = CodegenConfig(runtime = CodegenRuntime.CHASM, executionTier = ExecutionTier.Compiled(CompiledSource.Loaded()))
+        val GENERATED_CONFIG = CodegenConfig(
+            runtime = CodegenRuntime.CHASM,
+            executionTier = ExecutionTier.Compiled(CompiledSource.Generated("com.test.aot.WasmModule")),
+        )
         val GC_STRING_EXPORTS = setOf("echo_utf16", "echo_utf8", "utf16_length", "nullable_utf16", "frozen", "nullable_result")
     }
 }

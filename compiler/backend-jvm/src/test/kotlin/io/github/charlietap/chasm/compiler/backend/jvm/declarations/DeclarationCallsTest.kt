@@ -2,6 +2,9 @@ package io.github.charlietap.chasm.compiler.backend.jvm.declarations
 
 import com.github.michaelbull.result.getOrThrow
 import io.github.charlietap.chasm.ast.module.Module
+import io.github.charlietap.chasm.compiler.backend.abi.GeneratedClassNames
+import io.github.charlietap.chasm.compiler.backend.analysis.declarations.BuilderCall
+import io.github.charlietap.chasm.compiler.backend.analysis.declarations.DeclarationCallGenerator
 import io.github.charlietap.chasm.compiler.backend.jvm.Generated
 import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.declarations.DataPayload
@@ -44,7 +47,7 @@ class DeclarationCallsTest {
             val calls = DeclarationCallGenerator(expected, payloads)
             val data = payloads.toByteArray()
             val output = Generated()
-            val roots = DeclarationsLowerer(calls, "chasm/test", output)
+            val roots = DeclarationsLowerer(calls, GeneratedClassNames("chasm/test"), output)
             val loader = GeneratedClasses(output)
             val builder = DeclarationsBuilder()
             roots.forEach { root ->

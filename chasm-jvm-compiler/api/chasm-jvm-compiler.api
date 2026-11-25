@@ -1,0 +1,122 @@
+public abstract interface class io/github/charlietap/chasm/jvm/ClassOutput {
+	public static final field Companion Lio/github/charlietap/chasm/jvm/ClassOutput$Companion;
+	public abstract fun classFile (Ljava/lang/String;[B)V
+	public abstract fun resource (Ljava/lang/String;[B)V
+}
+
+public final class io/github/charlietap/chasm/jvm/ClassOutput$Companion {
+	public final fun directory (Ljava/nio/file/Path;)Lio/github/charlietap/chasm/jvm/ClassOutput;
+	public final fun jar (Ljava/nio/file/Path;)Lio/github/charlietap/chasm/jvm/ClassOutput;
+	public final fun memory ()Lio/github/charlietap/chasm/jvm/MemoryClassOutput;
+}
+
+public final class io/github/charlietap/chasm/jvm/CompileConfig {
+	public fun <init> (Ljava/lang/String;Lio/github/charlietap/chasm/jvm/CompileTarget;Lio/github/charlietap/chasm/config/RuntimeConfig;)V
+	public synthetic fun <init> (Ljava/lang/String;Lio/github/charlietap/chasm/jvm/CompileTarget;Lio/github/charlietap/chasm/config/RuntimeConfig;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Lio/github/charlietap/chasm/jvm/CompileTarget;
+	public final fun component3 ()Lio/github/charlietap/chasm/config/RuntimeConfig;
+	public final fun copy (Ljava/lang/String;Lio/github/charlietap/chasm/jvm/CompileTarget;Lio/github/charlietap/chasm/config/RuntimeConfig;)Lio/github/charlietap/chasm/jvm/CompileConfig;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/jvm/CompileConfig;Ljava/lang/String;Lio/github/charlietap/chasm/jvm/CompileTarget;Lio/github/charlietap/chasm/config/RuntimeConfig;ILjava/lang/Object;)Lio/github/charlietap/chasm/jvm/CompileConfig;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getClassName ()Ljava/lang/String;
+	public final fun getRuntime ()Lio/github/charlietap/chasm/config/RuntimeConfig;
+	public final fun getTarget ()Lio/github/charlietap/chasm/jvm/CompileTarget;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/jvm/CompileError {
+	public fun <init> (Ljava/lang/String;Lio/github/charlietap/chasm/jvm/CompileError$Stage;Ljava/util/List;)V
+	public synthetic fun <init> (Ljava/lang/String;Lio/github/charlietap/chasm/jvm/CompileError$Stage;Ljava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Lio/github/charlietap/chasm/jvm/CompileError$Stage;
+	public final fun component3 ()Ljava/util/List;
+	public final fun copy (Ljava/lang/String;Lio/github/charlietap/chasm/jvm/CompileError$Stage;Ljava/util/List;)Lio/github/charlietap/chasm/jvm/CompileError;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/jvm/CompileError;Ljava/lang/String;Lio/github/charlietap/chasm/jvm/CompileError$Stage;Ljava/util/List;ILjava/lang/Object;)Lio/github/charlietap/chasm/jvm/CompileError;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getFunctions ()Ljava/util/List;
+	public final fun getMessage ()Ljava/lang/String;
+	public final fun getStage ()Lio/github/charlietap/chasm/jvm/CompileError$Stage;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/jvm/CompileError$Stage : java/lang/Enum {
+	public static final field CONFIGURATION Lio/github/charlietap/chasm/jvm/CompileError$Stage;
+	public static final field DECODE Lio/github/charlietap/chasm/jvm/CompileError$Stage;
+	public static final field GENERATION Lio/github/charlietap/chasm/jvm/CompileError$Stage;
+	public static final field INPUT Lio/github/charlietap/chasm/jvm/CompileError$Stage;
+	public static final field OUTPUT Lio/github/charlietap/chasm/jvm/CompileError$Stage;
+	public static final field VALIDATION Lio/github/charlietap/chasm/jvm/CompileError$Stage;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/charlietap/chasm/jvm/CompileError$Stage;
+	public static fun values ()[Lio/github/charlietap/chasm/jvm/CompileError$Stage;
+}
+
+public final class io/github/charlietap/chasm/jvm/CompileKt {
+	public static final fun compile (Ljava/nio/file/Path;Lio/github/charlietap/chasm/jvm/ClassOutput;Lio/github/charlietap/chasm/jvm/CompileConfig;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun compile ([BLio/github/charlietap/chasm/jvm/ClassOutput;Lio/github/charlietap/chasm/jvm/CompileConfig;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class io/github/charlietap/chasm/jvm/CompileTarget : java/lang/Enum {
+	public static final field ART Lio/github/charlietap/chasm/jvm/CompileTarget;
+	public static final field HOTSPOT Lio/github/charlietap/chasm/jvm/CompileTarget;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/charlietap/chasm/jvm/CompileTarget;
+	public static fun values ()[Lio/github/charlietap/chasm/jvm/CompileTarget;
+}
+
+public final class io/github/charlietap/chasm/jvm/CompiledModuleInfo {
+	public fun <init> (Lio/github/charlietap/chasm/jvm/CompileConfig;Ljava/util/List;Ljava/util/List;ILjava/lang/String;Ljava/lang/String;Lio/github/charlietap/chasm/jvm/Diagnostics;Ljava/util/List;Ljava/util/List;Ljava/lang/String;)V
+	public final fun component1 ()Lio/github/charlietap/chasm/jvm/CompileConfig;
+	public final fun component10 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/util/List;
+	public final fun component3 ()Ljava/util/List;
+	public final fun component4 ()I
+	public final fun component5 ()Ljava/lang/String;
+	public final fun component6 ()Ljava/lang/String;
+	public final fun component7 ()Lio/github/charlietap/chasm/jvm/Diagnostics;
+	public final fun component8 ()Ljava/util/List;
+	public final fun component9 ()Ljava/util/List;
+	public final fun copy (Lio/github/charlietap/chasm/jvm/CompileConfig;Ljava/util/List;Ljava/util/List;ILjava/lang/String;Ljava/lang/String;Lio/github/charlietap/chasm/jvm/Diagnostics;Ljava/util/List;Ljava/util/List;Ljava/lang/String;)Lio/github/charlietap/chasm/jvm/CompiledModuleInfo;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/jvm/CompiledModuleInfo;Lio/github/charlietap/chasm/jvm/CompileConfig;Ljava/util/List;Ljava/util/List;ILjava/lang/String;Ljava/lang/String;Lio/github/charlietap/chasm/jvm/Diagnostics;Ljava/util/List;Ljava/util/List;Ljava/lang/String;ILjava/lang/Object;)Lio/github/charlietap/chasm/jvm/CompiledModuleInfo;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getClasses ()Ljava/util/List;
+	public final fun getCompilerVersion ()Ljava/lang/String;
+	public final fun getConfig ()Lio/github/charlietap/chasm/jvm/CompileConfig;
+	public final fun getDiagnostics ()Lio/github/charlietap/chasm/jvm/Diagnostics;
+	public final fun getExports ()Ljava/util/List;
+	public final fun getImports ()Ljava/util/List;
+	public final fun getResources ()Ljava/util/List;
+	public final fun getRuntimeAbi ()I
+	public final fun getShrinkerRules ()Ljava/lang/String;
+	public final fun getSourceHash ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/jvm/Diagnostics {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;)Lio/github/charlietap/chasm/jvm/Diagnostics;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/jvm/Diagnostics;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/charlietap/chasm/jvm/Diagnostics;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getRetracedLines ()Ljava/lang/String;
+	public final fun getSites ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/jvm/MemoryClassOutput : io/github/charlietap/chasm/jvm/ClassOutput {
+	public fun classFile (Ljava/lang/String;[B)V
+	public final fun getClassFiles ()Ljava/util/Map;
+	public final fun getResources ()Ljava/util/Map;
+	public fun resource (Ljava/lang/String;[B)V
+}
+
+public final class io/github/charlietap/chasm/jvm/RetraceTrapLinesKt {
+	public static final fun retraceTrapLines (Ljava/io/Reader;)Ljava/util/Map;
+}
+

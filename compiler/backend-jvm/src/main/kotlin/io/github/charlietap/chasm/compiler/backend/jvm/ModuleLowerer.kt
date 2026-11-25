@@ -3,22 +3,21 @@
 package io.github.charlietap.chasm.compiler.backend.jvm
 
 import io.github.charlietap.chasm.InternalChasmApi
-import io.github.charlietap.chasm.aot.internal.trapSitesResource
-import io.github.charlietap.chasm.aot.internal.writeTrapSites
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.cir.CirModule
+import io.github.charlietap.chasm.compiled.format.dataResource
+import io.github.charlietap.chasm.compiled.format.trapSitesResource
+import io.github.charlietap.chasm.compiled.format.writeTrapSites
 import io.github.charlietap.chasm.compiler.backend.abi.internalName
-import io.github.charlietap.chasm.compiler.backend.jvm.abi.codeClassDescriptor
-import io.github.charlietap.chasm.compiler.backend.jvm.abi.dataResource
+import io.github.charlietap.chasm.compiler.backend.analysis.UnsupportedFunctions
+import io.github.charlietap.chasm.compiler.backend.analysis.declarations.DeclarationCallGenerator
+import io.github.charlietap.chasm.compiler.backend.analysis.declarations.DiscardingOutputStream
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.entriesClassDescriptor
-import io.github.charlietap.chasm.compiler.backend.jvm.abi.moduleClassDescriptor
-import io.github.charlietap.chasm.compiler.backend.jvm.declarations.DeclarationCallGenerator
 import io.github.charlietap.chasm.compiler.backend.jvm.declarations.DeclarationsLowerer
 import io.github.charlietap.chasm.declarations.ModuleDeclarations
 import io.github.charlietap.chasm.runtime.diagnostic.FunctionTrapSites
 import org.objectweb.asm.ClassTooLargeException
 import org.objectweb.asm.tree.MethodNode
-import java.io.OutputStream
 import java.util.concurrent.Callable
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutionException
@@ -94,6 +93,7 @@ internal inline fun ModuleLowerer(
     crossinline moduleClassLowerer: ModuleClassLowerer,
     noinline structsLowerer: ModuleStructsLowerer,
 ): JvmModule = try {
+    val inventory = ClassInventory(output)
     val lowering = ModuleLowering(module, code, options)
     val entryPath = lowering.entryPath
     val reasons = LinkedHashMap<Int, String>()
@@ -107,7 +107,7 @@ internal inline fun ModuleLowerer(
         var next = 0
         var weight = 0L
         lowering.batches.forEachIndexed { batch, batchFunctions ->
-            val owner = codeClassDescriptor(entryPath, batch)
+            val owner = lowering.names.code(batch)
             val methods = ArrayList<MethodNode>()
             for (function in batchFunctions) {
                 while (
@@ -149,15 +149,17 @@ internal inline fun ModuleLowerer(
             )
             while (writes.isNotEmpty() && writes.first().second.isDone) {
                 val (name, bytes) = writes.removeFirst()
-                output.classFile(internalName(name), completed(bytes))
+                inventory.classFile(internalName(name), completed(bytes))
             }
         }
         while (writes.isNotEmpty()) {
             val (name, bytes) = writes.removeFirst()
-            output.classFile(internalName(name), completed(bytes))
+            inventory.classFile(internalName(name), completed(bytes))
         }
         if (reasons.isNotEmpty()) throw UnsupportedFunctions(reasons)
-        lowering.typedMethods.forEach { (signature, typed) -> output.classFile(internalName(signature), signatureLowerer(signature, typed)) }
+        lowering.typedMethods.forEach { (signature, typed) ->
+            inventory.classFile(internalName(signature), signatureLowerer(signature, typed))
+        }
         val groups = code.functions
             .groupBy { function -> lowering.declarations.functionType(function.index) }
             .values.flatMap { functions -> functions.chunked(ENTRY_GROUP) }
@@ -175,31 +177,30 @@ internal inline fun ModuleLowerer(
                     ?: CompletableFuture.completedFuture(entryLowerer(lowering, entry, methods, type, signature))
             )
         }
-        entryClasses.forEach { (entry, bytes) -> output.classFile(internalName(entry), completed(bytes)) }
+        entryClasses.forEach { (entry, bytes) -> inventory.classFile(internalName(entry), completed(bytes)) }
         entries.sortBy { it.function }
     } finally {
         pool?.shutdownNow()
     }
-    constantsLowerer(lowering, module, output)
-    bindingLowerer(lowering, output)
-    val dataResourcePath = dataResource(entryPath).takeIf { declarations.dataSegments.isNotEmpty() }
-    val calls = if (dataResourcePath != null) {
-        output.resource(dataResourcePath) { stream -> declarationCallGenerator(declarations, stream) }
+    constantsLowerer(lowering, module, inventory)
+    bindingLowerer(lowering, inventory)
+    val calls = if (declarations.dataSegments.isNotEmpty()) {
+        inventory.resource(dataResource(entryPath)) { stream -> declarationCallGenerator(declarations, stream) }
     } else {
-        declarationCallGenerator(declarations, OutputStream.nullOutputStream())
+        declarationCallGenerator(declarations, DiscardingOutputStream())
     }
-    val declarationClasses = declarationsLowerer(calls, entryPath, output)
+    val declarationClasses = declarationsLowerer(calls, lowering.names, inventory)
     if (options.stacktraces) {
         val sites = code.functions.associate { function ->
             val index = function.index.index
             val sites = trapSites[index] ?: FunctionTrapSites(IntArray(0), IntArray(0))
             index to sites.withChunkStarts(chunkStarts[index] ?: IntArray(0))
         }
-        output.resource(trapSitesResource(entryPath)) { stream -> writeTrapSites(stream, sites) }
+        inventory.resource(trapSitesResource(entryPath)) { stream -> writeTrapSites(stream, sites) }
     }
-    val moduleDescriptor = moduleClassDescriptor(entryPath)
-    moduleClassLowerer(lowering, moduleDescriptor, declarationClasses, dataResourcePath, entries, structsLowerer, output)
-    JvmModule(internalName(moduleDescriptor).replace('/', '.'), dataResourcePath)
+    val moduleDescriptor = lowering.names.module()
+    moduleClassLowerer(lowering, moduleDescriptor, declarationClasses, entries, structsLowerer, inventory)
+    JvmModule(internalName(moduleDescriptor).replace('/', '.'))
 } catch (tooLarge: ClassTooLargeException) {
     throw ClassTooLarge(
         "generated class ${tooLarge.className} needs ${tooLarge.constantPoolCount} constants, more than the JVM's 65535",

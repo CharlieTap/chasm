@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.compiler.backend.dex.analysis
 
+import io.github.charlietap.chasm.cir.AdminInstruction
 import io.github.charlietap.chasm.cir.AggregateInstruction
 import io.github.charlietap.chasm.cir.CirFunction
 import io.github.charlietap.chasm.cir.ControlInstruction
@@ -8,16 +9,19 @@ import io.github.charlietap.chasm.cir.Instruction
 import io.github.charlietap.chasm.cir.MemoryIndex
 import io.github.charlietap.chasm.cir.MemoryInstruction
 import io.github.charlietap.chasm.cir.ReferenceInstruction
+import io.github.charlietap.chasm.cir.ReferenceType
+import io.github.charlietap.chasm.cir.TypeIndex
 import io.github.charlietap.chasm.cir.VariableInstruction
 import io.github.charlietap.chasm.compiler.backend.abi.GLOBAL_INSTANCE
 import io.github.charlietap.chasm.compiler.backend.abi.MEMORY_INSTANCE
 import io.github.charlietap.chasm.compiler.backend.abi.REFERENCE_GLOBAL
 import io.github.charlietap.chasm.compiler.backend.abi.REFERENCE_TABLE
-import io.github.charlietap.chasm.compiler.backend.abi.REFERENCE_TYPE_TEST
+import io.github.charlietap.chasm.compiler.backend.abi.RTT_TYPE
 import io.github.charlietap.chasm.compiler.backend.abi.Resource
 import io.github.charlietap.chasm.compiler.backend.analysis.InstructionTable
 import io.github.charlietap.chasm.compiler.backend.analysis.form.HelperArgument
 import io.github.charlietap.chasm.compiler.backend.analysis.form.arrayCopy
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.ReferenceTest
 import io.github.charlietap.chasm.compiler.backend.analysis.redundantBoundsChecks
 import io.github.charlietap.chasm.compiler.backend.dex.ModuleLowering
 import io.github.charlietap.chasm.type.ValueType
@@ -110,6 +114,18 @@ private fun cachedConstants(
         use(Resource.ReferenceTable(table), REFERENCE_TABLE)
     }
 
+    fun useRtt(type: TypeIndex) {
+        use(Resource.Rtt(type.index), RTT_TYPE)
+    }
+
+    fun useRtt(type: ReferenceType) {
+
+        val test = module.referenceTests.test(type.heapType)
+        if (test is ReferenceTest.Defined) {
+            use(Resource.Rtt(test.typeIndex), RTT_TYPE)
+        }
+    }
+
     for (position in function.instructions.indices) {
         when (val instruction = function.instructions[position]) {
             is VariableInstruction.GlobalGetS -> useGlobal(instruction.global.index)
@@ -140,15 +156,30 @@ private fun cachedConstants(
             }
             is ControlInstruction.Throw -> valueLoads++
             is ReferenceInstruction.RefFuncS -> valueLoads++
-            is ReferenceInstruction.RefCastS -> use(Resource.TypeTest(instruction.typeTest), REFERENCE_TYPE_TEST)
-            is ReferenceInstruction.RefTestS -> use(Resource.TypeTest(instruction.typeTest), REFERENCE_TYPE_TEST)
-            is AggregateInstruction.RefCastStructGetS -> use(Resource.TypeTest(instruction.typeTest), REFERENCE_TYPE_TEST)
-            is AggregateInstruction.StructNewS,
-            is AggregateInstruction.StructNewDefaultS,
-            is AggregateInstruction.ArrayNewDefaultI,
-            is AggregateInstruction.ArrayNewDefaultS,
-            is AggregateInstruction.ArrayNewFixedS,
-            -> valueLoads++
+            is ReferenceInstruction.RefCastS -> useRtt(instruction.typeTest)
+            is ReferenceInstruction.RefTestS -> useRtt(instruction.typeTest)
+            is AdminInstruction.JumpOnCastI -> useRtt(instruction.typeTest)
+            is AdminInstruction.JumpOnCastS -> useRtt(instruction.typeTest)
+            is AdminInstruction.JumpOnCastFailI -> useRtt(instruction.typeTest)
+            is AdminInstruction.JumpOnCastFailS -> useRtt(instruction.typeTest)
+            is AggregateInstruction.RefCastStructGetS -> useRtt(instruction.typeTest)
+            is AggregateInstruction.StructNewS -> useRtt(instruction.type)
+            is AggregateInstruction.StructNewDefaultS -> useRtt(instruction.type)
+            is AggregateInstruction.ArrayNewIi -> useRtt(instruction.type)
+            is AggregateInstruction.ArrayNewIs -> useRtt(instruction.type)
+            is AggregateInstruction.ArrayNewSi -> useRtt(instruction.type)
+            is AggregateInstruction.ArrayNewSs -> useRtt(instruction.type)
+            is AggregateInstruction.ArrayNewDefaultI -> useRtt(instruction.type)
+            is AggregateInstruction.ArrayNewDefaultS -> useRtt(instruction.type)
+            is AggregateInstruction.ArrayNewFixedS -> useRtt(instruction.type)
+            is AggregateInstruction.ArrayNewDataIi -> useRtt(instruction.type)
+            is AggregateInstruction.ArrayNewDataIs -> useRtt(instruction.type)
+            is AggregateInstruction.ArrayNewDataSi -> useRtt(instruction.type)
+            is AggregateInstruction.ArrayNewDataSs -> useRtt(instruction.type)
+            is AggregateInstruction.ArrayNewElementIi -> useRtt(instruction.type)
+            is AggregateInstruction.ArrayNewElementIs -> useRtt(instruction.type)
+            is AggregateInstruction.ArrayNewElementSi -> useRtt(instruction.type)
+            is AggregateInstruction.ArrayNewElementSs -> useRtt(instruction.type)
             is AggregateInstruction -> valueLoads += table.forms.helperCall(position)?.arguments?.count { it is HelperArgument.RuntimeType } ?: 0
             else -> Unit
         }

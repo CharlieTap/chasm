@@ -8,7 +8,7 @@ import io.github.charlietap.chasm.compiler.backend.abi.internalName
 import io.github.charlietap.chasm.compiler.backend.analysis.gc.FieldStorage
 import io.github.charlietap.chasm.compiler.backend.analysis.gc.Lane
 import io.github.charlietap.chasm.compiler.backend.analysis.gc.LaneKind
-import io.github.charlietap.chasm.compiler.backend.analysis.gc.STORAGE_FAMILY
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.StoragePlans
 import io.github.charlietap.chasm.compiler.backend.analysis.gc.StructStorage
 import io.github.charlietap.chasm.compiler.backend.jvm.pushInt
 import io.github.charlietap.chasm.type.FieldType
@@ -47,6 +47,7 @@ internal inline fun MethodVisitor.allocateStruct(
 }
 
 internal inline fun MethodVisitor.putField(
+    plans: StoragePlans,
     storage: StructStorage,
     field: FieldStorage,
     wideLocal: Int,
@@ -58,11 +59,11 @@ internal inline fun MethodVisitor.putField(
         pushValue()
         visitVarInsn(Opcodes.LSTORE, wideLocal)
         visitInsn(Opcodes.DUP)
-        putLane(storage, lanes[0]) {
+        putLane(plans, storage, lanes[0]) {
             visitVarInsn(Opcodes.LLOAD, wideLocal)
             visitInsn(Opcodes.L2I)
         }
-        putLane(storage, lanes[1]) {
+        putLane(plans, storage, lanes[1]) {
             visitVarInsn(Opcodes.LLOAD, wideLocal)
             pushInt(HALF_BITS)
             visitInsn(Opcodes.LUSHR)
@@ -72,7 +73,7 @@ internal inline fun MethodVisitor.putField(
     }
 
     val lane = lanes.single()
-    putLane(storage, lane) {
+    putLane(plans, storage, lane) {
         pushValue()
         if (lane.kind == LaneKind.INT) {
             maskPacked(field.type)
@@ -81,12 +82,13 @@ internal inline fun MethodVisitor.putField(
 }
 
 internal inline fun MethodVisitor.putLane(
+    plans: StoragePlans,
     storage: StructStorage,
     lane: Lane,
     pushValue: MethodVisitor.() -> Unit,
 ) {
 
-    val owner = laneOwner(storage, lane)
+    val owner = internalName(plans.laneOwner(storage, lane))
     when {
         lane.spilled && lane.kind == LaneKind.INT -> {
             visitFieldInsn(Opcodes.GETFIELD, owner, SPILLED_INTS_FIELD, SPILLED_INTS_TYPE)
@@ -102,21 +104,22 @@ internal inline fun MethodVisitor.putLane(
         }
         lane.kind == LaneKind.INT -> {
             pushValue()
-            visitFieldInsn(Opcodes.PUTFIELD, owner, intLane(lane), "I")
+            visitFieldInsn(Opcodes.PUTFIELD, owner, lane.fieldName(), "I")
         }
         else -> {
             pushValue()
-            visitFieldInsn(Opcodes.PUTFIELD, owner, referenceLane(lane), OBJECT_TYPE)
+            visitFieldInsn(Opcodes.PUTFIELD, owner, lane.fieldName(), OBJECT_TYPE)
         }
     }
 }
 
 internal fun MethodVisitor.getLane(
+    plans: StoragePlans,
     storage: StructStorage,
     lane: Lane,
 ) {
 
-    val owner = laneOwner(storage, lane)
+    val owner = internalName(plans.laneOwner(storage, lane))
     when {
         lane.spilled && lane.kind == LaneKind.INT -> {
             visitFieldInsn(Opcodes.GETFIELD, owner, SPILLED_INTS_FIELD, SPILLED_INTS_TYPE)
@@ -128,8 +131,8 @@ internal fun MethodVisitor.getLane(
             pushInt(lane.index)
             visitInsn(Opcodes.AALOAD)
         }
-        lane.kind == LaneKind.INT -> visitFieldInsn(Opcodes.GETFIELD, owner, intLane(lane), "I")
-        else -> visitFieldInsn(Opcodes.GETFIELD, owner, referenceLane(lane), OBJECT_TYPE)
+        lane.kind == LaneKind.INT -> visitFieldInsn(Opcodes.GETFIELD, owner, lane.fieldName(), "I")
+        else -> visitFieldInsn(Opcodes.GETFIELD, owner, lane.fieldName(), OBJECT_TYPE)
     }
 }
 
@@ -145,21 +148,6 @@ internal fun MethodVisitor.maskPacked(type: FieldType) {
         }
         null -> Unit
     }
-}
-
-internal fun laneOwner(
-    storage: StructStorage,
-    lane: Lane,
-): String {
-    return internalName(STORAGE_FAMILY.storageClass(storage.className).declaringClass(lane).name)
-}
-
-internal fun intLane(lane: Lane): String {
-    return "i${lane.index}"
-}
-
-internal fun referenceLane(lane: Lane): String {
-    return "r${lane.index}"
 }
 
 internal const val SPILLED_INTS_TYPE = "[I"

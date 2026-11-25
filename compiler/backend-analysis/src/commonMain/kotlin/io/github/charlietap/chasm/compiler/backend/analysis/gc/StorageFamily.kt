@@ -9,7 +9,12 @@ data class Lane(
     val kind: LaneKind,
     val index: Int,
     val spilled: Boolean,
-)
+) {
+
+    fun fieldName(): String {
+        return if (kind == LaneKind.INT) "i$index" else "r$index"
+    }
+}
 
 class StorageClass internal constructor(
     val name: String,

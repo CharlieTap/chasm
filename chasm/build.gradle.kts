@@ -52,12 +52,15 @@ kotlin {
     @OptIn(ExperimentalAbiValidation::class)
     abiValidation()
 
+    compilerOptions {
+        optIn.add("io.github.charlietap.chasm.InternalChasmApi")
+    }
+
     sourceSets {
        commonMain {
             dependencies {
                 api(projects.config)
                 api(projects.embeddingApi)
-                api(projects.embeddingModule)
                 api(projects.libs.parallel)
                 api(projects.runtime.type)
                 api(projects.stream)
@@ -72,9 +75,15 @@ kotlin {
                 implementation(projects.compiler.backendChasm)
                 implementation(projects.compiler.frontend)
                 implementation(projects.decoder)
+                implementation(projects.executor.callCore)
                 implementation(projects.executor.instantiator)
+                implementation(projects.memory)
                 implementation(projects.module)
+                implementation(projects.moduleDeclarations)
+                implementation(projects.runtime.address)
                 implementation(projects.runtime.core)
+                implementation(projects.runtime.host)
+                implementation(projects.runtime.resources)
                 implementation(projects.typeSystem)
                 implementation(projects.validator)
 
@@ -89,6 +98,7 @@ kotlin {
                 implementation(projects.test.fixture.chasm)
                 implementation(projects.test.fixture.config)
                 implementation(projects.test.fixture.runtime)
+                implementation(projects.test.fixture.typeSystem)
 
                 implementation(libs.kotlinx.coroutines.test)
                 implementation(libs.kotlinx.test.resources)

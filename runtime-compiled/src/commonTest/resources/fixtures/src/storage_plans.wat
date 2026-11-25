@@ -1,0 +1,38 @@
+(module
+  (type $spare_fill (struct (field i32) (field anyref) (field i32)))
+  (type $parent (sub (struct (field i32) (field anyref))))
+  (type $child (sub $parent (struct (field i32) (field anyref) (field i64))))
+  (type $grandchild (sub $child (struct (field i32) (field anyref) (field i64) (field anyref))))
+  (type $pair_levels (struct (field i32) (field i32) (field i64)))
+  (type $tree_tail (struct (field i32 i32 i32 i32 i32 i32) (field i64)))
+  (type $tail_levels (struct (field i32 i32 i32 i32 i32 i32 i32) (field i64)))
+  (type $tail_spill (sub (struct
+    (field i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32)
+    (field i64))))
+  (type $spill_start (struct
+    (field i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32)
+    (field anyref)))
+  (type $spilled_child (sub $tail_spill (struct
+    (field i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32)
+    (field i64)
+    (field anyref)
+    (field i32))))
+  (type $empty (sub (struct)))
+  (type $empty_child (sub $empty (struct (field i32))))
+  (type $packed (struct (field (mut i8)) (field (mut i16)) (field f32) (field f64)))
+  (rec
+    (type $node (sub (struct (field (ref null $node)) (field i32))))
+    (type $leaf_node (sub $node (struct (field (ref null $leaf_node)) (field i32) (field f64)))))
+  (type $references (struct
+    (field anyref anyref anyref anyref anyref anyref anyref anyref anyref anyref anyref anyref anyref)
+    (field anyref anyref anyref anyref anyref anyref anyref anyref anyref anyref anyref anyref)))
+  (type $bytes (array (mut i8)))
+  (type $chars (array (mut i16)))
+  (type $ints (array i32))
+  (type $longs (array i64))
+  (type $floats (array f32))
+  (type $doubles (array f64))
+  (type $refs (array (ref null $spare_fill)))
+  (type $vectors (struct (field v128)))
+  (type $function (func))
+)

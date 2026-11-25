@@ -29,7 +29,6 @@ import io.github.charlietap.chasm.compiler.backend.abi.internalName
 import io.github.charlietap.chasm.compiler.backend.analysis.gc.LaneKind
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.CLASS_FILE_VERSION
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.INITIALIZE_CONSTANTS
-import io.github.charlietap.chasm.compiler.backend.jvm.abi.constantsClassDescriptor
 import io.github.charlietap.chasm.compiler.backend.jvm.binding.FIELD_PLACEHOLDER
 import io.github.charlietap.chasm.compiler.backend.jvm.binding.PART_PLACEHOLDER
 import io.github.charlietap.chasm.compiler.backend.jvm.binding.PENDING_OWNER
@@ -58,7 +57,7 @@ internal fun ConstantsLowerer(
         return
     }
 
-    val owner = internalName(constantsClassDescriptor(lowering.entryPath))
+    val owner = internalName(lowering.names.constants())
     val writer = ConstantsWriter(lowering, owner)
     val importedGlobals = module.imports.count { import -> import.descriptor is Import.Descriptor.Global }
     val importedTables = module.imports.count { import -> import.descriptor is Import.Descriptor.Table }
@@ -291,7 +290,7 @@ private class ConstantsWriter(
                         else -> Opcodes.ILOAD
                     }
                     method.visitInsn(Opcodes.DUP)
-                    method.putField(storage, field, valueSlot) {
+                    method.putField(lowering.storagePlans, storage, field, valueSlot) {
                         visitVarInsn(load, valueSlot)
                     }
                 }
@@ -366,7 +365,7 @@ private class ConstantsWriter(
             method.visitInsn(Opcodes.DUP)
             method.pushResource(Resource.Rtt(type))
             method.visitVarInsn(Opcodes.ALOAD, slot(first))
-            method.visitMethodInsn(Opcodes.INVOKESPECIAL, className, "<init>", "($RTT_TYPE${element.arrayDescriptor})V", false)
+            method.visitMethodInsn(Opcodes.INVOKESPECIAL, className, "<init>", "($RTT_TYPE${element.kind.arrayDescriptor})V", false)
 
             replace(first)
         }

@@ -46,21 +46,27 @@ enum class WasiLinking {
 }
 
 sealed interface ExecutionTier {
+
     val managed: Boolean
 
     class Interpreter : ExecutionTier {
         override val managed: Boolean = false
     }
 
-    class Jit : ExecutionTier {
-        override val managed: Boolean = true
-    }
-
-    data class Aot(
-        val compiledModule: String,
+    data class Compiled(
+        val module: CompiledSource,
     ) : ExecutionTier {
         override val managed: Boolean = true
     }
+}
+
+sealed interface CompiledSource {
+
+    data class Generated(
+        val className: String,
+    ) : CompiledSource
+
+    class Loaded : CompiledSource
 }
 
 data class CodegenConfig(

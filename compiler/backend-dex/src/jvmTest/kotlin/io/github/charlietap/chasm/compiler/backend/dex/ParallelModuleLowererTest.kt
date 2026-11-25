@@ -1,9 +1,17 @@
+@file:OptIn(InternalChasmApi::class)
+
 package io.github.charlietap.chasm.compiler.backend.dex
 
 import com.github.michaelbull.result.getOrThrow
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.typeResolver
 import io.github.charlietap.chasm.compiler.frontend.ModuleCompiler
+import io.github.charlietap.chasm.config.CpuLimits
+import io.github.charlietap.chasm.config.Fuel
+import io.github.charlietap.chasm.config.Limits
+import io.github.charlietap.chasm.config.RuntimeConfig
+import io.github.charlietap.chasm.module.ModuleDeclarationsFactory
 import io.github.charlietap.chasm.parallel.ParallelTaskExecutor
 import io.github.charlietap.chasm.parallel.ParallelTaskScope
 import java.io.File
@@ -50,6 +58,10 @@ class ParallelModuleLowererTest {
                     module = module,
                     code = code,
                     options = DexOptions(),
+                    declarations = ModuleDeclarationsFactory(module),
+                    trapSites = emptyMap(),
+                    resources = CollectedResources(),
+                    limits = MetadataFiles.DEX_LIMITS,
                     taskExecutor = ThreadTaskExecutor(),
                     workers = { _, _, _ -> WORKERS },
                     claimOrder = { _, layout -> layout.files.indices.reversed().toList().toIntArray() },
@@ -71,13 +83,19 @@ class ParallelModuleLowererTest {
         for (options in OPTIONS) {
             val code = ModuleCompiler(module, module.typeResolver(), recordProvenance = false, devirtualiseIndirectCalls = true)
                 .getOrThrow { IllegalStateException(it.toString()) }
-            val serial = runCatching { ModuleLowerer(module, code, options) }
+            val serialResources = CollectedResources()
+            val parallelResources = CollectedResources()
+            val serial = runCatching { lower(module, code, options, serialResources) }
             val parallel = runCatching {
                 runSuspending {
                     ParallelModuleLowerer(
                         module = module,
                         code = code,
                         options = options,
+                        declarations = ModuleDeclarationsFactory(module),
+                        trapSites = emptyMap(),
+                        resources = parallelResources,
+                        limits = MetadataFiles.DEX_LIMITS,
                         taskExecutor = ThreadTaskExecutor(),
                         workers = { _, _, _ -> WORKERS },
                         claimOrder = { _, layout -> layout.files.indices.shuffled(Random(name.hashCode())).toIntArray() },
@@ -96,9 +114,10 @@ class ParallelModuleLowererTest {
             }
             assertEquals(expected.dex.size, actual.dex.size, "$name file count")
             expected.dex.indices.forEach { file -> assertContentEquals(expected.dex[file], actual.dex[file], "$name file $file") }
-            assertEquals(expected.installer, actual.installer, "$name installer")
-            assertEquals(expected.chunkStarts.keys, actual.chunkStarts.keys, "$name split functions")
-            expected.chunkStarts.forEach { (function, starts) -> assertContentEquals(starts, actual.chunkStarts[function], "$name f$function") }
+            assertEquals(expected.moduleClass, actual.moduleClass, "$name module class")
+            assertEquals(expected.classes, actual.classes, "$name classes")
+            assertEquals(serialResources.resources.keys, parallelResources.resources.keys, "$name resources")
+            serialResources.resources.forEach { (path, bytes) -> assertContentEquals(bytes, parallelResources.resources[path], "$name $path") }
         }
     }
 
@@ -137,8 +156,14 @@ class ParallelModuleLowererTest {
         const val WORKERS = 4
         val FIXTURES = listOf("bench", "bench_gc", "calls", "control", "devirtualisation", "eh", "gc", "memory", "restart", "routes", "routes_eh", "scalar", "slot_kinds", "tail", "wide")
         val OPTIONS = listOf(
-            DexOptions(packageName = "chasm.jit.h0", byteArrayBaseOffset = 16L),
-            DexOptions(packageName = "chasm.jit.h0", stacktraces = true, meterFuel = true, interruptible = true, byteArrayBaseOffset = 16L, splitInstructions = 40),
+            DexOptions(entryClass = "com.example.Guest", byteArrayBaseOffset = 16L),
+            DexOptions(
+                entryClass = "com.example.Guest",
+                runtime = RuntimeConfig(interrupts = true, stacktraces = true, limits = Limits(cpu = CpuLimits.Metered(Fuel(FUEL)))),
+                byteArrayBaseOffset = 16L,
+                splitInstructions = 40,
+            ),
         )
+        const val FUEL = 1_000_000L
     }
 }

@@ -5,7 +5,7 @@ plugins {
 
 kotlin {
     android {
-        namespace = "io.github.charlietap.chasm.compiled"
+        namespace = "io.github.charlietap.chasm.test.compiled"
     }
 
     compilerOptions {
@@ -15,7 +15,7 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                api(projects.runtimeAot)
+                api(projects.runtimeCompiled)
                 api(libs.corpus.lib)
                 api(libs.sweet.lib)
 
@@ -34,7 +34,6 @@ kotlin {
         jvmTest {
             dependencies {
                 implementation(projects.compiler.backendAnalysis)
-                implementation(projects.runtime.compiled)
                 implementation(libs.asm.util)
             }
         }

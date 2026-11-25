@@ -28,6 +28,7 @@ internal fun LowerContext.lowerPrologue() {
     if (analysis.unsafeMemory) {
         loadObject(registers.unsafe, Resource.Unsafe, UNSAFE_TYPE)
         emit.constWide(registers.byteArrayBase, checkNotNull(module.options.byteArrayBaseOffset))
+        module.emittedByteArrayBase = true
     }
     if (!facts.isLeaf || frameCost(registers) > MAX_UNCHARGED_LEAF_FRAME_COST) {
         chargeStackBudget()

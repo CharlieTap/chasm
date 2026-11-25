@@ -81,28 +81,41 @@ public final class io/github/charlietap/chasm/bindgen/CodegenRuntime : java/lang
 	public static fun values ()[Lio/github/charlietap/chasm/bindgen/CodegenRuntime;
 }
 
+public abstract interface class io/github/charlietap/chasm/bindgen/CompiledSource {
+}
+
+public final class io/github/charlietap/chasm/bindgen/CompiledSource$Generated : io/github/charlietap/chasm/bindgen/CompiledSource {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Lio/github/charlietap/chasm/bindgen/CompiledSource$Generated;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/bindgen/CompiledSource$Generated;Ljava/lang/String;ILjava/lang/Object;)Lio/github/charlietap/chasm/bindgen/CompiledSource$Generated;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getClassName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/bindgen/CompiledSource$Loaded : io/github/charlietap/chasm/bindgen/CompiledSource {
+	public fun <init> ()V
+}
+
 public abstract interface class io/github/charlietap/chasm/bindgen/ExecutionTier {
 	public abstract fun getManaged ()Z
 }
 
-public final class io/github/charlietap/chasm/bindgen/ExecutionTier$Aot : io/github/charlietap/chasm/bindgen/ExecutionTier {
-	public fun <init> (Ljava/lang/String;)V
-	public final fun component1 ()Ljava/lang/String;
-	public final fun copy (Ljava/lang/String;)Lio/github/charlietap/chasm/bindgen/ExecutionTier$Aot;
-	public static synthetic fun copy$default (Lio/github/charlietap/chasm/bindgen/ExecutionTier$Aot;Ljava/lang/String;ILjava/lang/Object;)Lio/github/charlietap/chasm/bindgen/ExecutionTier$Aot;
+public final class io/github/charlietap/chasm/bindgen/ExecutionTier$Compiled : io/github/charlietap/chasm/bindgen/ExecutionTier {
+	public fun <init> (Lio/github/charlietap/chasm/bindgen/CompiledSource;)V
+	public final fun component1 ()Lio/github/charlietap/chasm/bindgen/CompiledSource;
+	public final fun copy (Lio/github/charlietap/chasm/bindgen/CompiledSource;)Lio/github/charlietap/chasm/bindgen/ExecutionTier$Compiled;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/bindgen/ExecutionTier$Compiled;Lio/github/charlietap/chasm/bindgen/CompiledSource;ILjava/lang/Object;)Lio/github/charlietap/chasm/bindgen/ExecutionTier$Compiled;
 	public fun equals (Ljava/lang/Object;)Z
-	public final fun getCompiledModule ()Ljava/lang/String;
 	public fun getManaged ()Z
+	public final fun getModule ()Lio/github/charlietap/chasm/bindgen/CompiledSource;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
 public final class io/github/charlietap/chasm/bindgen/ExecutionTier$Interpreter : io/github/charlietap/chasm/bindgen/ExecutionTier {
-	public fun <init> ()V
-	public fun getManaged ()Z
-}
-
-public final class io/github/charlietap/chasm/bindgen/ExecutionTier$Jit : io/github/charlietap/chasm/bindgen/ExecutionTier {
 	public fun <init> ()V
 	public fun getManaged ()Z
 }

@@ -241,7 +241,7 @@ private fun LowerContext.structGetStructGet(instruction: AggregateInstruction.St
     val lane = first.fields[instruction.firstFieldIndex].lanes.single()
     pushReceiver(instruction.addressSlot, first.className)
     emit.visit {
-        getLane(first, lane)
+        getLane(module.storagePlans, first, lane)
     }
     emit.store(Opcodes.ASTORE, locals.scratchObject)
 
@@ -263,14 +263,14 @@ private fun LowerContext.readField(
     if (lanes.size == 2) {
         emit.insn(Opcodes.DUP)
         emit.visit {
-            getLane(storage, lanes[0])
+            getLane(module.storagePlans, storage, lanes[0])
         }
         emit.insn(Opcodes.I2L)
         emit.long(LOW_HALF)
         emit.insn(Opcodes.LAND)
         emit.store(Opcodes.LSTORE, locals.scratchLong[0])
         emit.visit {
-            getLane(storage, lanes[1])
+            getLane(module.storagePlans, storage, lanes[1])
         }
         emit.insn(Opcodes.I2L)
         emit.int(HALF_BITS)
@@ -283,7 +283,7 @@ private fun LowerContext.readField(
 
     val lane = lanes.single()
     emit.visit {
-        getLane(storage, lane)
+        getLane(module.storagePlans, storage, lane)
     }
     if (lane.kind == LaneKind.REFERENCE) {
         storeObject(destination)
@@ -310,7 +310,7 @@ private fun LowerContext.putField(
     val lane = field.lanes.first()
 
     emit.visit {
-        putField(storage, field, locals.scratchLong[0]) {
+        putField(module.storagePlans, storage, field, locals.scratchLong[0]) {
             when {
                 field.lanes.size == 2 -> pushLong(value)
                 lane.kind == LaneKind.REFERENCE -> pushObject(value)
@@ -370,7 +370,7 @@ private fun LowerContext.arrayNew(
 
     val storage = module.storagePlans.array(type.index)
     val element = arrayElement(type)
-    val data = locals.storageArrayScratch(element.arrayDescriptor)
+    val data = locals.storageArrayScratch(element.kind.arrayDescriptor)
     chargeArray(size, storage.elementShift)
     emit.load(Opcodes.ILOAD, locals.scratchInt)
     newElements(element)
@@ -394,7 +394,7 @@ private fun LowerContext.arrayNewFixed(
 
     val storage = module.storagePlans.array(type.index)
     val element = arrayElement(type)
-    val data = locals.storageArrayScratch(element.arrayDescriptor)
+    val data = locals.storageArrayScratch(element.kind.arrayDescriptor)
     chargeAllocation((size shl storage.elementShift) + ARRAY_OVERHEAD)
     emit.int(size)
     newElements(element)
@@ -421,7 +421,7 @@ private fun LowerContext.arrayNewData(
 
     val storage = module.storagePlans.array(type.index)
     val element = arrayElement(type)
-    val data = locals.storageArrayScratch(element.arrayDescriptor)
+    val data = locals.storageArrayScratch(element.kind.arrayDescriptor)
 
     pushResource(Resource.Data(dataIndex))
     pushInt(offset)
@@ -454,7 +454,7 @@ private fun LowerContext.arrayNewElement(
 
     val storage = module.storagePlans.array(type.index)
     val element = arrayElement(type)
-    val data = locals.storageArrayScratch(element.arrayDescriptor)
+    val data = locals.storageArrayScratch(element.kind.arrayDescriptor)
 
     pushResource(Resource.ReferenceSegment(segment))
     pushInt(offset)
@@ -487,7 +487,7 @@ private fun LowerContext.wrapArray(
     emit.insn(Opcodes.DUP)
     pushResource(Resource.Rtt(type.index))
     emit.load(Opcodes.ALOAD, data)
-    emit.invokeSpecial(MethodRef(className, CONSTRUCTOR, listOf(RTT_TYPE, element.arrayDescriptor), "V"))
+    emit.invokeSpecial(MethodRef(className, CONSTRUCTOR, listOf(RTT_TYPE, element.kind.arrayDescriptor), "V"))
     storeObject(destination)
 }
 
@@ -546,9 +546,9 @@ private fun LowerContext.checkedElements(
 ): Int {
 
     val className = module.storagePlans.array(type.index).className
-    val data = locals.storageArrayScratch(element.arrayDescriptor)
+    val data = locals.storageArrayScratch(element.kind.arrayDescriptor)
     pushReceiver(addressSlot, className)
-    emit.getField(className, STORAGE_ARRAY_DATA_FIELD, element.arrayDescriptor)
+    emit.getField(className, STORAGE_ARRAY_DATA_FIELD, element.kind.arrayDescriptor)
     emit.store(Opcodes.ASTORE, data)
 
     val outOfBounds = trapLabel(ARRAY_OUT_OF_BOUNDS)
@@ -591,7 +591,7 @@ private fun LowerContext.arrayLen(
 
     val className = module.storagePlans.array(type.index).className
     pushReceiver(addressSlot, className)
-    emit.getField(className, STORAGE_ARRAY_DATA_FIELD, arrayElement(type).arrayDescriptor)
+    emit.getField(className, STORAGE_ARRAY_DATA_FIELD, arrayElement(type).kind.arrayDescriptor)
     emit.insn(Opcodes.ARRAYLENGTH)
     storeInt(destination)
 }
@@ -624,7 +624,7 @@ private fun LowerContext.arrayFill(
     pushInt(offset)
     pushElement(element, value)
     pushInt(count)
-    emit.invokeStatic(element.rangeFill)
+    emit.invokeStatic(element.kind.rangeFill)
 }
 
 private fun LowerContext.arrayInitData(

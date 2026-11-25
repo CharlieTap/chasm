@@ -1,20 +1,30 @@
+@file:OptIn(InternalChasmApi::class)
+
 package io.github.charlietap.chasm.compiler.backend.dex
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.cir.CirFunction
 import io.github.charlietap.chasm.cir.CirModule
+import io.github.charlietap.chasm.compiled.format.UNPINNED_OFFSET
+import io.github.charlietap.chasm.compiled.format.dataResource
+import io.github.charlietap.chasm.compiled.format.trapSitesResource
+import io.github.charlietap.chasm.compiled.format.writeTrapSites
 import io.github.charlietap.chasm.compiler.backend.abi.binaryName
+import io.github.charlietap.chasm.compiler.backend.analysis.UnsupportedFunctions
+import io.github.charlietap.chasm.compiler.backend.analysis.declarations.BuilderCall
+import io.github.charlietap.chasm.compiler.backend.analysis.declarations.DeclarationCallGenerator
+import io.github.charlietap.chasm.compiler.backend.analysis.declarations.DiscardingOutputStream
 import io.github.charlietap.chasm.compiler.backend.analysis.gc.ConstantExpressions
 import io.github.charlietap.chasm.compiler.backend.analysis.gc.UnsupportedShape
 import io.github.charlietap.chasm.compiler.backend.dex.abi.FunctionSignature
-import io.github.charlietap.chasm.compiler.backend.dex.abi.codeClass
-import io.github.charlietap.chasm.compiler.backend.dex.abi.constantsClass
 import io.github.charlietap.chasm.compiler.backend.dex.abi.installClass
 import io.github.charlietap.chasm.compiler.backend.dex.binding.BoundResources
 import io.github.charlietap.chasm.compiler.backend.dex.binding.boundResources
 import io.github.charlietap.chasm.compiler.backend.dex.gc.ConstantsWriter
-import io.github.charlietap.chasm.compiler.backend.dex.gc.ShapeWriter
 import io.github.charlietap.chasm.compiler.backend.dex.lower.Unsupported
+import io.github.charlietap.chasm.declarations.ModuleDeclarations
+import io.github.charlietap.chasm.runtime.diagnostic.FunctionTrapSites
 import io.github.charlietap.chasm.type.AbstractHeapType
 import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.chasm.type.ValueType
@@ -23,27 +33,62 @@ import io.github.charlietap.dexter.Dexter
 import io.github.charlietap.dexter.DexterException
 import io.github.charlietap.dexter.DexterFileFullException
 
-typealias ModuleLowerer = (Module, CirModule, DexOptions) -> DexModule
+typealias ModuleLowerer = (Module, CirModule, DexOptions, ModuleDeclarations, Map<Int, FunctionTrapSites>, DexResources) -> DexModule
 
 fun ModuleLowerer(
     module: Module,
     code: CirModule,
-    options: DexOptions = DexOptions(),
-): DexModule =
-    ModuleLowerer(
+    options: DexOptions,
+    declarations: ModuleDeclarations,
+    trapSites: Map<Int, FunctionTrapSites>,
+    resources: DexResources,
+): DexModule {
+    return ModuleLowerer(
         module = module,
         code = code,
         options = options,
+        declarations = declarations,
+        trapSites = trapSites,
+        resources = resources,
+        limits = MetadataFiles.DEX_LIMITS,
         layout = ::partitionedLayout,
         functionLowerer = ::FunctionLowerer,
         entryLowerer = ::EntryLowerer,
         installLowerer = ::InstallLowerer,
     )
+}
+
+fun lowerWithSeparateMetadata(
+    module: Module,
+    code: CirModule,
+    options: DexOptions,
+    declarations: ModuleDeclarations,
+    resources: DexResources,
+    limits: PoolLimits,
+): DexModule {
+    return ModuleLowerer(
+        module = module,
+        code = code,
+        options = options,
+        declarations = declarations,
+        trapSites = emptyMap(),
+        resources = resources,
+        limits = limits,
+        layout = ::filePerBatchLayout,
+        functionLowerer = ::FunctionLowerer,
+        entryLowerer = ::EntryLowerer,
+        installLowerer = ::InstallLowerer,
+    )
+}
 
 internal fun ModuleLowerer(
     module: Module,
     code: CirModule,
     options: DexOptions,
+    declarations: ModuleDeclarations,
+    trapSites: Map<Int, FunctionTrapSites>,
+    resources: DexResources,
+    limits: PoolLimits,
     layout: (ModulePlan) -> DexLayout,
     functionLowerer: FunctionLowerer,
     entryLowerer: EntryLowerer,
@@ -52,11 +97,12 @@ internal fun ModuleLowerer(
     return try {
 
         val plan = ModulePlan(module, code, options)
+        val metadata = ModuleMetadata(declarationCalls(plan, declarations, resources), trapSites, resources, limits)
 
         try {
-            lowerFiles(plan, layout(plan), functionLowerer, entryLowerer, installLowerer)
+            lowerFiles(plan, layout(plan), metadata, functionLowerer, entryLowerer, installLowerer)
         } catch (_: DexterFileFullException) {
-            lowerFiles(plan, filePerBatchLayout(plan), functionLowerer, entryLowerer, installLowerer)
+            lowerFiles(plan, filePerBatchLayout(plan), metadata, functionLowerer, entryLowerer, installLowerer)
         }
     } catch (tooLarge: DexterException) {
         throw DexTooLarge(tooLarge.message ?: tooLarge.toString(), tooLarge)
@@ -67,9 +113,29 @@ internal fun ModuleLowerer(
     }
 }
 
+internal data class ModuleMetadata(
+    val calls: List<BuilderCall>,
+    val trapSites: Map<Int, FunctionTrapSites>,
+    val resources: DexResources,
+    val limits: PoolLimits,
+)
+
+internal fun declarationCalls(
+    plan: ModulePlan,
+    declarations: ModuleDeclarations,
+    resources: DexResources,
+): List<BuilderCall> {
+    return if (declarations.dataSegments.isNotEmpty()) {
+        resources.resource(dataResource(plan.entryPath)) { stream -> DeclarationCallGenerator(declarations, stream) }
+    } else {
+        DeclarationCallGenerator(declarations, DiscardingOutputStream())
+    }
+}
+
 private fun lowerFiles(
     plan: ModulePlan,
     layout: DexLayout,
+    metadata: ModuleMetadata,
     functionLowerer: FunctionLowerer,
     entryLowerer: EntryLowerer,
     installLowerer: InstallLowerer,
@@ -92,8 +158,9 @@ private fun lowerFiles(
     }
 
     val bound = boundResources(listOf(lowering.usedObjects), listOf(lowering.usedValues))
+    val loweredModule = LoweredModule(lowered, lowering.chunkStarts, bound, lowering.emittedByteArrayBase)
 
-    return finishModule(plan, codeDex, codeAndEntryFile, lowered, lowering.chunkStarts, bound, entryLowerer, installLowerer)
+    return finishModule(plan, codeDex, codeAndEntryFile, loweredModule, metadata, entryLowerer, installLowerer)
 }
 
 internal fun lowerBatch(
@@ -105,7 +172,7 @@ internal fun lowerBatch(
 ) {
 
     if (batch == 0) lowering.addSignatureInterfaces(file)
-    val owner = codeClass(lowering.packagePath, batch)
+    val owner = lowering.plan.names.code(batch)
     val classBuilder = lowering.codeClassBuilder(file, owner)
     lowering.constants.begin(owner)
 
@@ -118,24 +185,30 @@ internal fun lowerBatch(
     lowering.constants.declare(classBuilder)
 }
 
+internal class LoweredModule(
+    val functions: LoweredFunctions,
+    val chunkStarts: Array<IntArray?>,
+    val bound: BoundResources,
+    val emittedByteArrayBase: Boolean,
+)
+
 internal fun finishModule(
     plan: ModulePlan,
     codeDex: List<ByteArray>,
     codeAndEntryFile: DexFile?,
-    lowered: LoweredFunctions,
-    chunkStarts: Array<IntArray?>,
-    bound: BoundResources,
+    lowered: LoweredModule,
+    metadata: ModuleMetadata,
     entryLowerer: EntryLowerer,
     installLowerer: InstallLowerer,
 ): DexModule {
 
-    val reasons = lowered.reasons(plan.functions)
+    val reasons = lowered.functions.reasons(plan.functions)
     if (reasons.isNotEmpty()) {
         codeAndEntryFile?.abort()
         throw UnsupportedFunctions(reasons)
     }
     return try {
-        finishFiles(plan, codeDex, codeAndEntryFile, chunkStarts, bound, entryLowerer, installLowerer)
+        finishFiles(plan, codeDex, codeAndEntryFile, lowered, metadata, entryLowerer, installLowerer)
     } catch (failure: Throwable) {
         codeAndEntryFile?.abort()
         throw failure
@@ -146,8 +219,8 @@ private fun finishFiles(
     plan: ModulePlan,
     codeDex: List<ByteArray>,
     codeAndEntryFile: DexFile?,
-    chunkStarts: Array<IntArray?>,
-    bound: BoundResources,
+    lowered: LoweredModule,
+    metadata: ModuleMetadata,
     entryLowerer: EntryLowerer,
     installLowerer: InstallLowerer,
 ): DexModule {
@@ -169,7 +242,7 @@ private fun finishFiles(
     for (members in entryFiles) {
         val file = codeAndEntryFile ?: dexter.beginFile()
         for (group in members) {
-            val descriptor = entryLowerer(file, group, plan.packagePath)
+            val descriptor = entryLowerer(file, group, plan.entryPath)
             entryClasses += descriptor
             group.members.forEachIndexed { id, member -> entries[member.index] = EntryRef(descriptor, id) }
         }
@@ -178,40 +251,71 @@ private fun finishFiles(
 
     val ordered = LinkedHashMap<Int, EntryRef>()
     entries.forEachIndexed { function, entry -> if (entry != null) ordered[function] = entry }
-    val installer = installClass(plan.packagePath)
-    val installFile = codeAndEntryFile ?: dexter.beginFile()
-    val installEntries = installLowerer(installFile, installer, bound, ordered)
-    val constantExpressions = ConstantExpressions(plan.module)
-    val constants = if (constantExpressions.needed) constantsClass(plan.packagePath) else null
-    if (constants != null) {
-        ConstantsWriter(plan.module, plan.gc, constantExpressions).write(installFile, constants)
+
+    val files = MetadataFiles(dexter, metadata.limits, codeAndEntryFile)
+    val generated = try {
+        writeMetadata(plan, files, metadata, lowered, ordered, entryClasses, installLowerer)
+    } catch (failure: Throwable) {
+        files.abort()
+        throw failure
     }
-    dex += installFile.finish()
+    dex += files.finish()
 
-    val splitStarts = HashMap<Int, IntArray>()
-    chunkStarts.forEachIndexed { function, starts -> if (starts != null) splitStarts[function] = starts }
-
-    val gc = plan.gc
-    val shapeClasses = (gc.structs.map { shape -> shape.className } + gc.arrays.map { shape -> shape.className }).map(::binaryName)
-    val shapeDex = if (shapeClasses.isEmpty()) {
-        null
-    } else {
-        val file = dexter.beginFile()
-        ShapeWriter().write(file, gc)
-        file.finish()
+    if (plan.options.stacktraces) {
+        val sites = trapSites(plan, metadata.trapSites, lowered.chunkStarts)
+        metadata.resources.resource(trapSitesResource(plan.entryPath)) { stream -> writeTrapSites(stream, sites) }
     }
 
     return DexModule(
         dex = dex,
-        installer = binaryName(installer),
-        inlineMemory = plan.inlineMemory != null,
-        chunkStarts = splitStarts,
-        classesToInitialize = (plan.batches.indices.map { batch -> codeClass(plan.packagePath, batch) } + entryClasses + installEntries + installer + listOfNotNull(constants)).map(::binaryName),
-        shapeDex = shapeDex,
-        shapeClasses = shapeClasses,
-        shapeTypes = List(gc.typeCount) { index -> gc.className(index)?.let(::binaryName) },
-        constants = constants?.let(::binaryName),
+        moduleClass = binaryName(plan.names.module()),
+        classes = (generated + plan.names.module()).map(::binaryName),
     )
+}
+
+private fun writeMetadata(
+    plan: ModulePlan,
+    files: MetadataFiles,
+    metadata: ModuleMetadata,
+    lowered: LoweredModule,
+    ordered: Map<Int, EntryRef>,
+    entryClasses: Set<String>,
+    installLowerer: InstallLowerer,
+): List<String> {
+
+    val declareClasses = DeclarationsWriter(plan.names).write(files, metadata.calls)
+    val structClasses = StructsWriter(plan.names, plan.structLanes).write(files)
+    val installEntries = installLowerer(files, plan.entryPath, lowered.bound, ordered)
+    val constantExpressions = ConstantExpressions(plan.module)
+    val constants = plan.names.constants().takeIf { constantExpressions.needed }
+    if (constants != null) {
+        ConstantsWriter(plan.module, plan.storagePlans, constantExpressions).write(files, constants)
+    }
+
+    val codeClasses = plan.batches.indices.map(plan.names::code)
+    val generated = codeClasses + plan.signatureClasses + entryClasses + installEntries + installClass(plan.entryPath) +
+        declareClasses + structClasses + listOfNotNull(constants)
+    val offset = if (lowered.emittedByteArrayBase) {
+        checkNotNull(plan.options.byteArrayBaseOffset)
+    } else {
+        UNPINNED_OFFSET
+    }
+    ModuleClassWriter(plan, offset)
+        .write(files, declareClasses, structClasses, generated.map(::binaryName), lowered.bound, installEntries, constants)
+
+    return generated
+}
+
+private fun trapSites(
+    plan: ModulePlan,
+    sites: Map<Int, FunctionTrapSites>,
+    chunkStarts: Array<IntArray?>,
+): Map<Int, FunctionTrapSites> {
+    return plan.functions.associate { function ->
+        val index = function.index.index
+        val functionSites = sites[index] ?: FunctionTrapSites(IntArray(0), IntArray(0))
+        index to functionSites.withChunkStarts(chunkStarts[index] ?: IntArray(0))
+    }
 }
 
 internal class LoweredFunctions(

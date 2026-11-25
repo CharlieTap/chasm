@@ -3,15 +3,14 @@ package io.github.charlietap.chasm.compiler.backend.dex
 import io.github.charlietap.chasm.compiler.backend.abi.CODE_INSTALLATION
 import io.github.charlietap.chasm.compiler.backend.abi.INSTALL
 import io.github.charlietap.chasm.compiler.backend.abi.INSTALLATION_INSTANCE
-import io.github.charlietap.chasm.compiler.backend.abi.INSTALLATION_TYPE_TEST
 import io.github.charlietap.chasm.compiler.backend.abi.MethodRef
-import io.github.charlietap.chasm.compiler.backend.abi.OBJECT_TYPE
 import io.github.charlietap.chasm.compiler.backend.abi.Resource
 import io.github.charlietap.chasm.compiler.backend.abi.UNSAFE_INSTANCE
-import io.github.charlietap.chasm.compiler.backend.abi.heapTypeNumber
 import io.github.charlietap.chasm.compiler.backend.abi.installationAccessor
 import io.github.charlietap.chasm.compiler.backend.abi.installationIndex
 import io.github.charlietap.chasm.compiler.backend.dex.abi.BINDING_TYPE
+import io.github.charlietap.chasm.compiler.backend.dex.abi.installClass
+import io.github.charlietap.chasm.compiler.backend.dex.abi.installEntriesClass
 import io.github.charlietap.chasm.compiler.backend.dex.abi.method
 import io.github.charlietap.chasm.compiler.backend.dex.binding.BindingLayout
 import io.github.charlietap.chasm.compiler.backend.dex.binding.BoundResources
@@ -23,23 +22,46 @@ import io.github.charlietap.dexter.CodeEmitter
 import io.github.charlietap.dexter.Conversion
 import io.github.charlietap.dexter.DexConstructor
 import io.github.charlietap.dexter.DexFile
+import io.github.charlietap.dexter.DexMethod
 import io.github.charlietap.dexter.DexType
 import io.github.charlietap.dexter.MemberAccess
 import io.github.charlietap.dexter.Reg
 
-internal typealias InstallLowerer = (DexFile, String, BoundResources, Map<Int, EntryRef>) -> List<String>
+internal typealias InstallLowerer = (MetadataFiles, String, BoundResources, Map<Int, EntryRef>) -> List<String>
 
 internal fun InstallLowerer(
-    file: DexFile,
-    installer: String,
+    files: MetadataFiles,
+    entryPath: String,
     bound: BoundResources,
     entries: Map<Int, EntryRef>,
 ): List<String> {
+
     val groups = entries.entries.chunked(INSTALLS_PER_CLASS)
-    val groupClasses = groups.indices.map { group -> installer.removeSuffix(";") + "Entries$group;" }
-    groups.forEachIndexed { group, installs -> entriesClass(file, groupClasses[group], installs.chunked(INSTALLS_PER_METHOD)) }
-    installerClass(file, installer, bound, groupClasses)
+    val groupClasses = groups.indices.map { group -> installEntriesClass(entryPath, group) }
+    groups.forEachIndexed { group, installs ->
+        files.write { file -> entriesClass(file, groupClasses[group], installs.chunked(INSTALLS_PER_METHOD)) }
+    }
+    files.write { file -> installerClass(file, installClass(entryPath), bound) }
+
     return groupClasses
+}
+
+internal fun bindObjectsMethods(
+    installer: String,
+    bound: BoundResources,
+): List<DexMethod> {
+    return bound.objects.chunked(RESOURCES_PER_METHOD).indices.map { chunk -> chunkMethod(installer, BIND_OBJECTS, chunk) }
+}
+
+internal fun bindValuesMethods(
+    installer: String,
+    bound: BoundResources,
+): List<DexMethod> {
+    return bound.values.chunked(RESOURCES_PER_METHOD).indices.map { chunk -> chunkMethod(installer, BIND_VALUES, chunk) }
+}
+
+internal fun installEntriesMethod(group: String): DexMethod {
+    return chunkMethod(group, INSTALL_ENTRIES, 0)
 }
 
 private fun entriesClass(
@@ -47,8 +69,10 @@ private fun entriesClass(
     owner: String,
     chunks: List<List<Map.Entry<Int, EntryRef>>>,
 ) {
+
     val builder = file.addClass(ClassType(owner), DexType.Object, access = ClassAccess.PackageFinal)
     val install = INSTALL.method
+
     builder.chunk(owner, INSTALL_ENTRIES, 0, MemberAccess.Package) { installation, binding ->
         chunks.indices.forEach { chunk -> invokeStatic(chunkMethod(owner, INSTALL_ENTRIES, chunk + 1), installation, binding) }
     }
@@ -70,38 +94,12 @@ private fun installerClass(
     file: DexFile,
     installer: String,
     bound: BoundResources,
-    groupClasses: List<String>,
 ) {
-    val owner = ClassType(installer)
-    val builder = file.addClass(owner, DexType.Object, CONSUMER)
-    val objects = bound.objects.chunked(RESOURCES_PER_METHOD)
-    val values = bound.values.chunked(RESOURCES_PER_METHOD)
 
-    builder.beginConstructor(DexConstructor(owner), registerCount = 1).apply {
-        invokeConstructor(OBJECT_CONSTRUCTOR, self)
-        returnVoid()
-        finish()
-    }
+    val builder = file.addClass(ClassType(installer), DexType.Object, access = ClassAccess.PackageFinal)
 
-    val accept = MethodRef(installer, "accept", listOf(OBJECT_TYPE), "V").method
-    builder.beginInstanceMethod(accept, registerCount = 5).apply {
-        val installation = parameter(0)
-        checkCast(installation, ClassType(CODE_INSTALLATION))
-        const(SIZE, bound.objectCount)
-        newArray(BINDING, SIZE, DexType.Object.array())
-        const(SIZE, bound.valueCount)
-        newArray(VALUES, SIZE, DexType.Long.array())
-        const(SIZE, BindingLayout.VALUES_SLOT)
-        arrayPut(ArrayKind.Object, VALUES, BINDING, SIZE)
-        objects.indices.forEach { chunk -> invokeStatic(chunkMethod(installer, "bindObjects", chunk), installation, BINDING) }
-        values.indices.forEach { chunk -> invokeStatic(chunkMethod(installer, "bindValues", chunk), installation, BINDING) }
-        groupClasses.forEach { group -> invokeStatic(chunkMethod(group, INSTALL_ENTRIES, 0), installation, BINDING) }
-        returnVoid()
-        finish()
-    }
-
-    objects.forEachIndexed { chunk, bindings ->
-        builder.chunk(installer, "bindObjects", chunk) { installation, binding ->
+    bound.objects.chunked(RESOURCES_PER_METHOD).forEachIndexed { chunk, bindings ->
+        builder.chunk(installer, BIND_OBJECTS, chunk, MemberAccess.Package) { installation, binding ->
             bindings.forEach { bound ->
                 loadObject(bound.resource, installation)
                 const(INDEX, bound.slot)
@@ -110,8 +108,8 @@ private fun installerClass(
         }
     }
 
-    values.forEachIndexed { chunk, bindings ->
-        builder.chunk(installer, "bindValues", chunk) { installation, binding ->
+    bound.values.chunked(RESOURCES_PER_METHOD).forEachIndexed { chunk, bindings ->
+        builder.chunk(installer, BIND_VALUES, chunk, MemberAccess.Package) { installation, binding ->
             const(INDEX, BindingLayout.VALUES_SLOT)
             arrayGet(ArrayKind.Object, VALUES_ARRAY, binding, INDEX)
             checkCast(VALUES_ARRAY, DexType.Long.array())
@@ -125,13 +123,13 @@ private fun installerClass(
 }
 
 private inline fun ClassBuilder.chunk(
-    installer: String,
+    owner: String,
     name: String,
     chunk: Int,
     access: MemberAccess = MemberAccess.Private,
     body: CodeEmitter.(Reg, Reg) -> Unit,
 ) {
-    beginStaticMethod(chunkMethod(installer, name, chunk), registerCount = SCRATCH + 2, access = access).apply {
+    beginStaticMethod(chunkMethod(owner, name, chunk), registerCount = SCRATCH + 2, access = access).apply {
         body(parameter(0), parameter(1))
         returnVoid()
         finish()
@@ -139,10 +137,12 @@ private inline fun ClassBuilder.chunk(
 }
 
 private fun chunkMethod(
-    installer: String,
+    owner: String,
     name: String,
     chunk: Int,
-) = MethodRef(installer, "$name$chunk", listOf(CODE_INSTALLATION, BINDING_TYPE), "V").method
+): DexMethod {
+    return MethodRef(owner, "$name$chunk", listOf(CODE_INSTALLATION, BINDING_TYPE), "V").method
+}
 
 private fun CodeEmitter.loadObject(
     resource: Resource,
@@ -151,11 +151,6 @@ private fun CodeEmitter.loadObject(
     when (resource) {
         Resource.Instance -> invokeVirtual(INSTALLATION_INSTANCE.method, installation)
         Resource.Unsafe -> invokeStatic(UNSAFE_INSTANCE.method)
-        is Resource.TypeTest -> {
-            const(INDEX, if (resource.type.nullable) 1 else 0)
-            const(NUMBER, heapTypeNumber(resource.type.heapType))
-            invokeVirtual(INSTALLATION_TYPE_TEST.method, installation, INDEX, NUMBER)
-        }
         else -> {
             val accessor = checkNotNull(installationAccessor(resource)) { "$resource has no binding object" }
             const(INDEX, installationIndex(resource))
@@ -180,14 +175,6 @@ private fun CodeEmitter.loadValue(
     }
 }
 
-private val CONSUMER = ClassType("Ljava/util/function/Consumer;")
-
-private val OBJECT_CONSTRUCTOR = DexConstructor(DexType.Object)
-
-private val SIZE = Reg(0)
-private val BINDING = Reg(1)
-private val VALUES = Reg(2)
-
 private val WIDE = Reg(0)
 private val INDEX = Reg(2)
 private val NUMBER = Reg(3)
@@ -202,3 +189,7 @@ private const val INSTALLS_PER_METHOD = 400
 private const val INSTALLS_PER_CLASS = 8_000
 
 private const val INSTALL_ENTRIES = "installEntries"
+
+private const val BIND_OBJECTS = "bindObjects"
+
+private const val BIND_VALUES = "bindValues"

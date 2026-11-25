@@ -3,44 +3,36 @@
 package io.github.charlietap.chasm.compiler.backend.jvm
 
 import io.github.charlietap.chasm.InternalChasmApi
-import io.github.charlietap.chasm.aot.internal.COMPILED_RUNTIME_ABI
-import io.github.charlietap.chasm.aot.internal.UNSET_LONG
+import io.github.charlietap.chasm.compiled.format.ArtifactTarget
 import io.github.charlietap.chasm.compiler.backend.abi.CODE_INSTALLATION
+import io.github.charlietap.chasm.compiler.backend.abi.COMPILED_MODULE
 import io.github.charlietap.chasm.compiler.backend.abi.INSTALL
+import io.github.charlietap.chasm.compiler.backend.abi.ModuleSetting
 import io.github.charlietap.chasm.compiler.backend.abi.internalName
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.BUILD_DECLARATIONS
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.CLASS_FILE_VERSION
-import io.github.charlietap.chasm.compiler.backend.jvm.abi.COMPILED_MODULE
-import io.github.charlietap.chasm.compiler.backend.jvm.abi.COMPILED_MODULE_STRUCTS
-import io.github.charlietap.chasm.compiler.backend.jvm.abi.DATA_SOURCE
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.DATA_SOURCE_TYPE
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.INITIALIZE_CONSTANTS
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.INSTALLS_PER_METHOD
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.MAX_FANOUT
-import io.github.charlietap.chasm.compiler.backend.jvm.abi.META_FUEL
-import io.github.charlietap.chasm.compiler.backend.jvm.abi.META_GC_HEAP_BYTES
-import io.github.charlietap.chasm.compiler.backend.jvm.abi.META_INTERRUPTS
-import io.github.charlietap.chasm.compiler.backend.jvm.abi.META_LINEAR_MEMORY_BYTES
-import io.github.charlietap.chasm.compiler.backend.jvm.abi.META_STACKTRACES
-import io.github.charlietap.chasm.compiler.backend.jvm.abi.META_STACK_BYTES
-import io.github.charlietap.chasm.compiler.backend.jvm.abi.META_TABLE_BYTES
-import io.github.charlietap.chasm.compiler.backend.jvm.abi.META_TRAP_ON_GROWTH_FAILURE
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.MODULE_DECLARATIONS
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.RESOURCE_ROOT
-import io.github.charlietap.chasm.compiler.backend.jvm.abi.RUNTIME_ABI
-import io.github.charlietap.chasm.compiler.backend.jvm.abi.constantsClassDescriptor
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.installClassDescriptor
 import io.github.charlietap.chasm.compiler.backend.jvm.declarations.DECLARATIONS_BUILDER
 import io.github.charlietap.chasm.compiler.backend.jvm.declarations.DECLARE
 import io.github.charlietap.chasm.compiler.backend.jvm.declarations.DECLARE_DESCRIPTOR
-import io.github.charlietap.chasm.config.CpuLimits
-import io.github.charlietap.chasm.config.GrowthFailureStrategy
 import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes
-import org.objectweb.asm.Type
 
-internal typealias ModuleClassLowerer = (ModuleLowering, String, List<String>, String?, List<InstalledEntry>, ModuleStructsLowerer, JvmOutput) -> Unit
+internal typealias ModuleClassLowerer = (
+    ModuleLowering,
+    String,
+    List<String>,
+    List<InstalledEntry>,
+    ModuleStructsLowerer,
+    ClassInventory,
+) -> Unit
 
 internal class InstalledEntry(
     val function: Int,
@@ -52,10 +44,9 @@ internal fun ModuleClassLowerer(
     module: ModuleLowering,
     moduleDescriptor: String,
     declarationClasses: List<String>,
-    dataResourcePath: String?,
     entries: List<InstalledEntry>,
     structsLowerer: ModuleStructsLowerer,
-    output: JvmOutput,
+    output: ClassInventory,
 ) {
     val writer = supportClassWriter()
     val owner = internalName(moduleDescriptor)
@@ -66,7 +57,7 @@ internal fun ModuleClassLowerer(
         owner,
         null,
         ModuleLowering.OBJECT,
-        arrayOf(internalName(COMPILED_MODULE), internalName(COMPILED_MODULE_STRUCTS)),
+        arrayOf(internalName(COMPILED_MODULE)),
     )
     writer.visitField(Opcodes.ACC_PUBLIC or Opcodes.ACC_STATIC or Opcodes.ACC_FINAL, COMPILED_FIELD, moduleDescriptor, null, null).visitEnd()
 
@@ -90,24 +81,18 @@ internal fun ModuleClassLowerer(
         visitEnd()
     }
 
-    writer.visitMethod(Opcodes.ACC_PUBLIC, BUILD_DECLARATIONS, "()$MODULE_DECLARATIONS", null, null).apply {
+    writer.visitMethod(Opcodes.ACC_PUBLIC, BUILD_DECLARATIONS, "($DATA_SOURCE_TYPE)$MODULE_DECLARATIONS", null, null).apply {
         visitCode()
         visitTypeInsn(Opcodes.NEW, DECLARATIONS_BUILDER)
         visitInsn(Opcodes.DUP)
         visitMethodInsn(Opcodes.INVOKESPECIAL, DECLARATIONS_BUILDER, "<init>", "()V", false)
-        visitVarInsn(Opcodes.ASTORE, 1)
+        visitVarInsn(Opcodes.ASTORE, 2)
         declarationClasses.forEach { declaring ->
-            visitVarInsn(Opcodes.ALOAD, 1)
+            visitVarInsn(Opcodes.ALOAD, 2)
             visitMethodInsn(Opcodes.INVOKESTATIC, declaring, DECLARE, DECLARE_DESCRIPTOR, false)
         }
+        visitVarInsn(Opcodes.ALOAD, 2)
         visitVarInsn(Opcodes.ALOAD, 1)
-        if (dataResourcePath != null) {
-            visitLdcInsn(Type.getObjectType(owner))
-            visitLdcInsn(dataResourcePath)
-            visitMethodInsn(Opcodes.INVOKESTATIC, internalName(DATA_SOURCE.owner), DATA_SOURCE.name, DATA_SOURCE.descriptor, false)
-        } else {
-            visitInsn(Opcodes.ACONST_NULL)
-        }
         visitMethodInsn(Opcodes.INVOKEVIRTUAL, DECLARATIONS_BUILDER, "build", "($DATA_SOURCE_TYPE)$MODULE_DECLARATIONS", false)
         visitInsn(Opcodes.ARETURN)
         visitMaxs(0, 0)
@@ -123,13 +108,19 @@ internal fun ModuleClassLowerer(
         visitEnd()
     }
 
-    writeSettings(writer, module.options)
+    module.settings.constants().forEach { setting ->
+        writer.constant(setting)
+    }
 
     structsLowerer(module, writer, output)
 
     val chunks = entries.chunked(INSTALLS_PER_METHOD)
     val chunkClasses = chunks.indices.map { chunk -> installClassDescriptor(module.entryPath, chunk) }
     val chunkDescriptor = "($CODE_INSTALLATION$binding)V"
+    chunks.forEachIndexed { chunk, chunkEntries ->
+        val chunkOwner = internalName(chunkClasses[chunk])
+        output.classFile(chunkOwner, installChunkClass(chunkOwner, chunkEntries, binding, chunkDescriptor))
+    }
     var installers = chunkClasses.map(::internalName)
     var groups = 0
     while (installers.size > MAX_FANOUT) {
@@ -154,73 +145,103 @@ internal fun ModuleClassLowerer(
         if (module.constants.needed) {
             visitVarInsn(Opcodes.ALOAD, 1)
             visitVarInsn(Opcodes.ALOAD, 2)
-            visitMethodInsn(Opcodes.INVOKESTATIC, internalName(constantsClassDescriptor(module.entryPath)), INITIALIZE_CONSTANTS, chunkDescriptor, false)
+            visitMethodInsn(Opcodes.INVOKESTATIC, internalName(module.names.constants()), INITIALIZE_CONSTANTS, chunkDescriptor, false)
         }
         visitInsn(Opcodes.RETURN)
         visitMaxs(0, 0)
         visitEnd()
     }
+
+    val inventory = if (module.options.target == ArtifactTarget.HOTSPOT) output.classNames.toList() else emptyList()
+    writer.classes(owner, inventory)
+    writer.constantMethod(INITIALIZES_EAGERLY, "()Z", Opcodes.IRETURN) {
+        visitInsn(Opcodes.ICONST_0)
+    }
+
     writer.visitEnd()
     output.classFile(owner, writer.toByteArray())
+}
 
-    chunks.forEachIndexed { chunk, chunkEntries ->
-        val chunkOwner = internalName(chunkClasses[chunk])
-        val chunkWriter = supportClassWriter()
-        chunkWriter.visit(CLASS_FILE_VERSION, Opcodes.ACC_FINAL or Opcodes.ACC_SUPER, chunkOwner, null, ModuleLowering.OBJECT, null)
-        chunkWriter.visitMethod(Opcodes.ACC_STATIC, INSTALL_CHUNK, chunkDescriptor, null, null).apply {
+private fun installChunkClass(
+    owner: String,
+    entries: List<InstalledEntry>,
+    binding: String,
+    descriptor: String,
+): ByteArray {
+
+    val writer = supportClassWriter()
+    writer.visit(CLASS_FILE_VERSION, Opcodes.ACC_FINAL or Opcodes.ACC_SUPER, owner, null, ModuleLowering.OBJECT, null)
+
+    writer.visitMethod(Opcodes.ACC_STATIC, INSTALL_CHUNK, descriptor, null, null).apply {
+
+        visitCode()
+
+        entries.forEach { installed ->
+
+            val entry = internalName(installed.entry)
+            val identified = installed.id >= 0
+
+            visitVarInsn(Opcodes.ALOAD, 0)
+            pushInt(installed.function)
+            visitTypeInsn(Opcodes.NEW, entry)
+            visitInsn(Opcodes.DUP)
+            visitVarInsn(Opcodes.ALOAD, 1)
+            if (identified) {
+                pushInt(installed.id)
+            }
+            visitMethodInsn(Opcodes.INVOKESPECIAL, entry, "<init>", entryConstructor(binding, identified), false)
+            visitMethodInsn(Opcodes.INVOKEVIRTUAL, internalName(INSTALL.owner), INSTALL.name, INSTALL.descriptor, false)
+        }
+
+        visitInsn(Opcodes.RETURN)
+        visitMaxs(0, 0)
+        visitEnd()
+    }
+    writer.visitEnd()
+
+    return writer.toByteArray()
+}
+
+private fun ClassWriter.classes(
+    owner: String,
+    names: List<String>,
+) {
+
+    val parts = names.chunked(CLASSES_PER_METHOD)
+    parts.forEachIndexed { part, partNames ->
+        visitMethod(Opcodes.ACC_PRIVATE or Opcodes.ACC_STATIC, "$CLASSES$part", CLASSES_PART_DESCRIPTOR, null, null).apply {
             visitCode()
-            chunkEntries.forEach { installed ->
+            partNames.forEachIndexed { index, name ->
                 visitVarInsn(Opcodes.ALOAD, 0)
-                pushInt(installed.function)
-                visitTypeInsn(Opcodes.NEW, internalName(installed.entry))
-                visitInsn(Opcodes.DUP)
-                visitVarInsn(Opcodes.ALOAD, 1)
-                if (installed.id >= 0) pushInt(installed.id)
-                visitMethodInsn(Opcodes.INVOKESPECIAL, internalName(installed.entry), "<init>", entryConstructor(binding, installed.id >= 0), false)
-                visitMethodInsn(Opcodes.INVOKEVIRTUAL, internalName(INSTALL.owner), INSTALL.name, INSTALL.descriptor, false)
+                pushInt(part * CLASSES_PER_METHOD + index)
+                visitLdcInsn(name)
+                visitInsn(Opcodes.AASTORE)
             }
             visitInsn(Opcodes.RETURN)
             visitMaxs(0, 0)
             visitEnd()
         }
-        chunkWriter.visitEnd()
-        output.classFile(chunkOwner, chunkWriter.toByteArray())
+    }
+
+    constantMethod(CLASSES, "()$STRINGS", Opcodes.ARETURN) {
+        pushInt(names.size)
+        visitTypeInsn(Opcodes.ANEWARRAY, STRING)
+        parts.indices.forEach { part ->
+            visitInsn(Opcodes.DUP)
+            visitMethodInsn(Opcodes.INVOKESTATIC, owner, "$CLASSES$part", CLASSES_PART_DESCRIPTOR, false)
+        }
     }
 }
 
-private fun writeSettings(
-    writer: ClassWriter,
-    options: JvmOptions,
-) {
-
-    val runtime = options.runtime
-    val memory = runtime.limits.memory
-
-    writer.constant(RUNTIME_ABI, COMPILED_RUNTIME_ABI)
-    writer.constant(META_INTERRUPTS, runtime.interrupts)
-    writer.constant(META_STACKTRACES, runtime.stacktraces)
-    writer.constant(META_FUEL, (runtime.limits.cpu as? CpuLimits.Metered)?.fuel?.units ?: UNSET_LONG)
-    writer.constant(META_LINEAR_MEMORY_BYTES, memory.linearMemory?.value ?: UNSET_LONG)
-    writer.constant(META_GC_HEAP_BYTES, memory.gcHeap?.value ?: UNSET_LONG)
-    writer.constant(META_TABLE_BYTES, memory.tables?.value ?: UNSET_LONG)
-    writer.constant(META_STACK_BYTES, memory.stack?.value ?: UNSET_LONG)
-    writer.constant(META_TRAP_ON_GROWTH_FAILURE, memory.onGrowthFailure == GrowthFailureStrategy.Trap)
+private fun ClassWriter.constant(setting: ModuleSetting) {
+    when (setting) {
+        is ModuleSetting.IntSetting -> constantMethod(setting.name, "()I", Opcodes.IRETURN) { visitLdcInsn(setting.value) }
+        is ModuleSetting.LongSetting -> constantMethod(setting.name, "()J", Opcodes.LRETURN) { visitLdcInsn(setting.value) }
+        is ModuleSetting.BooleanSetting -> constantMethod(setting.name, "()Z", Opcodes.IRETURN) {
+            visitInsn(if (setting.value) Opcodes.ICONST_1 else Opcodes.ICONST_0)
+        }
+    }
 }
-
-private fun ClassWriter.constant(
-    name: String,
-    value: Int,
-) = constantMethod(name, "()I", Opcodes.IRETURN) { visitLdcInsn(value) }
-
-private fun ClassWriter.constant(
-    name: String,
-    value: Long,
-) = constantMethod(name, "()J", Opcodes.LRETURN) { visitLdcInsn(value) }
-
-private fun ClassWriter.constant(
-    name: String,
-    value: Boolean,
-) = constantMethod(name, "()Z", Opcodes.IRETURN) { visitInsn(if (value) Opcodes.ICONST_1 else Opcodes.ICONST_0) }
 
 private inline fun ClassWriter.constantMethod(
     name: String,
@@ -262,3 +283,15 @@ private fun installGroupClass(
 private const val INSTALL_CHUNK = "install"
 
 private const val COMPILED_FIELD = "COMPILED"
+
+private const val CLASSES = "classes"
+
+private const val CLASSES_PER_METHOD = 256
+
+private const val INITIALIZES_EAGERLY = "initializesEagerly"
+
+private const val STRING = "java/lang/String"
+
+private const val STRINGS = "[Ljava/lang/String;"
+
+private const val CLASSES_PART_DESCRIPTOR = "($STRINGS)V"

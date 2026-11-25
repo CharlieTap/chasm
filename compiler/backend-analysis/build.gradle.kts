@@ -15,8 +15,11 @@ kotlin {
             dependencies {
                 api(projects.ast)
                 api(projects.cir)
-                api(projects.compiler.backendAbi)
+                api(projects.config)
+                api(projects.moduleDeclarations)
+                api(projects.typeSystem)
 
+                implementation(projects.runtime.compiledFormat)
                 implementation(projects.runtime.encoding)
             }
         }
@@ -25,6 +28,7 @@ kotlin {
             dependencies {
                 implementation(projects.compiler.frontend)
                 implementation(projects.decoder)
+                implementation(projects.runtimeCompiled)
                 implementation(projects.validator)
                 implementation(libs.result)
             }

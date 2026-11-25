@@ -10,19 +10,18 @@ kotlin {
     dependencies {
         api(projects.ast)
         api(projects.cir)
-        api(projects.compiler.backendAbi)
+        api(projects.compiler.backendAnalysis)
         api(projects.config)
         api(projects.moduleDeclarations)
         api(libs.asm)
         api(libs.asm.tree)
 
-        implementation(projects.compiler.backendAnalysis)
-        implementation(projects.runtime.compiledApi)
+        implementation(projects.runtime.compiledFormat)
 
         testImplementation(projects.compiler.frontend)
         testImplementation(projects.decoder)
         testImplementation(projects.module)
-        testImplementation(projects.runtime.compiled)
+        testImplementation(projects.runtimeCompiled)
         testImplementation(projects.validator)
         testImplementation(libs.asm.analysis)
         testImplementation(libs.result)

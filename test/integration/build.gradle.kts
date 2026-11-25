@@ -45,14 +45,15 @@ kotlin {
 
         named("jvmHostTest") {
             dependencies {
-                implementation(projects.chasmAot)
-                implementation(projects.runtimeAot)
+                implementation(projects.chasmJvmCompiler)
+                implementation(projects.runtimeCompiled)
             }
         }
 
         named("androidDeviceTest") {
             dependencies {
-                implementation(projects.chasmJit)
+                implementation(projects.chasmDexCompiler)
+                implementation(projects.runtimeCompiled)
                 implementation(libs.kotlin.junit)
                 implementation(libs.androidx.test.junit)
                 implementation(libs.androidx.test.runner)

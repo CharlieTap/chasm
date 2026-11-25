@@ -1,5 +1,0 @@
-public final class io/github/charlietap/chasm/jit/StoreKt {
-	public static final fun store (Lio/github/charlietap/chasm/config/RuntimeConfig;)Lio/github/charlietap/chasm/embedding/shapes/Store;
-	public static synthetic fun store$default (Lio/github/charlietap/chasm/config/RuntimeConfig;ILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/Store;
-}
-

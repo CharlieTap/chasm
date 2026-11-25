@@ -18,7 +18,16 @@ data class StructStorage(
     val fields: List<FieldStorage>,
     val bytes: Int,
     val final: Boolean,
-)
+) {
+
+    val spilledInts: Int = spilledLanes(LaneKind.INT)
+
+    val spilledReferences: Int = spilledLanes(LaneKind.REFERENCE)
+
+    private fun spilledLanes(kind: LaneKind): Int {
+        return fields.sumOf { field -> field.lanes.count { lane -> lane.spilled && lane.kind == kind } }
+    }
+}
 
 data class ArrayStorage(
     val className: String,
@@ -63,6 +72,13 @@ class StoragePlans(
     fun array(index: Int): ArrayStorage {
         requireSupported(index)
         return arraysByIndex[index] ?: error("type $index is not an array type")
+    }
+
+    fun laneOwner(
+        storage: StructStorage,
+        lane: Lane,
+    ): String {
+        return family.storageClass(storage.className).declaringClass(lane).name
     }
 
     private fun requireSupported(index: Int) {
@@ -254,12 +270,12 @@ class StoragePlans(
         val TWO_INTS = listOf(LaneKind.INT, LaneKind.INT)
         val ONE_REFERENCE = listOf(LaneKind.REFERENCE)
 
-        val I8_ARRAY = ArrayStorage("L${STORAGE_PACKAGE}I8Array;", 0)
-        val I16_ARRAY = ArrayStorage("L${STORAGE_PACKAGE}I16Array;", 1)
-        val I32_ARRAY = ArrayStorage("L${STORAGE_PACKAGE}I32Array;", 2)
-        val I64_ARRAY = ArrayStorage("L${STORAGE_PACKAGE}I64Array;", 3)
-        val F32_ARRAY = ArrayStorage("L${STORAGE_PACKAGE}F32Array;", 2)
-        val F64_ARRAY = ArrayStorage("L${STORAGE_PACKAGE}F64Array;", 3)
-        val REF_ARRAY = ArrayStorage("L${STORAGE_PACKAGE}RefArray;", 2)
+        val I8_ARRAY = ArrayStorage("L${STORAGE_PACKAGE}I8Array;", ArrayElementKind.BYTE.shift)
+        val I16_ARRAY = ArrayStorage("L${STORAGE_PACKAGE}I16Array;", ArrayElementKind.CHAR.shift)
+        val I32_ARRAY = ArrayStorage("L${STORAGE_PACKAGE}I32Array;", ArrayElementKind.INT.shift)
+        val I64_ARRAY = ArrayStorage("L${STORAGE_PACKAGE}I64Array;", ArrayElementKind.LONG.shift)
+        val F32_ARRAY = ArrayStorage("L${STORAGE_PACKAGE}F32Array;", ArrayElementKind.FLOAT.shift)
+        val F64_ARRAY = ArrayStorage("L${STORAGE_PACKAGE}F64Array;", ArrayElementKind.DOUBLE.shift)
+        val REF_ARRAY = ArrayStorage("L${STORAGE_PACKAGE}RefArray;", ArrayElementKind.REFERENCE.shift)
     }
 }

@@ -1,5 +1,9 @@
+@file:OptIn(InternalChasmApi::class)
+
 package io.github.charlietap.chasm.compiler.backend.jvm
 
+import io.github.charlietap.chasm.InternalChasmApi
+import io.github.charlietap.chasm.compiled.format.ArtifactTarget
 import io.github.charlietap.chasm.compiler.backend.jvm.size.BytecodeSize
 import io.github.charlietap.chasm.compiler.backend.jvm.size.MethodSize
 import io.github.charlietap.chasm.config.CpuLimits
@@ -11,6 +15,7 @@ data class JvmOptions(
     val memory: MemoryLowering = MemoryLowering.HELPERS,
     val splitInstructions: Int? = null,
     val methodSize: MethodSize = BytecodeSize(),
+    val target: ArtifactTarget = ArtifactTarget.HOTSPOT,
 ) {
     val meterFuel: Boolean = runtime.limits.cpu is CpuLimits.Metered
 

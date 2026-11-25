@@ -11,8 +11,8 @@ import io.github.charlietap.chasm.compiler.backend.abi.Resource
 import io.github.charlietap.chasm.compiler.backend.analysis.ModuleAnalysis
 import io.github.charlietap.chasm.compiler.backend.analysis.ModuleIndexSpaces
 import io.github.charlietap.chasm.compiler.backend.analysis.gc.ReferenceTests
-import io.github.charlietap.chasm.compiler.backend.analysis.gc.ShapeLayouts
-import io.github.charlietap.chasm.compiler.backend.analysis.gc.ShapeSizes
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.RttTests
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.StoragePlans
 import io.github.charlietap.chasm.compiler.backend.dex.abi.DexReferences
 import io.github.charlietap.chasm.compiler.backend.dex.abi.FunctionSignature
 import io.github.charlietap.chasm.compiler.backend.dex.abi.Invocation
@@ -41,10 +41,9 @@ internal class ModuleLowering(
     val declarations: ModuleIndexSpaces get() = plan.declarations
     val analysis: ModuleAnalysis get() = plan.analysis
     val layout: BindingLayout get() = plan.layout
-    val packagePath: String get() = plan.packagePath
     val referenceDescriptor: String get() = plan.referenceDescriptor
-    val gc: ShapeLayouts get() = plan.gc
-    val shapeSizes: ShapeSizes get() = plan.shapeSizes
+    val storagePlans: StoragePlans get() = plan.storagePlans
+    val rttTests: RttTests get() = plan.rttTests
     val referenceTests: ReferenceTests get() = plan.referenceTests
     val inlineMemory: MemoryIndex? get() = plan.inlineMemory
     val batches: List<List<CirFunction>> get() = plan.batches
@@ -55,6 +54,7 @@ internal class ModuleLowering(
     val workspace = LoweringWorkspace()
     val usedObjects = arrayOfNulls<Resource>(plan.layout.objectCount)
     val usedValues = arrayOfNulls<Resource>(plan.layout.valueCount)
+    var emittedByteArrayBase = false
 
     fun objectSlot(resource: Resource): Int {
         val slot = plan.layout.objectSlot(resource)

@@ -90,8 +90,8 @@ kotlin {
 
         jvmMain {
             dependencies {
-                implementation(projects.runtimeAot)
-                implementation(projects.chasmAot)
+                implementation(projects.runtimeCompiled)
+                implementation(projects.chasmJvmCompiler)
             }
         }
     }

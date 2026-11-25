@@ -55,6 +55,18 @@ class FunctionRoutesTest {
     }
 
     @Test
+    fun `a function heavy in reference instructions that fits whole lowers whole`() {
+
+        val function = code.functions[STRUCT_READS]
+        assertEquals(Route.TryInOrder, route(lowering(), function))
+        val lowering = lowering()
+
+        lower(lowering, function) { builder, method -> assertNull(FunctionLowerer(lowering, function, builder, method)) }
+
+        assertNull(lowering.chunkStarts[STRUCT_READS])
+    }
+
+    @Test
     fun `a pinned function that is too large inline reuses its slot kinds for the helper attempt`() {
 
         val function = code.functions[PINNED_HELPER]
@@ -399,6 +411,8 @@ private const val HELPER = 1
 private const val PINNED_HELPER = 2
 
 private const val PINNED_SPLIT = 3
+
+private const val STRUCT_READS = 4
 
 private const val MAX_METHOD_IDS = 65_536
 

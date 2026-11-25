@@ -21,7 +21,6 @@ import io.github.charlietap.chasm.host.HostFunction
 import io.github.charlietap.chasm.host.HostFunctionException
 import io.github.charlietap.chasm.integration.EXCLUSIONS
 import io.github.charlietap.chasm.integration.INTERPRETER
-import io.github.charlietap.chasm.integration.JIT
 import io.github.charlietap.chasm.integration.TestRunner
 import io.github.charlietap.chasm.integration.TestScope
 import io.github.charlietap.chasm.integration.integrationTest
@@ -328,7 +327,7 @@ class TrapDiagnosticsTest {
     }
 
     @Test
-    fun `a traced AOT module joined to an untraced store reports its own frames`() = integrationTest(START_IMPORT_FIXTURE, AOT_ONLY) {
+    fun `a traced compiled module joined to an untraced store reports its own frames`() = integrationTest(START_IMPORT_FIXTURE, COMPILED_ONLY) {
         val owner = runner(script = START_OWNER_FIXTURE)
         val boom = assertNotNull(owner.exports().expect("owner exports").function("boom"), engine.name())
 
@@ -339,7 +338,7 @@ class TrapDiagnosticsTest {
     }
 
     @Test
-    fun `an untraced AOT module joined to a traced store reports no frames`() = integrationTest(START_IMPORT_FIXTURE, AOT_ONLY) {
+    fun `an untraced compiled module joined to a traced store reports no frames`() = integrationTest(START_IMPORT_FIXTURE, COMPILED_ONLY) {
         val owner = runner(config = DIAGNOSTICS, script = START_OWNER_FIXTURE)
         val boom = assertNotNull(owner.exports().expect("owner exports").function("boom"), engine.name())
 
@@ -447,6 +446,6 @@ class TrapDiagnosticsTest {
         const val START_IMPORT_FIXTURE = "trap_diagnostics_start_import"
         const val PAGE_SIZE = 65536L
         val DIAGNOSTICS = RuntimeConfig(stacktraces = true)
-        val AOT_ONLY = EXCLUSIONS + mapOf(INTERPRETER to setOf(START_IMPORT_FIXTURE), JIT to setOf(START_IMPORT_FIXTURE))
+        val COMPILED_ONLY = EXCLUSIONS + mapOf(INTERPRETER to setOf(START_IMPORT_FIXTURE))
     }
 }

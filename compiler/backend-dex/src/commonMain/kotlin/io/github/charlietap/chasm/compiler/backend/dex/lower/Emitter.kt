@@ -144,6 +144,23 @@ internal class Emitter(
         code.invokeConstructor(DexConstructor(references.reference(owner) as ClassType, valueType(parameter)), Reg(receiver), Reg(argument))
     }
 
+    fun invokeConstructor(
+        owner: String,
+        firstParameter: String,
+        secondParameter: String,
+        receiver: Int,
+        firstArgument: Int,
+        secondArgument: Int,
+    ) {
+        if (recording) return
+        code.invokeConstructor(
+            DexConstructor(references.reference(owner) as ClassType, valueType(firstParameter), valueType(secondParameter)),
+            Reg(receiver),
+            Reg(firstArgument),
+            Reg(secondArgument),
+        )
+    }
+
     fun constWide(
         destination: Int,
         value: Long,

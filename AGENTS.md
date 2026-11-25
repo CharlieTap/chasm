@@ -4,7 +4,7 @@
 
 - **Fast dev loop:** run `./gradlew test`. This executes the runtime unit
   tests, the official Wasm test suite and the configured `wasm-corpus` slice
-  via the JVM backend, for both Chasm and runtime-aot, giving quick signal
+  via the JVM backend, for both Chasm and runtime-compiled, giving quick signal
   without longer-running native targets.
 - **Corpus only:** `./gradlew corpus` runs just the `wasm-corpus` slice and
   writes its report. Use it to iterate on a corpus failure from `test`,
@@ -22,10 +22,10 @@
 - If you’ve changed a public ABI, first check it with `./gradlew
   checkKotlinAbi`. If it reports changes, record them with `./gradlew
   updateKotlinAbi`.
-- If you’ve changed chasm-jit, runtime-jit or the DEX backend, run
-  `./gradlew :chasm-jit:checkJitTiering` with the Samsung S24 (SM-S721B)
-  connected over adb. It fails if ART stops JIT-compiling the generated code.
-  It never runs in CI.
+- If you’ve changed chasm-dex-compiler, runtime-compiled or the DEX backend,
+  run `./gradlew :runtime-compiled:checkJitTiering` with the Samsung S24
+  (SM-S721B) connected over adb. It fails if ART stops JIT-compiling the
+  generated code. It never runs in CI.
 - In Cursor, use the `read_lints` command before finishing to surface IDE
   diagnostics (detekt/ktlint) for the files you edited.
 

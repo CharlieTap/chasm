@@ -1,6 +1,11 @@
+@file:OptIn(InternalChasmApi::class)
+
 package io.github.charlietap.chasm.compiler.backend.jvm.lower
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.cir.MemoryInstruction
+import io.github.charlietap.chasm.compiled.format.MEMORY_ACCESS_READ
+import io.github.charlietap.chasm.compiled.format.MEMORY_ACCESS_WRITE
 import io.github.charlietap.chasm.compiler.backend.abi.BUFFER_I32_LOAD
 import io.github.charlietap.chasm.compiler.backend.abi.BUFFER_I32_LOAD_16_S
 import io.github.charlietap.chasm.compiler.backend.abi.BUFFER_I32_LOAD_8_S
@@ -46,7 +51,6 @@ import io.github.charlietap.chasm.compiler.backend.analysis.form.Operand
 import io.github.charlietap.chasm.compiler.backend.analysis.form.access
 import io.github.charlietap.chasm.compiler.backend.analysis.form.bulk
 import io.github.charlietap.chasm.compiler.backend.analysis.form.helperCall
-import io.github.charlietap.chasm.runtime.diagnostic.FailedMemoryAccess
 import io.github.charlietap.chasm.type.NumberType
 import org.objectweb.asm.Label
 import org.objectweb.asm.Opcodes
@@ -370,7 +374,7 @@ private fun LowerContext.trapAccess(
     pushAddress: LowerContext.() -> Unit,
 ) {
     pushResource(Resource.Memory(access.memory.index))
-    emit.int(if (access.value == null) FailedMemoryAccess.Kind.READ.ordinal else FailedMemoryAccess.Kind.WRITE.ordinal)
+    emit.int(if (access.value == null) MEMORY_ACCESS_READ else MEMORY_ACCESS_WRITE)
     pushAddress()
     emit.int(access.operation.width)
     trap(MEMORY_ACCESS_OUT_OF_BOUNDS)

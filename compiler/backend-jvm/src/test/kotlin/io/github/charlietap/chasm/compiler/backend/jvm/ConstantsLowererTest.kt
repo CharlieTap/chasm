@@ -140,13 +140,6 @@ class ConstantsLowererTest {
             return numbers
         }
 
-        override fun typeTest(
-            nullable: Boolean,
-            heapType: Int,
-        ): Any {
-            error("the constants test no type")
-        }
-
         override fun install(
             index: Int,
             entry: CompiledFunction,

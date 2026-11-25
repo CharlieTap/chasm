@@ -5,6 +5,7 @@ import com.android.tools.smali.dexlib2.dexbacked.DexBackedDexFile
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
+import io.github.charlietap.chasm.compiler.backend.analysis.UnsupportedFunctions
 import java.io.File
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -43,7 +44,7 @@ class CorpusCensusTest {
         val digest = java.security.MessageDigest.getInstance("SHA-256")
         val differing = ArrayList<String>()
         for (file in modules.shuffled()) {
-            val options = DexOptions(packageName = "chasm.jit.h0", byteArrayBaseOffset = 16L)
+            val options = DexOptions(byteArrayBaseOffset = 16L)
             val first = runCatching { generate(decodeModule(file.readBytes()), options).dex }.getOrNull() ?: continue
             val second = generate(decodeModule(file.readBytes()), options).dex
             if (first.size != second.size || first.indices.any { index -> !first[index].contentEquals(second[index]) }) {
@@ -51,7 +52,7 @@ class CorpusCensusTest {
             }
         }
         for (file in modules) {
-            val options = DexOptions(packageName = "chasm.jit.h0", byteArrayBaseOffset = 16L)
+            val options = DexOptions(byteArrayBaseOffset = 16L)
             val dex = runCatching { generate(decodeModule(file.readBytes()), options).dex }.getOrNull() ?: continue
             dex.forEach(digest::update)
         }

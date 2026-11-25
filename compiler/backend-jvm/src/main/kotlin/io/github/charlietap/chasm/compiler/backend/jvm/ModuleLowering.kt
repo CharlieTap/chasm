@@ -1,10 +1,16 @@
+@file:OptIn(InternalChasmApi::class)
+
 package io.github.charlietap.chasm.compiler.backend.jvm
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.cir.CirFunction
 import io.github.charlietap.chasm.cir.CirModule
 import io.github.charlietap.chasm.cir.FunctionIndex
+import io.github.charlietap.chasm.compiled.format.UNPINNED_OFFSET
+import io.github.charlietap.chasm.compiler.backend.abi.GeneratedClassNames
 import io.github.charlietap.chasm.compiler.backend.abi.MethodRef
+import io.github.charlietap.chasm.compiler.backend.abi.ModuleSettings
 import io.github.charlietap.chasm.compiler.backend.abi.OBJECT_TYPE
 import io.github.charlietap.chasm.compiler.backend.abi.internalName
 import io.github.charlietap.chasm.compiler.backend.abi.returnDescriptor
@@ -17,19 +23,18 @@ import io.github.charlietap.chasm.compiler.backend.analysis.analyzeModule
 import io.github.charlietap.chasm.compiler.backend.analysis.functionBatches
 import io.github.charlietap.chasm.compiler.backend.analysis.gc.ConstantExpressions
 import io.github.charlietap.chasm.compiler.backend.analysis.gc.ReferenceTests
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.RttTests
 import io.github.charlietap.chasm.compiler.backend.analysis.gc.STORAGE_FAMILY
 import io.github.charlietap.chasm.compiler.backend.analysis.gc.StoragePlans
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.StructLanes
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.BATCH_FUNCTIONS
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.BATCH_INSTRUCTIONS
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.CLASS_FILE_VERSION
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.SOURCE_FILE
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.TYPED_CALL
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.bindingClassDescriptor
-import io.github.charlietap.chasm.compiler.backend.jvm.abi.codeClassDescriptor
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.functionMethod
-import io.github.charlietap.chasm.compiler.backend.jvm.abi.signatureClassDescriptor
 import io.github.charlietap.chasm.compiler.backend.jvm.binding.BindingLayout
-import io.github.charlietap.chasm.compiler.backend.jvm.gc.RttTests
 import io.github.charlietap.chasm.compiler.backend.jvm.lower.InlineMemory
 import io.github.charlietap.chasm.type.DefinedType
 import io.github.charlietap.chasm.type.FunctionType
@@ -48,6 +53,8 @@ internal class ModuleLowering(
 
     val definedTypes: List<DefinedType> = module.definedTypes
     val storagePlans = StoragePlans(module.definedTypes, STORAGE_FAMILY)
+    val structLanes = StructLanes(storagePlans, module.definedTypes)
+    val settings = ModuleSettings(options.runtime, options.target, UNPINNED_OFFSET)
     val constants = ConstantExpressions(module)
     val referenceTests = ReferenceTests(module.definedTypes)
     val rttTests = RttTests(module.definedTypes)
@@ -60,6 +67,7 @@ internal class ModuleLowering(
         MemoryLowering.UNSAFE -> InlineMemory.UNSAFE
     }.takeIf { declarations.memoryCount > 0 }
     val entryPath = options.entryClass.replace('.', '/')
+    val names = GeneratedClassNames(entryPath)
     val bindingType = bindingClassDescriptor(entryPath)
 
     val batches: List<List<CirFunction>> = functionBatches(code.functions, BATCH_INSTRUCTIONS, BATCH_FUNCTIONS)
@@ -71,7 +79,7 @@ internal class ModuleLowering(
     init {
         code.functions.forEach { function ->
             val type = declarations.functionType(function.index)
-            val signature = signatures.getOrPut(typedCall("", type).descriptor) { signatureClassDescriptor(entryPath, signatures.size) }
+            val signature = signatures.getOrPut(typedCall("", type).descriptor) { names.signature(signatures.size) }
             typedMethods.getOrPut(signature) { typedCall(signature, type) }
         }
     }
@@ -93,7 +101,7 @@ internal class ModuleLowering(
     fun functionMethod(
         index: FunctionIndex,
     ): MethodRef =
-        functionMethod(codeClassDescriptor(entryPath, batchOf.getValue(index.index)), bindingType, index.index, declarations.functionType(index))
+        functionMethod(names.code(batchOf.getValue(index.index)), bindingType, index.index, declarations.functionType(index))
 
     fun methodsClass(
         owner: String,

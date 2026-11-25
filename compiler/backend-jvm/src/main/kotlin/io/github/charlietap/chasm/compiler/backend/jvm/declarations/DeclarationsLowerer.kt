@@ -1,5 +1,8 @@
 package io.github.charlietap.chasm.compiler.backend.jvm.declarations
 
+import io.github.charlietap.chasm.compiler.backend.abi.GeneratedClassNames
+import io.github.charlietap.chasm.compiler.backend.abi.internalName
+import io.github.charlietap.chasm.compiler.backend.analysis.declarations.BuilderCall
 import io.github.charlietap.chasm.compiler.backend.jvm.JvmOutput
 import io.github.charlietap.chasm.compiler.backend.jvm.ModuleLowering
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.CLASS_FILE_VERSION
@@ -14,16 +17,16 @@ internal const val DECLARATIONS_BUILDER = "io/github/charlietap/chasm/declaratio
 internal const val DECLARE = "declare"
 internal const val DECLARE_DESCRIPTOR = "(L$DECLARATIONS_BUILDER;)V"
 
-internal typealias DeclarationsLowerer = (List<BuilderCall>, String, JvmOutput) -> List<String>
+internal typealias DeclarationsLowerer = (List<BuilderCall>, GeneratedClassNames, JvmOutput) -> List<String>
 
 internal fun DeclarationsLowerer(
     calls: List<BuilderCall>,
-    entryPath: String,
+    names: GeneratedClassNames,
     output: JvmOutput,
 ): List<String> {
     var classes = 0
 
-    fun nextClass(): String = "$entryPath\$Declare${classes++}"
+    fun nextClass(): String = internalName(names.declare(classes++))
 
     var level = batchCallsByBytecodeBudget(calls).map { chunk ->
         val owner = nextClass()

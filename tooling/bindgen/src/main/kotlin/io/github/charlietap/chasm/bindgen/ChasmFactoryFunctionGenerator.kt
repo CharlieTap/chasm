@@ -67,10 +67,13 @@ internal class ChasmFactoryFunctionGenerator {
 
     private fun moduleSource(config: CodegenConfig): ModuleSource {
         return when (val tier = config.executionTier) {
-            is ExecutionTier.Aot -> CompiledModule(tier)
-            is ExecutionTier.Interpreter,
-            is ExecutionTier.Jit,
-            -> DecodedModule(config)
+            is ExecutionTier.Interpreter -> DecodedModule(config)
+            is ExecutionTier.Compiled -> {
+                when (val source = tier.module) {
+                    is CompiledSource.Generated -> CompiledModule(source)
+                    is CompiledSource.Loaded -> LoadedModule()
+                }
+            }
         }
     }
 }
@@ -103,7 +106,7 @@ private class DecodedModule(
     override fun loadModule(): CodeBlock {
         return CodeBlock.builder().apply {
 
-            addStatement("val store = %M(%L)", chasmStoreFactory(config.executionTier), runtimeConfig())
+            addStatement("val store = %M(%L)", CHASM_STORE_FUNCTION, runtimeConfig())
             addStatement(
                 "val module = moduleFactory?.invoke(binary) ?: %M(binary).%M(%S)",
                 CHASM_MODULE_FUNCTION,
@@ -175,7 +178,7 @@ private class DecodedModule(
 }
 
 private class CompiledModule(
-    private val tier: ExecutionTier.Aot,
+    private val source: CompiledSource.Generated,
 ) : ModuleSource {
 
     override val inputs = emptyList<ParameterSpec>()
@@ -184,7 +187,7 @@ private class CompiledModule(
 
     override fun loadModule(): CodeBlock {
 
-        val moduleClass = ClassName(tier.compiledModule.substringBeforeLast('.', ""), tier.compiledModule.substringAfterLast('.'))
+        val moduleClass = ClassName(source.className.substringBeforeLast('.', ""), source.className.substringAfterLast('.'))
 
         return CodeBlock.builder().apply {
 
@@ -193,10 +196,33 @@ private class CompiledModule(
                 CHASM_COMPILED_MODULE_FUNCTION,
                 moduleClass,
                 CHASM_EXPECT,
-                "Failed to load ${tier.compiledModule}",
+                "Failed to load ${source.className}",
             )
-            addStatement("val store = %M(module)", chasmStoreFactory(tier))
+            addStatement("val store = %M(module)", CHASM_COMPILED_STORE_FUNCTION)
         }.build()
+    }
+
+    override fun instantiate(): CodeBlock {
+        return CodeBlock.builder()
+            .addStatement(
+                "val instance = %M(store, module, allocatedImports).%M(%S)",
+                CHASM_INSTANCE_FUNCTION,
+                CHASM_EXPECT,
+                "Failed to instantiate module",
+            ).build()
+    }
+}
+
+private class LoadedModule : ModuleSource {
+
+    override val inputs = listOf(ParameterSpec("module", CHASM_MODULE_CLASS_NAME))
+
+    override val factories = emptyList<ParameterSpec>()
+
+    override fun loadModule(): CodeBlock {
+        return CodeBlock.builder()
+            .addStatement("val store = %M(module)", CHASM_COMPILED_STORE_FUNCTION)
+            .build()
     }
 
     override fun instantiate(): CodeBlock {
@@ -219,6 +245,7 @@ internal val CHASM_FUEL_CLASS_NAME = ClassName("io.github.charlietap.chasm.confi
 internal val CHASM_BYTES_CLASS_NAME = ClassName("io.github.charlietap.chasm.config", "Bytes")
 internal val CHASM_GROWTH_FAILURE_STRATEGY_CLASS_NAME = ClassName("io.github.charlietap.chasm.config", "GrowthFailureStrategy")
 internal val CHASM_EXPERIMENTAL_API_CLASS_NAME = ClassName("io.github.charlietap.chasm", "ExperimentalChasmApi")
+internal val CHASM_INTERNAL_API_CLASS_NAME = ClassName("io.github.charlietap.chasm", "InternalChasmApi")
 internal val OPT_IN_CLASS_NAME = ClassName("kotlin", "OptIn")
 internal val UNSAFE_HOST_API_CLASS_NAME = ClassName("io.github.charlietap.chasm.host", "UnsafeHostApi")
 internal val WASI_EMBEDDER_HOST_CLASS_NAME = ClassName("at.released.weh.host", "EmbedderHost")

@@ -5,13 +5,10 @@ import io.github.charlietap.chasm.compiler.backend.abi.RTT_TYPE
 import io.github.charlietap.chasm.compiler.backend.abi.UNREACHABLE
 import io.github.charlietap.chasm.compiler.backend.abi.internalName
 import io.github.charlietap.chasm.compiler.backend.analysis.gc.StructStorage
-import io.github.charlietap.chasm.compiler.backend.analysis.gc.UnsupportedShape
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.CLASS_FILE_VERSION
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.MODULE_NEW_STRUCT
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.MODULE_STRUCT_LANES
-import io.github.charlietap.chasm.compiler.backend.jvm.abi.structsClassDescriptor
 import io.github.charlietap.chasm.compiler.backend.jvm.gc.allocateStruct
-import io.github.charlietap.chasm.type.ext.structType
 import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.Label
 import org.objectweb.asm.MethodVisitor
@@ -25,14 +22,11 @@ internal fun ModuleStructsLowerer(
     output: JvmOutput,
 ) {
 
-    val structs = module.definedTypes.indices
-        .filter { index -> module.definedTypes[index].structType() != null }
-        .mapNotNull { index -> supportedStruct(module, index)?.let { storage -> index to storage } }
-        .toMap()
+    val structs = module.structLanes.structs
     val groups = structs.keys.groupBy { index -> index / TYPES_PER_GROUP }
 
     writer.method(MODULE_STRUCT_LANES) {
-        pushLongs(structLanes(structs))
+        pushLongs(module.structLanes.encode())
         visitInsn(Opcodes.ARETURN)
     }
     writer.method(MODULE_NEW_STRUCT) {
@@ -40,7 +34,7 @@ internal fun ModuleStructsLowerer(
     }
 
     groups.forEach { (group, types) ->
-        val owner = internalName(structsClassDescriptor(module.entryPath, group))
+        val owner = internalName(module.names.structs(group))
         output.classFile(owner, groupClass(owner, types, structs))
     }
 }
@@ -63,7 +57,7 @@ private fun MethodVisitor.newStruct(
     visitLookupSwitchInsn(missing, groups.toIntArray(), labels.toTypedArray())
 
     groups.forEachIndexed { position, group ->
-        val owner = internalName(structsClassDescriptor(module.entryPath, group))
+        val owner = internalName(module.names.structs(group))
         visitLabel(labels[position])
         visitVarInsn(Opcodes.ILOAD, 1)
         visitVarInsn(Opcodes.ALOAD, 2)
@@ -112,33 +106,6 @@ private fun groupClass(
     writer.visitEnd()
 
     return writer.toByteArray()
-}
-
-private fun structLanes(structs: Map<Int, StructStorage>): LongArray {
-
-    val values = ArrayList<Long>()
-    structs.forEach { (type, storage) ->
-        val lanes = storage.fields.flatMap { field -> field.lanes }
-        values += type.toLong()
-        values += storage.bytes.toLong()
-        values += lanes.size.toLong()
-        lanes.forEach { lane ->
-            values += (lane.index.toLong() shl 1) or if (lane.spilled) 1L else 0L
-        }
-    }
-
-    return values.toLongArray()
-}
-
-private fun supportedStruct(
-    module: ModuleLowering,
-    index: Int,
-): StructStorage? {
-    return try {
-        module.storagePlans.struct(index)
-    } catch (_: UnsupportedShape) {
-        null
-    }
 }
 
 private fun MethodVisitor.unreachable() {

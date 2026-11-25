@@ -26,8 +26,7 @@ class RuntimeAbiTest {
     private fun generatedDex(
         name: String,
     ): List<ByteArray> {
-        val generated = generate(decodeModule(fixture(name)))
-        return generated.dex + listOfNotNull(generated.shapeDex)
+        return generate(decodeModule(fixture(name))).dex
     }
 
     private fun methodExists(
@@ -87,6 +86,6 @@ class RuntimeAbiTest {
     }
 
     private companion object {
-        val FIXTURES = listOf("scalar", "control", "memory", "calls", "gc", "eh", "tail", "wide", "bench_gc", "bench")
+        val FIXTURES = listOf("scalar", "control", "memory", "calls", "gc", "gc_types", "struct_accessors", "eh", "tail", "wide", "bench_gc", "bench")
     }
 }

@@ -1,22 +1,20 @@
 package io.github.charlietap.chasm.compiler.backend.dex
 
+import java.io.OutputStream
+
+interface DexResources {
+
+    fun <T> resource(
+        path: String,
+        write: (OutputStream) -> T,
+    ): T
+}
+
 class DexModule(
     val dex: List<ByteArray>,
-    val installer: String,
-    val inlineMemory: Boolean,
-    val chunkStarts: Map<Int, IntArray> = emptyMap(),
-    val classesToInitialize: List<String>,
-    val shapeDex: ByteArray? = null,
-    val shapeClasses: List<String> = emptyList(),
-    val shapeTypes: List<String?>,
-    val constants: String?,
+    val moduleClass: String,
+    val classes: List<String>,
 )
-
-class UnsupportedFunctions(
-    val reasons: Map<Int, String>,
-) : IllegalArgumentException(
-        "${reasons.size} functions cannot compile: " + reasons.entries.take(10).joinToString { (index, reason) -> "f$index: $reason" },
-    )
 
 class UnsupportedModule(
     message: String,

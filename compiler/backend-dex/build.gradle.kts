@@ -14,11 +14,12 @@ kotlin {
             dependencies {
                 api(projects.ast)
                 api(projects.cir)
-                api(projects.compiler.backendAbi)
                 api(projects.compiler.backendAnalysis)
+                api(projects.config)
+                api(projects.moduleDeclarations)
                 api(projects.libs.parallel)
 
-                implementation(projects.runtime.core)
+                implementation(projects.runtime.compiledFormat)
                 implementation(libs.dexter)
             }
         }
@@ -28,12 +29,13 @@ kotlin {
                 implementation(projects.compiler.frontend)
                 implementation(projects.decoder)
                 implementation(projects.embeddingApi)
+                implementation(projects.module)
                 implementation(projects.validator)
                 implementation(libs.kotlin.test)
                 implementation(libs.result)
                 implementation(libs.smali.baksmali)
 
-                runtimeOnly(projects.runtime.compiled)
+                runtimeOnly(projects.runtimeCompiled)
             }
         }
     }

@@ -15,11 +15,3 @@ class AllocationMeter {
 }
 
 const val ALLOCATION_INTERVAL = 1 shl 20
-
-const val ARRAY_OVERHEAD = 32
-
-fun maximumArrayLength(
-    shift: Int,
-): Int {
-    return (Int.MAX_VALUE - ARRAY_OVERHEAD) ushr shift
-}

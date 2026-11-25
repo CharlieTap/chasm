@@ -1,8 +1,0 @@
-public final class io/github/charlietap/chasm/aot/ModuleKt {
-	public static final fun module (Lio/github/charlietap/chasm/aot/CompiledModule;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
-}
-
-public final class io/github/charlietap/chasm/aot/StoreKt {
-	public static final fun store (Lio/github/charlietap/chasm/embedding/shapes/Module;)Lio/github/charlietap/chasm/embedding/shapes/Store;
-}
-

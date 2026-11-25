@@ -32,7 +32,7 @@ import io.github.charlietap.chasm.fixture.type.memoryType
 import io.github.charlietap.chasm.fixture.type.resultType
 import io.github.charlietap.chasm.fixture.type.tableType
 import io.github.charlietap.chasm.host.HostFunction
-import io.github.charlietap.chasm.integration.AOT
+import io.github.charlietap.chasm.integration.COMPILED
 import io.github.charlietap.chasm.integration.TestRunner
 import io.github.charlietap.chasm.integration.TestScope
 import io.github.charlietap.chasm.integration.assertTrapped
@@ -140,7 +140,7 @@ class StoreLimitsTest {
     }
 
     @Test
-    fun `instantiating a module whose memory starts above the store limit fails`() = integrationTest(LARGE_MEMORY_FIXTURE, mapOf(AOT to setOf(LARGE_MEMORY_FIXTURE))) {
+    fun `instantiating a module whose memory starts above the store limit fails`() = integrationTest(LARGE_MEMORY_FIXTURE, mapOf(COMPILED to setOf(LARGE_MEMORY_FIXTURE))) {
         val result = runner(memoryLimits(MemoryLimits(linearMemory = 3.pages))).instance()
 
         assertTrapped(TrapReason.MEMORY_LIMIT_EXCEEDED, result, engine.name())
@@ -180,7 +180,7 @@ class StoreLimitsTest {
     }
 
     @Test
-    fun `instantiating a module whose table starts above the store limit fails`() = integrationTest(LARGE_TABLE_FIXTURE, mapOf(AOT to setOf(LARGE_TABLE_FIXTURE))) {
+    fun `instantiating a module whose table starts above the store limit fails`() = integrationTest(LARGE_TABLE_FIXTURE, mapOf(COMPILED to setOf(LARGE_TABLE_FIXTURE))) {
         val result = runner(memoryLimits(MemoryLimits(tables = 800.bytes))).instance()
 
         assertTrapped(TrapReason.TABLE_LIMIT_EXCEEDED, result, engine.name())

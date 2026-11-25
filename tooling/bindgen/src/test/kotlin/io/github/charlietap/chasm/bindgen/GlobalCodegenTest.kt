@@ -50,9 +50,9 @@ class GlobalCodegenTest {
     )
 
     @Test
-    fun `generates JIT globals`() {
+    fun `generates loaded compiled globals`() {
         assertGlobal(
-            scenario = "JitGlobals",
+            scenario = "LoadedGlobals",
             properties = listOf(
                 property("intValue", integerScalarType(), false, globalProxy("int_value", VALUE_I32_CLASS_NAME)),
                 property("longValue", longScalarType(), false, globalProxy("long_value", VALUE_I64_CLASS_NAME)),
@@ -60,7 +60,7 @@ class GlobalCodegenTest {
                 property("doubleValue", doubleScalarType(), false, globalProxy("double_value", VALUE_F64_CLASS_NAME)),
                 property("constant", integerScalarType(), true, globalProxy("constant", VALUE_I32_CLASS_NAME)),
             ),
-            config = codegenConfig(executionTier = ExecutionTier.Jit()),
+            config = codegenConfig(executionTier = ExecutionTier.Compiled(CompiledSource.Loaded())),
             runtimes = listOf(CodegenRuntime.CHASM),
         )
     }

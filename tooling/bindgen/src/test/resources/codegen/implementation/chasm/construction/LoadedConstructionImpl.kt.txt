@@ -1,0 +1,27 @@
+@file:OptIn(ExperimentalChasmApi::class)
+
+package com.test
+
+import io.github.charlietap.chasm.ExperimentalChasmApi
+import io.github.charlietap.chasm.compiled.store
+import io.github.charlietap.chasm.embedding.codegen.CodegenImport
+import io.github.charlietap.chasm.embedding.codegen.allocateImports
+import io.github.charlietap.chasm.embedding.instance
+import io.github.charlietap.chasm.embedding.shapes.Instance
+import io.github.charlietap.chasm.embedding.shapes.Module
+import io.github.charlietap.chasm.embedding.shapes.Store
+import io.github.charlietap.chasm.embedding.shapes.`expect`
+import kotlin.OptIn
+import kotlin.collections.List
+
+public suspend fun loadedConstruction(module: Module, imports: List<CodegenImport> = emptyList()): LoadedConstruction {
+  val store = store(module)
+  val allocatedImports = allocateImports(store, imports)
+  val instance = instance(store, module, allocatedImports).`expect`("Failed to instantiate module")
+  return LoadedConstructionImpl(store = store, instance = instance)
+}
+
+private class LoadedConstructionImpl(
+  private val store: Store,
+  private val instance: Instance,
+) : LoadedConstruction

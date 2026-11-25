@@ -2,7 +2,6 @@
 
 package io.github.charlietap.chasm.integration
 
-import com.github.michaelbull.result.Result
 import com.goncalossilva.resources.Resource
 import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.instruction.AtomicMemoryInstruction
@@ -11,13 +10,10 @@ import io.github.charlietap.chasm.ast.instruction.Expression
 import io.github.charlietap.chasm.ast.instruction.VectorInstruction
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.config.ModuleConfig
-import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.embedding.error.ExecutionError
 import io.github.charlietap.chasm.embedding.fixture.publicModule
 import io.github.charlietap.chasm.embedding.instance
-import io.github.charlietap.chasm.embedding.internal.InterpreterModuleInstaller
-import io.github.charlietap.chasm.embedding.internal.ModuleInstaller
-import io.github.charlietap.chasm.embedding.internal.ParallelModuleCodeInstaller
+import io.github.charlietap.chasm.embedding.internal.InterpreterTrapSources
 import io.github.charlietap.chasm.embedding.internal.StoreRuntime
 import io.github.charlietap.chasm.embedding.internal.interpreterEngine
 import io.github.charlietap.chasm.embedding.invoke
@@ -30,16 +26,13 @@ import io.github.charlietap.chasm.embedding.shapes._payload
 import io.github.charlietap.chasm.embedding.shapes.expect
 import io.github.charlietap.chasm.embedding.value.ExecutionValue
 import io.github.charlietap.chasm.embedding.value.NumberValue
-import io.github.charlietap.chasm.executor.instantiator.ParallelModuleInstantiator
 import io.github.charlietap.chasm.fixture.ast.module.function
 import io.github.charlietap.chasm.fixture.type.definedType
 import io.github.charlietap.chasm.fixture.type.functionRecursiveType
 import io.github.charlietap.chasm.parallel.ParallelTaskExecutor
 import io.github.charlietap.chasm.parallel.ParallelTaskScope
 import io.github.charlietap.chasm.runtime.error.InstantiationError
-import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
-import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -51,7 +44,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertIs
 import kotlin.test.assertTrue
 import io.github.charlietap.chasm.fixture.ast.module.module as astModule
-import io.github.charlietap.chasm.runtime.instance.Import as RuntimeImport
 import io.github.charlietap.chasm.runtime.store.Store as RuntimeStore
 
 class ParallelInstantiationTest {
@@ -209,7 +201,7 @@ class ParallelInstantiationTest {
     ) {
 
         val runtime = RuntimeStore()
-        val store: Store = interpreterEngine(StoreRuntime(runtime), TestModuleInstaller(taskExecutor)).store
+        val store: Store = interpreterEngine(StoreRuntime(runtime), taskExecutor, InterpreterTrapSources()).store
 
         fun compiledFunctions(): List<CompiledFunction> = runtime.functions
             .filterIsInstance<FunctionInstance.WasmFunction>()
@@ -220,31 +212,6 @@ class ParallelInstantiationTest {
                     returnSlots = function.functionType.results.types.indices.toList(),
                 )
             }
-    }
-
-    private class TestModuleInstaller(
-        private val taskExecutor: ParallelTaskExecutor,
-        private val installer: ModuleInstaller = InterpreterModuleInstaller(),
-    ) : ModuleInstaller by installer {
-
-        override suspend fun instantiate(
-            module: Module,
-            config: RuntimeConfig,
-            runtime: RuntimeStore,
-            imports: List<RuntimeImport>,
-        ): Result<ModuleInstance, ModuleTrapError> {
-
-            val decoded = module._payload() as DecodedModule
-
-            return ParallelModuleInstantiator(
-                config = config,
-                store = runtime,
-                module = decoded.declarations,
-                imports = imports,
-                taskExecutor = taskExecutor,
-                codeInstaller = ParallelModuleCodeInstaller(decoded.module),
-            )
-        }
     }
 
     private data class CompilationResult(

@@ -20,6 +20,7 @@ kotlin {
                 api(projects.config)
                 api(projects.moduleDeclarations)
                 api(projects.gc)
+                api(projects.runtime.compiledFormat)
                 api(projects.runtime.host)
                 api(projects.runtime.encoding)
                 api(projects.runtime.type)

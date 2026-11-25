@@ -1,0 +1,30 @@
+package com.test
+
+import io.github.charlietap.chasm.InternalChasmApi
+import io.github.charlietap.chasm.reference.StructReference
+import io.github.charlietap.chasm.runtime.compiled.gc.storage.S_I_IR
+import kotlin.Long
+import kotlin.OptIn
+import kotlin.jvm.JvmInline
+
+public interface LoadedSkippedViews {
+  public fun usesKept(p0: Struct2): Long
+
+  @JvmInline
+  @OptIn(InternalChasmApi::class)
+  public value class Struct2(
+    public val reference: StructReference,
+  ) {
+    public val f0: Long
+      get() {
+        val storage = storage()
+        return (storage.i0.toLong() and 0xFFFFFFFFL) or (storage.i1.toLong() shl 32)
+      }
+
+    private fun storage(): S_I_IR {
+      val struct = reference as S_I_IR
+      require(struct.rtt.key === "9d84b14a18f84b7081dc287b94be5e54_0") { "the struct is not a Struct2" }
+      return struct
+    }
+  }
+}

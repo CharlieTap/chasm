@@ -1,0 +1,41 @@
+@file:OptIn(ExperimentalChasmApi::class)
+
+package com.test
+
+import com.test.aot.WasmModule
+import io.github.charlietap.chasm.ExperimentalChasmApi
+import io.github.charlietap.chasm.compiled.module
+import io.github.charlietap.chasm.compiled.store
+import io.github.charlietap.chasm.embedding.codegen.CodegenImport
+import io.github.charlietap.chasm.embedding.codegen.allocateImports
+import io.github.charlietap.chasm.embedding.instance
+import io.github.charlietap.chasm.embedding.shapes.Instance
+import io.github.charlietap.chasm.embedding.shapes.Store
+import io.github.charlietap.chasm.embedding.shapes.`expect`
+import kotlin.Boolean
+import kotlin.Long
+import kotlin.OptIn
+import kotlin.Unit
+import kotlin.collections.List
+import io.github.charlietap.chasm.embedding.addFuel as chasmAddFuel
+import io.github.charlietap.chasm.embedding.interrupt as chasmInterrupt
+import io.github.charlietap.chasm.embedding.remainingFuel as chasmRemainingFuel
+
+public suspend fun compiledStoreControlsConstruction(imports: List<CodegenImport> = emptyList()): CompiledStoreControlsConstruction {
+  val module = module(WasmModule.COMPILED).`expect`("Failed to load com.test.aot.WasmModule")
+  val store = store(module)
+  val allocatedImports = allocateImports(store, imports)
+  val instance = instance(store, module, allocatedImports).`expect`("Failed to instantiate module")
+  return CompiledStoreControlsConstructionImpl(store = store, instance = instance)
+}
+
+private class CompiledStoreControlsConstructionImpl(
+  private val store: Store,
+  private val instance: Instance,
+) : CompiledStoreControlsConstruction {
+  override fun addFuel(units: Long): Unit = chasmAddFuel(store, units)
+
+  override fun remainingFuel(): Long = chasmRemainingFuel(store)
+
+  override fun interrupt(): Boolean = chasmInterrupt(store)
+}

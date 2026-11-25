@@ -9,7 +9,7 @@ on:
         required: true
       module:
         type: string
-        description: 'The Gradle project whose device tests run, e.g. :chasm-jit'
+        description: 'The Gradle project whose device tests run, e.g. :runtime-compiled'
         required: true
       name:
         type: string

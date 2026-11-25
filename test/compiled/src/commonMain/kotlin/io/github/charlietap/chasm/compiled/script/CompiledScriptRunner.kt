@@ -1,10 +1,10 @@
 package io.github.charlietap.chasm.compiled.script
 
-import io.github.charlietap.chasm.aot.store
 import io.github.charlietap.chasm.compiled.Compiler
 import io.github.charlietap.chasm.compiled.script.command.CommandResult
 import io.github.charlietap.chasm.compiled.script.command.CommandRunner
 import io.github.charlietap.chasm.compiled.script.host.HostModuleResolver
+import io.github.charlietap.chasm.compiled.store
 import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.embedding.dropStore

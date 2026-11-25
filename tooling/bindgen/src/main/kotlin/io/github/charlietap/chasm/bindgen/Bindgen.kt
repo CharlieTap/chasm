@@ -50,22 +50,23 @@ private class KotlinPoetBindingGenerator(
                 "Chasm's direct host-function API."
         }
         require(config.runtime == CodegenRuntime.CHASM || tier is ExecutionTier.Interpreter) {
-            "ExecutionTier.Jit and ExecutionTier.Aot require CodegenRuntime.CHASM because they run on " +
+            "ExecutionTier.Compiled requires CodegenRuntime.CHASM because it runs on " +
                 "Chasm's own runtime."
         }
         require(config.runtime == CodegenRuntime.CHASM || !config.usesStoreSettings) {
             "runtimeConfig requires CodegenRuntime.CHASM because it configures Chasm's store"
         }
-        require(tier !is ExecutionTier.Aot || (config.runtimeConfig.limits.memory == MemoryLimits() && !config.runtimeConfig.stacktraces)) {
-            "an AOT module's runtime settings are fixed when it is compiled: set them in CompileConfig.runtime. " +
-                "For ExecutionTier.Aot, runtimeConfig may only set limits.cpu and interrupts, which shape the generated store controls"
+        val compiledSettingsOnly = config.runtimeConfig.limits.memory == MemoryLimits() && !config.runtimeConfig.stacktraces
+        require(tier !is ExecutionTier.Compiled || compiledSettingsOnly) {
+            "a compiled module's runtime settings are fixed when it is compiled: set them in CompileConfig.runtime. " +
+                "For ExecutionTier.Compiled, runtimeConfig may only set limits.cpu and interrupts, which shape the generated store controls"
         }
         val gcStringFunctions = options.functions.filter { function ->
             function.parameters.any { parameter -> parameter.stringEncodingStrategy.storedInGcArray } ||
                 function.returnType.stringEncodingStrategy.storedInGcArray
         }
         require(tier.managed || gcStringFunctions.isEmpty()) {
-            "StringEncodingStrategy.GC_UTF16_ARRAY and GC_UTF8_ARRAY require ExecutionTier.Jit or ExecutionTier.Aot, but " +
+            "StringEncodingStrategy.GC_UTF16_ARRAY and GC_UTF8_ARRAY require ExecutionTier.Compiled, but " +
                 "${gcStringFunctions.joinToString { function -> function.name }} use them."
         }
         val freedGcStringFunctions = options.functions.filter { function ->
@@ -77,10 +78,11 @@ private class KotlinPoetBindingGenerator(
             "freeAfterCall does not apply to GC_UTF16_ARRAY or GC_UTF8_ARRAY strings because the GC owns the array, but " +
                 "${freedGcStringFunctions.joinToString { function -> function.name }} set it."
         }
-        if (tier is ExecutionTier.Aot) {
-            require(QUALIFIED_CLASS_NAME.matches(tier.compiledModule)) {
-                "compiledModule must name a class as Kotlin source does, such as com.example.parser.ParserModule: " +
-                    "\"${tier.compiledModule}\" is not one."
+        val source = (tier as? ExecutionTier.Compiled)?.module
+        if (source is CompiledSource.Generated) {
+            require(QUALIFIED_CLASS_NAME.matches(source.className)) {
+                "className must name a class as Kotlin source does, such as com.example.parser.ParserModule: " +
+                    "\"${source.className}\" is not one."
             }
         }
         val wasmInterface = WasmInterfaceFactory()(
@@ -94,12 +96,8 @@ private class KotlinPoetBindingGenerator(
             ignoredExports = options.ignoredExports,
             logger = logger,
         )
-        require(tier !is ExecutionTier.Aot || !wasmInterface.linksWasiPreview1) {
-            "WasiLinking.AUTOMATIC is not supported for ExecutionTier.Aot yet. Use WasiLinking.DISABLED and " +
-                "pass the module's WASI imports."
-        }
-        require(tier !is ExecutionTier.Jit || !wasmInterface.linksWasiPreview1) {
-            "WasiLinking.AUTOMATIC is not supported for ExecutionTier.Jit yet. Use WasiLinking.DISABLED and " +
+        require(tier !is ExecutionTier.Compiled || !wasmInterface.linksWasiPreview1) {
+            "WasiLinking.AUTOMATIC is not supported for ExecutionTier.Compiled yet. Use WasiLinking.DISABLED and " +
                 "pass the module's WASI imports."
         }
         val controls = config.storeControls.map { control -> control.name }

@@ -1,0 +1,21 @@
+package io.github.charlietap.chasm.runtime.compiled.gc
+
+import io.github.charlietap.chasm.InternalChasmApi
+import io.github.charlietap.chasm.embedding.engine.Engine
+import io.github.charlietap.chasm.reference.ExceptionReference
+import io.github.charlietap.chasm.runtime.store.Store
+import kotlin.jvm.JvmField
+
+@InternalChasmApi
+class WasmException(
+    @JvmField val store: Store,
+    @JvmField val tag: Int,
+    @JvmField val words: LongArray,
+    @JvmField val references: Array<Any?>,
+) : ExceptionReference() {
+
+    override fun engine(): Engine {
+        val managedStore = checkNotNull(store.referenceStorage as ManagedStore?) { "the store of this exception has been dropped" }
+        return managedStore.engine
+    }
+}

@@ -7,7 +7,6 @@ import io.github.charlietap.chasm.compiler.backend.abi.GLOBAL_INSTANCE
 import io.github.charlietap.chasm.compiler.backend.abi.MANAGED_FUNCTION
 import io.github.charlietap.chasm.compiler.backend.abi.MEMORY_INSTANCE
 import io.github.charlietap.chasm.compiler.backend.abi.MODULE_INSTANCE
-import io.github.charlietap.chasm.compiler.backend.abi.OBJECT_TYPE
 import io.github.charlietap.chasm.compiler.backend.abi.REFERENCE_GLOBAL
 import io.github.charlietap.chasm.compiler.backend.abi.REFERENCE_SEGMENT
 import io.github.charlietap.chasm.compiler.backend.abi.REFERENCE_TABLE
@@ -45,7 +44,6 @@ internal class BindingLayout {
             is Resource.Function -> "function${resource.index}"
             is Resource.Element -> "element${resource.index}"
             is Resource.Data -> "data${resource.index}"
-            is Resource.TypeTest -> "typeTest$index"
             is Resource.Longs -> "longs$index"
             is Resource.FunctionReference -> "reference${resource.index}"
             is Resource.FunctionObject -> "functionObject${resource.index}"
@@ -109,7 +107,6 @@ internal fun bindingDescriptor(
     is Resource.Function -> FUNCTION_INSTANCE
     is Resource.Element -> ELEMENT_INSTANCE
     is Resource.Data -> DATA_INSTANCE
-    is Resource.TypeTest -> OBJECT_TYPE
     is Resource.Longs -> "[J"
     is Resource.FunctionReference -> "J"
     is Resource.FunctionObject -> MANAGED_FUNCTION

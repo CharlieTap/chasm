@@ -33,12 +33,25 @@ import io.github.charlietap.chasm.compiler.backend.abi.NULL_REFERENCE
 import io.github.charlietap.chasm.compiler.backend.abi.OBJECT_TYPE
 import io.github.charlietap.chasm.compiler.backend.abi.REFERENCE_SEGMENT
 import io.github.charlietap.chasm.compiler.backend.abi.REFILL_ALLOCATION
+import io.github.charlietap.chasm.compiler.backend.abi.RTT_TYPE
 import io.github.charlietap.chasm.compiler.backend.abi.Resource
+import io.github.charlietap.chasm.compiler.backend.abi.STORAGE_ARRAY_DATA_FIELD
 import io.github.charlietap.chasm.compiler.backend.analysis.form.Operand
 import io.github.charlietap.chasm.compiler.backend.analysis.form.immediate
 import io.github.charlietap.chasm.compiler.backend.analysis.form.slot
-import io.github.charlietap.chasm.compiler.backend.analysis.gc.ArrayShape
-import io.github.charlietap.chasm.compiler.backend.analysis.gc.ShapeField
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.ArrayElementKind
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.ArrayStorage
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.FieldStorage
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.LaneKind
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.StructStorage
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.arrayElementKind
+import io.github.charlietap.chasm.compiler.backend.dex.gc.HALF_BITS
+import io.github.charlietap.chasm.compiler.backend.dex.gc.allocateStruct
+import io.github.charlietap.chasm.compiler.backend.dex.gc.combineLanes
+import io.github.charlietap.chasm.compiler.backend.dex.gc.extendPacked
+import io.github.charlietap.chasm.compiler.backend.dex.gc.getLane
+import io.github.charlietap.chasm.compiler.backend.dex.gc.maskPacked
+import io.github.charlietap.chasm.compiler.backend.dex.gc.putLane
 import io.github.charlietap.chasm.runtime.execution.ARRAY_OVERHEAD
 import io.github.charlietap.chasm.runtime.execution.maximumArrayLength
 import io.github.charlietap.dexter.ArrayKind
@@ -139,13 +152,12 @@ private fun LowerContext.structNew(
     destination: Int,
 ) {
 
-    val shape = module.gc.struct(type.index)
-    chargeAllocation(module.shapeSizes.structBytes(shape))
-    emit.newInstance(Registers.OBJECT, shape.className)
-    emit.invokeConstructor(shape.className, Registers.OBJECT)
+    val storage = module.storagePlans.struct(type.index)
+    chargeAllocation(storage.bytes)
+    allocateStruct(storage, type.index)
 
     if (firstFieldSlot != null) {
-        shape.fields.forEachIndexed { index, field -> putFieldValue(Registers.OBJECT, field, slot(firstFieldSlot + index)) }
+        storage.fields.forEachIndexed { index, field -> putFieldValue(Registers.OBJECT, storage, field, slot(firstFieldSlot + index)) }
     }
 
     storeReference(destination, Registers.OBJECT)
@@ -158,8 +170,11 @@ private fun LowerContext.structGet(
     destination: Int,
     signed: Boolean?,
 ) {
+
+    val storage = module.storagePlans.struct(type.index)
+
     loadReference(Registers.OBJECT, addressSlot)
-    getFieldValue(Registers.OBJECT, module.gc.struct(type.index).fields[fieldIndex], destination, signed)
+    getFieldValue(Registers.OBJECT, storage, storage.fields[fieldIndex], destination, signed)
 }
 
 private fun LowerContext.structSet(
@@ -169,10 +184,11 @@ private fun LowerContext.structSet(
     value: Operand,
 ) {
 
-    val field = module.gc.struct(type.index).fields[fieldIndex]
+    val storage = module.storagePlans.struct(type.index)
+
     loadReference(Registers.OBJECT, addressSlot)
-    receiver(Registers.OBJECT, field.owner)
-    putFieldValue(Registers.OBJECT, field, value)
+    receiver(Registers.OBJECT, storage.className)
+    putFieldValue(Registers.OBJECT, storage, storage.fields[fieldIndex], value)
 }
 
 private fun LowerContext.refCastStructGet(
@@ -189,19 +205,22 @@ private fun LowerContext.refCastStructGet(
     trap(CAST_FAILED)
     emit.place(matches)
 
-    getFieldValue(Registers.OBJECT, module.gc.struct(type.index).fields[fieldIndex], destination, signed = null)
+    val storage = module.storagePlans.struct(type.index)
+    getFieldValue(Registers.OBJECT, storage, storage.fields[fieldIndex], destination, signed = null)
 }
 
 private fun LowerContext.structGetStructGet(
     instruction: AggregateInstruction.StructGetStructGetS,
 ) {
 
-    val first = module.gc.struct(instruction.firstType.index).fields[instruction.firstFieldIndex]
-    loadReference(Registers.OBJECT, instruction.addressSlot)
-    receiver(Registers.OBJECT, first.owner)
-    emit.getField(Registers.OBJECT, Registers.OBJECT, first.owner, first.name, first.descriptor)
+    val first = module.storagePlans.struct(instruction.firstType.index)
+    val second = module.storagePlans.struct(instruction.secondType.index)
 
-    getFieldValue(Registers.OBJECT, module.gc.struct(instruction.secondType.index).fields[instruction.secondFieldIndex], instruction.destinationSlot, signed = null)
+    loadReference(Registers.OBJECT, instruction.addressSlot)
+    receiver(Registers.OBJECT, first.className)
+    getLane(Registers.OBJECT, Registers.OBJECT, first, first.fields[instruction.firstFieldIndex].lanes.single())
+
+    getFieldValue(Registers.OBJECT, second, second.fields[instruction.secondFieldIndex], instruction.destinationSlot, signed = null)
 }
 
 private fun LowerContext.arrayNew(
@@ -211,24 +230,24 @@ private fun LowerContext.arrayNew(
     destination: Int,
 ) {
 
-    val shape = module.gc.array(type.index)
+    val storage = module.storagePlans.array(type.index)
+    val element = arrayElement(type)
     loadInt(Registers.I1, Registers.W0, size)
-    chargeArray(shape, Registers.I1)
-    emit.newArray(Registers.SECOND_OBJECT, Registers.I1, shape.data.descriptor)
+    chargeArray(storage.elementShift, Registers.I1)
+    emit.newArray(Registers.SECOND_OBJECT, Registers.I1, element.arrayDescriptor)
 
     if (value != null && !(value is Operand.Immediate && value.bits == 0L)) {
-        fillArray(shape, value)
+        fillArray(element.descriptor, value)
     }
 
-    wrapArray(shape, destination)
+    wrapArray(type, storage, element, destination)
 }
 
 private fun LowerContext.fillArray(
-    shape: ArrayShape,
+    element: String,
     value: Operand,
 ) {
 
-    val element = shape.data.descriptor.substring(1)
     val fill = MethodRef(ARRAYS, "fill", listOf(fillArrayDescriptor(element), fillValueDescriptor(element)), "V")
 
     when (element) {
@@ -263,27 +282,26 @@ private fun LowerContext.arrayNewFixed(
     destination: Int,
 ) {
 
-    val shape = module.gc.array(type.index)
-    val element = shape.data.descriptor.substring(1)
-    chargeAllocation(module.shapeSizes.arrayBytes(size, module.shapeSizes.arrayShift(shape)))
+    val storage = module.storagePlans.array(type.index)
+    val element = arrayElement(type)
+    chargeAllocation((size shl storage.elementShift) + ARRAY_OVERHEAD)
     emit.const(Registers.I1, size)
-    emit.newArray(Registers.SECOND_OBJECT, Registers.I1, shape.data.descriptor)
+    emit.newArray(Registers.SECOND_OBJECT, Registers.I1, element.arrayDescriptor)
 
     for (index in 0 until size) {
         emit.const(Registers.I3, index)
-        val value = loadElement(element, slot(firstElementSlot + index))
-        emit.arrayPut(arrayKind(element), value, Registers.SECOND_OBJECT, Registers.I3)
+        val value = loadElement(element.descriptor, slot(firstElementSlot + index))
+        emit.arrayPut(arrayKind(element.descriptor), value, Registers.SECOND_OBJECT, Registers.I3)
     }
 
-    wrapArray(shape, destination)
+    wrapArray(type, storage, element, destination)
 }
 
 private fun LowerContext.chargeArray(
-    shape: ArrayShape,
+    shift: Int,
     length: Int,
 ) {
 
-    val shift = module.shapeSizes.arrayShift(shape)
     val exhausted = trapLabel(GUEST_HEAP_EXHAUSTED)
     emit.branchZero(Cond.Lt, length, exhausted)
     emit.const(Registers.W0 + 1, maximumArrayLength(shift))
@@ -317,12 +335,26 @@ private fun LowerContext.chargeRegister(
 private const val I31_BYTES = 16
 
 private fun LowerContext.wrapArray(
-    shape: ArrayShape,
+    type: TypeIndex,
+    storage: ArrayStorage,
+    element: ArrayElementKind,
     destination: Int,
 ) {
-    emit.newInstance(Registers.OBJECT, shape.className)
-    emit.invokeConstructor(shape.className, shape.data.descriptor, Registers.OBJECT, Registers.SECOND_OBJECT)
+    loadObject(Registers.THIRD_OBJECT, Resource.Rtt(type.index), RTT_TYPE)
+    emit.newInstance(Registers.OBJECT, storage.className)
+    emit.invokeConstructor(
+        storage.className,
+        RTT_TYPE,
+        element.arrayDescriptor,
+        Registers.OBJECT,
+        Registers.THIRD_OBJECT,
+        Registers.SECOND_OBJECT,
+    )
     storeReference(destination, Registers.OBJECT)
+}
+
+private fun LowerContext.arrayElement(type: TypeIndex): ArrayElementKind {
+    return arrayElementKind(declarations.arrayElement(type))
 }
 
 private fun LowerContext.arrayGet(
@@ -333,9 +365,8 @@ private fun LowerContext.arrayGet(
     signed: Boolean?,
 ) {
 
-    val data = module.gc.array(type.index).data
-    val element = data.descriptor.substring(1)
-    loadArrayData(addressSlot, data, index)
+    val element = arrayElement(type).descriptor
+    loadArrayData(addressSlot, type, index)
 
     when (element) {
         "J", "D" -> {
@@ -361,21 +392,19 @@ private fun LowerContext.arraySet(
     value: Operand,
 ) {
 
-    val data = module.gc.array(type.index).data
-    val element = data.descriptor.substring(1)
-    loadArrayData(addressSlot, data, index)
+    val element = arrayElement(type).descriptor
+    loadArrayData(addressSlot, type, index)
 
     emit.arrayPut(arrayKind(element), loadElement(element, value), Registers.SECOND_OBJECT, Registers.I1)
 }
 
 private fun LowerContext.loadArrayData(
     addressSlot: Int,
-    data: ShapeField,
+    type: TypeIndex,
     index: Operand,
 ) {
     loadReference(Registers.OBJECT, addressSlot)
-    receiver(Registers.OBJECT, data.owner)
-    emit.getField(Registers.SECOND_OBJECT, Registers.OBJECT, data.owner, data.name, data.descriptor)
+    loadStorageData(type)
     loadInt(Registers.I1, Registers.W0, index)
     emit.arrayLength(Registers.I0, Registers.SECOND_OBJECT)
     emit.branchZero(Cond.Lt, Registers.I1, trapLabel(ARRAY_OUT_OF_BOUNDS))
@@ -405,7 +434,7 @@ private fun LowerContext.arrayFill(
     count: Operand,
 ) {
 
-    val element = module.gc.array(type.index).data.descriptor.substring(1)
+    val element = arrayElement(type).descriptor
     loadReference(Registers.OBJECT, addressSlot)
     loadInt(Registers.I0, Registers.W0, offset)
 
@@ -443,18 +472,19 @@ private fun LowerContext.arrayNewData(
     destination: Int,
 ) {
 
-    val shape = module.gc.array(type.index)
+    val storage = module.storagePlans.array(type.index)
+    val element = arrayElement(type)
     loadObject(Registers.OBJECT, Resource.Data(data), DATA_INSTANCE)
     loadInt(Registers.I0, Registers.W0, offset)
     loadInt(Registers.I1, Registers.W1, length)
     emit.const(Registers.I3, width)
     emit.invoke(CHECK_DATA_RANGE, Registers.OBJECT, Registers.I0, Registers.I1, Registers.I3)
-    chargeArray(shape, Registers.I1)
-    emit.newArray(Registers.SECOND_OBJECT, Registers.I1, shape.data.descriptor)
+    chargeArray(storage.elementShift, Registers.I1)
+    emit.newArray(Registers.SECOND_OBJECT, Registers.I1, element.arrayDescriptor)
     emit.const(Registers.I3, 0)
     emit.invoke(COPY_DATA, Registers.OBJECT, Registers.I0, Registers.SECOND_OBJECT, Registers.I3, Registers.I1)
 
-    wrapArray(shape, destination)
+    wrapArray(type, storage, element, destination)
 }
 
 private fun LowerContext.arrayNewElement(
@@ -465,17 +495,18 @@ private fun LowerContext.arrayNewElement(
     destination: Int,
 ) {
 
-    val shape = module.gc.array(type.index)
+    val storage = module.storagePlans.array(type.index)
+    val kind = arrayElement(type)
     loadObject(Registers.OBJECT, Resource.ReferenceSegment(element), REFERENCE_SEGMENT)
     loadInt(Registers.I0, Registers.W0, offset)
     loadInt(Registers.I1, Registers.W1, length)
     emit.invoke(CHECK_ELEMENT_RANGE, Registers.OBJECT, Registers.I0, Registers.I1)
-    chargeArray(shape, Registers.I1)
-    emit.newArray(Registers.SECOND_OBJECT, Registers.I1, shape.data.descriptor)
+    chargeArray(storage.elementShift, Registers.I1)
+    emit.newArray(Registers.SECOND_OBJECT, Registers.I1, kind.arrayDescriptor)
     emit.const(Registers.I3, 0)
     emit.invoke(COPY_ELEMENTS, Registers.OBJECT, Registers.I0, Registers.SECOND_OBJECT, Registers.I3, Registers.I1)
 
-    wrapArray(shape, destination)
+    wrapArray(type, storage, kind, destination)
 }
 
 private fun LowerContext.arrayInitData(
@@ -535,11 +566,17 @@ private fun LowerContext.arrayLen(
         return storeInt(destination, Registers.I0)
     }
 
-    val data = module.gc.array(type.index).data
-    receiver(Registers.OBJECT, data.owner)
-    emit.getField(Registers.SECOND_OBJECT, Registers.OBJECT, data.owner, data.name, data.descriptor)
+    loadStorageData(type)
     emit.arrayLength(Registers.I0, Registers.SECOND_OBJECT)
     storeInt(destination, Registers.I0)
+}
+
+private fun LowerContext.loadStorageData(type: TypeIndex) {
+
+    val className = module.storagePlans.array(type.index).className
+
+    receiver(Registers.OBJECT, className)
+    emit.getField(Registers.SECOND_OBJECT, Registers.OBJECT, className, STORAGE_ARRAY_DATA_FIELD, arrayElement(type).arrayDescriptor)
 }
 
 private fun LowerContext.refI31(
@@ -583,45 +620,64 @@ private fun LowerContext.receiver(
 
 private fun LowerContext.getFieldValue(
     receiverRegister: Int,
-    field: ShapeField,
+    storage: StructStorage,
+    field: FieldStorage,
     destination: Int,
     signed: Boolean?,
 ) {
 
-    receiver(receiverRegister, field.owner)
+    receiver(receiverRegister, storage.className)
 
-    when (val descriptor = field.descriptor) {
-        "J" -> {
-            emit.getField(Registers.W0, receiverRegister, field.owner, field.name, descriptor)
-            store(destination, Registers.W0)
-        }
-        "D" -> {
-            emit.getField(Registers.W0, receiverRegister, field.owner, field.name, descriptor)
-            storeDouble(destination, Registers.W0)
-        }
-        "F" -> {
-            emit.getField(Registers.I0, receiverRegister, field.owner, field.name, descriptor)
-            storeFloat(destination, Registers.I0)
-        }
-        "I", "B", "C" -> {
-            emit.getField(Registers.I0, receiverRegister, field.owner, field.name, descriptor)
-            widenStorage(descriptor, Registers.I0, signed)
-            storeInt(destination, Registers.I0)
-        }
-        else -> {
-            emit.getField(Registers.SECOND_OBJECT, receiverRegister, field.owner, field.name, descriptor)
-            storeReference(destination, Registers.SECOND_OBJECT)
-        }
+    val lanes = field.lanes
+    if (lanes.size == 2) {
+        getLane(Registers.I0, receiverRegister, storage, lanes[0])
+        getLane(Registers.I1, receiverRegister, storage, lanes[1])
+        combineLanes(Registers.W0, Registers.I0, Registers.I1)
+        store(destination, Registers.W0)
+        return
     }
+
+    val lane = lanes.single()
+    if (lane.kind == LaneKind.REFERENCE) {
+        getLane(Registers.SECOND_OBJECT, receiverRegister, storage, lane)
+        storeReference(destination, Registers.SECOND_OBJECT)
+        return
+    }
+
+    getLane(Registers.I0, receiverRegister, storage, lane)
+    extendPacked(field.type, Registers.I0, signed)
+    storeInt(destination, Registers.I0)
 }
 
 private fun LowerContext.putFieldValue(
     receiverRegister: Int,
-    field: ShapeField,
+    storage: StructStorage,
+    field: FieldStorage,
     value: Operand,
 ) {
-    val register = loadStorage(field.descriptor, value, Registers.SECOND_OBJECT)
-    emit.putField(register, receiverRegister, field.owner, field.name, field.descriptor)
+
+    val lanes = field.lanes
+    if (lanes.size == 2) {
+        loadWide(Registers.W1, value)
+        emit.convert(Conversion.LongToInt, Registers.I0, Registers.W1)
+        putLane(Registers.I0, receiverRegister, storage, lanes[0])
+        emit.const(Registers.NARROW, HALF_BITS)
+        emit.binary(BinaryOp.UshrLong, Registers.W1, Registers.W1, Registers.NARROW)
+        emit.convert(Conversion.LongToInt, Registers.I0, Registers.W1)
+        putLane(Registers.I0, receiverRegister, storage, lanes[1])
+        return
+    }
+
+    val lane = lanes.single()
+    if (lane.kind == LaneKind.REFERENCE) {
+        loadReference(Registers.SECOND_OBJECT, value)
+        putLane(Registers.SECOND_OBJECT, receiverRegister, storage, lane)
+        return
+    }
+
+    loadInt(Registers.I0, Registers.W0, value)
+    maskPacked(field.type, Registers.I0)
+    putLane(Registers.I0, receiverRegister, storage, lane)
 }
 
 private fun LowerContext.loadElement(

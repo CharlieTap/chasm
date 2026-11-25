@@ -50,47 +50,49 @@ class ConstructionCodegenTest {
     )
 
     @Test
-    fun `generates JIT construction`() = assertConstruction(
-        scenario = "JitConstruction",
-        config = codegenConfig(executionTier = ExecutionTier.Jit()),
+    fun `generates construction from a loaded compiled module`() = assertConstruction(
+        scenario = "LoadedConstruction",
+        config = codegenConfig(executionTier = ExecutionTier.Compiled(CompiledSource.Loaded())),
         runtimes = listOf(CodegenRuntime.CHASM),
     )
 
     @Test
-    fun `generates AOT construction`() = assertConstruction(
-        scenario = "AotConstruction",
-        config = codegenConfig(executionTier = ExecutionTier.Aot("com.test.aot.WasmModule")),
+    fun `generates construction from a generated compiled module`() = assertConstruction(
+        scenario = "CompiledConstruction",
+        config = codegenConfig(executionTier = ExecutionTier.Compiled(CompiledSource.Generated("com.test.aot.WasmModule"))),
         runtimes = listOf(CodegenRuntime.CHASM),
     )
 
     @Test
-    fun `generates AOT construction with store controls`() = assertConstruction(
-        scenario = "AotStoreControlsConstruction",
+    fun `generates compiled construction with store controls`() = assertConstruction(
+        scenario = "CompiledStoreControlsConstruction",
         config = codegenConfig(
-            executionTier = ExecutionTier.Aot("com.test.aot.WasmModule"),
+            executionTier = ExecutionTier.Compiled(CompiledSource.Generated("com.test.aot.WasmModule")),
             runtimeConfig = RuntimeConfig(interrupts = true, limits = Limits(cpu = CpuLimits.Metered(1_000.fuel))),
         ),
         runtimes = listOf(CodegenRuntime.CHASM),
     )
 
     @Test
-    fun `generates AOT construction from a compiled module bridge object`() = assertConstruction(
-        scenario = "AotBridgeConstruction",
-        config = codegenConfig(executionTier = ExecutionTier.Aot("com.test.AotBridgeConstructionCompiledModule")),
+    fun `generates compiled construction from a compiled module bridge object`() = assertConstruction(
+        scenario = "CompiledBridgeConstruction",
+        config = codegenConfig(executionTier = ExecutionTier.Compiled(CompiledSource.Generated("com.test.CompiledBridgeConstructionCompiledModule"))),
         runtimes = listOf(CodegenRuntime.CHASM),
     )
 
     @Test
     fun `generates construction with store settings`() = assertConstruction(
         scenario = "StoreSettingsConstruction",
-        config = storeSettings(ExecutionTier.Interpreter()),
-        runtimes = listOf(CodegenRuntime.CHASM),
-    )
-
-    @Test
-    fun `generates JIT construction with store settings`() = assertConstruction(
-        scenario = "JitStoreSettingsConstruction",
-        config = storeSettings(ExecutionTier.Jit()),
+        config = codegenConfig(
+            runtimeConfig = RuntimeConfig(
+                interrupts = true,
+                stacktraces = true,
+                limits = Limits(
+                    cpu = CpuLimits.Metered(1_000.fuel),
+                    memory = MemoryLimits(linearMemory = 1.MB, gcHeap = 1.MB),
+                ),
+            ),
+        ),
         runtimes = listOf(CodegenRuntime.CHASM),
     )
 
@@ -208,20 +210,6 @@ class ConstructionCodegenTest {
 
         assertContains(error.message.orEmpty(), "public implementation for internal interface InternalService")
     }
-
-    private fun storeSettings(
-        executionTier: ExecutionTier,
-    ) = codegenConfig(
-        executionTier = executionTier,
-        runtimeConfig = RuntimeConfig(
-            interrupts = true,
-            stacktraces = true,
-            limits = Limits(
-                cpu = CpuLimits.Metered(1_000.fuel),
-                memory = MemoryLimits(linearMemory = 1.MB, gcHeap = 1.MB),
-            ),
-        ),
-    )
 
     private fun assertConstruction(
         scenario: String,

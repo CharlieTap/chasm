@@ -29,7 +29,11 @@ class BindingGeneratorTest {
 
     @Test
     fun `every execution tier generates the interface and its implementation`() {
-        val tiers = listOf(ExecutionTier.Interpreter(), ExecutionTier.Jit(), ExecutionTier.Aot("com.example.aot.WasmModule"))
+        val tiers = listOf(
+            ExecutionTier.Interpreter(),
+            ExecutionTier.Compiled(CompiledSource.Loaded()),
+            ExecutionTier.Compiled(CompiledSource.Generated("com.example.aot.WasmModule")),
+        )
 
         tiers.forEach { tier ->
             val config = CodegenConfig(runtime = CodegenRuntime.CHASM, executionTier = tier)
@@ -44,35 +48,49 @@ class BindingGeneratorTest {
     }
 
     @Test
-    fun `compiled tiers cannot link WASI imports automatically yet`() {
+    fun `compiled sources cannot link WASI imports automatically yet`() {
 
-        val tiers = listOf(ExecutionTier.Jit(), ExecutionTier.Aot("com.example.aot.WasmModule"))
         val info = moduleInfo(imports = listOf(importDefinition(moduleName = "wasi_snapshot_preview1", entityName = "fd_write")))
 
-        tiers.forEach { tier ->
+        COMPILED_SOURCES.forEach { source ->
 
-            val config = CodegenConfig(runtime = CodegenRuntime.CHASM, wasi = WasiLinking.AUTOMATIC, executionTier = tier)
+            val config = CodegenConfig(runtime = CodegenRuntime.CHASM, wasi = WasiLinking.AUTOMATIC, executionTier = ExecutionTier.Compiled(source))
 
-            assertFailsWith<IllegalArgumentException>(tier::class.simpleName) {
+            assertFailsWith<IllegalArgumentException>(source::class.simpleName) {
                 BindingGenerator().generate(info, BindingOptions(interfaceName = "Service", packageName = "com.example", config = config))
             }
         }
     }
 
     @Test
-    fun `compiled tiers generate with automatic WASI linking when the module imports no WASI`() {
-        val tiers = listOf(ExecutionTier.Jit(), ExecutionTier.Aot("com.example.aot.WasmModule"))
+    fun `compiled sources generate with automatic WASI linking when the module imports no WASI`() {
+        COMPILED_SOURCES.forEach { source ->
 
-        tiers.forEach { tier ->
-            val config = CodegenConfig(runtime = CodegenRuntime.CHASM, wasi = WasiLinking.AUTOMATIC, executionTier = tier)
+            val config = CodegenConfig(runtime = CodegenRuntime.CHASM, wasi = WasiLinking.AUTOMATIC, executionTier = ExecutionTier.Compiled(source))
 
             val files = BindingGenerator().generate(
                 moduleInfo(),
                 BindingOptions(interfaceName = "Service", packageName = "com.example", config = config),
             )
 
-            assertEquals(listOf("Service", "ServiceImpl"), files.map { file -> file.name }, tier::class.simpleName)
+            assertEquals(listOf("Service", "ServiceImpl"), files.map { file -> file.name }, source::class.simpleName)
         }
+    }
+
+    @Test
+    fun `a loaded compiled module refuses memory limits`() {
+
+        val config = CodegenConfig(
+            runtime = CodegenRuntime.CHASM,
+            executionTier = ExecutionTier.Compiled(CompiledSource.Loaded()),
+            runtimeConfig = RuntimeConfig(limits = Limits(memory = MemoryLimits(linearMemory = 1.MB, gcHeap = 1.MB))),
+        )
+
+        val failure = assertFailsWith<IllegalArgumentException> {
+            BindingGenerator().generate(moduleInfo(), BindingOptions(interfaceName = "Service", packageName = "com.example", config = config))
+        }
+
+        assertTrue("CompileConfig.runtime" in failure.message.orEmpty(), failure.message)
     }
 
     @Test
@@ -91,21 +109,26 @@ class BindingGeneratorTest {
     @Test
     fun `configurations no tier can serve fail generation`() {
         val rejected = listOf(
-            CodegenConfig(runtime = CodegenRuntime.PORTABLE_VM, executionTier = ExecutionTier.Jit()),
-            CodegenConfig(runtime = CodegenRuntime.PORTABLE_VM, executionTier = ExecutionTier.Aot("com.example.aot.WasmModule")),
+            CodegenConfig(runtime = CodegenRuntime.PORTABLE_VM, executionTier = ExecutionTier.Compiled(CompiledSource.Loaded())),
+            CodegenConfig(runtime = CodegenRuntime.PORTABLE_VM, executionTier = ExecutionTier.Compiled(CompiledSource.Generated("com.example.aot.WasmModule"))),
             CodegenConfig(runtime = CodegenRuntime.PORTABLE_VM, runtimeConfig = RuntimeConfig(limits = Limits(cpu = CpuLimits.Metered(10.fuel)))),
             CodegenConfig(runtime = CodegenRuntime.PORTABLE_VM, runtimeConfig = RuntimeConfig(limits = Limits(memory = MemoryLimits(linearMemory = 1.MB)))),
             CodegenConfig(runtime = CodegenRuntime.PORTABLE_VM, runtimeConfig = RuntimeConfig(interrupts = true)),
             CodegenConfig(runtime = CodegenRuntime.PORTABLE_VM, runtimeConfig = RuntimeConfig(stacktraces = true)),
-            CodegenConfig(runtime = CodegenRuntime.CHASM, executionTier = ExecutionTier.Aot("com.example.Outer\$Inner")),
+            CodegenConfig(runtime = CodegenRuntime.CHASM, executionTier = ExecutionTier.Compiled(CompiledSource.Generated("com.example.Outer\$Inner"))),
             CodegenConfig(
                 runtime = CodegenRuntime.CHASM,
-                executionTier = ExecutionTier.Aot("com.example.aot.WasmModule"),
+                executionTier = ExecutionTier.Compiled(CompiledSource.Generated("com.example.aot.WasmModule")),
                 runtimeConfig = RuntimeConfig(limits = Limits(memory = MemoryLimits(linearMemory = 1.MB))),
             ),
             CodegenConfig(
                 runtime = CodegenRuntime.CHASM,
-                executionTier = ExecutionTier.Aot("com.example.aot.WasmModule"),
+                executionTier = ExecutionTier.Compiled(CompiledSource.Generated("com.example.aot.WasmModule")),
+                runtimeConfig = RuntimeConfig(stacktraces = true),
+            ),
+            CodegenConfig(
+                runtime = CodegenRuntime.CHASM,
+                executionTier = ExecutionTier.Compiled(CompiledSource.Loaded()),
                 runtimeConfig = RuntimeConfig(stacktraces = true),
             ),
         )
@@ -137,5 +160,9 @@ class BindingGeneratorTest {
         val files = BindingGenerator().generate(info, BindingOptions(interfaceName = "Service", packageName = "com.example", config = config))
 
         assertEquals(listOf("Service", "ServiceImpl"), files.map { file -> file.name })
+    }
+
+    private companion object {
+        val COMPILED_SOURCES = listOf(CompiledSource.Loaded(), CompiledSource.Generated("com.example.aot.WasmModule"))
     }
 }

@@ -146,23 +146,21 @@ there is no useful opportunity to prepare it ahead of invocation.
 
 ### Engines
 
-Chasm runs modules on three engines: an interpreter, a JIT for Android and
-an ahead-of-time (AOT) compiler for the JVM and Android. Every call above
-works on all three; only the store and, for AOT, the module are created
-differently:
+Chasm runs modules on two engines: an interpreter, and a runtime for
+compiled modules, `runtime-compiled`, on the JVM and Android. Modules are
+compiled to JVM classes by `chasm-jvm-compiler` or to DEX by
+`chasm-dex-compiler`, ahead of time or on the device. Every call above works
+on both engines; only the store and, for compiled modules, the module are
+created differently:
 
 ```kotlin
 // interpreter: io.github.charlietap.chasm:chasm
 val store = io.github.charlietap.chasm.embedding.store()
 val module = module(wasmFileAsByteArray).expect("Failed to decode module")
 
-// JIT: io.github.charlietap.chasm:chasm-jit
-val store = io.github.charlietap.chasm.jit.store()
-val module = module(wasmFileAsByteArray).expect("Failed to decode module")
-
-// AOT: io.github.charlietap.chasm:runtime-aot, with the module compiled at build time
-val module = io.github.charlietap.chasm.aot.module(ExampleModule.COMPILED).expect("Failed to load module")
-val store = io.github.charlietap.chasm.aot.store(module)
+// compiled: io.github.charlietap.chasm:runtime-compiled, with the module compiled at build time
+val module = io.github.charlietap.chasm.compiled.module(ExampleModule.COMPILED).expect("Failed to load module")
+val store = io.github.charlietap.chasm.compiled.store(module)
 ```
 
 A store runs modules on one engine only, so a module made for one engine
@@ -170,13 +168,60 @@ cannot be instantiated in a store of another.
 
 Every engine takes the same `RuntimeConfig`: stack traces, interrupts and
 the [resource limits](./docs/limits.md) a store enforces. The interpreter
-and the JIT take it when the store is created, `store(RuntimeConfig(...))`.
-An AOT module is compiled with it, so its store is made from the module.
-The interpreter and AOT keep WebAssembly GC objects in Chasm's own
-[collected heap](./docs/gc.md), while the JIT allocates them as ordinary
-JVM objects, so some limits behave differently there. Compiling modules
-ahead of time, and the contract the compiled classes keep, are described in
-[Ahead-of-time compilation](./docs/aot.md).
+takes it when the store is created, `store(RuntimeConfig(...))`.
+A compiled module takes it at compile time, so its store is made from the
+module. The interpreter keeps WebAssembly GC objects in Chasm's own
+[collected heap](./docs/gc.md), while compiled modules allocate them as
+ordinary JVM objects, so some limits behave differently there. Compiling
+modules ahead of time, and the contract the compiled classes keep, are
+described in [Ahead-of-time compilation](./docs/aot.md). Moving from
+`chasm-aot` or `chasm-jit`? See
+[Migrating compiled modules to 3.0](./CHANGELOG.md#migrating-compiled-modules-to-30).
+
+### Loading DEX from files
+
+`chasm-dex-compiler` compiles a module to DEX and `runtime-compiled` loads
+it on the device with `module(DexInput.directory(path), className)` or
+`module(DexInput.jar(path), className)`. Files let ART verify, optimise and
+cache the code like any other secondary DEX; `DexInput.memory` code never is.
+
+Android only loads DEX files named `classes.dex`, `classes2.dex`, ..., so
+the names cannot say which module they belong to. One directory or jar
+therefore holds exactly one module from one compile:
+
+- `DexOutput.directory(path)` writes only into a missing or empty
+  directory and fails at stage `OUTPUT` otherwise. A directory that kept an
+  older compile could hand its `classes3.dex` to a newer module, and
+  clearing it first could delete files a loaded module still uses.
+- `DexOutput.jar(path)` writes a temporary jar and renames it over `path`
+  once the compile succeeds.
+- Every file is made read-only, as Android 14 and later require.
+
+To replace a module, compile it into a new directory (or a new jar, or
+rename a new jar over the old one), load it from there, and delete the old
+directory only once no module, store or instance loaded from it is still in
+use. A directory named after the Wasm module and its compile settings works
+as a cache:
+
+```kotlin
+val directory = cache.resolve("$wasmHash-$settingsName-$appVersion")
+if (!Files.isDirectory(directory)) {
+    val staging = Files.createTempDirectory(cache, "compiling")
+    compile(wasm, DexOutput.directory(staging), config).expect("compiles")
+    Files.move(staging, directory, StandardCopyOption.ATOMIC_MOVE)
+}
+val module = module(DexInput.directory(directory), config.className).expect("loads")
+```
+
+DEX compiled somewhere else, such as on a server, loads the same way once it
+is on the device. On Android 14 and later `DexInput.directory` and
+`DexInput.jar` refuse a writable DEX file with `ModuleError.Malformed`, so
+make each downloaded or copied file read-only (`File.setReadOnly()`) before
+loading it, and download into a new directory or a temporary jar that is
+renamed into place rather than over files a loaded module still uses.
+`DexInput.directory` loads `classes.dex`, `classes2.dex` and so on up to the
+first missing number and ignores any other DEX file, so a gap in the numbering
+leaves the files after it out and `module()` fails, naming a missing class.
 
 ### Imports
 

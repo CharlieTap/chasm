@@ -1,0 +1,77 @@
+@file:OptIn(ExperimentalChasmApi::class)
+
+package com.test
+
+import io.github.charlietap.chasm.ExperimentalChasmApi
+import io.github.charlietap.chasm.compiled.store
+import io.github.charlietap.chasm.embedding.codegen.CodegenImport
+import io.github.charlietap.chasm.embedding.codegen.allocateImports
+import io.github.charlietap.chasm.embedding.exports
+import io.github.charlietap.chasm.embedding.global.readGlobal
+import io.github.charlietap.chasm.embedding.global.writeGlobal
+import io.github.charlietap.chasm.embedding.instance
+import io.github.charlietap.chasm.embedding.shapes.Global
+import io.github.charlietap.chasm.embedding.shapes.Instance
+import io.github.charlietap.chasm.embedding.shapes.Module
+import io.github.charlietap.chasm.embedding.shapes.Store
+import io.github.charlietap.chasm.embedding.shapes.`expect`
+import kotlin.Double
+import kotlin.Float
+import kotlin.Int
+import kotlin.Long
+import kotlin.OptIn
+import kotlin.collections.List
+
+public suspend fun loadedGlobals(module: Module, imports: List<CodegenImport> = emptyList()): LoadedGlobals {
+  val store = store(module)
+  val allocatedImports = allocateImports(store, imports)
+  val instance = instance(store, module, allocatedImports).`expect`("Failed to instantiate module")
+  return LoadedGlobalsImpl(store = store, instance = instance)
+}
+
+private class LoadedGlobalsImpl(
+  private val store: Store,
+  private val instance: Instance,
+) : LoadedGlobals {
+  private val _intValue: Global =
+      exports(instance).global("int_value") ?: error("Failed to find global export with name int_value")
+
+  override var intValue: Int
+    get() = readGlobal(_intValue).toInt()
+    set(newValue) {
+      writeGlobal(_intValue, newValue.toLong())
+    }
+
+  private val _longValue: Global =
+      exports(instance).global("long_value") ?: error("Failed to find global export with name long_value")
+
+  override var longValue: Long
+    get() = readGlobal(_longValue)
+    set(newValue) {
+      writeGlobal(_longValue, newValue)
+    }
+
+  private val _floatValue: Global =
+      exports(instance).global("float_value") ?: error("Failed to find global export with name float_value")
+
+  override var floatValue: Float
+    get() = Float.fromBits(readGlobal(_floatValue).toInt())
+    set(newValue) {
+      writeGlobal(_floatValue, newValue.toRawBits().toLong())
+    }
+
+  private val _doubleValue: Global =
+      exports(instance).global("double_value") ?: error("Failed to find global export with name double_value")
+
+  override var doubleValue: Double
+    get() = Double.fromBits(readGlobal(_doubleValue))
+    set(newValue) {
+      writeGlobal(_doubleValue, newValue.toRawBits())
+    }
+
+  private val _constant: Global =
+      exports(instance).global("constant") ?: error("Failed to find global export with name constant")
+
+  override val constant: Int
+    get() = readGlobal(_constant).toInt()
+}

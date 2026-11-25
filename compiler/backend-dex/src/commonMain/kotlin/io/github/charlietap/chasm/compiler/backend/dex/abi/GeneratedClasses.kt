@@ -6,33 +6,27 @@ import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.compiler.backend.abi.MethodRef
 import io.github.charlietap.chasm.compiler.backend.abi.returnDescriptor
 import io.github.charlietap.chasm.runtime.compiled.CHUNK_METHOD_SEPARATOR
-import io.github.charlietap.chasm.runtime.compiled.CODE_CLASS_PREFIX
 import io.github.charlietap.chasm.runtime.compiled.FUNCTION_METHOD_PREFIX
 import io.github.charlietap.chasm.runtime.compiled.TRAP_DIAGNOSTICS_SOURCE_FILE
 import io.github.charlietap.chasm.type.FunctionType
 
-internal fun codeClass(
-    packagePath: String,
-    batch: Int,
-) = "L$packagePath/$CODE_CLASS_PREFIX$batch;"
-
 internal fun entryClass(
-    packagePath: String,
+    entryPath: String,
     index: Int,
-) = "L$packagePath/Entry$index;"
+): String {
+    return "L$entryPath\$Entry$index;"
+}
 
-internal fun installClass(
-    packagePath: String,
-) = "L$packagePath/Install;"
+internal fun installClass(entryPath: String): String {
+    return "L$entryPath\$Install;"
+}
 
-internal fun constantsClass(
-    packagePath: String,
-) = "L$packagePath/Constants;"
-
-internal fun signatureClass(
-    packagePath: String,
-    index: Int,
-) = "L$packagePath/Sig$index;"
+internal fun installEntriesClass(
+    entryPath: String,
+    group: Int,
+): String {
+    return "L$entryPath\$InstallEntries$group;"
+}
 
 internal fun functionName(
     index: Int,

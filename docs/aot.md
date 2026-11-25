@@ -1,26 +1,28 @@
 # Ahead-of-time compilation in Chasm
 
-`chasm-aot` compiles a WebAssembly module to JVM classes, usually at build
-time. `runtime-aot` runs those classes, on the JVM or on Android, with the same
-embedding API as the other engines: `instance` and `invoke` are unchanged, and
-only the module and the store are created differently.
+`chasm-jvm-compiler` compiles a WebAssembly module to JVM classes, usually at
+build time. `runtime-compiled` runs those classes, on the JVM or on Android,
+with the same embedding API as the interpreter: `instance` and `invoke` are
+unchanged, and only the module and the store are created differently.
 
 ```kotlin
 dependencies {
-    implementation("io.github.charlietap.chasm:runtime-aot:3.0.0")
+    implementation("io.github.charlietap.chasm:runtime-compiled:3.0.0")
 }
 ```
 
-`chasm-aot` (`io.github.charlietap.chasm:chasm-aot`) is only needed where
-modules are compiled, such as a build step; an app that runs modules compiled
-at build time needs only `runtime-aot`.
+`chasm-jvm-compiler` (`io.github.charlietap.chasm:chasm-jvm-compiler`) is only
+needed where modules are compiled, such as a build step; an app that runs
+modules compiled at build time needs only `runtime-compiled`. The same runtime
+also loads DEX compiled by `chasm-dex-compiler`; see
+[Loading DEX from files](../README.md#loading-dex-from-files).
 
 ## Compiling a module
 
 ```kotlin
 val config = CompileConfig(
     className = "com.example.parser.ParserModule",
-    target = CompileTarget.JVM,
+    target = CompileTarget.HOTSPOT,
     runtime = RuntimeConfig(
         stacktraces = true,
         limits = Limits(
@@ -34,14 +36,15 @@ val compiled = compile(Path("src/main/wasm/parser.wasm"), ClassOutput.jar(Path("
     .expect("parser compiles")
 ```
 
-`compile` takes the module as a `Path` or a `ByteArray`, an output and a
-`CompileConfig`:
+`compile` is a suspending function. It takes the module as a `Path` or a
+`ByteArray`, an output and a `CompileConfig`:
 
 - `className` is the binary name of the entry class, the class the app refers
   to. It must be a Java class name and may not contain `$`.
-- `target` is `CompileTarget.JVM` (the default) or `CompileTarget.ANDROID`.
+- `target` is `CompileTarget.HOTSPOT` (the default) or `CompileTarget.ART`.
   Each target sizes methods against the limit of the VM that runs them; see
-  [Method size](#method-size).
+  [Method size](#method-size). A module runs only on the target it was
+  compiled for.
 - `runtime` is the `RuntimeConfig` the module runs with; see
   [Settings](#settings).
 
@@ -74,7 +77,8 @@ store already holds the fuel it was compiled with. There is no way to change
 them when the module is loaded.
 
 A module whose memory or table starts above its limits fails to compile with a
-`CONFIGURATION` error, rather than failing to instantiate later.
+`CONFIGURATION` error, rather than failing to instantiate later. A module with
+a 64-bit memory or table fails to compile with a `GENERATION` error.
 
 A store can instantiate other compiled modules, for example to link them, only
 when their fuel, interrupts and every limit match the store's. Otherwise
@@ -85,8 +89,8 @@ Unset and set values are different settings: a store with an unset `stack`
 does not accept a module compiled with an explicit `stack`, even when it
 equals the platform default.
 
-The GC heap follows the [fixed collection policy](./gc.md#collection) of the
-interpreter.
+Structs, arrays and exceptions are ordinary JVM or ART objects; see
+[compiled modules in the GC documentation](./gc.md#in-compiled-modules).
 
 ## Outputs
 
@@ -140,15 +144,15 @@ also returned as `CompiledModuleInfo.shrinkerRules`.
 
 ## Method size
 
-There is no setting. On `JVM`, a method closes at 8,000 bytes of bytecode,
-above which HotSpot never JIT-compiles it. On `ANDROID`, a method closes at
+There is no setting. On `HOTSPOT`, a method closes at 8,000 bytes of bytecode,
+above which HotSpot never JIT-compiles it. On `ART`, a method closes at
 5,150 estimated DEX code units, which keeps it under the 10,000 units ART
 compiles after D8 or R8.
 
 A function too large for one method is split into pieces, called through a
-dispatcher method. On `ANDROID` the dispatcher is held to the same limit as
+dispatcher method. On `ART` the dispatcher is held to the same limit as
 every other method, and a function whose dispatcher would pass it fails to
-compile with a `GENERATION` error. On `JVM` the dispatcher only has to stay
+compile with a `GENERATION` error. On `HOTSPOT` the dispatcher only has to stay
 under 32,767 bytes.
 
 ## Stack traces after shrinking
@@ -162,39 +166,38 @@ path the app's assets must carry it at, the same path as
 ## Loading compiled classes at runtime
 
 A server that runs WebAssembly it only sees at runtime can compile it into its
-own local cache and load the entry class with a plain `URLClassLoader`. Chasm
-needs no load API for this:
+own local cache and load it from there with `ClassInput`:
 
 ```kotlin
 val jar = cache.resolve("recipes-v35.jar")
 compile(appWasm, ClassOutput.jar(jar), CompileConfig(className = "apps.Recipes", runtime = runtimeConfig)).expect("compiles")
 
-val loader = URLClassLoader(arrayOf(jar.toUri().toURL()), CompiledModule::class.java.classLoader)
-val compiled = loader.loadClass("apps.Recipes").getField("COMPILED").get(null) as CompiledModule
-val module = module(compiled).expect("loads")
+val module = module(ClassInput.jar(jar), "apps.Recipes").expect("loads")
 val store = store(module)
-
-// once the module is no longer needed: drop the store and instances, then
-loader.close()
 ```
 
-The artifact's contract, which Chasm documents and keeps stable:
+`ClassInput.jar(path)`, `ClassInput.directory(path)` and
+`ClassInput.memory(classFiles, resources)` read the classes and their
+resources from the same jar, directory or maps. Chasm builds the class loader
+for them, and `module()` checks what it loaded:
 
 - The entry class is named exactly `CompileConfig.className`, implements
   `CompiledModule`, and exposes `public static final COMPILED`.
-- It reads its resources (data segments, trap sites) through its own class
-  loader. Data segments are memory-mapped when that loader serves the
-  `.chasmdata` resource from a file on local disk: a `file:` URL, as from a
-  classes directory, or a `jar:file:` URL to an uncompressed (stored) entry of a
-  jar that is not nested in another archive and needs no Zip64 records, under
-  2 GiB. A `URLClassLoader` on a jar written by `ClassOutput.jar` serves such
-  URLs, since that output stores `.chasmdata` uncompressed. Otherwise the data
-  segments are read as a stream.
-- The parent loader must see `runtime-aot`, so `CompiledModule` is the same
-  class on both sides.
-- Unloading is the consumer's. It owns the loader: dropping the module, store
-  and instances and closing the loader lets the classes be collected. Chasm
-  keeps no global references to loaded modules.
+- Every class the module was compiled with comes from the input, and none is
+  missing. An entry class that a class on the runtime's own class path already
+  defines is refused.
+- The module was compiled for this runtime and this VM, and every resource it
+  needs is present.
 
-The one reflective line is the consumer's; `chasm-aot` and `runtime-aot` use
-no reflection to load a compiled module.
+Any of these failing is a `ModuleError.Malformed` naming the class, path or
+resource. Data segments are memory-mapped from a directory input and read as
+a stream from a jar input. `ClassInput.memory` copies its maps
+and arrays, so later changes to them do not reach the module.
+
+Unloading needs nothing from the caller: dropping the module, its stores and
+instances lets the loader and its classes be collected. Chasm keeps no global
+references to loaded modules.
+
+`module(loader, className)` loads the entry class from a class loader the
+caller built instead. Chasm then checks nothing about where the classes come
+from, and reads resources through the entry class's own loader.

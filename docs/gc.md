@@ -1,10 +1,10 @@
 # WebAssembly GC in Chasm
 
 Chasm supports the [WebAssembly GC proposal](https://github.com/WebAssembly/gc/blob/main/proposals/gc/Overview.md).
-On the interpreter and on AOT, structs, arrays, and exceptions are allocated
-in a non-moving, mark-and-sweep heap owned by the runtime Store. Modules that
-only use linear memory do not allocate in this heap. The JIT works differently;
-see [On the JIT](#on-the-jit).
+On the interpreter, structs, arrays, and exceptions are allocated in a
+non-moving, mark-and-sweep heap owned by the runtime Store. Modules that only
+use linear memory do not allocate in this heap. Compiled modules work
+differently; see [In compiled modules](#in-compiled-modules).
 
 The collector traces reference fields described by registered WebAssembly
 types. During execution, the current value stack is passed directly to a
@@ -40,7 +40,7 @@ reporting guest heap exhaustion as an invocation error.
 
 ## Heap limit
 
-On the interpreter and on AOT, `MemoryLimits.gcHeap` caps the heap so that a
+On the interpreter, `MemoryLimits.gcHeap` caps the heap so that a
 guest cannot exhaust host memory by allocating:
 
 ```kotlin
@@ -68,16 +68,16 @@ The limit covers the guest heap only. Linear memories and tables have their own
 limits, described in [Resource limits](./limits.md), and Kotlin host values
 referenced through `externref` are not counted.
 
-## On the JIT
+## In compiled modules
 
-The JIT allocates structs, arrays, and exceptions as ordinary JVM objects, so
-the JVM's or ART's own collector reclaims them. None of the above applies:
-there is no Chasm heap, collection threshold or eight-byte slot, and
+Compiled modules allocate structs, arrays, and exceptions as ordinary JVM
+objects, so the JVM's or ART's own collector reclaims them. None of the above
+applies: there is no Chasm heap, collection threshold or eight-byte slot, and
 `collect(store)` asks the runtime to collect with `Runtime.gc()`.
 
-The JIT meters what guest code allocates and checks it once per MiB allocated.
-At each check, an allocation larger than `gcHeap` on its own traps with
-`GuestHeapOutOfMemory`; `gcHeap` does not cap the total the guest holds. The
-check also traps when the process heap has too little headroom left, after one
-collection.
+Compiled code meters what guest code allocates and checks it once per MiB
+allocated. At each check, an allocation larger than `gcHeap` on its own traps
+with `GuestHeapOutOfMemory`; `gcHeap` does not cap the total the guest holds.
+The check also traps when the process heap has too little headroom left, after
+one collection.
 

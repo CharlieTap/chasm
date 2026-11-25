@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.bindgen
 
+import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.DOUBLE
@@ -37,6 +38,11 @@ internal class StructViewGenerator {
             if (storage == null) {
                 addProperties(view.fields.map(::fieldProperty))
             } else {
+                addAnnotation(
+                    AnnotationSpec.builder(OPT_IN_CLASS_NAME)
+                        .addMember("%T::class", CHASM_INTERNAL_API_CLASS_NAME)
+                        .build(),
+                )
                 addProperties(view.fields.map { field -> laneProperty(field, storage.fieldLanes[field.index]) })
                 addFunction(storageFunction(view.className, storage))
             }

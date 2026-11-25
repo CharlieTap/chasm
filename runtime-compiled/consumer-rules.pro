@@ -1,0 +1,62 @@
+-keep,allowobfuscation,allowshrinking class io.github.charlietap.chasm.runtime.compiled.gc.storage.*
+-keep,allowobfuscation,allowshrinking class io.github.charlietap.chasm.runtime.compiled.gc.ManagedEntry { *** enter(...); }
+
+-keep,allowshrinking class io.github.charlietap.chasm.compiled.internal.RuntimeLoadedCode
+-keepclassmembers class io.github.charlietap.chasm.compiled.internal.RuntimeLoadedCode { *; }
+
+-if class io.github.charlietap.chasm.compiled.internal.RuntimeLoadedCode
+-keep,includedescriptorclasses class io.github.charlietap.chasm.runtime.compiled.gc.storage.** { public <fields>; public <init>(...); }
+-if class io.github.charlietap.chasm.compiled.internal.RuntimeLoadedCode
+-keep,includedescriptorclasses class io.github.charlietap.chasm.runtime.compiled.gc.Rtt { public <fields>; }
+-if class io.github.charlietap.chasm.compiled.internal.RuntimeLoadedCode
+-keep,includedescriptorclasses class io.github.charlietap.chasm.compiled.CompiledModule { *; }
+-if class io.github.charlietap.chasm.compiled.internal.RuntimeLoadedCode
+-keep,includedescriptorclasses class io.github.charlietap.chasm.declarations.construction.DeclarationsBuilder { public *; }
+-if class io.github.charlietap.chasm.compiled.internal.RuntimeLoadedCode
+-keep,includedescriptorclasses class io.github.charlietap.chasm.runtime.compiled.Compiled* { public static *; }
+-if class io.github.charlietap.chasm.compiled.internal.RuntimeLoadedCode
+-keep,includedescriptorclasses class io.github.charlietap.chasm.runtime.compiled.CodeInstallation { public *; }
+-if class io.github.charlietap.chasm.compiled.internal.RuntimeLoadedCode
+-keep,includedescriptorclasses class io.github.charlietap.chasm.runtime.compiled.ObjectEntry { public *; <init>(...); }
+-if class io.github.charlietap.chasm.compiled.internal.RuntimeLoadedCode
+-keep,includedescriptorclasses class io.github.charlietap.chasm.runtime.compiled.BindingEntry { public <fields>; <init>(...); }
+-if class io.github.charlietap.chasm.compiled.internal.RuntimeLoadedCode
+-keep,includedescriptorclasses interface io.github.charlietap.chasm.runtime.function.CompiledFunction { *; }
+-if class io.github.charlietap.chasm.compiled.internal.RuntimeLoadedCode
+-keep,includedescriptorclasses class io.github.charlietap.chasm.runtime.execution.ExecutionContext { public <fields>; }
+-if class io.github.charlietap.chasm.compiled.internal.RuntimeLoadedCode
+-keep,includedescriptorclasses class io.github.charlietap.chasm.runtime.execution.AllocationMeter { public <fields>; }
+-if class io.github.charlietap.chasm.compiled.internal.RuntimeLoadedCode
+-keep,includedescriptorclasses class io.github.charlietap.chasm.runtime.instance.GlobalInstance { public long getValue(); public void setValue(long); }
+-if class io.github.charlietap.chasm.compiled.internal.RuntimeLoadedCode
+-keep,includedescriptorclasses class io.github.charlietap.chasm.runtime.instance.MemoryInstance { public byte[] byteArray; public java.nio.ByteBuffer byteBuffer; public int getSize(); }
+-if class io.github.charlietap.chasm.compiled.internal.RuntimeLoadedCode
+-keepnames class io.github.charlietap.chasm.runtime.instance.**
+-if class io.github.charlietap.chasm.compiled.internal.RuntimeLoadedCode
+-keep,includedescriptorclasses interface io.github.charlietap.chasm.reference.EqReference
+-if class io.github.charlietap.chasm.compiled.internal.RuntimeLoadedCode
+-keep,includedescriptorclasses class io.github.charlietap.chasm.reference.I31Reference { public <fields>; <init>(...); }
+-if class io.github.charlietap.chasm.compiled.internal.RuntimeLoadedCode
+-keep,includedescriptorclasses class io.github.charlietap.chasm.runtime.compiled.gc.ManagedStruct { public *; <init>(...); }
+-if class io.github.charlietap.chasm.compiled.internal.RuntimeLoadedCode
+-keep,includedescriptorclasses class io.github.charlietap.chasm.runtime.compiled.gc.ManagedArray { public *; <init>(...); }
+-if class io.github.charlietap.chasm.compiled.internal.RuntimeLoadedCode
+-keep,includedescriptorclasses class io.github.charlietap.chasm.runtime.compiled.gc.CompiledStruct { public *; <init>(...); }
+-if class io.github.charlietap.chasm.compiled.internal.RuntimeLoadedCode
+-keep,includedescriptorclasses class io.github.charlietap.chasm.runtime.compiled.gc.CompiledArray { public *; <init>(...); }
+-if class io.github.charlietap.chasm.compiled.internal.RuntimeLoadedCode
+-keep,includedescriptorclasses class io.github.charlietap.chasm.runtime.compiled.gc.ManagedOps { public static *; }
+-if class io.github.charlietap.chasm.compiled.internal.RuntimeLoadedCode
+-keep,includedescriptorclasses class io.github.charlietap.chasm.runtime.compiled.gc.ManagedArrays { public static *; }
+-if class io.github.charlietap.chasm.compiled.internal.RuntimeLoadedCode
+-keep,includedescriptorclasses class io.github.charlietap.chasm.runtime.compiled.gc.ManagedTables { public static *; }
+-if class io.github.charlietap.chasm.compiled.internal.RuntimeLoadedCode
+-keep,includedescriptorclasses class io.github.charlietap.chasm.runtime.compiled.gc.ManagedFunction { public <fields>; }
+-if class io.github.charlietap.chasm.compiled.internal.RuntimeLoadedCode
+-keep,includedescriptorclasses class io.github.charlietap.chasm.runtime.compiled.gc.WasmException { public <fields>; }
+-if class io.github.charlietap.chasm.compiled.internal.RuntimeLoadedCode
+-keep,includedescriptorclasses class io.github.charlietap.chasm.runtime.compiled.gc.ReferenceGlobal { public <fields>; }
+-if class io.github.charlietap.chasm.compiled.internal.RuntimeLoadedCode
+-keep,includedescriptorclasses class io.github.charlietap.chasm.runtime.compiled.gc.ReferenceTable { public <fields>; }
+-if class io.github.charlietap.chasm.compiled.internal.RuntimeLoadedCode
+-keep,includedescriptorclasses class io.github.charlietap.chasm.runtime.compiled.gc.ReferenceSegment { public <fields>; }

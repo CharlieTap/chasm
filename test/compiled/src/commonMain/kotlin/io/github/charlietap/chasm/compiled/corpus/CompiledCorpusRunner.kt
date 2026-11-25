@@ -1,9 +1,9 @@
 package io.github.charlietap.chasm.compiled.corpus
 
-import io.github.charlietap.chasm.aot.store
 import io.github.charlietap.chasm.compiled.Compiler
 import io.github.charlietap.chasm.compiled.corpus.fixture.FixtureContext
 import io.github.charlietap.chasm.compiled.corpus.fixture.FixtureRunner
+import io.github.charlietap.chasm.compiled.store
 import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.embedding.shapes.Module

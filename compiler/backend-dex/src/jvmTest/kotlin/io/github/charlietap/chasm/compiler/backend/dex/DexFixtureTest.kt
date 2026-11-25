@@ -1,8 +1,6 @@
 package io.github.charlietap.chasm.compiler.backend.dex
 
-import io.github.charlietap.chasm.compiler.backend.analysis.gc.ShapeLayouts
-import io.github.charlietap.chasm.compiler.backend.dex.gc.ShapeAccessorDex
-import io.github.charlietap.chasm.compiler.backend.dex.gc.StructuralShapeNames
+import io.github.charlietap.chasm.compiler.backend.analysis.UnsupportedFunctions
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
@@ -20,7 +18,7 @@ class DexFixtureTest {
     fun `memory fixture generates`() = golden("memory")
 
     @Test
-    fun `memory fixture generates unsafe accesses`() = golden("memory", "memory_unsafe", DexOptions(stacktraces = true, byteArrayBaseOffset = 16L))
+    fun `memory fixture generates unsafe accesses`() = golden("memory", "memory_unsafe", TRACED.copy(byteArrayBaseOffset = 16L))
 
     @Test
     fun `calls fixture generates`() = golden("calls")
@@ -31,23 +29,7 @@ class DexFixtureTest {
     }
 
     @Test
-    fun `struct accessors fixture generates shape classes`() {
-
-        val generated = generate(decodeModule(fixture("struct_accessors")))
-
-        assertGolden("struct_accessors_shape_classes.smali", renderSmali(listOf(checkNotNull(generated.shapeDex))))
-    }
-
-    @Test
-    fun `struct accessors fixture generates shape accessors`() {
-
-        val layouts = ShapeLayouts(decodeModule(fixture("struct_accessors")).definedTypes, StructuralShapeNames())
-        val writer = ShapeAccessorDex()
-        val structs = layouts.structs.map { shape -> writer.struct(shape.className, shape.fields) }
-        val arrays = layouts.arrays.map { shape -> writer.array(shape.className, shape.data.descriptor) }
-
-        assertGolden("struct_accessors_shapes.smali", renderSmali(structs + arrays))
-    }
+    fun `struct accessors fixture generates`() = golden("struct_accessors")
 
     @Test
     fun `gc fixture generates`() = golden("gc")
@@ -98,7 +80,7 @@ class DexFixtureTest {
     private fun golden(
         name: String,
         golden: String = name,
-        options: DexOptions = DexOptions(stacktraces = true),
+        options: DexOptions = TRACED,
     ) {
         val generated = generate(decodeModule(fixture(name)), options)
 

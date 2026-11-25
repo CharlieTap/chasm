@@ -38,6 +38,7 @@ private fun LowerContext.lowerChunkPrologue(
     if (chunk.usesMemory && analysis.unsafeMemory) {
         loadObject(registers.unsafe, Resource.Unsafe, UNSAFE_TYPE)
         emit.constWide(registers.byteArrayBase, checkNotNull(module.options.byteArrayBaseOffset))
+        module.emittedByteArrayBase = true
     }
     analysis.cachedConstants.forEachIndexed { index, constant ->
         if (chunk.constants?.get(index) == false) return@forEachIndexed

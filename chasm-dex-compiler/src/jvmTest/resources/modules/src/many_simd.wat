@@ -1,0 +1,13 @@
+(module
+  (func (export "v0") (result i32) (i32x4.extract_lane 0 (v128.const i32x4 0 0 0 0)))
+  (func (export "v1") (result i32) (i32x4.extract_lane 0 (v128.const i32x4 1 0 0 0)))
+  (func (export "v2") (result i32) (i32x4.extract_lane 0 (v128.const i32x4 2 0 0 0)))
+  (func (export "v3") (result i32) (i32x4.extract_lane 0 (v128.const i32x4 3 0 0 0)))
+  (func (export "v4") (result i32) (i32x4.extract_lane 0 (v128.const i32x4 4 0 0 0)))
+  (func (export "v5") (result i32) (i32x4.extract_lane 0 (v128.const i32x4 5 0 0 0)))
+  (func (export "v6") (result i32) (i32x4.extract_lane 0 (v128.const i32x4 6 0 0 0)))
+  (func (export "v7") (result i32) (i32x4.extract_lane 0 (v128.const i32x4 7 0 0 0)))
+  (func (export "v8") (result i32) (i32x4.extract_lane 0 (v128.const i32x4 8 0 0 0)))
+  (func (export "v9") (result i32) (i32x4.extract_lane 0 (v128.const i32x4 9 0 0 0)))
+  (func (export "v10") (result i32) (i32x4.extract_lane 0 (v128.const i32x4 10 0 0 0)))
+  (func (export "v11") (result i32) (i32x4.extract_lane 0 (v128.const i32x4 11 0 0 0))))

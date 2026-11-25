@@ -6,6 +6,7 @@ import com.github.michaelbull.result.getOrThrow
 import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.module.Export
 import io.github.charlietap.chasm.ast.module.Module
+import io.github.charlietap.chasm.compiled.CompiledModule
 import io.github.charlietap.chasm.compiler.backend.abi.ALLOCATION_REMAINING_FIELD
 import io.github.charlietap.chasm.compiler.backend.abi.ARRAY_OUT_OF_BOUNDS
 import io.github.charlietap.chasm.compiler.backend.abi.COMPILED_RTT_FIELD
@@ -21,15 +22,16 @@ import io.github.charlietap.chasm.compiler.backend.analysis.DataflowSlotKindAnal
 import io.github.charlietap.chasm.compiler.backend.analysis.ModuleIndexSpaces
 import io.github.charlietap.chasm.compiler.backend.analysis.SlotKindFlow
 import io.github.charlietap.chasm.compiler.backend.analysis.analyzeSlotKinds
+import io.github.charlietap.chasm.compiler.backend.analysis.declarations.DeclarationCallGenerator
 import io.github.charlietap.chasm.compiler.backend.analysis.form.InstructionForms
 import io.github.charlietap.chasm.compiler.backend.analysis.frameFacts
 import io.github.charlietap.chasm.compiler.backend.analysis.gc.STORAGE_FAMILY
 import io.github.charlietap.chasm.compiler.backend.analysis.gc.StoragePlans
 import io.github.charlietap.chasm.compiler.backend.analysis.instructionTable
-import io.github.charlietap.chasm.compiler.backend.jvm.declarations.DeclarationCallGenerator
 import io.github.charlietap.chasm.compiler.backend.jvm.declarations.DeclarationsLowerer
 import io.github.charlietap.chasm.compiler.backend.jvm.lower.Locals
 import io.github.charlietap.chasm.compiler.frontend.ModuleCompiler
+import io.github.charlietap.chasm.declarations.DataSource
 import io.github.charlietap.chasm.module.ModuleDeclarationsFactory
 import io.github.charlietap.chasm.runtime.compiled.CHUNK_METHOD_SEPARATOR
 import org.objectweb.asm.ClassReader
@@ -47,6 +49,7 @@ import org.objectweb.asm.tree.analysis.BasicVerifier
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
+import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
 class ManagedLoweringTest {
@@ -214,6 +217,22 @@ class ManagedLoweringTest {
         whole.values.forEach { method ->
             assertTrue(method.instructions.none { instruction -> instruction.invokes(FRAME) || instruction.invokes(OPEN_FRAME) }, method.name)
         }
+    }
+
+    @Test
+    fun `buildDeclarations takes its data source`() {
+
+        val declarations = decodeModule(fixture("declarations"))
+        val code = ModuleCompiler(declarations).getOrThrow { error -> IllegalStateException(error.toString()) }
+        val output = Generated()
+        val lowered = ModuleLowerer(declarations, code, JvmOptions(), output, ModuleDeclarationsFactory(declarations))
+        val compiled = GeneratedClassLoader(output).loadClass(lowered.moduleClass).getField("COMPILED").get(null) as CompiledModule
+        val data = DataSource { error("the data is only handed over") }
+
+        val built = compiled.buildDeclarations(data)
+
+        assertTrue(built.dataSegments.isNotEmpty())
+        assertSame(data, built.dataSource)
     }
 
     private fun function(name: String): MethodNode {

@@ -31,6 +31,7 @@ suspend fun ParallelModuleCompiler(
     types: ModuleTypeResolver = module.typeResolver(),
     taskExecutor: ParallelTaskExecutor,
     devirtualiseIndirectCalls: Boolean = false,
+    recordProvenance: Boolean = false,
 ): Result<CirModule, CompilationError> {
     return ParallelModuleCompiler(
         module = module,
@@ -40,9 +41,31 @@ suspend fun ParallelModuleCompiler(
         availableProcessors = availableParallelProcessors(),
         policy = compilationParallelism(),
         devirtualiseIndirectCalls = devirtualiseIndirectCalls,
-        functionCompiler = ::FunctionCompiler,
+        recordProvenance = recordProvenance,
+    )
+}
+
+internal suspend fun ParallelModuleCompiler(
+    module: Module,
+    types: ModuleTypeResolver,
+    taskExecutor: ParallelTaskExecutor,
+    mode: CompilationMode,
+    availableProcessors: Int,
+    policy: ParallelismPolicy,
+    devirtualiseIndirectCalls: Boolean,
+    recordProvenance: Boolean,
+): Result<CirModule, CompilationError> {
+    return ParallelModuleCompiler(
+        module = module,
+        types = types,
+        taskExecutor = taskExecutor,
+        mode = mode,
+        availableProcessors = availableProcessors,
+        policy = policy,
+        devirtualiseIndirectCalls = devirtualiseIndirectCalls,
+        functionCompiler = { context, function, workspace -> FunctionCompiler(context, function, workspace, recordProvenance) },
         moduleCompiler = { source, resolver ->
-            ModuleCompiler(source, resolver, recordProvenance = false, devirtualiseIndirectCalls = devirtualiseIndirectCalls)
+            ModuleCompiler(source, resolver, recordProvenance = recordProvenance, devirtualiseIndirectCalls = devirtualiseIndirectCalls)
         },
     )
 }

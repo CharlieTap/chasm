@@ -58,9 +58,9 @@ internal typealias EntryLowerer = (DexFile, EntryGroup, String) -> String
 internal fun EntryLowerer(
     file: DexFile,
     group: EntryGroup,
-    packagePath: String,
+    entryPath: String,
 ): String {
-    val entry = ClassType(entryClass(packagePath, group.number))
+    val entry = ClassType(entryClass(entryPath, group.number))
     val signature = group.signature
     val builder = if (signature == null) {
         file.addClass(entry, ENTRY)

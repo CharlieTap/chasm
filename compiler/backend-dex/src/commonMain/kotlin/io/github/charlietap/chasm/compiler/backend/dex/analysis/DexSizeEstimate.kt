@@ -39,7 +39,7 @@ internal enum class CostFamily(
     Copy(96, 54),
     Select(58, 76),
     Global(183, 115),
-    Reference(147, 507),
+    Reference(107, 182),
     Table(0, 0),
     Other(0, 0),
 }

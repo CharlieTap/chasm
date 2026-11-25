@@ -26,7 +26,7 @@ class DevirtualisedCallLoweringTest {
         val windows = listOf(null) + (1..8).toList()
 
         windows.forEach { window ->
-            val generated = ModuleLowerer(module, code, DexOptions(byteArrayBaseOffset = 16L, splitInstructions = window))
+            val generated = lower(module, code, DexOptions(byteArrayBaseOffset = 16L, splitInstructions = window))
 
             assertTrue(generated.dex.isNotEmpty(), "window $window")
             assertEquals(emptyList(), zeroOffsetBranches(generated.dex), "window $window")

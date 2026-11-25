@@ -1,4 +1,4 @@
-.class public final Lchasm/jit/Code0;
+.class public final Lchasm/dex/WasmModule$Code0;
 .super Ljava/lang/Object;
 .source "module.wasm"
 
@@ -184,7 +184,7 @@
     .line 2
     move/from16 v21, v17
 
-    invoke-static/range {v18 .. v21}, Lchasm/jit/Code0;->f0([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;II)V
+    invoke-static/range {v18 .. v21}, Lchasm/dex/WasmModule$Code0;->f0([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;II)V
 
     iget-boolean v8, v14, Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;->compiledUnwinding:Z
 
@@ -489,7 +489,7 @@
     .line 10
     const/16 v32, 0x21
 
-    invoke-static/range {v29 .. v32}, Lchasm/jit/Code0;->f0([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;II)V
+    invoke-static/range {v29 .. v32}, Lchasm/dex/WasmModule$Code0;->f0([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;II)V
 
     iget-boolean v8, v14, Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;->compiledUnwinding:Z
 
@@ -898,7 +898,7 @@
     move/from16 v21, v15
 
     .line 2
-    invoke-static/range {v23 .. v25}, Lchasm/jit/Code0;->f5([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;I)V
+    invoke-static/range {v23 .. v25}, Lchasm/dex/WasmModule$Code0;->f5([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;I)V
 
     iget-boolean v8, v14, Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;->compiledUnwinding:Z
 
@@ -1065,21 +1065,13 @@
 .end method
 
 .method public static f7([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;II)I
-    .registers 33
+    .registers 32
 
     move-object/from16 v14, p1
 
     move/from16 v13, p2
 
     move-object/from16 v16, p0
-
-    const/4 v9, 0x0
-
-    aget-object v12, v16, v9
-
-    check-cast v12, [J
-
-    move-object/from16 v25, v12
 
     move/from16 v17, p3
 
@@ -1117,7 +1109,11 @@
 
     aput-wide v0, v10, v9
 
-    move-object/from16 v12, v25
+    const/4 v9, 0x0
+
+    aget-object v12, v16, v9
+
+    check-cast v12, [J
 
     const/16 v9, 0x9
 
@@ -1141,21 +1137,21 @@
 
     move-wide/from16 v20, v0
 
-    goto/16 :goto_42
+    goto/16 :goto_3e
 
     .line 4
-    :goto_42
+    :goto_3e
     move-object/from16 v19, v24
 
     .line 6
-    :goto_44
+    :goto_40
     const/high16 v10, -0x80000000
 
     add-int v8, v18, v10
 
     const v9, -0x7ffff830
 
-    if-ge v8, v9, :cond_6b
+    if-ge v8, v9, :cond_6c
 
     .line 7
     move/from16 v22, v18
@@ -1171,18 +1167,24 @@
 
     iput v0, v2, Lio/github/charlietap/chasm/runtime/execution/AllocationMeter;->remaining:I
 
-    if-gez v0, :cond_5d
+    if-gez v0, :cond_59
 
     invoke-static {v14, v1}, Lio/github/charlietap/chasm/runtime/compiled/gc/ManagedOps;->refillAllocation(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;I)V
 
-    :cond_5d
-    new-instance v12, Lchasm/gc/S7cd61ed60e3e32738fd5976a89584478_0;
+    :cond_59
+    const/4 v9, 0x4
 
-    invoke-direct {v12}, Lchasm/gc/S7cd61ed60e3e32738fd5976a89584478_0;-><init>()V
+    aget-object v10, v16, v9
+
+    check-cast v10, Lio/github/charlietap/chasm/runtime/compiled/gc/Rtt;
+
+    new-instance v12, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/S_I;
+
+    invoke-direct {v12, v10}, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/S_I;-><init>(Lio/github/charlietap/chasm/runtime/compiled/gc/Rtt;)V
 
     move/from16 v8, v22
 
-    iput v8, v12, Lchasm/gc/S7cd61ed60e3e32738fd5976a89584478_0;->f0:I
+    iput v8, v12, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/S_I;->i0:I
 
     move-object/from16 v23, v12
 
@@ -1190,10 +1192,10 @@
     add-int/lit8 v18, v18, 0x1
 
     .line 10
-    goto :goto_44
+    goto :goto_40
 
     .line 11
-    :cond_6b
+    :cond_6c
     move-object/from16 v23, v19
 
     .line 12
@@ -1201,13 +1203,13 @@
 
     invoke-static {v14, v12}, Lio/github/charlietap/chasm/runtime/compiled/gc/ManagedOps;->rethrowException(Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;Ljava/lang/Object;)V
 
-    goto/16 :goto_76
+    goto/16 :goto_77
 
     const/4 v8, 0x0
 
     return v8
 
-    :goto_76
+    :goto_77
     const/4 v8, 0x1
 
     iput-boolean v8, v14, Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;->compiledUnwinding:Z
@@ -1260,7 +1262,7 @@
     .line 2
     move/from16 v24, v17
 
-    invoke-static/range {v21 .. v24}, Lchasm/jit/Code0;->f7([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;II)I
+    invoke-static/range {v21 .. v24}, Lchasm/dex/WasmModule$Code0;->f7([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;II)I
 
     move-result v9
 
@@ -1377,7 +1379,388 @@
     return-void
 .end method
 
-.class public final Lchasm/jit/Entry0;
+.class final Lchasm/dex/WasmModule$Declare0;
+.super Ljava/lang/Object;
+
+
+# direct methods
+.method static declare(Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;)V
+    .registers 12
+
+    move-object v0, p0
+
+    const-string v1, "after_trysame_functionnestedcatch_allgrow_throwcatch_refthrow_nulluncaught"
+
+    invoke-virtual/range {v0 .. v1}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->strings(Ljava/lang/String;)V
+
+    const-string v1, "\t\r\u0006\t\n\t\n\u0008"
+
+    invoke-virtual/range {v0 .. v1}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->stringLengths(Ljava/lang/String;)V
+
+    invoke-virtual/range {v0 .. v0}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->endStrings()V
+
+    const/4 v1, 0x1
+
+    invoke-virtual/range {v0 .. v1}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->group(I)V
+
+    const/4 v1, 0x1
+
+    invoke-virtual/range {v0 .. v1}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->group(I)V
+
+    const/4 v1, 0x1
+
+    invoke-virtual/range {v0 .. v1}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->group(I)V
+
+    const/4 v1, 0x1
+
+    invoke-virtual/range {v0 .. v1}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->group(I)V
+
+    const/4 v1, 0x1
+
+    invoke-virtual/range {v0 .. v1}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->group(I)V
+
+    const/4 v1, 0x1
+
+    invoke-virtual/range {v0 .. v1}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->group(I)V
+
+    const/4 v1, 0x1
+
+    invoke-virtual/range {v0 .. v1}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->group(I)V
+
+    const/4 v1, 0x1
+
+    invoke-virtual/range {v0 .. v1}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->group(I)V
+
+    const/4 v1, 0x1
+
+    invoke-virtual/range {v0 .. v1}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->group(I)V
+
+    const/4 v1, 0x0
+
+    invoke-virtual/range {v0 .. v1}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->numberType(I)V
+
+    const/4 v1, 0x0
+
+    const/4 v2, 0x0
+
+    invoke-virtual/range {v0 .. v2}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->fieldType(IZ)V
+
+    const/4 v1, 0x1
+
+    invoke-virtual/range {v0 .. v1}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->structComposite(I)V
+
+    const/4 v1, 0x1
+
+    const/4 v2, 0x0
+
+    invoke-virtual/range {v0 .. v2}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->subType(ZI)V
+
+    const/4 v1, 0x0
+
+    const/4 v2, 0x1
+
+    invoke-virtual/range {v0 .. v2}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->groupBody(II)V
+
+    const/4 v1, 0x0
+
+    const-string v2, "7cd61ed60e3e32738fd5976a89584478"
+
+    invoke-virtual/range {v0 .. v2}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->groupKey(ILjava/lang/String;)V
+
+    const/4 v1, 0x0
+
+    invoke-virtual/range {v0 .. v1}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->numberType(I)V
+
+    const/4 v1, 0x1
+
+    const/4 v2, 0x0
+
+    invoke-virtual/range {v0 .. v2}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->functionComposite(II)V
+
+    const/4 v1, 0x1
+
+    const/4 v2, 0x0
+
+    invoke-virtual/range {v0 .. v2}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->subType(ZI)V
+
+    const/4 v1, 0x1
+
+    const/4 v2, 0x1
+
+    invoke-virtual/range {v0 .. v2}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->groupBody(II)V
+
+    const/4 v1, 0x1
+
+    const-string v2, "56fea0d3d9dff2e917c8513666724464"
+
+    invoke-virtual/range {v0 .. v2}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->groupKey(ILjava/lang/String;)V
+
+    const/4 v1, 0x1
+
+    invoke-virtual/range {v0 .. v1}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->numberType(I)V
+
+    const/4 v1, 0x0
+
+    invoke-virtual/range {v0 .. v1}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->numberType(I)V
+
+    const/4 v1, 0x2
+
+    const/4 v2, 0x0
+
+    invoke-virtual/range {v0 .. v2}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->functionComposite(II)V
+
+    const/4 v1, 0x1
+
+    const/4 v2, 0x0
+
+    invoke-virtual/range {v0 .. v2}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->subType(ZI)V
+
+    const/4 v1, 0x2
+
+    const/4 v2, 0x1
+
+    invoke-virtual/range {v0 .. v2}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->groupBody(II)V
+
+    const/4 v1, 0x2
+
+    const-string v2, "3c9fdc07080286255dd9b9b5301301a1"
+
+    invoke-virtual/range {v0 .. v2}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->groupKey(ILjava/lang/String;)V
+
+    const/4 v1, 0x0
+
+    const/4 v2, 0x0
+
+    invoke-virtual/range {v0 .. v2}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->functionComposite(II)V
+
+    const/4 v1, 0x1
+
+    const/4 v2, 0x0
+
+    invoke-virtual/range {v0 .. v2}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->subType(ZI)V
+
+    const/4 v1, 0x3
+
+    const/4 v2, 0x1
+
+    invoke-virtual/range {v0 .. v2}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->groupBody(II)V
+
+    const/4 v1, 0x3
+
+    const-string v2, "c663c838ba102d405623fdadf53aeb86"
+
+    invoke-virtual/range {v0 .. v2}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->groupKey(ILjava/lang/String;)V
+
+    const/4 v1, 0x0
+
+    invoke-virtual/range {v0 .. v1}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->numberType(I)V
+
+    const/4 v1, 0x0
+
+    invoke-virtual/range {v0 .. v1}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->numberType(I)V
+
+    const/4 v1, 0x1
+
+    const/4 v2, 0x1
+
+    invoke-virtual/range {v0 .. v2}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->functionComposite(II)V
+
+    const/4 v1, 0x1
+
+    const/4 v2, 0x0
+
+    invoke-virtual/range {v0 .. v2}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->subType(ZI)V
+
+    const/4 v1, 0x4
+
+    const/4 v2, 0x1
+
+    invoke-virtual/range {v0 .. v2}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->groupBody(II)V
+
+    const/4 v1, 0x4
+
+    const-string v2, "0ef75fe501975ab105bb8f78dea59994"
+
+    invoke-virtual/range {v0 .. v2}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->groupKey(ILjava/lang/String;)V
+
+    const/4 v1, 0x0
+
+    invoke-virtual/range {v0 .. v1}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->numberType(I)V
+
+    const/4 v1, 0x1
+
+    invoke-virtual/range {v0 .. v1}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->numberType(I)V
+
+    const/4 v1, 0x1
+
+    const/4 v2, 0x1
+
+    invoke-virtual/range {v0 .. v2}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->functionComposite(II)V
+
+    const/4 v1, 0x1
+
+    const/4 v2, 0x0
+
+    invoke-virtual/range {v0 .. v2}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->subType(ZI)V
+
+    const/4 v1, 0x5
+
+    const/4 v2, 0x1
+
+    invoke-virtual/range {v0 .. v2}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->groupBody(II)V
+
+    const/4 v1, 0x5
+
+    const-string v2, "f4ca4f5a2991bec9ca3a69a0c464f9b4"
+
+    invoke-virtual/range {v0 .. v2}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->groupKey(ILjava/lang/String;)V
+
+    const/4 v1, 0x1
+
+    invoke-virtual/range {v0 .. v1}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->numberType(I)V
+
+    const/4 v1, 0x0
+
+    invoke-virtual/range {v0 .. v1}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->numberType(I)V
+
+    const/4 v1, 0x0
+
+    const/4 v2, 0x2
+
+    invoke-virtual/range {v0 .. v2}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->functionComposite(II)V
+
+    const/4 v1, 0x1
+
+    const/4 v2, 0x0
+
+    invoke-virtual/range {v0 .. v2}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->subType(ZI)V
+
+    const/4 v1, 0x6
+
+    const/4 v2, 0x1
+
+    invoke-virtual/range {v0 .. v2}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->groupBody(II)V
+
+    const/4 v1, 0x6
+
+    const-string v2, "9e65d43dcbc1bae36a8b4cbc029c8fb1"
+
+    invoke-virtual/range {v0 .. v2}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->groupKey(ILjava/lang/String;)V
+
+    const/4 v1, 0x0
+
+    invoke-virtual/range {v0 .. v1}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->numberType(I)V
+
+    const/4 v1, 0x0
+
+    const/4 v2, 0x1
+
+    invoke-virtual/range {v0 .. v2}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->functionComposite(II)V
+
+    const/4 v1, 0x1
+
+    const/4 v2, 0x0
+
+    invoke-virtual/range {v0 .. v2}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->subType(ZI)V
+
+    const/4 v1, 0x7
+
+    const/4 v2, 0x1
+
+    invoke-virtual/range {v0 .. v2}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->groupBody(II)V
+
+    const/4 v1, 0x7
+
+    const-string v2, "5e754b92492ccd4fac81f1d5b5fff84b"
+
+    invoke-virtual/range {v0 .. v2}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->groupKey(ILjava/lang/String;)V
+
+    const/4 v1, 0x0
+
+    invoke-virtual/range {v0 .. v1}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->numberType(I)V
+
+    const/4 v1, 0x4
+
+    invoke-virtual/range {v0 .. v1}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->abstractHeapType(I)V
+
+    const/4 v1, 0x1
+
+    invoke-virtual/range {v0 .. v1}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->referenceType(Z)V
+
+    invoke-virtual/range {v0 .. v0}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->referenceValueType()V
+
+    const/4 v1, 0x0
+
+    const/4 v2, 0x2
+
+    invoke-virtual/range {v0 .. v2}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->functionComposite(II)V
+
+    const/4 v1, 0x1
+
+    const/4 v2, 0x0
+
+    invoke-virtual/range {v0 .. v2}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->subType(ZI)V
+
+    const/16 v1, 0x8
+
+    const/4 v2, 0x1
+
+    invoke-virtual/range {v0 .. v2}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->groupBody(II)V
+
+    const/16 v1, 0x8
+
+    const-string v2, "65f7bf54e851a4bb2827f04c60f2427c"
+
+    invoke-virtual/range {v0 .. v2}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->groupKey(ILjava/lang/String;)V
+
+    const-string v1, "\u0001\u0004\u0004\u0005\u0004\u0003\u0007\u0004\u0004\u0003\u0004"
+
+    invoke-virtual/range {v0 .. v1}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->functions(Ljava/lang/String;)V
+
+    const-wide/16 v1, 0x1
+
+    const/4 v3, 0x1
+
+    const-wide/16 v4, 0x4
+
+    invoke-virtual/range {v0 .. v5}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->limits(JZJ)V
+
+    const/4 v1, 0x0
+
+    const/4 v2, 0x0
+
+    invoke-virtual/range {v0 .. v2}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->memoryType(ZZ)V
+
+    invoke-virtual/range {v0 .. v0}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->memory()V
+
+    const/4 v1, 0x1
+
+    invoke-virtual/range {v0 .. v1}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->tag(I)V
+
+    const/4 v1, 0x2
+
+    invoke-virtual/range {v0 .. v1}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->tag(I)V
+
+    const/4 v1, 0x3
+
+    invoke-virtual/range {v0 .. v1}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->tag(I)V
+
+    const-string v1, "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000"
+
+    invoke-virtual/range {v0 .. v1}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->exportKinds(Ljava/lang/String;)V
+
+    const-string v1, "\u0001\u0002\u0003\u0004\u0006\u0008\t\n"
+
+    invoke-virtual/range {v0 .. v1}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->exportIndices(Ljava/lang/String;)V
+
+    const-string v1, "\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007"
+
+    invoke-virtual/range {v0 .. v1}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->exportNames(Ljava/lang/String;)V
+
+    return-void
+.end method
+
+.class public final Lchasm/dex/WasmModule$Entry0;
 .super Lio/github/charlietap/chasm/runtime/compiled/BindingEntry;
 
 
@@ -1412,7 +1795,7 @@
 
     move v8, v2
 
-    invoke-static/range {v5 .. v8}, Lchasm/jit/Code0;->f0([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;II)V
+    invoke-static/range {v5 .. v8}, Lchasm/dex/WasmModule$Code0;->f0([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;II)V
     :try_end_d
     .catch Ljava/lang/StackOverflowError; {:try_start_0 .. :try_end_d} :catch_e
     .catch Ljava/lang/OutOfMemoryError; {:try_start_0 .. :try_end_d} :catch_12
@@ -1430,7 +1813,7 @@
     return-void
 .end method
 
-.class public final Lchasm/jit/Entry1;
+.class public final Lchasm/dex/WasmModule$Entry1;
 .super Lio/github/charlietap/chasm/runtime/compiled/BindingEntry;
 
 
@@ -1475,42 +1858,42 @@
 
     :goto_14
     :pswitch_14
-    invoke-static/range {v5 .. v8}, Lchasm/jit/Code0;->f1([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;II)I
+    invoke-static/range {v5 .. v8}, Lchasm/dex/WasmModule$Code0;->f1([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;II)I
 
     move-result v2
 
     goto/16 :goto_38
 
     :pswitch_1a
-    invoke-static/range {v5 .. v8}, Lchasm/jit/Code0;->f2([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;II)I
+    invoke-static/range {v5 .. v8}, Lchasm/dex/WasmModule$Code0;->f2([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;II)I
 
     move-result v2
 
     goto/16 :goto_38
 
     :pswitch_20
-    invoke-static/range {v5 .. v8}, Lchasm/jit/Code0;->f4([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;II)I
+    invoke-static/range {v5 .. v8}, Lchasm/dex/WasmModule$Code0;->f4([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;II)I
 
     move-result v2
 
     goto/16 :goto_38
 
     :pswitch_26
-    invoke-static/range {v5 .. v8}, Lchasm/jit/Code0;->f7([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;II)I
+    invoke-static/range {v5 .. v8}, Lchasm/dex/WasmModule$Code0;->f7([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;II)I
 
     move-result v2
 
     goto/16 :goto_38
 
     :pswitch_2c
-    invoke-static/range {v5 .. v8}, Lchasm/jit/Code0;->f8([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;II)I
+    invoke-static/range {v5 .. v8}, Lchasm/dex/WasmModule$Code0;->f8([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;II)I
 
     move-result v2
 
     goto/16 :goto_38
 
     :pswitch_32
-    invoke-static/range {v5 .. v8}, Lchasm/jit/Code0;->f10([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;II)I
+    invoke-static/range {v5 .. v8}, Lchasm/dex/WasmModule$Code0;->f10([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;II)I
 
     move-result v2
 
@@ -1551,7 +1934,7 @@
     .end packed-switch
 .end method
 
-.class public final Lchasm/jit/Entry2;
+.class public final Lchasm/dex/WasmModule$Entry2;
 .super Lio/github/charlietap/chasm/runtime/compiled/BindingEntry;
 
 
@@ -1586,7 +1969,7 @@
 
     move v8, v2
 
-    invoke-static/range {v5 .. v8}, Lchasm/jit/Code0;->f3([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;II)J
+    invoke-static/range {v5 .. v8}, Lchasm/dex/WasmModule$Code0;->f3([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;II)J
 
     move-result-wide v0
 
@@ -1610,7 +1993,7 @@
     return-void
 .end method
 
-.class public final Lchasm/jit/Entry3;
+.class public final Lchasm/dex/WasmModule$Entry3;
 .super Lio/github/charlietap/chasm/runtime/compiled/BindingEntry;
 
 
@@ -1647,12 +2030,12 @@
 
     :goto_f
     :pswitch_f
-    invoke-static/range {v5 .. v7}, Lchasm/jit/Code0;->f5([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;I)V
+    invoke-static/range {v5 .. v7}, Lchasm/dex/WasmModule$Code0;->f5([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;I)V
 
     goto/16 :goto_19
 
     :pswitch_14
-    invoke-static/range {v5 .. v7}, Lchasm/jit/Code0;->f9([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;I)V
+    invoke-static/range {v5 .. v7}, Lchasm/dex/WasmModule$Code0;->f9([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;I)V
 
     goto/16 :goto_19
     :try_end_19
@@ -1679,7 +2062,7 @@
     .end packed-switch
 .end method
 
-.class public final Lchasm/jit/Entry4;
+.class public final Lchasm/dex/WasmModule$Entry4;
 .super Lio/github/charlietap/chasm/runtime/compiled/BindingEntry;
 
 
@@ -1706,7 +2089,7 @@
 
     move v7, p4
 
-    invoke-static/range {v5 .. v7}, Lchasm/jit/Code0;->f6([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;I)I
+    invoke-static/range {v5 .. v7}, Lchasm/dex/WasmModule$Code0;->f6([Ljava/lang/Object;Lio/github/charlietap/chasm/runtime/execution/ExecutionContext;I)I
 
     move-result v2
 
@@ -1732,23 +2115,12 @@
     return-void
 .end method
 
-.class public final Lchasm/jit/Install;
+.class final Lchasm/dex/WasmModule$Install;
 .super Ljava/lang/Object;
-
-# interfaces
-.implements Ljava/util/function/Consumer;
 
 
 # direct methods
-.method public constructor <init>()V
-    .registers 1
-
-    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
-
-    return-void
-.end method
-
-.method private static bindObjects0(Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;[Ljava/lang/Object;)V
+.method static bindObjects0(Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;[Ljava/lang/Object;)V
     .registers 8
 
     const/4 v2, 0x0
@@ -1761,10 +2133,20 @@
 
     aput-object v4, p1, v2
 
+    const/4 v2, 0x0
+
+    invoke-virtual {p0, v2}, Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;->rtt(I)Ljava/lang/Object;
+
+    move-result-object v4
+
+    const/4 v2, 0x4
+
+    aput-object v4, p1, v2
+
     return-void
 .end method
 
-.method private static bindValues0(Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;[Ljava/lang/Object;)V
+.method static bindValues0(Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;[Ljava/lang/Object;)V
     .registers 8
 
     const/4 v2, 0x0
@@ -1812,14 +2194,336 @@
     return-void
 .end method
 
+.class final Lchasm/dex/WasmModule$InstallEntries0;
+.super Ljava/lang/Object;
 
-# virtual methods
-.method public accept(Ljava/lang/Object;)V
+
+# direct methods
+.method static installEntries0(Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;[Ljava/lang/Object;)V
+    .registers 8
+
+    invoke-static {p0, p1}, Lchasm/dex/WasmModule$InstallEntries0;->installEntries1(Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;[Ljava/lang/Object;)V
+
+    return-void
+.end method
+
+.method private static installEntries1(Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;[Ljava/lang/Object;)V
+    .registers 8
+
+    new-instance v4, Lchasm/dex/WasmModule$Entry0;
+
+    const/4 v3, 0x0
+
+    invoke-direct {v4, p1, v3}, Lchasm/dex/WasmModule$Entry0;-><init>([Ljava/lang/Object;I)V
+
+    const/4 v2, 0x0
+
+    invoke-virtual {p0, v2, v4}, Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;->install(ILio/github/charlietap/chasm/runtime/function/CompiledFunction;)V
+
+    new-instance v4, Lchasm/dex/WasmModule$Entry1;
+
+    const/4 v3, 0x0
+
+    invoke-direct {v4, p1, v3}, Lchasm/dex/WasmModule$Entry1;-><init>([Ljava/lang/Object;I)V
+
+    const/4 v2, 0x1
+
+    invoke-virtual {p0, v2, v4}, Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;->install(ILio/github/charlietap/chasm/runtime/function/CompiledFunction;)V
+
+    new-instance v4, Lchasm/dex/WasmModule$Entry1;
+
+    const/4 v3, 0x1
+
+    invoke-direct {v4, p1, v3}, Lchasm/dex/WasmModule$Entry1;-><init>([Ljava/lang/Object;I)V
+
+    const/4 v2, 0x2
+
+    invoke-virtual {p0, v2, v4}, Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;->install(ILio/github/charlietap/chasm/runtime/function/CompiledFunction;)V
+
+    new-instance v4, Lchasm/dex/WasmModule$Entry2;
+
+    const/4 v3, 0x0
+
+    invoke-direct {v4, p1, v3}, Lchasm/dex/WasmModule$Entry2;-><init>([Ljava/lang/Object;I)V
+
+    const/4 v2, 0x3
+
+    invoke-virtual {p0, v2, v4}, Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;->install(ILio/github/charlietap/chasm/runtime/function/CompiledFunction;)V
+
+    new-instance v4, Lchasm/dex/WasmModule$Entry1;
+
+    const/4 v3, 0x2
+
+    invoke-direct {v4, p1, v3}, Lchasm/dex/WasmModule$Entry1;-><init>([Ljava/lang/Object;I)V
+
+    const/4 v2, 0x4
+
+    invoke-virtual {p0, v2, v4}, Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;->install(ILio/github/charlietap/chasm/runtime/function/CompiledFunction;)V
+
+    new-instance v4, Lchasm/dex/WasmModule$Entry3;
+
+    const/4 v3, 0x0
+
+    invoke-direct {v4, p1, v3}, Lchasm/dex/WasmModule$Entry3;-><init>([Ljava/lang/Object;I)V
+
+    const/4 v2, 0x5
+
+    invoke-virtual {p0, v2, v4}, Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;->install(ILio/github/charlietap/chasm/runtime/function/CompiledFunction;)V
+
+    new-instance v4, Lchasm/dex/WasmModule$Entry4;
+
+    const/4 v3, 0x0
+
+    invoke-direct {v4, p1, v3}, Lchasm/dex/WasmModule$Entry4;-><init>([Ljava/lang/Object;I)V
+
+    const/4 v2, 0x6
+
+    invoke-virtual {p0, v2, v4}, Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;->install(ILio/github/charlietap/chasm/runtime/function/CompiledFunction;)V
+
+    new-instance v4, Lchasm/dex/WasmModule$Entry1;
+
+    const/4 v3, 0x3
+
+    invoke-direct {v4, p1, v3}, Lchasm/dex/WasmModule$Entry1;-><init>([Ljava/lang/Object;I)V
+
+    const/4 v2, 0x7
+
+    invoke-virtual {p0, v2, v4}, Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;->install(ILio/github/charlietap/chasm/runtime/function/CompiledFunction;)V
+
+    new-instance v4, Lchasm/dex/WasmModule$Entry1;
+
+    const/4 v3, 0x4
+
+    invoke-direct {v4, p1, v3}, Lchasm/dex/WasmModule$Entry1;-><init>([Ljava/lang/Object;I)V
+
+    const/16 v2, 0x8
+
+    invoke-virtual {p0, v2, v4}, Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;->install(ILio/github/charlietap/chasm/runtime/function/CompiledFunction;)V
+
+    new-instance v4, Lchasm/dex/WasmModule$Entry3;
+
+    const/4 v3, 0x1
+
+    invoke-direct {v4, p1, v3}, Lchasm/dex/WasmModule$Entry3;-><init>([Ljava/lang/Object;I)V
+
+    const/16 v2, 0x9
+
+    invoke-virtual {p0, v2, v4}, Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;->install(ILio/github/charlietap/chasm/runtime/function/CompiledFunction;)V
+
+    new-instance v4, Lchasm/dex/WasmModule$Entry1;
+
+    const/4 v3, 0x5
+
+    invoke-direct {v4, p1, v3}, Lchasm/dex/WasmModule$Entry1;-><init>([Ljava/lang/Object;I)V
+
+    const/16 v2, 0xa
+
+    invoke-virtual {p0, v2, v4}, Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;->install(ILio/github/charlietap/chasm/runtime/function/CompiledFunction;)V
+
+    return-void
+.end method
+
+.class final Lchasm/dex/WasmModule$Structs0;
+.super Ljava/lang/Object;
+
+
+# direct methods
+.method static newStruct(ILio/github/charlietap/chasm/runtime/compiled/gc/Rtt;)Lio/github/charlietap/chasm/runtime/compiled/gc/CompiledStruct;
     .registers 5
 
-    check-cast p1, Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;
+    packed-switch p0, :pswitch_data_e
+
+    invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/CompiledRuntime;->unreachable()Ljava/lang/Void;
+
+    const/4 v0, 0x0
+
+    return-object v0
+
+    :pswitch_8
+    new-instance v0, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/S_I;
+
+    invoke-direct {v0, p1}, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/S_I;-><init>(Lio/github/charlietap/chasm/runtime/compiled/gc/Rtt;)V
+
+    return-object v0
+
+    :pswitch_data_e
+    .packed-switch 0x0
+        :pswitch_8
+    .end packed-switch
+.end method
+
+.class public final Lchasm/dex/WasmModule;
+.super Ljava/lang/Object;
+
+# interfaces
+.implements Lio/github/charlietap/chasm/compiled/CompiledModule;
+
+
+# static fields
+.field public static final COMPILED:Lchasm/dex/WasmModule;
+
+
+# direct methods
+.method static constructor <clinit>()V
+    .registers 1
+
+    new-instance v0, Lchasm/dex/WasmModule;
+
+    invoke-direct {v0}, Lchasm/dex/WasmModule;-><init>()V
+
+    sput-object v0, Lchasm/dex/WasmModule;->COMPILED:Lchasm/dex/WasmModule;
+
+    return-void
+.end method
+
+.method private constructor <init>()V
+    .registers 1
+
+    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
+
+    return-void
+.end method
+
+.method private static classes0([Ljava/lang/String;)V
+    .registers 3
+
+    const/4 v0, 0x0
+
+    const-string v1, "chasm.dex.WasmModule$Code0"
+
+    aput-object v1, p0, v0
+
+    const/4 v0, 0x1
+
+    const-string v1, "chasm.dex.WasmModule$Entry0"
+
+    aput-object v1, p0, v0
+
+    const/4 v0, 0x2
+
+    const-string v1, "chasm.dex.WasmModule$Entry1"
+
+    aput-object v1, p0, v0
+
+    const/4 v0, 0x3
+
+    const-string v1, "chasm.dex.WasmModule$Entry2"
+
+    aput-object v1, p0, v0
 
     const/4 v0, 0x4
+
+    const-string v1, "chasm.dex.WasmModule$Entry3"
+
+    aput-object v1, p0, v0
+
+    const/4 v0, 0x5
+
+    const-string v1, "chasm.dex.WasmModule$Entry4"
+
+    aput-object v1, p0, v0
+
+    const/4 v0, 0x6
+
+    const-string v1, "chasm.dex.WasmModule$InstallEntries0"
+
+    aput-object v1, p0, v0
+
+    const/4 v0, 0x7
+
+    const-string v1, "chasm.dex.WasmModule$Install"
+
+    aput-object v1, p0, v0
+
+    const/16 v0, 0x8
+
+    const-string v1, "chasm.dex.WasmModule$Declare0"
+
+    aput-object v1, p0, v0
+
+    const/16 v0, 0x9
+
+    const-string v1, "chasm.dex.WasmModule$Structs0"
+
+    aput-object v1, p0, v0
+
+    return-void
+.end method
+
+
+# virtual methods
+.method public buildDeclarations(Lio/github/charlietap/chasm/declarations/DataSource;)Lio/github/charlietap/chasm/declarations/ModuleDeclarations;
+    .registers 3
+
+    new-instance v0, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;
+
+    invoke-direct {v0}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;-><init>()V
+
+    invoke-static {v0}, Lchasm/dex/WasmModule$Declare0;->declare(Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;)V
+
+    invoke-virtual {v0, p1}, Lio/github/charlietap/chasm/declarations/construction/DeclarationsBuilder;->build(Lio/github/charlietap/chasm/declarations/DataSource;)Lio/github/charlietap/chasm/declarations/ModuleDeclarations;
+
+    move-result-object v0
+
+    return-object v0
+.end method
+
+.method public byteArrayBaseOffset()J
+    .registers 3
+
+    const-wide/16 v0, -0x1
+
+    return-wide v0
+.end method
+
+.method public classes()[Ljava/lang/String;
+    .registers 3
+
+    const/16 v0, 0xa
+
+    new-array v1, v0, [Ljava/lang/String;
+
+    invoke-static {v1}, Lchasm/dex/WasmModule;->classes0([Ljava/lang/String;)V
+
+    return-object v1
+.end method
+
+.method public fuel()J
+    .registers 3
+
+    const-wide/16 v0, -0x1
+
+    return-wide v0
+.end method
+
+.method public gcHeapBytes()J
+    .registers 3
+
+    const-wide/16 v0, -0x1
+
+    return-wide v0
+.end method
+
+.method public initializesEagerly()Z
+    .registers 3
+
+    const/4 v0, 0x1
+
+    return v0
+.end method
+
+.method public install(Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;)V
+    .registers 5
+
+    const/4 v0, 0x0
+
+    invoke-virtual {p1, v0}, Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;->memory(I)Lio/github/charlietap/chasm/runtime/instance/MemoryInstance;
+
+    move-result-object v1
+
+    invoke-static {v1}, Lio/github/charlietap/chasm/runtime/compiled/CompiledMemory;->requireByteArray(Lio/github/charlietap/chasm/runtime/instance/MemoryInstance;)V
+
+    const/4 v0, 0x5
 
     new-array v1, v0, [Ljava/lang/Object;
 
@@ -1831,140 +2535,135 @@
 
     aput-object v2, v1, v0
 
-    invoke-static {p1, v1}, Lchasm/jit/Install;->bindObjects0(Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;[Ljava/lang/Object;)V
+    invoke-static {p1, v1}, Lchasm/dex/WasmModule$Install;->bindObjects0(Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;[Ljava/lang/Object;)V
 
-    invoke-static {p1, v1}, Lchasm/jit/Install;->bindValues0(Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;[Ljava/lang/Object;)V
+    invoke-static {p1, v1}, Lchasm/dex/WasmModule$Install;->bindValues0(Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;[Ljava/lang/Object;)V
 
-    invoke-static {p1, v1}, Lchasm/jit/InstallEntries0;->installEntries0(Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;[Ljava/lang/Object;)V
-
-    return-void
-.end method
-
-.class final Lchasm/jit/InstallEntries0;
-.super Ljava/lang/Object;
-
-
-# direct methods
-.method static installEntries0(Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;[Ljava/lang/Object;)V
-    .registers 8
-
-    invoke-static {p0, p1}, Lchasm/jit/InstallEntries0;->installEntries1(Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;[Ljava/lang/Object;)V
+    invoke-static {p1, v1}, Lchasm/dex/WasmModule$InstallEntries0;->installEntries0(Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;[Ljava/lang/Object;)V
 
     return-void
 .end method
 
-.method private static installEntries1(Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;[Ljava/lang/Object;)V
-    .registers 8
+.method public interrupts()Z
+    .registers 3
 
-    new-instance v4, Lchasm/jit/Entry0;
+    const/4 v0, 0x0
 
-    const/4 v3, 0x0
+    return v0
+.end method
 
-    invoke-direct {v4, p1, v3}, Lchasm/jit/Entry0;-><init>([Ljava/lang/Object;I)V
+.method public linearMemoryBytes()J
+    .registers 3
 
-    const/4 v2, 0x0
+    const-wide/16 v0, -0x1
 
-    invoke-virtual {p0, v2, v4}, Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;->install(ILio/github/charlietap/chasm/runtime/function/CompiledFunction;)V
+    return-wide v0
+.end method
 
-    new-instance v4, Lchasm/jit/Entry1;
+.method public newStruct(ILjava/lang/Object;)Ljava/lang/Object;
+    .registers 5
 
-    const/4 v3, 0x0
+    div-int/lit16 v0, p1, 0x80
 
-    invoke-direct {v4, p1, v3}, Lchasm/jit/Entry1;-><init>([Ljava/lang/Object;I)V
+    packed-switch v0, :pswitch_data_12
 
-    const/4 v2, 0x1
+    invoke-static {}, Lio/github/charlietap/chasm/runtime/compiled/CompiledRuntime;->unreachable()Ljava/lang/Void;
 
-    invoke-virtual {p0, v2, v4}, Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;->install(ILio/github/charlietap/chasm/runtime/function/CompiledFunction;)V
+    const/4 v0, 0x0
 
-    new-instance v4, Lchasm/jit/Entry1;
+    return-object v0
 
-    const/4 v3, 0x1
+    :pswitch_a
+    move-object v1, p2
 
-    invoke-direct {v4, p1, v3}, Lchasm/jit/Entry1;-><init>([Ljava/lang/Object;I)V
+    check-cast v1, Lio/github/charlietap/chasm/runtime/compiled/gc/Rtt;
 
-    const/4 v2, 0x2
+    invoke-static {p1, v1}, Lchasm/dex/WasmModule$Structs0;->newStruct(ILio/github/charlietap/chasm/runtime/compiled/gc/Rtt;)Lio/github/charlietap/chasm/runtime/compiled/gc/CompiledStruct;
 
-    invoke-virtual {p0, v2, v4}, Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;->install(ILio/github/charlietap/chasm/runtime/function/CompiledFunction;)V
+    move-result-object v0
 
-    new-instance v4, Lchasm/jit/Entry2;
+    return-object v0
 
-    const/4 v3, 0x0
+    :pswitch_data_12
+    .packed-switch 0x0
+        :pswitch_a
+    .end packed-switch
+.end method
 
-    invoke-direct {v4, p1, v3}, Lchasm/jit/Entry2;-><init>([Ljava/lang/Object;I)V
+.method public resourceRoot()Ljava/lang/String;
+    .registers 3
 
-    const/4 v2, 0x3
+    const-string v0, "chasm/dex/WasmModule"
 
-    invoke-virtual {p0, v2, v4}, Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;->install(ILio/github/charlietap/chasm/runtime/function/CompiledFunction;)V
+    return-object v0
+.end method
 
-    new-instance v4, Lchasm/jit/Entry1;
+.method public runtimeAbi()I
+    .registers 3
 
-    const/4 v3, 0x2
+    const/4 v0, 0x4
 
-    invoke-direct {v4, p1, v3}, Lchasm/jit/Entry1;-><init>([Ljava/lang/Object;I)V
+    return v0
+.end method
 
-    const/4 v2, 0x4
+.method public stackBytes()J
+    .registers 3
 
-    invoke-virtual {p0, v2, v4}, Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;->install(ILio/github/charlietap/chasm/runtime/function/CompiledFunction;)V
+    const-wide/16 v0, -0x1
 
-    new-instance v4, Lchasm/jit/Entry3;
+    return-wide v0
+.end method
 
-    const/4 v3, 0x0
+.method public stacktraces()Z
+    .registers 3
 
-    invoke-direct {v4, p1, v3}, Lchasm/jit/Entry3;-><init>([Ljava/lang/Object;I)V
+    const/4 v0, 0x1
 
-    const/4 v2, 0x5
+    return v0
+.end method
 
-    invoke-virtual {p0, v2, v4}, Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;->install(ILio/github/charlietap/chasm/runtime/function/CompiledFunction;)V
+.method public structLanes()[J
+    .registers 3
 
-    new-instance v4, Lchasm/jit/Entry4;
+    const/4 v0, 0x4
 
-    const/4 v3, 0x0
+    new-array v1, v0, [J
 
-    invoke-direct {v4, p1, v3}, Lchasm/jit/Entry4;-><init>([Ljava/lang/Object;I)V
+    fill-array-data v1, :array_8
 
-    const/4 v2, 0x6
+    return-object v1
 
-    invoke-virtual {p0, v2, v4}, Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;->install(ILio/github/charlietap/chasm/runtime/function/CompiledFunction;)V
+    nop
 
-    new-instance v4, Lchasm/jit/Entry1;
+    :array_8
+    .array-data 8
+        0x0
+        0x10
+        0x1
+        0x0
+    .end array-data
+.end method
 
-    const/4 v3, 0x3
+.method public tableBytes()J
+    .registers 3
 
-    invoke-direct {v4, p1, v3}, Lchasm/jit/Entry1;-><init>([Ljava/lang/Object;I)V
+    const-wide/16 v0, -0x1
 
-    const/4 v2, 0x7
+    return-wide v0
+.end method
 
-    invoke-virtual {p0, v2, v4}, Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;->install(ILio/github/charlietap/chasm/runtime/function/CompiledFunction;)V
+.method public target()I
+    .registers 3
 
-    new-instance v4, Lchasm/jit/Entry1;
+    const/4 v0, 0x1
 
-    const/4 v3, 0x4
+    return v0
+.end method
 
-    invoke-direct {v4, p1, v3}, Lchasm/jit/Entry1;-><init>([Ljava/lang/Object;I)V
+.method public trapOnGrowthFailure()Z
+    .registers 3
 
-    const/16 v2, 0x8
+    const/4 v0, 0x0
 
-    invoke-virtual {p0, v2, v4}, Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;->install(ILio/github/charlietap/chasm/runtime/function/CompiledFunction;)V
-
-    new-instance v4, Lchasm/jit/Entry3;
-
-    const/4 v3, 0x1
-
-    invoke-direct {v4, p1, v3}, Lchasm/jit/Entry3;-><init>([Ljava/lang/Object;I)V
-
-    const/16 v2, 0x9
-
-    invoke-virtual {p0, v2, v4}, Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;->install(ILio/github/charlietap/chasm/runtime/function/CompiledFunction;)V
-
-    new-instance v4, Lchasm/jit/Entry1;
-
-    const/4 v3, 0x5
-
-    invoke-direct {v4, p1, v3}, Lchasm/jit/Entry1;-><init>([Ljava/lang/Object;I)V
-
-    const/16 v2, 0xa
-
-    invoke-virtual {p0, v2, v4}, Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;->install(ILio/github/charlietap/chasm/runtime/function/CompiledFunction;)V
-
-    return-void
+    return v0
 .end method

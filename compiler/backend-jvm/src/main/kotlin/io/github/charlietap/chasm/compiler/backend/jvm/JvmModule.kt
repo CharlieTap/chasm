@@ -16,16 +16,9 @@ interface JvmOutput {
 
 class JvmModule(
     val moduleClass: String,
-    val data: String?,
 )
-
-const val DATA_EXTENSION = "chasmdata"
 
 class ClassTooLarge(
     message: String,
     cause: Throwable,
 ) : IllegalArgumentException(message, cause)
-
-class UnsupportedFunctions(
-    val reasons: Map<Int, String>,
-) : IllegalArgumentException("cannot generate functions: " + reasons.entries.joinToString { (index, reason) -> "$index ($reason)" })

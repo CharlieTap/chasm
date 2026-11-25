@@ -1,3 +1,5 @@
+@file:OptIn(InternalChasmApi::class)
+
 package io.github.charlietap.chasm.compiler.backend.dex
 
 import com.android.tools.smali.baksmali.Adaptors.ClassDefinition
@@ -11,12 +13,18 @@ import com.android.tools.smali.dexlib2.iface.instruction.OffsetInstruction
 import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 import com.github.michaelbull.result.getOrThrow
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.module.Module
+import io.github.charlietap.chasm.cir.CirModule
 import io.github.charlietap.chasm.compiler.frontend.ModuleCompiler
 import io.github.charlietap.chasm.config.ModuleConfig
+import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
+import io.github.charlietap.chasm.module.ModuleDeclarationsFactory
 import io.github.charlietap.chasm.validator.WasmModuleValidator
+import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.OutputStream
 import java.io.StringWriter
 
 internal fun decodeModule(
@@ -29,11 +37,39 @@ internal fun decodeModule(
 
 internal fun generate(
     module: Module,
-    options: DexOptions = DexOptions(stacktraces = true),
+    options: DexOptions = TRACED,
 ): DexModule {
     val code = ModuleCompiler(module).getOrThrow { IllegalStateException(it.toString()) }
-    return ModuleLowerer(module, code, options)
+    return lower(module, code, options)
 }
+
+internal fun lower(
+    module: Module,
+    code: CirModule,
+    options: DexOptions,
+    resources: DexResources = CollectedResources(),
+): DexModule {
+    return ModuleLowerer(module, code, options, ModuleDeclarationsFactory(module), emptyMap(), resources)
+}
+
+internal class CollectedResources : DexResources {
+
+    val resources = LinkedHashMap<String, ByteArray>()
+
+    override fun <T> resource(
+        path: String,
+        write: (OutputStream) -> T,
+    ): T {
+
+        val stream = ByteArrayOutputStream()
+        val result = write(stream)
+        check(resources.put(path, stream.toByteArray()) == null) { "resource $path written twice" }
+
+        return result
+    }
+}
+
+internal val TRACED = DexOptions(runtime = RuntimeConfig(stacktraces = true))
 
 internal fun fixture(
     name: String,

@@ -24,36 +24,14 @@ kotlin {
             dependencies {
                 api(projects.config)
                 api(projects.embeddingApi)
-                api(projects.runtime.type)
 
-                implementation(projects.executor.callCore)
-                implementation(projects.memory)
                 implementation(projects.moduleDeclarations)
-                implementation(projects.runtime.address)
                 implementation(projects.runtime.core)
                 implementation(projects.runtime.host)
                 implementation(projects.runtime.resources)
-                implementation(projects.runtime.value)
                 implementation(projects.typeSystem)
 
                 implementation(libs.result)
-            }
-        }
-
-        commonTest {
-            dependencies {
-                implementation(projects.ast)
-                implementation(projects.compiler.backendChasm)
-                implementation(projects.compiler.frontend)
-                implementation(projects.embeddingModule)
-                implementation(projects.executor.instantiator)
-                implementation(projects.libs.parallelCoroutines)
-                implementation(projects.test.fixture.ast)
-                implementation(projects.test.fixture.config)
-                implementation(projects.test.fixture.runtime)
-                implementation(projects.test.fixture.typeSystem)
-
-                implementation(libs.kotlinx.coroutines.test)
             }
         }
     }

@@ -25,6 +25,7 @@ import io.github.charlietap.chasm.host.HostFunction
 import io.github.charlietap.chasm.host.HostFunctionException
 import io.github.charlietap.chasm.host.hasPending
 import io.github.charlietap.chasm.host.writeI32
+import io.github.charlietap.chasm.integration.COMPILED
 import io.github.charlietap.chasm.integration.TestRunner
 import io.github.charlietap.chasm.integration.TestScope
 import io.github.charlietap.chasm.integration.assertTrapped
@@ -50,7 +51,7 @@ class ExecutionErrorTest {
     }
 
     @Test
-    fun `instantiating a memory64 module is unsupported`() = integrationTest(MEMORY64_FIXTURE) {
+    fun `instantiating a memory64 module is unsupported`() = integrationTest(MEMORY64_FIXTURE, mapOf(COMPILED to setOf(MEMORY64_FIXTURE))) {
 
         val result = runner().instance()
 

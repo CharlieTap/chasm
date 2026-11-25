@@ -21,3 +21,5 @@ internal const val SPLIT_CODE_UNITS = 13_000
 internal const val CHUNK_CODE_UNITS = 7_500
 
 internal const val CHUNK_INSTRUCTIONS = 3_000
+
+const val ART_BYTE_ARRAY_BASE_OFFSET = 12L

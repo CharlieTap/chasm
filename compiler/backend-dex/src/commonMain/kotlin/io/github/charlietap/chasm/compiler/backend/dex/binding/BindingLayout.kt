@@ -1,7 +1,6 @@
 package io.github.charlietap.chasm.compiler.backend.dex.binding
 
 import io.github.charlietap.chasm.compiler.backend.abi.Resource
-import io.github.charlietap.chasm.compiler.backend.abi.heapTypeNumber
 import io.github.charlietap.chasm.compiler.backend.analysis.FunctionCensus
 import io.github.charlietap.chasm.compiler.backend.analysis.ModuleAnalysis
 import io.github.charlietap.chasm.compiler.backend.analysis.ModuleIndexSpaces
@@ -20,15 +19,14 @@ internal class BindingLayout(
     private val functions = tables + declarations.tableCount
     private val elements = functions + bridgedFunctions.count
     private val data = elements + declarations.elementCount
-    private val typeTests = data + declarations.dataCount
-
-    private val functionObjects = typeTests + (declarations.typeCount + ABSTRACT_HEAP_TYPES) * 2
+    private val functionObjects = data + declarations.dataCount
 
     private val referenceGlobals = functionObjects + referencedFunctions.count
     private val referenceTables = referenceGlobals + declarations.globalCount
     private val referenceSegments = referenceTables + declarations.tableCount
+    private val rtts = referenceSegments + declarations.elementCount
 
-    val objectCount = referenceSegments + declarations.elementCount
+    val objectCount = rtts + declarations.typeCount
 
     private val runtimeTypes = 0
     private val functionReferences = runtimeTypes + declarations.typeCount
@@ -44,15 +42,12 @@ internal class BindingLayout(
             is Resource.Global -> ranged(globals, resource.index, tables, resource)
             is Resource.Table -> ranged(tables, resource.index, functions, resource)
             is Resource.Element -> ranged(elements, resource.index, data, resource)
-            is Resource.Data -> ranged(data, resource.index, typeTests, resource)
-            is Resource.TypeTest -> {
-                val index = (heapTypeNumber(resource.type.heapType) + ABSTRACT_HEAP_TYPES) * 2 + if (resource.type.nullable) 1 else 0
-                ranged(typeTests, index, functionObjects, resource)
-            }
+            is Resource.Data -> ranged(data, resource.index, functionObjects, resource)
             is Resource.FunctionObject -> functionObjects + censusOrdinal(referencedFunctions, resource.index, resource)
             is Resource.ReferenceGlobal -> ranged(referenceGlobals, resource.index, referenceTables, resource)
             is Resource.ReferenceTable -> ranged(referenceTables, resource.index, referenceSegments, resource)
-            is Resource.ReferenceSegment -> ranged(referenceSegments, resource.index, objectCount, resource)
+            is Resource.ReferenceSegment -> ranged(referenceSegments, resource.index, rtts, resource)
+            is Resource.Rtt -> ranged(rtts, resource.typeIndex, objectCount, resource)
             is Resource.Function -> functions + censusOrdinal(bridgedFunctions, resource.index, resource)
             else -> throw IllegalArgumentException("$resource has no binding object slot")
         }
@@ -93,6 +88,5 @@ internal class BindingLayout(
         private const val INSTANCE_SLOT = 1
         private const val UNSAFE_SLOT = 2
         private const val FIRST_DECLARATION_SLOT = 3
-        private const val ABSTRACT_HEAP_TYPES = 12
     }
 }

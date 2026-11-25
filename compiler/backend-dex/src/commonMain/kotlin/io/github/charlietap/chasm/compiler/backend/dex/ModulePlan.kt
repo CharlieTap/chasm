@@ -6,6 +6,7 @@ import io.github.charlietap.chasm.cir.CirModule
 import io.github.charlietap.chasm.cir.FunctionIndex
 import io.github.charlietap.chasm.cir.MemoryIndex
 import io.github.charlietap.chasm.cir.TypeIndex
+import io.github.charlietap.chasm.compiler.backend.abi.GeneratedClassNames
 import io.github.charlietap.chasm.compiler.backend.abi.MethodRef
 import io.github.charlietap.chasm.compiler.backend.abi.OBJECT_TYPE
 import io.github.charlietap.chasm.compiler.backend.analysis.ModuleAnalysis
@@ -13,19 +14,17 @@ import io.github.charlietap.chasm.compiler.backend.analysis.ModuleIndexSpaces
 import io.github.charlietap.chasm.compiler.backend.analysis.analyzeModule
 import io.github.charlietap.chasm.compiler.backend.analysis.functionBatches
 import io.github.charlietap.chasm.compiler.backend.analysis.gc.ReferenceTests
-import io.github.charlietap.chasm.compiler.backend.analysis.gc.ShapeLayouts
-import io.github.charlietap.chasm.compiler.backend.analysis.gc.ShapeSizes
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.RttTests
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.STORAGE_FAMILY
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.StoragePlans
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.StructLanes
 import io.github.charlietap.chasm.compiler.backend.dex.abi.BATCH_FUNCTIONS
 import io.github.charlietap.chasm.compiler.backend.dex.abi.BATCH_INSTRUCTIONS
 import io.github.charlietap.chasm.compiler.backend.dex.abi.DexReferences
 import io.github.charlietap.chasm.compiler.backend.dex.abi.FunctionSignature
 import io.github.charlietap.chasm.compiler.backend.dex.abi.Invocation
-import io.github.charlietap.chasm.compiler.backend.dex.abi.codeClass
 import io.github.charlietap.chasm.compiler.backend.dex.abi.functionMethod
-import io.github.charlietap.chasm.compiler.backend.dex.abi.signatureClass
 import io.github.charlietap.chasm.compiler.backend.dex.binding.BindingLayout
-import io.github.charlietap.chasm.compiler.backend.dex.gc.StructuralShapeNames
-import io.github.charlietap.chasm.runtime.execution.ARRAY_OVERHEAD
 
 internal class ModulePlan(
     val module: Module,
@@ -36,19 +35,23 @@ internal class ModulePlan(
 ) {
 
     val referenceDescriptor = OBJECT_TYPE
-    val gc = ShapeLayouts(module.definedTypes, StructuralShapeNames())
-    val shapeSizes = ShapeSizes(ARRAY_OVERHEAD)
+    val storagePlans = StoragePlans(module.definedTypes, STORAGE_FAMILY)
+    val rttTests = RttTests(module.definedTypes)
+    val structLanes = StructLanes(storagePlans, module.definedTypes)
     val referenceTests = ReferenceTests(module.definedTypes)
 
     val layout = BindingLayout(declarations, analysis)
-    val packagePath = options.packageName.replace('.', '/')
+    val entryPath = options.entryClass.replace('.', '/')
+    val names = GeneratedClassNames(entryPath)
     val inlineMemory: MemoryIndex? = MemoryIndex(0).takeIf { options.inlineMemory && declarations.memoryCount == 1 }
     val functionCount = declarations.functionCount
     val functions: List<CirFunction> = code.functions
     val batches: List<List<CirFunction>> = functionBatches(code.functions, BATCH_INSTRUCTIONS, BATCH_FUNCTIONS)
 
+    val signatureClasses: List<String> = List(analysis.signatureTypes.size, names::signature)
+
     private val signatures: Map<String, String> = analysis.signatureTypes.keys.withIndex().associate { (index, key) ->
-        key to signatureClass(packagePath, index)
+        key to signatureClasses[index]
     }
 
     private val batchOf = IntArray(functionCount) { NO_BATCH }.also { batchOf ->
@@ -68,7 +71,7 @@ internal class ModulePlan(
         val references = DexReferences()
         for (function in code.functions) {
             val index = function.index.index
-            val method = functionMethod(codeClass(packagePath, batchOf[index]), index, declarations.functionType(function.type), referenceDescriptor)
+            val method = functionMethod(names.code(batchOf[index]), index, declarations.functionType(function.type), referenceDescriptor)
             functionMethods[index] = method
             functionInvocations[index] = references.invocation(method)
         }
@@ -83,7 +86,7 @@ internal class ModulePlan(
     }
 
     fun codeClass(index: FunctionIndex): String {
-        return codeClass(packagePath, batchOf[index.index])
+        return names.code(batchOf[index.index])
     }
 
     fun functionMethod(index: FunctionIndex): MethodRef {

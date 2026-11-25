@@ -8,7 +8,7 @@ import io.github.charlietap.chasm.embedding.instance
 import io.github.charlietap.chasm.embedding.invoke
 import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.expect
-import io.github.charlietap.chasm.integration.Aot
+import io.github.charlietap.chasm.integration.ClassFiles
 import io.github.charlietap.chasm.integration.Engine
 import io.github.charlietap.chasm.integration.Interpreter
 import io.github.charlietap.chasm.integration.trapOf
@@ -25,7 +25,7 @@ class MixedEngineTrapTest {
         val expected = trap(owner = Interpreter(), caller = Interpreter())
 
         assertEquals(listOf("boom", "call_boom", "call_owner"), expected.frames.map { frame -> frame.functionName })
-        assertSameTrap(expected, trap(owner = Aot(), caller = Aot()))
+        assertSameTrap(expected, trap(owner = ClassFiles(), caller = ClassFiles()))
     }
 
     private fun assertSameTrap(

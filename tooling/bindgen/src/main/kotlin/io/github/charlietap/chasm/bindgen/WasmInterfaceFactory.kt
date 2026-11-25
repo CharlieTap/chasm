@@ -469,7 +469,7 @@ internal class WasmInterfaceFactory(
         val gcTypes = GcTypeResolver(
             interfaceClassName = ClassName(packageName, interfaceName),
             mapsReferences = config.runtime == CodegenRuntime.CHASM,
-            storagePlanner = if (config.executionTier is ExecutionTier.Aot) {
+            storagePlanner = if (config.executionTier is ExecutionTier.Compiled) {
                 StoragePlansStructViewStoragePlanner(RttKeys(emptyList()))
             } else {
                 null

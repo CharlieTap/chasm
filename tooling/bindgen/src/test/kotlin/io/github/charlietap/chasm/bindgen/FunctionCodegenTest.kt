@@ -226,7 +226,7 @@ class FunctionCodegenTest {
     )
 
     @Test
-    fun `generates JIT scalar parameters with a freed string parameter and a string return`() {
+    fun `generates loaded compiled scalar parameters with a freed string parameter and a string return`() {
 
         val mixedParameterFunction = function(
             name = "invoke",
@@ -250,13 +250,13 @@ class FunctionCodegenTest {
         assertGenerates(
             category = "function",
             wasmInterface = wasmInterface(
-                interfaceName = "JitScalarAndStringParams",
+                interfaceName = "LoadedScalarAndStringParams",
                 packageName = PACKAGE_NAME,
                 allocator = ExportedAllocator("alloc", "free"),
                 memories = listOf(memoryBinding("memory", "memory", exposed = false)),
                 functions = listOf(mixedParameterFunction),
             ),
-            config = codegenConfig(executionTier = ExecutionTier.Jit()),
+            config = codegenConfig(executionTier = ExecutionTier.Compiled(CompiledSource.Loaded())),
             runtimes = listOf(CodegenRuntime.CHASM),
         )
     }

@@ -10,6 +10,8 @@ import io.github.charlietap.chasm.ast.module.Import
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.compiler.backend.abi.CHECK_ARRAY_LENGTH
 import io.github.charlietap.chasm.compiler.backend.abi.CODE_INSTALLATION
+import io.github.charlietap.chasm.compiler.backend.abi.DOUBLE_TO_RAW_LONG_BITS
+import io.github.charlietap.chasm.compiler.backend.abi.FLOAT_TO_RAW_INT_BITS
 import io.github.charlietap.chasm.compiler.backend.abi.GLOBAL_INSTANCE
 import io.github.charlietap.chasm.compiler.backend.abi.I31_REFERENCE
 import io.github.charlietap.chasm.compiler.backend.abi.INSTALLATION_GLOBAL
@@ -17,6 +19,7 @@ import io.github.charlietap.chasm.compiler.backend.abi.INSTALLATION_MANAGED_FUNC
 import io.github.charlietap.chasm.compiler.backend.abi.INSTALLATION_REFERENCE_GLOBAL
 import io.github.charlietap.chasm.compiler.backend.abi.INSTALLATION_REFERENCE_SEGMENT
 import io.github.charlietap.chasm.compiler.backend.abi.INSTALLATION_REFERENCE_TABLE
+import io.github.charlietap.chasm.compiler.backend.abi.INSTALLATION_RTT
 import io.github.charlietap.chasm.compiler.backend.abi.INT_BITS_TO_FLOAT
 import io.github.charlietap.chasm.compiler.backend.abi.LONG_BITS_TO_DOUBLE
 import io.github.charlietap.chasm.compiler.backend.abi.MANAGED_FUNCTION
@@ -27,14 +30,24 @@ import io.github.charlietap.chasm.compiler.backend.abi.REFERENCE_GLOBAL_VALUE
 import io.github.charlietap.chasm.compiler.backend.abi.REFERENCE_SEGMENT
 import io.github.charlietap.chasm.compiler.backend.abi.REFERENCE_STORAGE_ELEMENTS
 import io.github.charlietap.chasm.compiler.backend.abi.REFERENCE_TABLE
-import io.github.charlietap.chasm.compiler.backend.analysis.gc.ArrayShape
+import io.github.charlietap.chasm.compiler.backend.abi.RTT_TYPE
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.ArrayElementKind
 import io.github.charlietap.chasm.compiler.backend.analysis.gc.ConstantExpressions
-import io.github.charlietap.chasm.compiler.backend.analysis.gc.ShapeLayouts
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.FieldStorage
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.Lane
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.LaneKind
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.StoragePlans
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.StructStorage
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.arrayElementKind
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.subType
+import io.github.charlietap.chasm.compiler.backend.dex.MetadataFiles
+import io.github.charlietap.chasm.compiler.backend.dex.abi.BINDING_TYPE
 import io.github.charlietap.chasm.compiler.backend.dex.abi.method
 import io.github.charlietap.chasm.compiler.backend.dex.abi.referenceType
-import io.github.charlietap.chasm.compiler.backend.dex.abi.valueType
 import io.github.charlietap.chasm.compiler.backend.dex.lower.Unsupported
+import io.github.charlietap.chasm.type.CompositeType
 import io.github.charlietap.chasm.type.NumberType
+import io.github.charlietap.chasm.type.StorageType
 import io.github.charlietap.chasm.type.ValueType
 import io.github.charlietap.dexter.ArrayKind
 import io.github.charlietap.dexter.ArrayType
@@ -50,11 +63,13 @@ import io.github.charlietap.dexter.DexFile
 import io.github.charlietap.dexter.DexMethod
 import io.github.charlietap.dexter.DexType
 import io.github.charlietap.dexter.LiteralOp
+import io.github.charlietap.dexter.MemberAccess
 import io.github.charlietap.dexter.Reg
+import io.github.charlietap.chasm.type.FieldType as WasmFieldType
 
 internal class ConstantsWriter(
     private val module: Module,
-    private val layouts: ShapeLayouts,
+    private val storagePlans: StoragePlans,
     private val expressions: ConstantExpressions,
 ) {
     private val importedGlobals = module.imports.mapNotNull { import -> (import.descriptor as? Import.Descriptor.Global)?.type }
@@ -62,12 +77,19 @@ internal class ConstantsWriter(
     private val globalTypes = importedGlobals.map { type -> type.valueType } + module.globals.map { global -> global.type.valueType }
 
     fun write(
+        files: MetadataFiles,
+        owner: String,
+    ) {
+        files.write { file -> writeClass(file, owner) }
+    }
+
+    private fun writeClass(
         file: DexFile,
         owner: String,
     ) {
 
         val type = ClassType(owner)
-        val builder = file.addClass(type, DexType.Object, CONSUMER, access = ClassAccess.PublicFinal)
+        val builder = file.addClass(type, DexType.Object, access = ClassAccess.PackageFinal)
         val initializers = ArrayList<DexMethod>()
 
         expressions.globals.forEach { defined ->
@@ -80,15 +102,9 @@ internal class ConstantsWriter(
             initializers += elementInitializer(builder, type, index, module.elementSegments[index].initExpressions)
         }
 
-        builder.beginConstructor(DexConstructor(type), registerCount = 1).apply {
-            invokeConstructor(DexConstructor(DexType.Object), self)
-            returnVoid()
-            finish()
-        }
-
-        builder.beginInstanceMethod(DexMethod(type, "accept", DexType.Void, DexType.Object), registerCount = 2).apply {
+        val initialize = DexMethod(type, INITIALIZE, DexType.Void, INSTALLATION, BINDING)
+        builder.beginStaticMethod(initialize, registerCount = 2, access = MemberAccess.Package).apply {
             val installation = parameter(0)
-            checkCast(installation, ClassType(CODE_INSTALLATION))
             initializers.forEach { initializer -> invokeStatic(initializer, installation) }
             returnVoid()
             finish()
@@ -103,7 +119,7 @@ internal class ConstantsWriter(
     ): DexMethod {
 
         val method = DexMethod(owner, "global$global", DexType.Void, INSTALLATION)
-        val code = builder.beginStaticMethod(method, registerCount = registersFor(expression) + 1)
+        val code = builder.beginStaticMethod(method, registerCount = registersFor(expression) + 1, access = MemberAccess.Private)
         code.moveObject(INSTALLATION_REGISTER, code.parameter(0))
         val installation = INSTALLATION_REGISTER
         val value = Evaluator(code, installation).evaluate(expression)
@@ -128,7 +144,7 @@ internal class ConstantsWriter(
     ): DexMethod {
 
         val method = DexMethod(owner, "table$table", DexType.Void, INSTALLATION)
-        val code = builder.beginStaticMethod(method, registerCount = registersFor(expression) + 1)
+        val code = builder.beginStaticMethod(method, registerCount = registersFor(expression) + 1, access = MemberAccess.Private)
         code.moveObject(INSTALLATION_REGISTER, code.parameter(0))
         val installation = INSTALLATION_REGISTER
         val value = Evaluator(code, installation).evaluate(expression)
@@ -156,7 +172,7 @@ internal class ConstantsWriter(
         val chunks = expressions.chunked(EXPRESSIONS_PER_METHOD)
         val chunkMethods = chunks.mapIndexed { chunk, members ->
             val method = DexMethod(owner, "element${element}_$chunk", DexType.Void, INSTALLATION, OBJECTS)
-            val code = builder.beginStaticMethod(method, registerCount = members.maxOf(::registersFor) + 2)
+            val code = builder.beginStaticMethod(method, registerCount = members.maxOf(::registersFor) + 2, access = MemberAccess.Private)
             code.moveObject(INSTALLATION_REGISTER, code.parameter(0))
             code.moveObject(SEGMENT, code.parameter(1))
             val installation = INSTALLATION_REGISTER
@@ -172,7 +188,7 @@ internal class ConstantsWriter(
         }
 
         val method = DexMethod(owner, "element$element", DexType.Void, INSTALLATION)
-        val code = builder.beginStaticMethod(method, registerCount = BASE + 1)
+        val code = builder.beginStaticMethod(method, registerCount = BASE + 1, access = MemberAccess.Private)
         code.moveObject(INSTALLATION_REGISTER, code.parameter(0))
         val installation = INSTALLATION_REGISTER
         code.const(INDEX, expressions.size)
@@ -209,7 +225,7 @@ internal class ConstantsWriter(
         return when (instruction) {
             is NumericInstruction.I32Const, is NumericInstruction.I64Const, is NumericInstruction.F32Const, is NumericInstruction.F64Const -> 1
             is ReferenceInstruction.RefNull, is ReferenceInstruction.RefFunc, is VariableInstruction.GlobalGet -> 1
-            is AggregateInstruction.StructNew -> 1 - layouts.struct(instruction.typeIndex.idx.toInt()).fields.size
+            is AggregateInstruction.StructNew -> 1 - storagePlans.struct(instruction.typeIndex.idx.toInt()).fields.size
             is AggregateInstruction.StructNewDefault -> 1
             is AggregateInstruction.ArrayNew -> -1
             is AggregateInstruction.ArrayNewFixed -> 1 - instruction.size.toInt()
@@ -218,6 +234,13 @@ internal class ConstantsWriter(
             -> -1
             else -> 0
         }
+    }
+
+    private fun arrayElement(type: Int): ArrayElementKind {
+
+        val composite = module.definedTypes[type].subType().compositeType as CompositeType.Array
+
+        return arrayElementKind(composite.arrayType.fieldType)
     }
 
     private inner class Evaluator(
@@ -304,50 +327,105 @@ internal class ConstantsWriter(
             withFields: Boolean,
         ) {
 
-            val shape = layouts.struct(type)
-            val first = kinds.size - if (withFields) shape.fields.size else 0
-            val owner = ClassType(shape.className)
-            code.newInstance(TARGET, owner)
-            code.invokeConstructor(DexConstructor(owner), TARGET)
+            val storage = storagePlans.struct(type)
+            val first = kinds.size - if (withFields) storage.fields.size else 0
+            loadRtt(STORAGE, type)
+            code.allocateStruct(storage, STORAGE, STRUCT_REGISTERS)
 
             if (withFields) {
-                shape.fields.forEachIndexed { index, field ->
-                    val value = storageValue(field.descriptor, slot(first + index))
-                    code.putField(value, TARGET, DexField(ClassType(field.owner), field.name, valueType(field.descriptor)))
-                }
+                storage.fields.forEachIndexed { index, field -> putField(storage, field, slot(first + index)) }
             }
 
             replace(first, TARGET)
         }
 
+        private fun putField(
+            storage: StructStorage,
+            field: FieldStorage,
+            value: Reg,
+        ) {
+
+            val lanes = field.lanes
+            if (lanes.size == 2) {
+                code.moveWide(WIDE, value)
+                if (numberType(field.type) == NumberType.F64) {
+                    code.invokeStatic(DOUBLE_TO_RAW_LONG_BITS.method, WIDE)
+                    code.moveResult(WIDE)
+                }
+                code.convert(Conversion.LongToInt, NARROW, WIDE)
+                putLane(NARROW, storage, lanes[0])
+                code.const(RIGHT, HALF_BITS)
+                code.binary(BinaryOp.UshrLong, WIDE, WIDE, RIGHT)
+                code.convert(Conversion.LongToInt, NARROW, WIDE)
+                putLane(NARROW, storage, lanes[1])
+                return
+            }
+
+            val lane = lanes.single()
+            if (lane.kind == LaneKind.REFERENCE) {
+                code.moveObject(VALUE, value)
+                putLane(VALUE, storage, lane)
+                return
+            }
+
+            code.move(NARROW, value)
+            if (numberType(field.type) == NumberType.F32) {
+                code.invokeStatic(FLOAT_TO_RAW_INT_BITS.method, NARROW)
+                code.moveResult(NARROW)
+            }
+            code.maskPacked(field.type, NARROW)
+            putLane(NARROW, storage, lane)
+        }
+
+        private fun putLane(
+            value: Reg,
+            storage: StructStorage,
+            lane: Lane,
+        ) {
+            code.putLane(value, ClassType(storagePlans.laneOwner(storage, lane)), lane, STRUCT_REGISTERS)
+        }
+
+        private fun numberType(type: WasmFieldType): NumberType? {
+            return ((type.storageType as? StorageType.Value)?.type as? ValueType.Number)?.numberType
+        }
+
+        private fun loadRtt(
+            register: Reg,
+            type: Int,
+        ) {
+            code.const(INDEX, type)
+            code.invokeVirtual(INSTALLATION_RTT.method, installation, INDEX)
+            code.moveResult(register)
+            code.checkCast(register, RTT)
+        }
+
         private fun arrayNew(type: Int) {
 
-            val shape = layouts.array(type)
-            val element = shape.data.descriptor.substring(1)
-            val primitive = element.length == 1
+            val element = arrayElement(type)
+            val primitive = element != ArrayElementKind.REFERENCE
             val fill = MethodRef(
                 ARRAYS,
                 "fill",
-                listOf(if (primitive) shape.data.descriptor else "[$OBJECT_TYPE", if (primitive) element else OBJECT_TYPE),
+                listOf(if (primitive) element.arrayDescriptor else "[$OBJECT_TYPE", if (primitive) element.descriptor else OBJECT_TYPE),
                 "V",
             ).method
 
             code.move(INDEX, slot(kinds.size - 1))
-            checkLength(element)
-            code.newArray(STORAGE, INDEX, referenceType(shape.data.descriptor) as ArrayType)
-            code.invokeStatic(fill, STORAGE, storageValue(element, slot(kinds.size - 2)))
+            checkLength(type)
+            code.newArray(STORAGE, INDEX, referenceType(element.arrayDescriptor) as ArrayType)
+            code.invokeStatic(fill, STORAGE, storageValue(element.descriptor, slot(kinds.size - 2)))
 
-            wrap(shape, kinds.size - 2)
+            wrap(type, element, kinds.size - 2)
         }
 
         private fun arrayNewDefault(type: Int) {
 
-            val shape = layouts.array(type)
+            val element = arrayElement(type)
             code.move(INDEX, slot(kinds.size - 1))
-            checkLength(shape.data.descriptor.substring(1))
-            code.newArray(STORAGE, INDEX, referenceType(shape.data.descriptor) as ArrayType)
+            checkLength(type)
+            code.newArray(STORAGE, INDEX, referenceType(element.arrayDescriptor) as ArrayType)
 
-            wrap(shape, kinds.size - 1)
+            wrap(type, element, kinds.size - 1)
         }
 
         private fun arrayNewFixed(
@@ -355,43 +433,36 @@ internal class ConstantsWriter(
             size: Int,
         ) {
 
-            val shape = layouts.array(type)
-            val element = shape.data.descriptor.substring(1)
+            val element = arrayElement(type)
             val first = kinds.size - size
             code.const(INDEX, size)
-            code.newArray(STORAGE, INDEX, referenceType(shape.data.descriptor) as ArrayType)
+            code.newArray(STORAGE, INDEX, referenceType(element.arrayDescriptor) as ArrayType)
 
             for (index in 0 until size) {
-                val value = storageValue(element, slot(first + index))
+                val value = storageValue(element.descriptor, slot(first + index))
                 code.const(INDEX, index)
-                code.arrayPut(arrayKind(element), value, STORAGE, INDEX)
+                code.arrayPut(arrayKind(element.descriptor), value, STORAGE, INDEX)
             }
 
-            wrap(shape, first)
+            wrap(type, element, first)
         }
 
-        private fun checkLength(
-            element: String,
-        ) {
-            val shift = when (element) {
-                "B" -> 0
-                "C" -> 1
-                "J", "D" -> 3
-                else -> 2
-            }
-            code.const(RIGHT, shift)
+        private fun checkLength(type: Int) {
+            code.const(RIGHT, storagePlans.array(type).elementShift)
             code.invokeStatic(CHECK_ARRAY_LENGTH.method, INDEX, RIGHT)
             code.moveResult(INDEX)
         }
 
         private fun wrap(
-            shape: ArrayShape,
+            type: Int,
+            element: ArrayElementKind,
             first: Int,
         ) {
 
-            val owner = ClassType(shape.className)
+            val owner = ClassType(storagePlans.array(type).className)
+            loadRtt(VALUE, type)
             code.newInstance(TARGET, owner)
-            code.invokeConstructor(DexConstructor(owner, referenceType(shape.data.descriptor)), TARGET, STORAGE)
+            code.invokeConstructor(DexConstructor(owner, RTT, referenceType(element.arrayDescriptor)), TARGET, VALUE, STORAGE)
 
             replace(first, TARGET)
         }
@@ -432,7 +503,6 @@ internal class ConstantsWriter(
                 }
                 else -> {
                     code.moveObject(VALUE, value)
-                    if (descriptor != OBJECT_TYPE) code.checkCast(VALUE, referenceType(descriptor))
                     VALUE
                 }
             }
@@ -514,8 +584,10 @@ internal class ConstantsWriter(
 
     private companion object {
         const val ARRAYS = "Ljava/util/Arrays;"
+        const val INITIALIZE = "initialize"
         val INSTALLATION = ClassType(CODE_INSTALLATION)
-        val CONSUMER = ClassType("Ljava/util/function/Consumer;")
+        val BINDING = referenceType(BINDING_TYPE)
+        val RTT = ClassType(RTT_TYPE)
         val OBJECTS = DexType.Object.array()
         val REFERENCE_GLOBAL_TYPE = ClassType(REFERENCE_GLOBAL)
         val REFERENCE_TABLE_TYPE = ClassType(REFERENCE_TABLE)
@@ -539,5 +611,6 @@ internal class ConstantsWriter(
         val SEGMENT = Reg(12)
         const val BASE = 13
         const val EXPRESSIONS_PER_METHOD = 256
+        val STRUCT_REGISTERS = StructRegisters(struct = TARGET, array = STORAGE, index = INDEX)
     }
 }

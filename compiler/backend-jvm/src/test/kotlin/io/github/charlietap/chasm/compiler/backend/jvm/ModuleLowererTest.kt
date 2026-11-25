@@ -4,7 +4,8 @@ package io.github.charlietap.chasm.compiler.backend.jvm
 
 import com.github.michaelbull.result.getOrThrow
 import io.github.charlietap.chasm.InternalChasmApi
-import io.github.charlietap.chasm.compiler.backend.jvm.declarations.DeclarationCallGenerator
+import io.github.charlietap.chasm.compiler.backend.analysis.UnsupportedFunctions
+import io.github.charlietap.chasm.compiler.backend.analysis.declarations.DeclarationCallGenerator
 import io.github.charlietap.chasm.compiler.backend.jvm.declarations.DeclarationsLowerer
 import io.github.charlietap.chasm.compiler.backend.jvm.size.BytecodeSize
 import io.github.charlietap.chasm.compiler.backend.jvm.size.DexUnitEstimate
@@ -214,7 +215,7 @@ class ModuleLowererTest {
             bindingLowerer = { _, _ -> fail("the binding is lowered after every function") },
             declarationCallGenerator = { _, _ -> fail("declarations are lowered after every function") },
             declarationsLowerer = { _, _, _ -> fail("declarations are lowered after every function") },
-            moduleClassLowerer = { _, _, _, _, _, _, _ -> fail("the module class is lowered after every function") },
+            moduleClassLowerer = { _, _, _, _, _, _ -> fail("the module class is lowered after every function") },
             structsLowerer = { _, _, _ -> fail("the struct allocators are lowered after every function") },
         )
 
