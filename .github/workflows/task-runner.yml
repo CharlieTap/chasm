@@ -18,6 +18,11 @@ on:
         description: 'If the workflow has an output result'
         default: false
         required: false
+      artifact:
+        type: string
+        description: 'A path-safe name for uploaded corpus reports; empty uploads nothing'
+        default: ''
+        required: false
     outputs:
       result:
         description: "The result from the task execution"
@@ -73,3 +78,11 @@ jobs:
           RESULT=$(./gradlew -q ${{ inputs.task }})
           echo $RESULT
           echo "result=${RESULT}" >> $GITHUB_OUTPUT
+
+      - name: Upload corpus reports
+        if: ${{ always() && inputs.artifact != '' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: corpus-${{ inputs.artifact }}
+          path: '**/build/reports/corpus/**'
+          if-no-files-found: ignore

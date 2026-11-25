@@ -1,165 +1,75 @@
 package io.github.charlietap.corpus.plugin.task
 
+import io.github.charlietap.corpus.lib.measurement.Measurement
 import io.github.charlietap.corpus.lib.report.CorpusConfiguration
 import io.github.charlietap.corpus.lib.report.CorpusEnvironment
-import io.github.charlietap.corpus.lib.report.CorpusFixtureResult
-import io.github.charlietap.corpus.lib.report.CorpusGradleRuntime
-import io.github.charlietap.corpus.lib.report.CorpusJavaRuntime
-import io.github.charlietap.corpus.lib.report.CorpusMachine
 import io.github.charlietap.corpus.lib.report.CorpusReport
-import kotlinx.serialization.encodeToString
+import io.github.charlietap.corpus.plugin.report.CorpusReportFactory
+import io.github.charlietap.corpus.plugin.report.CorpusReportSummary
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
-import org.gradle.api.provider.ListProperty
-import org.gradle.api.provider.Property
-import org.gradle.api.tasks.CacheableTask
+import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
+import org.gradle.work.DisableCachingByDefault
 
-@CacheableTask
+@DisableCachingByDefault(because = "Aggregates a measurement")
 abstract class GenerateCorpusReportTask : DefaultTask() {
 
     @get:InputFiles
     @get:PathSensitive(PathSensitivity.RELATIVE)
-    abstract val resultFiles: ConfigurableFileCollection
+    abstract val measurements: ConfigurableFileCollection
 
     @get:Input
-    abstract val machine: Property<String>
+    abstract val environmentEngines: SetProperty<String>
 
-    @get:Input
-    abstract val repositoryUrl: Property<String>
+    @get:InputFile
+    @get:PathSensitive(PathSensitivity.NONE)
+    abstract val fixturesIndex: RegularFileProperty
 
-    @get:Input
-    abstract val revision: Property<String>
+    @get:InputFile
+    @get:PathSensitive(PathSensitivity.NONE)
+    abstract val runFile: RegularFileProperty
 
-    @get:Input
-    abstract val phase: Property<String>
-
-    @get:Input
-    abstract val versions: ListProperty<String>
-
-    @get:Input
-    abstract val languages: ListProperty<String>
-
-    @get:Input
-    abstract val requiredFeatures: ListProperty<String>
-
-    @get:Input
-    abstract val excludedFeatures: ListProperty<String>
-
-    @get:Input
-    abstract val tags: ListProperty<String>
-
-    @get:Input
-    abstract val excludedTags: ListProperty<String>
-
-    @get:Input
-    @get:Optional
-    abstract val size: Property<String>
-
-    @get:Input
-    @get:Optional
-    abstract val duration: Property<String>
-
-    @get:Input
-    abstract val targets: ListProperty<String>
-
-    @get:Input
-    abstract val excludedTargets: ListProperty<String>
-
-    @get:Input
-    abstract val gradleVersion: Property<String>
-
-    @get:Input
-    abstract val gradleJavaLanguageVersion: Property<String>
-
-    @get:Input
-    abstract val gradleJavaRuntimeVersion: Property<String>
-
-    @get:Input
-    abstract val gradleJvmVersion: Property<String>
-
-    @get:Input
-    abstract val gradleJavaVendor: Property<String>
-
-    @get:Input
-    abstract val testJavaLanguageVersion: Property<String>
-
-    @get:Input
-    abstract val testJavaRuntimeVersion: Property<String>
-
-    @get:Input
-    abstract val testJvmVersion: Property<String>
-
-    @get:Input
-    abstract val testJavaVendor: Property<String>
+    @get:InputFile
+    @get:PathSensitive(PathSensitivity.NONE)
+    abstract val environment: RegularFileProperty
 
     @get:OutputFile
     abstract val outputFile: RegularFileProperty
 
-    private val inputJson = Json { ignoreUnknownKeys = true }
-    private val outputJson = Json { prettyPrint = true }
-
     @TaskAction
     fun generate() {
-        val fixtureResults = resultFiles.files
-            .asSequence()
-            .map { file -> inputJson.decodeFromString<CorpusFixtureResult>(file.readText()) }
-            .sortedWith(compareBy(CorpusFixtureResult::version, CorpusFixtureResult::fixture))
-            .toList()
 
-        val report = CorpusReport(
-            schemaVersion = SCHEMA_VERSION,
-            environment = CorpusEnvironment(
-                machine = inputJson.decodeFromString<CorpusMachine>(machine.get()),
-                gradle = CorpusGradleRuntime(
-                    version = gradleVersion.get(),
-                    jvm = CorpusJavaRuntime(
-                        languageVersion = gradleJavaLanguageVersion.get(),
-                        runtimeVersion = gradleJavaRuntimeVersion.get(),
-                        jvmVersion = gradleJvmVersion.get(),
-                        vendor = gradleJavaVendor.get(),
-                    ),
-                ),
-                testJvm = CorpusJavaRuntime(
-                    languageVersion = testJavaLanguageVersion.get(),
-                    runtimeVersion = testJavaRuntimeVersion.get(),
-                    jvmVersion = testJvmVersion.get(),
-                    vendor = testJavaVendor.get(),
-                ),
-            ),
-            configuration = CorpusConfiguration(
-                repositoryUrl = repositoryUrl.get(),
-                revision = revision.get(),
-                phase = phase.get(),
-                versions = versions.get(),
-                languages = languages.get(),
-                requiredFeatures = requiredFeatures.get(),
-                excludedFeatures = excludedFeatures.get(),
-                tags = tags.get(),
-                excludedTags = excludedTags.get(),
-                size = size.orNull,
-                duration = duration.orNull,
-                targets = targets.get(),
-                excludedTargets = excludedTargets.get(),
-            ),
-            fixtures = fixtureResults,
+        val json = Json { ignoreUnknownKeys = true }
+        val measured = measurements.asFileTree.matching { include("*/*.json") }.files.map { file ->
+            json.decodeFromString(Measurement.serializer(), file.readText())
+        }
+        val fixtures = json.parseToJsonElement(fixturesIndex.get().asFile.readText()).jsonArray.map { element ->
+            element.jsonObject.getValue("name").jsonPrimitive.content
+        }
+
+        val report = CorpusReportFactory().create(
+            environment = json.decodeFromString(CorpusEnvironment.serializer(), environment.get().asFile.readText()),
+            environmentEngines = environmentEngines.get(),
+            configuration = json.decodeFromString(CorpusConfiguration.serializer(), runFile.get().asFile.readText()),
+            fixtures = fixtures,
+            measurements = measured,
         )
 
-        val reportFile = outputFile.get().asFile
-        reportFile.parentFile.mkdirs()
-        reportFile.writeText(outputJson.encodeToString(report))
-        logger.lifecycle("Corpus report: ${reportFile.absolutePath} (${fixtureResults.size} fixtures)")
-    }
-
-    private companion object {
-        const val SCHEMA_VERSION = 1
+        val file = outputFile.get().asFile
+        file.parentFile.mkdirs()
+        file.writeText(Json { prettyPrint = true }.encodeToString(CorpusReport.serializer(), report))
+        logger.lifecycle(CorpusReportSummary().describe(report, file))
     }
 }

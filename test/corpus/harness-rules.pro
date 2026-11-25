@@ -1,0 +1,8 @@
+-keep class io.github.charlietap.chasm.corpus.generated.CorpusTest { *; }
+-keep class androidx.test.** { *; }
+-keep class org.junit.** { *; }
+-keep class junit.** { *; }
+-keep class org.hamcrest.** { *; }
+-keepattributes *Annotation*,Signature,InnerClasses,EnclosingMethod
+-dontwarn android.test.**
+-dontwarn com.google.errorprone.annotations.**

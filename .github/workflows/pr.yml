@@ -39,24 +39,29 @@ jobs:
         include:
           - os: ubuntu-24.04-arm
             task: test :chasm-gradle-plugin:check
+            artifact: jvm
           - os: ubuntu-24.04-arm
             task: jsTest
           - os: ubuntu-24.04-arm
             task: wasmJsTest
           - os: macos-latest
             task: macosArm64Test
+            artifact: macosArm64
           - os: macos-latest
             task: iosSimulatorArm64Test
           - os: macos-latest
             task: testAndroidHostTest lintAndroidMain
+            artifact: androidHost
           - os: ubuntu-latest
             task: linuxX64Test
+            artifact: linuxX64
           - os: windows-latest
             task: mingwX64Test
     uses: ./.github/workflows/task-runner.yml
     with:
       runner: ${{ matrix.os }}
       task: ${{ matrix.task }}
+      artifact: ${{ matrix.artifact }}
 
   device:
     strategy:
@@ -64,12 +69,20 @@ jobs:
       matrix:
         api: [30, 36]
         suite:
-          - { module: ':test:integration', name: integration }
-          - { module: ':runtime-compiled', name: runtime-compiled }
+          - name: integration
+            assemble: ':test:integration:assembleAndroidDeviceTest'
+            test: ':test:integration:connectedAndroidDeviceTest'
+          - name: runtime-compiled
+            assemble: ':runtime-compiled:assembleAndroidDeviceTest'
+            test: ':runtime-compiled:connectedAndroidDeviceTest'
+          - name: corpus
+            assemble: ':test:corpus:assembleAndroidDeviceTest'
+            test: ':test:corpus:corpusAndroidDevice'
     uses: ./.github/workflows/device-runner.yml
     with:
       api-level: ${{ matrix.api }}
-      module: ${{ matrix.suite.module }}
+      assemble: ${{ matrix.suite.assemble }}
+      test: ${{ matrix.suite.test }}
       name: ${{ matrix.suite.name }}
 
   compile-example:

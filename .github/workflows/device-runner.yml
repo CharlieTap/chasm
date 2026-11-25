@@ -7,9 +7,13 @@ on:
         type: number
         description: 'The Android API level of the emulator'
         required: true
-      module:
+      assemble:
         type: string
-        description: 'The Gradle project whose device tests run, e.g. :runtime-compiled'
+        description: 'The Gradle task that builds the test APK'
+        required: true
+      test:
+        type: string
+        description: 'The Gradle task that runs the tests on the emulator'
         required: true
       name:
         type: string
@@ -44,7 +48,7 @@ jobs:
           sudo udevadm trigger --name-match=kvm
 
       - name: Assemble test APK
-        run: ./gradlew ${{ inputs.module }}:assembleAndroidDeviceTest
+        run: ./gradlew ${{ inputs.assemble }}
 
       - name: Run device tests
         uses: ReactiveCircus/android-emulator-runner@v2.38.0
@@ -54,7 +58,15 @@ jobs:
           target: default
           disable-animations: true
           emulator-options: -no-window -gpu software -no-snapshot -noaudio -no-boot-anim
-          script: ./gradlew ${{ inputs.module }}:connectedAndroidDeviceTest || (adb logcat -d > logcat.txt; exit 1)
+          script: ./gradlew ${{ inputs.test }} || (adb logcat -d > logcat.txt; exit 1)
+
+      - name: Upload corpus reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: corpus-androidDevice-api-${{ inputs.api-level }}-${{ inputs.name }}
+          path: '**/build/reports/corpus/**'
+          if-no-files-found: ignore
 
       - name: Upload reports
         if: failure()

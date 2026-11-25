@@ -2,13 +2,30 @@
 
 ## Build & Test
 
-- **Fast dev loop:** run `./gradlew test`. This executes the runtime unit
-  tests, the official Wasm test suite and the configured `wasm-corpus` slice
-  via the JVM backend, for both Chasm and runtime-compiled, giving quick signal
+- **Fast dev loop:** run `./gradlew test`. This executes the unit tests, the
+  official Wasm test suite and the `wasm-corpus` on the JVM, for the
+  interpreter and for modules compiled to class files, giving quick signal
   without longer-running native targets.
-- **Corpus only:** `./gradlew corpus` runs just the `wasm-corpus` slice and
-  writes its report. Use it to iterate on a corpus failure from `test`,
-  narrowed with `-PwasmCorpus.targets=<fixture>`.
+- **Corpus:** every run writes a JSON report and always runs afresh.
+  Narrow any of these with `-PwasmCorpus.targets=<fixture>`,
+  `-PwasmCorpus.engines=interpreter` or `compiled`, and
+  `-PwasmCorpus.phase=decoding|validation|instantiation`.
+
+  | Command | Runs on | Report |
+  |---|---|---|
+  | `./gradlew corpus` | JVM (part of `test`) | `test/corpus/build/reports/corpus/jvm.json` |
+  | `./gradlew corpusAndroidHost` | Android class files on the host JVM (part of `testAndroidHostTest`) | `.../corpus/androidHost.json` |
+  | `./gradlew corpusMacosArm64`, `corpusLinuxX64` | native interpreter (part of `macosArm64Test`, `linuxX64Test`) | `.../corpus/<target>.json` |
+  | `./gradlew corpusAndroidDevice` | a phone, attached, unlocked and on power | `.../corpus/androidDevice.json` |
+
+  With more than one phone attached add `-PwasmCorpus.device=<model or
+  serial>`, for example `SM-S721B`. The corpus does not run on mingwX64 (the
+  WASI binding has no Windows build), linuxArm64 or iOS.
+- **Corpus timings:** every run measures one cold pass per fixture.
+  `-PwasmCorpus.warmups=<n> -PwasmCorpus.rounds=<n>` optionally reruns each
+  fixture for warm medians. Compare a report with its baseline with
+  `./gradlew corpusCompare` (or `corpusCompareAndroidDevice`). Timings never
+  fail a build. Movement in only `lzma_wasm` and `brotli_codec` is noise.
 - **Full matrix:** invoke the usual platform tasks (e.g. `./gradlew jvmTest`,
   `./gradlew macosArm64Test`, etc.) when you need exhaustive coverage or are
   touching platform-specific code.

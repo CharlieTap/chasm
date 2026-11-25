@@ -16,7 +16,6 @@ kotlin {
         commonMain {
             dependencies {
                 api(projects.runtimeCompiled)
-                api(libs.corpus.lib)
                 api(libs.sweet.lib)
 
                 implementation(projects.ast)
@@ -27,7 +26,6 @@ kotlin {
                 implementation(libs.kotlinx.io.core)
                 implementation(libs.kotlinx.serialization)
                 implementation(libs.result)
-                implementation(libs.wasi.emscripten.host.chasm.wasip1.kmp)
             }
         }
 

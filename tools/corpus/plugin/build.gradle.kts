@@ -19,6 +19,10 @@ kotlin {
         implementation(libs.kotlin.gradle.plugin)
         implementation(libs.kotlinx.serialization)
         implementation(libs.kotlin.poet)
+
+        compileOnly(libs.android.gradle.plugin)
+
+        testImplementation(libs.kotlin.test)
     }
 }
 

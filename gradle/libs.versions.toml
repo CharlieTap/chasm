@@ -88,7 +88,6 @@ kotlinter = { id = "org.jmailen.kotlinter", version.ref = "kotlinter" }
 maven-publish = { id = "maven-publish" }
 metro = { id = "dev.zacsweers.metro", version.ref = "metro" }
 wasm-testsuite = { id = "io.github.charlietap.sweet.plugin" }
-wasm-corpus = { id = "io.github.charlietap.corpus.plugin" }
 
 conventions-kmp  = { id = "kmp-conventions" }
 conventions-kmp-jvm  = { id = "kmp-jvm-conventions" }
@@ -99,6 +98,7 @@ conventions-linting  = { id = "linting-conventions" }
 conventions-publishing  = { id = "publishing-conventions" }
 conventions-versions  = { id = "versions-conventions" }
 conventions-sweet = { id = "sweet-conventions" }
+conventions-corpus = { id = "corpus-conventions" }
 
 [libraries]
 

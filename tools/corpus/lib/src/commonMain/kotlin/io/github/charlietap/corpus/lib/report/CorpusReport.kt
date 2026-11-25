@@ -1,5 +1,8 @@
 package io.github.charlietap.corpus.lib.report
 
+import io.github.charlietap.corpus.lib.measurement.Measurement
+import io.github.charlietap.corpus.lib.measurement.Timings
+import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -7,14 +10,16 @@ data class CorpusReport(
     val schemaVersion: Int,
     val environment: CorpusEnvironment,
     val configuration: CorpusConfiguration,
-    val fixtures: List<CorpusFixtureResult>,
+    val summary: List<EngineSummary>,
+    val fixtures: List<Measurement>,
 )
 
 @Serializable
 data class CorpusEnvironment(
+    val name: String,
     val machine: CorpusMachine,
-    val gradle: CorpusGradleRuntime,
-    val testJvm: CorpusJavaRuntime,
+    val runtime: CorpusRuntime,
+    val conditions: Map<String, String>,
 )
 
 @Serializable
@@ -29,17 +34,10 @@ data class CorpusMachine(
 )
 
 @Serializable
-data class CorpusGradleRuntime(
+data class CorpusRuntime(
+    val name: String,
     val version: String,
-    val jvm: CorpusJavaRuntime,
-)
-
-@Serializable
-data class CorpusJavaRuntime(
-    val languageVersion: String,
-    val runtimeVersion: String,
-    val jvmVersion: String,
-    val vendor: String,
+    val detail: String?,
 )
 
 @Serializable
@@ -47,6 +45,11 @@ data class CorpusConfiguration(
     val repositoryUrl: String,
     val revision: String,
     val phase: String,
+    val engines: List<String>,
+    val warmups: Int,
+    val rounds: Int,
+    @EncodeDefault
+    val pin: Boolean = false,
     val versions: List<String>,
     val languages: List<String>,
     val requiredFeatures: List<String>,
@@ -57,4 +60,15 @@ data class CorpusConfiguration(
     val duration: String?,
     val targets: List<String>,
     val excludedTargets: List<String>,
+)
+
+@Serializable
+data class EngineSummary(
+    val engine: String,
+    val passed: Int,
+    val skipped: Int,
+    val failed: Int,
+    val missing: List<String>,
+    val cold: Timings,
+    val warm: Timings?,
 )

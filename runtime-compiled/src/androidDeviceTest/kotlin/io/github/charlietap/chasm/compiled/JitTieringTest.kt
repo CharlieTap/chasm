@@ -17,9 +17,9 @@ import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.chasm.type.NumberType
 import io.github.charlietap.chasm.type.ResultType
 import io.github.charlietap.chasm.type.ValueType
-import io.github.charlietap.corpus.lib.fixture.Fixture
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlin.io.encoding.Base64
@@ -64,8 +64,9 @@ class JitTieringTest {
     }
 
     private fun fixtureRom(): ByteArray {
-        val fixture = Json { ignoreUnknownKeys = true }.decodeFromString<Fixture>(resourceBytes(LUNABOY_FIXTURE).decodeToString())
-        val romWrite = fixture.tests.single().steps.first { step -> step.getValue("type").jsonPrimitive.content == "memory.write" }
+        val fixture = Json.parseToJsonElement(resourceBytes(LUNABOY_FIXTURE).decodeToString()).jsonObject
+        val steps = fixture.getValue("tests").jsonArray.single().jsonObject.getValue("steps").jsonArray
+        val romWrite = steps.map { step -> step.jsonObject }.first { step -> step.getValue("type").jsonPrimitive.content == "memory.write" }
         return Base64.decode(romWrite.getValue("bytes").jsonObject.getValue("value").jsonPrimitive.content)
     }
 

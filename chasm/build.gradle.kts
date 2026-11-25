@@ -8,7 +8,6 @@ plugins {
     alias(libs.plugins.conventions.jvm.functional.test)
     alias(libs.plugins.conventions.sweet)
 
-    alias(libs.plugins.wasm.corpus)
     alias(libs.plugins.kotlinx.test.resources)
 }
 
@@ -25,23 +24,6 @@ sweet {
             phaseSupport = SemanticPhase.VALIDATION
         }
     }
-}
-
-corpus {
-    corpusRef = libs.versions.wasm.corpus.ref
-    corpusRunner = "io.github.charlietap.chasm.corpus.ChasmCorpusRunner"
-    testPackageName = "io.github.charlietap.chasm.corpus.generated"
-    phase = io.github.charlietap.corpus.lib.CorpusPhase.INVOCATION
-    versions = listOf("1.0", "2.0", "3.0")
-    excludedFeatures = listOf("memory64", "simd", "relaxed-simd")
-    excludedTags = listOf("stress-test", "benchmark", "duration-extra-long")
-    excludedTargets = listOf(
-        // Execution-heavy fixtures; keep the normal corpus run suitable for the development loop.
-        "esbuild",
-        "jsquash_hqx",
-        // Huge finite loop; valid corpus case, but too slow for the current JVM interpreter path.
-        "learning_rate_scheduling",
-    )
 }
 
 kotlin {
@@ -105,13 +87,6 @@ kotlin {
                 implementation(libs.sweet.lib)
                 implementation(libs.kotlinx.serialization)
                 implementation(libs.kotlinx.io.core)
-            }
-        }
-
-        jvmTest {
-            dependencies {
-                implementation(libs.corpus.lib)
-                implementation(libs.wasi.emscripten.host.chasm.wasip1.kmp)
             }
         }
     }
