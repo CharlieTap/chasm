@@ -126,12 +126,6 @@ include(":vm")
 
 includeBuild("tools/sweet")
 includeBuild("tools/corpus")
-// TODO: remove once dexter is published and bumped, before Chasm 3.0
-includeBuild("../dexter") {
-    dependencySubstitution {
-        substitute(module("io.github.charlietap.dexter:dexter")).using(project(":dexter"))
-    }
-}
 
 rootProject.name = "chasm-multiplatform"
 
