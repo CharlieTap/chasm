@@ -26,7 +26,7 @@ and the fixture runner, so the corpus always tests the local source tree.
 
 | Task | Runs on | Report |
 |---|---|---|
-| `corpus` | the JVM: the interpreter and class files through `chasm-jvm-compiler` | `test/corpus/build/reports/corpus/jvm.json` |
+| `corpus` | the JVM: the interpreter and class files through `chasm-class-compiler` | `test/corpus/build/reports/corpus/jvm.json` |
 | `corpusAndroidHost` | the host JVM: the interpreter and ART-target class files | `.../corpus/androidHost.json` |
 | `corpusMacosArm64`, `corpusLinuxX64` | the native interpreter, as a release test binary | `.../corpus/<target>.json` |
 | `corpusAndroidDevice` | an attached phone: the interpreter and DEX through `chasm-dex-compiler` | `.../corpus/androidDevice.json` |

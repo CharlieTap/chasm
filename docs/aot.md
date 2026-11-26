@@ -1,6 +1,6 @@
 # Ahead-of-time compilation in Chasm
 
-`chasm-jvm-compiler` compiles a WebAssembly module to JVM classes, usually at
+`chasm-class-compiler` compiles a WebAssembly module to JVM classes, usually at
 build time. `runtime-compiled` runs those classes, on the JVM or on Android,
 with the same embedding API as the interpreter: `instance` and `invoke` are
 unchanged, and only the module and the store are created differently.
@@ -11,7 +11,7 @@ dependencies {
 }
 ```
 
-`chasm-jvm-compiler` (`io.github.charlietap.chasm:chasm-jvm-compiler`) is only
+`chasm-class-compiler` (`io.github.charlietap.chasm:chasm-class-compiler`) is only
 needed where modules are compiled, such as a build step; an app that runs
 modules compiled at build time needs only `runtime-compiled`. The same runtime
 also loads DEX compiled by `chasm-dex-compiler`; see

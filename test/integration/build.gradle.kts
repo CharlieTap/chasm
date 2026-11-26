@@ -45,7 +45,7 @@ kotlin {
 
         named("jvmHostTest") {
             dependencies {
-                implementation(projects.chasmJvmCompiler)
+                implementation(projects.chasmClassCompiler)
                 implementation(projects.runtimeCompiled)
             }
         }

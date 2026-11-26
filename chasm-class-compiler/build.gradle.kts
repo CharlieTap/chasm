@@ -11,7 +11,7 @@ plugins {
 }
 
 configure<PublishingConventionsExtension> {
-    name = "chasm-jvm-compiler"
+    name = "chasm-class-compiler"
     description = "Compiles wasm modules to JVM classes"
 }
 
@@ -41,7 +41,7 @@ kotlin {
                 implementation(projects.moduleDeclarations)
                 implementation(projects.compiler.driver)
                 implementation(projects.compiler.frontend)
-                implementation(projects.compiler.backendJvm)
+                implementation(projects.compiler.backendClass)
                 implementation(projects.module)
                 implementation(projects.runtime.compiledFormat)
                 implementation(projects.validator)

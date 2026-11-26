@@ -9,7 +9,7 @@ compile. Three artifacts replace `chasm-aot`, `runtime-aot` and `chasm-jit`:
 
 | 3.0 artifact | Replaces | Does |
 | --- | --- | --- |
-| `chasm-jvm-compiler` | `chasm-aot` | compiles a module to JVM classes, at build time or on a server |
+| `chasm-class-compiler` | `chasm-aot` | compiles a module to JVM classes, at build time or on a server |
 | `chasm-dex-compiler` | the compiler inside `chasm-jit` | compiles a module to DEX, on a server, in a build or on the device |
 | `runtime-compiled` | `runtime-aot` and the runtime inside `chasm-jit` | loads and runs either, on the JVM (classes) or on Android (classes and DEX) |
 
@@ -40,7 +40,7 @@ three dependencies if you declared them.
   `CompileTarget.ANDROID` is now `CompileTarget.ART`. A module runs only on the
   target it was compiled for; `module()` refuses one compiled for the other
   with `ModuleError.Malformed`.
-- Both compilers' `compile` functions are `suspend`. `chasm-jvm-compiler`
+- Both compilers' `compile` functions are `suspend`. `chasm-class-compiler`
   runs the work on `Dispatchers.Default` and can be cancelled while it runs;
   `chasm-dex-compiler` also runs its work on `Dispatchers.Default`, so it is
   safe to call from Android's main thread. Callers outside a coroutine can
@@ -49,7 +49,7 @@ three dependencies if you declared them.
   compile it, with a `GENERATION` error, "memory64 is unsupported". `chasm-aot`
   compiled such a module and it failed at `instance()`.
 - Classes compiled by `chasm-aot` do not load in `runtime-compiled`: compile
-  them again with `chasm-jvm-compiler`.
+  them again with `chasm-class-compiler`.
 
 #### JIT users
 
@@ -102,7 +102,7 @@ val module = io.github.charlietap.chasm.aot.module(ParserModule.COMPILED).expect
 val store = io.github.charlietap.chasm.aot.store(module)
 ```
 
-After, with `chasm-jvm-compiler` at build time and `runtime-compiled` in the
+After, with `chasm-class-compiler` at build time and `runtime-compiled` in the
 app:
 
 ```kotlin

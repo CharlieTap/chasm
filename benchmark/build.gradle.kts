@@ -91,7 +91,7 @@ kotlin {
         jvmMain {
             dependencies {
                 implementation(projects.runtimeCompiled)
-                implementation(projects.chasmJvmCompiler)
+                implementation(projects.chasmClassCompiler)
             }
         }
     }

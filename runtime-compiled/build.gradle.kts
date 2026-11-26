@@ -75,7 +75,7 @@ kotlin {
             dependencies {
                 implementation(projects.chasm)
                 implementation(projects.compiler.backendAnalysis)
-                implementation(projects.compiler.backendJvm)
+                implementation(projects.compiler.backendClass)
                 implementation(projects.compiler.frontend)
                 implementation(projects.decoder)
                 implementation(projects.module)
@@ -93,7 +93,7 @@ kotlin {
 
         jvmTest {
             dependencies {
-                implementation(projects.chasmJvmCompiler)
+                implementation(projects.chasmClassCompiler)
                 implementation(projects.test.fixture.ast)
                 implementation(projects.test.fixture.runtime)
                 implementation(projects.test.fixture.typeSystem)

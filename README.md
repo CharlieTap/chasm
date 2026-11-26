@@ -148,7 +148,7 @@ there is no useful opportunity to prepare it ahead of invocation.
 
 Chasm runs modules on two engines: an interpreter, and a runtime for
 compiled modules, `runtime-compiled`, on the JVM and Android. Modules are
-compiled to JVM classes by `chasm-jvm-compiler` or to DEX by
+compiled to JVM classes by `chasm-class-compiler` or to DEX by
 `chasm-dex-compiler`, ahead of time or on the device. Every call above works
 on both engines; only the store and, for compiled modules, the module are
 created differently:

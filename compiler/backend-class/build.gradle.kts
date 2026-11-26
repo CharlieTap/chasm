@@ -34,6 +34,6 @@ tasks.withType<Test>().configureEach {
 }
 
 configure<PublishingConventionsExtension> {
-    name = "compiler-backend-jvm"
+    name = "compiler-backend-class"
     description = "Lowers Chasm IR to JVM class files that run on the JVM and, through D8, on Android"
 }
