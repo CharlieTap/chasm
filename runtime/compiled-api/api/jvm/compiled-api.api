@@ -71,6 +71,13 @@ public final class io/github/charlietap/chasm/aot/internal/LineRange {
 	public final fun getOriginal ()I
 }
 
+public final class io/github/charlietap/chasm/aot/internal/MemoryClassLoader : java/lang/ClassLoader {
+	public fun <init> (Ljava/util/Map;Ljava/util/Map;Ljava/lang/ClassLoader;)V
+	public fun getResource (Ljava/lang/String;)Ljava/net/URL;
+	public fun getResourceAsStream (Ljava/lang/String;)Ljava/io/InputStream;
+	public final fun module (Ljava/lang/String;)Lio/github/charlietap/chasm/aot/CompiledModule;
+}
+
 public final class io/github/charlietap/chasm/aot/internal/TrapLines {
 	public fun <init> (Ljava/util/Map;)V
 	public final fun original (Ljava/lang/String;Ljava/lang/String;I)I

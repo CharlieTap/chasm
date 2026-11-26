@@ -1,5 +1,7 @@
 package io.github.charlietap.chasm.jit.internal
 
+import io.github.charlietap.chasm.jit.internal.CompileError.Stage
+
 internal sealed interface CompileResult {
 
     data class Success(
@@ -10,3 +12,9 @@ internal sealed interface CompileResult {
         val error: CompileError,
     ) : CompileResult
 }
+
+internal fun error(
+    stage: Stage,
+    message: String,
+    functions: List<Int> = emptyList(),
+): CompileResult.Error = CompileResult.Error(CompileError(message, stage, functions))

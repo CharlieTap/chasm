@@ -17,6 +17,10 @@ interface JvmOutput {
 class JvmModule(
     val moduleClass: String,
     val data: String?,
+    /** How the code reads memory 0 directly, which the memory must then support, or null when it goes through helpers. */
+    val inlineMemory: MemoryLowering? = null,
+    /** Each chunked function's chunk start offsets, when lowered with stack traces. */
+    val chunkStarts: Map<Int, IntArray> = emptyMap(),
 )
 
 const val DATA_EXTENSION = "chasmdata"
