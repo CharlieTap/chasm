@@ -13,10 +13,22 @@ on:
           - 'libraries'
           - ':chasm-gradle-plugin:'
         default: 'all'
+      snapshot:
+        description: 'Publish the libraries as a snapshot of version-name, ignoring module'
+        required: false
+        type: boolean
+        default: false
 jobs:
   publish:
     name: Release build and publish
     runs-on: macos-latest
+    env:
+      ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+      ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+      ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.SIGNING_KEY_ID }}
+      ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_PASSWORD }}
+      ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_KEY_CONTENTS }}
+      ORG_GRADLE_PROJECT_signAllPublications: 'true'
     steps:
       - name: Check out code
         uses: actions/checkout@v7
@@ -41,14 +53,16 @@ jobs:
             ${{ runner.os }}-${{ runner.arch }}-konan-
 
       - name: Publish to MavenCentral
+        if: ${{ !inputs.snapshot }}
         run: >-
           ./gradlew
           ${{ github.event.inputs.module == ':chasm-gradle-plugin:' && ':chasm-gradle-plugin:' || '' }}publishToMavenCentral
           ${{ github.event.inputs.module == 'libraries' && '-x :chasm-gradle-plugin:publishToMavenCentral' || '' }}
-        env:
-          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
-          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
-          ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.SIGNING_KEY_ID }}
-          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_PASSWORD }}
-          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_KEY_CONTENTS }}
-          ORG_GRADLE_PROJECT_signAllPublications: 'true'
+
+      - name: Publish snapshot to MavenCentral
+        if: ${{ inputs.snapshot }}
+        run: >-
+          ./gradlew
+          publishToMavenCentral
+          -x :chasm-gradle-plugin:publishToMavenCentral
+          -Pversion="$(sed -n 's/^version-name = "\(.*\)"$/\1/p' gradle/libs.versions.toml)-SNAPSHOT"
