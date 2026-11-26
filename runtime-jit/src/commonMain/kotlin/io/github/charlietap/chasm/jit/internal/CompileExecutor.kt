@@ -6,9 +6,12 @@ import io.github.charlietap.chasm.parallel.coroutines.CallerParticipatingParalle
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Semaphore
 
+/** How many threads one compile may use. */
+internal val compileWorkers: Int = minOf(MAXIMUM_COMPILE_WORKERS, availableParallelProcessors())
+
 internal val compileExecutor: ParallelTaskExecutor = CallerParticipatingParallelTaskExecutor(
     dispatcher = Dispatchers.Default,
-    permits = Semaphore(minOf(MAXIMUM_COMPILE_WORKERS, availableParallelProcessors())),
+    permits = Semaphore(compileWorkers),
 )
 
 private const val MAXIMUM_COMPILE_WORKERS = 6

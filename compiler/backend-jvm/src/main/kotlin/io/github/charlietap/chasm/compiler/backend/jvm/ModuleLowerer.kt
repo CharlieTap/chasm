@@ -49,6 +49,10 @@ fun ModuleLowerer(
     declarations: ModuleDeclarations,
 ): JvmModule = ModuleLowerer(module, code, options, output, declarations, emptyMap())
 
+/**
+ * Lowers on at most [parallelism] threads, calling [checkCancelled] before each function so that a caller
+ * can stop lowering by throwing from it.
+ */
 fun ModuleLowerer(
     module: Module,
     code: CirModule,
@@ -56,6 +60,8 @@ fun ModuleLowerer(
     output: JvmOutput,
     declarations: ModuleDeclarations,
     trapSites: Map<Int, FunctionTrapSites>,
+    parallelism: Int = Runtime.getRuntime().availableProcessors(),
+    checkCancelled: () -> Unit = {},
 ): JvmModule =
     ModuleLowerer(
         module = module,
@@ -64,7 +70,8 @@ fun ModuleLowerer(
         output = output,
         declarations = declarations,
         trapSites = trapSites,
-        parallelism = Runtime.getRuntime().availableProcessors(),
+        parallelism = parallelism,
+        checkCancelled = checkCancelled,
         functionLowerer = ::FunctionLowerer,
         signatureLowerer = ::SignatureLowerer,
         entryLowerer = ::EntryLowerer,
@@ -82,6 +89,7 @@ internal inline fun ModuleLowerer(
     declarations: ModuleDeclarations,
     trapSites: Map<Int, FunctionTrapSites> = emptyMap(),
     parallelism: Int,
+    crossinline checkCancelled: () -> Unit = {},
     crossinline functionLowerer: FunctionLowerer,
     crossinline signatureLowerer: SignatureLowerer,
     crossinline entryLowerer: EntryLowerer,
@@ -106,6 +114,7 @@ internal inline fun ModuleLowerer(
             val owner = codeClassDescriptor(packagePath, batch)
             val methods = ArrayList<MethodNode>()
             for (function in batchFunctions) {
+                checkCancelled()
                 while (
                     next < functions.size &&
                     pending.size < maxOf(1, parallelism) * LOWERED_AHEAD &&
@@ -194,7 +203,7 @@ internal inline fun ModuleLowerer(
     }
     val moduleDescriptor = moduleClassDescriptor(packagePath)
     moduleClassLowerer(lowering, moduleDescriptor, declarationClasses, dataResourcePath, entries, output)
-    JvmModule(internalName(moduleDescriptor).replace('/', '.'), dataResourcePath)
+    JvmModule(internalName(moduleDescriptor).replace('/', '.'), dataResourcePath, options.memory.takeIf { lowering.inlineMemory != null }, chunkStarts)
 } catch (tooLarge: ClassTooLargeException) {
     throw ClassTooLarge(
         "generated class ${tooLarge.className} needs ${tooLarge.constantPoolCount} constants, more than the JVM's 65535",

@@ -19,14 +19,13 @@ import io.github.charlietap.chasm.runtime.compiled.CodeInstallation
 import io.github.charlietap.chasm.runtime.compiled.byteArrayBase
 import kotlinx.coroutines.ensureActive
 import java.util.function.Consumer
-import kotlin.coroutines.cancellation.CancellationException
 import kotlin.coroutines.coroutineContext
 
-internal actual suspend fun compile(
+internal actual suspend fun compileUnchecked(
     module: Module,
     config: CompileConfig,
 ): CompileResult {
-    return compile(
+    return compileUnchecked(
         module = module,
         config = config,
         executor = compileExecutor,
@@ -36,7 +35,7 @@ internal actual suspend fun compile(
                 module = ast,
                 types = types,
                 taskExecutor = executor,
-                devirtualiseIndirectCalls = !config.stacktraces && !config.meterFuel && !config.interruptible,
+                devirtualiseIndirectCalls = config.devirtualiseIndirectCalls,
             )
         },
         uncompilableFunctions = ::UncompilableFunctions,
@@ -44,26 +43,6 @@ internal actual suspend fun compile(
         dexLoader = ::DexLoader,
         codeClassInitializer = ::CodeClassInitializer,
     )
-}
-
-internal suspend inline fun compile(
-    module: Module,
-    config: CompileConfig,
-    executor: ParallelTaskExecutor,
-    crossinline packageNames: (ByteArray?, DexOptions) -> String,
-    crossinline moduleCompiler: ParallelModuleCompiler,
-    crossinline uncompilableFunctions: UncompilableFunctions,
-    crossinline moduleLowerer: ParallelModuleLowerer,
-    crossinline dexLoader: DexLoader,
-    crossinline codeClassInitializer: CodeClassInitializer,
-): CompileResult {
-    return try {
-        compileUnchecked(module, config, executor, packageNames, moduleCompiler, uncompilableFunctions, moduleLowerer, dexLoader, codeClassInitializer)
-    } catch (cancelled: CancellationException) {
-        throw cancelled
-    } catch (failure: RuntimeException) {
-        error(Stage.GENERATION, failure.message ?: failure.toString())
-    }
 }
 
 internal suspend inline fun compileUnchecked(
@@ -80,14 +59,7 @@ internal suspend inline fun compileUnchecked(
 
     coroutineContext.ensureActive()
     val ast = module._module()
-    val types = ast.typeResolver()
-    val code = moduleCompiler(ast, types, executor).getOrElse { failure ->
-        coroutineContext.ensureActive()
-        val functions = uncompilableFunctions(ast, types)
-        coroutineContext.ensureActive()
-        val reasons = functions.entries.joinToString { (index, reason) -> "$index ($reason)" }
-        return error(Stage.GENERATION, "cannot compile functions: ${reasons.ifEmpty { failure.toString() }}", functions.keys.toList())
-    }
+    val code = frontend(ast, ast.typeResolver(), executor, moduleCompiler, uncompilableFunctions).getOrElse { refused -> return refused }
     coroutineContext.ensureActive()
 
     val emission = DexOptions(
@@ -105,24 +77,14 @@ internal suspend inline fun compileUnchecked(
     }
     coroutineContext.ensureActive()
 
-    val installer = try {
+    return loading {
         val loader = dexLoader(dex.dex, CodeInstallation::class.java.classLoader!!)
         codeClassInitializer(loader, dex.classesToInitialize, executor)
         @Suppress("UNCHECKED_CAST")
-        loader.loadClass(dex.installer).getDeclaredConstructor().newInstance() as Consumer<CodeInstallation>
-    } catch (failure: ReflectiveOperationException) {
-        return error(Stage.LOADING, failure.toString())
-    } catch (failure: LinkageError) {
-        return error(Stage.LOADING, failure.toString())
-    } catch (cancelled: CancellationException) {
-        throw cancelled
-    } catch (failure: RuntimeException) {
-        return error(Stage.LOADING, failure.toString())
+        val installer = loader.loadClass(dex.installer).getDeclaredConstructor().newInstance() as Consumer<CodeInstallation>
+        coroutineContext.ensureActive()
+        JitCompilation(packageName, dex.chunkStarts, installer, dex.inlineMemory)
     }
-    coroutineContext.ensureActive()
-
-    return CompileResult.Success(JitCompilation(packageName, dex.chunkStarts, installer, dex.inlineMemory))
 }
 
 private val packageNames = PackageNames()
-
