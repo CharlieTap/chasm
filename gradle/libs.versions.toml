@@ -1,6 +1,6 @@
 [versions]
 
-version-name = "2.5.0"
+version-name = "3.0.0"
 plugin-version-name = "3.2.0-2.5.0"
 
 application-id = "com.tap.chasm"
