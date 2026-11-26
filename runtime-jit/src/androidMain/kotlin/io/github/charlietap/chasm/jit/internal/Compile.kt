@@ -22,7 +22,7 @@ import java.util.function.Consumer
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.coroutines.coroutineContext
 
-internal suspend fun compile(
+internal actual suspend fun compile(
     module: Module,
     config: CompileConfig,
 ): CompileResult {
@@ -126,8 +126,3 @@ internal suspend inline fun compileUnchecked(
 
 private val packageNames = PackageNames()
 
-internal fun error(
-    stage: Stage,
-    message: String,
-    functions: List<Int> = emptyList(),
-): CompileResult.Error = CompileResult.Error(CompileError(message, stage, functions))

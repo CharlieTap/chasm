@@ -56,6 +56,8 @@ kotlin {
         }
     }
 
+    jvm()
+
     @OptIn(ExperimentalAbiValidation::class)
     abiValidation()
 
@@ -96,6 +98,13 @@ kotlin {
             }
         }
 
+        jvmTest {
+            resources.srcDir(sweetResources)
+            dependencies {
+                implementation(libs.kotlin.junit)
+            }
+        }
+
         getByName("androidDeviceTest") {
             resources.srcDir(sweetResources)
             dependencies {
@@ -109,5 +118,5 @@ kotlin {
 
 configure<PublishingConventionsExtension> {
     name = "chasm-jit"
-    description = "Compiles wasm modules to DEX on Android devices and runs them on Chasm's runtime"
+    description = "Compiles wasm modules to DEX on Android and to JVM classes on the JVM, and runs them on Chasm's runtime"
 }

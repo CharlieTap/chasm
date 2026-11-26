@@ -24,6 +24,8 @@ kotlin {
         }
     }
 
+    jvm()
+
     @OptIn(ExperimentalAbiValidation::class)
     abiValidation()
 
@@ -36,7 +38,6 @@ kotlin {
                 api(projects.embeddingRuntime)
 
                 implementation(projects.ast)
-                implementation(projects.compiler.backendDex)
                 implementation(projects.compiler.frontend)
                 implementation(projects.decoder)
                 implementation(projects.executor.instantiator)
@@ -50,10 +51,23 @@ kotlin {
                 implementation(libs.result)
             }
         }
+
+        androidMain {
+            dependencies {
+                implementation(projects.compiler.backendDex)
+            }
+        }
+
+        jvmMain {
+            dependencies {
+                implementation(projects.compiler.backendJvm)
+                implementation(projects.runtime.compiledApi)
+            }
+        }
     }
 }
 
 configure<PublishingConventionsExtension> {
     name = "runtime-jit"
-    description = "Compiles wasm modules to DEX on Android devices and instantiates them on Chasm's runtime"
+    description = "Compiles wasm modules to DEX on Android and to JVM classes on the JVM, and instantiates them on Chasm's runtime"
 }
