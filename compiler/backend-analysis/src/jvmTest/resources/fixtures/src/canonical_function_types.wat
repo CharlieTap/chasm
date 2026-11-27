@@ -1,0 +1,11 @@
+(module
+  (type $first (struct (field i32)))
+  (type $second (struct (field i32)))
+  (type $other (struct (field i64)))
+  (type $takes_first (func (param (ref $first))))
+  (type $takes_second (func (param (ref $second))))
+  (type $takes_nullable_first (func (param (ref null $first))))
+  (type $takes_other (func (param (ref $other))))
+  (type $returns_first (func (result (ref $first) i32)))
+  (type $returns_second (func (result (ref $second) i32)))
+)

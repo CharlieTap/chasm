@@ -1,0 +1,11 @@
+(module
+  (elem declare func $target)
+  (func $target)
+  (func (export "number_then_reference") (result i64 funcref)
+    (i64.const 7)
+    (ref.func $target))
+  (func (export "reference_then_number") (result funcref i64)
+    (ref.func $target)
+    (i64.const 7))
+  (func (export "null_reference") (result funcref)
+    (ref.null func)))

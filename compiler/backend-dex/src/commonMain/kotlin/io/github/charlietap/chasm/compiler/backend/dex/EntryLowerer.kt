@@ -1,8 +1,10 @@
 package io.github.charlietap.chasm.compiler.backend.dex
 
+import io.github.charlietap.chasm.compiler.backend.abi.ArgumentPassing
 import io.github.charlietap.chasm.compiler.backend.abi.CALL_STACK_EXHAUSTED
 import io.github.charlietap.chasm.compiler.backend.abi.CONTEXT_TYPE
 import io.github.charlietap.chasm.compiler.backend.abi.DOUBLE_TO_RAW_LONG_BITS
+import io.github.charlietap.chasm.compiler.backend.abi.EntryShape
 import io.github.charlietap.chasm.compiler.backend.abi.FLOAT_TO_RAW_INT_BITS
 import io.github.charlietap.chasm.compiler.backend.abi.GUEST_HEAP_EXHAUSTED
 import io.github.charlietap.chasm.compiler.backend.abi.INT_BITS_TO_FLOAT
@@ -10,18 +12,11 @@ import io.github.charlietap.chasm.compiler.backend.abi.LONG_BITS_TO_DOUBLE
 import io.github.charlietap.chasm.compiler.backend.abi.RESULT_REFERENCES
 import io.github.charlietap.chasm.compiler.backend.abi.UNREACHABLE
 import io.github.charlietap.chasm.compiler.backend.abi.descriptorWords
-import io.github.charlietap.chasm.compiler.backend.abi.returnDescriptor
-import io.github.charlietap.chasm.compiler.backend.abi.takesArgumentArray
-import io.github.charlietap.chasm.compiler.backend.abi.takesReferenceArray
-import io.github.charlietap.chasm.compiler.backend.abi.valueDescriptor
 import io.github.charlietap.chasm.compiler.backend.dex.abi.DEX_ENTRY
 import io.github.charlietap.chasm.compiler.backend.dex.abi.ENTRY_BINDING_FIELD
 import io.github.charlietap.chasm.compiler.backend.dex.abi.ENTRY_ID_FIELD
 import io.github.charlietap.chasm.compiler.backend.dex.abi.entryClass
 import io.github.charlietap.chasm.compiler.backend.dex.abi.method
-import io.github.charlietap.chasm.compiler.backend.dex.abi.typedCall
-import io.github.charlietap.chasm.type.FunctionType
-import io.github.charlietap.chasm.type.ValueType
 import io.github.charlietap.dexter.ArrayKind
 import io.github.charlietap.dexter.ClassBuilder
 import io.github.charlietap.dexter.ClassType
@@ -47,7 +42,7 @@ internal class LoweredFunction(
 
 internal class EntryGroup(
     val number: Int,
-    val type: FunctionType,
+    val shape: EntryShape,
     val signature: String?,
     val members: List<LoweredFunction>,
     val referenceDescriptor: String,
@@ -93,14 +88,13 @@ private val NARROW = Reg(2)
 private val INDEX = Reg(3)
 private val SELECTOR = Reg(4)
 private const val WINDOW = 5
-private const val OBJECT_ARRAY = "[Ljava/lang/Object;"
 
 private fun typedMethod(
     builder: ClassBuilder,
     entry: ClassType,
     group: EntryGroup,
 ) {
-    val typed = typedCall(entry.descriptor, group.type, group.referenceDescriptor)
+    val typed = group.shape.typedCall(entry.descriptor)
     val parameters = typed.parameters
     val returns = typed.returns
     val signature = typed.method
@@ -126,10 +120,9 @@ private fun callObjectsMethod(
     entry: ClassType,
     group: EntryGroup,
 ) {
-    val type = group.type
-    val arrayArguments = takesArgumentArray(type)
-    val descriptors = entryDescriptors(group)
-    val returns = returnDescriptor(type, group.referenceDescriptor)
+    val shape = group.shape
+    val descriptors = shape.arguments
+    val returns = shape.returns
     val signature = DexMethod(entry, "callObjects", DexType.Void, CONTEXT, DexType.Long.array(), DexType.Object.array(), DexType.Int)
     val registers = WINDOW + 3 + descriptors.sumOf(::descriptorWords) + 5
     val code = builder.beginInstanceMethod(signature, access = MemberAccess.Public, registerCount = registers)
@@ -144,9 +137,9 @@ private fun callObjectsMethod(
     code.moveObject(Reg(WINDOW + 1), context)
     code.move(Reg(WINDOW + 2), depth)
     var offset = WINDOW + 3
-    if (arrayArguments) {
+    if (shape.passing != ArgumentPassing.Direct) {
         code.moveObject(Reg(offset), values)
-        if (takesReferenceArray(type, group.referenceDescriptor)) code.moveObject(Reg(offset + 1), references)
+        if (shape.passing == ArgumentPassing.ValueAndReferenceArrays) code.moveObject(Reg(offset + 1), references)
     } else {
         descriptors.forEachIndexed { parameter, descriptor ->
             code.const(INDEX, parameter)
@@ -164,9 +157,9 @@ private fun callObjectsMethod(
         "[J" -> {
             code.branchZero(Cond.Eq, NARROW, end)
             loadResultReferences(code, group)
-            type.results.types.forEachIndexed { result, value ->
+            shape.referenceResults.forEachIndexed { result, isReference ->
                 code.const(INDEX, result)
-                if (value is ValueType.Reference) {
+                if (isReference) {
                     code.arrayGet(ArrayKind.Object, Reg(WINDOW + 2), SELECTOR, INDEX)
                     code.arrayPut(ArrayKind.Object, Reg(WINDOW + 2), references, INDEX)
                 } else {
@@ -188,28 +181,17 @@ private fun callObjectsMethod(
     returnOrOverflow(code, start, end, overflow)
 }
 
-private fun entryDescriptors(
-    group: EntryGroup,
-): List<String> {
-    val type = group.type
-    return when {
-        takesReferenceArray(type, group.referenceDescriptor) -> listOf("[J", OBJECT_ARRAY)
-        takesArgumentArray(type) -> listOf("[J")
-        else -> type.params.types.map { parameter -> valueDescriptor(parameter, group.referenceDescriptor) }
-    }
-}
-
 private fun loadResultReferences(
     code: CodeEmitter,
     group: EntryGroup,
 ) {
 
-    val results = group.type.results.types
-    if (results.none { result -> result is ValueType.Reference }) {
+    val referenceResults = group.shape.referenceResults
+    if (true !in referenceResults) {
         return
     }
 
-    code.const(INDEX, results.size)
+    code.const(INDEX, referenceResults.size)
     code.invokeStatic(RESULT_REFERENCES.method, Reg(WINDOW + 1), INDEX)
     code.moveResult(SELECTOR)
 }

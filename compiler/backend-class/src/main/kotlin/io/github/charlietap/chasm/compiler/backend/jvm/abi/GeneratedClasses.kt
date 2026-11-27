@@ -46,6 +46,4 @@ internal fun functionMethod(
 ) =
     MethodRef(owner, functionName(index), staticParameters(type, binding, OBJECT_TYPE), returnDescriptor(type, OBJECT_TYPE))
 
-internal const val TYPED_CALL = "typed"
-
 internal const val SOURCE_FILE = TRAP_DIAGNOSTICS_SOURCE_FILE

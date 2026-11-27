@@ -8,21 +8,23 @@ import io.github.charlietap.chasm.cir.CirFunction
 import io.github.charlietap.chasm.cir.CirModule
 import io.github.charlietap.chasm.cir.FunctionIndex
 import io.github.charlietap.chasm.compiled.format.UNPINNED_OFFSET
+import io.github.charlietap.chasm.compiler.backend.abi.EntryShape
 import io.github.charlietap.chasm.compiler.backend.abi.GeneratedClassNames
 import io.github.charlietap.chasm.compiler.backend.abi.MethodRef
 import io.github.charlietap.chasm.compiler.backend.abi.ModuleSettings
 import io.github.charlietap.chasm.compiler.backend.abi.OBJECT_TYPE
 import io.github.charlietap.chasm.compiler.backend.abi.internalName
-import io.github.charlietap.chasm.compiler.backend.abi.returnDescriptor
-import io.github.charlietap.chasm.compiler.backend.abi.staticParameters
+import io.github.charlietap.chasm.compiler.backend.abi.typedCall
 import io.github.charlietap.chasm.compiler.backend.analysis.DataflowSlotKindAnalyzer
 import io.github.charlietap.chasm.compiler.backend.analysis.ModuleAnalysis
 import io.github.charlietap.chasm.compiler.backend.analysis.ModuleIndexSpaces
 import io.github.charlietap.chasm.compiler.backend.analysis.SlotKindAnalyzer
 import io.github.charlietap.chasm.compiler.backend.analysis.analyzeModule
 import io.github.charlietap.chasm.compiler.backend.analysis.functionBatches
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.CanonicalFunctionTypes
 import io.github.charlietap.chasm.compiler.backend.analysis.gc.ConstantExpressions
 import io.github.charlietap.chasm.compiler.backend.analysis.gc.ReferenceTests
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.RttKeys
 import io.github.charlietap.chasm.compiler.backend.analysis.gc.RttTests
 import io.github.charlietap.chasm.compiler.backend.analysis.gc.STORAGE_FAMILY
 import io.github.charlietap.chasm.compiler.backend.analysis.gc.StoragePlans
@@ -31,7 +33,6 @@ import io.github.charlietap.chasm.compiler.backend.jvm.abi.BATCH_FUNCTIONS
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.BATCH_INSTRUCTIONS
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.CLASS_FILE_VERSION
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.SOURCE_FILE
-import io.github.charlietap.chasm.compiler.backend.jvm.abi.TYPED_CALL
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.bindingClassDescriptor
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.functionMethod
 import io.github.charlietap.chasm.compiler.backend.jvm.binding.BindingLayout
@@ -88,11 +89,38 @@ internal class ModuleLowering(
         type: FunctionType,
     ): String? = signatures[typedCall("", type).descriptor]
 
+    fun signature(shape: EntryShape): String {
+        return signatures.getValue(shape.typedCall("").descriptor)
+    }
+
+    fun entryShape(index: FunctionIndex): EntryShape {
+        return EntryShape(declarations.functionType(index), OBJECT_TYPE)
+    }
+
+    private val canonicalFunctionTypes = CanonicalFunctionTypes(RttKeys(module.definedTypes))
+
+    private val functionTypeKeys = arrayOfNulls<String>(declarations.typeCount)
+
+    fun functionTypeKey(index: FunctionIndex): String {
+
+        val typeIndex = declarations.functionTypeIndex(index)
+        val cachedKey = functionTypeKeys[typeIndex.index]
+        if (cachedKey != null) {
+            return cachedKey
+        }
+
+        val key = canonicalFunctionTypes.key(declarations.functionType(typeIndex))
+        functionTypeKeys[typeIndex.index] = key
+
+        return key
+    }
+
     fun typedCall(
         signature: String,
         type: FunctionType,
-    ): MethodRef =
-        MethodRef(signature, TYPED_CALL, staticParameters(type, bindingType, OBJECT_TYPE).drop(1), returnDescriptor(type, OBJECT_TYPE))
+    ): MethodRef {
+        return typedCall(signature, type, OBJECT_TYPE)
+    }
 
     private val batchOf = HashMap<Int, Int>().apply {
         batches.forEachIndexed { batch, functions -> functions.forEach { function -> put(function.index.index, batch) } }

@@ -1,8 +1,10 @@
 package io.github.charlietap.chasm.compiler.backend.jvm
 
+import io.github.charlietap.chasm.compiler.backend.abi.ArgumentPassing
 import io.github.charlietap.chasm.compiler.backend.abi.CALL_STACK_EXHAUSTED
 import io.github.charlietap.chasm.compiler.backend.abi.DOUBLE_TO_RAW_LONG_BITS
 import io.github.charlietap.chasm.compiler.backend.abi.ENTRY_CALL_OBJECTS
+import io.github.charlietap.chasm.compiler.backend.abi.EntryShape
 import io.github.charlietap.chasm.compiler.backend.abi.FLOAT_TO_RAW_INT_BITS
 import io.github.charlietap.chasm.compiler.backend.abi.GUEST_HEAP_EXHAUSTED
 import io.github.charlietap.chasm.compiler.backend.abi.INT_BITS_TO_FLOAT
@@ -13,14 +15,8 @@ import io.github.charlietap.chasm.compiler.backend.abi.OBJECT_TYPE
 import io.github.charlietap.chasm.compiler.backend.abi.RESULT_REFERENCES
 import io.github.charlietap.chasm.compiler.backend.abi.descriptorWords
 import io.github.charlietap.chasm.compiler.backend.abi.internalName
-import io.github.charlietap.chasm.compiler.backend.abi.returnDescriptor
-import io.github.charlietap.chasm.compiler.backend.abi.takesArgumentArray
-import io.github.charlietap.chasm.compiler.backend.abi.takesReferenceArray
-import io.github.charlietap.chasm.compiler.backend.abi.valueDescriptor
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.CLASS_FILE_VERSION
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.STACK_OVERFLOW
-import io.github.charlietap.chasm.type.FunctionType
-import io.github.charlietap.chasm.type.ValueType
 import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.Label
 import org.objectweb.asm.MethodVisitor
@@ -50,20 +46,20 @@ internal fun SignatureLowerer(
     return writer.toByteArray()
 }
 
-internal typealias EntryLowerer = (ModuleLowering, String, List<MethodRef>, FunctionType, String) -> ByteArray
+internal typealias EntryLowerer = (ModuleLowering, String, List<MethodRef>, EntryShape, String) -> ByteArray
 
 internal fun EntryLowerer(
     module: ModuleLowering,
     entry: String,
     methods: List<MethodRef>,
-    type: FunctionType,
+    shape: EntryShape,
     signature: String,
 ): ByteArray {
 
     val writer = supportClassWriter()
     val owner = internalName(entry)
     val grouped = methods.size > 1
-    val call = EntryCall(owner, module.bindingType, methods, type)
+    val call = EntryCall(owner, module.bindingType, methods, shape)
     writer.visit(CLASS_FILE_VERSION, Opcodes.ACC_FINAL or Opcodes.ACC_SUPER, owner, null, internalName(signature), null)
     writer.visitField(Opcodes.ACC_PRIVATE or Opcodes.ACC_FINAL, BINDING_FIELD, module.bindingType, null, null).visitEnd()
     if (grouped) {
@@ -87,7 +83,7 @@ internal fun EntryLowerer(
         visitEnd()
     }
 
-    val typed = module.typedCall(signature, type)
+    val typed = shape.typedCall(signature)
     writer.method(typed) {
         visitVarInsn(Opcodes.ALOAD, 0)
         visitFieldInsn(Opcodes.GETFIELD, owner, BINDING_FIELD, module.bindingType)
@@ -137,7 +133,7 @@ private class EntryCall(
     private val owner: String,
     private val binding: String,
     private val methods: List<MethodRef>,
-    private val type: FunctionType,
+    private val shape: EntryShape,
 ) {
 
     fun invokeFunction(visitor: MethodVisitor) {
@@ -165,7 +161,7 @@ private class EntryCall(
 
     fun emitCallObjects(visitor: MethodVisitor) {
 
-        val result = returnDescriptor(type, OBJECT_TYPE)
+        val result = shape.returns
         when (result) {
             OBJECT_TYPE -> resultSlot(visitor, REFERENCES_LOCAL)
             "I", "F", "D", "J" -> resultSlot(visitor, VALUES_LOCAL)
@@ -200,16 +196,15 @@ private class EntryCall(
 
     private fun pushArguments(visitor: MethodVisitor) {
 
-        if (takesArgumentArray(type)) {
+        if (shape.passing != ArgumentPassing.Direct) {
             visitor.visitVarInsn(Opcodes.ALOAD, VALUES_LOCAL)
-            if (takesReferenceArray(type, OBJECT_TYPE)) {
+            if (shape.passing == ArgumentPassing.ValueAndReferenceArrays) {
                 visitor.visitVarInsn(Opcodes.ALOAD, REFERENCES_LOCAL)
             }
             return
         }
 
-        type.params.types.forEachIndexed { index, parameter ->
-            val descriptor = valueDescriptor(parameter, OBJECT_TYPE)
+        shape.arguments.forEachIndexed { index, descriptor ->
             if (descriptor == OBJECT_TYPE) {
                 visitor.visitVarInsn(Opcodes.ALOAD, REFERENCES_LOCAL)
                 visitor.pushInt(index)
@@ -225,21 +220,21 @@ private class EntryCall(
 
     private fun storeResults(visitor: MethodVisitor) {
 
-        val results = type.results.types
+        val referenceResults = shape.referenceResults
         val noResults = Label()
         visitor.visitVarInsn(Opcodes.ASTORE, RESULT_LOCAL)
         visitor.visitVarInsn(Opcodes.ALOAD, RESULT_LOCAL)
         visitor.visitJumpInsn(Opcodes.IFNULL, noResults)
 
-        if (results.any { result -> result is ValueType.Reference }) {
+        if (true in referenceResults) {
             visitor.visitVarInsn(Opcodes.ALOAD, CONTEXT_LOCAL)
-            visitor.pushInt(results.size)
+            visitor.pushInt(referenceResults.size)
             visitor.invoke(RESULT_REFERENCES)
             visitor.visitVarInsn(Opcodes.ASTORE, RESULT_REFERENCES_LOCAL)
         }
 
-        results.forEachIndexed { index, result ->
-            val copy = if (result is ValueType.Reference) REFERENCE_RESULT else NUMBER_RESULT
+        referenceResults.forEachIndexed { index, isReference ->
+            val copy = if (isReference) REFERENCE_RESULT else NUMBER_RESULT
             visitor.visitVarInsn(Opcodes.ALOAD, copy.targetLocal)
             visitor.pushInt(index)
             visitor.visitVarInsn(Opcodes.ALOAD, copy.sourceLocal)

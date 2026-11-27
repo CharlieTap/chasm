@@ -8,6 +8,7 @@ import io.github.charlietap.chasm.cir.MemoryIndex
 import io.github.charlietap.chasm.cir.TypeIndex
 import io.github.charlietap.chasm.compiler.backend.abi.MethodRef
 import io.github.charlietap.chasm.compiler.backend.abi.Resource
+import io.github.charlietap.chasm.compiler.backend.abi.typedCall
 import io.github.charlietap.chasm.compiler.backend.analysis.ModuleAnalysis
 import io.github.charlietap.chasm.compiler.backend.analysis.ModuleIndexSpaces
 import io.github.charlietap.chasm.compiler.backend.analysis.gc.ReferenceTests
@@ -17,7 +18,6 @@ import io.github.charlietap.chasm.compiler.backend.dex.abi.DexReferences
 import io.github.charlietap.chasm.compiler.backend.dex.abi.FunctionSignature
 import io.github.charlietap.chasm.compiler.backend.dex.abi.Invocation
 import io.github.charlietap.chasm.compiler.backend.dex.abi.SOURCE_FILE
-import io.github.charlietap.chasm.compiler.backend.dex.abi.typedCall
 import io.github.charlietap.chasm.compiler.backend.dex.analysis.CostFamilies
 import io.github.charlietap.chasm.compiler.backend.dex.binding.BatchConstants
 import io.github.charlietap.chasm.compiler.backend.dex.binding.BindingLayout

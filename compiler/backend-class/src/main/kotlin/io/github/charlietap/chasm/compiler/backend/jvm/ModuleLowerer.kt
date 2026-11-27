@@ -12,6 +12,7 @@ import io.github.charlietap.chasm.compiler.backend.abi.internalName
 import io.github.charlietap.chasm.compiler.backend.analysis.UnsupportedFunctions
 import io.github.charlietap.chasm.compiler.backend.analysis.declarations.DeclarationCallGenerator
 import io.github.charlietap.chasm.compiler.backend.analysis.declarations.DiscardingOutputStream
+import io.github.charlietap.chasm.compiler.backend.analysis.entryShapeGroups
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.entriesClassDescriptor
 import io.github.charlietap.chasm.compiler.backend.jvm.declarations.DeclarationsLowerer
 import io.github.charlietap.chasm.declarations.ModuleDeclarations
@@ -160,21 +161,23 @@ internal inline fun ModuleLowerer(
         lowering.typedMethods.forEach { (signature, typed) ->
             inventory.classFile(internalName(signature), signatureLowerer(signature, typed))
         }
-        val groups = code.functions
-            .groupBy { function -> lowering.declarations.functionType(function.index) }
-            .values.flatMap { functions -> functions.chunked(ENTRY_GROUP) }
-            .sortedBy { group -> group.first().index.index }
+        val groups = entryShapeGroups(
+            functions = code.functions,
+            limit = ENTRY_GROUP,
+            shape = { function -> lowering.entryShape(function.index) },
+            partition = { function -> lowering.functionTypeKey(function.index) },
+        ).sortedBy { group -> group.members.first().index.index }
         entries = ArrayList()
         val entryClasses = groups.mapIndexed { number, group ->
-            val first = group.first()
+            val members = group.members
+            val shape = group.shape
             val entry = entriesClassDescriptor(entryPath, number)
-            group.forEachIndexed { id, function -> entries += InstalledEntry(function.index.index, entry, if (group.size == 1) -1 else id) }
-            val type = lowering.declarations.functionType(first.index)
-            val signature = checkNotNull(lowering.signature(type))
-            val methods = group.map { function -> lowering.functionMethod(function.index) }
+            members.forEachIndexed { id, function -> entries += InstalledEntry(function.index.index, entry, if (members.size == 1) -1 else id) }
+            val signature = lowering.signature(shape)
+            val methods = members.map { function -> lowering.functionMethod(function.index) }
             entry to (
-                pool?.submit(Callable { entryLowerer(lowering, entry, methods, type, signature) })
-                    ?: CompletableFuture.completedFuture(entryLowerer(lowering, entry, methods, type, signature))
+                pool?.submit(Callable { entryLowerer(lowering, entry, methods, shape, signature) })
+                    ?: CompletableFuture.completedFuture(entryLowerer(lowering, entry, methods, shape, signature))
             )
         }
         entryClasses.forEach { (entry, bytes) -> inventory.classFile(internalName(entry), completed(bytes)) }

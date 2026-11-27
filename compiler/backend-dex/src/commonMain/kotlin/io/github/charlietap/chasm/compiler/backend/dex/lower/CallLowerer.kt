@@ -22,11 +22,11 @@ import io.github.charlietap.chasm.compiler.backend.abi.descriptorWords
 import io.github.charlietap.chasm.compiler.backend.abi.returnDescriptor
 import io.github.charlietap.chasm.compiler.backend.abi.takesArgumentArray
 import io.github.charlietap.chasm.compiler.backend.abi.takesReferenceArray
+import io.github.charlietap.chasm.compiler.backend.abi.typedCall
 import io.github.charlietap.chasm.compiler.backend.abi.valueDescriptor
 import io.github.charlietap.chasm.compiler.backend.analysis.SlotKindFlow
 import io.github.charlietap.chasm.compiler.backend.analysis.form.CallSite
 import io.github.charlietap.chasm.compiler.backend.analysis.form.Operand
-import io.github.charlietap.chasm.compiler.backend.dex.abi.typedCall
 import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.chasm.type.ValueType
 import io.github.charlietap.dexter.ArrayKind

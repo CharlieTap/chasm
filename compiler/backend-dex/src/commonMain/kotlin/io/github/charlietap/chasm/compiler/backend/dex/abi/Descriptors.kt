@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.compiler.backend.dex.abi
 
+import io.github.charlietap.chasm.compiler.backend.abi.EntryShape
 import io.github.charlietap.chasm.compiler.backend.abi.MethodRef
 import io.github.charlietap.chasm.compiler.backend.abi.argumentWords
 import io.github.charlietap.chasm.compiler.backend.abi.descriptorWords
@@ -38,6 +39,8 @@ internal class FunctionSignature(
     val resultDescriptor: String = returnDescriptor(type, reference)
 
     val key: String = signatureKey(type, reference)
+
+    val entryShape: EntryShape = EntryShape(type, reference)
 
     val argumentWords: Int = argumentWords(type, reference)
 }
@@ -137,9 +140,3 @@ internal fun bindingParameters(
     type: FunctionType,
     reference: String,
 ): List<String> = staticParameters(type, BINDING_TYPE, reference)
-
-internal fun typedCall(
-    signature: String,
-    type: FunctionType,
-    reference: String,
-): MethodRef = MethodRef(signature, TYPED_CALL, bindingParameters(type, reference).drop(1), returnDescriptor(type, reference))

@@ -15,9 +15,9 @@ import io.github.charlietap.chasm.compiler.backend.analysis.UnsupportedFunctions
 import io.github.charlietap.chasm.compiler.backend.analysis.declarations.BuilderCall
 import io.github.charlietap.chasm.compiler.backend.analysis.declarations.DeclarationCallGenerator
 import io.github.charlietap.chasm.compiler.backend.analysis.declarations.DiscardingOutputStream
+import io.github.charlietap.chasm.compiler.backend.analysis.entryShapeGroups
 import io.github.charlietap.chasm.compiler.backend.analysis.gc.ConstantExpressions
 import io.github.charlietap.chasm.compiler.backend.analysis.gc.UnsupportedShape
-import io.github.charlietap.chasm.compiler.backend.dex.abi.FunctionSignature
 import io.github.charlietap.chasm.compiler.backend.dex.abi.installClass
 import io.github.charlietap.chasm.compiler.backend.dex.binding.BoundResources
 import io.github.charlietap.chasm.compiler.backend.dex.binding.boundResources
@@ -25,9 +25,6 @@ import io.github.charlietap.chasm.compiler.backend.dex.gc.ConstantsWriter
 import io.github.charlietap.chasm.compiler.backend.dex.lower.Unsupported
 import io.github.charlietap.chasm.declarations.ModuleDeclarations
 import io.github.charlietap.chasm.runtime.diagnostic.FunctionTrapSites
-import io.github.charlietap.chasm.type.AbstractHeapType
-import io.github.charlietap.chasm.type.FunctionType
-import io.github.charlietap.chasm.type.ValueType
 import io.github.charlietap.dexter.DexFile
 import io.github.charlietap.dexter.Dexter
 import io.github.charlietap.dexter.DexterException
@@ -225,17 +222,9 @@ private fun finishFiles(
     installLowerer: InstallLowerer,
 ): DexModule {
 
-    val compiled = LinkedHashMap<EntryKey, EntryCandidates>()
-    for (function in plan.functions) {
-        val type = plan.declarations.functionType(function.type)
-        val key = EntryKey(plan.functionSignature(function.type), type)
-        val method = plan.functionInvocation(function.index).method
-        compiled.getOrPut(key) { EntryCandidates(type) }.functions += LoweredFunction(function.index.index, method)
-    }
-
     val entries = arrayOfNulls<EntryRef>(plan.functionCount)
     val entryClasses = LinkedHashSet<String>()
-    val groups = entryGroups(compiled, plan)
+    val groups = entryGroups(plan)
     val dexter = Dexter()
     val dex = ArrayList(codeDex)
     val entryFiles = if (codeAndEntryFile != null) listOf(groups) else groups.chunkedBy(ENTRY_FUNCTIONS_PER_FILE)
@@ -348,41 +337,19 @@ internal class EntryRef(
     val id: Int,
 )
 
-internal data class EntryCandidates(
-    val type: FunctionType,
-    val functions: MutableList<LoweredFunction> = ArrayList(),
-)
+private fun entryGroups(plan: ModulePlan): List<EntryGroup> {
 
-internal data class EntryKey(
-    val signature: String,
-    val parameters: Int,
-    val results: Int,
-    val externResults: List<Boolean>,
-) {
-    constructor(
-        signature: FunctionSignature,
-        type: FunctionType,
-    ) : this(
-        signature.key,
-        type.params.types.size,
-        type.results.types.size,
-        type.results.types.map(::isExternReference),
-    )
-}
+    val shapeGroups = entryShapeGroups(plan.functions, ENTRY_GROUP_SIZE) { function -> plan.functionSignature(function.type).entryShape }
 
-private fun entryGroups(
-    compiled: Map<EntryKey, EntryCandidates>,
-    plan: ModulePlan,
-): List<EntryGroup> {
-    val groups = ArrayList<EntryGroup>()
-    for ((key, candidates) in compiled) {
-        val type = candidates.type
-        val signature = plan.signatureClass(key.signature)
-        for (members in candidates.functions.chunked(ENTRY_GROUP_SIZE)) {
-            groups += EntryGroup(number = groups.size, type = type, signature = signature, members = members, referenceDescriptor = plan.referenceDescriptor)
-        }
+    return shapeGroups.mapIndexed { number, shapeGroup ->
+        EntryGroup(
+            number = number,
+            shape = shapeGroup.shape,
+            signature = plan.signatureClass(plan.functionSignature(shapeGroup.members.first().type).key),
+            members = shapeGroup.members.map { function -> LoweredFunction(function.index.index, plan.functionInvocation(function.index).method) },
+            referenceDescriptor = plan.referenceDescriptor,
+        )
     }
-    return groups
 }
 
 private fun List<EntryGroup>.chunkedBy(
@@ -407,10 +374,3 @@ private fun List<EntryGroup>.chunkedBy(
 internal const val ENTRY_GROUP_SIZE = 64
 
 private const val ENTRY_FUNCTIONS_PER_FILE = 8_000
-
-private fun isExternReference(
-    type: ValueType,
-): Boolean {
-    val heap = (type as? ValueType.Reference)?.referenceType?.heapType
-    return heap == AbstractHeapType.Extern || heap == AbstractHeapType.NoExtern
-}

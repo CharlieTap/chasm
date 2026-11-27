@@ -4,6 +4,7 @@ package io.github.charlietap.chasm.compiler.backend.jvm
 
 import com.github.michaelbull.result.getOrThrow
 import io.github.charlietap.chasm.InternalChasmApi
+import io.github.charlietap.chasm.compiler.backend.abi.EntryShape
 import io.github.charlietap.chasm.compiler.backend.analysis.UnsupportedFunctions
 import io.github.charlietap.chasm.compiler.backend.analysis.declarations.DeclarationCallGenerator
 import io.github.charlietap.chasm.compiler.backend.jvm.declarations.DeclarationsLowerer
@@ -13,6 +14,8 @@ import io.github.charlietap.chasm.compiler.backend.jvm.size.MethodSize
 import io.github.charlietap.chasm.compiler.frontend.ModuleCompiler
 import io.github.charlietap.chasm.module.ModuleDeclarationsFactory
 import org.objectweb.asm.ClassTooLargeException
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.TimeUnit
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
@@ -159,6 +162,41 @@ class ModuleLowererTest {
         assertTrue(jvm.codeLength in 8_001..32_767, "${jvm.codeLength} bytes")
     }
 
+    @Test
+    fun `functions of one function type share entry classes and other function types do not join them`() {
+
+        val entryClassCounts = mapOf("managed_lowering" to 10, "call_effects" to 20, "scalar" to 6, "control" to 5)
+
+        entryClassCounts.forEach { (name, entryClasses) ->
+            assertEquals(entryClasses, entryShapes(fixture(name)).size, name)
+        }
+    }
+
+    @Test
+    fun `a function type declared twice shares one entry class`() {
+
+        val shapes = entryShapes(fixture("repeated_function_types"))
+
+        assertEquals(1, shapes.size)
+    }
+
+    @Test
+    fun `a module whose function types reach deeply nested types is lowered promptly`() {
+
+        val shapes = CompletableFuture.supplyAsync { entryShapes(fixture("deep_types")) }.get(60, TimeUnit.SECONDS)
+
+        assertEquals(1, shapes.size)
+    }
+
+    @Test
+    fun `functions returning a number and a reference in different orders have separate entries`() {
+
+        val referenceResults = entryShapes(fixture("result_lanes")).map(EntryShape::referenceResults)
+
+        assertTrue(listOf(false, true) in referenceResults)
+        assertTrue(listOf(true, false) in referenceResults)
+    }
+
     private fun longestDispatcher(
         methodSize: MethodSize,
         refusedSteps: Int,
@@ -196,6 +234,36 @@ class ModuleLowererTest {
         val code = ModuleCompiler(module).getOrThrow { error -> IllegalStateException(error.toString()) }
 
         return Generated().also { output -> ModuleLowerer(module, code, options, output, ModuleDeclarationsFactory(module)) }
+    }
+
+    private fun entryShapes(bytes: ByteArray): List<EntryShape> {
+
+        val module = decodeNamedModule(bytes)
+        val code = ModuleCompiler(module).getOrThrow { error -> IllegalStateException(error.toString()) }
+        val shapes = ArrayList<EntryShape>()
+
+        ModuleLowerer(
+            module = module,
+            code = code,
+            options = JvmOptions(),
+            output = Generated(),
+            declarations = ModuleDeclarationsFactory(module),
+            parallelism = 1,
+            functionLowerer = ::FunctionLowerer,
+            signatureLowerer = ::SignatureLowerer,
+            entryLowerer = { lowering, entry, methods, shape, signature ->
+                shapes += shape
+                EntryLowerer(lowering, entry, methods, shape, signature)
+            },
+            constantsLowerer = ::ConstantsLowerer,
+            bindingLowerer = ::BindingLowerer,
+            declarationCallGenerator = ::DeclarationCallGenerator,
+            declarationsLowerer = ::DeclarationsLowerer,
+            moduleClassLowerer = ::ModuleClassLowerer,
+            structsLowerer = ::ModuleStructsLowerer,
+        )
+
+        return shapes
     }
 
     private fun lower(

@@ -40,8 +40,6 @@ internal fun functionMethod(
 ) =
     MethodRef(owner, functionName(index), bindingParameters(type, reference), returnDescriptor(type, reference))
 
-internal const val TYPED_CALL = "typed"
-
 internal const val SOURCE_FILE = TRAP_DIAGNOSTICS_SOURCE_FILE
 
 internal fun chunkName(
