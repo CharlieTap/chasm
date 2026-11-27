@@ -37,6 +37,10 @@ internal class StructStorageLayout(
     private val allocator: StructAllocator,
 ) : StorageLayout {
 
+    private val fieldLanes: Array<Array<StorageLane>> = Array(fields.size) { index -> fields[index].lanes.toTypedArray() }
+
+    private val isReferenceField = BooleanArray(fields.size) { index -> holdsReference(fields[index].type) }
+
     fun newStruct(rtt: Rtt): CompiledStruct {
         return allocator.newStruct(rtt)
     }
@@ -46,13 +50,13 @@ internal class StructStorageLayout(
         index: Int,
     ): Long {
 
-        val field = numberField(index)
-        val low = readInt(struct, field.lanes[0])
+        val lanes = numberLanes(index)
+        val low = readInt(struct, lanes[0])
 
-        return if (field.lanes.size == 1) {
+        return if (lanes.size == 1) {
             low.toLong()
         } else {
-            (low.toLong() and LOW_BITS) or (readInt(struct, field.lanes[1]).toLong() shl Int.SIZE_BITS)
+            (low.toLong() and LOW_BITS) or (readInt(struct, lanes[1]).toLong() shl Int.SIZE_BITS)
         }
     }
 
@@ -61,7 +65,7 @@ internal class StructStorageLayout(
         index: Int,
     ): Any? {
 
-        val lane = referenceField(index).lanes[0]
+        val lane = referenceLane(index)
 
         return if (lane.spilled) struct.readSpilledReference(lane.index) else struct.readReference(lane.index)
     }
@@ -72,13 +76,13 @@ internal class StructStorageLayout(
         value: Long,
     ) {
 
-        val field = numberField(index)
+        val lanes = numberLanes(index)
 
-        if (field.lanes.size == 1) {
-            writeInt(struct, field.lanes[0], value.toInt() and packedMask(field.type))
+        if (lanes.size == 1) {
+            writeInt(struct, lanes[0], value.toInt() and packedMask(fields[index].type))
         } else {
-            writeInt(struct, field.lanes[0], value.toInt())
-            writeInt(struct, field.lanes[1], (value ushr Int.SIZE_BITS).toInt())
+            writeInt(struct, lanes[0], value.toInt())
+            writeInt(struct, lanes[1], (value ushr Int.SIZE_BITS).toInt())
         }
     }
 
@@ -88,7 +92,7 @@ internal class StructStorageLayout(
         value: Any?,
     ) {
 
-        val lane = referenceField(index).lanes[0]
+        val lane = referenceLane(index)
 
         if (lane.spilled) {
             struct.writeSpilledReference(lane.index, value)
@@ -97,24 +101,30 @@ internal class StructStorageLayout(
         }
     }
 
-    private fun numberField(index: Int): StorageField {
+    private fun numberLanes(index: Int): Array<StorageLane> {
 
-        val field = fields.getOrNull(index) ?: throw fieldIndexError(index)
-        if (holdsReference(field.type)) {
+        checkFieldIndex(index)
+        if (isReferenceField[index]) {
             throw referenceFieldError(index)
         }
 
-        return field
+        return fieldLanes[index]
     }
 
-    private fun referenceField(index: Int): StorageField {
+    private fun referenceLane(index: Int): StorageLane {
 
-        val field = fields.getOrNull(index) ?: throw fieldIndexError(index)
-        if (!holdsReference(field.type)) {
+        checkFieldIndex(index)
+        if (!isReferenceField[index]) {
             throw numberFieldError(index)
         }
 
-        return field
+        return fieldLanes[index][0]
+    }
+
+    private fun checkFieldIndex(index: Int) {
+        if (index < 0 || index >= fieldLanes.size) {
+            throw fieldIndexError(index)
+        }
     }
 
     private fun readInt(
