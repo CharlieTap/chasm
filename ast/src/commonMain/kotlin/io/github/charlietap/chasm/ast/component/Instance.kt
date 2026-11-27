@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.ast.component
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.component.Index.ComponentFunctionIndex
 import io.github.charlietap.chasm.ast.component.Index.ComponentIndex
 import io.github.charlietap.chasm.ast.component.Index.ComponentModuleIndex
@@ -7,6 +8,7 @@ import io.github.charlietap.chasm.ast.component.Index.ComponentModuleInstanceInd
 import io.github.charlietap.chasm.ast.component.Index.ComponentValueIndex
 import io.github.charlietap.chasm.ast.value.NameValue
 
+@InternalChasmApi
 sealed interface CoreInstanceDefinition {
 
     data class Instantiate(
@@ -17,16 +19,19 @@ sealed interface CoreInstanceDefinition {
     data class InlineExports(val exports: List<CoreExport>) : CoreInstanceDefinition
 }
 
+@InternalChasmApi
 data class CoreInstantiateArgument(
     val name: NameValue,
     val instanceIndex: ComponentModuleInstanceIndex,
 )
 
+@InternalChasmApi
 data class CoreExport(
     val name: NameValue,
     val target: CoreExportTarget,
 )
 
+@InternalChasmApi
 sealed interface InstanceDefinition {
 
     data class Instantiate(
@@ -37,27 +42,32 @@ sealed interface InstanceDefinition {
     data class InlineExports(val exports: List<InlineExport>) : InstanceDefinition
 }
 
+@InternalChasmApi
 data class InstantiateArgument(
     val name: NameValue,
     val target: ExportTarget,
 )
 
+@InternalChasmApi
 data class InlineExport(
     val name: NameAttributes,
     val target: ExportTarget,
 )
 
+@InternalChasmApi
 data class StartDefinition(
     val functionIndex: ComponentFunctionIndex,
     val args: List<ComponentValueIndex>,
     val resultCount: UInt,
 )
 
+@InternalChasmApi
 data class ComponentValue(
     val type: ValueType,
     val value: ComponentValueLiteral,
 )
 
+@InternalChasmApi
 sealed interface ComponentValueLiteral {
 
     data class Bool(val value: Boolean) : ComponentValueLiteral

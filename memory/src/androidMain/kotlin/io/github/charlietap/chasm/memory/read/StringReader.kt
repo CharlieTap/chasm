@@ -7,7 +7,7 @@ import io.github.charlietap.chasm.memory.ByteArrayLinearMemory
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
 import java.nio.charset.StandardCharsets
 
-actual inline fun StringReader(
+internal actual inline fun StringReader(
     memory: LinearMemory,
     memoryPointer: Int,
     stringLengthInBytes: Int,

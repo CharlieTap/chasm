@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.executor.invoker.compiled
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.executor.invoker.function.initializeLocals
 import io.github.charlietap.chasm.executor.invoker.function.invokeHost
 import io.github.charlietap.chasm.host.UnsafeHostApi
@@ -14,11 +15,13 @@ import io.github.charlietap.chasm.runtime.stack.activationHeader
 import io.github.charlietap.chasm.type.AbstractHeapType
 import io.github.charlietap.chasm.type.ValueType
 
+@InternalChasmApi
 const val INTERPRETED_CALL_COST = 256
 
+@InternalChasmApi
 const val COMPILED_CALL_COST = 4
 
-fun interpretFunctionAt(
+internal fun interpretFunctionAt(
     context: ExecutionContext,
     caller: ModuleInstance,
     function: FunctionInstance,
@@ -38,7 +41,7 @@ fun interpretFunctionAt(
     }
 }
 
-fun callFunction(
+internal fun callFunction(
     context: ExecutionContext,
     caller: ModuleInstance,
     function: FunctionInstance,
@@ -71,7 +74,7 @@ fun callFunction(
 }
 
 @OptIn(UnsafeHostApi::class)
-fun interpretFunction(
+internal fun interpretFunction(
     context: ExecutionContext,
     caller: ModuleInstance,
     function: FunctionInstance,
@@ -136,7 +139,7 @@ internal inline fun copySlots(
 
 private const val SMALL_COPY = 16
 
-fun requestTailCall(
+internal fun requestTailCall(
     context: ExecutionContext,
     caller: ModuleInstance,
     function: FunctionInstance,
@@ -147,7 +150,7 @@ fun requestTailCall(
     context.pendingTailArguments = values
 }
 
-fun completeTailCall(
+internal fun completeTailCall(
     context: ExecutionContext,
     values: LongArray,
     depth: Int,
@@ -170,6 +173,7 @@ internal fun clearPendingTailCall(
     context.pendingTailArguments = null
 }
 
+@InternalChasmApi
 fun raiseUnwinding(
     context: ExecutionContext,
 ): Nothing {

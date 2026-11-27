@@ -1,8 +1,10 @@
 package io.github.charlietap.chasm.compiler.backend.chasm
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.cir.CirFunction
 import io.github.charlietap.chasm.runtime.store.Store
 
+@InternalChasmApi
 class FunctionLayout(
     private val instructionCount: Int,
     private val unlinkedCheckpoints: IntArray,
@@ -29,6 +31,7 @@ class FunctionLayout(
     }
 }
 
+@InternalChasmApi
 fun FunctionLayout(
     function: CirFunction,
     store: Store,

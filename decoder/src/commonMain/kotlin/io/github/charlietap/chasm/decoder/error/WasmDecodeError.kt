@@ -2,7 +2,7 @@ package io.github.charlietap.chasm.decoder.error
 
 import kotlin.jvm.JvmInline
 
-sealed interface WasmDecodeError : ModuleDecoderError, ComponentDecoderError {
+internal sealed interface WasmDecodeError : ModuleDecoderError, ComponentDecoderError {
     @JvmInline
     value class InvalidWasmFile(val number: UByteArray) : WasmDecodeError
 

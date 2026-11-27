@@ -1,9 +1,6 @@
 package io.github.charlietap.chasm.runtime.compiled.gc
 
-import io.github.charlietap.chasm.InternalChasmApi
-
-@InternalChasmApi
-class RttTypes(
+internal class RttTypes(
     private val managedStore: ManagedStore,
     val registry: RttRegistry,
 ) : GcTypes {

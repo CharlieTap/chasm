@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.runtime.host
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.host.HostGcFieldInfo
 import io.github.charlietap.chasm.host.HostGcType
 
@@ -14,6 +15,7 @@ import io.github.charlietap.chasm.host.HostGcType
  * This is a trusted API. References, types, fields, and indexes must match the
  * guest module's declarations.
  */
+@InternalChasmApi
 interface HostGc {
 
     val allocatedBytes: Long

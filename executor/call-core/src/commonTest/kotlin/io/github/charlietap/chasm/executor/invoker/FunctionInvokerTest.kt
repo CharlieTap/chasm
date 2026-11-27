@@ -1,10 +1,7 @@
-@file:OptIn(InternalChasmApi::class)
-
 package io.github.charlietap.chasm.executor.invoker
 
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.fixture.config.runtimeConfig
 import io.github.charlietap.chasm.fixture.runtime.instance.functionAddress
 import io.github.charlietap.chasm.fixture.runtime.instance.hostFunctionInstance

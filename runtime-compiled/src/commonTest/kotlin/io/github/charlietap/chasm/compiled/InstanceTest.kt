@@ -1,7 +1,6 @@
 package io.github.charlietap.chasm.compiled
 
 import com.github.michaelbull.result.getOrThrow
-import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.compiled.code.fixture
 import io.github.charlietap.chasm.compiled.code.generate
 import io.github.charlietap.chasm.compiled.format.COMPILED_RUNTIME_ABI
@@ -39,7 +38,6 @@ import kotlin.test.assertIs
 import kotlin.test.assertTrue
 import kotlin.test.fail
 
-@OptIn(InternalChasmApi::class)
 class InstanceTest {
 
     private val emptyDeclarations = emptyModuleDeclarations()

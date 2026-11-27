@@ -2,11 +2,13 @@
 
 package io.github.charlietap.chasm.memory.fill
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.memory.ByteBufferLinearMemory
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
 
+@InternalChasmApi
 actual fun LinearMemoryFiller(
     memory: LinearMemory,
     address: Int,

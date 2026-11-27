@@ -1,5 +1,8 @@
 package io.github.charlietap.chasm.runtime.instance
 
+import io.github.charlietap.chasm.InternalChasmApi
+
+@InternalChasmApi
 data class DataInstance(
     var bytes: UByteArray,
 ) {

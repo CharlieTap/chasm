@@ -1,5 +1,8 @@
 package io.github.charlietap.chasm.benchmark
 
+import io.github.charlietap.chasm.InternalChasmApi
+
+@InternalChasmApi
 public enum class BenchmarkMode {
     /**
      * Requests user-interactive QoS on Darwin.

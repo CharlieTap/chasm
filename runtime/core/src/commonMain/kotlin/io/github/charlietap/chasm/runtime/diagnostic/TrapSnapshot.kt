@@ -1,11 +1,14 @@
 package io.github.charlietap.chasm.runtime.diagnostic
 
+import io.github.charlietap.chasm.InternalChasmApi
+
 /**
  * Per-frame arrays are aligned and innermost first: the first IP is the
  * faulting instruction, later IPs are call sites. A frame of compiled code
  * has [COMPILED_FRAME] as its entry and end IP, and the compiled instruction
  * position, or -1, as its IP. Nothing here retains the store, stack or heap.
  */
+@InternalChasmApi
 class TrapSnapshot(
     val functionAddresses: IntArray,
     val ips: IntArray,
@@ -36,6 +39,7 @@ class TrapSnapshot(
  * imports one memory twice needs its instruction to tell. [memorySize] is
  * the size of the memory accessed when the trap happened.
  */
+@InternalChasmApi
 class TrapMemoryAccess(
     val kind: FailedMemoryAccess.Kind,
     val memoryIndex: Int,

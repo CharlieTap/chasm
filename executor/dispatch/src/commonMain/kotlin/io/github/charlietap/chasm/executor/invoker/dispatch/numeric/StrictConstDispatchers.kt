@@ -1,7 +1,9 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.numeric
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 
+@InternalChasmApi
 fun I32ConstSDispatcher(
     value: Int,
     destinationSlot: Int,
@@ -13,6 +15,7 @@ fun I32ConstSDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64ConstSDispatcher(
     value: Long,
     destinationSlot: Int,
@@ -23,6 +26,7 @@ fun I64ConstSDispatcher(
     }
 }
 
+@InternalChasmApi
 fun F32ConstSDispatcher(
     bits: Int,
     destinationSlot: Int,
@@ -34,6 +38,7 @@ fun F32ConstSDispatcher(
     }
 }
 
+@InternalChasmApi
 fun F64ConstSDispatcher(
     bits: Long,
     destinationSlot: Int,

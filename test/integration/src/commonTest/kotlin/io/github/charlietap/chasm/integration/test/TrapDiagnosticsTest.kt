@@ -1,8 +1,5 @@
-@file:OptIn(InternalChasmApi::class)
-
 package io.github.charlietap.chasm.integration.test
 
-import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.embedding.error.MemoryAccess
 import io.github.charlietap.chasm.embedding.error.Trap

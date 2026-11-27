@@ -1,8 +1,5 @@
-@file:OptIn(InternalChasmApi::class)
-
 package io.github.charlietap.chasm.embedding.diagnostic
 
-import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.embedding.error.ExecutionError
 import io.github.charlietap.chasm.embedding.error.Trap
 import io.github.charlietap.chasm.embedding.error.TrapReason

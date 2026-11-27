@@ -22,7 +22,7 @@ import kotlinx.coroutines.runBlocking
 import kotlin.contextOf
 import io.github.charlietap.chasm.host.HostFunction as ChasmHostFunction
 
-object NonJsVirtualMachine : WasmVirtualMachine {
+internal object NonJsVirtualMachine : WasmVirtualMachine {
 
     object ResultFactory {
         fun <T> new(result: ChasmResult<T, *>): Result<T> {

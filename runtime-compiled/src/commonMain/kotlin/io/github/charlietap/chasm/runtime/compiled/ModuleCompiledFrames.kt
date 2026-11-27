@@ -1,14 +1,12 @@
 package io.github.charlietap.chasm.runtime.compiled
 
-import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.runtime.diagnostic.CompiledFrames
 import io.github.charlietap.chasm.runtime.diagnostic.CompiledFrames.Companion.NOT_COMPILED
 import io.github.charlietap.chasm.runtime.diagnostic.CompiledTrace
 import io.github.charlietap.chasm.runtime.store.Store
 import kotlin.reflect.KClass
 
-@InternalChasmApi
-class ModuleCompiledFrames(
+internal class ModuleCompiledFrames(
     private val classPrefix: String,
     private val chunkStarts: (function: Int) -> IntArray?,
     private val originalLine: (className: String, methodName: String, line: Int) -> Int,

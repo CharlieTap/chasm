@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.declarations
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.module.Export
 import io.github.charlietap.chasm.ast.module.Import
 import io.github.charlietap.chasm.ast.module.Index
@@ -7,6 +8,7 @@ import io.github.charlietap.chasm.type.DefinedType
 import io.github.charlietap.chasm.type.MemoryType
 import io.github.charlietap.chasm.type.TagType
 
+@InternalChasmApi
 class ModuleDeclarations(
     val definedTypes: List<DefinedType>,
     val imports: List<Import>,

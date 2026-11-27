@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.runtime.ext
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.type.ConcreteHeapType
@@ -8,6 +9,7 @@ import io.github.charlietap.chasm.type.ReferenceType
 import io.github.charlietap.chasm.type.StorageType
 import io.github.charlietap.chasm.type.ValueType
 
+@InternalChasmApi
 fun ValueType.defaultBits(): Long? = when (this) {
     is ValueType.Number -> 0L
     is ValueType.Vector -> 0L
@@ -24,6 +26,7 @@ fun ValueType.defaultBits(): Long? = when (this) {
     is ValueType.Bottom -> null
 }
 
+@InternalChasmApi
 fun FieldType.defaultBits(): Long? = when (val storageType = this.storageType) {
     is StorageType.Packed -> storageType.type.default()
     is StorageType.Value -> storageType.type.defaultBits()

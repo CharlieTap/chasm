@@ -1,8 +1,10 @@
 package io.github.charlietap.chasm.runtime.function
 
+import io.github.charlietap.chasm.InternalChasmApi
 import kotlin.jvm.JvmInline
 
 /** Precomputed initialization shape for a function's defined locals. */
+@InternalChasmApi
 sealed interface LocalInitialization {
 
     data object None : LocalInitialization
@@ -21,6 +23,7 @@ sealed interface LocalInitialization {
     class ConstantStores(val values: LongArray) : LocalInitialization
 }
 
+@InternalChasmApi
 fun classifyLocalInitialization(values: LongArray): LocalInitialization {
     if (values.isEmpty()) return LocalInitialization.None
     var index = 0

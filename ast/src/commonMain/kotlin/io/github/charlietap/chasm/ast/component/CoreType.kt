@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.ast.component
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.value.NameValue
 import io.github.charlietap.chasm.type.GlobalType
 import io.github.charlietap.chasm.type.MemoryType
@@ -8,6 +9,7 @@ import io.github.charlietap.chasm.type.TableType
 import io.github.charlietap.chasm.type.TagType
 import io.github.charlietap.chasm.ast.module.Index.TypeIndex as ModuleTypeIndex
 
+@InternalChasmApi
 sealed interface CoreTypeDefinition {
 
     data class DefinedType(val type: RecursiveType) : CoreTypeDefinition
@@ -15,6 +17,7 @@ sealed interface CoreTypeDefinition {
     data class ModuleType(val declarations: List<CoreModuleDeclaration>) : CoreTypeDefinition
 }
 
+@InternalChasmApi
 sealed interface CoreModuleDeclaration {
 
     data class Type(val type: CoreTypeDefinition) : CoreModuleDeclaration
@@ -36,6 +39,7 @@ sealed interface CoreModuleDeclaration {
     ) : CoreModuleDeclaration
 }
 
+@InternalChasmApi
 sealed interface CoreExternalType {
 
     data class Function(val typeIndex: ModuleTypeIndex) : CoreExternalType

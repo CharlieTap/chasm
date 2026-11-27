@@ -1,5 +1,8 @@
 package io.github.charlietap.chasm.compiler.backend.analysis
 
+import io.github.charlietap.chasm.InternalChasmApi
+
+@InternalChasmApi
 class BasicBlocks(
     val leaders: IntArray,
     val blockAt: IntArray,
@@ -9,6 +12,7 @@ class BasicBlocks(
     }
 }
 
+@InternalChasmApi
 fun basicBlocks(
     isLeader: BooleanArray,
     size: Int,

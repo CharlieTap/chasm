@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.ast.component
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.component.Index.ComponentFunctionIndex
 import io.github.charlietap.chasm.ast.component.Index.ComponentIndex
 import io.github.charlietap.chasm.ast.component.Index.ComponentInstanceIndex
@@ -10,6 +11,7 @@ import io.github.charlietap.chasm.ast.component.Index.ComponentValueIndex
 import io.github.charlietap.chasm.ast.value.NameValue
 import io.github.charlietap.chasm.ast.module.Index.TypeIndex as ModuleTypeIndex
 
+@InternalChasmApi
 sealed interface AliasDefinition {
 
     data class InstanceExport(val target: InstanceExportAliasTarget) : AliasDefinition
@@ -19,6 +21,7 @@ sealed interface AliasDefinition {
     data class Outer(val target: OuterAliasTarget) : AliasDefinition
 }
 
+@InternalChasmApi
 sealed interface InstanceExportAliasTarget {
 
     data class Module(
@@ -52,6 +55,7 @@ sealed interface InstanceExportAliasTarget {
     ) : InstanceExportAliasTarget
 }
 
+@InternalChasmApi
 sealed interface CoreInstanceExportAliasTarget {
 
     data class Function(
@@ -95,6 +99,7 @@ sealed interface CoreInstanceExportAliasTarget {
     ) : CoreInstanceExportAliasTarget
 }
 
+@InternalChasmApi
 sealed interface OuterAliasTarget {
 
     data class Module(

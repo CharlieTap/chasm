@@ -1,5 +1,8 @@
 package io.github.charlietap.chasm.cir
 
+import io.github.charlietap.chasm.InternalChasmApi
+
+@InternalChasmApi
 sealed class NumericInstruction : Instruction() {
 
     @CirTag("numeric.i32.const")
@@ -5052,4 +5055,5 @@ sealed class NumericInstruction : Instruction() {
     }
 }
 
+@InternalChasmApi
 const val NUMERIC_OPCODE_COUNT = 460

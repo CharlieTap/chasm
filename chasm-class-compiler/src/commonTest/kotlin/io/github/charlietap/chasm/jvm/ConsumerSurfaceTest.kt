@@ -1,8 +1,5 @@
-@file:OptIn(InternalChasmApi::class)
-
 package io.github.charlietap.chasm.jvm
 
-import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.embedding.shapes.expect
 import io.github.charlietap.chasm.runtime.compiled.gc.CompiledStruct
 import kotlinx.coroutines.test.runTest

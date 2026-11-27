@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.decoder
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.component.Component
 import io.github.charlietap.chasm.ast.component.Version
 import io.github.charlietap.chasm.config.ComponentConfig
@@ -27,6 +28,7 @@ import io.github.charlietap.chasm.decoder.section.SectionSize
 import io.github.charlietap.chasm.stream.SourceReader
 import io.github.charlietap.chasm.decoder.decoder.ComponentDecoder as ComponentContextDecoder
 
+@InternalChasmApi
 fun WasmComponentDecoder(
     config: ComponentConfig,
     bytes: ByteArray,
@@ -38,6 +40,7 @@ fun WasmComponentDecoder(
     return WasmComponentDecoder(context)
 }
 
+@InternalChasmApi
 fun WasmComponentDecoder(
     config: ComponentConfig,
     source: SourceReader,

@@ -1,8 +1,5 @@
-@file:OptIn(InternalChasmApi::class)
-
 package io.github.charlietap.chasm.dex
 
-import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.compiled.format.DATA_EXTENSION
 import java.io.IOException
 import java.nio.file.Files

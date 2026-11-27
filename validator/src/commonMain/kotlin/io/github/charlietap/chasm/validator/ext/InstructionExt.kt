@@ -5,7 +5,7 @@ import io.github.charlietap.chasm.ast.instruction.Instruction
 import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
 import io.github.charlietap.chasm.ast.instruction.VectorInstruction
 
-fun Instruction?.size(): Int = when (this) {
+internal fun Instruction?.size(): Int = when (this) {
     is AtomicMemoryInstruction -> size()
     is MemoryInstruction -> size()
     is VectorInstruction -> size()

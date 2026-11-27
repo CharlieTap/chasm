@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.runtime.resource.allocation
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.runtime.host.RawHostFunction
 import io.github.charlietap.chasm.runtime.instance.ExternalValue
@@ -8,8 +9,10 @@ import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.chasm.type.ext.definedType
 
+@InternalChasmApi
 typealias HostFunctionAllocator = (Store, FunctionType, RawHostFunction) -> ExternalValue.Function
 
+@InternalChasmApi
 fun HostFunctionAllocator(
     store: Store,
     functionType: FunctionType,

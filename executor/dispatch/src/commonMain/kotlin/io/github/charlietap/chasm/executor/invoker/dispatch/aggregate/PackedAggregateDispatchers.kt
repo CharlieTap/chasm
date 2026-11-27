@@ -1,8 +1,10 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.aggregate
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.type.PackedType
 
+@InternalChasmApi
 fun ArrayGetSignedIDispatcher(
     addressSlot: Int,
     field: Int,
@@ -17,6 +19,7 @@ fun ArrayGetSignedIDispatcher(
     }
 }
 
+@InternalChasmApi
 fun ArrayGetSignedSDispatcher(
     addressSlot: Int,
     fieldSlot: Int,
@@ -32,6 +35,7 @@ fun ArrayGetSignedSDispatcher(
     }
 }
 
+@InternalChasmApi
 fun ArrayGetUnsignedIDispatcher(
     addressSlot: Int,
     field: Int,
@@ -46,6 +50,7 @@ fun ArrayGetUnsignedIDispatcher(
     }
 }
 
+@InternalChasmApi
 fun ArrayGetUnsignedSDispatcher(
     addressSlot: Int,
     fieldSlot: Int,
@@ -61,6 +66,7 @@ fun ArrayGetUnsignedSDispatcher(
     }
 }
 
+@InternalChasmApi
 fun StructGetSignedSDispatcher(
     addressSlot: Int,
     destinationSlot: Int,
@@ -76,6 +82,7 @@ fun StructGetSignedSDispatcher(
     }
 }
 
+@InternalChasmApi
 fun StructGetUnsignedSDispatcher(
     addressSlot: Int,
     destinationSlot: Int,

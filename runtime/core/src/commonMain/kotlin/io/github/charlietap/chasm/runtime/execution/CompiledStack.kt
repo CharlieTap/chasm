@@ -1,7 +1,9 @@
 package io.github.charlietap.chasm.runtime.execution
 
+import io.github.charlietap.chasm.InternalChasmApi
 import kotlin.concurrent.Volatile
 
+@InternalChasmApi
 object CompiledStack {
 
     const val UNIT_BYTES = 32L

@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.memory
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.executor.invoker.dispatch.dispatchInstruction
 import io.github.charlietap.chasm.executor.invoker.instruction.memory.store.executeMemoryStore
 import io.github.charlietap.chasm.memory.write.F32Writer
@@ -14,6 +15,7 @@ import io.github.charlietap.chasm.memory.write.I64Writer
 import io.github.charlietap.chasm.runtime.instance.MemoryInstance
 import io.github.charlietap.chasm.runtime.operations.effectiveAddress
 
+@InternalChasmApi
 fun I32StoreIiDispatcher(
     value: Int,
     address: Int,
@@ -25,6 +27,7 @@ fun I32StoreIiDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I32StoreIsDispatcher(
     value: Int,
     addressSlot: Int,
@@ -49,6 +52,7 @@ fun I32StoreIsDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I32StoreSiDispatcher(
     valueSlot: Int,
     address: Int,
@@ -60,6 +64,7 @@ fun I32StoreSiDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I32StoreSsDispatcher(
     valueSlot: Int,
     addressSlot: Int,
@@ -83,6 +88,7 @@ fun I32StoreSsDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64StoreIiDispatcher(
     value: Long,
     address: Int,
@@ -94,6 +100,7 @@ fun I64StoreIiDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64StoreIsDispatcher(
     value: Long,
     addressSlot: Int,
@@ -117,6 +124,7 @@ fun I64StoreIsDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64StoreSiDispatcher(
     valueSlot: Int,
     address: Int,
@@ -134,6 +142,7 @@ fun I64StoreSiDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64StoreSsDispatcher(
     valueSlot: Int,
     addressSlot: Int,
@@ -145,6 +154,7 @@ fun I64StoreSsDispatcher(
     }
 }
 
+@InternalChasmApi
 fun F32StoreIiDispatcher(
     value: Float,
     address: Int,
@@ -156,6 +166,7 @@ fun F32StoreIiDispatcher(
     }
 }
 
+@InternalChasmApi
 fun F32StoreIsDispatcher(
     value: Float,
     addressSlot: Int,
@@ -167,6 +178,7 @@ fun F32StoreIsDispatcher(
     }
 }
 
+@InternalChasmApi
 fun F32StoreSiDispatcher(
     valueSlot: Int,
     address: Int,
@@ -178,6 +190,7 @@ fun F32StoreSiDispatcher(
     }
 }
 
+@InternalChasmApi
 fun F32StoreSsDispatcher(
     valueSlot: Int,
     addressSlot: Int,
@@ -189,6 +202,7 @@ fun F32StoreSsDispatcher(
     }
 }
 
+@InternalChasmApi
 fun F64StoreIiDispatcher(
     value: Double,
     address: Int,
@@ -200,6 +214,7 @@ fun F64StoreIiDispatcher(
     }
 }
 
+@InternalChasmApi
 fun F64StoreIsDispatcher(
     value: Double,
     addressSlot: Int,
@@ -211,6 +226,7 @@ fun F64StoreIsDispatcher(
     }
 }
 
+@InternalChasmApi
 fun F64StoreSiDispatcher(
     valueSlot: Int,
     address: Int,
@@ -222,6 +238,7 @@ fun F64StoreSiDispatcher(
     }
 }
 
+@InternalChasmApi
 fun F64StoreSsDispatcher(
     valueSlot: Int,
     addressSlot: Int,
@@ -233,6 +250,7 @@ fun F64StoreSsDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I32Store8IiDispatcher(
     value: Int,
     address: Int,
@@ -244,6 +262,7 @@ fun I32Store8IiDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I32Store8IsDispatcher(
     value: Int,
     addressSlot: Int,
@@ -267,6 +286,7 @@ fun I32Store8IsDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I32Store8SiDispatcher(
     valueSlot: Int,
     address: Int,
@@ -278,6 +298,7 @@ fun I32Store8SiDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I32Store8SsDispatcher(
     valueSlot: Int,
     addressSlot: Int,
@@ -301,6 +322,7 @@ fun I32Store8SsDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I32Store16IiDispatcher(
     value: Int,
     address: Int,
@@ -312,6 +334,7 @@ fun I32Store16IiDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I32Store16IsDispatcher(
     value: Int,
     addressSlot: Int,
@@ -335,6 +358,7 @@ fun I32Store16IsDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I32Store16SiDispatcher(
     valueSlot: Int,
     address: Int,
@@ -346,6 +370,7 @@ fun I32Store16SiDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I32Store16SsDispatcher(
     valueSlot: Int,
     addressSlot: Int,
@@ -369,6 +394,7 @@ fun I32Store16SsDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64Store8IiDispatcher(
     value: Long,
     address: Int,
@@ -380,6 +406,7 @@ fun I64Store8IiDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64Store8IsDispatcher(
     value: Long,
     addressSlot: Int,
@@ -391,6 +418,7 @@ fun I64Store8IsDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64Store8SiDispatcher(
     valueSlot: Int,
     address: Int,
@@ -402,6 +430,7 @@ fun I64Store8SiDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64Store8SsDispatcher(
     valueSlot: Int,
     addressSlot: Int,
@@ -413,6 +442,7 @@ fun I64Store8SsDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64Store16IiDispatcher(
     value: Long,
     address: Int,
@@ -424,6 +454,7 @@ fun I64Store16IiDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64Store16IsDispatcher(
     value: Long,
     addressSlot: Int,
@@ -435,6 +466,7 @@ fun I64Store16IsDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64Store16SiDispatcher(
     valueSlot: Int,
     address: Int,
@@ -446,6 +478,7 @@ fun I64Store16SiDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64Store16SsDispatcher(
     valueSlot: Int,
     addressSlot: Int,
@@ -457,6 +490,7 @@ fun I64Store16SsDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64Store32IiDispatcher(
     value: Long,
     address: Int,
@@ -468,6 +502,7 @@ fun I64Store32IiDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64Store32IsDispatcher(
     value: Long,
     addressSlot: Int,
@@ -491,6 +526,7 @@ fun I64Store32IsDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64Store32SiDispatcher(
     valueSlot: Int,
     address: Int,
@@ -502,6 +538,7 @@ fun I64Store32SiDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64Store32SsDispatcher(
     valueSlot: Int,
     addressSlot: Int,

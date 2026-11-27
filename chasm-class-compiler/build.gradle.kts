@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
-
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.build.config)
@@ -27,8 +25,7 @@ buildConfig {
 kotlin {
     jvm()
 
-    @OptIn(ExperimentalAbiValidation::class)
-    abiValidation()
+    validatePublicAbi()
 
     sourceSets {
         commonMain {

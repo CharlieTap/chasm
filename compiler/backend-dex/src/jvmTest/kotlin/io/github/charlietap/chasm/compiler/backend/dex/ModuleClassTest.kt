@@ -1,5 +1,3 @@
-@file:OptIn(InternalChasmApi::class)
-
 package io.github.charlietap.chasm.compiler.backend.dex
 
 import com.android.tools.smali.dexlib2.Opcodes
@@ -12,7 +10,6 @@ import com.android.tools.smali.dexlib2.iface.instruction.formats.ArrayPayload
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 import com.android.tools.smali.dexlib2.iface.reference.StringReference
 import com.github.michaelbull.result.getOrThrow
-import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.compiled.format.ArtifactTarget
 import io.github.charlietap.chasm.compiled.format.UNPINNED_OFFSET
 import io.github.charlietap.chasm.compiler.backend.abi.COMPILED_MODULE

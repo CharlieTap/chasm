@@ -1,7 +1,9 @@
 package io.github.charlietap.chasm.ast.component
 
+import io.github.charlietap.chasm.InternalChasmApi
 import kotlin.jvm.JvmInline
 
+@InternalChasmApi
 sealed interface Index {
 
     val idx: UInt

@@ -4,6 +4,7 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.fold
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.module.Function
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.typeResolver
@@ -24,8 +25,10 @@ import io.github.charlietap.chasm.parallel.claimEach
 import io.github.charlietap.chasm.parallel.executeWorkers
 import io.github.charlietap.chasm.parallel.workersForBatches
 
+@InternalChasmApi
 typealias ParallelModuleCompiler = suspend (Module, ModuleTypeResolver, ParallelTaskExecutor) -> Result<CirModule, CompilationError>
 
+@InternalChasmApi
 suspend fun ParallelModuleCompiler(
     module: Module,
     types: ModuleTypeResolver = module.typeResolver(),

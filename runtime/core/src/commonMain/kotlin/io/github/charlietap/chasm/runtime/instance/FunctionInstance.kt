@@ -1,10 +1,12 @@
 package io.github.charlietap.chasm.runtime.instance
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.runtime.function.WasmFunctionCallStrategy
 import io.github.charlietap.chasm.runtime.host.RawHostFunction
 import io.github.charlietap.chasm.runtime.type.RTT
 import io.github.charlietap.chasm.type.FunctionType
 
+@InternalChasmApi
 sealed class FunctionInstance {
 
     abstract val rtt: RTT

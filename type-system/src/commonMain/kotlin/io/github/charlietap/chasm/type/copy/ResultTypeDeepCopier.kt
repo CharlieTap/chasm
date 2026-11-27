@@ -3,7 +3,7 @@ package io.github.charlietap.chasm.type.copy
 import io.github.charlietap.chasm.type.ResultType
 import io.github.charlietap.chasm.type.ValueType
 
-fun ResultTypeDeepCopier(
+internal fun ResultTypeDeepCopier(
     input: ResultType,
 ): ResultType =
     ResultTypeDeepCopier(
@@ -11,7 +11,7 @@ fun ResultTypeDeepCopier(
         valueTypeCopier = ::ValueTypeDeepCopier,
     )
 
-inline fun ResultTypeDeepCopier(
+internal inline fun ResultTypeDeepCopier(
     input: ResultType,
     valueTypeCopier: DeepCopier<ValueType>,
 ): ResultType = ResultType(

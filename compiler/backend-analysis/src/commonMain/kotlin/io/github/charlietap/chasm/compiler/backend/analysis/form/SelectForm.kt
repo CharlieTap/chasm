@@ -1,7 +1,9 @@
 package io.github.charlietap.chasm.compiler.backend.analysis.form
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.cir.ParametricInstruction
 
+@InternalChasmApi
 class SelectForm(
     val condition: Operand,
     val first: Operand,
@@ -9,6 +11,7 @@ class SelectForm(
     val destination: Int,
 )
 
+@InternalChasmApi
 fun ParametricInstruction.select(): SelectForm = when (val i = this) {
     is ParametricInstruction.SelectIii -> SelectForm(immediate(i.condition), immediate(i.val1), immediate(i.val2), i.destinationSlot)
     is ParametricInstruction.SelectIis -> SelectForm(immediate(i.condition), immediate(i.val1), slot(i.val2Slot), i.destinationSlot)

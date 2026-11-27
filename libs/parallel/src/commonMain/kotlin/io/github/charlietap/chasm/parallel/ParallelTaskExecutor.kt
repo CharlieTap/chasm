@@ -1,10 +1,14 @@
 package io.github.charlietap.chasm.parallel
 
+import io.github.charlietap.chasm.InternalChasmApi
+
+@InternalChasmApi
 fun interface ParallelTaskScope {
 
     fun ensureActive()
 }
 
+@InternalChasmApi
 interface ParallelTaskExecutor {
 
     /** Executes [tasks] and returns their results in the same order. */
@@ -12,6 +16,7 @@ interface ParallelTaskExecutor {
 }
 
 /** Runs [worker] [count] times in parallel. A single worker runs on the calling thread. */
+@InternalChasmApi
 suspend fun <T> ParallelTaskExecutor.executeWorkers(
     count: Int,
     worker: ParallelTaskScope.() -> T,

@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.compiler.frontend
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.typeResolver
 import io.github.charlietap.chasm.cir.CirFunction
@@ -10,8 +11,10 @@ import io.github.charlietap.chasm.compiler.frontend.context.FunctionCompilerWork
 import io.github.charlietap.chasm.compiler.frontend.context.createCompilerContext
 import io.github.charlietap.chasm.declarations.ModuleTypeResolver
 
+@InternalChasmApi
 typealias ModuleCompiler = (Module, ModuleTypeResolver) -> Result<CirModule, CompilationError>
 
+@InternalChasmApi
 fun ModuleCompiler(
     module: Module,
     types: ModuleTypeResolver = module.typeResolver(),
@@ -24,6 +27,7 @@ fun ModuleCompiler(
     )
 }
 
+@InternalChasmApi
 fun ModuleCompiler(
     module: Module,
     types: ModuleTypeResolver,

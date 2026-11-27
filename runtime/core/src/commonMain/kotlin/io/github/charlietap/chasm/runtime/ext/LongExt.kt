@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.runtime.ext
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.runtime.encoder.RV_SHIFT_BITS
 import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_EXTERN
@@ -16,14 +17,17 @@ import io.github.charlietap.chasm.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.type.NumberType
 import io.github.charlietap.chasm.type.ValueType
 
+@InternalChasmApi
 fun Long.toReferenceValue(): ReferenceValue = ReferenceValueDecoder(this)
 
+@InternalChasmApi
 fun Long.toExternReference(): ReferenceValue.Extern = try {
     toReferenceValue() as ReferenceValue.Extern
 } catch (_: ClassCastException) {
     throw InvocationException(InvocationError.ExternReferenceExpected)
 }
 
+@InternalChasmApi
 inline fun Long.toFunctionAddress(): Address.Function {
     val typeId = this and RV_TYPE_MASK
     if (typeId != RV_TYPE_FUNCTION) {
@@ -33,6 +37,7 @@ inline fun Long.toFunctionAddress(): Address.Function {
     return Address.Function(address)
 }
 
+@InternalChasmApi
 inline fun Long.toI31(): UInt {
     val typeId = this and RV_TYPE_MASK
     if (typeId != RV_TYPE_I31) {
@@ -41,10 +46,13 @@ inline fun Long.toI31(): UInt {
     return (this shr RV_SHIFT_BITS).toUInt()
 }
 
+@InternalChasmApi
 inline fun Long.isNullableReference(): Boolean = (this and RV_TYPE_MASK) == RV_TYPE_NULL
 
+@InternalChasmApi
 inline fun Long.isExternReference(): Boolean = (this and RV_TYPE_MASK) == RV_TYPE_EXTERN
 
+@InternalChasmApi
 inline fun Long.toExecutionValue(
     type: ValueType,
 ): ExecutionValue = when (type) {

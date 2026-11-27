@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.runtime.store
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.config.Bytes
 import io.github.charlietap.chasm.config.CpuLimits
 import io.github.charlietap.chasm.config.GrowthFailureStrategy
@@ -18,6 +19,7 @@ import io.github.charlietap.chasm.runtime.reference.ReferenceStorage
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import kotlin.jvm.JvmField
 
+@InternalChasmApi
 class Store(
     val functions: MutableList<FunctionInstance> = [],
     val tables: MutableList<TableInstance> = [],

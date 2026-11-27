@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.compiler.backend.analysis
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.cir.CirFunction
 import io.github.charlietap.chasm.cir.CirModule
 import io.github.charlietap.chasm.cir.ControlInstruction
@@ -12,6 +13,7 @@ import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.chasm.type.ReferenceType
 import io.github.charlietap.chasm.type.ValueType
 
+@InternalChasmApi
 class ModuleAnalysis(
     val signatureTypes: Map<String, FunctionType>,
     val hasTailCalls: Boolean,
@@ -23,6 +25,7 @@ class ModuleAnalysis(
     val referencedFunctions: FunctionCensus,
 )
 
+@InternalChasmApi
 class FunctionCensus(
     included: BooleanArray,
 ) {
@@ -48,6 +51,7 @@ class FunctionCensus(
     }
 }
 
+@InternalChasmApi
 fun analyzeModule(
     code: CirModule,
     declarations: ModuleIndexSpaces,
@@ -56,6 +60,7 @@ fun analyzeModule(
     return analyzeModule(code, declarations, code.functions.map { function -> functionSummary(function, declarations) }, referenceDescriptor)
 }
 
+@InternalChasmApi
 fun analyzeModule(
     code: CirModule,
     declarations: ModuleIndexSpaces,
@@ -93,6 +98,7 @@ fun analyzeModule(
     )
 }
 
+@InternalChasmApi
 fun Instruction.indirectCallTypeIndex(): TypeIndex? {
     return when (this) {
         is ControlInstruction.CallIndirectI -> type
@@ -102,11 +108,12 @@ fun Instruction.indirectCallTypeIndex(): TypeIndex? {
     }
 }
 
-fun Instruction.isTailCall(): Boolean = this is ControlInstruction.ReturnCall ||
+internal fun Instruction.isTailCall(): Boolean = this is ControlInstruction.ReturnCall ||
     this is ControlInstruction.ReturnCallIndirectI || this is ControlInstruction.ReturnCallIndirectS ||
     this is ControlInstruction.ReturnCallRefS
 
 /** Whether [this] is a tail call by [function] to itself outside any try region, [region], which lowers to a jump. */
+@InternalChasmApi
 fun Instruction.isSelfTailCall(
     function: CirFunction,
     region: Int,
@@ -118,13 +125,14 @@ internal fun Instruction.isCall(): Boolean {
         this is ControlInstruction.CallRefS
 }
 
+@InternalChasmApi
 fun CirFunction.isLeaf(): Boolean {
     return instructions.none(Instruction::isCall)
 }
 
-fun Instruction.raisesException(): Boolean = this is ControlInstruction.Throw || this is ControlInstruction.ThrowRefS
+internal fun Instruction.raisesException(): Boolean = this is ControlInstruction.Throw || this is ControlInstruction.ThrowRefS
 
-fun collectable(
+internal fun collectable(
     type: ValueType,
 ): Boolean = type is ValueType.Reference && collectable(type.referenceType)
 

@@ -3,7 +3,7 @@ package io.github.charlietap.chasm.type.copy
 import io.github.charlietap.chasm.type.FieldType
 import io.github.charlietap.chasm.type.StorageType
 
-fun FieldTypeDeepCopier(
+internal fun FieldTypeDeepCopier(
     input: FieldType,
 ): FieldType =
     FieldTypeDeepCopier(
@@ -11,7 +11,7 @@ fun FieldTypeDeepCopier(
         storageTypeCopier = ::StorageTypeDeepCopier,
     )
 
-inline fun FieldTypeDeepCopier(
+internal inline fun FieldTypeDeepCopier(
     input: FieldType,
     storageTypeCopier: DeepCopier<StorageType>,
 ): FieldType = input.copy(

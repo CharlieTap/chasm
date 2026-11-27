@@ -4,6 +4,7 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.getOrElse
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.module.Function
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.config.ModuleConfig
@@ -26,6 +27,7 @@ import io.github.charlietap.chasm.validator.validator.function.FunctionValidator
 import io.github.charlietap.chasm.validator.validator.module.ModulePreludeValidator
 import io.github.charlietap.chasm.validator.validator.module.ModuleRemainderValidator
 
+@InternalChasmApi
 suspend fun ParallelWasmModuleValidator(
     config: ModuleConfig,
     module: Module,

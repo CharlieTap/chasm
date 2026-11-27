@@ -1,10 +1,8 @@
 package io.github.charlietap.chasm.runtime.compiled.gc
 
-import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.runtime.exception.HostRaisedWasmException
 
-@InternalChasmApi
-interface PendingExceptions {
+internal interface PendingExceptions {
 
     val hasPending: Boolean
 
@@ -15,8 +13,7 @@ interface PendingExceptions {
     fun take(): WasmException
 }
 
-@InternalChasmApi
-class PendingExceptionSlot : PendingExceptions {
+internal class PendingExceptionSlot : PendingExceptions {
 
     private var pending: WasmException? = null
 

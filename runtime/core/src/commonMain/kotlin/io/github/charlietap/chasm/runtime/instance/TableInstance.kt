@@ -1,10 +1,12 @@
 package io.github.charlietap.chasm.runtime.instance
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.host.UnsafeHostApi
 import io.github.charlietap.chasm.runtime.host.HostReference
 import io.github.charlietap.chasm.runtime.host.HostTable
 import io.github.charlietap.chasm.type.TableType
 
+@InternalChasmApi
 @OptIn(UnsafeHostApi::class)
 data class TableInstance(
     var type: TableType,

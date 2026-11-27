@@ -1,5 +1,7 @@
 package io.github.charlietap.chasm.runtime.host
 
+import io.github.charlietap.chasm.InternalChasmApi
+
 /**
  * `HostReferences` is an API that lets host code keep Chasm references alive
  * by registering roots with Chasm's garbage collector, then ending or
@@ -18,6 +20,7 @@ package io.github.charlietap.chasm.runtime.host
  * its store. Roots are invalid after release, and all markers and roots are
  * invalid after the store is destroyed.
  */
+@InternalChasmApi
 interface HostReferences {
 
     /**
@@ -46,6 +49,7 @@ interface HostReferences {
 }
 
 /** Runs [block] in a nested reference scope and always ends that scope. */
+@InternalChasmApi
 inline fun <T> HostReferences.withScope(
     capacity: Int = 0,
     block: HostReferences.() -> T,

@@ -1,17 +1,23 @@
 package io.github.charlietap.chasm.compiler.backend.analysis
 
+import io.github.charlietap.chasm.InternalChasmApi
+
+@InternalChasmApi
 inline fun LongArray.setBit(bit: Int) {
     this[bit ushr 6] = this[bit ushr 6] or (1L shl (bit and 63))
 }
 
+@InternalChasmApi
 inline fun LongArray.clearBit(bit: Int) {
     this[bit ushr 6] = this[bit ushr 6] and (1L shl (bit and 63)).inv()
 }
 
+@InternalChasmApi
 inline fun LongArray.hasBit(bit: Int): Boolean {
     return this[bit ushr 6] and (1L shl (bit and 63)) != 0L
 }
 
+@InternalChasmApi
 inline fun LongArray.orInto(
     into: LongArray,
     words: Int,

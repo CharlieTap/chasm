@@ -1,8 +1,5 @@
-@file:OptIn(InternalChasmApi::class)
-
 package io.github.charlietap.chasm.embedding.fixture
 
-import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.declarations.moduleInfo
 import io.github.charlietap.chasm.embedding.shapes.Module

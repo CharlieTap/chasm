@@ -24,8 +24,7 @@ class ManagedFunction(
     }
 }
 
-@InternalChasmApi
-class ManagedFunctions(
+internal class ManagedFunctions(
     private val store: Store,
     private val managedStore: ManagedStore,
 ) {

@@ -1,8 +1,10 @@
 package io.github.charlietap.chasm.compiler.backend.dex
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.dexter.DexFile
 import io.github.charlietap.dexter.Dexter
 
+@InternalChasmApi
 data class PoolLimits(
     val strings: Int,
     val types: Int,

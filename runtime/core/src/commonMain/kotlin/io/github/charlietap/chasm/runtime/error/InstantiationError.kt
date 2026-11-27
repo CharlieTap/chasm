@@ -1,9 +1,11 @@
 package io.github.charlietap.chasm.runtime.error
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.module.Import
 import io.github.charlietap.chasm.ast.module.Index
 import kotlin.jvm.JvmInline
 
+@InternalChasmApi
 sealed interface InstantiationError : ModuleTrapError {
 
     @JvmInline

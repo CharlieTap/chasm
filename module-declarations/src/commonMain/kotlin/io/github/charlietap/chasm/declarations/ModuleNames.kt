@@ -1,5 +1,8 @@
 package io.github.charlietap.chasm.declarations
 
+import io.github.charlietap.chasm.InternalChasmApi
+
+@InternalChasmApi
 class ModuleNames(
     val moduleName: String?,
     val functionNameIndices: IntArray,

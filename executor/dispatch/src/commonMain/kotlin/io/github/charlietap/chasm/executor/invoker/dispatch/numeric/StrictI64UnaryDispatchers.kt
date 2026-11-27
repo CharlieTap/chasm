@@ -1,9 +1,11 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.numeric
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.executor.invoker.dispatch.dispatchInstruction
 import io.github.charlietap.chasm.executor.invoker.instruction.numeric.unop.executeI64UnaryI
 import io.github.charlietap.chasm.executor.invoker.instruction.numeric.unop.executeI64UnaryS
 
+@InternalChasmApi
 fun I64ClzIDispatcher(
     operand: Long,
     destinationSlot: Int,
@@ -13,6 +15,7 @@ fun I64ClzIDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64ClzSDispatcher(
     operandSlot: Int,
     destinationSlot: Int,
@@ -22,6 +25,7 @@ fun I64ClzSDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64CtzIDispatcher(
     operand: Long,
     destinationSlot: Int,
@@ -31,6 +35,7 @@ fun I64CtzIDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64CtzSDispatcher(
     operandSlot: Int,
     destinationSlot: Int,
@@ -40,6 +45,7 @@ fun I64CtzSDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64PopcntIDispatcher(
     operand: Long,
     destinationSlot: Int,
@@ -49,6 +55,7 @@ fun I64PopcntIDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64PopcntSDispatcher(
     operandSlot: Int,
     destinationSlot: Int,
@@ -58,6 +65,7 @@ fun I64PopcntSDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64Extend8SIDispatcher(
     operand: Long,
     destinationSlot: Int,
@@ -67,6 +75,7 @@ fun I64Extend8SIDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64Extend8SSDispatcher(
     operandSlot: Int,
     destinationSlot: Int,
@@ -76,6 +85,7 @@ fun I64Extend8SSDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64Extend16SIDispatcher(
     operand: Long,
     destinationSlot: Int,
@@ -85,6 +95,7 @@ fun I64Extend16SIDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64Extend16SSDispatcher(
     operandSlot: Int,
     destinationSlot: Int,
@@ -94,6 +105,7 @@ fun I64Extend16SSDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64Extend32SIDispatcher(
     operand: Long,
     destinationSlot: Int,
@@ -103,6 +115,7 @@ fun I64Extend32SIDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64Extend32SSDispatcher(
     operandSlot: Int,
     destinationSlot: Int,

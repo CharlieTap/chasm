@@ -1,13 +1,18 @@
 package io.github.charlietap.chasm.runtime.encoder
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.type.AbstractHeapType
 import io.github.charlietap.chasm.type.BottomType
 import io.github.charlietap.chasm.type.ConcreteHeapType
 import io.github.charlietap.chasm.type.HeapType
 
+@InternalChasmApi
 typealias HeapTypeEncoder = (HeapType) -> Int
+
+@InternalChasmApi
 typealias HeapTypeDecoder = (Int) -> HeapType
 
+@InternalChasmApi
 inline fun HeapTypeEncoder(
     type: HeapType,
 ): Int = when (type) {
@@ -31,6 +36,7 @@ inline fun HeapTypeEncoder(
     is ConcreteHeapType.Defined -> throw IllegalArgumentException("Cannot encode Defined type on the stack")
 }
 
+@InternalChasmApi
 inline fun HeapTypeDecoder(
     encoded: Int,
 ): HeapType {
@@ -56,17 +62,44 @@ inline fun HeapTypeDecoder(
     }
 }
 
+@InternalChasmApi
 const val HEAP_TYPE_FUNC = 1
+
+@InternalChasmApi
 const val HEAP_TYPE_NO_FUNC = 2
+
+@InternalChasmApi
 const val HEAP_TYPE_EXTERN = 3
+
+@InternalChasmApi
 const val HEAP_TYPE_NO_EXTERN = 4
+
+@InternalChasmApi
 const val HEAP_TYPE_EXCEPTION = 5
+
+@InternalChasmApi
 const val HEAP_TYPE_NO_EXCEPTION = 6
+
+@InternalChasmApi
 const val HEAP_TYPE_ANY = 7
+
+@InternalChasmApi
 const val HEAP_TYPE_EQ = 8
+
+@InternalChasmApi
 const val HEAP_TYPE_STRUCT = 9
+
+@InternalChasmApi
 const val HEAP_TYPE_ARRAY = 10
+
+@InternalChasmApi
 const val HEAP_TYPE_I31 = 11
+
+@InternalChasmApi
 const val HEAP_TYPE_NONE = 12
+
+@InternalChasmApi
 const val HEAP_TYPE_BOTTOM = 13
+
+@InternalChasmApi
 const val HEAP_TYPE_HEAP_TYPE_INDEX = 14

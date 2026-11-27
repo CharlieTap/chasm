@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.executor.instantiator
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.module.toInt
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.declarations.ModuleDeclarations
@@ -20,6 +21,7 @@ import io.github.charlietap.chasm.runtime.instance.Import
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.store.Store
 
+@InternalChasmApi
 typealias ModuleInstantiator = (
     RuntimeConfig,
     Store,
@@ -28,6 +30,7 @@ typealias ModuleInstantiator = (
     ModuleCodeInstaller,
 ) -> Result<ModuleInstance, ModuleTrapError>
 
+@InternalChasmApi
 fun ModuleInstantiator(
     config: RuntimeConfig,
     store: Store,
@@ -45,6 +48,7 @@ fun ModuleInstantiator(
     )
 }
 
+@InternalChasmApi
 fun ModuleInstantiator(
     config: RuntimeConfig,
     store: Store,

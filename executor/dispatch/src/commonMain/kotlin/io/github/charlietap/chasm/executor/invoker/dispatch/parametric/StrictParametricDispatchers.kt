@@ -1,8 +1,10 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.parametric
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.executor.invoker.dispatch.dispatchInstruction
 import io.github.charlietap.chasm.executor.invoker.instruction.parametric.executeSelect
 
+@InternalChasmApi
 fun SelectIiiDispatcher(
     condition: Long,
     val1: Long,
@@ -18,6 +20,7 @@ fun SelectIiiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun SelectIisDispatcher(
     condition: Long,
     val1: Long,
@@ -33,6 +36,7 @@ fun SelectIisDispatcher(
     )
 }
 
+@InternalChasmApi
 fun SelectIsiDispatcher(
     condition: Long,
     val1Slot: Int,
@@ -48,6 +52,7 @@ fun SelectIsiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun SelectIssDispatcher(
     condition: Long,
     val1Slot: Int,
@@ -63,6 +68,7 @@ fun SelectIssDispatcher(
     )
 }
 
+@InternalChasmApi
 fun SelectSiiDispatcher(
     conditionSlot: Int,
     val1: Long,
@@ -78,6 +84,7 @@ fun SelectSiiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun SelectSisDispatcher(
     conditionSlot: Int,
     val1: Long,
@@ -93,6 +100,7 @@ fun SelectSisDispatcher(
     )
 }
 
+@InternalChasmApi
 fun SelectSsiDispatcher(
     conditionSlot: Int,
     val1Slot: Int,
@@ -108,6 +116,7 @@ fun SelectSsiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun SelectSssDispatcher(
     conditionSlot: Int,
     val1Slot: Int,

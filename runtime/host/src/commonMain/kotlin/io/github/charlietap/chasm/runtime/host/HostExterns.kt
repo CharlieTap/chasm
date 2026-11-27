@@ -1,5 +1,7 @@
 package io.github.charlietap.chasm.runtime.host
 
+import io.github.charlietap.chasm.InternalChasmApi
+
 /**
  * `HostExterns` is an API for creating and inspecting WebAssembly `externref`
  * values inside host functions.
@@ -8,6 +10,7 @@ package io.github.charlietap.chasm.runtime.host
  * its [HostExternReference.raw] value when it must outlive that scope. Creating
  * the same Kotlin object more than once creates separate extern identities.
  */
+@InternalChasmApi
 interface HostExterns {
 
     /** Creates a scoped extern reference containing [value]. */

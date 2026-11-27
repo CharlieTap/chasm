@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.runtime.store
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import kotlin.jvm.JvmField
 
@@ -9,6 +10,7 @@ internal class LiveStack(
     @JvmField val next: LiveStack?,
 )
 
+@InternalChasmApi
 inline fun <T> Store.withLiveStack(
     stack: ValueStack,
     block: () -> T,

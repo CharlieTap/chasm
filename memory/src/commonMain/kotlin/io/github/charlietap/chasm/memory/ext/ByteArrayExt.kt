@@ -1,29 +1,34 @@
 package io.github.charlietap.chasm.memory.ext
 
+import io.github.charlietap.chasm.InternalChasmApi
+
+@InternalChasmApi
 inline fun ByteArray.toShortLittleEndian(): Short =
     (
         (this[0].toInt() and 0xFF) or
             ((this[1].toInt() and 0xFF) shl 8)
     ).toShort()
 
+@InternalChasmApi
 inline fun ByteArray.toShortLittleEndian(offset: Int = 0): Short =
     (
         (this[offset].toInt() and 0xFF) or
             ((this[offset + 1].toInt() and 0xFF) shl 8)
     ).toShort()
 
-inline fun ByteArray.toUShortLittleEndian(): UShort =
+internal inline fun ByteArray.toUShortLittleEndian(): UShort =
     (
         (this[0].toUByte().toUInt() and 0xFFu) or
             ((this[1].toUByte().toUInt() and 0xFFu) shl 8)
     ).toUShort()
 
-inline fun ByteArray.toUShortLittleEndian(offset: Int = 0): UShort =
+internal inline fun ByteArray.toUShortLittleEndian(offset: Int = 0): UShort =
     (
         (this[offset].toUByte().toUInt() and 0xFFu) or
             ((this[offset + 1].toUByte().toUInt() and 0xFFu) shl 8)
     ).toUShort()
 
+@InternalChasmApi
 inline fun ByteArray.toIntLittleEndian(): Int {
     return (this[0].toInt() and 0xFF) or
         ((this[1].toInt() and 0xFF) shl 8) or
@@ -31,6 +36,7 @@ inline fun ByteArray.toIntLittleEndian(): Int {
         ((this[3].toInt() and 0xFF) shl 24)
 }
 
+@InternalChasmApi
 inline fun ByteArray.toIntLittleEndian(offset: Int = 0): Int =
     (this[offset].toInt() and 0xFF) or
         ((this[offset + 1].toInt() and 0xFF) shl 8) or
@@ -50,14 +56,14 @@ internal inline fun ByteArray.toIntSizedLittleEndian(size: Int): Int {
     return result
 }
 
-inline fun ByteArray.toUIntLittleEndian(): UInt {
+internal inline fun ByteArray.toUIntLittleEndian(): UInt {
     return (this[0].toUInt() and 0xFFu) or
         ((this[1].toUInt() and 0xFFu) shl 8) or
         ((this[2].toUInt() and 0xFFu) shl 16) or
         ((this[3].toUInt() and 0xFFu) shl 24)
 }
 
-inline fun ByteArray.toUIntLittleEndian(offset: Int = 0): UInt {
+internal inline fun ByteArray.toUIntLittleEndian(offset: Int = 0): UInt {
     return (this[offset].toUInt() and 0xFFu) or
         ((this[offset + 1].toUInt() and 0xFFu) shl 8) or
         ((this[offset + 2].toUInt() and 0xFFu) shl 16) or
@@ -72,6 +78,7 @@ internal inline fun ByteArray.toUIntSizedLittleEndian(size: Int): UInt {
     return result
 }
 
+@InternalChasmApi
 inline fun ByteArray.toLongLittleEndian(): Long {
     return (this[0].toLong() and 0xFF) or
         ((this[1].toLong() and 0xFF) shl 8) or
@@ -83,6 +90,7 @@ inline fun ByteArray.toLongLittleEndian(): Long {
         ((this[7].toLong() and 0xFF) shl 56)
 }
 
+@InternalChasmApi
 inline fun ByteArray.toLongLittleEndian(offset: Int = 0): Long =
     (this[offset].toLong() and 0xFF) or
         ((this[offset + 1].toLong() and 0xFF) shl 8) or
@@ -136,8 +144,10 @@ internal inline fun ByteArray.toULongSizedLittleEndian(size: Int): ULong {
     return result
 }
 
+@InternalChasmApi
 inline fun ByteArray.toFloatLittleEndian(offset: Int = 0): Float =
     Float.fromBits(this.toIntLittleEndian(offset))
 
+@InternalChasmApi
 inline fun ByteArray.toDoubleLittleEndian(offset: Int = 0): Double =
     Double.fromBits(this.toLongLittleEndian(offset))

@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.runtime.resource.allocation
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.memory.factory.LinearMemoryFactory
 import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.runtime.instance.MemoryInstance
@@ -7,8 +8,10 @@ import io.github.charlietap.chasm.runtime.memory.LinearMemory
 import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.type.MemoryType
 
+@InternalChasmApi
 typealias MemoryAllocator = (Store, MemoryType) -> Address.Memory
 
+@InternalChasmApi
 fun MemoryAllocator(
     store: Store,
     type: MemoryType,

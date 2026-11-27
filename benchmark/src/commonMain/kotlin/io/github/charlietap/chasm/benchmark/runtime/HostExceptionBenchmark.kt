@@ -1,9 +1,6 @@
-@file:OptIn(InternalChasmApi::class)
-
 package io.github.charlietap.chasm.benchmark.runtime
 
 import com.github.michaelbull.result.Err
-import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.benchmark.BenchmarkConfig
 import io.github.charlietap.chasm.benchmark.StabilizedBenchmark
 import io.github.charlietap.chasm.config.RuntimeConfig

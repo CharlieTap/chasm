@@ -1,5 +1,8 @@
 package io.github.charlietap.chasm.cir
 
+import io.github.charlietap.chasm.InternalChasmApi
+
+@InternalChasmApi
 sealed class MemoryInstruction : Instruction() {
 
     @CirTag("memory.i32.load.i")

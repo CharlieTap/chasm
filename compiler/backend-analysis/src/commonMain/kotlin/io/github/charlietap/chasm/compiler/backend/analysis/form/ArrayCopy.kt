@@ -1,7 +1,9 @@
 package io.github.charlietap.chasm.compiler.backend.analysis.form
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.cir.AggregateInstruction
 
+@InternalChasmApi
 class ArrayCopy(
     val sourceSlot: Int,
     val destinationSlot: Int,
@@ -10,6 +12,7 @@ class ArrayCopy(
     val destinationOffset: Operand,
 )
 
+@InternalChasmApi
 fun AggregateInstruction.arrayCopy(): ArrayCopy? = when (val i = this) {
     is AggregateInstruction.ArrayCopyIii ->
         ArrayCopy(i.sourceAddressSlot, i.destinationAddressSlot, immediate(i.elementsToCopy), immediate(i.sourceOffset), immediate(i.destinationOffset))

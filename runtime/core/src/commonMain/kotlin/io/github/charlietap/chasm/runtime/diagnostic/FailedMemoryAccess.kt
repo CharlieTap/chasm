@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.runtime.diagnostic
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.runtime.instance.MemoryInstance
 
 /**
@@ -7,6 +8,7 @@ import io.github.charlietap.chasm.runtime.instance.MemoryInstance
  * [memory] from [address], an unsigned effective address. [source] is true
  * when a copy failed on its source rather than its destination.
  */
+@InternalChasmApi
 class FailedMemoryAccess(
     val kind: Kind,
     val memory: MemoryInstance,

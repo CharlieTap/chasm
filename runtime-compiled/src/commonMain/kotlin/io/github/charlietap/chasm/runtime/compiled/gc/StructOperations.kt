@@ -1,10 +1,8 @@
 package io.github.charlietap.chasm.runtime.compiled.gc
 
-import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.host.HostGcType
 
-@InternalChasmApi
-class StructOperations(
+internal class StructOperations(
     private val layouts: ShapeLayouts,
     private val allocator: ManagedAllocator,
 ) {
@@ -20,7 +18,7 @@ class StructOperations(
 
         val compiledStruct = ownedStruct(struct)
 
-        return layout(compiledStruct).storageLayout.readBits(compiledStruct, index)
+        return storageLayout(compiledStruct).readBits(compiledStruct, index)
     }
 
     fun readStructReference(
@@ -30,7 +28,7 @@ class StructOperations(
 
         val compiledStruct = ownedStruct(struct)
 
-        return layout(compiledStruct).storageLayout.readReference(compiledStruct, index)
+        return storageLayout(compiledStruct).readReference(compiledStruct, index)
     }
 
     fun writeStructField(
@@ -135,6 +133,10 @@ class StructOperations(
         if (index !in layout.checks.indices) {
             throw fieldIndexError(index)
         }
+    }
+
+    private fun storageLayout(struct: CompiledStruct): StructStorageLayout {
+        return requireNotNull(layouts.structStorage(struct)) { "not a struct of this store" }
     }
 
     private fun layout(struct: CompiledStruct): StructLayout {

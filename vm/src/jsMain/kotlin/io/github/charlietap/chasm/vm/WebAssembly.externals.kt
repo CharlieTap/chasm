@@ -6,18 +6,18 @@ import org.khronos.webgl.ArrayBuffer
 import kotlin.js.JsName
 
 @JsName("Module")
-external class WasmModule(buffer: ArrayBuffer)
+internal external class WasmModule(buffer: ArrayBuffer)
 
 @JsName("Instance")
-external class WasmInstance(module: WasmModule, imports: dynamic = definedExternally) {
+internal external class WasmInstance(module: WasmModule, imports: dynamic = definedExternally) {
     val exports: dynamic
 }
 
 @JsName("Function")
-external class WasmFunction(descriptor: Any? = definedExternally, impl: Any? = definedExternally)
+internal external class WasmFunction(descriptor: Any? = definedExternally, impl: Any? = definedExternally)
 
 @JsName("Global")
-external class WasmGlobal {
+internal external class WasmGlobal {
     var value: dynamic
 
     companion object {
@@ -25,13 +25,13 @@ external class WasmGlobal {
     }
 }
 
-external interface WasmGlobalType {
+internal external interface WasmGlobalType {
     val value: String
     val mutable: Boolean
 }
 
 @JsName("Memory")
-external class WasmMemory {
+internal external class WasmMemory {
     val buffer: ArrayBuffer
 
     companion object {
@@ -39,32 +39,32 @@ external class WasmMemory {
     }
 }
 
-external interface WasmMemoryType {
+internal external interface WasmMemoryType {
     val shared: Boolean?
     val minimum: Int
     val maximum: Int?
 }
 
 @JsName("Table")
-external class WasmTable {
+internal external class WasmTable {
     companion object {
         fun type(table: WasmTable): WasmTableType
     }
 }
 
-external interface WasmTableType {
+internal external interface WasmTableType {
     val element: String
     val minimum: Int
     val maximum: Int?
 }
 
 @JsName("Tag")
-external class WasmTag(descriptor: Any? = definedExternally) {
+internal external class WasmTag(descriptor: Any? = definedExternally) {
     companion object {
         fun type(tag: WasmTag): WasmTagType
     }
 }
 
-external interface WasmTagType {
+internal external interface WasmTagType {
     val parameters: Array<String>?
 }

@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.compiler.backend.analysis.form
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.cir.NumericInstruction
 import io.github.charlietap.chasm.compiler.backend.analysis.form.BinaryOperation.Add
 import io.github.charlietap.chasm.compiler.backend.analysis.form.BinaryOperation.And
@@ -86,6 +87,7 @@ import io.github.charlietap.chasm.type.NumberType.F64
 import io.github.charlietap.chasm.type.NumberType.I32
 import io.github.charlietap.chasm.type.NumberType.I64
 
+@InternalChasmApi
 fun NumericInstruction.form(): NumericForm = when (opcode / OPCODES_PER_GROUP) {
     0 -> form0()
     1 -> form1()

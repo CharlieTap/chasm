@@ -7,7 +7,7 @@ import io.github.charlietap.chasm.runtime.memory.LinearMemory
 import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets
 
-actual inline fun NullTerminatedStringReader(
+internal actual inline fun NullTerminatedStringReader(
     memory: LinearMemory,
     memoryPointer: Int,
 ): String {
@@ -21,7 +21,7 @@ actual inline fun NullTerminatedStringReader(
     return String(bytes, StandardCharsets.UTF_8)
 }
 
-inline fun findNull(buffer: ByteBuffer, startIndex: Int): Int {
+internal inline fun findNull(buffer: ByteBuffer, startIndex: Int): Int {
     val limit = buffer.limit()
     var index = startIndex
 
@@ -47,6 +47,6 @@ inline fun findNull(buffer: ByteBuffer, startIndex: Int): Int {
     return -1
 }
 
-inline fun Long.containsNullByte(): Boolean {
+internal inline fun Long.containsNullByte(): Boolean {
     return ((this - 0x0101010101010101L) and this.inv() and -0x7f7f7f7f7f7f7f80L) != 0L
 }

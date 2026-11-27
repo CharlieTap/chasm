@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.runtime.compiled.gc
 
-import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.embedding.engine.Engine
 import io.github.charlietap.chasm.host.HostGcType
 import io.github.charlietap.chasm.reference.I31Reference
@@ -21,8 +20,7 @@ import io.github.charlietap.chasm.type.DefinedType
 import java.util.IdentityHashMap
 import java.util.concurrent.ConcurrentHashMap
 
-@InternalChasmApi
-class ManagedStore(
+internal class ManagedStore(
     private val store: Store,
 ) : ReferenceStorage {
 

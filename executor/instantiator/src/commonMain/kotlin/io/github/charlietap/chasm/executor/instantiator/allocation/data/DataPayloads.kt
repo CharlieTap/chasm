@@ -5,6 +5,7 @@ import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import com.github.michaelbull.result.getOrElse
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.declarations.DataPayload
 import io.github.charlietap.chasm.declarations.DataReader
 import io.github.charlietap.chasm.declarations.DataSegmentDeclaration
@@ -12,6 +13,7 @@ import io.github.charlietap.chasm.declarations.ModuleDeclarations
 import io.github.charlietap.chasm.runtime.error.InstantiationError
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 
+@InternalChasmApi
 class DataPayloads(
     val payloads: Array<ByteArray?>,
     reader: DataReader?,

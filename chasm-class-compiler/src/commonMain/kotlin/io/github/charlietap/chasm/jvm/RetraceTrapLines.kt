@@ -1,8 +1,5 @@
-@file:OptIn(InternalChasmApi::class)
-
 package io.github.charlietap.chasm.jvm
 
-import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.compiled.format.LineRange
 import io.github.charlietap.chasm.compiled.format.trapLinesKey
 import io.github.charlietap.chasm.compiled.format.trapLinesResource

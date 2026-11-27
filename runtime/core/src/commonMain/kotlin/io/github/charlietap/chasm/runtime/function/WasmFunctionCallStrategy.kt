@@ -1,6 +1,9 @@
 package io.github.charlietap.chasm.runtime.function
 
+import io.github.charlietap.chasm.InternalChasmApi
+
 /** Precomputed activation metadata for a compiled Wasm function. */
+@InternalChasmApi
 class WasmFunctionCallStrategy(
     val interfaceSlotCount: Int,
     var entryIp: Int = -1,

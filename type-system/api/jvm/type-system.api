@@ -1436,15 +1436,10 @@ public final class io/github/charlietap/chasm/type/component/canonical/Canonical
 }
 
 public final class io/github/charlietap/chasm/type/component/canonical/CanonicalAbiKt {
-	public static final field MAX_FLAT_ASYNC_PARAMS I
-	public static final field MAX_FLAT_PARAMS I
-	public static final field MAX_FLAT_RESULTS I
 	public static final fun CanonicalCoreFunctionType (Ljava/util/List;Ljava/util/List;)Lio/github/charlietap/chasm/type/DefinedType;
 	public static synthetic fun CanonicalCoreFunctionType$default (Ljava/util/List;Ljava/util/List;ILjava/lang/Object;)Lio/github/charlietap/chasm/type/DefinedType;
 	public static final fun CanonicalFunctionType (Lio/github/charlietap/chasm/type/component/ComponentFunctionType;Lio/github/charlietap/chasm/type/component/canonical/CanonicalAbiSignatureOptions;Lio/github/charlietap/chasm/type/component/canonical/CanonicalAbiContext;)Lio/github/charlietap/chasm/type/DefinedType;
 	public static final fun CanonicalFunctionTypeLowering (Lio/github/charlietap/chasm/type/component/ComponentFunctionType;Lio/github/charlietap/chasm/type/component/canonical/CanonicalAbiSignatureOptions;Lio/github/charlietap/chasm/type/component/canonical/CanonicalAbiContext;)Lio/github/charlietap/chasm/type/component/canonical/CanonicalAbiLowering;
-	public static final fun FlattenComponentType (Lio/github/charlietap/chasm/type/component/ComponentValueType;Lio/github/charlietap/chasm/type/AddressType;)Ljava/util/List;
-	public static final fun FlattenComponentTypes (Ljava/util/List;Lio/github/charlietap/chasm/type/AddressType;)Ljava/util/List;
 	public static final fun containsListOrString (Lio/github/charlietap/chasm/type/component/ComponentValueType;)Z
 	public static final fun coreValueType (Lio/github/charlietap/chasm/type/AddressType;)Lio/github/charlietap/chasm/type/ValueType;
 }
@@ -1481,67 +1476,9 @@ public final class io/github/charlietap/chasm/type/component/canonical/Canonical
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/type/copy/ArrayTypeDeepCopierKt {
-	public static final fun ArrayTypeDeepCopier-9jzuwY4 (Lio/github/charlietap/chasm/type/FieldType;Lkotlin/jvm/functions/Function1;)Lio/github/charlietap/chasm/type/FieldType;
-	public static final fun ArrayTypeDeepCopier-Kgwk01M (Lio/github/charlietap/chasm/type/FieldType;)Lio/github/charlietap/chasm/type/FieldType;
-}
-
-public final class io/github/charlietap/chasm/type/copy/CompositeTypeDeepCopierKt {
-	public static final fun CompositeTypeDeepCopier (Lio/github/charlietap/chasm/type/CompositeType;)Lio/github/charlietap/chasm/type/CompositeType;
-	public static final fun CompositeTypeDeepCopier (Lio/github/charlietap/chasm/type/CompositeType;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lio/github/charlietap/chasm/type/CompositeType;
-}
-
-public final class io/github/charlietap/chasm/type/copy/FieldTypeDeepCopierKt {
-	public static final fun FieldTypeDeepCopier (Lio/github/charlietap/chasm/type/FieldType;)Lio/github/charlietap/chasm/type/FieldType;
-	public static final fun FieldTypeDeepCopier (Lio/github/charlietap/chasm/type/FieldType;Lkotlin/jvm/functions/Function1;)Lio/github/charlietap/chasm/type/FieldType;
-}
-
-public final class io/github/charlietap/chasm/type/copy/FunctionTypeDeepCopierKt {
-	public static final fun FunctionTypeDeepCopier (Lio/github/charlietap/chasm/type/FunctionType;)Lio/github/charlietap/chasm/type/FunctionType;
-	public static final fun FunctionTypeDeepCopier (Lio/github/charlietap/chasm/type/FunctionType;Lkotlin/jvm/functions/Function1;)Lio/github/charlietap/chasm/type/FunctionType;
-}
-
-public final class io/github/charlietap/chasm/type/copy/HeapTypeDeepCopierKt {
-	public static final fun HeapTypeDeepCopier (Lio/github/charlietap/chasm/type/HeapType;)Lio/github/charlietap/chasm/type/HeapType;
-}
-
-public final class io/github/charlietap/chasm/type/copy/PackedTypeDeepCopierKt {
-	public static final fun PackedTypeDeepCopier (Lio/github/charlietap/chasm/type/PackedType;)Lio/github/charlietap/chasm/type/PackedType;
-}
-
 public final class io/github/charlietap/chasm/type/copy/RecursiveTypeDeepCopierKt {
 	public static final fun RecursiveTypeDeepCopier (Lio/github/charlietap/chasm/type/RecursiveType;)Lio/github/charlietap/chasm/type/RecursiveType;
 	public static final fun RecursiveTypeDeepCopier (Lio/github/charlietap/chasm/type/RecursiveType;Lkotlin/jvm/functions/Function1;)Lio/github/charlietap/chasm/type/RecursiveType;
-}
-
-public final class io/github/charlietap/chasm/type/copy/ReferenceTypeDeepCopierKt {
-	public static final fun ReferenceTypeDeepCopier (Lio/github/charlietap/chasm/type/ReferenceType;)Lio/github/charlietap/chasm/type/ReferenceType;
-	public static final fun ReferenceTypeDeepCopier (Lio/github/charlietap/chasm/type/ReferenceType;Lkotlin/jvm/functions/Function1;)Lio/github/charlietap/chasm/type/ReferenceType;
-}
-
-public final class io/github/charlietap/chasm/type/copy/ResultTypeDeepCopierKt {
-	public static final fun ResultTypeDeepCopier--gLIJY4 (Ljava/util/List;Lkotlin/jvm/functions/Function1;)Ljava/util/List;
-	public static final fun ResultTypeDeepCopier-ahte0nc (Ljava/util/List;)Ljava/util/List;
-}
-
-public final class io/github/charlietap/chasm/type/copy/StorageTypeDeepCopierKt {
-	public static final fun StorageTypeDeepCopier (Lio/github/charlietap/chasm/type/StorageType;)Lio/github/charlietap/chasm/type/StorageType;
-	public static final fun StorageTypeDeepCopier (Lio/github/charlietap/chasm/type/StorageType;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lio/github/charlietap/chasm/type/StorageType;
-}
-
-public final class io/github/charlietap/chasm/type/copy/StructTypeDeepCopierKt {
-	public static final fun StructTypeDeepCopier-IZlBR9w (Ljava/util/List;)Ljava/util/List;
-	public static final fun StructTypeDeepCopier-Ssq-r9s (Ljava/util/List;Lkotlin/jvm/functions/Function1;)Ljava/util/List;
-}
-
-public final class io/github/charlietap/chasm/type/copy/SubTypeDeepCopierKt {
-	public static final fun SubTypeDeepCopier (Lio/github/charlietap/chasm/type/SubType;)Lio/github/charlietap/chasm/type/SubType;
-	public static final fun SubTypeDeepCopier (Lio/github/charlietap/chasm/type/SubType;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lio/github/charlietap/chasm/type/SubType;
-}
-
-public final class io/github/charlietap/chasm/type/copy/ValueTypeDeepCopierKt {
-	public static final fun ValueTypeDeepCopier (Lio/github/charlietap/chasm/type/ValueType;)Lio/github/charlietap/chasm/type/ValueType;
-	public static final fun ValueTypeDeepCopier (Lio/github/charlietap/chasm/type/ValueType;Lkotlin/jvm/functions/Function1;)Lio/github/charlietap/chasm/type/ValueType;
 }
 
 public final class io/github/charlietap/chasm/type/differ/ReferenceTypeDifferKt {
@@ -1591,10 +1528,6 @@ public final class io/github/charlietap/chasm/type/ext/ValueTypeExtKt {
 	public static final fun bitWidth (Lio/github/charlietap/chasm/type/ValueType;)Ljava/lang/Integer;
 }
 
-public final class io/github/charlietap/chasm/type/extremas/BottomOfHeapTypeKt {
-	public static final fun BottomOfHeapType (Lio/github/charlietap/chasm/type/HeapType;Ljava/util/List;)Lio/github/charlietap/chasm/type/HeapType;
-}
-
 public final class io/github/charlietap/chasm/type/extremas/TopOfHeapTypeKt {
 	public static final fun TopOfHeapType (Lio/github/charlietap/chasm/type/HeapType;Ljava/util/List;)Lio/github/charlietap/chasm/type/HeapType;
 }
@@ -1626,10 +1559,6 @@ public final class io/github/charlietap/chasm/type/matching/GlobalTypeMatcherKt 
 
 public final class io/github/charlietap/chasm/type/matching/HeapTypeMatcherKt {
 	public static final fun HeapTypeMatcher (Lio/github/charlietap/chasm/type/HeapType;Lio/github/charlietap/chasm/type/HeapType;Lio/github/charlietap/chasm/type/matching/TypeMatcherContext;)Z
-}
-
-public final class io/github/charlietap/chasm/type/matching/LimitsMatcherKt {
-	public static final fun LimitsMatcher (Lio/github/charlietap/chasm/type/Limits;Lio/github/charlietap/chasm/type/Limits;Lio/github/charlietap/chasm/type/matching/TypeMatcherContext;)Z
 }
 
 public final class io/github/charlietap/chasm/type/matching/MemoryTypeMatcherKt {
@@ -1666,10 +1595,6 @@ public final class io/github/charlietap/chasm/type/rolling/DefinedTypeRollerKt {
 
 public final class io/github/charlietap/chasm/type/rolling/DefinedTypeUnrollerKt {
 	public static final fun DefinedTypeUnroller (Lio/github/charlietap/chasm/type/DefinedType;)Lio/github/charlietap/chasm/type/SubType;
-}
-
-public final class io/github/charlietap/chasm/type/rolling/RecursiveTypeUnrollerKt {
-	public static final fun RecursiveTypeUnroller (Lio/github/charlietap/chasm/type/RecursiveType;)Lio/github/charlietap/chasm/type/RecursiveType;
 }
 
 public final class io/github/charlietap/chasm/type/rolling/substitution/ConcreteHeapTypeSubstitutorKt {

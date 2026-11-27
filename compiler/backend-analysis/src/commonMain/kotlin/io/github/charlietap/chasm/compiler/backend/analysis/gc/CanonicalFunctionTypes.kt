@@ -1,10 +1,12 @@
 package io.github.charlietap.chasm.compiler.backend.analysis.gc
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.type.ConcreteHeapType
 import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.chasm.type.ReferenceType
 import io.github.charlietap.chasm.type.ValueType
 
+@InternalChasmApi
 class CanonicalFunctionTypes(
     private val rttKeys: RttKeys,
 ) {

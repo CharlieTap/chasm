@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.runtime.instance
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.host.UnsafeHostApi
 import io.github.charlietap.chasm.runtime.host.ByteArrayHostMemory
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
@@ -9,6 +10,7 @@ import io.github.charlietap.chasm.runtime.memory.OutOfMemoryError
 import io.github.charlietap.chasm.type.MemoryType
 import kotlin.jvm.JvmField
 
+@InternalChasmApi
 data class MemoryInstance(
     var type: MemoryType,
     var data: LinearMemory,

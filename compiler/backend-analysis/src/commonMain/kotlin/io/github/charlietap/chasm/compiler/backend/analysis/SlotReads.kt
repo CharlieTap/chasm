@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.compiler.backend.analysis
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.cir.AdminInstruction
 import io.github.charlietap.chasm.cir.AggregateInstruction
 import io.github.charlietap.chasm.cir.ControlInstruction
@@ -22,6 +23,7 @@ import io.github.charlietap.chasm.compiler.backend.analysis.form.form
 import io.github.charlietap.chasm.compiler.backend.analysis.form.operandTransfer
 import io.github.charlietap.chasm.compiler.backend.analysis.form.select
 
+@InternalChasmApi
 interface SlotReadVisitor {
 
     fun read(
@@ -29,6 +31,7 @@ interface SlotReadVisitor {
     )
 }
 
+@InternalChasmApi
 fun visitSlotReads(
     position: Int,
     forms: InstructionForms,

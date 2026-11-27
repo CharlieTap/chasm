@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.validator.error
 
-sealed interface InstructionValidatorError : ModuleValidatorError {
+internal sealed interface InstructionValidatorError : ModuleValidatorError {
     data object UnknownInstruction : InstructionValidatorError
 
     data object UnknownDataSegment : InstructionValidatorError

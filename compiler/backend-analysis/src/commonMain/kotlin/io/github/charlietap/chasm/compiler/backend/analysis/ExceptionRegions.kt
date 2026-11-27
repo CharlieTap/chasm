@@ -1,11 +1,13 @@
 package io.github.charlietap.chasm.compiler.backend.analysis
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.cir.ExceptionRegion
 
 /**
  * The innermost region covering each position, or -1. Regions nest and are ordered by start with each parent before its
  * children, as the frontend enters them, so one sweep with a stack of open regions finds them.
  */
+@InternalChasmApi
 fun innermostRegions(
     outermostFirst: List<ExceptionRegion>,
     positions: Int,

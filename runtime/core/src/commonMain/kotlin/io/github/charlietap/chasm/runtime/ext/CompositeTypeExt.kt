@@ -7,19 +7,19 @@ import io.github.charlietap.chasm.type.CompositeType
 import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.chasm.type.StructType
 
-inline fun CompositeType.functionType(): FunctionType = try {
+internal inline fun CompositeType.functionType(): FunctionType = try {
     (this as CompositeType.Function).functionType
 } catch (_: ClassCastException) {
     throw InvocationException(InvocationError.FunctionCompositeTypeExpected)
 }
 
-inline fun CompositeType.structType(): StructType = try {
+internal inline fun CompositeType.structType(): StructType = try {
     (this as CompositeType.Struct).structType
 } catch (_: ClassCastException) {
     throw InvocationException(InvocationError.StructCompositeTypeExpected)
 }
 
-inline fun CompositeType.arrayType(): ArrayType = try {
+internal inline fun CompositeType.arrayType(): ArrayType = try {
     (this as CompositeType.Array).arrayType
 } catch (_: ClassCastException) {
     throw InvocationException(InvocationError.ArrayCompositeTypeExpected)

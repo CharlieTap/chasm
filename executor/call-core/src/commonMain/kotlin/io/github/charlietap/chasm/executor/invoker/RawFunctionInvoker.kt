@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.executor.invoker
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.executor.invoker.function.withHostCallbackScope
 import io.github.charlietap.chasm.gc.GuestHeapOutOfMemoryException
@@ -16,6 +17,7 @@ import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.runtime.store.withLiveStack
 
+@InternalChasmApi
 fun RawFunctionInvoker(
     config: RuntimeConfig,
     store: Store,

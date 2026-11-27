@@ -33,9 +33,9 @@ import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
 import io.github.charlietap.chasm.type.ext.asArrayType
 import io.github.charlietap.chasm.type.ext.asStructType
 
-typealias ConstantExpressionEvaluator = (Store, ModuleInstance, ModuleTypeResolver, ConstantExpression) -> Result<Long, InvocationError>
+internal typealias ConstantExpressionEvaluator = (Store, ModuleInstance, ModuleTypeResolver, ConstantExpression) -> Result<Long, InvocationError>
 
-fun ConstantExpressionEvaluator(
+internal fun ConstantExpressionEvaluator(
     store: Store,
     instance: ModuleInstance,
     types: ModuleTypeResolver,

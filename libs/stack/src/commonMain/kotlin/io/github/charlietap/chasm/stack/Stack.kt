@@ -1,7 +1,9 @@
 package io.github.charlietap.chasm.stack
 
+import io.github.charlietap.chasm.InternalChasmApi
 import kotlin.jvm.JvmOverloads
 
+@InternalChasmApi
 class Stack<T>
     @JvmOverloads
     constructor(minCapacity: Int = MIN_CAPACITY) {

@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.compiler.backend.analysis.gc
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.type.CompositeType
 import io.github.charlietap.chasm.type.DefinedType
 import io.github.charlietap.chasm.type.FieldType
@@ -8,11 +9,13 @@ import io.github.charlietap.chasm.type.PackedType
 import io.github.charlietap.chasm.type.StorageType
 import io.github.charlietap.chasm.type.ValueType
 
+@InternalChasmApi
 data class FieldStorage(
     val type: FieldType,
     val lanes: List<Lane>,
 )
 
+@InternalChasmApi
 data class StructStorage(
     val className: String,
     val fields: List<FieldStorage>,
@@ -29,11 +32,13 @@ data class StructStorage(
     }
 }
 
+@InternalChasmApi
 data class ArrayStorage(
     val className: String,
     val elementShift: Int,
 )
 
+@InternalChasmApi
 class StoragePlans(
     private val types: List<DefinedType>,
     private val family: StorageFamily,

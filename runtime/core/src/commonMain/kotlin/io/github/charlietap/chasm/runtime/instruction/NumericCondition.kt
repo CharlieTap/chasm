@@ -1,5 +1,8 @@
 package io.github.charlietap.chasm.runtime.instruction
 
+import io.github.charlietap.chasm.InternalChasmApi
+
+@InternalChasmApi
 sealed interface NumericCondition {
 
     data class I32Eqz(val operand: FusedOperand) : NumericCondition

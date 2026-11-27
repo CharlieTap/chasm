@@ -5,7 +5,7 @@ import io.github.charlietap.chasm.type.CompositeType
 import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.chasm.type.StructType
 
-fun CompositeTypeDeepCopier(
+internal fun CompositeTypeDeepCopier(
     input: CompositeType,
 ): CompositeType =
     CompositeTypeDeepCopier(
@@ -15,7 +15,7 @@ fun CompositeTypeDeepCopier(
         structTypeCopier = ::StructTypeDeepCopier,
     )
 
-inline fun CompositeTypeDeepCopier(
+internal inline fun CompositeTypeDeepCopier(
     input: CompositeType,
     arrayTypeCopier: DeepCopier<ArrayType>,
     functionTypeCopier: DeepCopier<FunctionType>,

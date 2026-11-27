@@ -1,6 +1,9 @@
 package io.github.charlietap.chasm.parallel
 
+import io.github.charlietap.chasm.InternalChasmApi
+
 /** How much work justifies sharing it between threads, in whatever unit the caller measures work in. */
+@InternalChasmApi
 class ParallelismPolicy(
     val minimumWork: Long,
     val workPerWorker: Long,

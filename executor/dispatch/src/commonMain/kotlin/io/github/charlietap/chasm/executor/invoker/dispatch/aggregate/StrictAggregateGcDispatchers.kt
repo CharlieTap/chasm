@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.aggregate
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.executor.invoker.dispatch.dispatchInstruction
 import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.executeAnyConvertExtern
 import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.executeArrayInitData
@@ -15,6 +16,7 @@ import io.github.charlietap.chasm.runtime.ext.extendUnsigned
 import io.github.charlietap.chasm.runtime.ext.toI31
 import io.github.charlietap.chasm.runtime.type.RTT
 
+@InternalChasmApi
 fun ArrayNewDefaultIDispatcher(
     size: Int,
     destinationSlot: Int,
@@ -32,6 +34,7 @@ fun ArrayNewDefaultIDispatcher(
     )
 }
 
+@InternalChasmApi
 fun ArrayNewDefaultSDispatcher(
     sizeSlot: Int,
     destinationSlot: Int,
@@ -49,6 +52,7 @@ fun ArrayNewDefaultSDispatcher(
     )
 }
 
+@InternalChasmApi
 fun ArrayNewDataIiDispatcher(
     sourceOffset: Int,
     arrayLength: Int,
@@ -70,6 +74,7 @@ fun ArrayNewDataIiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun ArrayNewDataIsDispatcher(
     sourceOffset: Int,
     arrayLengthSlot: Int,
@@ -91,6 +96,7 @@ fun ArrayNewDataIsDispatcher(
     )
 }
 
+@InternalChasmApi
 fun ArrayNewDataSiDispatcher(
     sourceOffsetSlot: Int,
     arrayLength: Int,
@@ -112,6 +118,7 @@ fun ArrayNewDataSiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun ArrayNewDataSsDispatcher(
     sourceOffsetSlot: Int,
     arrayLengthSlot: Int,
@@ -133,6 +140,7 @@ fun ArrayNewDataSsDispatcher(
     )
 }
 
+@InternalChasmApi
 fun ArrayNewElementIiDispatcher(
     sourceOffset: Int,
     arrayLength: Int,
@@ -152,6 +160,7 @@ fun ArrayNewElementIiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun ArrayNewElementIsDispatcher(
     sourceOffset: Int,
     arrayLengthSlot: Int,
@@ -171,6 +180,7 @@ fun ArrayNewElementIsDispatcher(
     )
 }
 
+@InternalChasmApi
 fun ArrayNewElementSiDispatcher(
     sourceOffsetSlot: Int,
     arrayLength: Int,
@@ -190,6 +200,7 @@ fun ArrayNewElementSiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun ArrayNewElementSsDispatcher(
     sourceOffsetSlot: Int,
     arrayLengthSlot: Int,
@@ -209,6 +220,7 @@ fun ArrayNewElementSsDispatcher(
     )
 }
 
+@InternalChasmApi
 fun ArrayInitDataIiiDispatcher(
     elementsToCopy: Int,
     sourceOffset: Int,
@@ -228,6 +240,7 @@ fun ArrayInitDataIiiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun ArrayInitDataIisDispatcher(
     elementsToCopy: Int,
     sourceOffset: Int,
@@ -247,6 +260,7 @@ fun ArrayInitDataIisDispatcher(
     )
 }
 
+@InternalChasmApi
 fun ArrayInitDataIsiDispatcher(
     elementsToCopy: Int,
     sourceOffsetSlot: Int,
@@ -266,6 +280,7 @@ fun ArrayInitDataIsiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun ArrayInitDataIssDispatcher(
     elementsToCopy: Int,
     sourceOffsetSlot: Int,
@@ -285,6 +300,7 @@ fun ArrayInitDataIssDispatcher(
     )
 }
 
+@InternalChasmApi
 fun ArrayInitDataSiiDispatcher(
     elementsToCopySlot: Int,
     sourceOffset: Int,
@@ -304,6 +320,7 @@ fun ArrayInitDataSiiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun ArrayInitDataSisDispatcher(
     elementsToCopySlot: Int,
     sourceOffset: Int,
@@ -323,6 +340,7 @@ fun ArrayInitDataSisDispatcher(
     )
 }
 
+@InternalChasmApi
 fun ArrayInitDataSsiDispatcher(
     elementsToCopySlot: Int,
     sourceOffsetSlot: Int,
@@ -342,6 +360,7 @@ fun ArrayInitDataSsiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun ArrayInitDataSssDispatcher(
     elementsToCopySlot: Int,
     sourceOffsetSlot: Int,
@@ -361,6 +380,7 @@ fun ArrayInitDataSssDispatcher(
     )
 }
 
+@InternalChasmApi
 fun ArrayInitElementIiiDispatcher(
     elementsToCopy: Int,
     sourceOffset: Int,
@@ -378,6 +398,7 @@ fun ArrayInitElementIiiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun ArrayInitElementIisDispatcher(
     elementsToCopy: Int,
     sourceOffset: Int,
@@ -395,6 +416,7 @@ fun ArrayInitElementIisDispatcher(
     )
 }
 
+@InternalChasmApi
 fun ArrayInitElementIsiDispatcher(
     elementsToCopy: Int,
     sourceOffsetSlot: Int,
@@ -412,6 +434,7 @@ fun ArrayInitElementIsiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun ArrayInitElementIssDispatcher(
     elementsToCopy: Int,
     sourceOffsetSlot: Int,
@@ -429,6 +452,7 @@ fun ArrayInitElementIssDispatcher(
     )
 }
 
+@InternalChasmApi
 fun ArrayInitElementSiiDispatcher(
     elementsToCopySlot: Int,
     sourceOffset: Int,
@@ -446,6 +470,7 @@ fun ArrayInitElementSiiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun ArrayInitElementSisDispatcher(
     elementsToCopySlot: Int,
     sourceOffset: Int,
@@ -463,6 +488,7 @@ fun ArrayInitElementSisDispatcher(
     )
 }
 
+@InternalChasmApi
 fun ArrayInitElementSsiDispatcher(
     elementsToCopySlot: Int,
     sourceOffsetSlot: Int,
@@ -480,6 +506,7 @@ fun ArrayInitElementSsiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun ArrayInitElementSssDispatcher(
     elementsToCopySlot: Int,
     sourceOffsetSlot: Int,
@@ -497,6 +524,7 @@ fun ArrayInitElementSssDispatcher(
     )
 }
 
+@InternalChasmApi
 fun RefI31IDispatcher(
     value: Int,
     destinationSlot: Int,
@@ -508,6 +536,7 @@ fun RefI31IDispatcher(
     )
 }
 
+@InternalChasmApi
 fun RefI31SDispatcher(
     valueSlot: Int,
     destinationSlot: Int,
@@ -519,6 +548,7 @@ fun RefI31SDispatcher(
     )
 }
 
+@InternalChasmApi
 fun I31GetSignedSDispatcher(
     valueSlot: Int,
     destinationSlot: Int,
@@ -531,6 +561,7 @@ fun I31GetSignedSDispatcher(
     )
 }
 
+@InternalChasmApi
 fun I31GetUnsignedSDispatcher(
     valueSlot: Int,
     destinationSlot: Int,
@@ -543,6 +574,7 @@ fun I31GetUnsignedSDispatcher(
     )
 }
 
+@InternalChasmApi
 fun AnyConvertExternSDispatcher(
     valueSlot: Int,
     destinationSlot: Int,
@@ -554,6 +586,7 @@ fun AnyConvertExternSDispatcher(
     )
 }
 
+@InternalChasmApi
 fun ExternConvertAnySDispatcher(
     valueSlot: Int,
     destinationSlot: Int,

@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.compiler.backend.analysis.form
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.cir.AggregateInstruction
 import io.github.charlietap.chasm.cir.DataIndex
 import io.github.charlietap.chasm.cir.ElementIndex
@@ -20,6 +21,7 @@ import io.github.charlietap.chasm.compiler.backend.abi.MethodRef
 import io.github.charlietap.chasm.compiler.backend.abi.Resource
 import io.github.charlietap.chasm.compiler.backend.abi.TABLE_INSTANCE
 
+@InternalChasmApi
 sealed interface HelperArgument {
     val words: Int get() = 1
 
@@ -45,6 +47,7 @@ sealed interface HelperArgument {
     }
 }
 
+@InternalChasmApi
 class HelperCall(
     val method: MethodRef?,
     val arguments: List<HelperArgument>,
@@ -55,6 +58,7 @@ class HelperCall(
     val words: Int get() = arguments.sumOf { it.words }
 }
 
+@InternalChasmApi
 fun Instruction.helperCall(): HelperCall? = when (this) {
     is MemoryInstruction -> memoryHelperCall()
     is TableInstruction -> tableHelperCall()

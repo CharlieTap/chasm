@@ -2,11 +2,13 @@
 
 package io.github.charlietap.chasm.memory.read
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.memory.BoundsChecker
 import io.github.charlietap.chasm.memory.ByteArrayLinearMemory
 import io.github.charlietap.chasm.memory.ext.toShortLittleEndian
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
 
+@InternalChasmApi
 actual inline fun I3216SReader(
     memory: LinearMemory,
     address: Int,

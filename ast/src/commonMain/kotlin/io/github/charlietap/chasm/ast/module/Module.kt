@@ -1,7 +1,9 @@
 package io.github.charlietap.chasm.ast.module
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.type.DefinedType
 
+@InternalChasmApi
 data class Module(
     val version: Version,
     val types: List<Type>,

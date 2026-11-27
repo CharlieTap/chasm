@@ -1,8 +1,10 @@
 package io.github.charlietap.chasm.memory
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 
+@InternalChasmApi
 actual inline fun <T> OptimisticBoundsChecker(
     address: Int,
     bytes: Int,

@@ -1,5 +1,8 @@
 package io.github.charlietap.chasm.runtime.exception
 
+import io.github.charlietap.chasm.InternalChasmApi
+
+@InternalChasmApi
 class FunctionExceptionTable(
     val entryIp: Int,
     val instructionCount: Int,
@@ -79,6 +82,7 @@ class FunctionExceptionTable(
     }
 }
 
+@InternalChasmApi
 class ExceptionRegion(
     val startOffset: Int,
     val endOffset: Int,
@@ -86,6 +90,7 @@ class ExceptionRegion(
     val catches: Array<CompiledCatch>,
 )
 
+@InternalChasmApi
 class CompiledCatch(
     val tagAddress: Int,
     val targetOffset: Int,

@@ -1,11 +1,13 @@
 package io.github.charlietap.chasm.compiler.backend.analysis
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.cir.AdminInstruction
 import io.github.charlietap.chasm.cir.CirFunction
 import io.github.charlietap.chasm.cir.ExceptionCatch
 import io.github.charlietap.chasm.cir.Instruction
 import io.github.charlietap.chasm.type.ValueType
 
+@InternalChasmApi
 class SlotKindFlow internal constructor(
     private val blocks: BasicBlocks,
     private val blockStates: Array<ByteArray?>,
@@ -163,6 +165,7 @@ class SlotKindFlow internal constructor(
     }
 }
 
+@InternalChasmApi
 fun interface SlotKindAnalyzer {
 
     fun analyze(
@@ -173,6 +176,7 @@ fun interface SlotKindAnalyzer {
     ): SlotKindFlow
 }
 
+@InternalChasmApi
 class DataflowSlotKindAnalyzer : SlotKindAnalyzer {
     override fun analyze(
         function: CirFunction,

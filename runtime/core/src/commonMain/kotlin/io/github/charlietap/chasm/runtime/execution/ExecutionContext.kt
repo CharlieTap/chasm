@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.runtime.execution
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.host.ModuleIndex
 import io.github.charlietap.chasm.runtime.heap.WasmHeap
@@ -20,6 +21,7 @@ import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
 import kotlin.jvm.JvmField
 
+@InternalChasmApi
 data class ExecutionContext(
     val vstack: ValueStack,
     val store: Store,

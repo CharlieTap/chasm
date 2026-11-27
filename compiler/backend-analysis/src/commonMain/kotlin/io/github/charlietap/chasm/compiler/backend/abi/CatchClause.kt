@@ -1,5 +1,8 @@
 package io.github.charlietap.chasm.compiler.backend.abi
 
+import io.github.charlietap.chasm.InternalChasmApi
+
+@InternalChasmApi
 data class CatchClause(
     val tag: Int?,
     val target: Int,

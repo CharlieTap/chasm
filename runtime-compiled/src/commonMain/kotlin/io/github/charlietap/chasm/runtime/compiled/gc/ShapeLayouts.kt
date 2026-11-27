@@ -1,12 +1,12 @@
 package io.github.charlietap.chasm.runtime.compiled.gc
 
-import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.host.HostGcType
 
-@InternalChasmApi
-interface ShapeLayouts {
+internal interface ShapeLayouts {
 
     fun struct(value: Any): StructLayout?
+
+    fun structStorage(value: Any): StructStorageLayout?
 
     fun array(value: Any): ArrayLayout?
 
@@ -15,8 +15,7 @@ interface ShapeLayouts {
     fun array(type: HostGcType): ArrayLayout
 }
 
-@InternalChasmApi
-class StructLayout(
+internal class StructLayout(
     val type: HostGcType,
     val rtt: Rtt,
     val storageLayout: StructStorageLayout,
@@ -24,8 +23,7 @@ class StructLayout(
     val checks: Array<ReferenceCheck?>,
 )
 
-@InternalChasmApi
-class ArrayLayout(
+internal class ArrayLayout(
     val type: HostGcType,
     val rtt: Rtt,
     val storageLayout: ArrayStorageLayout,

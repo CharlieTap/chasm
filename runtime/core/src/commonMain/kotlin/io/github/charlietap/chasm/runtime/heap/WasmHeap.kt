@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.runtime.heap
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.gc.AllocationAvailability
 import io.github.charlietap.chasm.gc.GarbageCollectedHeap
 import io.github.charlietap.chasm.gc.GcHostReferenceMarker
@@ -55,6 +56,7 @@ import io.github.charlietap.chasm.type.TagType
 import io.github.charlietap.chasm.type.ValueType
 import io.github.charlietap.chasm.type.VectorType
 
+@InternalChasmApi
 class WasmHeap internal constructor(
     private val garbageCollectedHeap: GarbageCollectedHeap,
 ) : HostReferences, HostGc, HostExterns, HostExceptions, GcHostReferenceMarker {

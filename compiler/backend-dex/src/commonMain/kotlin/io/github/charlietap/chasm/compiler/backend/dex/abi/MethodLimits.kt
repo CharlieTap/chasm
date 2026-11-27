@@ -1,5 +1,7 @@
 package io.github.charlietap.chasm.compiler.backend.dex.abi
 
+import io.github.charlietap.chasm.InternalChasmApi
+
 internal const val HUGE_METHOD_CODE_UNITS = 10_000
 
 internal const val ART_METHOD_CODE_UNITS = 16_000
@@ -22,4 +24,5 @@ internal const val CHUNK_CODE_UNITS = 7_500
 
 internal const val CHUNK_INSTRUCTIONS = 3_000
 
+@InternalChasmApi
 const val ART_BYTE_ARRAY_BASE_OFFSET = 12L

@@ -11,8 +11,7 @@ import io.github.charlietap.chasm.type.ConcreteHeapType
 import io.github.charlietap.chasm.type.DefinedType
 import io.github.charlietap.chasm.type.ReferenceType
 
-@InternalChasmApi
-interface ReferenceChecks {
+internal interface ReferenceChecks {
 
     fun check(
         type: ReferenceType,
@@ -38,8 +37,7 @@ sealed interface ReferenceCheck {
     }
 }
 
-@InternalChasmApi
-class StoreReferenceChecks(
+internal class StoreReferenceChecks(
     private val managedStore: ManagedStore,
     private val functions: ManagedFunctions,
     private val store: Store,

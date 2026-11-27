@@ -3,35 +3,35 @@ package io.github.charlietap.chasm.vm
 import kotlin.js.JsName
 
 @JsName("Array")
-external object ArrayNamespace {
+internal external object ArrayNamespace {
     fun isArray(value: dynamic): Boolean
 }
 
 @JsName("Math")
-external object MathNamespace {
+internal external object MathNamespace {
     fun fround(value: dynamic): Double
 }
 
 @JsName("Number")
-external object NumberNamespace {
+internal external object NumberNamespace {
     fun isInteger(value: dynamic): Boolean
 }
 
-inline fun newObj(): dynamic = js("({})")
+internal inline fun newObj(): dynamic = js("({})")
 
-inline fun fround(value: dynamic): Double = MathNamespace.fround(value)
+internal inline fun fround(value: dynamic): Double = MathNamespace.fround(value)
 
-inline fun isArray(value: dynamic): Boolean = ArrayNamespace.isArray(value)
+internal inline fun isArray(value: dynamic): Boolean = ArrayNamespace.isArray(value)
 
-inline fun isInteger(value: dynamic): Boolean = NumberNamespace.isInteger(value)
+internal inline fun isInteger(value: dynamic): Boolean = NumberNamespace.isInteger(value)
 
-inline fun typeOf(value: dynamic): String = js("typeof value") as String
+internal inline fun typeOf(value: dynamic): String = js("typeof value") as String
 
 @JsName("BigInt")
-external fun BigInt(value: String): dynamic
+internal external fun BigInt(value: String): dynamic
 
-inline fun longToBigInt(value: Long): dynamic = BigInt(value.toString())
+internal inline fun longToBigInt(value: Long): dynamic = BigInt(value.toString())
 
-inline fun bigIntToLong(value: dynamic): Long = value.toString().toLong()
+internal inline fun bigIntToLong(value: dynamic): Long = value.toString().toLong()
 
-val UNDEFINED: dynamic = js("undefined")
+internal val UNDEFINED: dynamic = js("undefined")

@@ -1,8 +1,10 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.admin
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.executor.invoker.instruction.control.ReturnExecutor
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 
+@InternalChasmApi
 fun EndFunctionDispatcher(
     resultCount: Int,
     activationHeaderSlot: Int,

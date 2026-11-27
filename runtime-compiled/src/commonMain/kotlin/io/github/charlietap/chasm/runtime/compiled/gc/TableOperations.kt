@@ -1,9 +1,6 @@
 package io.github.charlietap.chasm.runtime.compiled.gc
 
-import io.github.charlietap.chasm.InternalChasmApi
-
-@InternalChasmApi
-class TableOperations(
+internal class TableOperations(
     private val checks: ReferenceChecks,
 ) {
 

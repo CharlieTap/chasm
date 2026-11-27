@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.compiler.backend.analysis.declarations
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.module.Import
 import io.github.charlietap.chasm.ast.module.toInt
 import io.github.charlietap.chasm.compiler.backend.abi.packLongs
@@ -37,13 +38,16 @@ import io.github.charlietap.chasm.type.ValueType
 import java.io.OutputStream
 import java.util.IdentityHashMap
 
+@InternalChasmApi
 class BuilderCall(
     val methodName: String,
     val arguments: List<Any>,
 )
 
+@InternalChasmApi
 typealias DeclarationCallGenerator = (ModuleDeclarations, OutputStream) -> List<BuilderCall>
 
+@InternalChasmApi
 fun DeclarationCallGenerator(
     declarations: ModuleDeclarations,
     payloads: OutputStream,

@@ -1,5 +1,3 @@
-@file:OptIn(InternalChasmApi::class)
-
 package io.github.charlietap.chasm.dex
 
 import com.android.tools.smali.dexlib2.Opcodes
@@ -7,7 +5,6 @@ import com.android.tools.smali.dexlib2.dexbacked.DexBackedClassDef
 import com.android.tools.smali.dexlib2.dexbacked.DexBackedDexFile
 import com.android.tools.smali.dexlib2.iface.instruction.WideLiteralInstruction
 import com.github.michaelbull.result.getError
-import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.compiled.format.COMPILED_RUNTIME_ABI
 import io.github.charlietap.chasm.compiled.format.UNPINNED_OFFSET
 import io.github.charlietap.chasm.compiler.backend.dex.ParallelModuleLowerer

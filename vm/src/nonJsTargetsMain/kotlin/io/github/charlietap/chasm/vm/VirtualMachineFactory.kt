@@ -8,13 +8,13 @@ import io.github.charlietap.chasm.embedding.shapes.Module
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.shapes.Table
 
-actual typealias StoreReference = Store
-actual typealias ModuleReference = Module
-actual typealias InstanceReference = Instance
-actual typealias FunctionReference = Function
-actual typealias GlobalReference = Global
-actual typealias MemoryReference = Memory
-actual typealias TableReference = Table
+internal actual typealias StoreReference = Store
+internal actual typealias ModuleReference = Module
+internal actual typealias InstanceReference = Instance
+internal actual typealias FunctionReference = Function
+internal actual typealias GlobalReference = Global
+internal actual typealias MemoryReference = Memory
+internal actual typealias TableReference = Table
 
 actual fun virtualMachineFactory(): WasmVirtualMachine {
     return NonJsVirtualMachine

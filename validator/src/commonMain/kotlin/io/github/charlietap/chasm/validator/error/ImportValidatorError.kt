@@ -1,5 +1,5 @@
 package io.github.charlietap.chasm.validator.error
 
-sealed interface ImportValidatorError : ModuleValidatorError {
+internal sealed interface ImportValidatorError : ModuleValidatorError {
     data object UnknownType : ImportValidatorError
 }

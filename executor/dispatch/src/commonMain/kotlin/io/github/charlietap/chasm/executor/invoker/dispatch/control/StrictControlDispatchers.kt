@@ -1,5 +1,3 @@
-@file:OptIn(InternalChasmApi::class)
-
 package io.github.charlietap.chasm.executor.invoker.dispatch.control
 
 import io.github.charlietap.chasm.InternalChasmApi
@@ -32,6 +30,7 @@ private const val NO_RESULT_DESTINATION = -1
 private const val RESULT_CALL_SITE_IP_LIMIT = 1 shl 30
 private const val CALLER_FRAME_DELTA_LIMIT = 1 shl 25
 
+@InternalChasmApi
 fun WasmCallDispatcher(
     operands: OperandTransfer,
     callFrameOffset: Int,
@@ -590,6 +589,7 @@ private inline fun linkedWasmFunctionCall(
     return entryIp
 }
 
+@InternalChasmApi
 fun HostCallDispatcher(
     function: FunctionInstance.HostFunction,
     caller: ModuleInstance,
@@ -642,6 +642,7 @@ fun HostCallDispatcher(
     }
 }
 
+@InternalChasmApi
 fun CallIndirectIDispatcher(
     elementIndex: Int,
     operands: OperandTransfer,
@@ -664,6 +665,7 @@ fun CallIndirectIDispatcher(
     }
 }
 
+@InternalChasmApi
 fun CallIndirectSDispatcher(
     elementIndexSlot: Int,
     operands: OperandTransfer,
@@ -687,6 +689,7 @@ fun CallIndirectSDispatcher(
     }
 }
 
+@InternalChasmApi
 fun CallRefSDispatcher(
     functionSlot: Int,
     operands: OperandTransfer,
@@ -819,6 +822,7 @@ private class ResultCallRefDispatcher(
     )
 }
 
+@InternalChasmApi
 fun ReturnWasmCallDispatcher(
     frameSlots: Int,
     entryIp: Int,
@@ -1055,6 +1059,7 @@ private inline fun linkedReturnWasmFunctionCall(
     return entryIp
 }
 
+@InternalChasmApi
 fun FunctionReturnDispatcher(
     results: OperandTransfer,
     activationHeaderSlot: Int,
@@ -1101,6 +1106,7 @@ fun FunctionReturnDispatcher(
     }
 }
 
+@InternalChasmApi
 fun ReturnHostCallDispatcher(
     function: FunctionInstance.HostFunction,
     caller: ModuleInstance,
@@ -1152,6 +1158,7 @@ fun ReturnHostCallDispatcher(
     }
 }
 
+@InternalChasmApi
 fun ReturnCallIndirectIDispatcher(
     elementIndex: Int,
     operands: TailCallOperandTransfer,
@@ -1175,6 +1182,7 @@ fun ReturnCallIndirectIDispatcher(
     )
 }
 
+@InternalChasmApi
 fun ReturnCallIndirectSDispatcher(
     elementIndexSlot: Int,
     operands: TailCallOperandTransfer,
@@ -1198,6 +1206,7 @@ fun ReturnCallIndirectSDispatcher(
     )
 }
 
+@InternalChasmApi
 fun ReturnCallRefSDispatcher(
     functionSlot: Int,
     operands: TailCallOperandTransfer,
@@ -1217,6 +1226,7 @@ fun ReturnCallRefSDispatcher(
     )
 }
 
+@InternalChasmApi
 fun ThrowDispatcher(
     tagAddress: Address.Tag,
     firstPayloadSlot: Int,
@@ -1229,6 +1239,7 @@ fun ThrowDispatcher(
     )
 }
 
+@InternalChasmApi
 fun ThrowRefSDispatcher(
     exceptionSlot: Int,
 ): DispatchableInstruction = DispatchableInstruction { vstack, context, nextIp ->

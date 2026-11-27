@@ -1,10 +1,12 @@
 package io.github.charlietap.chasm.runtime.instance
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.runtime.diagnostic.CompiledFrames
 import io.github.charlietap.chasm.runtime.host.RawHostModuleInstance
 import io.github.charlietap.chasm.runtime.type.RuntimeTypeMap
 
+@InternalChasmApi
 data class ModuleInstance(
     val runtimeTypes: RuntimeTypeMap,
     val functionAddresses: MutableList<Address.Function> = [],

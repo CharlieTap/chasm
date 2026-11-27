@@ -11,7 +11,6 @@ const val TARGET_ART: Int = 1
 @InternalChasmApi
 const val UNPINNED_OFFSET: Long = -1L
 
-@OptIn(InternalChasmApi::class)
 enum class ArtifactTarget(
     val code: Int,
 ) {

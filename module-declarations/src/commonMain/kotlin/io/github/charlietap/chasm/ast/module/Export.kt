@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.ast.module
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.module.Index.FunctionIndex
 import io.github.charlietap.chasm.ast.module.Index.GlobalIndex
 import io.github.charlietap.chasm.ast.module.Index.MemoryIndex
@@ -8,6 +9,7 @@ import io.github.charlietap.chasm.ast.module.Index.TagIndex
 import io.github.charlietap.chasm.ast.value.NameValue
 import kotlin.jvm.JvmInline
 
+@InternalChasmApi
 data class Export(
     val name: NameValue,
     val descriptor: Descriptor,

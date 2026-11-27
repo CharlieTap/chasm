@@ -2,10 +2,12 @@
 
 package io.github.charlietap.chasm.parallel
 
+import io.github.charlietap.chasm.InternalChasmApi
 import kotlin.concurrent.atomics.AtomicReference
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
 
 /** The reported failure with the lowest position, whatever order failures are reported in. */
+@InternalChasmApi
 class EarliestFailure<E : Any> {
 
     private val earliest = AtomicReference<Failure<E>?>(null)

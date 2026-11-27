@@ -1,73 +1,85 @@
 package io.github.charlietap.chasm.runtime.operations.ext
 
-inline fun Int.divu(
+import io.github.charlietap.chasm.InternalChasmApi
+
+internal inline fun Int.divu(
     other: Int,
 ): Int = this.toUInt().div(other.toUInt()).toInt()
 
+@InternalChasmApi
 inline fun Int.eq(
     other: Int,
 ): Boolean = this == other
 
-inline fun Int.eqz(): Boolean = this == 0
+internal inline fun Int.eqz(): Boolean = this == 0
 
+@InternalChasmApi
 inline fun Int.ge(
     other: Int,
 ): Boolean = this >= other
 
+@InternalChasmApi
 inline fun Int.gt(
     other: Int,
 ): Boolean = this > other
 
+@InternalChasmApi
 inline fun Int.le(
     other: Int,
 ): Boolean = this <= other
 
+@InternalChasmApi
 inline fun Int.lt(
     other: Int,
 ): Boolean = this < other
 
-inline fun Int.geu(
+internal inline fun Int.geu(
     other: Int,
 ): Boolean = this.toUInt() >= other.toUInt()
 
-inline fun Int.gtu(
+internal inline fun Int.gtu(
     other: Int,
 ): Boolean = this.toUInt() > other.toUInt()
 
-inline fun Int.leu(
+internal inline fun Int.leu(
     other: Int,
 ): Boolean = this.toUInt() <= other.toUInt()
 
-inline fun Int.ltu(
+internal inline fun Int.ltu(
     other: Int,
 ): Boolean = this.toUInt() < other.toUInt()
 
+@InternalChasmApi
 inline fun Int.ne(
     other: Int,
 ): Boolean = this != other
 
-inline fun Int.remu(
+internal inline fun Int.remu(
     other: Int,
 ): Int = this.toUInt().rem(other.toUInt()).toInt()
 
-inline fun Int.shru(
+internal inline fun Int.shru(
     other: Int,
 ): Int = this.toUInt().shr(other).toInt()
 
-inline fun Int.extend8s(): Int = (this and 0xFF).toByte().toInt()
+internal inline fun Int.extend8s(): Int = (this and 0xFF).toByte().toInt()
 
-inline fun Int.extend16s(): Int = (this and 0xFFFF).toShort().toInt()
+internal inline fun Int.extend16s(): Int = (this and 0xFFFF).toShort().toInt()
 
-inline fun Int.extendI64s(): Long = this.toLong()
+internal inline fun Int.extendI64s(): Long = this.toLong()
 
-inline fun Int.extendI64u(): Long = this.toUInt().toLong()
+internal inline fun Int.extendI64u(): Long = this.toUInt().toLong()
 
+@InternalChasmApi
 inline fun Int.convertF32s(): Float = this.toFloat()
 
+@InternalChasmApi
 inline fun Int.convertF32u(): Float = this.toUInt().toFloat()
 
+@InternalChasmApi
 inline fun Int.convertF64s(): Double = this.toDouble()
 
+@InternalChasmApi
 inline fun Int.convertF64u(): Double = this.toUInt().toDouble()
 
-inline fun Int.promote(): Long = this.toLong()
+internal inline fun Int.promote(): Long = this.toLong()

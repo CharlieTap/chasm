@@ -1,11 +1,13 @@
 package io.github.charlietap.chasm.compiler.backend.analysis
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.compiler.backend.analysis.ext.localInitialValue
 import io.github.charlietap.chasm.compiler.backend.analysis.ext.toType
 import io.github.charlietap.chasm.compiler.backend.analysis.form.InstructionForms
 import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.chasm.type.ValueType
 
+@InternalChasmApi
 class FrameFacts(
     val type: FunctionType,
     val frameSlots: Int,
@@ -14,6 +16,7 @@ class FrameFacts(
     val initialValues: LongArray,
 )
 
+@InternalChasmApi
 fun frameFacts(
     forms: InstructionForms,
 ): FrameFacts {

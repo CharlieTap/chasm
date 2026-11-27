@@ -1,8 +1,10 @@
 package io.github.charlietap.chasm.compiler.backend.analysis.form
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.cir.MemoryIndex
 import io.github.charlietap.chasm.cir.MemoryInstruction
 
+@InternalChasmApi
 sealed interface BulkMemory {
 
     class Copy(
@@ -21,6 +23,7 @@ sealed interface BulkMemory {
     ) : BulkMemory
 }
 
+@InternalChasmApi
 fun MemoryInstruction.bulk(): BulkMemory? = when (val i = this) {
     is MemoryInstruction.MemoryCopyIii ->
         copy(i.srcMemory, i.dstMemory, immediate(i.bytesToCopy), immediate(i.sourceOffset), immediate(i.destinationOffset))

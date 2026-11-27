@@ -1,17 +1,21 @@
 package io.github.charlietap.chasm.compiler.frontend.diagnostic
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.instruction.Instruction
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.cir.CirModule
 import io.github.charlietap.chasm.cir.Provenance
 
+@InternalChasmApi
 class TrapSiteTable(
     val offsets: IntArray,
     val memories: IntArray,
 )
 
+@InternalChasmApi
 typealias TrapSiteTables = (Module, CirModule, List<IntArray?>) -> Map<Int, TrapSiteTable>
 
+@InternalChasmApi
 fun TrapSiteTables(
     module: Module,
     code: CirModule,
@@ -27,7 +31,7 @@ fun TrapSiteTables(
     return tables
 }
 
-fun trapSiteTable(
+internal fun trapSiteTable(
     body: List<Instruction>,
     provenance: Provenance,
     offsets: IntArray,

@@ -4,7 +4,7 @@ package io.github.charlietap.chasm.memory.write
 
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
 
-actual inline fun StringWriter(
+internal actual inline fun StringWriter(
     memory: LinearMemory,
     memoryPointer: Int,
     string: String,

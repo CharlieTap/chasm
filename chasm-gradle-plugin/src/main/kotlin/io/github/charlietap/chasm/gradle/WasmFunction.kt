@@ -86,7 +86,7 @@ class WasmFunctionBuilder(
         returnType = ReturnTypeDefinition(Scalar.String, encodingStrategy)
     }
 
-    fun build() = WasmFunction(
+    internal fun build() = WasmFunction(
         name = name,
         parameters = parameters,
         returnType = returnType,

@@ -19,7 +19,7 @@ import io.github.charlietap.chasm.type.ValueType
 import io.github.charlietap.chasm.type.ext.functionType
 import java.security.MessageDigest
 
-object ModuleLayout {
+internal object ModuleLayout {
 
     fun hash(
         module: Module,

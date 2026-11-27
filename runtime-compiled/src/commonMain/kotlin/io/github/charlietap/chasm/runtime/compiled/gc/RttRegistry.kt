@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.runtime.compiled.gc
 
-import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.runtime.type.RuntimeTypeMap
 import io.github.charlietap.chasm.type.AbstractHeapType
 import io.github.charlietap.chasm.type.CompositeType
@@ -14,8 +13,7 @@ import io.github.charlietap.chasm.type.StorageType
 import io.github.charlietap.chasm.type.ValueType
 import java.util.concurrent.ConcurrentHashMap
 
-@InternalChasmApi
-class RttRegistry(
+internal class RttRegistry(
     private val managedStore: ManagedStore,
 ) {
 

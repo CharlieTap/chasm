@@ -1,11 +1,13 @@
 package io.github.charlietap.chasm.compiler.backend.analysis.form
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.cir.ControlInstruction
 import io.github.charlietap.chasm.cir.OperandTransfer
 import io.github.charlietap.chasm.cir.TypeIndex
 import io.github.charlietap.chasm.compiler.backend.analysis.ModuleIndexSpaces
 import io.github.charlietap.chasm.type.FunctionType
 
+@InternalChasmApi
 class CallSite(
     val typeIndex: TypeIndex,
     val type: FunctionType,
@@ -19,6 +21,7 @@ class CallSite(
     }
 }
 
+@InternalChasmApi
 fun ControlInstruction.callSite(
     declarations: ModuleIndexSpaces,
 ): CallSite? {
@@ -37,7 +40,7 @@ fun ControlInstruction.callSite(
     }
 }
 
-fun ControlInstruction.operandTransfer(): OperandTransfer? {
+internal fun ControlInstruction.operandTransfer(): OperandTransfer? {
     return when (val instruction = this) {
         is ControlInstruction.Call -> instruction.operands
         is ControlInstruction.CallIndirectI -> instruction.operands
@@ -52,6 +55,7 @@ fun ControlInstruction.operandTransfer(): OperandTransfer? {
     }
 }
 
+@InternalChasmApi
 fun ControlInstruction.tailCallArguments(): List<Operand>? = when (val i = this) {
     is ControlInstruction.ReturnCall -> i.operands.wasm.operands()
     is ControlInstruction.ReturnCallIndirectI -> i.operands.wasm.operands()

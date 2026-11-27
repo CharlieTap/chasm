@@ -1,8 +1,10 @@
 package io.github.charlietap.chasm.runtime.instance
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.runtime.host.HostGlobal
 import io.github.charlietap.chasm.type.GlobalType
 
+@InternalChasmApi
 data class GlobalInstance(
     val type: GlobalType,
     var value: Long,

@@ -13,9 +13,9 @@ import io.github.charlietap.chasm.type.component.ComponentPrimitiveType
 import io.github.charlietap.chasm.type.component.ComponentValueType
 import io.github.charlietap.chasm.type.ext.definedType
 
-const val MAX_FLAT_PARAMS = 16
-const val MAX_FLAT_ASYNC_PARAMS = 4
-const val MAX_FLAT_RESULTS = 1
+internal const val MAX_FLAT_PARAMS = 16
+internal const val MAX_FLAT_ASYNC_PARAMS = 4
+internal const val MAX_FLAT_RESULTS = 1
 
 enum class CanonicalAbiContext {
     Lift,
@@ -121,12 +121,12 @@ fun CanonicalFunctionTypeLowering(
     )
 }
 
-fun FlattenComponentTypes(
+internal fun FlattenComponentTypes(
     types: List<ComponentValueType>,
     addressType: AddressType,
 ): List<ValueType>? = CanonicalAbiFlattener(addressType).flatten(types) { type -> type }?.types
 
-fun FlattenComponentType(
+internal fun FlattenComponentType(
     type: ComponentValueType,
     addressType: AddressType,
 ): List<ValueType>? = CanonicalAbiFlattener(addressType).flatten(type)?.types

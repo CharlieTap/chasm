@@ -1,11 +1,13 @@
 package io.github.charlietap.chasm.declarations
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.module.Import
 import io.github.charlietap.chasm.declarations.transform.ExportMapper
 import io.github.charlietap.chasm.declarations.transform.ImportMapper
 import io.github.charlietap.chasm.embedding.shapes.ModuleInfo
 import io.github.charlietap.chasm.host.ModuleIndex
 
+@InternalChasmApi
 fun moduleInfo(
     module: ModuleDeclarations,
 ): ModuleInfo = moduleInfo(

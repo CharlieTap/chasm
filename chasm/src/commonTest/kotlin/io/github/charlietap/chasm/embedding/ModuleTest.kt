@@ -1,9 +1,6 @@
-@file:OptIn(InternalChasmApi::class)
-
 package io.github.charlietap.chasm.embedding
 
 import com.goncalossilva.resources.Resource
-import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.embedding.error.ModuleError
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.DecodedModule

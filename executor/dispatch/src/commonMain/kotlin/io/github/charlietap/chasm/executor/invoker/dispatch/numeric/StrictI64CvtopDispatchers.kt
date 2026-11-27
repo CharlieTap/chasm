@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.numeric
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.executor.invoker.dispatch.dispatchInstruction
 import io.github.charlietap.chasm.executor.invoker.instruction.numeric.cvtop.executeF32ToI64I
 import io.github.charlietap.chasm.executor.invoker.instruction.numeric.cvtop.executeF32ToI64S
@@ -12,6 +13,7 @@ import io.github.charlietap.chasm.runtime.operations.ext.truncI64sTrapping
 import io.github.charlietap.chasm.runtime.operations.ext.truncI64u
 import io.github.charlietap.chasm.runtime.operations.ext.truncI64uTrapping
 
+@InternalChasmApi
 fun I64TruncF32SIDispatcher(
     operand: Float,
     destinationSlot: Int,
@@ -25,6 +27,7 @@ fun I64TruncF32SIDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64TruncF32SSDispatcher(
     operandSlot: Int,
     destinationSlot: Int,
@@ -38,6 +41,7 @@ fun I64TruncF32SSDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64TruncF32UIDispatcher(
     operand: Float,
     destinationSlot: Int,
@@ -51,6 +55,7 @@ fun I64TruncF32UIDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64TruncF32USDispatcher(
     operandSlot: Int,
     destinationSlot: Int,
@@ -64,6 +69,7 @@ fun I64TruncF32USDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64TruncF64SIDispatcher(
     operand: Double,
     destinationSlot: Int,
@@ -77,6 +83,7 @@ fun I64TruncF64SIDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64TruncF64SSDispatcher(
     operandSlot: Int,
     destinationSlot: Int,
@@ -90,6 +97,7 @@ fun I64TruncF64SSDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64TruncF64UIDispatcher(
     operand: Double,
     destinationSlot: Int,
@@ -103,6 +111,7 @@ fun I64TruncF64UIDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64TruncF64USDispatcher(
     operandSlot: Int,
     destinationSlot: Int,
@@ -116,6 +125,7 @@ fun I64TruncF64USDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64TruncSatF32SIDispatcher(
     operand: Float,
     destinationSlot: Int,
@@ -125,6 +135,7 @@ fun I64TruncSatF32SIDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64TruncSatF32SSDispatcher(
     operandSlot: Int,
     destinationSlot: Int,
@@ -134,6 +145,7 @@ fun I64TruncSatF32SSDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64TruncSatF32UIDispatcher(
     operand: Float,
     destinationSlot: Int,
@@ -143,6 +155,7 @@ fun I64TruncSatF32UIDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64TruncSatF32USDispatcher(
     operandSlot: Int,
     destinationSlot: Int,
@@ -152,6 +165,7 @@ fun I64TruncSatF32USDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64TruncSatF64SIDispatcher(
     operand: Double,
     destinationSlot: Int,
@@ -161,6 +175,7 @@ fun I64TruncSatF64SIDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64TruncSatF64SSDispatcher(
     operandSlot: Int,
     destinationSlot: Int,
@@ -170,6 +185,7 @@ fun I64TruncSatF64SSDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64TruncSatF64UIDispatcher(
     operand: Double,
     destinationSlot: Int,
@@ -179,6 +195,7 @@ fun I64TruncSatF64UIDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64TruncSatF64USDispatcher(
     operandSlot: Int,
     destinationSlot: Int,

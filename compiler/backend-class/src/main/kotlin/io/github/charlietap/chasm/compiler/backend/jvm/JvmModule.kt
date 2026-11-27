@@ -1,7 +1,9 @@
 package io.github.charlietap.chasm.compiler.backend.jvm
 
+import io.github.charlietap.chasm.InternalChasmApi
 import java.io.OutputStream
 
+@InternalChasmApi
 interface JvmOutput {
     fun classFile(
         internalName: String,
@@ -14,10 +16,12 @@ interface JvmOutput {
     ): T
 }
 
+@InternalChasmApi
 class JvmModule(
     val moduleClass: String,
 )
 
+@InternalChasmApi
 class ClassTooLarge(
     message: String,
     cause: Throwable,

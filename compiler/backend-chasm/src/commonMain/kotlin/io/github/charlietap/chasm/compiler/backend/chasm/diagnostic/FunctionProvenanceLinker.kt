@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.compiler.backend.chasm.diagnostic
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.cir.CirFunction
 import io.github.charlietap.chasm.cir.Instruction
@@ -11,6 +12,7 @@ import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.program.Program
 import io.github.charlietap.chasm.runtime.store.Store
 
+@InternalChasmApi
 class FunctionProvenance internal constructor(
     private val function: CirFunction,
     private val provenance: Provenance,
@@ -40,6 +42,7 @@ class FunctionProvenance internal constructor(
     }
 }
 
+@InternalChasmApi
 class FunctionProvenanceLinker(
     private val store: Store,
     module: Module,

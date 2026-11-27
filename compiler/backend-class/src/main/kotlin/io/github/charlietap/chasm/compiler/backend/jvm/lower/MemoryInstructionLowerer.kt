@@ -1,8 +1,5 @@
-@file:OptIn(InternalChasmApi::class)
-
 package io.github.charlietap.chasm.compiler.backend.jvm.lower
 
-import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.cir.MemoryInstruction
 import io.github.charlietap.chasm.compiled.format.MEMORY_ACCESS_READ
 import io.github.charlietap.chasm.compiled.format.MEMORY_ACCESS_WRITE

@@ -1,6 +1,5 @@
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
-import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 
 plugins {
@@ -18,8 +17,7 @@ kotlin {
         namespace = "io.github.charlietap.chasm.vm"
     }
 
-    @OptIn(ExperimentalAbiValidation::class)
-    abiValidation()
+    validatePublicAbi()
 
     @OptIn(ExperimentalKotlinGradlePluginApi::class)
     applyHierarchyTemplate {

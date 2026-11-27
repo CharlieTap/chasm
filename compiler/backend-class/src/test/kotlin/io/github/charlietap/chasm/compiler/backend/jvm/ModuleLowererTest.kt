@@ -1,9 +1,6 @@
-@file:OptIn(InternalChasmApi::class)
-
 package io.github.charlietap.chasm.compiler.backend.jvm
 
 import com.github.michaelbull.result.getOrThrow
-import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.compiler.backend.abi.EntryShape
 import io.github.charlietap.chasm.compiler.backend.analysis.UnsupportedFunctions
 import io.github.charlietap.chasm.compiler.backend.analysis.declarations.DeclarationCallGenerator

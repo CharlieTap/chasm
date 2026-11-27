@@ -1,5 +1,3 @@
-@file:OptIn(InternalChasmApi::class)
-
 package io.github.charlietap.chasm.compiler.backend.abi
 
 import io.github.charlietap.chasm.InternalChasmApi
@@ -10,6 +8,7 @@ import io.github.charlietap.chasm.config.CpuLimits
 import io.github.charlietap.chasm.config.GrowthFailureStrategy
 import io.github.charlietap.chasm.config.RuntimeConfig
 
+@InternalChasmApi
 sealed interface ModuleSetting {
 
     val name: String
@@ -30,6 +29,7 @@ sealed interface ModuleSetting {
     ) : ModuleSetting
 }
 
+@InternalChasmApi
 class ModuleSettings(
     private val runtime: RuntimeConfig,
     private val target: ArtifactTarget,

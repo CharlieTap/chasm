@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.compiler.backend.analysis.gc
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.instruction.AggregateInstruction
 import io.github.charlietap.chasm.ast.instruction.Expression
 import io.github.charlietap.chasm.ast.instruction.VariableInstruction
@@ -7,6 +8,7 @@ import io.github.charlietap.chasm.ast.module.Import
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.type.ValueType
 
+@InternalChasmApi
 class ConstantExpressions(
     private val module: Module,
 ) {

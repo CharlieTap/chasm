@@ -1,7 +1,9 @@
 package io.github.charlietap.chasm.ast.instruction
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.module.Index
 
+@InternalChasmApi
 sealed interface AtomicMemoryInstruction : Instruction {
 
     sealed interface Load : AtomicMemoryInstruction {

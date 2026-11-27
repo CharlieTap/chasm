@@ -2,7 +2,7 @@ package io.github.charlietap.chasm.decoder.error
 
 import kotlin.jvm.JvmInline
 
-sealed interface InstructionDecodeError : WasmDecodeError {
+internal sealed interface InstructionDecodeError : WasmDecodeError {
 
     @JvmInline
     value class UnknownInstruction(val byte: UByte) : InstructionDecodeError

@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.compiler.backend.jvm.size
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.ART_ESTIMATED_METHOD_UNITS
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.MAX_SHORT_BRANCH_METHOD_BYTES
 import org.objectweb.asm.Label
@@ -15,6 +16,7 @@ import org.objectweb.asm.tree.MethodNode
 import org.objectweb.asm.tree.TableSwitchInsnNode
 import java.util.IdentityHashMap
 
+@InternalChasmApi
 data class DexUnitEstimate(
     override val limit: Int = ART_ESTIMATED_METHOD_UNITS,
 ) : MethodSize {

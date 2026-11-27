@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.ast.component
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.component.Index.ComponentFunctionIndex
 import io.github.charlietap.chasm.ast.component.Index.ComponentIndex
 import io.github.charlietap.chasm.ast.component.Index.ComponentInstanceIndex
@@ -14,6 +15,7 @@ import io.github.charlietap.chasm.ast.module.Index.TableIndex as ModuleTableInde
 import io.github.charlietap.chasm.ast.module.Index.TagIndex as ModuleTagIndex
 import io.github.charlietap.chasm.ast.module.Index.TypeIndex as ModuleTypeIndex
 
+@InternalChasmApi
 sealed interface ExportTarget {
 
     data class Module(val index: ComponentModuleIndex) : ExportTarget
@@ -29,6 +31,7 @@ sealed interface ExportTarget {
     data class Instance(val index: ComponentInstanceIndex) : ExportTarget
 }
 
+@InternalChasmApi
 sealed interface CoreExportTarget {
 
     data class Function(val index: ModuleFunctionIndex) : CoreExportTarget

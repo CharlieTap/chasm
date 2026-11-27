@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.runtime.type
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.type.AbstractHeapType
 import io.github.charlietap.chasm.type.ArrayType
 import io.github.charlietap.chasm.type.CompositeType
@@ -21,9 +22,11 @@ import kotlin.jvm.JvmInline
 
 private const val STANDALONE_GROUP = -1
 
+@InternalChasmApi
 @JvmInline
 value class RTT(val value: Int)
 
+@InternalChasmApi
 @JvmInline
 value class ReferenceTypeTest private constructor(
     private val encoding: Int,
@@ -40,6 +43,7 @@ value class ReferenceTypeTest private constructor(
     val acceptedReferenceTags: Int
         get() = encoding and PAYLOAD_MASK
 
+    @InternalChasmApi
     companion object {
         fun from(type: ReferenceType, runtimeTypes: RuntimeTypeMap): ReferenceTypeTest {
             val nullable = type is ReferenceType.RefNull
@@ -80,6 +84,7 @@ value class ReferenceTypeTest private constructor(
     }
 }
 
+@InternalChasmApi
 class RuntimeTypeMap internal constructor(
     private val ids: IntArray,
 ) {
@@ -88,11 +93,13 @@ class RuntimeTypeMap internal constructor(
 
     operator fun get(index: Int): RTT = RTT(ids[index])
 
+    @InternalChasmApi
     companion object {
         val Empty = RuntimeTypeMap(IntArray(0))
     }
 }
 
+@InternalChasmApi
 class RuntimeTypeRegistry {
     private val groups = mutableMapOf<RecGroupLookup, IntArray>()
     private val displays = mutableListOf<IntArray>()

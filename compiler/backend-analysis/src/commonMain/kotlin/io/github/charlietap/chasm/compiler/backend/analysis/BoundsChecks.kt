@@ -1,7 +1,9 @@
 package io.github.charlietap.chasm.compiler.backend.analysis
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.cir.CirFunction
 
+@InternalChasmApi
 class BoundsCheckStorage {
     internal var writeOffsets = IntArray(0)
     internal var writtenSlots = IntArray(0)
@@ -46,6 +48,7 @@ class BoundsCheckStorage {
     }
 }
 
+@InternalChasmApi
 fun CirFunction.redundantBoundsChecks(
     table: InstructionTable,
     storage: BoundsCheckStorage = BoundsCheckStorage(),

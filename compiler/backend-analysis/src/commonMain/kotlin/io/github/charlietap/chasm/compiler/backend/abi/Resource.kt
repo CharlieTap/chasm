@@ -1,5 +1,8 @@
 package io.github.charlietap.chasm.compiler.backend.abi
 
+import io.github.charlietap.chasm.InternalChasmApi
+
+@InternalChasmApi
 sealed interface Resource {
 
     data object Instance : Resource
@@ -95,5 +98,5 @@ sealed interface Resource {
     ) : Resource
 }
 
-val Resource.isValue: Boolean
+internal val Resource.isValue: Boolean
     get() = this is Resource.FunctionReference || this is Resource.TagAddress || this is Resource.RuntimeType

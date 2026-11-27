@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.jvm
 
-import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.compiled.CompiledModule
 import io.github.charlietap.chasm.compiled.format.COMPILED_RUNTIME_ABI
 import io.github.charlietap.chasm.compiled.format.TARGET_ART
@@ -68,7 +67,6 @@ import io.github.charlietap.chasm.embedding.module as embeddingModule
 
 private val EMPTY_MODULE = byteArrayOf(0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00)
 
-@OptIn(InternalChasmApi::class)
 class CompileTest {
 
     @Test

@@ -1,9 +1,6 @@
-@file:OptIn(InternalChasmApi::class)
-
 package io.github.charlietap.chasm.embedding.diagnostic
 
 import com.github.michaelbull.result.get
-import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.instruction.Instruction
 import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
 import io.github.charlietap.chasm.ast.module.FunctionNameSubsection

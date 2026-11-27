@@ -7,10 +7,10 @@ import io.github.charlietap.chasm.config.ComponentConfig
 import io.github.charlietap.chasm.type.component.ComponentTypes
 import io.github.charlietap.chasm.validator.error.ComponentValidatorError
 
-typealias WasmComponentValidator =
+internal typealias WasmComponentValidator =
     (ComponentConfig, Component) -> Result<Component, ComponentValidatorError>
 
-fun WasmComponentValidator(
+internal fun WasmComponentValidator(
     config: ComponentConfig,
     component: Component,
 ): Result<Component, ComponentValidatorError> = WasmComponentValidator(

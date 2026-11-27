@@ -1,7 +1,9 @@
 package io.github.charlietap.chasm.validator.error
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.config.ComponentFeature
 
+@InternalChasmApi
 sealed interface ComponentValidatorError {
 
     data class UnknownIndex(

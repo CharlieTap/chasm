@@ -1,15 +1,18 @@
 package io.github.charlietap.chasm.compiler.backend.analysis.gc
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.type.AbstractHeapType
 import io.github.charlietap.chasm.type.ConcreteHeapType
 import io.github.charlietap.chasm.type.DefinedType
 import io.github.charlietap.chasm.type.HeapType
 import io.github.charlietap.chasm.type.SubType
 
+@InternalChasmApi
 fun DefinedType.subType(): SubType {
     return recursiveType.subTypes[recursiveTypeIndex]
 }
 
+@InternalChasmApi
 fun resolveDefinedType(
     type: HeapType,
     types: List<DefinedType>,

@@ -1,8 +1,5 @@
-@file:OptIn(InternalChasmApi::class)
-
 package io.github.charlietap.chasm.compiler.backend.jvm.lower
 
-import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.compiler.backend.abi.ARRAYCOPY
 import io.github.charlietap.chasm.compiler.backend.abi.CLOSE_FRAME
 import io.github.charlietap.chasm.compiler.backend.abi.CONTEXT_TYPE

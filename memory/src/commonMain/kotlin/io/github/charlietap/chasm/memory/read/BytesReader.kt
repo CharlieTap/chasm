@@ -2,9 +2,9 @@ package io.github.charlietap.chasm.memory.read
 
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
 
-typealias BytesReader = (LinearMemory, ByteArray, Int, Int, Int) -> ByteArray
+internal typealias BytesReader = (LinearMemory, ByteArray, Int, Int, Int) -> ByteArray
 
-expect inline fun BytesReader(
+internal expect inline fun BytesReader(
     memory: LinearMemory,
     buffer: ByteArray,
     memoryPointer: Int,

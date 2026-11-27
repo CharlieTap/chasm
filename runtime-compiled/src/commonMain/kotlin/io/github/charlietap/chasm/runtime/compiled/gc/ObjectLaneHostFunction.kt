@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.runtime.compiled.gc
 
-import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.host.HostParameters
 import io.github.charlietap.chasm.host.HostResults
 import io.github.charlietap.chasm.host.HostStack
@@ -12,8 +11,7 @@ import io.github.charlietap.chasm.runtime.host.RawHostResources
 import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.chasm.type.ValueType
 
-@InternalChasmApi
-abstract class ObjectLaneHostFunction(
+internal abstract class ObjectLaneHostFunction(
     type: FunctionType,
 ) : RawHostFunction {
 

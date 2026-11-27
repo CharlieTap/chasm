@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.compiler.backend.analysis.gc
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.type.AbstractHeapType
 import io.github.charlietap.chasm.type.CompositeType
 import io.github.charlietap.chasm.type.ConcreteHeapType
@@ -17,6 +18,7 @@ import io.github.charlietap.chasm.type.ValueType
 import java.security.MessageDigest
 import java.util.IdentityHashMap
 
+@InternalChasmApi
 class RttKeys(
     private val types: List<DefinedType>,
 ) {

@@ -9,9 +9,9 @@ import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.type.AddressType
 import io.github.charlietap.chasm.type.SharedStatus
 
-typealias CompatibilityChecker = (ModuleDeclarations) -> Result<Unit, ModuleTrapError>
+internal typealias CompatibilityChecker = (ModuleDeclarations) -> Result<Unit, ModuleTrapError>
 
-fun CompatibilityChecker(
+internal fun CompatibilityChecker(
     module: ModuleDeclarations,
 ): Result<Unit, ModuleTrapError> = binding {
 

@@ -1,5 +1,8 @@
 package io.github.charlietap.chasm.cir
 
+import io.github.charlietap.chasm.InternalChasmApi
+
+@InternalChasmApi
 class OperandTransfer(
     val values: LongArray,
     val immediates: BooleanArray,
@@ -44,11 +47,13 @@ class OperandTransfer(
     override fun toString(): String = "OperandTransfer(sources=${sources()}, destinationSlotBase=$destinationSlotBase)"
 }
 
+@InternalChasmApi
 data class TailCallOperandTransfer(
     val wasm: OperandTransfer,
     val host: OperandTransfer,
 )
 
+@InternalChasmApi
 sealed interface TransferSource {
 
     @CirTag("immediate")

@@ -4,7 +4,7 @@ import io.github.charlietap.chasm.type.CompositeType
 import io.github.charlietap.chasm.type.HeapType
 import io.github.charlietap.chasm.type.SubType
 
-fun SubTypeDeepCopier(
+internal fun SubTypeDeepCopier(
     input: SubType,
 ): SubType =
     SubTypeDeepCopier(
@@ -13,7 +13,7 @@ fun SubTypeDeepCopier(
         heapTypeCopier = ::HeapTypeDeepCopier,
     )
 
-inline fun SubTypeDeepCopier(
+internal inline fun SubTypeDeepCopier(
     input: SubType,
     compositeTypeCopier: DeepCopier<CompositeType>,
     heapTypeCopier: DeepCopier<HeapType>,

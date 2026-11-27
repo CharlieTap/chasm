@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.admin
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.ext.isNullableReference
 import io.github.charlietap.chasm.runtime.instruction.FusedOperand
@@ -9,6 +10,7 @@ import io.github.charlietap.chasm.runtime.instruction.TransferSource
 import io.github.charlietap.chasm.runtime.operations.Caster
 import io.github.charlietap.chasm.runtime.type.ReferenceTypeTest
 
+@InternalChasmApi
 fun JumpDispatcher(
     targetIp: Int,
 ): DispatchableInstruction {
@@ -17,6 +19,7 @@ fun JumpDispatcher(
     }
 }
 
+@InternalChasmApi
 fun JumpCopiesDispatcher(
     operands: OperandTransfer,
     destinationSlotBase: Int,
@@ -50,6 +53,7 @@ fun JumpCopiesDispatcher(
     }
 }
 
+@InternalChasmApi
 fun JumpIfIDispatcher(
     operand: Long,
     targetIp: Int,
@@ -59,6 +63,7 @@ fun JumpIfIDispatcher(
     }
 }
 
+@InternalChasmApi
 fun JumpIfSDispatcher(
     operandSlot: Int,
     targetIp: Int,
@@ -68,6 +73,7 @@ fun JumpIfSDispatcher(
     }
 }
 
+@InternalChasmApi
 fun JumpIfZeroIDispatcher(
     operand: Long,
     targetIp: Int,
@@ -77,6 +83,7 @@ fun JumpIfZeroIDispatcher(
     }
 }
 
+@InternalChasmApi
 fun JumpIfZeroSDispatcher(
     operandSlot: Int,
     targetIp: Int,
@@ -86,6 +93,7 @@ fun JumpIfZeroSDispatcher(
     }
 }
 
+@InternalChasmApi
 fun JumpIfCopyIDispatcher(
     operand: Long,
     sourceSlot: Int,
@@ -100,6 +108,7 @@ fun JumpIfCopyIDispatcher(
     DispatchableInstruction { _, _, nextIp -> nextIp }
 }
 
+@InternalChasmApi
 fun JumpIfCopySDispatcher(
     operandSlot: Int,
     sourceSlot: Int,
@@ -116,7 +125,7 @@ fun JumpIfCopySDispatcher(
     }
 }
 
-fun JumpIfConditionDispatcher(
+internal fun JumpIfConditionDispatcher(
     condition: NumericCondition,
     targetIp: Int,
 ): DispatchableInstruction = when (val condition = condition) {
@@ -157,6 +166,7 @@ fun JumpIfConditionDispatcher(
     is NumericCondition.F64Ge -> jumpIfF64Ge(condition, targetIp)
 }
 
+@InternalChasmApi
 fun JumpConditionDispatcher(
     condition: NumericCondition,
     targetIp: Int,
@@ -367,6 +377,7 @@ internal fun FusedOperand.f64BitsOperand(): FusedOperand = when (this) {
     else -> unsupportedConditionOperand(this)
 }
 
+@InternalChasmApi
 fun JumpTableSDispatcher(
     operandSlot: Int,
     targetIps: IntArray,
@@ -383,6 +394,7 @@ internal inline fun IntArray.branchTarget(
     return if (index >= 0 && index < defaultIndex) this[index] else this[defaultIndex]
 }
 
+@InternalChasmApi
 fun JumpOnNullIDispatcher(
     operand: Long,
     targetIp: Int,
@@ -390,6 +402,7 @@ fun JumpOnNullIDispatcher(
     if (operand.isNullableReference()) targetIp else nextIp
 }
 
+@InternalChasmApi
 fun JumpOnNullSDispatcher(
     operandSlot: Int,
     targetIp: Int,
@@ -397,6 +410,7 @@ fun JumpOnNullSDispatcher(
     if (vstack.getFrameSlot(operandSlot).isNullableReference()) targetIp else nextIp
 }
 
+@InternalChasmApi
 fun JumpOnNonNullIDispatcher(
     operand: Long,
     targetIp: Int,
@@ -404,6 +418,7 @@ fun JumpOnNonNullIDispatcher(
     if (!operand.isNullableReference()) targetIp else nextIp
 }
 
+@InternalChasmApi
 fun JumpOnNonNullSDispatcher(
     operandSlot: Int,
     targetIp: Int,
@@ -411,6 +426,7 @@ fun JumpOnNonNullSDispatcher(
     if (!vstack.getFrameSlot(operandSlot).isNullableReference()) targetIp else nextIp
 }
 
+@InternalChasmApi
 fun JumpOnCastIDispatcher(
     operand: Long,
     targetIp: Int,
@@ -420,6 +436,7 @@ fun JumpOnCastIDispatcher(
     if (matches) targetIp else nextIp
 }
 
+@InternalChasmApi
 fun JumpOnCastSDispatcher(
     operandSlot: Int,
     targetIp: Int,
@@ -430,6 +447,7 @@ fun JumpOnCastSDispatcher(
     if (matches) targetIp else nextIp
 }
 
+@InternalChasmApi
 fun JumpOnCastFailIDispatcher(
     operand: Long,
     targetIp: Int,
@@ -439,6 +457,7 @@ fun JumpOnCastFailIDispatcher(
     if (!matches) targetIp else nextIp
 }
 
+@InternalChasmApi
 fun JumpOnCastFailSDispatcher(
     operandSlot: Int,
     targetIp: Int,

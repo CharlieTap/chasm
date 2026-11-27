@@ -1,11 +1,13 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.numeric
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.executor.invoker.dispatch.dispatchInstruction
 import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.executeI64BinaryIi
 import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.executeI64BinaryIs
 import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.executeI64BinarySi
 import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.executeI64BinarySs
 
+@InternalChasmApi
 fun I64EqIiDispatcher(
     left: Long,
     right: Long,
@@ -14,6 +16,7 @@ fun I64EqIiDispatcher(
     executeI64BinaryIi(vstack, destinationSlot, left, right) { left, right -> if (left == right) 1L else 0L }
 }
 
+@InternalChasmApi
 fun I64EqIsDispatcher(
     left: Long,
     rightSlot: Int,
@@ -22,6 +25,7 @@ fun I64EqIsDispatcher(
     executeI64BinaryIs(vstack, destinationSlot, left, rightSlot) { left, right -> if (left == right) 1L else 0L }
 }
 
+@InternalChasmApi
 fun I64EqSiDispatcher(
     leftSlot: Int,
     right: Long,
@@ -30,6 +34,7 @@ fun I64EqSiDispatcher(
     executeI64BinarySi(vstack, destinationSlot, leftSlot, right) { left, right -> if (left == right) 1L else 0L }
 }
 
+@InternalChasmApi
 fun I64EqSsDispatcher(
     leftSlot: Int,
     rightSlot: Int,
@@ -38,6 +43,7 @@ fun I64EqSsDispatcher(
     executeI64BinarySs(vstack, destinationSlot, leftSlot, rightSlot) { left, right -> if (left == right) 1L else 0L }
 }
 
+@InternalChasmApi
 fun I64NeIiDispatcher(
     left: Long,
     right: Long,
@@ -46,6 +52,7 @@ fun I64NeIiDispatcher(
     executeI64BinaryIi(vstack, destinationSlot, left, right) { left, right -> if (left != right) 1L else 0L }
 }
 
+@InternalChasmApi
 fun I64NeIsDispatcher(
     left: Long,
     rightSlot: Int,
@@ -54,6 +61,7 @@ fun I64NeIsDispatcher(
     executeI64BinaryIs(vstack, destinationSlot, left, rightSlot) { left, right -> if (left != right) 1L else 0L }
 }
 
+@InternalChasmApi
 fun I64NeSiDispatcher(
     leftSlot: Int,
     right: Long,
@@ -62,6 +70,7 @@ fun I64NeSiDispatcher(
     executeI64BinarySi(vstack, destinationSlot, leftSlot, right) { left, right -> if (left != right) 1L else 0L }
 }
 
+@InternalChasmApi
 fun I64NeSsDispatcher(
     leftSlot: Int,
     rightSlot: Int,
@@ -70,6 +79,7 @@ fun I64NeSsDispatcher(
     executeI64BinarySs(vstack, destinationSlot, leftSlot, rightSlot) { left, right -> if (left != right) 1L else 0L }
 }
 
+@InternalChasmApi
 fun I64LtSIiDispatcher(
     left: Long,
     right: Long,
@@ -78,6 +88,7 @@ fun I64LtSIiDispatcher(
     executeI64BinaryIi(vstack, destinationSlot, left, right) { left, right -> if (left < right) 1L else 0L }
 }
 
+@InternalChasmApi
 fun I64LtSIsDispatcher(
     left: Long,
     rightSlot: Int,
@@ -86,6 +97,7 @@ fun I64LtSIsDispatcher(
     executeI64BinaryIs(vstack, destinationSlot, left, rightSlot) { left, right -> if (left < right) 1L else 0L }
 }
 
+@InternalChasmApi
 fun I64LtSSiDispatcher(
     leftSlot: Int,
     right: Long,
@@ -94,6 +106,7 @@ fun I64LtSSiDispatcher(
     executeI64BinarySi(vstack, destinationSlot, leftSlot, right) { left, right -> if (left < right) 1L else 0L }
 }
 
+@InternalChasmApi
 fun I64LtSSsDispatcher(
     leftSlot: Int,
     rightSlot: Int,
@@ -102,6 +115,7 @@ fun I64LtSSsDispatcher(
     executeI64BinarySs(vstack, destinationSlot, leftSlot, rightSlot) { left, right -> if (left < right) 1L else 0L }
 }
 
+@InternalChasmApi
 fun I64LtUIiDispatcher(
     left: Long,
     right: Long,
@@ -112,6 +126,7 @@ fun I64LtUIiDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64LtUIsDispatcher(
     left: Long,
     rightSlot: Int,
@@ -122,6 +137,7 @@ fun I64LtUIsDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64LtUSiDispatcher(
     leftSlot: Int,
     right: Long,
@@ -132,6 +148,7 @@ fun I64LtUSiDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64LtUSsDispatcher(
     leftSlot: Int,
     rightSlot: Int,
@@ -142,6 +159,7 @@ fun I64LtUSsDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64GtSIiDispatcher(
     left: Long,
     right: Long,
@@ -150,6 +168,7 @@ fun I64GtSIiDispatcher(
     executeI64BinaryIi(vstack, destinationSlot, left, right) { left, right -> if (left > right) 1L else 0L }
 }
 
+@InternalChasmApi
 fun I64GtSIsDispatcher(
     left: Long,
     rightSlot: Int,
@@ -158,6 +177,7 @@ fun I64GtSIsDispatcher(
     executeI64BinaryIs(vstack, destinationSlot, left, rightSlot) { left, right -> if (left > right) 1L else 0L }
 }
 
+@InternalChasmApi
 fun I64GtSSiDispatcher(
     leftSlot: Int,
     right: Long,
@@ -166,6 +186,7 @@ fun I64GtSSiDispatcher(
     executeI64BinarySi(vstack, destinationSlot, leftSlot, right) { left, right -> if (left > right) 1L else 0L }
 }
 
+@InternalChasmApi
 fun I64GtSSsDispatcher(
     leftSlot: Int,
     rightSlot: Int,
@@ -174,6 +195,7 @@ fun I64GtSSsDispatcher(
     executeI64BinarySs(vstack, destinationSlot, leftSlot, rightSlot) { left, right -> if (left > right) 1L else 0L }
 }
 
+@InternalChasmApi
 fun I64GtUIiDispatcher(
     left: Long,
     right: Long,
@@ -184,6 +206,7 @@ fun I64GtUIiDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64GtUIsDispatcher(
     left: Long,
     rightSlot: Int,
@@ -194,6 +217,7 @@ fun I64GtUIsDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64GtUSiDispatcher(
     leftSlot: Int,
     right: Long,
@@ -204,6 +228,7 @@ fun I64GtUSiDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64GtUSsDispatcher(
     leftSlot: Int,
     rightSlot: Int,
@@ -214,6 +239,7 @@ fun I64GtUSsDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64LeSIiDispatcher(
     left: Long,
     right: Long,
@@ -222,6 +248,7 @@ fun I64LeSIiDispatcher(
     executeI64BinaryIi(vstack, destinationSlot, left, right) { left, right -> if (left <= right) 1L else 0L }
 }
 
+@InternalChasmApi
 fun I64LeSIsDispatcher(
     left: Long,
     rightSlot: Int,
@@ -230,6 +257,7 @@ fun I64LeSIsDispatcher(
     executeI64BinaryIs(vstack, destinationSlot, left, rightSlot) { left, right -> if (left <= right) 1L else 0L }
 }
 
+@InternalChasmApi
 fun I64LeSSiDispatcher(
     leftSlot: Int,
     right: Long,
@@ -238,6 +266,7 @@ fun I64LeSSiDispatcher(
     executeI64BinarySi(vstack, destinationSlot, leftSlot, right) { left, right -> if (left <= right) 1L else 0L }
 }
 
+@InternalChasmApi
 fun I64LeSSsDispatcher(
     leftSlot: Int,
     rightSlot: Int,
@@ -246,6 +275,7 @@ fun I64LeSSsDispatcher(
     executeI64BinarySs(vstack, destinationSlot, leftSlot, rightSlot) { left, right -> if (left <= right) 1L else 0L }
 }
 
+@InternalChasmApi
 fun I64LeUIiDispatcher(
     left: Long,
     right: Long,
@@ -256,6 +286,7 @@ fun I64LeUIiDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64LeUIsDispatcher(
     left: Long,
     rightSlot: Int,
@@ -266,6 +297,7 @@ fun I64LeUIsDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64LeUSiDispatcher(
     leftSlot: Int,
     right: Long,
@@ -276,6 +308,7 @@ fun I64LeUSiDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64LeUSsDispatcher(
     leftSlot: Int,
     rightSlot: Int,
@@ -286,6 +319,7 @@ fun I64LeUSsDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64GeSIiDispatcher(
     left: Long,
     right: Long,
@@ -294,6 +328,7 @@ fun I64GeSIiDispatcher(
     executeI64BinaryIi(vstack, destinationSlot, left, right) { left, right -> if (left >= right) 1L else 0L }
 }
 
+@InternalChasmApi
 fun I64GeSIsDispatcher(
     left: Long,
     rightSlot: Int,
@@ -302,6 +337,7 @@ fun I64GeSIsDispatcher(
     executeI64BinaryIs(vstack, destinationSlot, left, rightSlot) { left, right -> if (left >= right) 1L else 0L }
 }
 
+@InternalChasmApi
 fun I64GeSSiDispatcher(
     leftSlot: Int,
     right: Long,
@@ -310,6 +346,7 @@ fun I64GeSSiDispatcher(
     executeI64BinarySi(vstack, destinationSlot, leftSlot, right) { left, right -> if (left >= right) 1L else 0L }
 }
 
+@InternalChasmApi
 fun I64GeSSsDispatcher(
     leftSlot: Int,
     rightSlot: Int,
@@ -318,6 +355,7 @@ fun I64GeSSsDispatcher(
     executeI64BinarySs(vstack, destinationSlot, leftSlot, rightSlot) { left, right -> if (left >= right) 1L else 0L }
 }
 
+@InternalChasmApi
 fun I64GeUIiDispatcher(
     left: Long,
     right: Long,
@@ -328,6 +366,7 @@ fun I64GeUIiDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64GeUIsDispatcher(
     left: Long,
     rightSlot: Int,
@@ -338,6 +377,7 @@ fun I64GeUIsDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64GeUSiDispatcher(
     leftSlot: Int,
     right: Long,
@@ -348,6 +388,7 @@ fun I64GeUSiDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64GeUSsDispatcher(
     leftSlot: Int,
     rightSlot: Int,

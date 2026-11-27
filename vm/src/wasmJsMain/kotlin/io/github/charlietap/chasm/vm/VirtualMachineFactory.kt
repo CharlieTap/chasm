@@ -5,7 +5,7 @@ package io.github.charlietap.chasm.vm
 import kotlin.js.ExperimentalWasmJsInterop
 import kotlin.js.JsAny
 
-actual typealias StoreReference = Unit
+internal actual typealias StoreReference = Unit
 
 internal actual class ModuleReference internal constructor(internal val value: JsAny)
 

@@ -1,9 +1,11 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.numeric
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.executor.invoker.dispatch.dispatchInstruction
 import io.github.charlietap.chasm.executor.invoker.instruction.numeric.unop.executeI32UnaryI
 import io.github.charlietap.chasm.executor.invoker.instruction.numeric.unop.executeI32UnaryS
 
+@InternalChasmApi
 fun I32EqzIDispatcher(
     operand: Int,
     destinationSlot: Int,
@@ -13,6 +15,7 @@ fun I32EqzIDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I32EqzSDispatcher(
     operandSlot: Int,
     destinationSlot: Int,

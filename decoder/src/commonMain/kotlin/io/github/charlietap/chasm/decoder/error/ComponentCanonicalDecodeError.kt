@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.decoder.error
 
-sealed interface ComponentCanonicalDecodeError : WasmDecodeError {
+internal sealed interface ComponentCanonicalDecodeError : WasmDecodeError {
 
     data class UnknownDefinition(val opcode: UByte) : ComponentCanonicalDecodeError
 

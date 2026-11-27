@@ -1,5 +1,3 @@
-@file:OptIn(InternalChasmApi::class)
-
 package io.github.charlietap.chasm.compiler.backend.chasm
 
 import io.github.charlietap.chasm.InternalChasmApi
@@ -10,8 +8,10 @@ import io.github.charlietap.chasm.executor.invoker.thread.Interpreter
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.store.Store
 
+@InternalChasmApi
 typealias ModuleLinker = (Store, ModuleInstance, Module, CirModule) -> Unit
 
+@InternalChasmApi
 fun ModuleLinker(
     store: Store,
     instance: ModuleInstance,

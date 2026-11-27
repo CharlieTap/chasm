@@ -5,7 +5,7 @@ import io.github.charlietap.chasm.type.ConcreteHeapType
 import io.github.charlietap.chasm.type.DefinedType
 import io.github.charlietap.chasm.type.HeapType
 
-fun BottomOfHeapType(
+internal fun BottomOfHeapType(
     type: HeapType,
     types: List<DefinedType>,
 ): HeapType? = BottomOfHeapType(

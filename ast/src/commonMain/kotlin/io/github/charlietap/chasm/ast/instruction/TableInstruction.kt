@@ -1,9 +1,11 @@
 package io.github.charlietap.chasm.ast.instruction
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.module.Index.ElementIndex
 import io.github.charlietap.chasm.ast.module.Index.TableIndex
 import kotlin.jvm.JvmInline
 
+@InternalChasmApi
 sealed interface TableInstruction : Instruction {
     @JvmInline
     value class TableGet(val tableIdx: TableIndex) : TableInstruction

@@ -1,9 +1,11 @@
 package io.github.charlietap.chasm.ast.component
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.component.Index.ComponentTypeIndex
 import io.github.charlietap.chasm.ast.component.Index.ComponentValueIndex
 import io.github.charlietap.chasm.ast.module.Index.TypeIndex as ModuleTypeIndex
 
+@InternalChasmApi
 sealed interface ExternalType {
 
     data class CoreModule(val typeIndex: ModuleTypeIndex) : ExternalType
@@ -19,6 +21,7 @@ sealed interface ExternalType {
     data class Instance(val typeIndex: ComponentTypeIndex) : ExternalType
 }
 
+@InternalChasmApi
 sealed interface ValueBound {
 
     data class Equals(val valueIndex: ComponentValueIndex) : ValueBound
@@ -26,6 +29,7 @@ sealed interface ValueBound {
     data class Type(val type: ValueType) : ValueBound
 }
 
+@InternalChasmApi
 sealed interface TypeBound {
 
     data class Equals(val typeIndex: ComponentTypeIndex) : TypeBound

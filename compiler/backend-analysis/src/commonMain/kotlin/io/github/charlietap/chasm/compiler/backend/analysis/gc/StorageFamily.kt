@@ -1,10 +1,14 @@
 package io.github.charlietap.chasm.compiler.backend.analysis.gc
 
+import io.github.charlietap.chasm.InternalChasmApi
+
+@InternalChasmApi
 enum class LaneKind {
     INT,
     REFERENCE,
 }
 
+@InternalChasmApi
 data class Lane(
     val kind: LaneKind,
     val index: Int,
@@ -16,6 +20,7 @@ data class Lane(
     }
 }
 
+@InternalChasmApi
 class StorageClass internal constructor(
     val name: String,
     val superclass: StorageClass?,
@@ -46,6 +51,7 @@ class StorageClass internal constructor(
     }
 }
 
+@InternalChasmApi
 class StorageFamily(
     val inlineLanes: Int,
     val tailLevels: Int,
@@ -131,4 +137,5 @@ class StorageFamily(
 
 internal const val STORAGE_PACKAGE = "io/github/charlietap/chasm/runtime/compiled/gc/storage/"
 
+@InternalChasmApi
 val STORAGE_FAMILY = StorageFamily(inlineLanes = 7, tailLevels = 16)

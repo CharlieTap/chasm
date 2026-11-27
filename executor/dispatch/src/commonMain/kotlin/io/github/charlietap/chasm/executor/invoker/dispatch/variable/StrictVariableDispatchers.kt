@@ -1,8 +1,10 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.variable
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.executor.invoker.dispatch.dispatchInstruction
 import io.github.charlietap.chasm.runtime.instance.GlobalInstance
 
+@InternalChasmApi
 fun GlobalGetSDispatcher(
     global: GlobalInstance,
     destinationSlot: Int,
@@ -12,6 +14,7 @@ fun GlobalGetSDispatcher(
     }
 }
 
+@InternalChasmApi
 fun GlobalSetIDispatcher(
     value: Long,
     global: GlobalInstance,
@@ -21,6 +24,7 @@ fun GlobalSetIDispatcher(
     }
 }
 
+@InternalChasmApi
 fun GlobalSetSDispatcher(
     sourceSlot: Int,
     global: GlobalInstance,

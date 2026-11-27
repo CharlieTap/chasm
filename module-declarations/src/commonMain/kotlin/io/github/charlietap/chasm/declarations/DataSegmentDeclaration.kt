@@ -1,7 +1,9 @@
 package io.github.charlietap.chasm.declarations
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.module.Index
 
+@InternalChasmApi
 data class DataSegmentDeclaration(
     val payload: DataPayload,
     val mode: Mode,
@@ -18,6 +20,7 @@ data class DataSegmentDeclaration(
     }
 }
 
+@InternalChasmApi
 sealed interface DataPayload {
 
     val size: Int
@@ -42,11 +45,13 @@ sealed interface DataPayload {
     ) : DataPayload
 }
 
+@InternalChasmApi
 fun interface DataSource {
 
     fun open(): DataReader
 }
 
+@InternalChasmApi
 interface DataReader : AutoCloseable {
 
     val length: Long?

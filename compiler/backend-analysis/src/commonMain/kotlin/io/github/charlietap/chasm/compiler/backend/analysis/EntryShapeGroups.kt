@@ -1,12 +1,15 @@
 package io.github.charlietap.chasm.compiler.backend.analysis
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.compiler.backend.abi.EntryShape
 
+@InternalChasmApi
 data class EntryShapeGroup<F>(
     val shape: EntryShape,
     val members: List<F>,
 )
 
+@InternalChasmApi
 inline fun <F> entryShapeGroups(
     functions: List<F>,
     limit: Int,
@@ -15,6 +18,7 @@ inline fun <F> entryShapeGroups(
     return entryShapeGroups(functions, limit, shape) { }
 }
 
+@InternalChasmApi
 inline fun <F, P> entryShapeGroups(
     functions: List<F>,
     limit: Int,

@@ -1,10 +1,12 @@
 package io.github.charlietap.chasm.compiler.backend.analysis
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.cir.CirFunction
 import io.github.charlietap.chasm.cir.ControlInstruction
 import io.github.charlietap.chasm.cir.MemoryInstruction
 import io.github.charlietap.chasm.cir.ReferenceInstruction
 
+@InternalChasmApi
 class FunctionSummary internal constructor(
     internal val requestsTailCall: Boolean,
     internal val usesExceptions: Boolean,
@@ -17,6 +19,7 @@ class FunctionSummary internal constructor(
     internal val referencedFunctions: IntArray,
 )
 
+@InternalChasmApi
 fun functionSummary(
     function: CirFunction,
     declarations: ModuleIndexSpaces,

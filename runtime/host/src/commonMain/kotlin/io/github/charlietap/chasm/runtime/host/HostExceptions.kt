@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.runtime.host
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.host.HostFunctionException
 import io.github.charlietap.chasm.host.HostParameters
 import io.github.charlietap.chasm.host.HostStack
@@ -17,6 +18,7 @@ import io.github.charlietap.chasm.host.HostStack
  * offsets and lengths must match the exception tag's signature.
  * [HostFunctionException] remains a separate, uncatchable host trap.
  */
+@InternalChasmApi
 interface HostExceptions {
 
     /** Whether an exception is waiting at the host boundary. */
@@ -62,6 +64,7 @@ interface HostExceptions {
 }
 
 /** Creates an exception with this tag from parameters starting at [payload]. */
+@InternalChasmApi
 context(stack: HostStack, resources: RawHostResources)
 inline fun HostTag.createException(payload: HostParameters): HostException {
     return resources.exceptions.create(
@@ -72,6 +75,7 @@ inline fun HostTag.createException(payload: HostParameters): HostException {
 }
 
 /** Creates and raises an exception with this tag and payload. */
+@InternalChasmApi
 context(stack: HostStack, resources: RawHostResources)
 inline fun HostTag.raise(payload: HostParameters): Nothing {
     resources.exceptions.raise(createException(payload))

@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.compiler.backend.analysis
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.cir.AdminInstruction
 import io.github.charlietap.chasm.cir.AggregateInstruction
 import io.github.charlietap.chasm.cir.ControlInstruction
@@ -20,6 +21,7 @@ import io.github.charlietap.chasm.type.NumberType
 import io.github.charlietap.chasm.type.ReferenceType
 import io.github.charlietap.chasm.type.ValueType
 
+@InternalChasmApi
 interface SlotWriteVisitor {
 
     fun value(
@@ -45,6 +47,7 @@ interface SlotWriteVisitor {
     )
 }
 
+@InternalChasmApi
 fun visitSlotWrites(
     position: Int,
     forms: InstructionForms,

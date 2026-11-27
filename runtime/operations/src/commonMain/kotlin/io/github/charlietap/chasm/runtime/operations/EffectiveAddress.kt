@@ -1,8 +1,10 @@
 package io.github.charlietap.chasm.runtime.operations
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 
+@InternalChasmApi
 inline fun effectiveAddress(
     address: Int,
     offset: Int,

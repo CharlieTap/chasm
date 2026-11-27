@@ -1,7 +1,9 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.admin
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 
+@InternalChasmApi
 fun CopySlotDispatcher(
     sourceSlot: Int,
     destinationSlot: Int,
@@ -10,6 +12,7 @@ fun CopySlotDispatcher(
     nextIp
 }
 
+@InternalChasmApi
 fun CopySlotSequenceDispatcher(
     sourceSlots: IntArray,
     destinationSlots: IntArray,
@@ -27,6 +30,7 @@ fun CopySlotSequenceDispatcher(
     }
 }
 
+@InternalChasmApi
 fun CopySlotsDispatcher(
     sourceSlots: IntArray,
     destinationSlots: IntArray,

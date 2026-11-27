@@ -1,11 +1,13 @@
 package io.github.charlietap.chasm.compiler.backend.jvm.size
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.HOTSPOT_METHOD_BYTES
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.MAX_SHORT_BRANCH_METHOD_BYTES
 import org.objectweb.asm.Label
 import org.objectweb.asm.tree.LabelNode
 import org.objectweb.asm.tree.MethodNode
 
+@InternalChasmApi
 data class BytecodeSize(
     override val limit: Int = HOTSPOT_METHOD_BYTES,
 ) : MethodSize {

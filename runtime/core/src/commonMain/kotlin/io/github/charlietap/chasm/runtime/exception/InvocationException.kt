@@ -1,8 +1,10 @@
 package io.github.charlietap.chasm.runtime.exception
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.runtime.diagnostic.FailedMemoryAccess
 import io.github.charlietap.chasm.runtime.error.InvocationError
 
+@InternalChasmApi
 class InvocationException(val error: InvocationError) : Exception() {
 
     /** Recorded only by the traceable dispatch loop used when trap diagnostics are enabled. */

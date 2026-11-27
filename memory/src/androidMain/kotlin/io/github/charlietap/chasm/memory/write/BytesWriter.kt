@@ -6,7 +6,7 @@ import io.github.charlietap.chasm.memory.BoundsChecker
 import io.github.charlietap.chasm.memory.ByteArrayLinearMemory
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
 
-actual inline fun BytesWriter(
+internal actual inline fun BytesWriter(
     memory: LinearMemory,
     memorySize: Int,
     buffer: ByteArray,

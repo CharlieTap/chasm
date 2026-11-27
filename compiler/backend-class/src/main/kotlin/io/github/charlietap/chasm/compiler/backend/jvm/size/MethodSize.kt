@@ -1,8 +1,10 @@
 package io.github.charlietap.chasm.compiler.backend.jvm.size
 
+import io.github.charlietap.chasm.InternalChasmApi
 import org.objectweb.asm.Label
 import org.objectweb.asm.tree.MethodNode
 
+@InternalChasmApi
 interface MethodSize {
     val limit: Int
     val dispatcherLimit: Int

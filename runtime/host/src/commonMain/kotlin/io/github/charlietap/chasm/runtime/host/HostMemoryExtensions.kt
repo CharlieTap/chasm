@@ -1,5 +1,8 @@
 package io.github.charlietap.chasm.runtime.host
 
+import io.github.charlietap.chasm.InternalChasmApi
+
+@InternalChasmApi
 inline fun HostMemory.readUtf8String(
     memoryPointer: Int,
     stringLengthInBytes: Int,
@@ -11,6 +14,7 @@ inline fun HostMemory.readUtf8String(
     ).decodeToString()
 }
 
+@InternalChasmApi
 fun HostMemory.readNullTerminatedUtf8String(memoryPointer: Int): String {
 
     val stringLengthInBytes = findNullByte(memoryPointer)
@@ -18,6 +22,7 @@ fun HostMemory.readNullTerminatedUtf8String(memoryPointer: Int): String {
     return readUtf8String(memoryPointer, stringLengthInBytes)
 }
 
+@InternalChasmApi
 inline fun HostMemory.writeUtf8String(memoryPointer: Int, string: String) {
     write(memoryPointer, string.encodeToByteArray())
 }

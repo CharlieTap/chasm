@@ -16,26 +16,22 @@ import io.github.charlietap.chasm.type.ValueType
 @InternalChasmApi
 sealed interface StorageLayout
 
-@InternalChasmApi
-data class StorageLane(
+internal data class StorageLane(
     val index: Int,
     val spilled: Boolean,
 )
 
-@InternalChasmApi
-data class StorageField(
+internal data class StorageField(
     val type: FieldType,
     val lanes: List<StorageLane>,
 )
 
-@InternalChasmApi
-fun interface StructAllocator {
+internal fun interface StructAllocator {
 
     fun newStruct(rtt: Rtt): CompiledStruct
 }
 
-@InternalChasmApi
-class StructStorageLayout(
+internal class StructStorageLayout(
     val fields: List<StorageField>,
     val bytes: Int,
     private val allocator: StructAllocator,
@@ -160,8 +156,7 @@ class StructStorageLayout(
     }
 }
 
-@InternalChasmApi
-class ArrayStorageLayout(
+internal class ArrayStorageLayout(
     val type: FieldType,
     val element: ArrayElement,
 ) : StorageLayout {
@@ -195,8 +190,7 @@ class ArrayStorageLayout(
     }
 }
 
-@InternalChasmApi
-enum class ArrayElement(
+internal enum class ArrayElement(
     val storage: Class<*>,
     val shift: Int,
 ) {

@@ -1,5 +1,3 @@
-@file:OptIn(InternalChasmApi::class)
-
 package io.github.charlietap.chasm.compiler.backend.dex
 
 import io.github.charlietap.chasm.InternalChasmApi
@@ -30,9 +28,9 @@ import io.github.charlietap.dexter.Dexter
 import io.github.charlietap.dexter.DexterException
 import io.github.charlietap.dexter.DexterFileFullException
 
-typealias ModuleLowerer = (Module, CirModule, DexOptions, ModuleDeclarations, Map<Int, FunctionTrapSites>, DexResources) -> DexModule
+internal typealias ModuleLowerer = (Module, CirModule, DexOptions, ModuleDeclarations, Map<Int, FunctionTrapSites>, DexResources) -> DexModule
 
-fun ModuleLowerer(
+internal fun ModuleLowerer(
     module: Module,
     code: CirModule,
     options: DexOptions,
@@ -55,6 +53,7 @@ fun ModuleLowerer(
     )
 }
 
+@InternalChasmApi
 fun lowerWithSeparateMetadata(
     module: Module,
     code: CirModule,

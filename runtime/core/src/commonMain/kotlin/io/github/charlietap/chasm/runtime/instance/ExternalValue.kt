@@ -1,8 +1,10 @@
 package io.github.charlietap.chasm.runtime.instance
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.runtime.address.Address
 import kotlin.jvm.JvmInline
 
+@InternalChasmApi
 sealed interface ExternalValue {
 
     @JvmInline

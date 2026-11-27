@@ -1,8 +1,10 @@
 package io.github.charlietap.chasm.runtime.dispatch
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 
+@InternalChasmApi
 abstract class DispatchableInstruction {
     abstract operator fun invoke(
         vstack: ValueStack,
@@ -11,6 +13,7 @@ abstract class DispatchableInstruction {
     ): Int
 }
 
+@InternalChasmApi
 @Suppress("FunctionName")
 inline fun DispatchableInstruction(
     crossinline block: (

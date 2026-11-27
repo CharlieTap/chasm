@@ -1,0 +1,77 @@
+public abstract interface class io/github/charlietap/chasm/runtime/type/ExternalType {
+}
+
+public final class io/github/charlietap/chasm/runtime/type/ExternalType$Function : io/github/charlietap/chasm/runtime/type/ExternalType {
+	public static final synthetic fun box-impl (Lio/github/charlietap/chasm/type/FunctionType;)Lio/github/charlietap/chasm/runtime/type/ExternalType$Function;
+	public static fun constructor-impl (Lio/github/charlietap/chasm/type/FunctionType;)Lio/github/charlietap/chasm/type/FunctionType;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Lio/github/charlietap/chasm/type/FunctionType;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Lio/github/charlietap/chasm/type/FunctionType;Lio/github/charlietap/chasm/type/FunctionType;)Z
+	public final fun getFunctionType ()Lio/github/charlietap/chasm/type/FunctionType;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Lio/github/charlietap/chasm/type/FunctionType;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Lio/github/charlietap/chasm/type/FunctionType;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Lio/github/charlietap/chasm/type/FunctionType;
+}
+
+public final class io/github/charlietap/chasm/runtime/type/ExternalType$Global : io/github/charlietap/chasm/runtime/type/ExternalType {
+	public static final synthetic fun box-impl (Lio/github/charlietap/chasm/type/GlobalType;)Lio/github/charlietap/chasm/runtime/type/ExternalType$Global;
+	public static fun constructor-impl (Lio/github/charlietap/chasm/type/GlobalType;)Lio/github/charlietap/chasm/type/GlobalType;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Lio/github/charlietap/chasm/type/GlobalType;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Lio/github/charlietap/chasm/type/GlobalType;Lio/github/charlietap/chasm/type/GlobalType;)Z
+	public final fun getGlobalType ()Lio/github/charlietap/chasm/type/GlobalType;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Lio/github/charlietap/chasm/type/GlobalType;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Lio/github/charlietap/chasm/type/GlobalType;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Lio/github/charlietap/chasm/type/GlobalType;
+}
+
+public final class io/github/charlietap/chasm/runtime/type/ExternalType$Memory : io/github/charlietap/chasm/runtime/type/ExternalType {
+	public static final synthetic fun box-impl (Lio/github/charlietap/chasm/type/MemoryType;)Lio/github/charlietap/chasm/runtime/type/ExternalType$Memory;
+	public static fun constructor-impl (Lio/github/charlietap/chasm/type/MemoryType;)Lio/github/charlietap/chasm/type/MemoryType;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Lio/github/charlietap/chasm/type/MemoryType;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Lio/github/charlietap/chasm/type/MemoryType;Lio/github/charlietap/chasm/type/MemoryType;)Z
+	public final fun getMemoryType ()Lio/github/charlietap/chasm/type/MemoryType;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Lio/github/charlietap/chasm/type/MemoryType;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Lio/github/charlietap/chasm/type/MemoryType;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Lio/github/charlietap/chasm/type/MemoryType;
+}
+
+public final class io/github/charlietap/chasm/runtime/type/ExternalType$Table : io/github/charlietap/chasm/runtime/type/ExternalType {
+	public static final synthetic fun box-impl (Lio/github/charlietap/chasm/type/TableType;)Lio/github/charlietap/chasm/runtime/type/ExternalType$Table;
+	public static fun constructor-impl (Lio/github/charlietap/chasm/type/TableType;)Lio/github/charlietap/chasm/type/TableType;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Lio/github/charlietap/chasm/type/TableType;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Lio/github/charlietap/chasm/type/TableType;Lio/github/charlietap/chasm/type/TableType;)Z
+	public final fun getTableType ()Lio/github/charlietap/chasm/type/TableType;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Lio/github/charlietap/chasm/type/TableType;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Lio/github/charlietap/chasm/type/TableType;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Lio/github/charlietap/chasm/type/TableType;
+}
+
+public final class io/github/charlietap/chasm/runtime/type/ExternalType$Tag : io/github/charlietap/chasm/runtime/type/ExternalType {
+	public static final synthetic fun box-impl (Lio/github/charlietap/chasm/type/TagType;)Lio/github/charlietap/chasm/runtime/type/ExternalType$Tag;
+	public static fun constructor-impl (Lio/github/charlietap/chasm/type/TagType;)Lio/github/charlietap/chasm/type/TagType;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Lio/github/charlietap/chasm/type/TagType;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Lio/github/charlietap/chasm/type/TagType;Lio/github/charlietap/chasm/type/TagType;)Z
+	public final fun getTagType ()Lio/github/charlietap/chasm/type/TagType;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Lio/github/charlietap/chasm/type/TagType;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Lio/github/charlietap/chasm/type/TagType;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Lio/github/charlietap/chasm/type/TagType;
+}
+
+public final class io/github/charlietap/chasm/runtime/type/ext/ExternalTypeExtKt {
+	public static final fun clone (Lio/github/charlietap/chasm/runtime/type/ExternalType;)Lio/github/charlietap/chasm/runtime/type/ExternalType;
+}
+

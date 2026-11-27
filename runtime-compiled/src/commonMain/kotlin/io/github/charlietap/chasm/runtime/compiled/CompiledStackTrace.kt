@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.runtime.compiled
 
-import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.runtime.diagnostic.CompiledFrames
 import io.github.charlietap.chasm.runtime.diagnostic.CompiledTrace
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
@@ -15,8 +14,7 @@ import kotlin.reflect.KClass
  * code; frames of other code inside a run, such as runtime helpers and host
  * functions, are skipped.
  */
-@InternalChasmApi
-class CompiledStackTrace(
+internal class CompiledStackTrace(
     private val store: Store,
     exception: Throwable,
     entryClass: KClass<*>,

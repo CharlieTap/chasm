@@ -1,10 +1,12 @@
 package io.github.charlietap.chasm.ast.module
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.instruction.Expression
 import io.github.charlietap.chasm.ast.module.Index.ElementIndex
 import io.github.charlietap.chasm.ast.module.Index.TableIndex
 import io.github.charlietap.chasm.type.ReferenceType
 
+@InternalChasmApi
 data class ElementSegment(
     val idx: ElementIndex,
     val type: ReferenceType,

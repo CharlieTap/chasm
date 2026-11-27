@@ -1,6 +1,9 @@
 package io.github.charlietap.chasm.parallel
 
+import io.github.charlietap.chasm.InternalChasmApi
+
 /** Consecutive items grouped into batches. A batch covers the items from [start] until [end]. */
+@InternalChasmApi
 class WorkBatches
     @PublishedApi
     internal constructor(
@@ -16,6 +19,7 @@ class WorkBatches
     }
 
 /** Cuts [itemCount] items into batches of at least [batchWork], given the [work] in each item. */
+@InternalChasmApi
 inline fun workBatches(
     itemCount: Int,
     batchWork: Int,
@@ -36,6 +40,7 @@ inline fun workBatches(
     return WorkBatches(starts.copyOf(count))
 }
 
+@InternalChasmApi
 fun singleBatch(itemCount: Int): WorkBatches = WorkBatches(intArrayOf(0, itemCount))
 
 @PublishedApi

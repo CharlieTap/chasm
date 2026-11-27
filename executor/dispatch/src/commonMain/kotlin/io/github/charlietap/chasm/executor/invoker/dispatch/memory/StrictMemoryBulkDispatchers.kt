@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.memory
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.executor.invoker.dispatch.dispatchInstruction
 import io.github.charlietap.chasm.executor.invoker.instruction.memory.bulk.MemoryCopyExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.memory.bulk.MemoryFillExecutor
@@ -8,6 +9,7 @@ import io.github.charlietap.chasm.executor.invoker.instruction.memory.bulk.execu
 import io.github.charlietap.chasm.runtime.instance.DataInstance
 import io.github.charlietap.chasm.runtime.instance.MemoryInstance
 
+@InternalChasmApi
 fun MemoryGrowIDispatcher(
     pagesToAdd: Int,
     destinationSlot: Int,
@@ -22,6 +24,7 @@ fun MemoryGrowIDispatcher(
     )
 }
 
+@InternalChasmApi
 fun MemoryGrowSDispatcher(
     pagesToAddSlot: Int,
     destinationSlot: Int,
@@ -36,6 +39,7 @@ fun MemoryGrowSDispatcher(
     )
 }
 
+@InternalChasmApi
 fun MemoryInitIiiDispatcher(
     bytesToCopy: Int,
     sourceOffset: Int,
@@ -52,6 +56,7 @@ fun MemoryInitIiiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun MemoryInitIisDispatcher(
     bytesToCopy: Int,
     sourceOffset: Int,
@@ -68,6 +73,7 @@ fun MemoryInitIisDispatcher(
     )
 }
 
+@InternalChasmApi
 fun MemoryInitIsiDispatcher(
     bytesToCopy: Int,
     sourceOffsetSlot: Int,
@@ -84,6 +90,7 @@ fun MemoryInitIsiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun MemoryInitIssDispatcher(
     bytesToCopy: Int,
     sourceOffsetSlot: Int,
@@ -100,6 +107,7 @@ fun MemoryInitIssDispatcher(
     )
 }
 
+@InternalChasmApi
 fun MemoryInitSiiDispatcher(
     bytesToCopySlot: Int,
     sourceOffset: Int,
@@ -116,6 +124,7 @@ fun MemoryInitSiiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun MemoryInitSisDispatcher(
     bytesToCopySlot: Int,
     sourceOffset: Int,
@@ -132,6 +141,7 @@ fun MemoryInitSisDispatcher(
     )
 }
 
+@InternalChasmApi
 fun MemoryInitSsiDispatcher(
     bytesToCopySlot: Int,
     sourceOffsetSlot: Int,
@@ -148,6 +158,7 @@ fun MemoryInitSsiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun MemoryInitSssDispatcher(
     bytesToCopySlot: Int,
     sourceOffsetSlot: Int,
@@ -164,6 +175,7 @@ fun MemoryInitSssDispatcher(
     )
 }
 
+@InternalChasmApi
 fun MemoryCopyIiiDispatcher(
     bytesToCopy: Int,
     sourceOffset: Int,
@@ -180,6 +192,7 @@ fun MemoryCopyIiiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun MemoryCopyIisDispatcher(
     bytesToCopy: Int,
     sourceOffset: Int,
@@ -196,6 +209,7 @@ fun MemoryCopyIisDispatcher(
     )
 }
 
+@InternalChasmApi
 fun MemoryCopyIsiDispatcher(
     bytesToCopy: Int,
     sourceOffsetSlot: Int,
@@ -212,6 +226,7 @@ fun MemoryCopyIsiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun MemoryCopyIssDispatcher(
     bytesToCopy: Int,
     sourceOffsetSlot: Int,
@@ -228,6 +243,7 @@ fun MemoryCopyIssDispatcher(
     )
 }
 
+@InternalChasmApi
 fun MemoryCopySiiDispatcher(
     bytesToCopySlot: Int,
     sourceOffset: Int,
@@ -244,6 +260,7 @@ fun MemoryCopySiiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun MemoryCopySisDispatcher(
     bytesToCopySlot: Int,
     sourceOffset: Int,
@@ -260,6 +277,7 @@ fun MemoryCopySisDispatcher(
     )
 }
 
+@InternalChasmApi
 fun MemoryCopySsiDispatcher(
     bytesToCopySlot: Int,
     sourceOffsetSlot: Int,
@@ -276,6 +294,7 @@ fun MemoryCopySsiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun MemoryCopySssDispatcher(
     bytesToCopySlot: Int,
     sourceOffsetSlot: Int,
@@ -292,6 +311,7 @@ fun MemoryCopySssDispatcher(
     )
 }
 
+@InternalChasmApi
 fun MemoryFillIiiDispatcher(
     bytesToFill: Int,
     fillValue: Int,
@@ -306,6 +326,7 @@ fun MemoryFillIiiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun MemoryFillIisDispatcher(
     bytesToFill: Int,
     fillValue: Int,
@@ -320,6 +341,7 @@ fun MemoryFillIisDispatcher(
     )
 }
 
+@InternalChasmApi
 fun MemoryFillIsiDispatcher(
     bytesToFill: Int,
     fillValueSlot: Int,
@@ -334,6 +356,7 @@ fun MemoryFillIsiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun MemoryFillIssDispatcher(
     bytesToFill: Int,
     fillValueSlot: Int,
@@ -348,6 +371,7 @@ fun MemoryFillIssDispatcher(
     )
 }
 
+@InternalChasmApi
 fun MemoryFillSiiDispatcher(
     bytesToFillSlot: Int,
     fillValue: Int,
@@ -362,6 +386,7 @@ fun MemoryFillSiiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun MemoryFillSisDispatcher(
     bytesToFillSlot: Int,
     fillValue: Int,
@@ -376,6 +401,7 @@ fun MemoryFillSisDispatcher(
     )
 }
 
+@InternalChasmApi
 fun MemoryFillSsiDispatcher(
     bytesToFillSlot: Int,
     fillValueSlot: Int,
@@ -390,6 +416,7 @@ fun MemoryFillSsiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun MemoryFillSssDispatcher(
     bytesToFillSlot: Int,
     fillValueSlot: Int,

@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
-
 plugins {
     alias(libs.plugins.kotlin.jvm)
 
@@ -23,9 +21,6 @@ kotlinConventions {
 }
 
 kotlin {
-    @OptIn(ExperimentalAbiValidation::class)
-    abiValidation()
-
     dependencies {
         api(projects.config)
         api(projects.embeddingApi)

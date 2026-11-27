@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.declarations
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.module.Import
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.toInt
@@ -18,6 +19,7 @@ import io.github.charlietap.chasm.type.rolling.substitution.Substitution
 import io.github.charlietap.chasm.type.rolling.substitution.TableTypeSubstitutor
 import io.github.charlietap.chasm.type.rolling.substitution.TagTypeSubstitutor
 
+@InternalChasmApi
 class ModuleTypeResolver(
     private val definedTypes: List<DefinedType>,
     private val functionTypeIndices: IntArray,

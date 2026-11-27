@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.decoder.error
 
-sealed interface ComponentDecodeError : WasmDecodeError {
+internal sealed interface ComponentDecodeError : WasmDecodeError {
 
     data class InvalidLayer(val layer: UByteArray) : ComponentDecodeError
 

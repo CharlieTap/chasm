@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.compiler.frontend.diagnostic
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.instruction.AggregateInstruction
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
 import io.github.charlietap.chasm.ast.instruction.Instruction
@@ -14,6 +15,7 @@ import io.github.charlietap.chasm.ast.instruction.TableInstruction
  * [NO_SOURCE_INDEX] when the instruction has no source. A fused instruction
  * reports its first source instruction that can trap.
  */
+@InternalChasmApi
 fun trapSourceIndex(
     body: List<Instruction>,
     start: Int,
@@ -31,7 +33,7 @@ fun trapSourceIndex(
  * as `(first + 1) or ((second + 1) shl 16)`, where first is the memory, or a
  * copy's source, and second is a copy's destination; zero otherwise.
  */
-fun trapSiteMemories(
+internal fun trapSiteMemories(
     instruction: Instruction?,
 ): Int = when (instruction) {
     is MemoryInstruction.Load -> packMemories(instruction.memoryIndex.idx.toInt())
@@ -50,6 +52,7 @@ private fun packMemories(
 
 private const val MAX_PACKED = 0x7FFF
 
+@InternalChasmApi
 const val NO_SOURCE_INDEX = -1
 
 private fun Instruction.canTrap(): Boolean = when (this) {

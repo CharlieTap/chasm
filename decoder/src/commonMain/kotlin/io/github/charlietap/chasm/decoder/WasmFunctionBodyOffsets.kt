@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.decoder
 
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.decoder.context.CodeBodyDecoderContext
 import io.github.charlietap.chasm.decoder.decoder.instruction.ExpressionDecoder
@@ -14,6 +15,7 @@ import io.github.charlietap.chasm.decoder.error.WasmDecodeException
 import io.github.charlietap.chasm.decoder.reader.BinaryReader
 import io.github.charlietap.chasm.decoder.section.SectionType
 
+@InternalChasmApi
 fun WasmFunctionBodyOffsets(
     config: ModuleConfig,
     bytes: ByteArray,
@@ -29,6 +31,7 @@ fun WasmFunctionBodyOffsets(
  * order. An entry is null when that body cannot be decoded; the list is empty
  * when the code section cannot be found.
  */
+@InternalChasmApi
 fun WasmFunctionBodyOffsets(
     config: ModuleConfig,
     bytes: ByteArray,

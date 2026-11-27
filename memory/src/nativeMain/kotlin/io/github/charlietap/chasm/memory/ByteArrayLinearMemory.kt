@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.memory
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.host.UnsafeHostApi
 import io.github.charlietap.chasm.memory.ext.copyInto
 import io.github.charlietap.chasm.memory.ext.toDoubleLittleEndian
@@ -13,6 +14,7 @@ import io.github.charlietap.chasm.runtime.memory.LinearMemory
 import io.github.charlietap.chasm.runtime.memory.OutOfMemoryError
 import kotlin.OutOfMemoryError as PlatformOutOfMemoryError
 
+@InternalChasmApi
 @OptIn(UnsafeHostApi::class)
 class ByteArrayLinearMemory(
     var memory: ByteArray,

@@ -25,11 +25,14 @@ import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.runtime.store.withLiveStack
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
 
+@InternalChasmApi
 typealias FunctionInvoker = (RuntimeConfig, Store, ModuleInstance, Address.Function, List<ExecutionValue>) -> Result<List<ExecutionValue>, InvocationError>
 
+@InternalChasmApi
 typealias WasmFunctionExecutor =
     (RuntimeConfig, Store, FunctionInstance.WasmFunction, List<ExecutionValue>) -> Result<List<Long>, InvocationError>
 
+@InternalChasmApi
 fun FunctionInvoker(
     config: RuntimeConfig,
     store: Store,
@@ -44,7 +47,7 @@ fun FunctionInvoker(
     values = values,
 )
 
-@OptIn(InternalChasmApi::class)
+@InternalChasmApi
 fun FunctionInvoker(
     config: RuntimeConfig,
     store: Store,

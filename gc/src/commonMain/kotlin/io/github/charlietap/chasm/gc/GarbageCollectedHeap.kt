@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.gc
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.runtime.encoder.RV_SHIFT_BITS
 import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_ARRAY
 import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_EXCEPTION
@@ -12,6 +13,7 @@ private const val PAGE_SHIFT = 11
 private const val PAGE_WORDS = 1 shl PAGE_SHIFT
 private const val PAGE_MASK = PAGE_WORDS - 1
 
+@InternalChasmApi
 const val MAXIMUM_FIXED_PAYLOAD_WORDS = PAGE_WORDS
 private const val DEFAULT_INITIAL_PAGE_DIRECTORY_CAPACITY = 16
 private const val DEFAULT_INITIAL_DESCRIPTOR_DIRECTORY_CAPACITY = 16
@@ -61,6 +63,7 @@ private val ARRAY_LAYOUT_BY_LENGTH = IntArray(ARRAY_DEDICATED_CUTOFF) { length -
     ((capacity + 1) shl ARRAY_CLASS_INDEX_BITS) or classIndex
 }
 
+@InternalChasmApi
 enum class AllocationAvailability {
     /** Existing storage can satisfy the request. */
     REUSABLE,
@@ -72,15 +75,18 @@ enum class AllocationAvailability {
     EXHAUSTED,
 }
 
+@InternalChasmApi
 class GuestHeapOutOfMemoryException(
     message: String,
 ) : Exception(message)
 
+@InternalChasmApi
 interface GcRootMarker {
     fun markRoot(rawValue: Long)
 }
 
 /** Marks live host references found while tracing guest references. */
+@InternalChasmApi
 interface GcHostReferenceMarker {
     fun markHostReference(rawReference: Long)
 }
@@ -93,6 +99,7 @@ interface GcHostReferenceMarker {
  * Semantic IDs are runtime type IDs for structs and arrays, and tag addresses
  * for exceptions. Descriptor keys are opaque and only valid for this heap.
  */
+@InternalChasmApi
 class GarbageCollectedHeap(
     configuration: Configuration = Configuration(),
 ) : GcRootMarker {

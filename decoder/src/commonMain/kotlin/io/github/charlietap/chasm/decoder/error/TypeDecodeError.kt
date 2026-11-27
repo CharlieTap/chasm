@@ -2,7 +2,7 @@ package io.github.charlietap.chasm.decoder.error
 
 import kotlin.jvm.JvmInline
 
-sealed interface TypeDecodeError : WasmDecodeError {
+internal sealed interface TypeDecodeError : WasmDecodeError {
     @JvmInline
     value class InvalidNumberType(val encoded: UByte) : TypeDecodeError
 

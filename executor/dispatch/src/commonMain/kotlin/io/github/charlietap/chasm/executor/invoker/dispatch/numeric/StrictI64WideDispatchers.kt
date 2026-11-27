@@ -1,11 +1,13 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.numeric
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.executor.invoker.dispatch.dispatchInstruction
 import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.executeI64Add128
 import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.executeI64MulWideSigned
 import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.executeI64MulWideUnsigned
 import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.executeI64Sub128
 
+@InternalChasmApi
 fun I64Add128IiiiDispatcher(
     leftLow: Long,
     leftHigh: Long,
@@ -25,6 +27,7 @@ fun I64Add128IiiiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun I64Add128IiisDispatcher(
     leftLow: Long,
     leftHigh: Long,
@@ -44,6 +47,7 @@ fun I64Add128IiisDispatcher(
     )
 }
 
+@InternalChasmApi
 fun I64Add128IisiDispatcher(
     leftLow: Long,
     leftHigh: Long,
@@ -63,6 +67,7 @@ fun I64Add128IisiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun I64Add128IissDispatcher(
     leftLow: Long,
     leftHigh: Long,
@@ -82,6 +87,7 @@ fun I64Add128IissDispatcher(
     )
 }
 
+@InternalChasmApi
 fun I64Add128IsiiDispatcher(
     leftLow: Long,
     leftHighSlot: Int,
@@ -101,6 +107,7 @@ fun I64Add128IsiiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun I64Add128IsisDispatcher(
     leftLow: Long,
     leftHighSlot: Int,
@@ -120,6 +127,7 @@ fun I64Add128IsisDispatcher(
     )
 }
 
+@InternalChasmApi
 fun I64Add128IssiDispatcher(
     leftLow: Long,
     leftHighSlot: Int,
@@ -139,6 +147,7 @@ fun I64Add128IssiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun I64Add128IsssDispatcher(
     leftLow: Long,
     leftHighSlot: Int,
@@ -158,6 +167,7 @@ fun I64Add128IsssDispatcher(
     )
 }
 
+@InternalChasmApi
 fun I64Add128SiiiDispatcher(
     leftLowSlot: Int,
     leftHigh: Long,
@@ -177,6 +187,7 @@ fun I64Add128SiiiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun I64Add128SiisDispatcher(
     leftLowSlot: Int,
     leftHigh: Long,
@@ -196,6 +207,7 @@ fun I64Add128SiisDispatcher(
     )
 }
 
+@InternalChasmApi
 fun I64Add128SisiDispatcher(
     leftLowSlot: Int,
     leftHigh: Long,
@@ -215,6 +227,7 @@ fun I64Add128SisiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun I64Add128SissDispatcher(
     leftLowSlot: Int,
     leftHigh: Long,
@@ -234,6 +247,7 @@ fun I64Add128SissDispatcher(
     )
 }
 
+@InternalChasmApi
 fun I64Add128SsiiDispatcher(
     leftLowSlot: Int,
     leftHighSlot: Int,
@@ -253,6 +267,7 @@ fun I64Add128SsiiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun I64Add128SsisDispatcher(
     leftLowSlot: Int,
     leftHighSlot: Int,
@@ -272,6 +287,7 @@ fun I64Add128SsisDispatcher(
     )
 }
 
+@InternalChasmApi
 fun I64Add128SssiDispatcher(
     leftLowSlot: Int,
     leftHighSlot: Int,
@@ -291,6 +307,7 @@ fun I64Add128SssiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun I64Add128SsssDispatcher(
     leftLowSlot: Int,
     leftHighSlot: Int,
@@ -310,6 +327,7 @@ fun I64Add128SsssDispatcher(
     )
 }
 
+@InternalChasmApi
 fun I64Sub128IiiiDispatcher(
     leftLow: Long,
     leftHigh: Long,
@@ -329,6 +347,7 @@ fun I64Sub128IiiiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun I64Sub128IiisDispatcher(
     leftLow: Long,
     leftHigh: Long,
@@ -348,6 +367,7 @@ fun I64Sub128IiisDispatcher(
     )
 }
 
+@InternalChasmApi
 fun I64Sub128IisiDispatcher(
     leftLow: Long,
     leftHigh: Long,
@@ -367,6 +387,7 @@ fun I64Sub128IisiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun I64Sub128IissDispatcher(
     leftLow: Long,
     leftHigh: Long,
@@ -386,6 +407,7 @@ fun I64Sub128IissDispatcher(
     )
 }
 
+@InternalChasmApi
 fun I64Sub128IsiiDispatcher(
     leftLow: Long,
     leftHighSlot: Int,
@@ -405,6 +427,7 @@ fun I64Sub128IsiiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun I64Sub128IsisDispatcher(
     leftLow: Long,
     leftHighSlot: Int,
@@ -424,6 +447,7 @@ fun I64Sub128IsisDispatcher(
     )
 }
 
+@InternalChasmApi
 fun I64Sub128IssiDispatcher(
     leftLow: Long,
     leftHighSlot: Int,
@@ -443,6 +467,7 @@ fun I64Sub128IssiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun I64Sub128IsssDispatcher(
     leftLow: Long,
     leftHighSlot: Int,
@@ -462,6 +487,7 @@ fun I64Sub128IsssDispatcher(
     )
 }
 
+@InternalChasmApi
 fun I64Sub128SiiiDispatcher(
     leftLowSlot: Int,
     leftHigh: Long,
@@ -481,6 +507,7 @@ fun I64Sub128SiiiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun I64Sub128SiisDispatcher(
     leftLowSlot: Int,
     leftHigh: Long,
@@ -500,6 +527,7 @@ fun I64Sub128SiisDispatcher(
     )
 }
 
+@InternalChasmApi
 fun I64Sub128SisiDispatcher(
     leftLowSlot: Int,
     leftHigh: Long,
@@ -519,6 +547,7 @@ fun I64Sub128SisiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun I64Sub128SissDispatcher(
     leftLowSlot: Int,
     leftHigh: Long,
@@ -538,6 +567,7 @@ fun I64Sub128SissDispatcher(
     )
 }
 
+@InternalChasmApi
 fun I64Sub128SsiiDispatcher(
     leftLowSlot: Int,
     leftHighSlot: Int,
@@ -557,6 +587,7 @@ fun I64Sub128SsiiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun I64Sub128SsisDispatcher(
     leftLowSlot: Int,
     leftHighSlot: Int,
@@ -576,6 +607,7 @@ fun I64Sub128SsisDispatcher(
     )
 }
 
+@InternalChasmApi
 fun I64Sub128SssiDispatcher(
     leftLowSlot: Int,
     leftHighSlot: Int,
@@ -595,6 +627,7 @@ fun I64Sub128SssiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun I64Sub128SsssDispatcher(
     leftLowSlot: Int,
     leftHighSlot: Int,
@@ -614,6 +647,7 @@ fun I64Sub128SsssDispatcher(
     )
 }
 
+@InternalChasmApi
 fun I64MulWideSIiDispatcher(
     left: Long,
     right: Long,
@@ -623,6 +657,7 @@ fun I64MulWideSIiDispatcher(
     executeI64MulWideSigned(vstack, destinationLowSlot, destinationHighSlot, left, right)
 }
 
+@InternalChasmApi
 fun I64MulWideSIsDispatcher(
     left: Long,
     rightSlot: Int,
@@ -638,6 +673,7 @@ fun I64MulWideSIsDispatcher(
     )
 }
 
+@InternalChasmApi
 fun I64MulWideSSiDispatcher(
     leftSlot: Int,
     right: Long,
@@ -653,6 +689,7 @@ fun I64MulWideSSiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun I64MulWideSSsDispatcher(
     leftSlot: Int,
     rightSlot: Int,
@@ -668,6 +705,7 @@ fun I64MulWideSSsDispatcher(
     )
 }
 
+@InternalChasmApi
 fun I64MulWideUIiDispatcher(
     left: Long,
     right: Long,
@@ -677,6 +715,7 @@ fun I64MulWideUIiDispatcher(
     executeI64MulWideUnsigned(vstack, destinationLowSlot, destinationHighSlot, left, right)
 }
 
+@InternalChasmApi
 fun I64MulWideUIsDispatcher(
     left: Long,
     rightSlot: Int,
@@ -692,6 +731,7 @@ fun I64MulWideUIsDispatcher(
     )
 }
 
+@InternalChasmApi
 fun I64MulWideUSiDispatcher(
     leftSlot: Int,
     right: Long,
@@ -707,6 +747,7 @@ fun I64MulWideUSiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun I64MulWideUSsDispatcher(
     leftSlot: Int,
     rightSlot: Int,

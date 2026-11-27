@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.parallel.coroutines
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.parallel.ParallelTaskExecutor
 import io.github.charlietap.chasm.parallel.ParallelTaskScope
 import kotlinx.coroutines.CoroutineDispatcher
@@ -9,6 +10,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.sync.Semaphore
 
+@InternalChasmApi
 class CallerParticipatingParallelTaskExecutor(
     private val dispatcher: CoroutineDispatcher,
     private val permits: Semaphore,

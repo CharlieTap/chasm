@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 
 val libs = the<LibrariesForLibs>()
 val conventions = extensions.create<KotlinConventionsExtension>("kotlinConventions")
+val annotationsProject = rootProject.findProject(":annotations")?.takeIf { found -> found != project }
 
 conventions.jvmBytecodeVersion.convention(
     libs.versions.java.library.bytecode.version.map(String::toInt),
@@ -47,6 +48,9 @@ plugins.withId("org.jetbrains.kotlin.jvm") {
         targetBytecodeVersion(conventions.jvmBytecodeVersion)
     }
     dependencies.add(JavaPlugin.TEST_IMPLEMENTATION_CONFIGURATION_NAME, libs.kotlin.test)
+    if (annotationsProject != null) {
+        dependencies.add(JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME, annotationsProject)
+    }
 }
 
 plugins.withId("org.jetbrains.kotlin.multiplatform") {
@@ -60,6 +64,13 @@ plugins.withId("org.jetbrains.kotlin.multiplatform") {
         sourceSets.named(KotlinSourceSet.COMMON_TEST_SOURCE_SET_NAME) {
             dependencies {
                 implementation(libs.kotlin.test)
+            }
+        }
+        if (annotationsProject != null) {
+            sourceSets.named(KotlinSourceSet.COMMON_MAIN_SOURCE_SET_NAME) {
+                dependencies {
+                    api(annotationsProject)
+                }
             }
         }
     }
@@ -78,6 +89,9 @@ tasks.withType<KotlinCompilationTask<*>>().configureEach {
             "-Xcollection-literals",
             "-Xreturn-value-checker=check",
         )
+        if (annotationsProject != null) {
+            freeCompilerArgs.add("-opt-in=io.github.charlietap.chasm.InternalChasmApi")
+        }
     }
 }
 

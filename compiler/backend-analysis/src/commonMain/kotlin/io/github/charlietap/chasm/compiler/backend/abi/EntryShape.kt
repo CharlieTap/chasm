@@ -1,14 +1,17 @@
 package io.github.charlietap.chasm.compiler.backend.abi
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.chasm.type.ValueType
 
+@InternalChasmApi
 enum class ArgumentPassing {
     Direct,
     ValueArray,
     ValueAndReferenceArrays,
 }
 
+@InternalChasmApi
 data class EntryShape(
     val passing: ArgumentPassing,
     val arguments: List<String>,
@@ -30,8 +33,9 @@ data class EntryShape(
     }
 }
 
-const val TYPED_CALL = "typed"
+internal const val TYPED_CALL = "typed"
 
+@InternalChasmApi
 fun typedCall(
     owner: String,
     type: FunctionType,

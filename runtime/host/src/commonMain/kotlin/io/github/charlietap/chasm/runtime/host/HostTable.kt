@@ -1,11 +1,13 @@
 package io.github.charlietap.chasm.runtime.host
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.host.UnsafeHostApi
 
 /**
  * `HostTable` is an API for reading and changing the raw references in a
  * WebAssembly table inside host functions.
  */
+@InternalChasmApi
 interface HostTable {
 
     val size: Int

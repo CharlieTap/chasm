@@ -4,6 +4,7 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.fold
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.instruction.Instruction
 import io.github.charlietap.chasm.ast.module.DataSegment
 import io.github.charlietap.chasm.ast.module.Function
@@ -27,6 +28,7 @@ import io.github.charlietap.chasm.validator.error.ModuleValidatorError
  * A malformed binary is always reported as malformed, even when an earlier part of it is
  * also invalid.
  */
+@InternalChasmApi
 suspend fun WasmModuleFactory(
     config: ModuleConfig,
     bytes: ByteArray,

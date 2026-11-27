@@ -7,9 +7,9 @@ import io.github.charlietap.chasm.type.rolling.substitution.RecursiveTypeSubstit
 import io.github.charlietap.chasm.type.rolling.substitution.Substitution
 import io.github.charlietap.chasm.type.rolling.substitution.TypeSubstitutor
 
-typealias RecursiveTypeUnroller = (RecursiveType) -> RecursiveType
+internal typealias RecursiveTypeUnroller = (RecursiveType) -> RecursiveType
 
-fun RecursiveTypeUnroller(
+internal fun RecursiveTypeUnroller(
     recursiveType: RecursiveType,
 ): RecursiveType =
     RecursiveTypeUnroller(

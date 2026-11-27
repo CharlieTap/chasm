@@ -8,7 +8,7 @@ import io.github.charlietap.chasm.decoder.error.WasmDecodeException
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
-fun ioError() = Err(WasmDecodeError.IOError(Exception()))
+internal fun ioError() = Err(WasmDecodeError.IOError(Exception()))
 
 @OptIn(UnsafeResultErrorAccess::class)
 internal inline fun assertWasmDecodeError(

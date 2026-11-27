@@ -1,5 +1,3 @@
-@file:OptIn(InternalChasmApi::class)
-
 package io.github.charlietap.chasm.compiler.backend.jvm
 
 import io.github.charlietap.chasm.InternalChasmApi
@@ -9,6 +7,7 @@ import io.github.charlietap.chasm.compiler.backend.jvm.size.MethodSize
 import io.github.charlietap.chasm.config.CpuLimits
 import io.github.charlietap.chasm.config.RuntimeConfig
 
+@InternalChasmApi
 data class JvmOptions(
     val entryClass: String = "chasm.aot.WasmModule",
     val runtime: RuntimeConfig = RuntimeConfig(),
@@ -24,6 +23,7 @@ data class JvmOptions(
     val stacktraces: Boolean = runtime.stacktraces
 }
 
+@InternalChasmApi
 enum class MemoryLowering {
     HELPERS,
 

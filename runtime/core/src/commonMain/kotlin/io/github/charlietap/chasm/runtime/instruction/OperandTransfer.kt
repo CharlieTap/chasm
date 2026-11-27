@@ -1,11 +1,13 @@
 package io.github.charlietap.chasm.runtime.instruction
 
+import io.github.charlietap.chasm.InternalChasmApi
 import kotlin.jvm.JvmInline
 
 /**
  * Compile-selected movement of call or branch inputs into consecutive
  * destination slots. The containing instruction supplies the destination base.
  */
+@InternalChasmApi
 class OperandTransfer(
     val sources: Array<TransferSource>,
     destinationSlotBase: Int,
@@ -31,11 +33,13 @@ class OperandTransfer(
     override fun toString(): String = "OperandTransfer(sources=${sources.contentToString()}, schedule=$schedule)"
 }
 
+@InternalChasmApi
 data class TailCallOperandTransfer(
     val wasm: OperandTransfer,
     val host: OperandTransfer,
 )
 
+@InternalChasmApi
 sealed interface TransferSource {
 
     @JvmInline

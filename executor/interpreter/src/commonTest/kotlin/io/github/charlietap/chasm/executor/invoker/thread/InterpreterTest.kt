@@ -3,7 +3,6 @@ package io.github.charlietap.chasm.executor.invoker.thread
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
-import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.executor.invoker.WasmFunctionExecutor
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.EndFunctionDispatcher
@@ -225,7 +224,6 @@ class InterpreterTest {
         assertEquals(Ok(listOf(41L, 42L)), actual)
     }
 
-    @OptIn(InternalChasmApi::class)
     private fun interpret(
         config: RuntimeConfig,
         store: Store,

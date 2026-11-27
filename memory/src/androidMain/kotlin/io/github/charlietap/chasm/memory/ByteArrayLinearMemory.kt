@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.memory
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.host.UnsafeHostApi
 import io.github.charlietap.chasm.memory.ext.copyInto
 import io.github.charlietap.chasm.memory.ext.toDoubleLittleEndian
@@ -14,6 +15,7 @@ import io.github.charlietap.chasm.runtime.memory.OutOfMemoryError
 
 internal const val MAX_ANDROID_MEMORY_PAGES = Int.MAX_VALUE / LinearMemory.PAGE_SIZE
 
+@InternalChasmApi
 @OptIn(UnsafeHostApi::class)
 class ByteArrayLinearMemory(
     pages: LinearMemory.Pages,

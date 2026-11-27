@@ -1,7 +1,9 @@
 package io.github.charlietap.chasm.runtime
 
+import io.github.charlietap.chasm.InternalChasmApi
 import kotlin.jvm.JvmInline
 
+@InternalChasmApi
 sealed interface Arity {
     val value: Int
 

@@ -2,7 +2,7 @@ package io.github.charlietap.chasm.memory.write
 
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
 
-actual inline fun BytesWriter(
+internal actual inline fun BytesWriter(
     memory: LinearMemory,
     memorySize: Int,
     buffer: ByteArray,

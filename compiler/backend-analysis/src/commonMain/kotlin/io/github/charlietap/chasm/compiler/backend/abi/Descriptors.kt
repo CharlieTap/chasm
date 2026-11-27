@@ -1,29 +1,35 @@
 package io.github.charlietap.chasm.compiler.backend.abi
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.chasm.type.NumberType
 import io.github.charlietap.chasm.type.ValueType
 
+@InternalChasmApi
 const val OBJECT_TYPE = "Ljava/lang/Object;"
 
-const val MAX_PARAMETERS = 100
+internal const val MAX_PARAMETERS = 100
 
 private const val DEPTH = "I"
 private const val ARGUMENTS = "[J"
 private const val REFERENCE_ARGUMENTS = "[Ljava/lang/Object;"
 
+@InternalChasmApi
 fun descriptorWords(
     descriptor: String,
 ) = if (descriptor == "J" || descriptor == "D") 2 else 1
 
+@InternalChasmApi
 fun internalName(
     descriptor: String,
 ) = if (descriptor.startsWith("[")) descriptor else descriptor.removePrefix("L").removeSuffix(";")
 
+@InternalChasmApi
 fun binaryName(
     descriptor: String,
 ) = internalName(descriptor).replace('/', '.')
 
+@InternalChasmApi
 fun valueDescriptor(
     type: ValueType,
     reference: String = "J",
@@ -35,6 +41,7 @@ fun valueDescriptor(
     null -> if (type is ValueType.Reference) reference else "J"
 }
 
+@InternalChasmApi
 fun returnDescriptor(
     type: FunctionType,
     reference: String = "J",
@@ -44,25 +51,29 @@ fun returnDescriptor(
     else -> "[J"
 }
 
+@InternalChasmApi
 fun signatureKey(
     type: FunctionType,
     reference: String = "J",
 ): String = functionParameters(type, reference).joinToString("") + returnDescriptor(type, reference)
 
-fun functionParameters(
+internal fun functionParameters(
     type: FunctionType,
     reference: String = "J",
 ): List<String> = parameters(type, leading = 0, reference)
 
+@InternalChasmApi
 fun takesArgumentArray(
     type: FunctionType,
 ): Boolean = type.params.types.size > MAX_PARAMETERS
 
+@InternalChasmApi
 fun takesReferenceArray(
     type: FunctionType,
     reference: String,
 ): Boolean = reference != "J" && takesArgumentArray(type) && type.params.types.any { parameter -> parameter is ValueType.Reference }
 
+@InternalChasmApi
 fun argumentWords(
     type: FunctionType,
     reference: String = "J",
@@ -80,6 +91,7 @@ fun argumentWords(
     return words
 }
 
+@InternalChasmApi
 fun staticParameters(
     type: FunctionType,
     binding: String,

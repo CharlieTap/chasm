@@ -1,5 +1,7 @@
 package io.github.charlietap.chasm.runtime.stack
 
+import io.github.charlietap.chasm.InternalChasmApi
+
 private const val REFERENCE_TAG_BITS = 8
 private const val CALLER_FRAME_DELTA_BITS = 25
 private const val RETURN_IP_SHIFT = REFERENCE_TAG_BITS + CALLER_FRAME_DELTA_BITS
@@ -37,6 +39,7 @@ private const val CALLER_FRAME_DELTA_MASK = (1L shl CALLER_FRAME_DELTA_BITS) - 1
  * validates that both encoded values fit their fields; this packing operation
  * is deliberately unchecked.
  */
+@InternalChasmApi
 fun activationHeader(
     returnIp: Int,
     callerFrameDelta: Int,
@@ -51,6 +54,8 @@ internal inline fun activationCallerFrameDelta(header: Long): Int =
 /** Returns the encoded return-IP field. */
 internal inline fun activationReturnIp(header: Long): Int = (header ushr RETURN_IP_SHIFT).toInt()
 
+@InternalChasmApi
 fun decodeActivationCallerFrameDelta(header: Long): Int = activationCallerFrameDelta(header)
 
+@InternalChasmApi
 fun decodeActivationReturnIp(header: Long): Int = activationReturnIp(header)

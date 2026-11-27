@@ -1,5 +1,3 @@
-@file:OptIn(InternalChasmApi::class)
-
 package io.github.charlietap.chasm.compiler.backend.jvm
 
 import io.github.charlietap.chasm.InternalChasmApi
@@ -39,8 +37,10 @@ internal fun <T> completed(
     throw failure.cause ?: failure
 }
 
+@InternalChasmApi
 typealias ModuleLowerer = (Module, CirModule, JvmOptions, JvmOutput, ModuleDeclarations, Map<Int, FunctionTrapSites>) -> JvmModule
 
+@InternalChasmApi
 fun ModuleLowerer(
     module: Module,
     code: CirModule,
@@ -49,6 +49,7 @@ fun ModuleLowerer(
     declarations: ModuleDeclarations,
 ): JvmModule = ModuleLowerer(module, code, options, output, declarations, emptyMap())
 
+@InternalChasmApi
 fun ModuleLowerer(
     module: Module,
     code: CirModule,

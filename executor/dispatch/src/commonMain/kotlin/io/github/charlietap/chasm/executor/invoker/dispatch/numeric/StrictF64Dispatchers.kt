@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.numeric
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.executor.invoker.dispatch.dispatchInstruction
 import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.executeF64BinaryIi
 import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.executeF64BinaryIs
@@ -35,6 +36,7 @@ import io.github.charlietap.chasm.runtime.operations.ext.sqrt
 import io.github.charlietap.chasm.runtime.operations.ext.trunc
 import kotlin.math.absoluteValue
 
+@InternalChasmApi
 fun F64AddIiDispatcher(
     left: Double,
     right: Double,
@@ -43,6 +45,7 @@ fun F64AddIiDispatcher(
     executeF64BinaryIi(vstack, destinationSlot, left, right) { left, right -> left + right }
 }
 
+@InternalChasmApi
 fun F64AddIsDispatcher(
     left: Double,
     rightSlot: Int,
@@ -51,6 +54,7 @@ fun F64AddIsDispatcher(
     executeF64BinaryIs(vstack, destinationSlot, left, rightSlot) { left, right -> left + right }
 }
 
+@InternalChasmApi
 fun F64AddSiDispatcher(
     leftSlot: Int,
     right: Double,
@@ -59,6 +63,7 @@ fun F64AddSiDispatcher(
     executeF64BinarySi(vstack, destinationSlot, leftSlot, right) { left, right -> left + right }
 }
 
+@InternalChasmApi
 fun F64AddSsDispatcher(
     leftSlot: Int,
     rightSlot: Int,
@@ -67,6 +72,7 @@ fun F64AddSsDispatcher(
     executeF64BinarySs(vstack, destinationSlot, leftSlot, rightSlot) { left, right -> left + right }
 }
 
+@InternalChasmApi
 fun F64SubIiDispatcher(
     left: Double,
     right: Double,
@@ -75,6 +81,7 @@ fun F64SubIiDispatcher(
     executeF64BinaryIi(vstack, destinationSlot, left, right) { left, right -> left - right }
 }
 
+@InternalChasmApi
 fun F64SubIsDispatcher(
     left: Double,
     rightSlot: Int,
@@ -83,6 +90,7 @@ fun F64SubIsDispatcher(
     executeF64BinaryIs(vstack, destinationSlot, left, rightSlot) { left, right -> left - right }
 }
 
+@InternalChasmApi
 fun F64SubSiDispatcher(
     leftSlot: Int,
     right: Double,
@@ -91,6 +99,7 @@ fun F64SubSiDispatcher(
     executeF64BinarySi(vstack, destinationSlot, leftSlot, right) { left, right -> left - right }
 }
 
+@InternalChasmApi
 fun F64SubSsDispatcher(
     leftSlot: Int,
     rightSlot: Int,
@@ -99,6 +108,7 @@ fun F64SubSsDispatcher(
     executeF64BinarySs(vstack, destinationSlot, leftSlot, rightSlot) { left, right -> left - right }
 }
 
+@InternalChasmApi
 fun F64MulIiDispatcher(
     left: Double,
     right: Double,
@@ -107,6 +117,7 @@ fun F64MulIiDispatcher(
     executeF64BinaryIi(vstack, destinationSlot, left, right) { left, right -> left * right }
 }
 
+@InternalChasmApi
 fun F64MulIsDispatcher(
     left: Double,
     rightSlot: Int,
@@ -115,6 +126,7 @@ fun F64MulIsDispatcher(
     executeF64BinaryIs(vstack, destinationSlot, left, rightSlot) { left, right -> left * right }
 }
 
+@InternalChasmApi
 fun F64MulSiDispatcher(
     leftSlot: Int,
     right: Double,
@@ -123,6 +135,7 @@ fun F64MulSiDispatcher(
     executeF64BinarySi(vstack, destinationSlot, leftSlot, right) { left, right -> left * right }
 }
 
+@InternalChasmApi
 fun F64MulSsDispatcher(
     leftSlot: Int,
     rightSlot: Int,
@@ -131,6 +144,7 @@ fun F64MulSsDispatcher(
     executeF64BinarySs(vstack, destinationSlot, leftSlot, rightSlot) { left, right -> left * right }
 }
 
+@InternalChasmApi
 fun F64DivIiDispatcher(
     left: Double,
     right: Double,
@@ -139,6 +153,7 @@ fun F64DivIiDispatcher(
     executeF64BinaryIi(vstack, destinationSlot, left, right) { left, right -> left / right }
 }
 
+@InternalChasmApi
 fun F64DivIsDispatcher(
     left: Double,
     rightSlot: Int,
@@ -147,6 +162,7 @@ fun F64DivIsDispatcher(
     executeF64BinaryIs(vstack, destinationSlot, left, rightSlot) { left, right -> left / right }
 }
 
+@InternalChasmApi
 fun F64DivSiDispatcher(
     leftSlot: Int,
     right: Double,
@@ -155,6 +171,7 @@ fun F64DivSiDispatcher(
     executeF64BinarySi(vstack, destinationSlot, leftSlot, right) { left, right -> left / right }
 }
 
+@InternalChasmApi
 fun F64DivSsDispatcher(
     leftSlot: Int,
     rightSlot: Int,
@@ -163,6 +180,7 @@ fun F64DivSsDispatcher(
     executeF64BinarySs(vstack, destinationSlot, leftSlot, rightSlot) { left, right -> left / right }
 }
 
+@InternalChasmApi
 fun F64MinIiDispatcher(
     left: Double,
     right: Double,
@@ -171,6 +189,7 @@ fun F64MinIiDispatcher(
     executeF64BinaryIi(vstack, destinationSlot, left, right, Double::min)
 }
 
+@InternalChasmApi
 fun F64MinIsDispatcher(
     left: Double,
     rightSlot: Int,
@@ -179,6 +198,7 @@ fun F64MinIsDispatcher(
     executeF64BinaryIs(vstack, destinationSlot, left, rightSlot, Double::min)
 }
 
+@InternalChasmApi
 fun F64MinSiDispatcher(
     leftSlot: Int,
     right: Double,
@@ -187,6 +207,7 @@ fun F64MinSiDispatcher(
     executeF64BinarySi(vstack, destinationSlot, leftSlot, right, Double::min)
 }
 
+@InternalChasmApi
 fun F64MinSsDispatcher(
     leftSlot: Int,
     rightSlot: Int,
@@ -195,6 +216,7 @@ fun F64MinSsDispatcher(
     executeF64BinarySs(vstack, destinationSlot, leftSlot, rightSlot, Double::min)
 }
 
+@InternalChasmApi
 fun F64MaxIiDispatcher(
     left: Double,
     right: Double,
@@ -203,6 +225,7 @@ fun F64MaxIiDispatcher(
     executeF64BinaryIi(vstack, destinationSlot, left, right, Double::max)
 }
 
+@InternalChasmApi
 fun F64MaxIsDispatcher(
     left: Double,
     rightSlot: Int,
@@ -211,6 +234,7 @@ fun F64MaxIsDispatcher(
     executeF64BinaryIs(vstack, destinationSlot, left, rightSlot, Double::max)
 }
 
+@InternalChasmApi
 fun F64MaxSiDispatcher(
     leftSlot: Int,
     right: Double,
@@ -219,6 +243,7 @@ fun F64MaxSiDispatcher(
     executeF64BinarySi(vstack, destinationSlot, leftSlot, right, Double::max)
 }
 
+@InternalChasmApi
 fun F64MaxSsDispatcher(
     leftSlot: Int,
     rightSlot: Int,
@@ -227,6 +252,7 @@ fun F64MaxSsDispatcher(
     executeF64BinarySs(vstack, destinationSlot, leftSlot, rightSlot, Double::max)
 }
 
+@InternalChasmApi
 fun F64CopysignIiDispatcher(
     left: Double,
     right: Double,
@@ -235,6 +261,7 @@ fun F64CopysignIiDispatcher(
     executeF64BinaryIi(vstack, destinationSlot, left, right, Double::copySign)
 }
 
+@InternalChasmApi
 fun F64CopysignIsDispatcher(
     left: Double,
     rightSlot: Int,
@@ -243,6 +270,7 @@ fun F64CopysignIsDispatcher(
     executeF64BinaryIs(vstack, destinationSlot, left, rightSlot, Double::copySign)
 }
 
+@InternalChasmApi
 fun F64CopysignSiDispatcher(
     leftSlot: Int,
     right: Double,
@@ -251,6 +279,7 @@ fun F64CopysignSiDispatcher(
     executeF64BinarySi(vstack, destinationSlot, leftSlot, right, Double::copySign)
 }
 
+@InternalChasmApi
 fun F64CopysignSsDispatcher(
     leftSlot: Int,
     rightSlot: Int,
@@ -259,6 +288,7 @@ fun F64CopysignSsDispatcher(
     executeF64BinarySs(vstack, destinationSlot, leftSlot, rightSlot, Double::copySign)
 }
 
+@InternalChasmApi
 fun F64AbsIDispatcher(
     operand: Double,
     destinationSlot: Int,
@@ -266,6 +296,7 @@ fun F64AbsIDispatcher(
     executeF64UnaryI(vstack, destinationSlot, operand) { operand -> operand.absoluteValue }
 }
 
+@InternalChasmApi
 fun F64AbsSDispatcher(
     operandSlot: Int,
     destinationSlot: Int,
@@ -273,6 +304,7 @@ fun F64AbsSDispatcher(
     executeF64UnaryS(vstack, destinationSlot, operandSlot) { operand -> operand.absoluteValue }
 }
 
+@InternalChasmApi
 fun F64NegIDispatcher(
     operand: Double,
     destinationSlot: Int,
@@ -280,6 +312,7 @@ fun F64NegIDispatcher(
     executeF64UnaryI(vstack, destinationSlot, operand) { operand -> -operand }
 }
 
+@InternalChasmApi
 fun F64NegSDispatcher(
     operandSlot: Int,
     destinationSlot: Int,
@@ -287,6 +320,7 @@ fun F64NegSDispatcher(
     executeF64UnaryS(vstack, destinationSlot, operandSlot) { operand -> -operand }
 }
 
+@InternalChasmApi
 fun F64CeilIDispatcher(
     operand: Double,
     destinationSlot: Int,
@@ -294,6 +328,7 @@ fun F64CeilIDispatcher(
     executeF64UnaryI(vstack, destinationSlot, operand, Double::ceil)
 }
 
+@InternalChasmApi
 fun F64CeilSDispatcher(
     operandSlot: Int,
     destinationSlot: Int,
@@ -301,6 +336,7 @@ fun F64CeilSDispatcher(
     executeF64UnaryS(vstack, destinationSlot, operandSlot, Double::ceil)
 }
 
+@InternalChasmApi
 fun F64FloorIDispatcher(
     operand: Double,
     destinationSlot: Int,
@@ -308,6 +344,7 @@ fun F64FloorIDispatcher(
     executeF64UnaryI(vstack, destinationSlot, operand, Double::floor)
 }
 
+@InternalChasmApi
 fun F64FloorSDispatcher(
     operandSlot: Int,
     destinationSlot: Int,
@@ -315,6 +352,7 @@ fun F64FloorSDispatcher(
     executeF64UnaryS(vstack, destinationSlot, operandSlot, Double::floor)
 }
 
+@InternalChasmApi
 fun F64TruncIDispatcher(
     operand: Double,
     destinationSlot: Int,
@@ -322,6 +360,7 @@ fun F64TruncIDispatcher(
     executeF64UnaryI(vstack, destinationSlot, operand, Double::trunc)
 }
 
+@InternalChasmApi
 fun F64TruncSDispatcher(
     operandSlot: Int,
     destinationSlot: Int,
@@ -329,6 +368,7 @@ fun F64TruncSDispatcher(
     executeF64UnaryS(vstack, destinationSlot, operandSlot, Double::trunc)
 }
 
+@InternalChasmApi
 fun F64NearestIDispatcher(
     operand: Double,
     destinationSlot: Int,
@@ -336,6 +376,7 @@ fun F64NearestIDispatcher(
     executeF64UnaryI(vstack, destinationSlot, operand, Double::nearest)
 }
 
+@InternalChasmApi
 fun F64NearestSDispatcher(
     operandSlot: Int,
     destinationSlot: Int,
@@ -343,6 +384,7 @@ fun F64NearestSDispatcher(
     executeF64UnaryS(vstack, destinationSlot, operandSlot, Double::nearest)
 }
 
+@InternalChasmApi
 fun F64SqrtIDispatcher(
     operand: Double,
     destinationSlot: Int,
@@ -350,6 +392,7 @@ fun F64SqrtIDispatcher(
     executeF64UnaryI(vstack, destinationSlot, operand, Double::sqrt)
 }
 
+@InternalChasmApi
 fun F64SqrtSDispatcher(
     operandSlot: Int,
     destinationSlot: Int,
@@ -357,6 +400,7 @@ fun F64SqrtSDispatcher(
     executeF64UnaryS(vstack, destinationSlot, operandSlot, Double::sqrt)
 }
 
+@InternalChasmApi
 fun F64EqIiDispatcher(
     left: Double,
     right: Double,
@@ -365,6 +409,7 @@ fun F64EqIiDispatcher(
     executeF64RelopIi(vstack, destinationSlot, left, right, Double::eq)
 }
 
+@InternalChasmApi
 fun F64EqIsDispatcher(
     left: Double,
     rightSlot: Int,
@@ -373,6 +418,7 @@ fun F64EqIsDispatcher(
     executeF64RelopIs(vstack, destinationSlot, left, rightSlot, Double::eq)
 }
 
+@InternalChasmApi
 fun F64EqSiDispatcher(
     leftSlot: Int,
     right: Double,
@@ -381,6 +427,7 @@ fun F64EqSiDispatcher(
     executeF64RelopSi(vstack, destinationSlot, leftSlot, right, Double::eq)
 }
 
+@InternalChasmApi
 fun F64EqSsDispatcher(
     leftSlot: Int,
     rightSlot: Int,
@@ -389,6 +436,7 @@ fun F64EqSsDispatcher(
     executeF64RelopSs(vstack, destinationSlot, leftSlot, rightSlot, Double::eq)
 }
 
+@InternalChasmApi
 fun F64NeIiDispatcher(
     left: Double,
     right: Double,
@@ -397,6 +445,7 @@ fun F64NeIiDispatcher(
     executeF64RelopIi(vstack, destinationSlot, left, right, Double::ne)
 }
 
+@InternalChasmApi
 fun F64NeIsDispatcher(
     left: Double,
     rightSlot: Int,
@@ -405,6 +454,7 @@ fun F64NeIsDispatcher(
     executeF64RelopIs(vstack, destinationSlot, left, rightSlot, Double::ne)
 }
 
+@InternalChasmApi
 fun F64NeSiDispatcher(
     leftSlot: Int,
     right: Double,
@@ -413,6 +463,7 @@ fun F64NeSiDispatcher(
     executeF64RelopSi(vstack, destinationSlot, leftSlot, right, Double::ne)
 }
 
+@InternalChasmApi
 fun F64NeSsDispatcher(
     leftSlot: Int,
     rightSlot: Int,
@@ -421,6 +472,7 @@ fun F64NeSsDispatcher(
     executeF64RelopSs(vstack, destinationSlot, leftSlot, rightSlot, Double::ne)
 }
 
+@InternalChasmApi
 fun F64LtIiDispatcher(
     left: Double,
     right: Double,
@@ -429,6 +481,7 @@ fun F64LtIiDispatcher(
     executeF64RelopIi(vstack, destinationSlot, left, right, Double::lt)
 }
 
+@InternalChasmApi
 fun F64LtIsDispatcher(
     left: Double,
     rightSlot: Int,
@@ -437,6 +490,7 @@ fun F64LtIsDispatcher(
     executeF64RelopIs(vstack, destinationSlot, left, rightSlot, Double::lt)
 }
 
+@InternalChasmApi
 fun F64LtSiDispatcher(
     leftSlot: Int,
     right: Double,
@@ -445,6 +499,7 @@ fun F64LtSiDispatcher(
     executeF64RelopSi(vstack, destinationSlot, leftSlot, right, Double::lt)
 }
 
+@InternalChasmApi
 fun F64LtSsDispatcher(
     leftSlot: Int,
     rightSlot: Int,
@@ -453,6 +508,7 @@ fun F64LtSsDispatcher(
     executeF64RelopSs(vstack, destinationSlot, leftSlot, rightSlot, Double::lt)
 }
 
+@InternalChasmApi
 fun F64GtIiDispatcher(
     left: Double,
     right: Double,
@@ -461,6 +517,7 @@ fun F64GtIiDispatcher(
     executeF64RelopIi(vstack, destinationSlot, left, right, Double::gt)
 }
 
+@InternalChasmApi
 fun F64GtIsDispatcher(
     left: Double,
     rightSlot: Int,
@@ -469,6 +526,7 @@ fun F64GtIsDispatcher(
     executeF64RelopIs(vstack, destinationSlot, left, rightSlot, Double::gt)
 }
 
+@InternalChasmApi
 fun F64GtSiDispatcher(
     leftSlot: Int,
     right: Double,
@@ -477,6 +535,7 @@ fun F64GtSiDispatcher(
     executeF64RelopSi(vstack, destinationSlot, leftSlot, right, Double::gt)
 }
 
+@InternalChasmApi
 fun F64GtSsDispatcher(
     leftSlot: Int,
     rightSlot: Int,
@@ -485,6 +544,7 @@ fun F64GtSsDispatcher(
     executeF64RelopSs(vstack, destinationSlot, leftSlot, rightSlot, Double::gt)
 }
 
+@InternalChasmApi
 fun F64LeIiDispatcher(
     left: Double,
     right: Double,
@@ -493,6 +553,7 @@ fun F64LeIiDispatcher(
     executeF64RelopIi(vstack, destinationSlot, left, right, Double::le)
 }
 
+@InternalChasmApi
 fun F64LeIsDispatcher(
     left: Double,
     rightSlot: Int,
@@ -501,6 +562,7 @@ fun F64LeIsDispatcher(
     executeF64RelopIs(vstack, destinationSlot, left, rightSlot, Double::le)
 }
 
+@InternalChasmApi
 fun F64LeSiDispatcher(
     leftSlot: Int,
     right: Double,
@@ -509,6 +571,7 @@ fun F64LeSiDispatcher(
     executeF64RelopSi(vstack, destinationSlot, leftSlot, right, Double::le)
 }
 
+@InternalChasmApi
 fun F64LeSsDispatcher(
     leftSlot: Int,
     rightSlot: Int,
@@ -517,6 +580,7 @@ fun F64LeSsDispatcher(
     executeF64RelopSs(vstack, destinationSlot, leftSlot, rightSlot, Double::le)
 }
 
+@InternalChasmApi
 fun F64GeIiDispatcher(
     left: Double,
     right: Double,
@@ -525,6 +589,7 @@ fun F64GeIiDispatcher(
     executeF64RelopIi(vstack, destinationSlot, left, right, Double::ge)
 }
 
+@InternalChasmApi
 fun F64GeIsDispatcher(
     left: Double,
     rightSlot: Int,
@@ -533,6 +598,7 @@ fun F64GeIsDispatcher(
     executeF64RelopIs(vstack, destinationSlot, left, rightSlot, Double::ge)
 }
 
+@InternalChasmApi
 fun F64GeSiDispatcher(
     leftSlot: Int,
     right: Double,
@@ -541,6 +607,7 @@ fun F64GeSiDispatcher(
     executeF64RelopSi(vstack, destinationSlot, leftSlot, right, Double::ge)
 }
 
+@InternalChasmApi
 fun F64GeSsDispatcher(
     leftSlot: Int,
     rightSlot: Int,
@@ -549,6 +616,7 @@ fun F64GeSsDispatcher(
     executeF64RelopSs(vstack, destinationSlot, leftSlot, rightSlot, Double::ge)
 }
 
+@InternalChasmApi
 fun F64ConvertI32SIDispatcher(
     operand: Int,
     destinationSlot: Int,
@@ -556,6 +624,7 @@ fun F64ConvertI32SIDispatcher(
     executeI32ToF64I(vstack, destinationSlot, operand, Int::convertF64s)
 }
 
+@InternalChasmApi
 fun F64ConvertI32SSDispatcher(
     operandSlot: Int,
     destinationSlot: Int,
@@ -563,6 +632,7 @@ fun F64ConvertI32SSDispatcher(
     executeI32ToF64S(vstack, destinationSlot, operandSlot, Int::convertF64s)
 }
 
+@InternalChasmApi
 fun F64ConvertI32UIDispatcher(
     operand: Int,
     destinationSlot: Int,
@@ -570,6 +640,7 @@ fun F64ConvertI32UIDispatcher(
     executeI32ToF64I(vstack, destinationSlot, operand, Int::convertF64u)
 }
 
+@InternalChasmApi
 fun F64ConvertI32USDispatcher(
     operandSlot: Int,
     destinationSlot: Int,
@@ -577,6 +648,7 @@ fun F64ConvertI32USDispatcher(
     executeI32ToF64S(vstack, destinationSlot, operandSlot, Int::convertF64u)
 }
 
+@InternalChasmApi
 fun F64ConvertI64SIDispatcher(
     operand: Long,
     destinationSlot: Int,
@@ -584,6 +656,7 @@ fun F64ConvertI64SIDispatcher(
     executeI64ToF64I(vstack, destinationSlot, operand, Long::convertF64s)
 }
 
+@InternalChasmApi
 fun F64ConvertI64SSDispatcher(
     operandSlot: Int,
     destinationSlot: Int,
@@ -591,6 +664,7 @@ fun F64ConvertI64SSDispatcher(
     executeI64ToF64S(vstack, destinationSlot, operandSlot, Long::convertF64s)
 }
 
+@InternalChasmApi
 fun F64ConvertI64UIDispatcher(
     operand: Long,
     destinationSlot: Int,
@@ -598,6 +672,7 @@ fun F64ConvertI64UIDispatcher(
     executeI64ToF64I(vstack, destinationSlot, operand, Long::convertF64u)
 }
 
+@InternalChasmApi
 fun F64ConvertI64USDispatcher(
     operandSlot: Int,
     destinationSlot: Int,
@@ -605,6 +680,7 @@ fun F64ConvertI64USDispatcher(
     executeI64ToF64S(vstack, destinationSlot, operandSlot, Long::convertF64u)
 }
 
+@InternalChasmApi
 fun F64PromoteF32IDispatcher(
     operand: Float,
     destinationSlot: Int,
@@ -612,6 +688,7 @@ fun F64PromoteF32IDispatcher(
     executeF32ToF64I(vstack, destinationSlot, operand) { operand -> operand.toDouble() }
 }
 
+@InternalChasmApi
 fun F64PromoteF32SDispatcher(
     operandSlot: Int,
     destinationSlot: Int,

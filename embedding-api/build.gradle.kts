@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
-
 plugins {
     alias(libs.plugins.conventions.kmp)
     alias(libs.plugins.conventions.linting)
@@ -12,12 +10,7 @@ kotlin {
         namespace = "io.github.charlietap.chasm.embedding.api"
     }
 
-    @OptIn(ExperimentalAbiValidation::class)
-    abiValidation()
-
-    compilerOptions {
-        optIn.add("io.github.charlietap.chasm.InternalChasmApi")
-    }
+    validatePublicAbi()
 
     sourceSets {
         commonMain {

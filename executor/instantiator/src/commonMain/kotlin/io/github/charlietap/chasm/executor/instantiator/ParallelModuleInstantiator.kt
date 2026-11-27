@@ -4,6 +4,7 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.asErr
 import com.github.michaelbull.result.get
 import com.github.michaelbull.result.map
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.declarations.ModuleDeclarations
 import io.github.charlietap.chasm.executor.instantiator.allocation.ParallelModuleAllocator
@@ -20,6 +21,7 @@ import io.github.charlietap.chasm.runtime.instance.Import
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.store.Store
 
+@InternalChasmApi
 suspend fun ParallelModuleInstantiator(
     config: RuntimeConfig,
     store: Store,

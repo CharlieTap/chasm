@@ -15,6 +15,8 @@ kotlin {
         namespace = "io.github.charlietap.chasm.runtime.type"
     }
 
+    validatePublicAbi()
+
     sourceSets {
         commonMain {
             dependencies {

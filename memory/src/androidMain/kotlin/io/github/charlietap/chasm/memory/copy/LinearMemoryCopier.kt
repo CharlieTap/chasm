@@ -2,12 +2,14 @@
 
 package io.github.charlietap.chasm.memory.copy
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.memory.BoundsChecker
 import io.github.charlietap.chasm.memory.ByteArrayLinearMemory
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
 
+@InternalChasmApi
 actual inline fun LinearMemoryCopier(
     src: LinearMemory,
     dst: LinearMemory,

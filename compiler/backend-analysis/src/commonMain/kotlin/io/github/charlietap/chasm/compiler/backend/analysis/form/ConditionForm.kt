@@ -1,8 +1,10 @@
 package io.github.charlietap.chasm.compiler.backend.analysis.form
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.cir.NumericCondition
 import io.github.charlietap.chasm.type.NumberType
 
+@InternalChasmApi
 sealed interface ConditionForm {
 
     class Compare(
@@ -18,9 +20,11 @@ sealed interface ConditionForm {
     ) : ConditionForm
 }
 
+@InternalChasmApi
 val ConditionForm.negatable: Boolean
     get() = this !is ConditionForm.Compare || type == NumberType.I32 || type == NumberType.I64
 
+@InternalChasmApi
 fun NumericCondition.form(): ConditionForm = when (val c = this) {
     is NumericCondition.I32Eqz -> compare(NumberType.I32, Comparison.Eq, c.operand.operand(), ZERO)
     is NumericCondition.I64Eqz -> compare(NumberType.I64, Comparison.Eq, c.operand.operand(), ZERO)

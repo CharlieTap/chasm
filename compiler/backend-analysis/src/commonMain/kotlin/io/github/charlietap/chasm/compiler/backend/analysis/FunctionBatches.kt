@@ -1,7 +1,9 @@
 package io.github.charlietap.chasm.compiler.backend.analysis
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.cir.CirFunction
 
+@InternalChasmApi
 fun functionBatches(
     functions: List<CirFunction>,
     maxInstructions: Int,

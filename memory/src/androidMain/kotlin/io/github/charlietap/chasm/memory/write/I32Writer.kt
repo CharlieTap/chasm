@@ -2,11 +2,13 @@
 
 package io.github.charlietap.chasm.memory.write
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.memory.BoundsChecker
 import io.github.charlietap.chasm.memory.ByteArrayLinearMemory
 import io.github.charlietap.chasm.memory.ext.copyInto
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
 
+@InternalChasmApi
 actual inline fun I32Writer(
     memory: LinearMemory,
     address: Int,

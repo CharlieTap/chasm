@@ -1,5 +1,8 @@
 package io.github.charlietap.chasm.cir
 
+import io.github.charlietap.chasm.InternalChasmApi
+
+@InternalChasmApi
 sealed interface NumericCondition {
 
     @CirTag("i32.eqz")

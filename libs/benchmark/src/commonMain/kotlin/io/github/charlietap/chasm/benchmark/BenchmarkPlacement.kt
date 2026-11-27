@@ -1,10 +1,14 @@
 package io.github.charlietap.chasm.benchmark
 
+import io.github.charlietap.chasm.InternalChasmApi
+
+@InternalChasmApi
 public data class CpuSample(
     public val cpuId: Int?,
     public val isFastest: Boolean?,
 )
 
+@InternalChasmApi
 public data class TrialPlacement(
     public val start: CpuSample,
     public val end: CpuSample,
@@ -14,6 +18,7 @@ public data class TrialPlacement(
         get() = !isSupported || start.isFastest == true && end.isFastest == true
 }
 
+@InternalChasmApi
 public data class PolicyApplication(
     public val mode: BenchmarkMode,
     public val isApplied: Boolean,

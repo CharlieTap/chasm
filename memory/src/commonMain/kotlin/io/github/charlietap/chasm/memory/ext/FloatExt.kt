@@ -1,5 +1,8 @@
 package io.github.charlietap.chasm.memory.ext
 
+import io.github.charlietap.chasm.InternalChasmApi
+
+@InternalChasmApi
 inline fun Float.copyInto(buffer: ByteArray, offset: Int) {
     val bits = this.toRawBits()
     buffer[offset] = (bits and 0xFF).toByte()

@@ -1,9 +1,11 @@
 package io.github.charlietap.chasm.compiler.backend.analysis.form
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.cir.FusedOperand
 import io.github.charlietap.chasm.cir.OperandTransfer
 import kotlin.jvm.JvmInline
 
+@InternalChasmApi
 sealed interface Operand {
 
     @JvmInline
@@ -17,6 +19,7 @@ sealed interface Operand {
     ) : Operand
 }
 
+@InternalChasmApi
 fun slot(
     slot: Int,
 ): Operand {
@@ -27,12 +30,14 @@ fun slot(
     }
 }
 
+@InternalChasmApi
 fun immediate(
     value: Int,
 ): Operand {
     return immediate(value.toLong())
 }
 
+@InternalChasmApi
 fun immediate(
     value: Long,
 ): Operand {
@@ -43,24 +48,28 @@ fun immediate(
     }
 }
 
+@InternalChasmApi
 fun immediate(
     value: Float,
 ): Operand {
     return immediate(value.toRawBits().toLong())
 }
 
+@InternalChasmApi
 fun immediate(
     value: Double,
 ): Operand {
     return immediate(value.toRawBits())
 }
 
+@InternalChasmApi
 fun OperandTransfer.operands(): List<Operand> {
     return List(size) { index ->
         if (immediates[index]) immediate(values[index]) else slot(values[index].toInt())
     }
 }
 
+@InternalChasmApi
 fun FusedOperand.operand(): Operand {
     return when (this) {
         is FusedOperand.FrameSlot -> slot(offset)

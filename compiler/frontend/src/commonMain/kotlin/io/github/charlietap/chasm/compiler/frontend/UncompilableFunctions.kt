@@ -1,14 +1,17 @@
 package io.github.charlietap.chasm.compiler.frontend
 
 import com.github.michaelbull.result.onFailure
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.typeResolver
 import io.github.charlietap.chasm.compiler.frontend.context.FunctionCompilerWorkspace
 import io.github.charlietap.chasm.compiler.frontend.context.createCompilerContext
 import io.github.charlietap.chasm.declarations.ModuleTypeResolver
 
+@InternalChasmApi
 typealias UncompilableFunctions = (Module, ModuleTypeResolver) -> Map<Int, CompilationError>
 
+@InternalChasmApi
 fun UncompilableFunctions(
     module: Module,
     types: ModuleTypeResolver = module.typeResolver(),

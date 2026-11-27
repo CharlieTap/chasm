@@ -3,7 +3,7 @@ package io.github.charlietap.chasm.type.copy
 import io.github.charlietap.chasm.type.HeapType
 import io.github.charlietap.chasm.type.ReferenceType
 
-fun ReferenceTypeDeepCopier(
+internal fun ReferenceTypeDeepCopier(
     input: ReferenceType,
 ): ReferenceType =
     ReferenceTypeDeepCopier(
@@ -11,7 +11,7 @@ fun ReferenceTypeDeepCopier(
         heapTypeCopier = ::HeapTypeDeepCopier,
     )
 
-inline fun ReferenceTypeDeepCopier(
+internal inline fun ReferenceTypeDeepCopier(
     input: ReferenceType,
     heapTypeCopier: DeepCopier<HeapType>,
 ): ReferenceType = when (input) {

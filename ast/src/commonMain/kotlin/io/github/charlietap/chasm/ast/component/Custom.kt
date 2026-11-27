@@ -1,10 +1,13 @@
 package io.github.charlietap.chasm.ast.component
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.name.NameMap
 import io.github.charlietap.chasm.ast.value.NameValue
 
+@InternalChasmApi
 sealed interface Custom
 
+@InternalChasmApi
 data class Uninterpreted(val name: NameValue, val data: UByteArray) : Custom {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -17,15 +20,19 @@ data class Uninterpreted(val name: NameValue, val data: UByteArray) : Custom {
     override fun hashCode(): Int = name.hashCode()
 }
 
+@InternalChasmApi
 sealed interface NameSubsection
 
+@InternalChasmApi
 data class ComponentNameSubsection(val name: NameValue) : NameSubsection
 
+@InternalChasmApi
 data class SortNameSubsection(
     val sort: NameSort,
     val nameMap: NameMap,
 ) : NameSubsection
 
+@InternalChasmApi
 sealed interface NameSort {
 
     data object CoreFunction : NameSort
@@ -55,6 +62,7 @@ sealed interface NameSort {
     data object Instance : NameSort
 }
 
+@InternalChasmApi
 data class NameData(
     val subsections: List<NameSubsection>,
 ) : Custom

@@ -5,16 +5,16 @@ import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.value.ReferenceValue
 
-typealias ReferenceValueDecoder = (Long) -> ReferenceValue
+internal typealias ReferenceValueDecoder = (Long) -> ReferenceValue
 
-inline fun ReferenceValueDecoder(
+internal inline fun ReferenceValueDecoder(
     encoded: Long,
 ): ReferenceValue = ReferenceValueDecoder(
     encoded = encoded,
     heapTypeDecoder = ::HeapTypeDecoder,
 )
 
-fun ReferenceValueDecoder(
+internal fun ReferenceValueDecoder(
     encoded: Long,
     heapTypeDecoder: HeapTypeDecoder,
 ): ReferenceValue {

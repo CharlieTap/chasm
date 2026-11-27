@@ -16,7 +16,7 @@ import io.github.charlietap.chasm.type.HeapType as TypeHeapType
 import io.github.charlietap.chasm.type.ReferenceType as TypeReferenceType
 import io.github.charlietap.chasm.type.ValueType as TypeValueType
 
-fun ValueType.toType(): TypeValueType = when (this) {
+internal fun ValueType.toType(): TypeValueType = when (this) {
     ValueType.I32 -> TypeValueType.Number(NumberType.I32)
     ValueType.I64 -> TypeValueType.Number(NumberType.I64)
     ValueType.F32 -> TypeValueType.Number(NumberType.F32)
@@ -25,13 +25,13 @@ fun ValueType.toType(): TypeValueType = when (this) {
     is ValueType.Reference -> TypeValueType.Reference(type.toType())
 }
 
-fun ReferenceType.toType(): TypeReferenceType = if (nullable) {
+internal fun ReferenceType.toType(): TypeReferenceType = if (nullable) {
     TypeReferenceType.RefNull(heapType.toType())
 } else {
     TypeReferenceType.Ref(heapType.toType())
 }
 
-fun HeapType.toType(): TypeHeapType = when (this) {
+internal fun HeapType.toType(): TypeHeapType = when (this) {
     is HeapType.Concrete -> ConcreteHeapType.TypeIndex(type.index)
     is HeapType.Abstract -> when (type) {
         AbstractHeapType.Func -> TypeAbstractHeapType.Func
@@ -49,9 +49,9 @@ fun HeapType.toType(): TypeHeapType = when (this) {
     }
 }
 
-fun HeapType.nullReference(): Long = ReferenceValue.Null(toType()).toLong()
+internal fun HeapType.nullReference(): Long = ReferenceValue.Null(toType()).toLong()
 
-fun Frame.localInitialValue(
+internal fun Frame.localInitialValue(
     index: Int,
 ): Long {
     if (index >= initialisedLocalCount) return 0L

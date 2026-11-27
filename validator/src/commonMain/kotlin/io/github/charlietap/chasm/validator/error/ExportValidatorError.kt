@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.validator.error
 
-sealed interface ExportValidatorError : ModuleValidatorError {
+internal sealed interface ExportValidatorError : ModuleValidatorError {
     data object UnknownFunction : ExportValidatorError
 
     data object UnknownGlobal : ExportValidatorError

@@ -3,7 +3,7 @@ package io.github.charlietap.chasm.type.copy
 import io.github.charlietap.chasm.type.FieldType
 import io.github.charlietap.chasm.type.StructType
 
-fun StructTypeDeepCopier(
+internal fun StructTypeDeepCopier(
     input: StructType,
 ): StructType =
     StructTypeDeepCopier(
@@ -11,7 +11,7 @@ fun StructTypeDeepCopier(
         fieldTypeCopier = ::FieldTypeDeepCopier,
     )
 
-inline fun StructTypeDeepCopier(
+internal inline fun StructTypeDeepCopier(
     input: StructType,
     fieldTypeCopier: DeepCopier<FieldType>,
 ): StructType = StructType(

@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.decoder.error
 
-sealed interface ComponentValueDecodeError : WasmDecodeError {
+internal sealed interface ComponentValueDecodeError : WasmDecodeError {
 
     data class InvalidBoolean(val opcode: UByte) : ComponentValueDecodeError
 

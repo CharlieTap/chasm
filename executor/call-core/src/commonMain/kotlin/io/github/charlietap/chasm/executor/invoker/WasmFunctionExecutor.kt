@@ -1,5 +1,3 @@
-@file:OptIn(InternalChasmApi::class)
-
 package io.github.charlietap.chasm.executor.invoker
 
 import com.github.michaelbull.result.Err
@@ -19,6 +17,7 @@ import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
 
+@InternalChasmApi
 fun WasmFunctionExecutor(
     config: RuntimeConfig,
     store: Store,
@@ -38,8 +37,7 @@ fun WasmFunctionExecutor(
     )
 }
 
-@OptIn(InternalChasmApi::class)
-fun RawWasmFunctionExecutor(
+internal fun RawWasmFunctionExecutor(
     config: RuntimeConfig,
     store: Store,
     function: FunctionInstance.WasmFunction,

@@ -1,11 +1,13 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.numeric
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.executor.invoker.dispatch.dispatchInstruction
 import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.executeI32BinaryIi
 import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.executeI32BinaryIs
 import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.executeI32BinarySi
 import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.executeI32BinarySs
 
+@InternalChasmApi
 fun I32EqIiDispatcher(
     left: Int,
     right: Int,
@@ -16,6 +18,7 @@ fun I32EqIiDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I32EqIsDispatcher(
     left: Int,
     rightSlot: Int,
@@ -26,6 +29,7 @@ fun I32EqIsDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I32EqSiDispatcher(
     leftSlot: Int,
     right: Int,
@@ -36,6 +40,7 @@ fun I32EqSiDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I32EqSsDispatcher(
     leftSlot: Int,
     rightSlot: Int,
@@ -46,6 +51,7 @@ fun I32EqSsDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I32NeIiDispatcher(
     left: Int,
     right: Int,
@@ -56,6 +62,7 @@ fun I32NeIiDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I32NeIsDispatcher(
     left: Int,
     rightSlot: Int,
@@ -66,6 +73,7 @@ fun I32NeIsDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I32NeSiDispatcher(
     leftSlot: Int,
     right: Int,
@@ -76,6 +84,7 @@ fun I32NeSiDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I32NeSsDispatcher(
     leftSlot: Int,
     rightSlot: Int,
@@ -86,6 +95,7 @@ fun I32NeSsDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I32LtSIiDispatcher(
     left: Int,
     right: Int,
@@ -96,6 +106,7 @@ fun I32LtSIiDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I32LtSIsDispatcher(
     left: Int,
     rightSlot: Int,
@@ -106,6 +117,7 @@ fun I32LtSIsDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I32LtSSiDispatcher(
     leftSlot: Int,
     right: Int,
@@ -116,6 +128,7 @@ fun I32LtSSiDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I32LtSSsDispatcher(
     leftSlot: Int,
     rightSlot: Int,
@@ -126,6 +139,7 @@ fun I32LtSSsDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I32LtUIiDispatcher(
     left: Int,
     right: Int,
@@ -136,6 +150,7 @@ fun I32LtUIiDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I32LtUIsDispatcher(
     left: Int,
     rightSlot: Int,
@@ -146,6 +161,7 @@ fun I32LtUIsDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I32LtUSiDispatcher(
     leftSlot: Int,
     right: Int,
@@ -156,6 +172,7 @@ fun I32LtUSiDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I32LtUSsDispatcher(
     leftSlot: Int,
     rightSlot: Int,
@@ -166,6 +183,7 @@ fun I32LtUSsDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I32GtSIiDispatcher(
     left: Int,
     right: Int,
@@ -176,6 +194,7 @@ fun I32GtSIiDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I32GtSIsDispatcher(
     left: Int,
     rightSlot: Int,
@@ -186,6 +205,7 @@ fun I32GtSIsDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I32GtSSiDispatcher(
     leftSlot: Int,
     right: Int,
@@ -196,6 +216,7 @@ fun I32GtSSiDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I32GtSSsDispatcher(
     leftSlot: Int,
     rightSlot: Int,
@@ -206,6 +227,7 @@ fun I32GtSSsDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I32GtUIiDispatcher(
     left: Int,
     right: Int,
@@ -216,6 +238,7 @@ fun I32GtUIiDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I32GtUIsDispatcher(
     left: Int,
     rightSlot: Int,
@@ -226,6 +249,7 @@ fun I32GtUIsDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I32GtUSiDispatcher(
     leftSlot: Int,
     right: Int,
@@ -236,6 +260,7 @@ fun I32GtUSiDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I32GtUSsDispatcher(
     leftSlot: Int,
     rightSlot: Int,
@@ -246,6 +271,7 @@ fun I32GtUSsDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I32LeSIiDispatcher(
     left: Int,
     right: Int,
@@ -256,6 +282,7 @@ fun I32LeSIiDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I32LeSIsDispatcher(
     left: Int,
     rightSlot: Int,
@@ -266,6 +293,7 @@ fun I32LeSIsDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I32LeSSiDispatcher(
     leftSlot: Int,
     right: Int,
@@ -276,6 +304,7 @@ fun I32LeSSiDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I32LeSSsDispatcher(
     leftSlot: Int,
     rightSlot: Int,
@@ -286,6 +315,7 @@ fun I32LeSSsDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I32LeUIiDispatcher(
     left: Int,
     right: Int,
@@ -296,6 +326,7 @@ fun I32LeUIiDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I32LeUIsDispatcher(
     left: Int,
     rightSlot: Int,
@@ -306,6 +337,7 @@ fun I32LeUIsDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I32LeUSiDispatcher(
     leftSlot: Int,
     right: Int,
@@ -316,6 +348,7 @@ fun I32LeUSiDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I32LeUSsDispatcher(
     leftSlot: Int,
     rightSlot: Int,
@@ -326,6 +359,7 @@ fun I32LeUSsDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I32GeSIiDispatcher(
     left: Int,
     right: Int,
@@ -336,6 +370,7 @@ fun I32GeSIiDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I32GeSIsDispatcher(
     left: Int,
     rightSlot: Int,
@@ -346,6 +381,7 @@ fun I32GeSIsDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I32GeSSiDispatcher(
     leftSlot: Int,
     right: Int,
@@ -356,6 +392,7 @@ fun I32GeSSiDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I32GeSSsDispatcher(
     leftSlot: Int,
     rightSlot: Int,
@@ -366,6 +403,7 @@ fun I32GeSSsDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I32GeUIiDispatcher(
     left: Int,
     right: Int,
@@ -376,6 +414,7 @@ fun I32GeUIiDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I32GeUIsDispatcher(
     left: Int,
     rightSlot: Int,
@@ -386,6 +425,7 @@ fun I32GeUIsDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I32GeUSiDispatcher(
     leftSlot: Int,
     right: Int,
@@ -396,6 +436,7 @@ fun I32GeUSiDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I32GeUSsDispatcher(
     leftSlot: Int,
     rightSlot: Int,

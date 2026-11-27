@@ -1,8 +1,10 @@
 package io.github.charlietap.chasm.runtime.host
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.host.UnsafeHostApi
 import java.nio.ByteBuffer
 
+@InternalChasmApi
 interface ByteBufferHostMemory : HostMemory {
 
     /**

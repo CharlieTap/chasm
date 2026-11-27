@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.compiler.frontend
 
 import com.github.michaelbull.result.Result
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.typeResolver
 import io.github.charlietap.chasm.cir.CirFunction
@@ -8,6 +9,7 @@ import io.github.charlietap.chasm.compiler.frontend.context.FunctionCompilerWork
 import io.github.charlietap.chasm.compiler.frontend.context.createCompilerContext
 import io.github.charlietap.chasm.declarations.ModuleTypeResolver
 
+@InternalChasmApi
 class DefinedFunctionCompiler(
     private val module: Module,
     types: ModuleTypeResolver = module.typeResolver(),

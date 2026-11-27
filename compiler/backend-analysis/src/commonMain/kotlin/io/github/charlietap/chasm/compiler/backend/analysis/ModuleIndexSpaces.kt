@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.compiler.backend.analysis
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.module.Import
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.toInt
@@ -19,6 +20,7 @@ import io.github.charlietap.chasm.type.ext.arrayType
 import io.github.charlietap.chasm.type.ext.functionType
 import io.github.charlietap.chasm.type.ext.structType
 
+@InternalChasmApi
 class ModuleIndexSpaces(
     module: Module,
 ) {

@@ -46,6 +46,7 @@ dependencyResolutionManagement {
     }
 }
 
+include(":annotations")
 include(":ast")
 include(":module-declarations")
 include(":benchmark")

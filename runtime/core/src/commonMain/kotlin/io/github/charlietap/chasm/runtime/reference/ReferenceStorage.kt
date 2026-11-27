@@ -1,9 +1,11 @@
 package io.github.charlietap.chasm.runtime.reference
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.runtime.instance.ElementInstance
 import io.github.charlietap.chasm.runtime.instance.GlobalInstance
 import io.github.charlietap.chasm.runtime.instance.TableInstance
 
+@InternalChasmApi
 interface ReferenceStorage {
 
     fun initializeTable(

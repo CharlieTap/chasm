@@ -1,11 +1,13 @@
 package io.github.charlietap.chasm.declarations.construction
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.module.Export
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.declarations.ConstantInstruction
 import io.github.charlietap.chasm.type.AbstractHeapType
 import io.github.charlietap.chasm.type.NumberType
 
+@InternalChasmApi
 object HeapTypes {
 
     const val FUNC = 0
@@ -58,6 +60,7 @@ object HeapTypes {
     }
 }
 
+@InternalChasmApi
 object ValueTypes {
 
     const val I32 = 0
@@ -89,12 +92,14 @@ object ValueTypes {
     }
 }
 
+@InternalChasmApi
 object ElementModes {
     const val PASSIVE = 0
     const val ACTIVE = 1
     const val DECLARATIVE = 2
 }
 
+@InternalChasmApi
 object ExportKinds {
 
     const val FUNCTION = 0
@@ -139,6 +144,7 @@ object ExportKinds {
     }.toInt()
 }
 
+@InternalChasmApi
 object ConstantOps {
 
     const val I32_ADD = 0

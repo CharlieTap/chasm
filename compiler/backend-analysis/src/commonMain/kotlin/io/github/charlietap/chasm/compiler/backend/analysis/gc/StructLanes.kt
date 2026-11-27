@@ -1,8 +1,10 @@
 package io.github.charlietap.chasm.compiler.backend.analysis.gc
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.type.CompositeType
 import io.github.charlietap.chasm.type.DefinedType
 
+@InternalChasmApi
 class StructLanes(
     private val plans: StoragePlans,
     private val types: List<DefinedType>,

@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.vm
 
-object JsVirtualMachine : WasmVirtualMachine {
+internal object JsVirtualMachine : WasmVirtualMachine {
 
     override fun storeInit(): Store {
         return WebVirtualMachine.storeInit()

@@ -1,9 +1,11 @@
 package io.github.charlietap.chasm.runtime.diagnostic
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.store.Store
 
 /** Maps a module's compiled methods, as a platform stack trace names them, back to its Wasm functions. */
+@InternalChasmApi
 interface CompiledFrames {
 
     /** The Wasm function index [methodName] of [className] was compiled from, or [NOT_COMPILED]. */
@@ -37,6 +39,7 @@ interface CompiledFrames {
 }
 
 /** The compiled frames of one trap, read in order from the innermost entry into compiled code. */
+@InternalChasmApi
 interface CompiledTrace {
 
     /**

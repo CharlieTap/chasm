@@ -1,8 +1,5 @@
-@file:OptIn(InternalChasmApi::class)
-
 package io.github.charlietap.chasm.jvm
 
-import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.runtime.compiled.CHUNK_CLASS_PREFIX
 import io.github.charlietap.chasm.runtime.compiled.CODE_CLASS_PREFIX
 import io.github.charlietap.chasm.runtime.compiled.FUNCTION_METHOD_PREFIX

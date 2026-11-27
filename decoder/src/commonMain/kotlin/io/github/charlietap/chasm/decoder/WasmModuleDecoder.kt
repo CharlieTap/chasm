@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.decoder
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.Version
 import io.github.charlietap.chasm.config.ModuleConfig
@@ -28,6 +29,7 @@ import io.github.charlietap.chasm.decoder.section.SectionSize
 import io.github.charlietap.chasm.decoder.section.SectionType
 import io.github.charlietap.chasm.stream.SourceReader
 
+@InternalChasmApi
 fun WasmModuleDecoder(
     config: ModuleConfig,
     bytes: ByteArray,
@@ -39,6 +41,7 @@ fun WasmModuleDecoder(
     return WasmModuleDecoder(context)
 }
 
+@InternalChasmApi
 fun WasmModuleDecoder(
     config: ModuleConfig,
     source: SourceReader,

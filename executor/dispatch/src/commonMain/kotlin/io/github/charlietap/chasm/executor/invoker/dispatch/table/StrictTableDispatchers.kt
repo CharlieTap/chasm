@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.table
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.executor.invoker.dispatch.dispatchInstruction
 import io.github.charlietap.chasm.executor.invoker.instruction.table.executeTableCopy
 import io.github.charlietap.chasm.executor.invoker.instruction.table.executeTableFill
@@ -11,6 +12,7 @@ import io.github.charlietap.chasm.runtime.ext.element
 import io.github.charlietap.chasm.runtime.instance.ElementInstance
 import io.github.charlietap.chasm.runtime.instance.TableInstance
 
+@InternalChasmApi
 fun TableCopyIiiDispatcher(
     elementsToCopy: Int,
     srcOffset: Int,
@@ -27,6 +29,7 @@ fun TableCopyIiiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun TableCopyIisDispatcher(
     elementsToCopy: Int,
     srcOffset: Int,
@@ -43,6 +46,7 @@ fun TableCopyIisDispatcher(
     )
 }
 
+@InternalChasmApi
 fun TableCopyIsiDispatcher(
     elementsToCopy: Int,
     srcOffsetSlot: Int,
@@ -59,6 +63,7 @@ fun TableCopyIsiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun TableCopyIssDispatcher(
     elementsToCopy: Int,
     srcOffsetSlot: Int,
@@ -75,6 +80,7 @@ fun TableCopyIssDispatcher(
     )
 }
 
+@InternalChasmApi
 fun TableCopySiiDispatcher(
     elementsToCopySlot: Int,
     srcOffset: Int,
@@ -91,6 +97,7 @@ fun TableCopySiiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun TableCopySisDispatcher(
     elementsToCopySlot: Int,
     srcOffset: Int,
@@ -107,6 +114,7 @@ fun TableCopySisDispatcher(
     )
 }
 
+@InternalChasmApi
 fun TableCopySsiDispatcher(
     elementsToCopySlot: Int,
     srcOffsetSlot: Int,
@@ -123,6 +131,7 @@ fun TableCopySsiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun TableCopySssDispatcher(
     elementsToCopySlot: Int,
     srcOffsetSlot: Int,
@@ -139,6 +148,7 @@ fun TableCopySssDispatcher(
     )
 }
 
+@InternalChasmApi
 fun TableFillIsiDispatcher(
     elementsToFill: Int,
     fillValueSlot: Int,
@@ -153,6 +163,7 @@ fun TableFillIsiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun TableFillIssDispatcher(
     elementsToFill: Int,
     fillValueSlot: Int,
@@ -167,6 +178,7 @@ fun TableFillIssDispatcher(
     )
 }
 
+@InternalChasmApi
 fun TableFillSsiDispatcher(
     elementsToFillSlot: Int,
     fillValueSlot: Int,
@@ -181,6 +193,7 @@ fun TableFillSsiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun TableFillSssDispatcher(
     elementsToFillSlot: Int,
     fillValueSlot: Int,
@@ -195,6 +208,7 @@ fun TableFillSssDispatcher(
     )
 }
 
+@InternalChasmApi
 fun TableGrowIsDispatcher(
     elementsToAdd: Int,
     referenceValueSlot: Int,
@@ -211,6 +225,7 @@ fun TableGrowIsDispatcher(
     )
 }
 
+@InternalChasmApi
 fun TableGrowSsDispatcher(
     elementsToAddSlot: Int,
     referenceValueSlot: Int,
@@ -227,6 +242,7 @@ fun TableGrowSsDispatcher(
     )
 }
 
+@InternalChasmApi
 fun TableInitIiiDispatcher(
     elementsToInitialise: Int,
     segmentOffset: Int,
@@ -243,6 +259,7 @@ fun TableInitIiiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun TableInitIisDispatcher(
     elementsToInitialise: Int,
     segmentOffset: Int,
@@ -259,6 +276,7 @@ fun TableInitIisDispatcher(
     )
 }
 
+@InternalChasmApi
 fun TableInitIsiDispatcher(
     elementsToInitialise: Int,
     segmentOffsetSlot: Int,
@@ -275,6 +293,7 @@ fun TableInitIsiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun TableInitIssDispatcher(
     elementsToInitialise: Int,
     segmentOffsetSlot: Int,
@@ -291,6 +310,7 @@ fun TableInitIssDispatcher(
     )
 }
 
+@InternalChasmApi
 fun TableInitSiiDispatcher(
     elementsToInitialiseSlot: Int,
     segmentOffset: Int,
@@ -307,6 +327,7 @@ fun TableInitSiiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun TableInitSisDispatcher(
     elementsToInitialiseSlot: Int,
     segmentOffset: Int,
@@ -323,6 +344,7 @@ fun TableInitSisDispatcher(
     )
 }
 
+@InternalChasmApi
 fun TableInitSsiDispatcher(
     elementsToInitialiseSlot: Int,
     segmentOffsetSlot: Int,
@@ -339,6 +361,7 @@ fun TableInitSsiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun TableInitSssDispatcher(
     elementsToInitialiseSlot: Int,
     segmentOffsetSlot: Int,
@@ -355,6 +378,7 @@ fun TableInitSssDispatcher(
     )
 }
 
+@InternalChasmApi
 fun TableGetIDispatcher(
     elementIndex: Int,
     destinationSlot: Int,
@@ -368,6 +392,7 @@ fun TableGetIDispatcher(
     )
 }
 
+@InternalChasmApi
 fun TableGetSDispatcher(
     elementIndexSlot: Int,
     destinationSlot: Int,
@@ -381,6 +406,7 @@ fun TableGetSDispatcher(
     )
 }
 
+@InternalChasmApi
 fun TableSetSiDispatcher(
     valueSlot: Int,
     elementIndex: Int,
@@ -393,6 +419,7 @@ fun TableSetSiDispatcher(
     )
 }
 
+@InternalChasmApi
 fun TableSetSsDispatcher(
     valueSlot: Int,
     elementIndexSlot: Int,
@@ -405,6 +432,7 @@ fun TableSetSsDispatcher(
     )
 }
 
+@InternalChasmApi
 fun TableSizeSDispatcher(
     destinationSlot: Int,
     table: TableInstance,

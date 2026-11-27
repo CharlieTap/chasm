@@ -2,7 +2,7 @@ package io.github.charlietap.chasm.decoder.error
 
 import kotlin.jvm.JvmInline
 
-sealed interface SectionDecodeError : WasmDecodeError {
+internal sealed interface SectionDecodeError : WasmDecodeError {
     @JvmInline
     value class UnknownSectionType(val type: UByte) : SectionDecodeError
 

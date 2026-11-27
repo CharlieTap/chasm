@@ -1,8 +1,10 @@
 package io.github.charlietap.chasm.runtime.operations
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 
+@InternalChasmApi
 fun strictI32DivS(
     left: Int,
     right: Int,
@@ -18,6 +20,7 @@ fun strictI32DivS(
     }
 }
 
+@InternalChasmApi
 fun strictI32DivU(
     left: Int,
     right: Int,
@@ -27,6 +30,7 @@ fun strictI32DivU(
     throw InvocationException(InvocationError.CannotDivideIntegerByZero)
 }
 
+@InternalChasmApi
 fun strictI32RemS(
     left: Int,
     right: Int,
@@ -36,6 +40,7 @@ fun strictI32RemS(
     throw InvocationException(InvocationError.CannotDivideIntegerByZero)
 }
 
+@InternalChasmApi
 fun strictI32RemU(
     left: Int,
     right: Int,
@@ -45,6 +50,7 @@ fun strictI32RemU(
     throw InvocationException(InvocationError.CannotDivideIntegerByZero)
 }
 
+@InternalChasmApi
 fun strictI64DivS(
     left: Long,
     right: Long,
@@ -60,6 +66,7 @@ fun strictI64DivS(
     }
 }
 
+@InternalChasmApi
 fun strictI64DivU(
     left: Long,
     right: Long,
@@ -69,6 +76,7 @@ fun strictI64DivU(
     throw InvocationException(InvocationError.CannotDivideIntegerByZero)
 }
 
+@InternalChasmApi
 fun strictI64RemS(
     left: Long,
     right: Long,
@@ -78,6 +86,7 @@ fun strictI64RemS(
     throw InvocationException(InvocationError.CannotDivideIntegerByZero)
 }
 
+@InternalChasmApi
 fun strictI64RemU(
     left: Long,
     right: Long,

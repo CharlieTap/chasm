@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.runtime.stack
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.gc.GarbageCollectedHeap
 import io.github.charlietap.chasm.gc.GcRootMarker
 import io.github.charlietap.chasm.host.UnsafeHostApi
@@ -72,6 +73,7 @@ import io.github.charlietap.chasm.runtime.instruction.OperandTransfer
  * [InvocationError.CallStackExhausted]. The backing array never exceeds the
  * cap, so only the grow path needs to check it.
  */
+@InternalChasmApi
 class ValueStack(
     minCapacity: Int = 0,
     maxCapacity: Int = MAX_CAPACITY,

@@ -1,11 +1,13 @@
 package io.github.charlietap.chasm.runtime.error
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.runtime.diagnostic.TrapSnapshot
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.type.ValueType
 import kotlin.jvm.JvmInline
 
+@InternalChasmApi
 sealed interface InvocationError : ModuleTrapError {
 
     data object UncaughtException : InvocationError

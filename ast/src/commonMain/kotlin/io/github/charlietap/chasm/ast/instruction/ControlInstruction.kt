@@ -1,10 +1,12 @@
 package io.github.charlietap.chasm.ast.instruction
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.type.BlockType
 import io.github.charlietap.chasm.type.ReferenceType
 import kotlin.jvm.JvmInline
 
+@InternalChasmApi
 sealed interface ControlInstruction : Instruction {
 
     sealed interface CatchHandler {

@@ -4,7 +4,7 @@ import io.github.charlietap.chasm.type.PackedType
 import io.github.charlietap.chasm.type.StorageType
 import io.github.charlietap.chasm.type.ValueType
 
-fun StorageTypeDeepCopier(
+internal fun StorageTypeDeepCopier(
     input: StorageType,
 ): StorageType =
     StorageTypeDeepCopier(
@@ -13,7 +13,7 @@ fun StorageTypeDeepCopier(
         valueTypeCopier = ::ValueTypeDeepCopier,
     )
 
-inline fun StorageTypeDeepCopier(
+internal inline fun StorageTypeDeepCopier(
     input: StorageType,
     packedTypeCopier: DeepCopier<PackedType>,
     valueTypeCopier: DeepCopier<ValueType>,

@@ -1,5 +1,8 @@
 package io.github.charlietap.chasm.compiler.backend.analysis
 
+import io.github.charlietap.chasm.InternalChasmApi
+
+@InternalChasmApi
 fun loopCrossings(jumps: JumpTable): IntArray {
 
     val size = jumps.size
@@ -22,6 +25,7 @@ fun loopCrossings(jumps: JumpTable): IntArray {
     }
 }
 
+@InternalChasmApi
 fun cheapestCut(
     crossings: IntArray,
     start: Int,

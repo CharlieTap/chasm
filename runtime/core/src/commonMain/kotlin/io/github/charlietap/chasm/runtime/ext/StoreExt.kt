@@ -2,6 +2,7 @@
 
 package io.github.charlietap.chasm.runtime.ext
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.runtime.error.InvocationError.DataLookupFailed
 import io.github.charlietap.chasm.runtime.error.InvocationError.ElementLookupFailed
@@ -18,6 +19,7 @@ import io.github.charlietap.chasm.runtime.instance.MemoryInstance
 import io.github.charlietap.chasm.runtime.instance.TableInstance
 import io.github.charlietap.chasm.runtime.store.Store
 
+@InternalChasmApi
 inline fun Store.function(address: Address.Function): FunctionInstance = try {
     functions[address.address]
 } catch (_: IndexOutOfBoundsException) {
@@ -26,6 +28,7 @@ inline fun Store.function(address: Address.Function): FunctionInstance = try {
     throw InvocationException(FunctionLookupFailed(address))
 }
 
+@InternalChasmApi
 inline fun Store.table(address: Address.Table): TableInstance = try {
     tables[address.address]
 } catch (_: IndexOutOfBoundsException) {
@@ -34,6 +37,7 @@ inline fun Store.table(address: Address.Table): TableInstance = try {
     throw InvocationException(TableLookupFailed(address))
 }
 
+@InternalChasmApi
 inline fun Store.memory(address: Address.Memory): MemoryInstance = try {
     memories[address.address]
 } catch (_: IndexOutOfBoundsException) {
@@ -42,6 +46,7 @@ inline fun Store.memory(address: Address.Memory): MemoryInstance = try {
     throw InvocationException(MemoryLookupFailed(address))
 }
 
+@InternalChasmApi
 inline fun Store.global(address: Address.Global): GlobalInstance = try {
     globals[address.address]
 } catch (_: IndexOutOfBoundsException) {
@@ -50,6 +55,7 @@ inline fun Store.global(address: Address.Global): GlobalInstance = try {
     throw InvocationException(GlobalLookupFailed(address))
 }
 
+@InternalChasmApi
 inline fun Store.element(address: Address.Element): ElementInstance = try {
     elements[address.address]
 } catch (_: IndexOutOfBoundsException) {
@@ -58,6 +64,7 @@ inline fun Store.element(address: Address.Element): ElementInstance = try {
     throw InvocationException(ElementLookupFailed(address))
 }
 
+@InternalChasmApi
 inline fun Store.data(address: Address.Data): DataInstance = try {
     data[address.address]
 } catch (_: IndexOutOfBoundsException) {

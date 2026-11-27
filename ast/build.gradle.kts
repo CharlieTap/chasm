@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
-
 plugins {
     alias(libs.plugins.conventions.kmp)
     alias(libs.plugins.conventions.linting)
@@ -11,9 +9,6 @@ kotlin {
     android {
         namespace = "io.github.charlietap.chasm.ast"
     }
-
-    @OptIn(ExperimentalAbiValidation::class)
-    abiValidation()
 
     sourceSets {
        commonMain {

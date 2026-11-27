@@ -1,5 +1,3 @@
-@file:OptIn(InternalChasmApi::class)
-
 package io.github.charlietap.chasm.executor.invoker.compiled
 
 import io.github.charlietap.chasm.InternalChasmApi
@@ -22,6 +20,7 @@ import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
 import kotlin.reflect.KClass
 
+@InternalChasmApi
 class CompiledFunctionInstallation(
     val function: FunctionInstance.WasmFunction,
     val entry: CompiledFunction,
@@ -29,8 +28,9 @@ class CompiledFunctionInstallation(
 
 // The class whose frames mark each entry from the interpreter into compiled code in a stack trace, by reference so
 // its name follows a shrinker's renaming.
-val compiledEntryClass: KClass<*> = CompiledEntry::class
+internal val compiledEntryClass: KClass<*> = CompiledEntry::class
 
+@InternalChasmApi
 fun installCompiledFunctions(
     store: Store,
     installations: List<CompiledFunctionInstallation>,

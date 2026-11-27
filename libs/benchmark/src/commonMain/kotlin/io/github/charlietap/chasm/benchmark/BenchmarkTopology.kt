@@ -1,10 +1,14 @@
 package io.github.charlietap.chasm.benchmark
 
+import io.github.charlietap.chasm.InternalChasmApi
+
+@InternalChasmApi
 public enum class CpuTopologySource {
     DEVICE_TREE,
     UNAVAILABLE,
 }
 
+@InternalChasmApi
 public data class BenchmarkTopology(
     public val logicalCpuCount: Int,
     public val fastestCpuCount: Int?,

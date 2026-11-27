@@ -2,6 +2,7 @@
 
 package io.github.charlietap.chasm.mmap
 
+import io.github.charlietap.chasm.InternalChasmApi
 import kotlinx.cinterop.NativePtr
 
 /**
@@ -10,6 +11,7 @@ import kotlinx.cinterop.NativePtr
  * @param byteCount the positive number of bytes to reserve
  * @return the base address of the reservation
  */
+@InternalChasmApi
 public fun reserve(byteCount: Long): NativePtr {
     require(byteCount > 0) { "Reservation size must be positive" }
     return platformReserve(byteCount)
@@ -21,6 +23,7 @@ public fun reserve(byteCount: Long): NativePtr {
  * The address and size must satisfy the platform's page-alignment requirements.
  * Committing an empty range has no effect.
  */
+@InternalChasmApi
 public fun commit(
     address: NativePtr,
     byteCount: Long,
@@ -37,6 +40,7 @@ public fun commit(
  * The address must be one returned by [reserve], and [byteCount] must be the
  * corresponding reservation size.
  */
+@InternalChasmApi
 public fun release(
     address: NativePtr,
     byteCount: Long,

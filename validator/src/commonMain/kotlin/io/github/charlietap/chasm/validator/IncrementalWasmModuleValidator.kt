@@ -5,6 +5,7 @@ import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.andThen
 import com.github.michaelbull.result.binding
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.instruction.Instruction
 import io.github.charlietap.chasm.ast.module.DataSegment
 import io.github.charlietap.chasm.ast.module.Index
@@ -32,6 +33,7 @@ import io.github.charlietap.chasm.validator.validator.type.ValueTypeValidator
  * [prelude] is the module without function bodies or data segments; [dataCount] is the value
  * of its data count section, which stands in for the data segments.
  */
+@InternalChasmApi
 class IncrementalWasmModuleValidator(
     config: ModuleConfig,
     private val prelude: Module,
@@ -58,6 +60,7 @@ class IncrementalWasmModuleValidator(
 }
 
 /** Validates a function one instruction at a time as it is decoded. Not thread safe. */
+@InternalChasmApi
 class IncrementalFunctionValidator internal constructor(
     private val context: ModuleValidationContext,
 ) {

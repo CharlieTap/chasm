@@ -10,9 +10,9 @@ import io.github.charlietap.chasm.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.runtime.instance.Import
 import io.github.charlietap.chasm.ast.module.Import as ModuleImport
 
-typealias ImportMatcher = (InstantiationContext, List<Import>) -> Result<List<ExternalValue>, ModuleTrapError>
+internal typealias ImportMatcher = (InstantiationContext, List<Import>) -> Result<List<ExternalValue>, ModuleTrapError>
 
-fun ImportMatcher(
+internal fun ImportMatcher(
     context: InstantiationContext,
     imports: List<Import>,
 ): Result<List<ExternalValue>, ModuleTrapError> =

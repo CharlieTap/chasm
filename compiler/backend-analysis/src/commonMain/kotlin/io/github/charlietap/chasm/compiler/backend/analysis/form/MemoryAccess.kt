@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.compiler.backend.analysis.form
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.cir.MemoryIndex
 import io.github.charlietap.chasm.cir.MemoryInstruction
 import io.github.charlietap.chasm.compiler.backend.analysis.form.MemoryOperation.F32Load
@@ -27,6 +28,7 @@ import io.github.charlietap.chasm.compiler.backend.analysis.form.MemoryOperation
 import io.github.charlietap.chasm.compiler.backend.analysis.form.MemoryOperation.I64Store8
 import io.github.charlietap.chasm.type.NumberType
 
+@InternalChasmApi
 class MemoryAccess(
     val operation: MemoryOperation,
     val address: Operand,
@@ -38,6 +40,7 @@ class MemoryAccess(
     val isLoad: Boolean get() = value == null
 }
 
+@InternalChasmApi
 enum class MemoryOperation(
     val type: NumberType,
     val width: Int,
@@ -71,6 +74,7 @@ enum class MemoryOperation(
     val helperName: String = name.replaceFirstChar { it.lowercase() }
 }
 
+@InternalChasmApi
 fun MemoryInstruction.access(): MemoryAccess? = when (val i = this) {
     is MemoryInstruction.I32LoadI -> load(I32Load, immediate(i.address), i.destinationSlot, i.memory, i.memArg.offset)
     is MemoryInstruction.I32LoadS -> load(I32Load, slot(i.addressSlot), i.destinationSlot, i.memory, i.memArg.offset)

@@ -1,10 +1,7 @@
-@file:OptIn(InternalChasmApi::class)
-
 package io.github.charlietap.chasm.dex
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.getOrElse
-import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.module.typeResolver
 import io.github.charlietap.chasm.compiled.format.COMPILED_RUNTIME_ABI
 import io.github.charlietap.chasm.compiled.format.dexFileName

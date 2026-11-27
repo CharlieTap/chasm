@@ -1,10 +1,12 @@
 package io.github.charlietap.chasm.executor.invoker.compiled
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.host.UnsafeHostApi
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 
+@InternalChasmApi
 fun openFrame(
     context: ExecutionContext,
     frameSlots: Int,
@@ -18,6 +20,7 @@ fun openFrame(
     return (fp.toLong() shl 32) or (sp.toLong() and 0xFFFF_FFFFL)
 }
 
+@InternalChasmApi
 fun closeFrame(
     context: ExecutionContext,
     saved: Long,
@@ -25,11 +28,13 @@ fun closeFrame(
     context.vstack.activateFrameAtDepth((saved ushr 32).toInt(), saved.toInt())
 }
 
+@InternalChasmApi
 @OptIn(UnsafeHostApi::class)
 fun frame(
     context: ExecutionContext,
 ): LongArray = context.vstack.unsafeElements()
 
+@InternalChasmApi
 fun saveStack(
     context: ExecutionContext,
 ): Long {

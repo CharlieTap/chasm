@@ -1,10 +1,12 @@
 package io.github.charlietap.chasm.compiler.backend.analysis
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.compiler.backend.analysis.form.InstructionForms
 import io.github.charlietap.chasm.compiler.backend.analysis.form.Operand
 import io.github.charlietap.chasm.type.NumberType
 import io.github.charlietap.chasm.type.ValueType
 
+@InternalChasmApi
 class SlotKinds(
     private val kinds: ByteArray,
     private val accountedWrites: LongArray,
@@ -45,6 +47,7 @@ class SlotKinds(
     }
 }
 
+@InternalChasmApi
 class NarrowHomeMismatch(
     slot: Int,
     position: Int,
@@ -73,6 +76,7 @@ private const val WRITE_OTHER = 16
 private const val WRITE_WIDE_CONSTANT = 32
 private const val WRITES_WIDE = WRITE_I64 or WRITE_F64 or WRITE_OTHER or WRITE_WIDE_CONSTANT
 
+@InternalChasmApi
 fun analyzeSlotKinds(
     forms: InstructionForms,
     parameters: List<ValueType>,

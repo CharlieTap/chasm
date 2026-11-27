@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.memory
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.host.UnsafeHostApi
 import io.github.charlietap.chasm.runtime.host.ByteBufferHostMemory
 import io.github.charlietap.chasm.runtime.host.HostMemory
@@ -27,6 +28,7 @@ import java.lang.OutOfMemoryError as PlatformOutOfMemoryError
 internal const val MAX_JVM_MEMORY_PAGES = Int.MAX_VALUE / LinearMemory.PAGE_SIZE
 internal const val MAX_JVM_MEMORY_BYTES = MAX_JVM_MEMORY_PAGES * LinearMemory.PAGE_SIZE
 
+@InternalChasmApi
 @OptIn(UnsafeHostApi::class)
 class ByteBufferLinearMemory(
     pages: LinearMemory.Pages,

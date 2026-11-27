@@ -1,8 +1,10 @@
 package io.github.charlietap.chasm.runtime.memory
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.runtime.host.HostMemory
 import kotlin.jvm.JvmInline
 
+@InternalChasmApi
 interface LinearMemory : HostMemory {
 
     fun grow(pagesToAdd: Int): LinearMemory

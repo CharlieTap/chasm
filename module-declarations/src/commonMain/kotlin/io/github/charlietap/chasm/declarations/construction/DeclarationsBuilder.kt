@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.declarations.construction
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.module.Export
 import io.github.charlietap.chasm.ast.module.Import
 import io.github.charlietap.chasm.ast.module.Index
@@ -42,6 +43,7 @@ import io.github.charlietap.chasm.type.ValueType
 import io.github.charlietap.chasm.type.VectorType
 import io.github.charlietap.chasm.type.ext.functionType
 
+@InternalChasmApi
 class DeclarationsBuilder {
 
     private val stack = ArrayList<Any>()

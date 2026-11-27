@@ -1,5 +1,8 @@
 package io.github.charlietap.chasm.cir
 
+import io.github.charlietap.chasm.InternalChasmApi
+
+@InternalChasmApi
 sealed class VariableInstruction : Instruction() {
 
     @CirTag("variable.global_get")

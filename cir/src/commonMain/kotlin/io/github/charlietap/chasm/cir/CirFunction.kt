@@ -1,5 +1,8 @@
 package io.github.charlietap.chasm.cir
 
+import io.github.charlietap.chasm.InternalChasmApi
+
+@InternalChasmApi
 data class CirFunction(
     val index: FunctionIndex,
     val type: TypeIndex,
@@ -30,6 +33,7 @@ data class CirFunction(
     }
 }
 
+@InternalChasmApi
 data class Frame(
     val frameSlots: Int,
     val activationHeaderSlot: Int,
@@ -41,6 +45,7 @@ data class Frame(
     }
 }
 
+@InternalChasmApi
 data class ExceptionTable(
     val regions: List<ExceptionRegion>,
     val tailCalls: IntArray,
@@ -53,6 +58,7 @@ data class ExceptionTable(
     override fun hashCode(): Int = 31 * regions.hashCode() + tailCalls.contentHashCode()
 }
 
+@InternalChasmApi
 data class ExceptionRegion(
     val start: InstructionIndex,
     val end: InstructionIndex,
@@ -60,6 +66,7 @@ data class ExceptionRegion(
     val catches: List<ExceptionCatch>,
 )
 
+@InternalChasmApi
 data class ExceptionCatch(
     val tag: TagIndex?,
     val target: InstructionIndex,
@@ -86,6 +93,7 @@ data class ExceptionCatch(
     }
 }
 
+@InternalChasmApi
 data class Provenance(
     val sourceStart: IntArray,
     val sourceEnd: IntArray,

@@ -5,7 +5,7 @@ package io.github.charlietap.chasm.memory.read
 import io.github.charlietap.chasm.memory.ByteBufferLinearMemory
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
 
-actual inline fun BytesReader(
+internal actual inline fun BytesReader(
     memory: LinearMemory,
     buffer: ByteArray,
     memoryPointer: Int,

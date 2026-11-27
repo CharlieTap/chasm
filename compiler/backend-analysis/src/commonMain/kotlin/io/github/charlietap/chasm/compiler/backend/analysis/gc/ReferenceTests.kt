@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.compiler.backend.analysis.gc
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.cir.AbstractHeapType
 import io.github.charlietap.chasm.cir.HeapType
 import io.github.charlietap.chasm.compiler.backend.abi.EQ_REFERENCE
@@ -11,6 +12,7 @@ import io.github.charlietap.chasm.compiler.backend.abi.WASM_EXCEPTION_TYPE
 import io.github.charlietap.chasm.type.CompositeType
 import io.github.charlietap.chasm.type.DefinedType
 
+@InternalChasmApi
 sealed interface ReferenceTest {
 
     data object Always : ReferenceTest
@@ -26,6 +28,7 @@ sealed interface ReferenceTest {
     data class FunctionType(val typeIndex: Int) : ReferenceTest
 }
 
+@InternalChasmApi
 class ReferenceTests(
     private val types: List<DefinedType>,
 ) {

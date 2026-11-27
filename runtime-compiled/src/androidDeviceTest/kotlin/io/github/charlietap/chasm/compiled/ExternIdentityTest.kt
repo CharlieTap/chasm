@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.compiled
 
-import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.embedding.engine.Engine
 import io.github.charlietap.chasm.embedding.instance
 import io.github.charlietap.chasm.embedding.invoke
@@ -249,7 +248,6 @@ class ExternIdentityTest {
 
     private data class Label(val text: String)
 
-    @OptIn(InternalChasmApi::class)
     private class Forged : StructReference() {
 
         override fun engine(): Engine {

@@ -1,9 +1,12 @@
 package io.github.charlietap.chasm.runtime.host
 
+import io.github.charlietap.chasm.InternalChasmApi
+
 /**
  * `HostMemory` is an API for reading and changing a WebAssembly linear memory
  * inside host functions.
  */
+@InternalChasmApi
 interface HostMemory {
 
     val byteSize: Int

@@ -1,11 +1,9 @@
 package io.github.charlietap.chasm.runtime.compiled.gc
 
-import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.host.HostGcType
 import java.util.Arrays
 
-@InternalChasmApi
-class ArrayOperations(
+internal class ArrayOperations(
     private val layouts: ShapeLayouts,
     private val allocator: ManagedAllocator,
 ) {

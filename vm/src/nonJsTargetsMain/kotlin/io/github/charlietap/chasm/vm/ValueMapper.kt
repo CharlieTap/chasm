@@ -8,7 +8,7 @@ import io.github.charlietap.chasm.vm.WasmVirtualMachine.Value.F64
 import io.github.charlietap.chasm.vm.WasmVirtualMachine.Value.I32
 import io.github.charlietap.chasm.vm.WasmVirtualMachine.Value.I64
 
-object ValueMapper {
+internal object ValueMapper {
     internal fun fromRaw(value: Long, type: ValueType): Value = when (type) {
         is ValueType.Number -> when (type.numberType) {
             NumberType.I32 -> I32(value.toInt())

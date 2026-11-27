@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.parallel.coroutines
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.parallel.ParallelTaskExecutor
 import io.github.charlietap.chasm.parallel.ParallelTaskScope
 import kotlinx.coroutines.CoroutineDispatcher
@@ -9,7 +10,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.ensureActive
 
-class CoroutineParallelTaskExecutor(
+internal class CoroutineParallelTaskExecutor(
     private val dispatcher: CoroutineDispatcher,
 ) : ParallelTaskExecutor {
 
@@ -23,4 +24,5 @@ class CoroutineParallelTaskExecutor(
     }
 }
 
-val DefaultCoroutineParallelTaskExecutor = CoroutineParallelTaskExecutor(Dispatchers.Default)
+@InternalChasmApi
+val DefaultCoroutineParallelTaskExecutor: ParallelTaskExecutor = CoroutineParallelTaskExecutor(Dispatchers.Default)

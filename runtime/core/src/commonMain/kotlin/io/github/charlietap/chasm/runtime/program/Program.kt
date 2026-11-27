@@ -1,9 +1,11 @@
 package io.github.charlietap.chasm.runtime.program
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.exception.FunctionExceptionTable
 import kotlin.jvm.JvmOverloads
 
+@InternalChasmApi
 class Program
     @JvmOverloads
     constructor(initialCapacity: Int = INITIAL_CAPACITY) {
@@ -109,6 +111,7 @@ class Program
         }
     }
 
+@InternalChasmApi
 const val EXIT_IP = Int.MAX_VALUE
 
 private const val INITIAL_CAPACITY = 256

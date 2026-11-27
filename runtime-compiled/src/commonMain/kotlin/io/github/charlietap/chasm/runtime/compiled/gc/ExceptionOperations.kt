@@ -1,14 +1,12 @@
 package io.github.charlietap.chasm.runtime.compiled.gc
 
-import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.type.ValueType
 import java.util.concurrent.ConcurrentHashMap
 
-@InternalChasmApi
-class ExceptionOperations(
+internal class ExceptionOperations(
     private val store: Store,
     private val checks: ReferenceChecks,
     private val pending: PendingExceptions,

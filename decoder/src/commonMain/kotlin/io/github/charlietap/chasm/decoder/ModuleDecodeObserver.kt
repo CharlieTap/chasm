@@ -1,11 +1,13 @@
 package io.github.charlietap.chasm.decoder
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.instruction.Instruction
 import io.github.charlietap.chasm.ast.module.DataSegment
 import io.github.charlietap.chasm.ast.module.Local
 import io.github.charlietap.chasm.ast.module.Module
 
 /** Follows a module while [ParallelWasmModuleDecoder] decodes it. Implementations must not throw. */
+@InternalChasmApi
 interface ModuleDecodeObserver {
 
     /**
@@ -32,6 +34,7 @@ interface ModuleDecodeObserver {
  * for each instruction with the opcode it was decoded from or [UNKNOWN_OPCODE], and [end] when
  * the body has decoded completely. A body that fails to decode is never ended.
  */
+@InternalChasmApi
 interface FunctionBodyObserver {
 
     fun begin(bodyIndex: Int, locals: List<Local>)

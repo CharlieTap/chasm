@@ -1,5 +1,3 @@
-@file:OptIn(InternalChasmApi::class)
-
 package io.github.charlietap.chasm.compiler.backend.dex
 
 import io.github.charlietap.chasm.InternalChasmApi
@@ -29,6 +27,7 @@ import io.github.charlietap.dexter.DexterException
 import io.github.charlietap.dexter.DexterFileFullException
 import kotlin.coroutines.cancellation.CancellationException
 
+@InternalChasmApi
 typealias ParallelModuleLowerer = suspend (
     Module,
     CirModule,
@@ -39,6 +38,7 @@ typealias ParallelModuleLowerer = suspend (
     ParallelTaskExecutor,
 ) -> DexModule
 
+@InternalChasmApi
 suspend fun ParallelModuleLowerer(
     module: Module,
     code: CirModule,

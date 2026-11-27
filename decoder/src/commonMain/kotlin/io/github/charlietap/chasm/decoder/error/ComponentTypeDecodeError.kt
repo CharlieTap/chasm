@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.decoder.error
 
-sealed interface ComponentTypeDecodeError : WasmDecodeError {
+internal sealed interface ComponentTypeDecodeError : WasmDecodeError {
 
     data class UnknownPrimitiveValueType(val opcode: UByte) : ComponentTypeDecodeError
 

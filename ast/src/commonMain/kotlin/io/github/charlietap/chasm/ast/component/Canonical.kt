@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.ast.component
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.component.Index.ComponentFunctionIndex
 import io.github.charlietap.chasm.ast.component.Index.ComponentTypeIndex
 import io.github.charlietap.chasm.ast.module.Index.FunctionIndex as ModuleFunctionIndex
@@ -7,6 +8,7 @@ import io.github.charlietap.chasm.ast.module.Index.MemoryIndex as ModuleMemoryIn
 import io.github.charlietap.chasm.ast.module.Index.TableIndex as ModuleTableIndex
 import io.github.charlietap.chasm.type.ValueType as CoreValueType
 
+@InternalChasmApi
 sealed interface CanonicalDefinition {
 
     data class Lift(
@@ -162,6 +164,7 @@ sealed interface CanonicalDefinition {
     data class ThreadAvailableParallelism(val shared: Boolean) : CanonicalDefinition
 }
 
+@InternalChasmApi
 sealed interface CanonicalOption {
 
     data class StringEncoding(val encoding: ComponentStringEncoding) : CanonicalOption
@@ -177,6 +180,7 @@ sealed interface CanonicalOption {
     data class Callback(val index: ModuleFunctionIndex) : CanonicalOption
 }
 
+@InternalChasmApi
 enum class ComponentStringEncoding {
     Utf8,
     Utf16,

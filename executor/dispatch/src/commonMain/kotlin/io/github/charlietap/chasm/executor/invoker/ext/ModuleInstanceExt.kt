@@ -8,7 +8,7 @@ import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.instance.ExportInstance
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 
-inline fun ModuleInstance.functionAddress(
+internal inline fun ModuleInstance.functionAddress(
     index: Index.FunctionIndex,
 ): Address.Function = try {
     functionAddresses[index.toInt()]
@@ -18,7 +18,7 @@ inline fun ModuleInstance.functionAddress(
     throw InvocationException(InvocationError.FunctionAddressLookupFailed(index.toInt()))
 }
 
-inline fun ModuleInstance.tableAddress(
+internal inline fun ModuleInstance.tableAddress(
     index: Index.TableIndex,
 ): Address.Table = try {
     tableAddresses[index.toInt()]
@@ -28,7 +28,7 @@ inline fun ModuleInstance.tableAddress(
     throw InvocationException(InvocationError.TableAddressLookupFailed(index.toInt()))
 }
 
-inline fun ModuleInstance.memoryAddress(
+internal inline fun ModuleInstance.memoryAddress(
     index: Index.MemoryIndex,
 ): Address.Memory = try {
     memAddresses[index.toInt()]
@@ -38,7 +38,7 @@ inline fun ModuleInstance.memoryAddress(
     throw InvocationException(InvocationError.MemoryAddressLookupFailed(index.toInt()))
 }
 
-inline fun ModuleInstance.tagAddress(
+internal inline fun ModuleInstance.tagAddress(
     index: Index.TagIndex,
 ): Address.Tag = try {
     tagAddresses[index.toInt()]
@@ -48,7 +48,7 @@ inline fun ModuleInstance.tagAddress(
     throw InvocationException(InvocationError.TagAddressLookupFailed(index.toInt()))
 }
 
-inline fun ModuleInstance.globalAddress(
+internal inline fun ModuleInstance.globalAddress(
     index: Index.GlobalIndex,
 ): Address.Global = try {
     globalAddresses[index.toInt()]
@@ -58,7 +58,7 @@ inline fun ModuleInstance.globalAddress(
     throw InvocationException(InvocationError.GlobalAddressLookupFailed(index.toInt()))
 }
 
-inline fun ModuleInstance.elementAddress(
+internal inline fun ModuleInstance.elementAddress(
     index: Index.ElementIndex,
 ): Address.Element = try {
     elemAddresses[index.toInt()]
@@ -68,7 +68,7 @@ inline fun ModuleInstance.elementAddress(
     throw InvocationException(InvocationError.ElementAddressLookupFailed(index.toInt()))
 }
 
-inline fun ModuleInstance.dataAddress(
+internal inline fun ModuleInstance.dataAddress(
     index: Index.DataIndex,
 ): Address.Data = try {
     dataAddresses[index.toInt()]
@@ -78,7 +78,7 @@ inline fun ModuleInstance.dataAddress(
     throw InvocationException(InvocationError.DataAddressLookupFailed(index.toInt()))
 }
 
-inline fun ModuleInstance.exportInstance(
+internal inline fun ModuleInstance.exportInstance(
     index: Int,
 ): ExportInstance = try {
     exports[index]

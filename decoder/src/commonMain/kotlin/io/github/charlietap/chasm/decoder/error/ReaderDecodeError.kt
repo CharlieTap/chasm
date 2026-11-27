@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.decoder.error
 
-sealed interface ReaderDecodeError : WasmDecodeError {
+internal sealed interface ReaderDecodeError : WasmDecodeError {
 
     data class InvalidIntegerEncoding(val bitWidth: Int) : ReaderDecodeError
 

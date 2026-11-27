@@ -1,12 +1,10 @@
 package io.github.charlietap.chasm.runtime.compiled.gc
 
-import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.runtime.instance.GlobalInstance
 import io.github.charlietap.chasm.type.Mutability
 import io.github.charlietap.chasm.type.ValueType
 
-@InternalChasmApi
-class GlobalOperations(
+internal class GlobalOperations(
     private val checks: ReferenceChecks,
 ) {
 

@@ -2,7 +2,7 @@ package io.github.charlietap.chasm.type.matching
 
 import io.github.charlietap.chasm.type.Limits
 
-fun LimitsMatcher(
+internal fun LimitsMatcher(
     type1: Limits,
     type2: Limits,
     context: TypeMatcherContext,

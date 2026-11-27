@@ -2,7 +2,7 @@ package io.github.charlietap.chasm.memory.read
 
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
 
-actual inline fun StringReader(
+internal actual inline fun StringReader(
     memory: LinearMemory,
     memoryPointer: Int,
     stringLengthInBytes: Int,

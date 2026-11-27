@@ -1,9 +1,11 @@
 package io.github.charlietap.chasm.runtime.value
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.type.HeapType
 import kotlin.jvm.JvmInline
 
+@InternalChasmApi
 sealed interface ReferenceValue : ExecutionValue {
 
     data class Null(val heapType: HeapType) : ReferenceValue {

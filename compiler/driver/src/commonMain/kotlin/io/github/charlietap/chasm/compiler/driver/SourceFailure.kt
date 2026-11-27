@@ -1,5 +1,8 @@
 package io.github.charlietap.chasm.compiler.driver
 
+import io.github.charlietap.chasm.InternalChasmApi
+
+@InternalChasmApi
 sealed interface SourceFailure {
 
     val message: String

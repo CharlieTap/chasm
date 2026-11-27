@@ -1,7 +1,9 @@
 package io.github.charlietap.chasm.ast.instruction
 
+import io.github.charlietap.chasm.InternalChasmApi
 import kotlin.jvm.JvmInline
 
+@InternalChasmApi
 sealed interface NumericInstruction : Instruction {
 
     sealed class Operator(
@@ -299,6 +301,7 @@ sealed interface NumericInstruction : Instruction {
     data object I64MulWideU : Operator(NumericOpcode.I64MulWideU)
 }
 
+@InternalChasmApi
 enum class NumericOpcode {
     I32Eqz,
     I32Eq,

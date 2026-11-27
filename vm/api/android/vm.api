@@ -161,43 +161,6 @@ public final class io/github/charlietap/chasm/vm/Memory {
 public final class io/github/charlietap/chasm/vm/Module {
 }
 
-public final class io/github/charlietap/chasm/vm/NonJsVirtualMachine : io/github/charlietap/chasm/vm/WasmVirtualMachine {
-	public static final field INSTANCE Lio/github/charlietap/chasm/vm/NonJsVirtualMachine;
-	public fun allocateFunction (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/FunctionType;Lkotlin/jvm/functions/Function1;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
-	public fun exportFunction (Lio/github/charlietap/chasm/vm/Instance;Ljava/lang/String;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
-	public fun exportGlobal (Lio/github/charlietap/chasm/vm/Instance;Ljava/lang/String;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
-	public fun exportMemory (Lio/github/charlietap/chasm/vm/Instance;Ljava/lang/String;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
-	public fun exportTable (Lio/github/charlietap/chasm/vm/Instance;Ljava/lang/String;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
-	public fun functionInvoke (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Instance;Ljava/lang/String;Ljava/util/List;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
-	public fun functionInvokeTyped (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Instance;Ljava/lang/String;Ljava/util/List;Ljava/util/List;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
-	public fun globalRead (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Global;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
-	public fun globalWrite (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Global;Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Value;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
-	public fun memoryReadBytes (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;II[BI)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
-	public fun memoryReadDouble (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;I)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
-	public fun memoryReadFloat (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;I)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
-	public fun memoryReadInt (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;I)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
-	public fun memoryReadLong (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;I)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
-	public fun memoryReadUtf8NullTerminatedUtf8String (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;I)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
-	public fun memoryReadUtf8String (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;II)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
-	public fun memoryWriteBytes (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;I[B)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
-	public fun memoryWriteBytes (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;I[BII)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
-	public fun memoryWriteDouble (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;ID)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
-	public fun memoryWriteFloat (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;IF)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
-	public fun memoryWriteInt (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;II)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
-	public fun memoryWriteLong (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;IJ)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
-	public fun memoryWriteNullTerminatedUtf8String (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;ILjava/lang/String;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
-	public fun memoryWriteUtf8String (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;ILjava/lang/String;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
-	public fun moduleDecode ([B)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
-	public fun moduleInstantiate (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Module;Ljava/util/List;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
-	public fun prepareFunction (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Instance;Ljava/lang/String;Ljava/util/List;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
-	public fun storeInit ()Lio/github/charlietap/chasm/vm/Store;
-}
-
-public final class io/github/charlietap/chasm/vm/NonJsVirtualMachine$ResultFactory {
-	public static final field INSTANCE Lio/github/charlietap/chasm/vm/NonJsVirtualMachine$ResultFactory;
-	public final fun new (Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
-}
-
 public final class io/github/charlietap/chasm/vm/NumberType : java/lang/Enum {
 	public static final field F32 Lio/github/charlietap/chasm/vm/NumberType;
 	public static final field F64 Lio/github/charlietap/chasm/vm/NumberType;
@@ -275,12 +238,6 @@ public final class io/github/charlietap/chasm/vm/SuspendingWasmVirtualMachine$De
 }
 
 public final class io/github/charlietap/chasm/vm/Table {
-}
-
-public final class io/github/charlietap/chasm/vm/ValueMapper {
-	public static final field INSTANCE Lio/github/charlietap/chasm/vm/ValueMapper;
-	public final fun from (Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Value;)Lio/github/charlietap/chasm/embedding/value/ExecutionValue;
-	public final fun to (Lio/github/charlietap/chasm/embedding/value/ExecutionValue;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Value;
 }
 
 public abstract interface class io/github/charlietap/chasm/vm/ValueType {

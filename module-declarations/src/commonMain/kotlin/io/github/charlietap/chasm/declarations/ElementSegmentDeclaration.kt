@@ -1,8 +1,10 @@
 package io.github.charlietap.chasm.declarations
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.type.ReferenceType
 
+@InternalChasmApi
 data class ElementSegmentDeclaration(
     val type: ReferenceType,
     val initExpressions: List<ConstantExpression>,

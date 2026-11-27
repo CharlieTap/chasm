@@ -1,9 +1,11 @@
 package io.github.charlietap.chasm.ast.module
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.instruction.Expression
 import io.github.charlietap.chasm.ast.module.Index.DataIndex
 import io.github.charlietap.chasm.ast.module.Index.MemoryIndex
 
+@InternalChasmApi
 data class DataSegment(
     val idx: DataIndex,
     val initData: UByteArray,

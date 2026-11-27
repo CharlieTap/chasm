@@ -1,9 +1,12 @@
 package io.github.charlietap.chasm.parallel
 
+import io.github.charlietap.chasm.InternalChasmApi
+
 /**
  * How many workers [totalWork] is worth, where one means it is not worth sharing. The
  * [largestItem] occupies one worker whatever the others do, so only the rest justifies more.
  */
+@InternalChasmApi
 fun selectWorkerCount(
     totalWork: Long,
     largestItem: Long,
@@ -20,6 +23,7 @@ fun selectWorkerCount(
     return enforceMinimumWorkers(workerCount, policy)
 }
 
+@InternalChasmApi
 fun workersForBatches(
     workerCount: Int,
     batchCount: Int,

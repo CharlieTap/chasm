@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.module
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.instruction.AggregateInstruction
 import io.github.charlietap.chasm.ast.instruction.Expression
 import io.github.charlietap.chasm.ast.instruction.NumericInstruction
@@ -26,8 +27,10 @@ import io.github.charlietap.chasm.declarations.ModuleDeclarations
 import io.github.charlietap.chasm.declarations.ModuleNames
 import io.github.charlietap.chasm.declarations.TableDeclaration
 
+@InternalChasmApi
 typealias ModuleDeclarationsFactory = (Module) -> ModuleDeclarations
 
+@InternalChasmApi
 @OptIn(ExperimentalUnsignedTypes::class)
 fun ModuleDeclarationsFactory(
     module: Module,
@@ -122,7 +125,7 @@ private fun v128Const(
     return ConstantInstruction.V128Const(low = littleEndian(0), high = littleEndian(8))
 }
 
-fun moduleNames(
+internal fun moduleNames(
     module: Module,
 ): ModuleNames {
     val sections = module.customs.filterIsInstance<NameData>()

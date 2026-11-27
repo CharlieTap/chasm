@@ -1,10 +1,12 @@
 package io.github.charlietap.chasm.runtime.host
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.host.HostParameters
 import io.github.charlietap.chasm.host.HostResults
 import io.github.charlietap.chasm.host.HostStack
 
 /** Opaque identity of a WebAssembly module instance calling a host function. */
+@InternalChasmApi
 interface RawHostModuleInstance
 
 /**
@@ -40,6 +42,7 @@ interface RawHostModuleInstance
  * See [readI32], [readI64], [readF32], [readF64], [writeI32], [writeI64],
  * [writeF32], and [writeF64] for the available parameter and result accessors.
  */
+@InternalChasmApi
 fun interface RawHostFunction {
 
     context(

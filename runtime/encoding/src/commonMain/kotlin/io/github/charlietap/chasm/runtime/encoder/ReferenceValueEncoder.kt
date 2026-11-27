@@ -1,9 +1,12 @@
 package io.github.charlietap.chasm.runtime.encoder
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.runtime.value.ReferenceValue
 
+@InternalChasmApi
 typealias ReferenceValueEncoder = (ReferenceValue) -> Long
 
+@InternalChasmApi
 inline fun ReferenceValueEncoder(
     value: ReferenceValue,
 ): Long = ReferenceValueEncoder(
@@ -11,6 +14,7 @@ inline fun ReferenceValueEncoder(
     heapTypeEncoder = ::HeapTypeEncoder,
 )
 
+@InternalChasmApi
 fun ReferenceValueEncoder(
     value: ReferenceValue,
     heapTypeEncoder: HeapTypeEncoder,

@@ -1,10 +1,12 @@
 package io.github.charlietap.chasm.runtime.ext
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.runtime.value.NumberValue
 import io.github.charlietap.chasm.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.runtime.value.VectorValue
 
+@InternalChasmApi
 inline fun ExecutionValue.toLongFromBoxed(): Long = when (this) {
     is ExecutionValue.Uninitialised -> 0L
     is NumberValue.I32 -> value.toLong()

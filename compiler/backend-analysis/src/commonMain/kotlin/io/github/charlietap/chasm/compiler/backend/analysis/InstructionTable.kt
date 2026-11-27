@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.compiler.backend.analysis
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.cir.AdminInstruction
 import io.github.charlietap.chasm.cir.MemoryInstruction
 import io.github.charlietap.chasm.cir.ParametricInstruction
@@ -8,6 +9,7 @@ import io.github.charlietap.chasm.compiler.backend.analysis.form.MemoryAccess
 import io.github.charlietap.chasm.compiler.backend.analysis.form.Operand
 import io.github.charlietap.chasm.type.ValueType
 
+@InternalChasmApi
 class InstructionTable internal constructor(
     val forms: InstructionForms,
     val writes: SlotWriteTable,
@@ -28,6 +30,7 @@ class InstructionTable internal constructor(
     }
 }
 
+@InternalChasmApi
 class SlotWriteTable internal constructor(
     val modes: ByteArray,
     val start: IntArray,
@@ -51,6 +54,7 @@ class SlotWriteTable internal constructor(
     }
 }
 
+@InternalChasmApi
 class JumpTable internal constructor(
     val start: IntArray,
     val targets: IntArray,
@@ -63,6 +67,7 @@ class JumpTable internal constructor(
     }
 }
 
+@InternalChasmApi
 class MemoryAccessTable internal constructor(
     val start: IntArray,
     val positions: IntArray,
@@ -97,6 +102,7 @@ class MemoryAccessTable internal constructor(
     }
 }
 
+@InternalChasmApi
 class SlotReadTable internal constructor(
     val start: IntArray,
     val slots: IntArray,
@@ -107,6 +113,7 @@ class SlotReadTable internal constructor(
     }
 }
 
+@InternalChasmApi
 class InstructionTableStorage {
     internal var modes = ByteArray(0)
     internal var writeStart = IntArray(0)
@@ -126,6 +133,7 @@ class InstructionTableStorage {
     internal var readSlots = IntArray(0)
 }
 
+@InternalChasmApi
 fun instructionTable(
     forms: InstructionForms,
     storage: InstructionTableStorage = InstructionTableStorage(),

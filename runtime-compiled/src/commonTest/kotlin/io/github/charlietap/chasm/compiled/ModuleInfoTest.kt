@@ -1,7 +1,6 @@
 package io.github.charlietap.chasm.compiled
 
 import com.github.michaelbull.result.getOrThrow
-import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.compiled.code.fixture
 import io.github.charlietap.chasm.compiled.format.COMPILED_RUNTIME_ABI
 import io.github.charlietap.chasm.compiled.format.UNPINNED_OFFSET
@@ -24,7 +23,6 @@ import kotlin.test.assertEquals
 import kotlin.test.fail
 import io.github.charlietap.chasm.declarations.moduleInfo as declarationsModuleInfo
 
-@OptIn(InternalChasmApi::class)
 class ModuleInfoTest {
 
     @Test

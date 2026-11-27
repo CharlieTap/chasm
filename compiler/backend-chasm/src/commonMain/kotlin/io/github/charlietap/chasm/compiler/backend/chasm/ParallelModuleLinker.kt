@@ -1,5 +1,3 @@
-@file:OptIn(InternalChasmApi::class)
-
 package io.github.charlietap.chasm.compiler.backend.chasm
 
 import io.github.charlietap.chasm.InternalChasmApi
@@ -26,8 +24,10 @@ import io.github.charlietap.chasm.parallel.workersForBatches
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.store.Store
 
+@InternalChasmApi
 typealias ParallelModuleLinker = suspend (Store, ModuleInstance, Module, CirModule, ParallelTaskExecutor) -> Unit
 
+@InternalChasmApi
 suspend fun ParallelModuleLinker(
     store: Store,
     instance: ModuleInstance,

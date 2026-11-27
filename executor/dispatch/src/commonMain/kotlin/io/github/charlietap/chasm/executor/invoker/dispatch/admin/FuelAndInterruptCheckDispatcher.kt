@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.admin
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
@@ -7,6 +8,7 @@ import io.github.charlietap.chasm.runtime.store.Fuel
 import io.github.charlietap.chasm.runtime.store.Interrupt
 
 /** [fuel] and [interrupt] are the compiling store's, captured so a check does not look them up on every loop iteration. */
+@InternalChasmApi
 fun FuelAndInterruptCheckDispatcher(
     fuel: Fuel,
     interrupt: Interrupt,

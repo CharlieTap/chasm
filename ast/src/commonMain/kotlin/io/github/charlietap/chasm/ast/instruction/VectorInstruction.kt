@@ -1,8 +1,10 @@
 package io.github.charlietap.chasm.ast.instruction
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.module.Index
 import kotlin.jvm.JvmInline
 
+@InternalChasmApi
 sealed interface VectorInstruction : Instruction {
 
     sealed interface MemoryAccess : VectorInstruction {
@@ -543,6 +545,7 @@ sealed interface VectorInstruction : Instruction {
     data object I32x4RelaxedDotI8x16I7x16AddS : Operator(VectorOpcode.I32x4RelaxedDotI8x16I7x16AddS)
 }
 
+@InternalChasmApi
 enum class VectorOpcode {
     I8x16Swizzle,
     I8x16Splat,

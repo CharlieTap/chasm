@@ -7,7 +7,7 @@ import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.type.FieldType
 import io.github.charlietap.chasm.type.StructType
 
-fun StructType.field(
+internal fun StructType.field(
     index: Index.FieldIndex,
 ): FieldType {
     val runtimeIndex = index.toInt()

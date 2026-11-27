@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.compiler.backend.analysis
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.cir.AdminInstruction
 import io.github.charlietap.chasm.cir.AggregateInstruction
 import io.github.charlietap.chasm.cir.CirFunction
@@ -12,6 +13,7 @@ import io.github.charlietap.chasm.cir.ReferenceInstruction
 import io.github.charlietap.chasm.cir.TableInstruction
 import io.github.charlietap.chasm.cir.VariableInstruction
 
+@InternalChasmApi
 fun CirFunction.jumpTargets(): BooleanArray {
     val targets = BooleanArray(instructions.size + 1)
     targets[0] = true
@@ -22,6 +24,7 @@ fun CirFunction.jumpTargets(): BooleanArray {
     return targets
 }
 
+@InternalChasmApi
 fun Instruction.jumpTargets(): IntArray {
 
     if (this is AdminInstruction.JumpTableS) {
@@ -65,6 +68,7 @@ private val NO_TARGETS = IntArray(0)
 
 private const val NO_TARGET = -1
 
+@InternalChasmApi
 fun Instruction.fallsThrough(): Boolean {
     return when (this) {
         is AdminInstruction -> fallsThrough()

@@ -1,7 +1,9 @@
 package io.github.charlietap.chasm.runtime.host
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.host.UnsafeHostApi
 
+@InternalChasmApi
 interface ByteArrayHostMemory : HostMemory {
 
     /**

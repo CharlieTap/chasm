@@ -1,10 +1,12 @@
 package io.github.charlietap.chasm.ast.component
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.component.Index.ComponentTypeIndex
 import io.github.charlietap.chasm.ast.value.NameValue
 import io.github.charlietap.chasm.ast.module.Index.FunctionIndex as ModuleFunctionIndex
 import io.github.charlietap.chasm.type.ValueType as CoreValueType
 
+@InternalChasmApi
 sealed interface ValueType {
 
     data object Bool : PrimitiveValueType
@@ -38,8 +40,10 @@ sealed interface ValueType {
     data class TypeIndex(val index: ComponentTypeIndex) : ValueType
 }
 
+@InternalChasmApi
 sealed interface PrimitiveValueType : ValueType, DefinedValueType
 
+@InternalChasmApi
 sealed interface DefinedValueType {
 
     data class Record(val fields: kotlin.collections.List<LabeledValueType>) : DefinedValueType
@@ -71,16 +75,19 @@ sealed interface DefinedValueType {
     data class Future(val value: ValueType?) : DefinedValueType
 }
 
+@InternalChasmApi
 data class LabeledValueType(
     val label: NameValue,
     val type: ValueType,
 )
 
+@InternalChasmApi
 data class VariantCase(
     val label: NameValue,
     val type: ValueType?,
 )
 
+@InternalChasmApi
 sealed interface KeyType {
 
     data object Bool : KeyType
@@ -106,6 +113,7 @@ sealed interface KeyType {
     data object String : KeyType
 }
 
+@InternalChasmApi
 sealed interface TypeDefinition {
 
     data class Value(val type: DefinedValueType) : TypeDefinition
@@ -122,6 +130,7 @@ sealed interface TypeDefinition {
     ) : TypeDefinition
 }
 
+@InternalChasmApi
 data class FunctionType(
     val params: List<LabeledValueType>,
     val result: ValueType?,
@@ -130,6 +139,7 @@ data class FunctionType(
 
 // Decode keeps the grammar broad; validation rejects private resource types in
 // component and instance type declarations.
+@InternalChasmApi
 sealed interface ComponentDeclaration {
 
     data class CoreType(val type: CoreTypeDefinition) : ComponentDeclaration
@@ -149,6 +159,7 @@ sealed interface ComponentDeclaration {
     ) : ComponentDeclaration
 }
 
+@InternalChasmApi
 sealed interface InstanceDeclaration {
 
     data class CoreType(val type: CoreTypeDefinition) : InstanceDeclaration

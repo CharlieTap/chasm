@@ -1,11 +1,14 @@
 package io.github.charlietap.chasm.compiler.backend.abi
 
+import io.github.charlietap.chasm.InternalChasmApi
+
 private const val GROUP_BITS = 7
 private const val GROUP = 0x7F
 private const val SIGN = 0x40
 private const val CONTINUES = 0x80
 private const val MAX_GROUPS = 10
 
+@InternalChasmApi
 fun packLongs(
     values: LongArray,
     maxBytes: Int = 60_000,

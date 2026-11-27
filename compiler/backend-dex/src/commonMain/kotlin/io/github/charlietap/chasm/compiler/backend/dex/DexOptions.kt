@@ -1,8 +1,10 @@
 package io.github.charlietap.chasm.compiler.backend.dex
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.config.CpuLimits
 import io.github.charlietap.chasm.config.RuntimeConfig
 
+@InternalChasmApi
 data class DexOptions(
     val entryClass: String = "chasm.dex.WasmModule",
     val runtime: RuntimeConfig = RuntimeConfig(),

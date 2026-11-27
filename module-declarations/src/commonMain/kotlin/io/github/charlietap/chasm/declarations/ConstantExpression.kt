@@ -1,12 +1,15 @@
 package io.github.charlietap.chasm.declarations
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.type.HeapType
 
+@InternalChasmApi
 data class ConstantExpression(
     val instructions: List<ConstantInstruction>,
 )
 
+@InternalChasmApi
 sealed interface ConstantInstruction {
 
     data class I32Const(

@@ -1,9 +1,11 @@
 package io.github.charlietap.chasm.benchmark
 
+import io.github.charlietap.chasm.InternalChasmApi
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.TimeSource
 
+@InternalChasmApi
 public object BenchmarkStabilizer {
 
     /** Applies a scheduling policy to the calling thread only. */

@@ -1,7 +1,9 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.numeric
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.executor.invoker.dispatch.dispatchInstruction
 
+@InternalChasmApi
 fun I64ExtendI32SIDispatcher(
     operand: Int,
     destinationSlot: Int,
@@ -11,6 +13,7 @@ fun I64ExtendI32SIDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64ExtendI32SSDispatcher(
     operandSlot: Int,
     destinationSlot: Int,
@@ -20,6 +23,7 @@ fun I64ExtendI32SSDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64ExtendI32UIDispatcher(
     operand: Int,
     destinationSlot: Int,
@@ -29,6 +33,7 @@ fun I64ExtendI32UIDispatcher(
     }
 }
 
+@InternalChasmApi
 fun I64ExtendI32USDispatcher(
     operandSlot: Int,
     destinationSlot: Int,

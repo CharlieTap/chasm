@@ -1,5 +1,3 @@
-@file:OptIn(InternalChasmApi::class)
-
 package io.github.charlietap.chasm.compiler.driver
 
 import io.github.charlietap.chasm.InternalChasmApi
@@ -8,8 +6,10 @@ import io.github.charlietap.chasm.compiler.frontend.diagnostic.TrapSiteTables
 import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.runtime.diagnostic.FunctionTrapSites
 
+@InternalChasmApi
 typealias FunctionBodyOffsets = (ModuleConfig, ByteArray) -> List<IntArray?>
 
+@InternalChasmApi
 class TrapSiteSource(
     private val bodyOffsets: FunctionBodyOffsets,
     private val trapSiteTables: TrapSiteTables,

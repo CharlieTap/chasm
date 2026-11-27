@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.compiler.backend.analysis.gc
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.compiler.backend.abi.FILL_BYTES
 import io.github.charlietap.chasm.compiler.backend.abi.FILL_CHARS
 import io.github.charlietap.chasm.compiler.backend.abi.FILL_DOUBLES
@@ -15,6 +16,7 @@ import io.github.charlietap.chasm.type.PackedType
 import io.github.charlietap.chasm.type.StorageType
 import io.github.charlietap.chasm.type.ValueType
 
+@InternalChasmApi
 enum class ArrayElementKind(
     val descriptor: String,
     val shift: Int,
@@ -32,6 +34,7 @@ enum class ArrayElementKind(
     val arrayDescriptor: String = "[$descriptor"
 }
 
+@InternalChasmApi
 fun arrayElementKind(type: FieldType): ArrayElementKind {
     return when (val storage = type.storageType) {
         is StorageType.Packed -> when (storage.type) {

@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.runtime.compiled.gc
 
-import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.host.HostGcType
 import io.github.charlietap.chasm.type.DefinedType
 import io.github.charlietap.chasm.type.FieldType
@@ -10,8 +9,7 @@ import io.github.charlietap.chasm.type.StorageType
 import io.github.charlietap.chasm.type.ValueType
 import java.util.concurrent.ConcurrentHashMap
 
-@InternalChasmApi
-class RttShapeLayouts(
+internal class RttShapeLayouts(
     private val managedStore: ManagedStore,
     private val registry: RttRegistry,
 ) : ShapeLayouts {
@@ -26,6 +24,15 @@ class RttShapeLayouts(
         }
 
         return structLayout(value.rtt)
+    }
+
+    override fun structStorage(value: Any): StructStorageLayout? {
+
+        if (value !is CompiledStruct || managedStore.types.type(value) < 0) {
+            return null
+        }
+
+        return value.rtt.layout as? StructStorageLayout
     }
 
     override fun array(value: Any): ArrayLayout? {

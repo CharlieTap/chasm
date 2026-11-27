@@ -6,6 +6,7 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.getError
 import com.github.michaelbull.result.getOrElse
 import com.github.michaelbull.result.mapError
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.module.Import
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.config.Bytes
@@ -25,10 +26,13 @@ import java.nio.file.Path
 import java.nio.file.StandardOpenOption
 import java.security.MessageDigest
 
+@InternalChasmApi
 typealias BinaryModuleDecoder = (ModuleConfig, ByteArray) -> Result<Module, ModuleDecoderError>
 
+@InternalChasmApi
 typealias StreamedModuleDecoder = (ModuleConfig, SourceReader) -> Result<Module, ModuleDecoderError>
 
+@InternalChasmApi
 class ModuleSources(
     private val binaryDecoder: BinaryModuleDecoder,
     private val streamedDecoder: StreamedModuleDecoder,

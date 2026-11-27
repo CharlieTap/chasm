@@ -1,9 +1,11 @@
 package io.github.charlietap.chasm.ast.module
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.instruction.Expression
 import io.github.charlietap.chasm.ast.module.Index.FunctionIndex
 import io.github.charlietap.chasm.ast.module.Index.TypeIndex
 
+@InternalChasmApi
 data class Function(
     val idx: FunctionIndex,
     val typeIndex: TypeIndex,

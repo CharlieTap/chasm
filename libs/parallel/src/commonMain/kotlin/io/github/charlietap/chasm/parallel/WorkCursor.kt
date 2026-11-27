@@ -2,11 +2,13 @@
 
 package io.github.charlietap.chasm.parallel
 
+import io.github.charlietap.chasm.InternalChasmApi
 import kotlin.concurrent.atomics.AtomicInt
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.concurrent.atomics.fetchAndIncrement
 
 /** Hands out [count] pieces of work, each to whichever worker claims it first. */
+@InternalChasmApi
 class WorkCursor(
     private val count: Int,
 ) {
@@ -23,8 +25,10 @@ class WorkCursor(
     }
 }
 
+@InternalChasmApi
 const val NOTHING_TO_CLAIM = -1
 
+@InternalChasmApi
 inline fun ParallelTaskScope.claimEach(
     cursor: WorkCursor,
     action: (claimed: Int) -> Unit,

@@ -16,7 +16,7 @@ internal fun grownArrayCapacity(capacity: Int, required: Int, maximumPages: Int)
     return minOf(maximumPages, maxOf(required / LinearMemory.PAGE_SIZE, pages + extraPages)) * LinearMemory.PAGE_SIZE
 }
 
-const val OVERREAD_BYTES = 8
+internal const val OVERREAD_BYTES = 8
 
 internal fun allocateMemoryArray(capacity: Int, required: Int, allocate: (Int) -> ByteArray = ::ByteArray): ByteArray =
     try {

@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.runtime.compiled.gc
 
-import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.executor.invoker.compiled.closeFrame
 import io.github.charlietap.chasm.executor.invoker.compiled.saveStack
 import io.github.charlietap.chasm.executor.invoker.thread.traceableTrap
@@ -10,13 +9,11 @@ import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import kotlin.reflect.KClass
 
-@InternalChasmApi
-val managedEntryClass: KClass<*> = ManagedEntry::class
+internal val managedEntryClass: KClass<*> = ManagedEntry::class
 
 private val MANAGED_ENTRY = ManagedEntry()
 
-@InternalChasmApi
-fun enterObjects(
+internal fun enterObjects(
     context: ExecutionContext,
     function: FunctionInstance,
     words: LongArray,

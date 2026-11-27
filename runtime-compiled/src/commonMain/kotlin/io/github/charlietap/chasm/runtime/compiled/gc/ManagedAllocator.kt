@@ -1,12 +1,10 @@
 package io.github.charlietap.chasm.runtime.compiled.gc
 
-import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.runtime.execution.ARRAY_OVERHEAD
 import io.github.charlietap.chasm.runtime.store.Store
 import java.lang.reflect.Array as ReflectArray
 
-@InternalChasmApi
-class ManagedAllocator(
+internal class ManagedAllocator(
     private val store: Store,
 ) {
 

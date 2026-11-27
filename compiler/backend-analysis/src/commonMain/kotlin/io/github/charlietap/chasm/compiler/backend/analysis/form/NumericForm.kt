@@ -1,7 +1,9 @@
 package io.github.charlietap.chasm.compiler.backend.analysis.form
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.type.NumberType
 
+@InternalChasmApi
 sealed interface NumericForm {
 
     val resultType: NumberType
@@ -70,6 +72,7 @@ sealed interface NumericForm {
     }
 }
 
+@InternalChasmApi
 enum class UnaryOperation {
     Clz,
     Ctz,
@@ -86,6 +89,7 @@ enum class UnaryOperation {
     Sqrt,
 }
 
+@InternalChasmApi
 enum class BinaryOperation {
     Add,
     Sub,
@@ -108,6 +112,7 @@ enum class BinaryOperation {
     Copysign,
 }
 
+@InternalChasmApi
 enum class Comparison(
     val ordering: Ordering,
     val unsigned: Boolean = false,
@@ -128,6 +133,7 @@ enum class Comparison(
     Ge(Ordering.GreaterOrEqual),
 }
 
+@InternalChasmApi
 enum class Ordering {
     Equal,
     NotEqual,
@@ -137,6 +143,7 @@ enum class Ordering {
     GreaterOrEqual,
 }
 
+@InternalChasmApi
 enum class Conversion(
     val source: NumberType,
     val result: NumberType,
@@ -172,6 +179,7 @@ enum class Conversion(
     F64PromoteF32(NumberType.F32, NumberType.F64),
 }
 
+@InternalChasmApi
 enum class WideOperation {
     Add128,
     Sub128,

@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.runtime.store
 
+import io.github.charlietap.chasm.InternalChasmApi
 import kotlin.concurrent.Volatile
 
 /**
@@ -8,6 +9,7 @@ import kotlin.concurrent.Volatile
  * [io.github.charlietap.chasm.runtime.error.InvocationError.Interrupted] once it is set. Stores
  * without it compile no checks and pay nothing.
  */
+@InternalChasmApi
 class Interrupt(val enabled: Boolean = false) {
     /**
      * May be set from any thread. Stays set until the next outermost call starts, so a call made

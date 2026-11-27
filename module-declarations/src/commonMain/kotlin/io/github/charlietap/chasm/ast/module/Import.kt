@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.ast.module
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.value.NameValue
 import io.github.charlietap.chasm.type.GlobalType
 import io.github.charlietap.chasm.type.MemoryType
@@ -7,6 +8,7 @@ import io.github.charlietap.chasm.type.TableType
 import io.github.charlietap.chasm.type.TagType
 import kotlin.jvm.JvmInline
 
+@InternalChasmApi
 data class Import(
     val moduleName: NameValue,
     val entityName: NameValue,

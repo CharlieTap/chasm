@@ -9,7 +9,6 @@ import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.testing.Test
 import org.gradle.language.base.plugins.LifecycleBasePlugin
-import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
 
 plugins {
     alias(libs.plugins.kotlin.jvm)
@@ -74,8 +73,6 @@ listOf("apiElements", "runtimeElements").forEach { configurationName ->
 
 kotlin {
 
-    @OptIn(ExperimentalAbiValidation::class)
-    abiValidation()
     jvmToolchain {
         languageVersion.set(JavaLanguageVersion.of(libs.versions.java.compiler.version.get().toInt()))
     }

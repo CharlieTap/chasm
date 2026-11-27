@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.reference
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.executor.invoker.dispatch.dispatchInstruction
 import io.github.charlietap.chasm.executor.invoker.instruction.reference.RefCastExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.reference.RefTestExecutor
@@ -10,6 +11,7 @@ import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.ext.isNullableReference
 import io.github.charlietap.chasm.runtime.type.ReferenceTypeTest
 
+@InternalChasmApi
 fun RefCastSDispatcher(
     referenceSlot: Int,
     destinationSlot: Int,
@@ -24,6 +26,7 @@ fun RefCastSDispatcher(
     )
 }
 
+@InternalChasmApi
 fun RefEqSsDispatcher(
     reference1Slot: Int,
     reference2Slot: Int,
@@ -37,6 +40,7 @@ fun RefEqSsDispatcher(
     )
 }
 
+@InternalChasmApi
 fun RefIsNullSDispatcher(
     valueSlot: Int,
     destinationSlot: Int,
@@ -48,6 +52,7 @@ fun RefIsNullSDispatcher(
     )
 }
 
+@InternalChasmApi
 fun RefAsNonNullSDispatcher(
     valueSlot: Int,
     destinationSlot: Int,
@@ -61,6 +66,7 @@ fun RefAsNonNullSDispatcher(
     }
 }
 
+@InternalChasmApi
 fun RefNullSDispatcher(
     reference: Long,
     destinationSlot: Int,
@@ -70,6 +76,7 @@ fun RefNullSDispatcher(
     }
 }
 
+@InternalChasmApi
 fun RefFuncSDispatcher(
     reference: Long,
     destinationSlot: Int,
@@ -79,6 +86,7 @@ fun RefFuncSDispatcher(
     }
 }
 
+@InternalChasmApi
 fun RefTestSDispatcher(
     referenceSlot: Int,
     destinationSlot: Int,

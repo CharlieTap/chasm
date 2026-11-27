@@ -1,10 +1,9 @@
-@file:OptIn(InternalChasmApi::class)
-
 package io.github.charlietap.chasm.compiler.backend.abi
 
 import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.runtime.compiled.CODE_CLASS_PREFIX
 
+@InternalChasmApi
 class GeneratedClassNames(
     private val entryPath: String,
 ) {

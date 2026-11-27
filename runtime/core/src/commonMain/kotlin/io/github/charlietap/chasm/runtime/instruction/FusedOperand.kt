@@ -1,8 +1,10 @@
 package io.github.charlietap.chasm.runtime.instruction
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.module.Index
 import kotlin.jvm.JvmInline
 
+@InternalChasmApi
 sealed interface FusedOperand {
 
     @JvmInline

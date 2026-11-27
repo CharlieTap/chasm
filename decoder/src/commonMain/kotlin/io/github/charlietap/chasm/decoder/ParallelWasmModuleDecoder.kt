@@ -4,6 +4,7 @@ package io.github.charlietap.chasm.decoder
 
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.decoder.error.ModuleDecoderError
@@ -23,6 +24,7 @@ import io.github.charlietap.chasm.parallel.executeWorkers
 import io.github.charlietap.chasm.parallel.workersForBatches
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
 
+@InternalChasmApi
 suspend fun ParallelWasmModuleDecoder(
     config: ModuleConfig,
     bytes: ByteArray,
@@ -35,6 +37,7 @@ suspend fun ParallelWasmModuleDecoder(
  * binary whose section framing cannot be read up front, or which lacks a function type for
  * one of its bodies.
  */
+@InternalChasmApi
 suspend fun ParallelWasmModuleDecoder(
     config: ModuleConfig,
     bytes: ByteArray,

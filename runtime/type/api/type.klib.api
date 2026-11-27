@@ -1,0 +1,66 @@
+// Klib ABI Dump
+// Targets: [iosArm64, iosSimulatorArm64, linuxArm64, linuxX64, macosArm64, mingwX64]
+// Rendering settings:
+// - Signature version: 2
+// - Show manifest properties: true
+// - Show declarations: true
+
+// Library unique name: <io.github.charlietap.chasm:type>
+sealed interface io.github.charlietap.chasm.runtime.type/ExternalType { // io.github.charlietap.chasm.runtime.type/ExternalType|null[0]
+    final value class Function : io.github.charlietap.chasm.runtime.type/ExternalType { // io.github.charlietap.chasm.runtime.type/ExternalType.Function|null[0]
+        constructor <init>(io.github.charlietap.chasm.type/FunctionType) // io.github.charlietap.chasm.runtime.type/ExternalType.Function.<init>|<init>(io.github.charlietap.chasm.type.FunctionType){}[0]
+
+        final val functionType // io.github.charlietap.chasm.runtime.type/ExternalType.Function.functionType|{}functionType[0]
+            final fun <get-functionType>(): io.github.charlietap.chasm.type/FunctionType // io.github.charlietap.chasm.runtime.type/ExternalType.Function.functionType.<get-functionType>|<get-functionType>(){}[0]
+
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.runtime.type/ExternalType.Function.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.runtime.type/ExternalType.Function.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.runtime.type/ExternalType.Function.toString|toString(){}[0]
+    }
+
+    final value class Global : io.github.charlietap.chasm.runtime.type/ExternalType { // io.github.charlietap.chasm.runtime.type/ExternalType.Global|null[0]
+        constructor <init>(io.github.charlietap.chasm.type/GlobalType) // io.github.charlietap.chasm.runtime.type/ExternalType.Global.<init>|<init>(io.github.charlietap.chasm.type.GlobalType){}[0]
+
+        final val globalType // io.github.charlietap.chasm.runtime.type/ExternalType.Global.globalType|{}globalType[0]
+            final fun <get-globalType>(): io.github.charlietap.chasm.type/GlobalType // io.github.charlietap.chasm.runtime.type/ExternalType.Global.globalType.<get-globalType>|<get-globalType>(){}[0]
+
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.runtime.type/ExternalType.Global.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.runtime.type/ExternalType.Global.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.runtime.type/ExternalType.Global.toString|toString(){}[0]
+    }
+
+    final value class Memory : io.github.charlietap.chasm.runtime.type/ExternalType { // io.github.charlietap.chasm.runtime.type/ExternalType.Memory|null[0]
+        constructor <init>(io.github.charlietap.chasm.type/MemoryType) // io.github.charlietap.chasm.runtime.type/ExternalType.Memory.<init>|<init>(io.github.charlietap.chasm.type.MemoryType){}[0]
+
+        final val memoryType // io.github.charlietap.chasm.runtime.type/ExternalType.Memory.memoryType|{}memoryType[0]
+            final fun <get-memoryType>(): io.github.charlietap.chasm.type/MemoryType // io.github.charlietap.chasm.runtime.type/ExternalType.Memory.memoryType.<get-memoryType>|<get-memoryType>(){}[0]
+
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.runtime.type/ExternalType.Memory.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.runtime.type/ExternalType.Memory.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.runtime.type/ExternalType.Memory.toString|toString(){}[0]
+    }
+
+    final value class Table : io.github.charlietap.chasm.runtime.type/ExternalType { // io.github.charlietap.chasm.runtime.type/ExternalType.Table|null[0]
+        constructor <init>(io.github.charlietap.chasm.type/TableType) // io.github.charlietap.chasm.runtime.type/ExternalType.Table.<init>|<init>(io.github.charlietap.chasm.type.TableType){}[0]
+
+        final val tableType // io.github.charlietap.chasm.runtime.type/ExternalType.Table.tableType|{}tableType[0]
+            final fun <get-tableType>(): io.github.charlietap.chasm.type/TableType // io.github.charlietap.chasm.runtime.type/ExternalType.Table.tableType.<get-tableType>|<get-tableType>(){}[0]
+
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.runtime.type/ExternalType.Table.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.runtime.type/ExternalType.Table.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.runtime.type/ExternalType.Table.toString|toString(){}[0]
+    }
+
+    final value class Tag : io.github.charlietap.chasm.runtime.type/ExternalType { // io.github.charlietap.chasm.runtime.type/ExternalType.Tag|null[0]
+        constructor <init>(io.github.charlietap.chasm.type/TagType) // io.github.charlietap.chasm.runtime.type/ExternalType.Tag.<init>|<init>(io.github.charlietap.chasm.type.TagType){}[0]
+
+        final val tagType // io.github.charlietap.chasm.runtime.type/ExternalType.Tag.tagType|{}tagType[0]
+            final fun <get-tagType>(): io.github.charlietap.chasm.type/TagType // io.github.charlietap.chasm.runtime.type/ExternalType.Tag.tagType.<get-tagType>|<get-tagType>(){}[0]
+
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.runtime.type/ExternalType.Tag.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.runtime.type/ExternalType.Tag.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.runtime.type/ExternalType.Tag.toString|toString(){}[0]
+    }
+}
+
+final fun (io.github.charlietap.chasm.runtime.type/ExternalType).io.github.charlietap.chasm.runtime.type.ext/clone(): io.github.charlietap.chasm.runtime.type/ExternalType // io.github.charlietap.chasm.runtime.type.ext/clone|clone@io.github.charlietap.chasm.runtime.type.ExternalType(){}[0]

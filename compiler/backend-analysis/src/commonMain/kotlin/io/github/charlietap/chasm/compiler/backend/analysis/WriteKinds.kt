@@ -3,7 +3,7 @@ package io.github.charlietap.chasm.compiler.backend.analysis
 import io.github.charlietap.chasm.type.NumberType
 import io.github.charlietap.chasm.type.ValueType
 
-class WriteKinds private constructor() {
+internal class WriteKinds private constructor() {
 
     companion object {
         const val COPIED: Byte = 0

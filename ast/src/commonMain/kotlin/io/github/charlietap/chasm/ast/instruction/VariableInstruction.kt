@@ -1,9 +1,11 @@
 package io.github.charlietap.chasm.ast.instruction
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.module.Index.GlobalIndex
 import io.github.charlietap.chasm.ast.module.Index.LocalIndex
 import kotlin.jvm.JvmInline
 
+@InternalChasmApi
 sealed interface VariableInstruction : Instruction {
     @JvmInline
     value class LocalGet(val localIdx: LocalIndex) : VariableInstruction

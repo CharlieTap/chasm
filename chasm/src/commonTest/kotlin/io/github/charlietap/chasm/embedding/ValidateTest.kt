@@ -1,11 +1,8 @@
-@file:OptIn(InternalChasmApi::class)
-
 package io.github.charlietap.chasm.embedding
 
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.goncalossilva.resources.Resource
-import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.embedding.error.ModuleError
 import io.github.charlietap.chasm.embedding.fixture.componentTypes
 import io.github.charlietap.chasm.embedding.fixture.publicComponent

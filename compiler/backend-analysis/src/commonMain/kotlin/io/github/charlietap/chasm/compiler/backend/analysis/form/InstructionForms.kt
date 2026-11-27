@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.compiler.backend.analysis.form
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.cir.CirFunction
 import io.github.charlietap.chasm.cir.ControlInstruction
 import io.github.charlietap.chasm.cir.Instruction
@@ -7,6 +8,7 @@ import io.github.charlietap.chasm.cir.MemoryInstruction
 import io.github.charlietap.chasm.cir.NumericInstruction
 import io.github.charlietap.chasm.compiler.backend.analysis.ModuleIndexSpaces
 
+@InternalChasmApi
 class InstructionForms(
     val function: CirFunction,
     val declarations: ModuleIndexSpaces,
@@ -71,6 +73,7 @@ class InstructionForms(
     }
 }
 
+@InternalChasmApi
 class InstructionFormStorage {
     private var decoded = ByteArray(0)
     private var numericForms = arrayOfNulls<NumericForm>(0)

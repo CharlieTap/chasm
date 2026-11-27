@@ -4,7 +4,6 @@ package io.github.charlietap.chasm.runtime.compiled
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
-import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.executor.invoker.compiled.CompiledFunctionInstallation
 import io.github.charlietap.chasm.executor.invoker.compiled.installCompiledFunctions
 import io.github.charlietap.chasm.runtime.address.Address
@@ -26,8 +25,7 @@ import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.runtime.type.RuntimeTypeMap
 import io.github.charlietap.chasm.runtime.value.ReferenceValue
 
-@InternalChasmApi
-fun ModuleCodeInstallation(
+internal fun ModuleCodeInstallation(
     install: (CodeInstallation) -> Unit,
     store: Store,
     definedFunctions: Int,

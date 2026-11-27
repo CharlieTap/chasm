@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.runtime.host
 
+import io.github.charlietap.chasm.InternalChasmApi
 import kotlin.jvm.JvmInline
 
 /**
@@ -25,6 +26,7 @@ import kotlin.jvm.JvmInline
  *
  * Address payloads are only valid in the store that produced them.
  */
+@InternalChasmApi
 typealias HostReference = Long
 
 /**
@@ -34,6 +36,7 @@ typealias HostReference = Long
  *
  * The handle is invalid after release or after its store is destroyed.
  */
+@InternalChasmApi
 @JvmInline
 value class HostReferenceRoot(val slot: Int)
 
@@ -43,10 +46,12 @@ value class HostReferenceRoot(val slot: Int)
  * Use [raw] when passing it through a host stack, global, or table. The value
  * belongs to the store which created it.
  */
+@InternalChasmApi
 @JvmInline
 value class HostExternReference(val raw: HostReference)
 
 /** Describes what a [HostExternReference] contains. */
+@InternalChasmApi
 @JvmInline
 value class HostExternKind(val id: Int) {
 

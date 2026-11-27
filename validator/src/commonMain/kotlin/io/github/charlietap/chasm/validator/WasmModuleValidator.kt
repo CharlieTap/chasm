@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.validator
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.map
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.validator.context.ModuleValidationContext
@@ -11,8 +12,10 @@ import io.github.charlietap.chasm.validator.error.ModuleValidationException
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError
 import io.github.charlietap.chasm.validator.validator.module.ModuleValidator
 
+@InternalChasmApi
 typealias WasmModuleValidator = (ModuleConfig, Module) -> Result<Module, ModuleValidatorError>
 
+@InternalChasmApi
 fun WasmModuleValidator(
     config: ModuleConfig,
     module: Module,

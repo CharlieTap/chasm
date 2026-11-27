@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
-
 plugins {
     alias(libs.plugins.conventions.kmp.jvm)
     alias(libs.plugins.build.config)
@@ -23,8 +21,7 @@ kotlin {
         namespace = "io.github.charlietap.chasm.dex"
     }
 
-    @OptIn(ExperimentalAbiValidation::class)
-    abiValidation()
+    validatePublicAbi()
 
     sourceSets {
         commonMain {

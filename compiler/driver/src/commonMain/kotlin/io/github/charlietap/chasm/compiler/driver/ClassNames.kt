@@ -1,5 +1,8 @@
 package io.github.charlietap.chasm.compiler.driver
 
+import io.github.charlietap.chasm.InternalChasmApi
+
+@InternalChasmApi
 class ClassNames {
 
     fun valid(name: String): Boolean {

@@ -1,28 +1,53 @@
 package io.github.charlietap.chasm.compiler.backend.abi
 
-const val COMPILED_FUNCTION = "Lio/github/charlietap/chasm/runtime/function/CompiledFunction;"
+import io.github.charlietap.chasm.InternalChasmApi
+
+internal const val COMPILED_FUNCTION = "Lio/github/charlietap/chasm/runtime/function/CompiledFunction;"
+
+@InternalChasmApi
 const val CODE_INSTALLATION = "Lio/github/charlietap/chasm/runtime/compiled/CodeInstallation;"
+
+@InternalChasmApi
 const val OBJECT_ENTRY = "Lio/github/charlietap/chasm/runtime/compiled/ObjectEntry;"
 
+@InternalChasmApi
 val ENTRY_CALL_OBJECTS = MethodRef(OBJECT_ENTRY, "callObjects", listOf(CONTEXT_TYPE, "[J", "[Ljava/lang/Object;", "I"), "V")
 
+@InternalChasmApi
 val INSTALL = MethodRef(CODE_INSTALLATION, "install", listOf("I", COMPILED_FUNCTION), "V")
+
+@InternalChasmApi
 val INSTALLATION_INSTANCE = MethodRef(CODE_INSTALLATION, "getInstance", emptyList(), MODULE_INSTANCE)
+
+@InternalChasmApi
 val INSTALLATION_MEMORY = installationAccessor("memory", MEMORY_INSTANCE)
-val INSTALLATION_TABLE = installationAccessor("table", TABLE_INSTANCE)
+internal val INSTALLATION_TABLE = installationAccessor("table", TABLE_INSTANCE)
+
+@InternalChasmApi
 val INSTALLATION_GLOBAL = installationAccessor("global", GLOBAL_INSTANCE)
-val INSTALLATION_FUNCTION = installationAccessor("function", FUNCTION_INSTANCE)
-val INSTALLATION_ELEMENT = installationAccessor("element", ELEMENT_INSTANCE)
-val INSTALLATION_DATA = installationAccessor("data", DATA_INSTANCE)
+internal val INSTALLATION_FUNCTION = installationAccessor("function", FUNCTION_INSTANCE)
+internal val INSTALLATION_ELEMENT = installationAccessor("element", ELEMENT_INSTANCE)
+internal val INSTALLATION_DATA = installationAccessor("data", DATA_INSTANCE)
+
+@InternalChasmApi
 val INSTALLATION_REFERENCE_GLOBAL = installationAccessor("referenceGlobal", OBJECT_TYPE)
+
+@InternalChasmApi
 val INSTALLATION_REFERENCE_TABLE = installationAccessor("referenceTable", OBJECT_TYPE)
+
+@InternalChasmApi
 val INSTALLATION_REFERENCE_SEGMENT = installationAccessor("referenceSegment", OBJECT_TYPE)
-val INSTALLATION_RUNTIME_TYPE = installationAccessor("runtimeType", "I")
-val INSTALLATION_TAG_ADDRESS = installationAccessor("tagAddress", "I")
-val INSTALLATION_FUNCTION_REFERENCE = installationAccessor("functionReference", "J")
+internal val INSTALLATION_RUNTIME_TYPE = installationAccessor("runtimeType", "I")
+internal val INSTALLATION_TAG_ADDRESS = installationAccessor("tagAddress", "I")
+internal val INSTALLATION_FUNCTION_REFERENCE = installationAccessor("functionReference", "J")
+
+@InternalChasmApi
 val INSTALLATION_MANAGED_FUNCTION = installationAccessor("managedFunction", OBJECT_TYPE)
+
+@InternalChasmApi
 val INSTALLATION_RTT = installationAccessor("rtt", OBJECT_TYPE)
 
+@InternalChasmApi
 fun installationAccessor(
     resource: Resource,
 ): MethodRef? = when (resource) {
@@ -43,6 +68,7 @@ fun installationAccessor(
     else -> null
 }
 
+@InternalChasmApi
 fun installationIndex(
     resource: Resource,
 ): Int = when (resource) {

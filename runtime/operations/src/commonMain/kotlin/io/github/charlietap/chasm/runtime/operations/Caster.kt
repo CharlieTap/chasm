@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.runtime.operations
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.runtime.encoder.RV_SHIFT_BITS
 import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_ARRAY
 import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_FUNCTION
@@ -10,8 +11,10 @@ import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.type.RTT
 import io.github.charlietap.chasm.runtime.type.ReferenceTypeTest
 
+@InternalChasmApi
 typealias Caster = (Long, ReferenceTypeTest, ExecutionContext) -> Boolean
 
+@InternalChasmApi
 inline fun Caster(
     referenceValue: Long,
     typeTest: ReferenceTypeTest,

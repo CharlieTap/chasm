@@ -1,10 +1,12 @@
 package io.github.charlietap.chasm.ast.instruction
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.type.HeapType
 import io.github.charlietap.chasm.type.ReferenceType
 import kotlin.jvm.JvmInline
 
+@InternalChasmApi
 sealed interface ReferenceInstruction : Instruction {
     @JvmInline
     value class RefNull(val type: HeapType) : ReferenceInstruction

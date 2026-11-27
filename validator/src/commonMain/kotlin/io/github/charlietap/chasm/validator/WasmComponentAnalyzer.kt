@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.validator
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.map
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.ast.component.Component
 import io.github.charlietap.chasm.config.ComponentConfig
 import io.github.charlietap.chasm.type.component.ComponentTypes
@@ -10,9 +11,11 @@ import io.github.charlietap.chasm.validator.context.component.ComponentValidatio
 import io.github.charlietap.chasm.validator.error.ComponentValidatorError
 import io.github.charlietap.chasm.validator.validator.component.ComponentValidator
 
+@InternalChasmApi
 typealias WasmComponentAnalyzer =
     (ComponentConfig, Component) -> Result<ComponentTypes, ComponentValidatorError>
 
+@InternalChasmApi
 fun WasmComponentAnalyzer(
     config: ComponentConfig,
     component: Component,

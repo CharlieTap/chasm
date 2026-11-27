@@ -4,7 +4,7 @@ import io.github.charlietap.chasm.memory.NativeMappedLinearMemory
 import io.github.charlietap.chasm.memory.checkedAddress
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
 
-actual inline fun NullTerminatedStringReader(
+internal actual inline fun NullTerminatedStringReader(
     memory: LinearMemory,
     memoryPointer: Int,
 ): String {

@@ -1,10 +1,8 @@
 package io.github.charlietap.chasm.compiled.format
 
-import io.github.charlietap.chasm.InternalChasmApi
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-@OptIn(InternalChasmApi::class)
 class TrapLinesTest {
 
     @Test

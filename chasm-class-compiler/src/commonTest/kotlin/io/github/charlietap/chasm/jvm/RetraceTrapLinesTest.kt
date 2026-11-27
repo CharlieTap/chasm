@@ -1,12 +1,10 @@
 package io.github.charlietap.chasm.jvm
 
-import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.compiled.format.TrapLines
 import io.github.charlietap.chasm.compiled.format.readTrapLines
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-@OptIn(InternalChasmApi::class)
 class RetraceTrapLinesTest {
 
     @Test

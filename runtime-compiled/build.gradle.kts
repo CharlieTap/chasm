@@ -1,7 +1,6 @@
 import com.android.build.api.artifact.SingleArtifact
 import io.github.charlietap.chasm.gradle.task.DeviceInstrumentationCheckTask
 import io.github.charlietap.sweet.plugin.task.GenerateTestsTask
-import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
 import java.time.Duration
 
 plugins {
@@ -39,12 +38,7 @@ kotlin {
         }
     }
 
-    @OptIn(ExperimentalAbiValidation::class)
-    abiValidation()
-
-    compilerOptions {
-        optIn.add("io.github.charlietap.chasm.InternalChasmApi")
-    }
+    validatePublicAbi()
 
     sourceSets {
         commonMain {

@@ -1,7 +1,9 @@
 package io.github.charlietap.chasm.runtime.instance
 
+import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.type.ReferenceType
 
+@InternalChasmApi
 data class ElementInstance(
     var type: ReferenceType,
     var elements: LongArray,

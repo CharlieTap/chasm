@@ -19,8 +19,7 @@ import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.runtime.store.withLiveStack
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
 
-@InternalChasmApi
-inline fun ThreadInvocation(
+internal inline fun ThreadInvocation(
     config: RuntimeConfig,
     store: Store,
     instance: FunctionInstance.WasmFunction,
@@ -49,8 +48,7 @@ inline fun ThreadInvocation(
     )
 }
 
-@InternalChasmApi
-inline fun <R> ThreadInvocation(
+internal inline fun <R> ThreadInvocation(
     config: RuntimeConfig,
     store: Store,
     instance: FunctionInstance.WasmFunction,
