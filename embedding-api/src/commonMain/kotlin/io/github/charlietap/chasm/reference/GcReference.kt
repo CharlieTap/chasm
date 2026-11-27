@@ -14,6 +14,32 @@ abstract class StructReference
 
         @InternalChasmApi
         abstract fun engine(): Engine
+
+        @InternalChasmApi
+        abstract fun readField(index: Int): Long
+
+        @InternalChasmApi
+        abstract fun readFields(
+            offset: Int,
+            buffer: LongArray,
+            bufferOffset: Int,
+            count: Int,
+        )
+
+        @InternalChasmApi
+        abstract fun readFieldReference(index: Int): Any?
+
+        @InternalChasmApi
+        abstract fun writeField(
+            index: Int,
+            value: Long,
+        )
+
+        @InternalChasmApi
+        abstract fun writeFieldReference(
+            index: Int,
+            value: Any?,
+        )
     }
 
 abstract class ArrayReference

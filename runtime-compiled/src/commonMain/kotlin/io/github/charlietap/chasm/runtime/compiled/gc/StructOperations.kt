@@ -11,45 +11,6 @@ internal class StructOperations(
         return layout(ownedStruct(struct)).type
     }
 
-    fun readStructField(
-        struct: Any?,
-        index: Int,
-    ): Long {
-
-        val compiledStruct = ownedStruct(struct)
-
-        return storageLayout(compiledStruct).readBits(compiledStruct, index)
-    }
-
-    fun readStructFields(
-        struct: Any?,
-        offset: Int,
-        buffer: LongArray,
-        bufferOffset: Int,
-        count: Int,
-    ) {
-
-        val compiledStruct = ownedStruct(struct)
-        val storageLayout = storageLayout(compiledStruct)
-
-        checkRange(offset, count, storageLayout.fields.size)
-        checkRange(bufferOffset, count, buffer.size)
-
-        for (field in 0 until count) {
-            buffer[bufferOffset + field] = storageLayout.readBits(compiledStruct, offset + field)
-        }
-    }
-
-    fun readStructReference(
-        struct: Any?,
-        index: Int,
-    ): Any? {
-
-        val compiledStruct = ownedStruct(struct)
-
-        return storageLayout(compiledStruct).readReference(compiledStruct, index)
-    }
-
     fun writeStructField(
         struct: Any?,
         index: Int,

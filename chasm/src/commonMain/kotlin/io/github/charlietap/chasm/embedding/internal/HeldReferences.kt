@@ -24,6 +24,41 @@ internal class HeldStruct(
         return binding.engine
     }
 
+    override fun readField(index: Int): Long {
+        return interpreter().readStructField(this, index)
+    }
+
+    override fun readFields(
+        offset: Int,
+        buffer: LongArray,
+        bufferOffset: Int,
+        count: Int,
+    ) {
+        interpreter().readStructFields(this, offset, buffer, bufferOffset, count)
+    }
+
+    override fun readFieldReference(index: Int): Any? {
+        return interpreter().readStructReference(this, index)
+    }
+
+    override fun writeField(
+        index: Int,
+        value: Long,
+    ) {
+        binding.engine.writeStructField(this, index, value)
+    }
+
+    override fun writeFieldReference(
+        index: Int,
+        value: Any?,
+    ) {
+        binding.engine.writeStructReference(this, index, value)
+    }
+
+    private fun interpreter(): InterpreterEngine {
+        return binding.engine as InterpreterEngine
+    }
+
     override fun equals(other: Any?): Boolean {
         return other is HeldStruct && other.binding === binding && other.raw == raw
     }

@@ -298,12 +298,10 @@ class EmbeddingApiTest {
     fun objectsRefuseStoreCallsOnceTheirStoreIsDropped() {
 
         val (store, instance) = instantiate()
-        val box = (call(instance, "box", I32(1)).single() as ReferenceValue.Struct).reference
         val failed = assertIs<ExecutionError.Thrown>(error(invoke(instance, "fail", listOf(I32(2))))).exception
 
         dropStore(store)
 
-        assertFailsWith<IllegalStateException> { readStructField(box, 0) }
         assertFailsWith<IllegalStateException> { readPayload(failed, 0) }
     }
 

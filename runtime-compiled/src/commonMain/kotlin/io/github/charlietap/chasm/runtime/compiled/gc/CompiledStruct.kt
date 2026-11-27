@@ -13,6 +13,49 @@ abstract class CompiledStruct(
         return rtt.engine
     }
 
+    final override fun readField(index: Int): Long {
+        return storageLayout().readBits(this, index)
+    }
+
+    final override fun readFields(
+        offset: Int,
+        buffer: LongArray,
+        bufferOffset: Int,
+        count: Int,
+    ) {
+
+        val storageLayout = storageLayout()
+
+        checkRange(offset, count, storageLayout.fields.size)
+        checkRange(bufferOffset, count, buffer.size)
+
+        for (field in 0 until count) {
+            buffer[bufferOffset + field] = storageLayout.readBits(this, offset + field)
+        }
+    }
+
+    final override fun readFieldReference(index: Int): Any? {
+        return storageLayout().readReference(this, index)
+    }
+
+    final override fun writeField(
+        index: Int,
+        value: Long,
+    ) {
+        rtt.engine.writeStructField(this, index, value)
+    }
+
+    final override fun writeFieldReference(
+        index: Int,
+        value: Any?,
+    ) {
+        rtt.engine.writeStructReference(this, index, value)
+    }
+
+    private fun storageLayout(): StructStorageLayout {
+        return rtt.layout as StructStorageLayout
+    }
+
     open fun readInt(lane: Int): Int {
         throw laneError(lane)
     }

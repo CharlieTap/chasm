@@ -253,5 +253,36 @@ class ExternIdentityTest {
         override fun engine(): Engine {
             error("forged references belong to no engine")
         }
+
+        override fun readField(index: Int): Long {
+            error("forged references have no fields")
+        }
+
+        override fun readFields(
+            offset: Int,
+            buffer: LongArray,
+            bufferOffset: Int,
+            count: Int,
+        ) {
+            error("forged references have no fields")
+        }
+
+        override fun readFieldReference(index: Int): Any? {
+            error("forged references have no fields")
+        }
+
+        override fun writeField(
+            index: Int,
+            value: Long,
+        ) {
+            error("forged references have no fields")
+        }
+
+        override fun writeFieldReference(
+            index: Int,
+            value: Any?,
+        ) {
+            error("forged references have no fields")
+        }
     }
 }

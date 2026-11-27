@@ -12,7 +12,7 @@ fun readStructField(
     struct: StructReference,
     index: Int,
 ): Long {
-    return struct.engine().readStructField(struct, index)
+    return struct.readField(index)
 }
 
 fun readStructFields(
@@ -22,14 +22,14 @@ fun readStructFields(
     bufferOffset: Int = 0,
     count: Int = buffer.size - bufferOffset,
 ) {
-    struct.engine().readStructFields(struct, offset, buffer, bufferOffset, count)
+    struct.readFields(offset, buffer, bufferOffset, count)
 }
 
 fun readStructReference(
     struct: StructReference,
     index: Int,
 ): Any? {
-    return struct.engine().readStructReference(struct, index)
+    return struct.readFieldReference(index)
 }
 
 fun writeStructField(
@@ -37,7 +37,7 @@ fun writeStructField(
     index: Int,
     value: Long,
 ) {
-    struct.engine().writeStructField(struct, index, value)
+    struct.writeField(index, value)
 }
 
 fun writeStructReference(
@@ -45,7 +45,7 @@ fun writeStructReference(
     index: Int,
     value: Any?,
 ) {
-    struct.engine().writeStructReference(struct, index, value)
+    struct.writeFieldReference(index, value)
 }
 
 @UnsafeHostApi
