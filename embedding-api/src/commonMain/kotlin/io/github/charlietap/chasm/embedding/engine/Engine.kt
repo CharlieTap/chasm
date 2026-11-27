@@ -311,6 +311,14 @@ interface Engine {
         index: Int,
     ): Long
 
+    fun readStructFields(
+        struct: StructReference,
+        offset: Int,
+        buffer: LongArray,
+        bufferOffset: Int,
+        count: Int,
+    )
+
     fun readStructReference(
         struct: StructReference,
         index: Int,

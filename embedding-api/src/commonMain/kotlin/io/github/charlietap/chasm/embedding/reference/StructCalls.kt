@@ -15,6 +15,16 @@ fun readStructField(
     return struct.engine().readStructField(struct, index)
 }
 
+fun readStructFields(
+    struct: StructReference,
+    offset: Int,
+    buffer: LongArray,
+    bufferOffset: Int = 0,
+    count: Int = buffer.size - bufferOffset,
+) {
+    struct.engine().readStructFields(struct, offset, buffer, bufferOffset, count)
+}
+
 fun readStructReference(
     struct: StructReference,
     index: Int,

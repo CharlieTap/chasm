@@ -17,6 +17,14 @@ internal interface StructAccess {
         index: Int,
     ): Long
 
+    fun readStructFields(
+        struct: StructReference,
+        offset: Int,
+        buffer: LongArray,
+        bufferOffset: Int,
+        count: Int,
+    )
+
     fun readStructReference(
         struct: StructReference,
         index: Int,
@@ -63,6 +71,29 @@ internal class InterpreterStructs(
 
         return withAccessorFailures {
             packedValue(field, heap.getStructFieldTrusted(held.raw, index))
+        }
+    }
+
+    override fun readStructFields(
+        struct: StructReference,
+        offset: Int,
+        buffer: LongArray,
+        bufferOffset: Int,
+        count: Int,
+    ) {
+
+        val held = codec.struct(struct)
+        val type = HostGcType(held.runtimeType)
+
+        withAccessorFailures {
+            checkRange(offset, count, heap.structFieldCount(type))
+            checkRange(bufferOffset, count, buffer.size)
+            for (field in 0 until count) {
+                val index = offset + field
+                val fieldType = heap.runtimeStructFieldType(type, index)
+                require(referenceType(fieldType) == null) { "field $index holds a reference" }
+                buffer[bufferOffset + field] = packedValue(fieldType, heap.getStructFieldTrusted(held.raw, index))
+            }
         }
     }
 

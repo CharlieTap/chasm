@@ -39,6 +39,7 @@ import io.github.charlietap.chasm.embedding.reference.readArrayReference
 import io.github.charlietap.chasm.embedding.reference.readPayload
 import io.github.charlietap.chasm.embedding.reference.readPayloadReference
 import io.github.charlietap.chasm.embedding.reference.readStructField
+import io.github.charlietap.chasm.embedding.reference.readStructFields
 import io.github.charlietap.chasm.embedding.reference.readStructReference
 import io.github.charlietap.chasm.embedding.reference.structType
 import io.github.charlietap.chasm.embedding.reference.unsafeAllocateStruct
@@ -137,6 +138,19 @@ class ObjectCallsTest {
         assertEquals(0xFFL, readStructField(point, 3))
         assertEquals(0xFFFFL, readStructField(point, 4))
         assertSame("label", readStructReference(point, 6))
+    }
+
+    @Test
+    fun structFieldsReadIntoABuffer() {
+
+        val point = point(4)
+        val buffer = LongArray(4)
+
+        readStructFields(point, 1, buffer)
+
+        assertContentEquals(longArrayOf(2L, 3.5.toRawBits(), 0xFFL, 0xFFFFL), buffer)
+        assertFailsWith<IllegalArgumentException> { readStructFields(point, 4, LongArray(2)) }
+        assertFailsWith<IndexOutOfBoundsException> { readStructFields(point, 7, LongArray(2)) }
     }
 
     @Test

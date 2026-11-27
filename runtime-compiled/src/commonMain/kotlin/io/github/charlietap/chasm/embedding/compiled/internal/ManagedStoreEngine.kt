@@ -629,6 +629,16 @@ internal class ManagedStoreEngine(
         return objects.structs.readStructField(struct, index)
     }
 
+    override fun readStructFields(
+        struct: StructReference,
+        offset: Int,
+        buffer: LongArray,
+        bufferOffset: Int,
+        count: Int,
+    ) {
+        objects.structs.readStructFields(struct, offset, buffer, bufferOffset, count)
+    }
+
     override fun readStructReference(
         struct: StructReference,
         index: Int,

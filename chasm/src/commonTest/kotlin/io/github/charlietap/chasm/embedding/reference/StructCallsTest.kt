@@ -17,6 +17,7 @@ import io.github.charlietap.chasm.reference.StructReference
 import io.github.charlietap.chasm.type.AbstractHeapType
 import io.github.charlietap.chasm.type.FieldType
 import kotlin.test.Test
+import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNull
@@ -43,6 +44,34 @@ class StructCallsTest {
         assertFailsWith<IndexOutOfBoundsException> {
             readStructField(fixture.struct, 1)
         }
+    }
+
+    @Test
+    fun `can read a range of fields from a struct into a buffer`() {
+
+        val fixture = StructFixture(listOf(i32Field(), i32Field(), i32Field()), longArrayOf(117L, 118L, 119L))
+        val buffer = LongArray(4)
+
+        readStructFields(fixture.struct, 1, buffer, bufferOffset = 1, count = 2)
+
+        assertContentEquals(longArrayOf(0L, 118L, 119L, 0L), buffer)
+    }
+
+    @Test
+    fun `reading fields past the end of a struct or buffer throws index out of bounds`() {
+
+        val fixture = StructFixture(listOf(i32Field(), i32Field()), longArrayOf(117L, 118L))
+
+        assertFailsWith<IndexOutOfBoundsException> { readStructFields(fixture.struct, 1, LongArray(2)) }
+        assertFailsWith<IndexOutOfBoundsException> { readStructFields(fixture.struct, 0, LongArray(1), count = 2) }
+    }
+
+    @Test
+    fun `reading a reference field into a buffer throws illegal argument`() {
+
+        val fixture = StructFixture(listOf(i32Field(), externField()), longArrayOf(117L, 0L))
+
+        assertFailsWith<IllegalArgumentException> { readStructFields(fixture.struct, 0, LongArray(2)) }
     }
 
     @Test

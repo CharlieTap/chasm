@@ -625,6 +625,16 @@ internal class InterpreterEngine(
         return structs.readStructField(struct, index)
     }
 
+    override fun readStructFields(
+        struct: StructReference,
+        offset: Int,
+        buffer: LongArray,
+        bufferOffset: Int,
+        count: Int,
+    ) {
+        structs.readStructFields(struct, offset, buffer, bufferOffset, count)
+    }
+
     override fun readStructReference(
         struct: StructReference,
         index: Int,

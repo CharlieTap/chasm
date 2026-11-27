@@ -539,6 +539,8 @@ public final class io/github/charlietap/chasm/embedding/reference/GcCallsKt {
 
 public final class io/github/charlietap/chasm/embedding/reference/StructCallsKt {
 	public static final fun readStructField (Lio/github/charlietap/chasm/reference/StructReference;I)J
+	public static final fun readStructFields (Lio/github/charlietap/chasm/reference/StructReference;I[JII)V
+	public static synthetic fun readStructFields$default (Lio/github/charlietap/chasm/reference/StructReference;I[JIIILjava/lang/Object;)V
 	public static final fun readStructReference (Lio/github/charlietap/chasm/reference/StructReference;I)Ljava/lang/Object;
 	public static final fun structType (Lio/github/charlietap/chasm/reference/StructReference;)I
 	public static final fun unsafeWriteStructReference (Lio/github/charlietap/chasm/reference/StructReference;ILjava/lang/Object;)V
