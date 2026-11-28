@@ -41,8 +41,43 @@ internal class StructStorageLayout(
 
     private val isReferenceField = BooleanArray(fields.size) { index -> holdsReference(fields[index].type) }
 
+    private val isInlineNumberField = BooleanArray(fields.size) { index ->
+        !isReferenceField[index] && fields[index].lanes.none { lane -> lane.spilled }
+    }
+
+    private val lowLaneIndices = IntArray(fields.size) { index -> fields[index].lanes[0].index }
+
+    private val highLaneIndices = IntArray(fields.size) { index -> fields[index].lanes.getOrNull(1)?.index ?: NO_LANE }
+
     fun newStruct(rtt: Rtt): CompiledStruct {
         return allocator.newStruct(rtt)
+    }
+
+    fun readBitsInBulk(
+        struct: CompiledStruct,
+        offset: Int,
+        buffer: LongArray,
+        bufferOffset: Int,
+        count: Int,
+    ) {
+
+        val laneValues = IntArray(MAX_INLINE_INT_LANES)
+        struct.readInts(laneValues)
+
+        for (field in 0 until count) {
+            val index = offset + field
+            buffer[bufferOffset + field] = if (isInlineNumberField[index]) {
+                val low = laneValues[lowLaneIndices[index]]
+                val high = highLaneIndices[index]
+                if (high == NO_LANE) {
+                    low.toLong()
+                } else {
+                    (low.toLong() and LOW_BITS) or (laneValues[high].toLong() shl Int.SIZE_BITS)
+                }
+            } else {
+                readBits(struct, index)
+            }
+        }
     }
 
     fun readBits(
@@ -163,8 +198,13 @@ internal class StructStorageLayout(
         const val I8_MASK = 0xFF
         const val I16_MASK = 0xFFFF
         const val ALL_BITS = -1
+        const val NO_LANE = -1
     }
 }
+
+internal const val MAX_INLINE_INT_LANES = 23
+
+internal const val MIN_BULK_READ_FIELDS = 3
 
 internal class ArrayStorageLayout(
     val type: FieldType,

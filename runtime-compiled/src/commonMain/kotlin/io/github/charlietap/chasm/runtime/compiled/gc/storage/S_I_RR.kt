@@ -42,6 +42,12 @@ open class S_I_RR_II(rtt: Rtt) : S_I_RR(rtt) {
     @JvmField
     var i2: Int = 0
 
+    override fun readInts(target: IntArray) {
+        super.readInts(target)
+        target[1] = i1
+        target[2] = i2
+    }
+
     override fun readInt(lane: Int): Int {
         return when (lane) {
             1 -> i1
@@ -71,6 +77,12 @@ open class S_I_RR_II_II(rtt: Rtt) : S_I_RR_II(rtt) {
     @JvmField
     var i4: Int = 0
 
+    override fun readInts(target: IntArray) {
+        super.readInts(target)
+        target[3] = i3
+        target[4] = i4
+    }
+
     override fun readInt(lane: Int): Int {
         return when (lane) {
             3 -> i3
@@ -99,6 +111,11 @@ open class S_I_RR_II_IR(rtt: Rtt) : S_I_RR_II(rtt) {
 
     @JvmField
     var r2: Any? = null
+
+    override fun readInts(target: IntArray) {
+        super.readInts(target)
+        target[3] = i3
+    }
 
     override fun readInt(lane: Int): Int {
         return when (lane) {
@@ -173,6 +190,11 @@ open class S_I_RR_IR(rtt: Rtt) : S_I_RR(rtt) {
     @JvmField
     var r2: Any? = null
 
+    override fun readInts(target: IntArray) {
+        super.readInts(target)
+        target[1] = i1
+    }
+
     override fun readInt(lane: Int): Int {
         return when (lane) {
             1 -> i1
@@ -217,6 +239,12 @@ open class S_I_RR_IR_II(rtt: Rtt) : S_I_RR_IR(rtt) {
     @JvmField
     var i3: Int = 0
 
+    override fun readInts(target: IntArray) {
+        super.readInts(target)
+        target[2] = i2
+        target[3] = i3
+    }
+
     override fun readInt(lane: Int): Int {
         return when (lane) {
             2 -> i2
@@ -245,6 +273,11 @@ open class S_I_RR_IR_IR(rtt: Rtt) : S_I_RR_IR(rtt) {
 
     @JvmField
     var r3: Any? = null
+
+    override fun readInts(target: IntArray) {
+        super.readInts(target)
+        target[2] = i2
+    }
 
     override fun readInt(lane: Int): Int {
         return when (lane) {
@@ -348,6 +381,12 @@ open class S_I_RR_RR_II(rtt: Rtt) : S_I_RR_RR(rtt) {
     @JvmField
     var i2: Int = 0
 
+    override fun readInts(target: IntArray) {
+        super.readInts(target)
+        target[1] = i1
+        target[2] = i2
+    }
+
     override fun readInt(lane: Int): Int {
         return when (lane) {
             1 -> i1
@@ -376,6 +415,11 @@ open class S_I_RR_RR_IR(rtt: Rtt) : S_I_RR_RR(rtt) {
 
     @JvmField
     var r4: Any? = null
+
+    override fun readInts(target: IntArray) {
+        super.readInts(target)
+        target[1] = i1
+    }
 
     override fun readInt(lane: Int): Int {
         return when (lane) {

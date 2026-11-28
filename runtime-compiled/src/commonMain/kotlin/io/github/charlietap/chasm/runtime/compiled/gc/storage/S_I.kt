@@ -11,6 +11,11 @@ open class S_I(rtt: Rtt) : CompiledStruct(rtt) {
     @JvmField
     var i0: Int = 0
 
+    override fun readInts(target: IntArray) {
+        super.readInts(target)
+        target[0] = i0
+    }
+
     override fun readInt(lane: Int): Int {
         return when (lane) {
             0 -> i0

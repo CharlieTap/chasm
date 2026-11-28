@@ -29,8 +29,12 @@ abstract class CompiledStruct(
         checkRange(offset, count, storageLayout.fields.size)
         checkRange(bufferOffset, count, buffer.size)
 
-        for (field in 0 until count) {
-            buffer[bufferOffset + field] = storageLayout.readBits(this, offset + field)
+        if (count < MIN_BULK_READ_FIELDS) {
+            for (field in 0 until count) {
+                buffer[bufferOffset + field] = storageLayout.readBits(this, offset + field)
+            }
+        } else {
+            storageLayout.readBitsInBulk(this, offset, buffer, bufferOffset, count)
         }
     }
 
@@ -55,6 +59,8 @@ abstract class CompiledStruct(
     private fun storageLayout(): StructStorageLayout {
         return rtt.layout as StructStorageLayout
     }
+
+    open fun readInts(target: IntArray) {}
 
     open fun readInt(lane: Int): Int {
         throw laneError(lane)

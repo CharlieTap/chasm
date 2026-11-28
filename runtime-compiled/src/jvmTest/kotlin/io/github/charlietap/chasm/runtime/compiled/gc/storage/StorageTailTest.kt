@@ -1,10 +1,12 @@
 package io.github.charlietap.chasm.runtime.compiled.gc.storage
 
 import io.github.charlietap.chasm.runtime.compiled.gc.CompiledStruct
+import io.github.charlietap.chasm.runtime.compiled.gc.MAX_INLINE_INT_LANES
 import io.github.charlietap.chasm.runtime.compiled.gc.Rtt
 import io.github.charlietap.chasm.runtime.compiled.gc.fakeEngine
 import java.lang.reflect.Modifier
 import kotlin.test.Test
+import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
@@ -75,6 +77,10 @@ class StorageTailTest {
                 struct.writeInt(lane, lane + VALUE_OFFSET)
                 assertEquals(lane + VALUE_OFFSET, struct.readInt(lane), "${expected.name}.$name")
             }
+            assertTrue(ints.size <= MAX_INLINE_INT_LANES, expected.name)
+            val laneValues = IntArray(ints.size)
+            struct.readInts(laneValues)
+            assertContentEquals(IntArray(ints.size) { lane -> lane + VALUE_OFFSET }, laneValues, expected.name)
             references.forEach { name ->
                 val lane = name.drop(1).toInt()
                 val value = Any()
