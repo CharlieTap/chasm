@@ -90,21 +90,16 @@ class StoragePlansTest {
     fun `storage plans match the ABI goldens`() {
 
         val types = module("storage_plans").definedTypes
-        val plans = StoragePlans(types, STORAGE_FAMILY)
 
-        val lines = types.indices.mapNotNull { index ->
-            try {
-                when (types[index].recursiveType.subTypes[types[index].recursiveTypeIndex].compositeType) {
-                    is CompositeType.Struct -> "$index ${layout(plans.struct(index))}"
-                    is CompositeType.Array -> "$index ${simpleName(plans.array(index).className)} ${plans.array(index).elementShift}"
-                    is CompositeType.Function -> null
-                }
-            } catch (unsupported: UnsupportedShape) {
-                "$index unsupported"
-            }
-        }
+        assertEquals(resource("goldens/storage_plans.txt").decodeToString(), goldenLines(types, keys = null))
+    }
 
-        assertEquals(resource("goldens/storage_plans.txt").decodeToString(), lines.joinToString("\n", postfix = "\n"))
+    @Test
+    fun `storage layout cases match their golden`() {
+
+        val types = module("storage_layout_cases").definedTypes
+
+        assertEquals(resource("goldens/storage_layout_cases.txt").decodeToString(), goldenLines(types, RttKeys(types)))
     }
 
     @Test
@@ -668,6 +663,28 @@ class StoragePlansTest {
                 types.subtype(parent, *Array(random.nextInt(0, 9)) { kinds.random(random) })
             }.take(random.nextInt(2, 8)).toList()
         }
+    }
+
+    private fun goldenLines(
+        types: List<DefinedType>,
+        keys: RttKeys?,
+    ): String {
+
+        val plans = StoragePlans(types, STORAGE_FAMILY)
+        val lines = types.indices.mapNotNull { index ->
+            val label = if (keys == null) "$index" else "$index ${keys.key(types[index])}"
+            try {
+                when (types[index].recursiveType.subTypes[types[index].recursiveTypeIndex].compositeType) {
+                    is CompositeType.Struct -> "$label ${layout(plans.struct(index))}"
+                    is CompositeType.Array -> "$label ${simpleName(plans.array(index).className)} ${plans.array(index).elementShift}"
+                    is CompositeType.Function -> if (keys == null) null else "$label function"
+                }
+            } catch (unsupported: UnsupportedShape) {
+                "$index unsupported"
+            }
+        }
+
+        return lines.joinToString("\n", postfix = "\n")
     }
 
     private fun layout(storage: StructStorage): String {

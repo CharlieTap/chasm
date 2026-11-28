@@ -1,0 +1,140 @@
+public final class io/github/charlietap/chasm/storage/layout/ArrayLayout {
+	public fun <init> (ILio/github/charlietap/chasm/storage/layout/TypeCheck;Ljava/lang/String;)V
+	public final fun component1 ()I
+	public final fun component2 ()Lio/github/charlietap/chasm/storage/layout/TypeCheck;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun copy (ILio/github/charlietap/chasm/storage/layout/TypeCheck;Ljava/lang/String;)Lio/github/charlietap/chasm/storage/layout/ArrayLayout;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/storage/layout/ArrayLayout;ILio/github/charlietap/chasm/storage/layout/TypeCheck;Ljava/lang/String;ILjava/lang/Object;)Lio/github/charlietap/chasm/storage/layout/ArrayLayout;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCheck ()Lio/github/charlietap/chasm/storage/layout/TypeCheck;
+	public final fun getStorageClass ()Ljava/lang/String;
+	public final fun getTypeIndex ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/storage/layout/FieldLayout {
+	public fun <init> (Lio/github/charlietap/chasm/type/FieldType;Lio/github/charlietap/chasm/storage/layout/FieldSlots;)V
+	public final fun component1 ()Lio/github/charlietap/chasm/type/FieldType;
+	public final fun component2 ()Lio/github/charlietap/chasm/storage/layout/FieldSlots;
+	public final fun copy (Lio/github/charlietap/chasm/type/FieldType;Lio/github/charlietap/chasm/storage/layout/FieldSlots;)Lio/github/charlietap/chasm/storage/layout/FieldLayout;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/storage/layout/FieldLayout;Lio/github/charlietap/chasm/type/FieldType;Lio/github/charlietap/chasm/storage/layout/FieldSlots;ILjava/lang/Object;)Lio/github/charlietap/chasm/storage/layout/FieldLayout;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getSlots ()Lio/github/charlietap/chasm/storage/layout/FieldSlots;
+	public final fun getType ()Lio/github/charlietap/chasm/type/FieldType;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/charlietap/chasm/storage/layout/FieldSlots {
+}
+
+public final class io/github/charlietap/chasm/storage/layout/InlineSlot : io/github/charlietap/chasm/storage/layout/Slot {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Lio/github/charlietap/chasm/storage/layout/InlineSlot;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/storage/layout/InlineSlot;Ljava/lang/String;ILjava/lang/Object;)Lio/github/charlietap/chasm/storage/layout/InlineSlot;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getField ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/storage/layout/NumberSlot : io/github/charlietap/chasm/storage/layout/FieldSlots {
+	public fun <init> (Lio/github/charlietap/chasm/storage/layout/Slot;Lio/github/charlietap/chasm/type/PackedType;)V
+	public final fun component1 ()Lio/github/charlietap/chasm/storage/layout/Slot;
+	public final fun component2 ()Lio/github/charlietap/chasm/type/PackedType;
+	public final fun copy (Lio/github/charlietap/chasm/storage/layout/Slot;Lio/github/charlietap/chasm/type/PackedType;)Lio/github/charlietap/chasm/storage/layout/NumberSlot;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/storage/layout/NumberSlot;Lio/github/charlietap/chasm/storage/layout/Slot;Lio/github/charlietap/chasm/type/PackedType;ILjava/lang/Object;)Lio/github/charlietap/chasm/storage/layout/NumberSlot;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getPacked ()Lio/github/charlietap/chasm/type/PackedType;
+	public final fun getSlot ()Lio/github/charlietap/chasm/storage/layout/Slot;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/storage/layout/ReferenceSlot : io/github/charlietap/chasm/storage/layout/FieldSlots {
+	public fun <init> (Lio/github/charlietap/chasm/storage/layout/Slot;Lio/github/charlietap/chasm/storage/layout/TypeCheck;)V
+	public final fun component1 ()Lio/github/charlietap/chasm/storage/layout/Slot;
+	public final fun component2 ()Lio/github/charlietap/chasm/storage/layout/TypeCheck;
+	public final fun copy (Lio/github/charlietap/chasm/storage/layout/Slot;Lio/github/charlietap/chasm/storage/layout/TypeCheck;)Lio/github/charlietap/chasm/storage/layout/ReferenceSlot;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/storage/layout/ReferenceSlot;Lio/github/charlietap/chasm/storage/layout/Slot;Lio/github/charlietap/chasm/storage/layout/TypeCheck;ILjava/lang/Object;)Lio/github/charlietap/chasm/storage/layout/ReferenceSlot;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCheck ()Lio/github/charlietap/chasm/storage/layout/TypeCheck;
+	public final fun getSlot ()Lio/github/charlietap/chasm/storage/layout/Slot;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/charlietap/chasm/storage/layout/Slot {
+}
+
+public final class io/github/charlietap/chasm/storage/layout/SpilledSlot : io/github/charlietap/chasm/storage/layout/Slot {
+	public fun <init> (Ljava/lang/String;I)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()I
+	public final fun copy (Ljava/lang/String;I)Lio/github/charlietap/chasm/storage/layout/SpilledSlot;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/storage/layout/SpilledSlot;Ljava/lang/String;IILjava/lang/Object;)Lio/github/charlietap/chasm/storage/layout/SpilledSlot;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getArray ()Ljava/lang/String;
+	public final fun getIndex ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/storage/layout/StorageLayouts {
+	public final fun array (I)Lio/github/charlietap/chasm/storage/layout/ArrayLayout;
+	public final fun getRuntimeAbi ()I
+	public final fun struct (I)Lio/github/charlietap/chasm/storage/layout/StructLayout;
+}
+
+public final class io/github/charlietap/chasm/storage/layout/StorageLayoutsKt {
+	public static final fun storageLayouts (Ljava/util/List;)Lio/github/charlietap/chasm/storage/layout/StorageLayouts;
+	public static final fun storageLayouts ([B)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+}
+
+public final class io/github/charlietap/chasm/storage/layout/StructLayout {
+	public fun <init> (ILio/github/charlietap/chasm/storage/layout/TypeCheck;Ljava/lang/String;Ljava/util/List;)V
+	public final fun component1 ()I
+	public final fun component2 ()Lio/github/charlietap/chasm/storage/layout/TypeCheck;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun component4 ()Ljava/util/List;
+	public final fun copy (ILio/github/charlietap/chasm/storage/layout/TypeCheck;Ljava/lang/String;Ljava/util/List;)Lio/github/charlietap/chasm/storage/layout/StructLayout;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/storage/layout/StructLayout;ILio/github/charlietap/chasm/storage/layout/TypeCheck;Ljava/lang/String;Ljava/util/List;ILjava/lang/Object;)Lio/github/charlietap/chasm/storage/layout/StructLayout;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCheck ()Lio/github/charlietap/chasm/storage/layout/TypeCheck;
+	public final fun getFields ()Ljava/util/List;
+	public final fun getStorageClass ()Ljava/lang/String;
+	public final fun getTypeIndex ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/storage/layout/TypeCheck {
+	public fun <init> (Ljava/lang/String;IZ)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()I
+	public final fun component3 ()Z
+	public final fun copy (Ljava/lang/String;IZ)Lio/github/charlietap/chasm/storage/layout/TypeCheck;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/storage/layout/TypeCheck;Ljava/lang/String;IZILjava/lang/Object;)Lio/github/charlietap/chasm/storage/layout/TypeCheck;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getFinal ()Z
+	public final fun getRttKey ()Ljava/lang/String;
+	public final fun getSupertypes ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/storage/layout/WideNumberSlots : io/github/charlietap/chasm/storage/layout/FieldSlots {
+	public fun <init> (Lio/github/charlietap/chasm/storage/layout/Slot;Lio/github/charlietap/chasm/storage/layout/Slot;)V
+	public final fun component1 ()Lio/github/charlietap/chasm/storage/layout/Slot;
+	public final fun component2 ()Lio/github/charlietap/chasm/storage/layout/Slot;
+	public final fun copy (Lio/github/charlietap/chasm/storage/layout/Slot;Lio/github/charlietap/chasm/storage/layout/Slot;)Lio/github/charlietap/chasm/storage/layout/WideNumberSlots;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/storage/layout/WideNumberSlots;Lio/github/charlietap/chasm/storage/layout/Slot;Lio/github/charlietap/chasm/storage/layout/Slot;ILjava/lang/Object;)Lio/github/charlietap/chasm/storage/layout/WideNumberSlots;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getHigh ()Lio/github/charlietap/chasm/storage/layout/Slot;
+	public final fun getLow ()Lio/github/charlietap/chasm/storage/layout/Slot;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+

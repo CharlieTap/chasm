@@ -120,6 +120,7 @@ include(":test:integration")
 include(":tools:compiler-baseline")
 
 include(":tooling:bindgen")
+include(":tooling:storage-layout")
 
 include(":type-system")
 include(":validator")

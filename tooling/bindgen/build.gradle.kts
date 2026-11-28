@@ -26,10 +26,10 @@ kotlin {
         api(projects.embeddingApi)
         api(libs.kotlin.poet)
 
-        implementation(projects.compiler.backendAnalysis)
         implementation(projects.decoder)
         implementation(projects.module)
         implementation(projects.moduleDeclarations)
+        implementation(projects.tooling.storageLayout)
         implementation(libs.result)
 
         testImplementation(libs.kotlinx.test.resources)

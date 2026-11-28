@@ -18,7 +18,7 @@ import java.util.IdentityHashMap
 internal class GcTypeResolver(
     private val interfaceClassName: ClassName,
     private val mapsReferences: Boolean,
-    private val storagePlanner: StructViewStoragePlanner?,
+    private val structViewLayouts: StructViewLayouts?,
 ) {
 
     private var recursiveGroupBases = IdentityHashMap<RecursiveType, Int>()
@@ -112,7 +112,7 @@ internal class GcTypeResolver(
                     mutable = field.mutability == Mutability.Var,
                 )
             }
-            registeredStructViews[typeIndex] = StructView(className, fields, storagePlanner?.storage(definedType))
+            registeredStructViews[typeIndex] = StructView(className, fields, structViewLayouts?.layout(definedType))
         } finally {
             structViewsInProgress.remove(typeIndex)
         }

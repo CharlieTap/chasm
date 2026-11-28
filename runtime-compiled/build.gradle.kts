@@ -75,6 +75,7 @@ kotlin {
                 implementation(projects.module)
                 implementation(projects.runtime.address)
                 implementation(projects.test.compiled)
+                implementation(projects.tooling.storageLayout)
                 implementation(projects.validator)
 
                 implementation(libs.asm.util)
@@ -109,6 +110,7 @@ kotlin {
                 implementation(projects.module)
                 implementation(projects.runtime.address)
                 implementation(projects.test.compiled)
+                implementation(projects.tooling.storageLayout)
                 implementation(projects.typeSystem)
                 implementation(projects.validator)
 

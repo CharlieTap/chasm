@@ -11,10 +11,15 @@ import com.squareup.kotlinpoet.MemberName
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import io.github.charlietap.chasm.bindgen.ext.asTypeName
-import io.github.charlietap.chasm.compiler.backend.abi.SPILLED_INTS_FIELD
-import io.github.charlietap.chasm.compiler.backend.abi.SPILLED_REFERENCES_FIELD
-import io.github.charlietap.chasm.compiler.backend.analysis.gc.Lane
-import io.github.charlietap.chasm.compiler.backend.analysis.gc.LaneKind
+import io.github.charlietap.chasm.storage.layout.FieldSlots
+import io.github.charlietap.chasm.storage.layout.InlineSlot
+import io.github.charlietap.chasm.storage.layout.NumberSlot
+import io.github.charlietap.chasm.storage.layout.ReferenceSlot
+import io.github.charlietap.chasm.storage.layout.Slot
+import io.github.charlietap.chasm.storage.layout.SpilledSlot
+import io.github.charlietap.chasm.storage.layout.StructLayout
+import io.github.charlietap.chasm.storage.layout.TypeCheck
+import io.github.charlietap.chasm.storage.layout.WideNumberSlots
 import io.github.charlietap.chasm.type.PackedType
 
 internal class StructViewGenerator {
@@ -26,7 +31,7 @@ internal class StructViewGenerator {
         val reference = PropertySpec.builder("reference", STRUCT_REFERENCE_CLASS_NAME)
             .initializer("reference")
             .build()
-        val storage = view.storage
+        val layout = view.layout
 
         return TypeSpec.classBuilder(view.className).apply {
 
@@ -35,7 +40,7 @@ internal class StructViewGenerator {
             primaryConstructor(constructor)
             addProperty(reference)
 
-            if (storage == null) {
+            if (layout == null) {
                 addProperties(view.fields.map(::fieldProperty))
             } else {
                 addAnnotation(
@@ -43,8 +48,8 @@ internal class StructViewGenerator {
                         .addMember("%T::class", CHASM_INTERNAL_API_CLASS_NAME)
                         .build(),
                 )
-                addProperties(view.fields.map { field -> laneProperty(field, storage.fieldLanes[field.index]) })
-                addFunction(storageFunction(view.className, storage))
+                addProperties(view.fields.map { field -> slotProperty(field, layout.fields[field.index].slots) })
+                addFunction(storageFunction(view.className, layout))
             }
         }.build()
     }
@@ -61,63 +66,71 @@ internal class StructViewGenerator {
         return property(field, getter, setter)
     }
 
-    private fun laneProperty(
+    private fun slotProperty(
         field: StructViewField,
-        fieldLanes: FieldLanes,
+        slots: FieldSlots,
     ): PropertySpec {
 
         val getter = FunSpec.getterBuilder()
         val setter = setterBuilder(field)
 
-        when (fieldLanes) {
-            is NumberLanes -> if (fieldLanes.lanes.size == 1) {
-                numberLane(field, fieldLanes, getter, setter)
-            } else {
-                wideNumberLanes(field, fieldLanes, getter, setter)
-            }
-            is DefinedReferenceLane -> {
-                getter.addStatement("return %L", referenceToValue(laneRead("storage()", fieldLanes.lane), field.type))
-                definedReferenceWrite(field, fieldLanes, setter)
-            }
-            is AbstractReferenceLane -> {
-                getter.addStatement("return %L", referenceToValue(laneRead("storage()", fieldLanes.lane), field.type))
-                setter.addStatement("%L", fieldWriteExpression(field))
-            }
+        when (slots) {
+            is NumberSlot -> numberSlot(field, slots, getter, setter)
+            is WideNumberSlots -> wideNumberSlots(field, slots, getter, setter)
+            is ReferenceSlot -> referenceSlot(field, slots, getter, setter)
         }
 
         return property(field, getter.build(), setter.build())
     }
 
-    private fun numberLane(
+    private fun numberSlot(
         field: StructViewField,
-        numberLanes: NumberLanes,
+        numberSlot: NumberSlot,
         getter: FunSpec.Builder,
         setter: FunSpec.Builder,
     ) {
 
-        val lane = laneRead("storage()", numberLanes.lanes.single())
+        val access = slotRead("storage()", numberSlot.slot)
 
         if (field.type == Scalar.Float) {
-            getter.addStatement("return %T.fromBits(%L)", FLOAT, lane)
-            setter.addStatement("%L = newValue.toRawBits()", lane)
+            getter.addStatement("return %T.fromBits(%L)", FLOAT, access)
+            setter.addStatement("%L = newValue.toRawBits()", access)
         } else {
-            getter.addStatement("return %L", lane)
-            setter.addStatement("%L = %L", lane, packedValue(numberLanes.packedType))
+            getter.addStatement("return %L", access)
+            setter.addStatement("%L = %L", access, packedValue(numberSlot.packed))
         }
     }
 
-    private fun wideNumberLanes(
+    private fun referenceSlot(
         field: StructViewField,
-        numberLanes: NumberLanes,
+        referenceSlot: ReferenceSlot,
         getter: FunSpec.Builder,
         setter: FunSpec.Builder,
     ) {
 
-        val (low, high) = numberLanes.lanes
+        getter.addStatement("return %L", referenceToValue(slotRead("storage()", referenceSlot.slot), field.type))
+
+        val check = referenceSlot.check
+        if (check != null) {
+            checkedReferenceWrite(field, referenceSlot.slot, check, setter)
+        } else {
+            setter.addStatement("%L", fieldWriteExpression(field))
+        }
+    }
+
+    private fun wideNumberSlots(
+        field: StructViewField,
+        slots: WideNumberSlots,
+        getter: FunSpec.Builder,
+        setter: FunSpec.Builder,
+    ) {
+
+        val low = slots.low
+        val high = slots.high
         val bits = CodeBlock.of(
             "(%L.toLong() and 0xFFFFFFFFL) or (%L.toLong() shl 32)",
-            laneRead("storage", low),
-            laneRead("storage", high),
+            slotRead("storage", low),
+            slotRead("storage", high),
         )
         val value = if (field.type == Scalar.Double) "bits" else "newValue"
 
@@ -131,13 +144,14 @@ internal class StructViewGenerator {
             getter.addStatement("return %L", bits)
         }
 
-        setter.addStatement("%L = %L.toInt()", laneRead("storage", low), value)
-        setter.addStatement("%L = (%L ushr 32).toInt()", laneRead("storage", high), value)
+        setter.addStatement("%L = %L.toInt()", slotRead("storage", low), value)
+        setter.addStatement("%L = (%L ushr 32).toInt()", slotRead("storage", high), value)
     }
 
-    private fun definedReferenceWrite(
+    private fun checkedReferenceWrite(
         field: StructViewField,
-        lane: DefinedReferenceLane,
+        slot: Slot,
+        check: TypeCheck,
         setter: FunSpec.Builder,
     ) {
 
@@ -146,7 +160,7 @@ internal class StructViewGenerator {
             is ArrayReferenceType -> COMPILED_ARRAY_CLASS_NAME.copy(nullable = type.nullable)
             else -> error("Field ${field.index} does not hold a struct or array reference")
         }
-        val sameStoreAndType = CodeBlock.of("value.rtt.engine·===·storage.rtt.engine && %L", rttCheck("value.rtt", lane.check))
+        val sameStoreAndType = CodeBlock.of("value.rtt.engine·===·storage.rtt.engine && %L", rttCheck("value.rtt", check))
         val acceptsValue = if (compiledClass.isNullable) {
             CodeBlock.of("value·==·null || (%L)", sameStoreAndType)
         } else {
@@ -156,42 +170,43 @@ internal class StructViewGenerator {
         setter.addStatement("val storage = storage()")
         setter.addStatement("val value = %L as %T", valueToReference(CodeBlock.of("newValue"), field.type), compiledClass)
         setter.addStatement("require(%L) { %S }", acceptsValue, "the value does not match the type of field ${field.index}")
-        setter.addStatement("%L = value", laneRead("storage", lane.lane))
+        setter.addStatement("%L = value", slotRead("storage", slot))
     }
 
     private fun storageFunction(
         className: ClassName,
-        storage: StructViewStorage,
+        layout: StructLayout,
     ): FunSpec {
+
+        val storageClass = ClassName.bestGuess(layout.storageClass)
+
         return FunSpec.builder("storage")
             .addModifiers(KModifier.PRIVATE)
-            .returns(storage.storageClass)
-            .addStatement("val struct = reference as %T", storage.storageClass)
-            .addStatement("require(%L) { %S }", rttCheck("struct.rtt", storage.check), "the struct is not a ${className.simpleName}")
+            .returns(storageClass)
+            .addStatement("val struct = reference as %T", storageClass)
+            .addStatement("require(%L) { %S }", rttCheck("struct.rtt", layout.check), "the struct is not a ${className.simpleName}")
             .addStatement("return struct")
             .build()
     }
 
     private fun rttCheck(
         rtt: String,
-        check: RttCheck,
+        check: TypeCheck,
     ): CodeBlock {
         return when {
-            check.final -> CodeBlock.of("%L.key·===·%S", rtt, check.key)
-            check.depth == 0 -> CodeBlock.of("%L.supertypes[0].key·===·%S", rtt, check.key)
-            else -> CodeBlock.of("%L.depth·>=·%L && %L.supertypes[%L].key·===·%S", rtt, check.depth, rtt, check.depth, check.key)
+            check.final -> CodeBlock.of("%L.key·===·%S", rtt, check.rttKey)
+            check.supertypes == 0 -> CodeBlock.of("%L.supertypes[0].key·===·%S", rtt, check.rttKey)
+            else -> CodeBlock.of("%L.depth·>=·%L && %L.supertypes[%L].key·===·%S", rtt, check.supertypes, rtt, check.supertypes, check.rttKey)
         }
     }
 
-    private fun laneRead(
+    private fun slotRead(
         receiver: String,
-        lane: Lane,
+        slot: Slot,
     ): CodeBlock {
-        return when {
-            lane.spilled && lane.kind == LaneKind.INT -> CodeBlock.of("%L.%L!![%L]", receiver, SPILLED_INTS_FIELD, lane.index)
-            lane.spilled -> CodeBlock.of("%L.%L!![%L]", receiver, SPILLED_REFERENCES_FIELD, lane.index)
-            lane.kind == LaneKind.INT -> CodeBlock.of("%L.i%L", receiver, lane.index)
-            else -> CodeBlock.of("%L.r%L", receiver, lane.index)
+        return when (slot) {
+            is InlineSlot -> CodeBlock.of("%L.%L", receiver, slot.field)
+            is SpilledSlot -> CodeBlock.of("%L.%L!![%L]", receiver, slot.array, slot.index)
         }
     }
 
