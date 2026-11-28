@@ -6,6 +6,7 @@
     (field i32) (field i32) (field i32) (field i32) (field i32) (field i32) (field i32) (field i32)
     (field i32) (field i32) (field i32) (field i32) (field i32) (field i32) (field i32) (field (mut i64))
     (field (mut anyref))))
+  (type $record (struct (field i32) (field anyref) (field anyref) (field anyref) (field anyref)))
 
   (func $new_circle (export "new_circle") (param $radius f64) (result (ref $circle))
     (struct.new $circle (i32.const 1) (ref.null $bytes) (local.get $radius)))
@@ -46,4 +47,7 @@
     (local.get $total))
 
   (func $parameter_homes (export "parameter_homes") (param $bytes (ref null $bytes)) (result i32)
-    (array.len (local.get $bytes))))
+    (array.len (local.get $bytes)))
+
+  (func $new_record (export "new_record") (result (ref $record))
+    (struct.new $record (i32.const 1) (ref.null any) (ref.null any) (ref.null any) (ref.null any))))

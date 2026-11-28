@@ -19,7 +19,7 @@ data class FieldStorage(
 data class StructStorage(
     val className: String,
     val fields: List<FieldStorage>,
-    val bytes: Int,
+    val inlineLanes: Int,
     val final: Boolean,
 ) {
 
@@ -102,7 +102,7 @@ class StoragePlans(
         val kinds = fields.map(::laneKinds)
         val parent = supertype(type)?.let(::struct)
         val storage = if (parent == null && fields.isEmpty()) {
-            StructStorage(emptyStructClass.name, emptyList(), bytes(emptyStructClass, 0, 0), emptyStructClass.final)
+            StructStorage(emptyStructClass.name, emptyList(), inlineLanes(emptyStructClass), emptyStructClass.final)
         } else {
             place(parent, fields, kinds)
         }
@@ -134,7 +134,11 @@ class StoragePlans(
             FieldStorage(field, lanes)
         }
 
-        return StructStorage(best.storageClass.name, placedFields, best.bytes, best.storageClass.final)
+        return StructStorage(best.storageClass.name, placedFields, inlineLanes(best.storageClass), best.storageClass.final)
+    }
+
+    private fun inlineLanes(storageClass: StorageClass): Int {
+        return storageClass.intLanes + storageClass.referenceLanes
     }
 
     private fun search(

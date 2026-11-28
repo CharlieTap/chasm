@@ -8,6 +8,7 @@ import io.github.charlietap.chasm.type.DefinedType
 class StructLanes(
     private val plans: StoragePlans,
     private val types: List<DefinedType>,
+    private val sizes: StructSizes,
 ) {
 
     val structs: Map<Int, StructStorage> = types.indices
@@ -21,7 +22,7 @@ class StructLanes(
         structs.forEach { (type, storage) ->
             val lanes = storage.fields.flatMap { field -> field.lanes }
             values += type.toLong()
-            values += storage.bytes.toLong()
+            values += sizes.bytes(storage).toLong()
             values += lanes.size.toLong()
             lanes.forEach { lane ->
                 values += (lane.index.toLong() shl 1) or if (lane.spilled) SPILLED else 0L

@@ -153,7 +153,7 @@ private fun LowerContext.structNew(
 ) {
 
     val storage = module.storagePlans.struct(type.index)
-    chargeAllocation(storage.bytes)
+    chargeAllocation(module.structSizes.bytes(storage))
     allocateStruct(storage, type.index)
 
     if (firstFieldSlot != null) {

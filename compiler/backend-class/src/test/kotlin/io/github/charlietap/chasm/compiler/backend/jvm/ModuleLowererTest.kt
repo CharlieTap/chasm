@@ -162,7 +162,7 @@ class ModuleLowererTest {
     @Test
     fun `functions of one function type share entry classes and other function types do not join them`() {
 
-        val entryClassCounts = mapOf("managed_lowering" to 10, "call_effects" to 20, "scalar" to 6, "control" to 5)
+        val entryClassCounts = mapOf("managed_lowering" to 11, "call_effects" to 20, "scalar" to 6, "control" to 5)
 
         entryClassCounts.forEach { (name, entryClasses) ->
             assertEquals(entryClasses, entryShapes(fixture(name)).size, name)

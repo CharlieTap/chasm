@@ -1,9 +1,11 @@
 package io.github.charlietap.chasm.compiled.internal
 
 import com.github.michaelbull.result.getOrThrow
+import io.github.charlietap.chasm.compiled.format.ArtifactTarget
 import io.github.charlietap.chasm.compiler.backend.analysis.gc.STORAGE_FAMILY
 import io.github.charlietap.chasm.compiler.backend.analysis.gc.StoragePlans
 import io.github.charlietap.chasm.compiler.backend.analysis.gc.StructLanes
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.StructSizes
 import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
 import io.github.charlietap.chasm.runtime.compiled.gc.StorageLane
@@ -17,7 +19,8 @@ import kotlin.test.assertTrue
 class StructLanesTest {
 
     private val types = definedTypes("storage_plans")
-    private val lanes = StructLanes(StoragePlans(types, STORAGE_FAMILY), types)
+    private val sizes = StructSizes(ArtifactTarget.ART)
+    private val lanes = StructLanes(StoragePlans(types, STORAGE_FAMILY), types, sizes)
     private val layouts = CompiledStructLayouts(types, FakeCompiledModule(lanes = lanes.encode()))
 
     @Test
@@ -28,7 +31,7 @@ class StructLanesTest {
         lanes.structs.forEach { (index, storage) ->
             val layout = checkNotNull(layouts.layout(index)) { "type $index has no layout" }
             val expected = storage.fields.map { field -> field.lanes.map { lane -> StorageLane(lane.index, lane.spilled) } }
-            assertEquals(storage.bytes, layout.bytes, "type $index")
+            assertEquals(sizes.bytes(storage), layout.bytes, "type $index")
             assertEquals(expected, layout.fields.map { field -> field.lanes }, "type $index")
         }
     }

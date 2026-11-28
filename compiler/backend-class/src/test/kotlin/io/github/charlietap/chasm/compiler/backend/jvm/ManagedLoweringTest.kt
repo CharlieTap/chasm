@@ -4,6 +4,7 @@ import com.github.michaelbull.result.getOrThrow
 import io.github.charlietap.chasm.ast.module.Export
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.compiled.CompiledModule
+import io.github.charlietap.chasm.compiled.format.ArtifactTarget
 import io.github.charlietap.chasm.compiler.backend.abi.ALLOCATION_REMAINING_FIELD
 import io.github.charlietap.chasm.compiler.backend.abi.ARRAY_OUT_OF_BOUNDS
 import io.github.charlietap.chasm.compiler.backend.abi.COMPILED_RTT_FIELD
@@ -37,10 +38,12 @@ import org.objectweb.asm.Type
 import org.objectweb.asm.tree.AbstractInsnNode
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.FieldInsnNode
+import org.objectweb.asm.tree.IntInsnNode
 import org.objectweb.asm.tree.JumpInsnNode
 import org.objectweb.asm.tree.MethodInsnNode
 import org.objectweb.asm.tree.MethodNode
 import org.objectweb.asm.tree.TypeInsnNode
+import org.objectweb.asm.tree.VarInsnNode
 import org.objectweb.asm.tree.analysis.Analyzer
 import org.objectweb.asm.tree.analysis.BasicVerifier
 import kotlin.test.Test
@@ -69,6 +72,16 @@ class ManagedLoweringTest {
         assertTrue(allocation >= 0)
         assertTrue(charge in 0 until allocation)
         assertTrue(refill in 0 until allocation)
+    }
+
+    @Test
+    fun `struct new charges the bytes of the target's object`() {
+
+        val hotspot = lowerExports(module, JvmOptions(target = ArtifactTarget.HOTSPOT)).getValue("new_record")
+        val art = lowerExports(module, JvmOptions(target = ArtifactTarget.ART)).getValue("new_record")
+
+        assertEquals(40, chargedBytes(hotspot))
+        assertEquals(32, chargedBytes(art))
     }
 
     @Test
@@ -252,6 +265,21 @@ class ManagedLoweringTest {
         val target = method.instructions.indexOf(jump.label)
         val next = method.instructions.toList().drop(target).firstOrNull { instruction -> instruction.opcode >= 0 }
         return next?.invokes(trap) == true
+    }
+
+    private fun chargedBytes(method: MethodNode): Int {
+
+        val instructions = method.instructions.toList().filter { instruction -> instruction.opcode >= 0 }
+        val charge = instructions.indexOfFirst { instruction ->
+            instruction is FieldInsnNode && instruction.opcode == Opcodes.PUTFIELD && instruction.name == ALLOCATION_REMAINING_FIELD
+        }
+        val beforeCharge = instructions.subList(0, charge)
+        val scratchLoad = beforeCharge.last { instruction -> instruction is VarInsnNode && instruction.opcode == Opcodes.ILOAD } as VarInsnNode
+        val scratchStore = beforeCharge.indexOfLast { instruction ->
+            instruction is VarInsnNode && instruction.opcode == Opcodes.ISTORE && instruction.`var` == scratchLoad.`var`
+        }
+
+        return (instructions[scratchStore - 1] as IntInsnNode).operand
     }
 
     private fun AbstractInsnNode.invokes(method: MethodRef): Boolean {

@@ -14,6 +14,7 @@ import io.github.charlietap.chasm.compiler.backend.analysis.ModuleIndexSpaces
 import io.github.charlietap.chasm.compiler.backend.analysis.gc.ReferenceTests
 import io.github.charlietap.chasm.compiler.backend.analysis.gc.RttTests
 import io.github.charlietap.chasm.compiler.backend.analysis.gc.StoragePlans
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.StructSizes
 import io.github.charlietap.chasm.compiler.backend.dex.abi.DexReferences
 import io.github.charlietap.chasm.compiler.backend.dex.abi.FunctionSignature
 import io.github.charlietap.chasm.compiler.backend.dex.abi.Invocation
@@ -43,6 +44,7 @@ internal class ModuleLowering(
     val layout: BindingLayout get() = plan.layout
     val referenceDescriptor: String get() = plan.referenceDescriptor
     val storagePlans: StoragePlans get() = plan.storagePlans
+    val structSizes: StructSizes get() = plan.structSizes
     val rttTests: RttTests get() = plan.rttTests
     val referenceTests: ReferenceTests get() = plan.referenceTests
     val inlineMemory: MemoryIndex? get() = plan.inlineMemory

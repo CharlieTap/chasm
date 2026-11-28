@@ -19,6 +19,7 @@ import io.github.charlietap.chasm.compiler.backend.abi.binaryName
 import io.github.charlietap.chasm.compiler.backend.analysis.gc.STORAGE_FAMILY
 import io.github.charlietap.chasm.compiler.backend.analysis.gc.StoragePlans
 import io.github.charlietap.chasm.compiler.backend.analysis.gc.StructLanes
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.StructSizes
 import io.github.charlietap.chasm.compiler.frontend.ModuleCompiler
 import io.github.charlietap.chasm.config.Bytes
 import io.github.charlietap.chasm.config.CpuLimits
@@ -92,7 +93,7 @@ class ModuleClassTest {
         val module = decodeModule(fixture("gc"))
         val entry = classes(generate(module, OPTIONS).dex).getValue(ENTRY)
         val payload = entry.method("structLanes").implementation!!.instructions.filterIsInstance<ArrayPayload>().single()
-        val expected = StructLanes(StoragePlans(module.definedTypes, STORAGE_FAMILY), module.definedTypes).encode()
+        val expected = StructLanes(StoragePlans(module.definedTypes, STORAGE_FAMILY), module.definedTypes, StructSizes(ArtifactTarget.ART)).encode()
 
         assertTrue(expected.isNotEmpty())
         assertContentEquals(expected, payload.arrayElements.map(Number::toLong).toLongArray())

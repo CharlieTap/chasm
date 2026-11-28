@@ -26,6 +26,7 @@ import io.github.charlietap.chasm.compiler.backend.analysis.gc.RttTests
 import io.github.charlietap.chasm.compiler.backend.analysis.gc.STORAGE_FAMILY
 import io.github.charlietap.chasm.compiler.backend.analysis.gc.StoragePlans
 import io.github.charlietap.chasm.compiler.backend.analysis.gc.StructLanes
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.StructSizes
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.BATCH_FUNCTIONS
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.BATCH_INSTRUCTIONS
 import io.github.charlietap.chasm.compiler.backend.jvm.abi.CLASS_FILE_VERSION
@@ -51,7 +52,8 @@ internal class ModuleLowering(
 
     val definedTypes: List<DefinedType> = module.definedTypes
     val storagePlans = StoragePlans(module.definedTypes, STORAGE_FAMILY)
-    val structLanes = StructLanes(storagePlans, module.definedTypes)
+    val structSizes = StructSizes(options.target)
+    val structLanes = StructLanes(storagePlans, module.definedTypes, structSizes)
     val settings = ModuleSettings(options.runtime, options.target, UNPINNED_OFFSET)
     val constants = ConstantExpressions(module)
     val referenceTests = ReferenceTests(module.definedTypes)

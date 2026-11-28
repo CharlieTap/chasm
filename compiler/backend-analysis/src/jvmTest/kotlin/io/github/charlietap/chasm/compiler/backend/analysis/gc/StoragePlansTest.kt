@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.compiler.backend.analysis.gc
 
 import com.github.michaelbull.result.getOrThrow
 import io.github.charlietap.chasm.ast.module.Module
+import io.github.charlietap.chasm.compiled.format.ArtifactTarget
 import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
 import io.github.charlietap.chasm.type.AbstractHeapType
@@ -30,6 +31,8 @@ import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
 
 class StoragePlansTest {
+
+    private val ART_SIZES = StructSizes(ArtifactTarget.ART)
 
     @Test
     fun `a canonical type gets the same plan in every module`() {
@@ -391,7 +394,7 @@ class StoragePlansTest {
 
         assertEquals(listOf(0, 1, 2, 3), spilledLanes.filter { lane -> lane.kind == LaneKind.INT }.map { lane -> lane.index })
         assertEquals(listOf(0, 1), spilledLanes.filter { lane -> lane.kind == LaneKind.REFERENCE }.map { lane -> lane.index })
-        assertEquals(TERMINAL_BYTES + 32 + 24, storage.bytes)
+        assertEquals(TERMINAL_BYTES + 32 + 24, ART_SIZES.bytes(storage))
     }
 
     @Test
@@ -431,8 +434,8 @@ class StoragePlansTest {
 
         assertEquals(TREE_LEAF + "_T16 168 open " + ints(0, 22), layout(plans.struct(inline)))
         assertEquals(TREE_LEAF + "_X 192 final " + ints(0, 22) + " xi0", layout(plans.struct(intSpill)))
-        assertEquals(TERMINAL_BYTES + 16, plans.struct(intSpill).bytes)
-        assertEquals(TERMINAL_BYTES + 16 + 16, plans.struct(bothSpills).bytes)
+        assertEquals(TERMINAL_BYTES + 16, ART_SIZES.bytes(plans.struct(intSpill)))
+        assertEquals(TERMINAL_BYTES + 16 + 16, ART_SIZES.bytes(plans.struct(bothSpills)))
     }
 
     @Test
@@ -487,7 +490,7 @@ class StoragePlansTest {
 
     private fun layout(storage: StructStorage): String {
 
-        val header = listOf(simpleName(storage.className), storage.bytes.toString(), if (storage.final) "final" else "open")
+        val header = listOf(simpleName(storage.className), ART_SIZES.bytes(storage).toString(), if (storage.final) "final" else "open")
         val fields = storage.fields.map { field -> field.lanes.joinToString(",", transform = ::address) }
 
         return (header + fields).joinToString(" ")
@@ -619,17 +622,19 @@ class StoragePlansTest {
         const val CHAINS = 200
         const val CHAIN_SEED = 7
 
-        val I32 = FieldType(StorageType.Value(ValueType.Number(NumberType.I32)), Mutability.Var)
         val I64 = FieldType(StorageType.Value(ValueType.Number(NumberType.I64)), Mutability.Var)
         val F32 = FieldType(StorageType.Value(ValueType.Number(NumberType.F32)), Mutability.Var)
         val F64 = FieldType(StorageType.Value(ValueType.Number(NumberType.F64)), Mutability.Var)
         val I8 = FieldType(StorageType.Packed(PackedType.I8), Mutability.Var)
         val I16 = FieldType(StorageType.Packed(PackedType.I16), Mutability.Var)
         val V128 = FieldType(StorageType.Value(ValueType.Vector(VectorType.V128)), Mutability.Var)
-        val ANYREF = FieldType(StorageType.Value(ValueType.Reference(ReferenceType.RefNull(AbstractHeapType.Any))), Mutability.Var)
         val EQREF = FieldType(StorageType.Value(ValueType.Reference(ReferenceType.RefNull(AbstractHeapType.Eq))), Mutability.Var)
         val FUNCREF = FieldType(StorageType.Value(ValueType.Reference(ReferenceType.RefNull(AbstractHeapType.Func))), Mutability.Var)
         val CONST_ANYREF = FieldType(StorageType.Value(ValueType.Reference(ReferenceType.RefNull(AbstractHeapType.Any))), Mutability.Const)
         val CONST_EQREF = FieldType(StorageType.Value(ValueType.Reference(ReferenceType.RefNull(AbstractHeapType.Eq))), Mutability.Const)
     }
 }
+
+internal val I32 = FieldType(StorageType.Value(ValueType.Number(NumberType.I32)), Mutability.Var)
+
+internal val ANYREF = FieldType(StorageType.Value(ValueType.Reference(ReferenceType.RefNull(AbstractHeapType.Any))), Mutability.Var)

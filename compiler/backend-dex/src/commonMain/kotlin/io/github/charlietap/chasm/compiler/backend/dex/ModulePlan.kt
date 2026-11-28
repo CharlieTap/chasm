@@ -6,6 +6,7 @@ import io.github.charlietap.chasm.cir.CirModule
 import io.github.charlietap.chasm.cir.FunctionIndex
 import io.github.charlietap.chasm.cir.MemoryIndex
 import io.github.charlietap.chasm.cir.TypeIndex
+import io.github.charlietap.chasm.compiled.format.ArtifactTarget
 import io.github.charlietap.chasm.compiler.backend.abi.GeneratedClassNames
 import io.github.charlietap.chasm.compiler.backend.abi.MethodRef
 import io.github.charlietap.chasm.compiler.backend.abi.OBJECT_TYPE
@@ -18,6 +19,7 @@ import io.github.charlietap.chasm.compiler.backend.analysis.gc.RttTests
 import io.github.charlietap.chasm.compiler.backend.analysis.gc.STORAGE_FAMILY
 import io.github.charlietap.chasm.compiler.backend.analysis.gc.StoragePlans
 import io.github.charlietap.chasm.compiler.backend.analysis.gc.StructLanes
+import io.github.charlietap.chasm.compiler.backend.analysis.gc.StructSizes
 import io.github.charlietap.chasm.compiler.backend.dex.abi.BATCH_FUNCTIONS
 import io.github.charlietap.chasm.compiler.backend.dex.abi.BATCH_INSTRUCTIONS
 import io.github.charlietap.chasm.compiler.backend.dex.abi.DexReferences
@@ -37,7 +39,8 @@ internal class ModulePlan(
     val referenceDescriptor = OBJECT_TYPE
     val storagePlans = StoragePlans(module.definedTypes, STORAGE_FAMILY)
     val rttTests = RttTests(module.definedTypes)
-    val structLanes = StructLanes(storagePlans, module.definedTypes)
+    val structSizes = StructSizes(ArtifactTarget.ART)
+    val structLanes = StructLanes(storagePlans, module.definedTypes, structSizes)
     val referenceTests = ReferenceTests(module.definedTypes)
 
     val layout = BindingLayout(declarations, analysis)
