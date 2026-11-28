@@ -13,11 +13,11 @@
 
     if-eqz v12, :cond_26
 
-    check-cast v12, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/S_I_II_RR;
+    check-cast v12, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/Struct_I3_R2__I_II_RR;
 
-    iget v8, v12, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/S_I_II;->i1:I
+    iget v8, v12, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/Struct_I3_R0__I_II;->i1:I
 
-    iget v9, v12, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/S_I_II;->i2:I
+    iget v9, v12, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/Struct_I3_R0__I_II;->i2:I
 
     int-to-long v0, v8
 

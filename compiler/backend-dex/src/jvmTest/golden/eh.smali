@@ -1178,13 +1178,13 @@
 
     check-cast v10, Lio/github/charlietap/chasm/runtime/compiled/gc/Rtt;
 
-    new-instance v12, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/S_I;
+    new-instance v12, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/Struct_I1_R0__I;
 
-    invoke-direct {v12, v10}, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/S_I;-><init>(Lio/github/charlietap/chasm/runtime/compiled/gc/Rtt;)V
+    invoke-direct {v12, v10}, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/Struct_I1_R0__I;-><init>(Lio/github/charlietap/chasm/runtime/compiled/gc/Rtt;)V
 
     move/from16 v8, v22
 
-    iput v8, v12, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/S_I;->i0:I
+    iput v8, v12, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/Struct_I1_R0__I;->i0:I
 
     move-object/from16 v23, v12
 
@@ -2340,9 +2340,9 @@
     return-object v0
 
     :pswitch_8
-    new-instance v0, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/S_I;
+    new-instance v0, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/Struct_I1_R0__I;
 
-    invoke-direct {v0, p1}, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/S_I;-><init>(Lio/github/charlietap/chasm/runtime/compiled/gc/Rtt;)V
+    invoke-direct {v0, p1}, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/Struct_I1_R0__I;-><init>(Lio/github/charlietap/chasm/runtime/compiled/gc/Rtt;)V
 
     return-object v0
 
@@ -2601,7 +2601,7 @@
 .method public runtimeAbi()I
     .registers 3
 
-    const/4 v0, 0x4
+    const/4 v0, 0x5
 
     return v0
 .end method

@@ -60,7 +60,13 @@ abstract class CompiledStruct(
         return rtt.layout as StructStorageLayout
     }
 
-    open fun readInts(target: IntArray) {}
+    open fun readNumberLanes(
+        destinations: IntArray,
+        buffer: LongArray,
+        shift: Int,
+        from: Int,
+        until: Int,
+    ) {}
 
     open fun readInt(lane: Int): Int {
         throw laneError(lane)
@@ -106,3 +112,32 @@ abstract class CompiledStruct(
         throw laneError(slot)
     }
 }
+
+internal fun storeLane(
+    destination: Int,
+    value: Int,
+    buffer: LongArray,
+    shift: Int,
+    from: Int,
+    until: Int,
+) {
+
+    val index = (destination shr DESTINATION_FIELD_SHIFT) + shift
+    if (index < from || index >= until) {
+        return
+    }
+
+    when (destination and DESTINATION_PART_MASK) {
+        WHOLE_FIELD -> buffer[index] = value.toLong()
+        LOW_HALF -> buffer[index] = value.toLong() and LOW_BITS
+        else -> buffer[index] = buffer[index] or (value.toLong() shl Int.SIZE_BITS)
+    }
+}
+
+internal const val DESTINATION_FIELD_SHIFT = 2
+internal const val DESTINATION_PART_MASK = 3
+internal const val WHOLE_FIELD = 0
+internal const val LOW_HALF = 1
+internal const val HIGH_HALF = 2
+internal const val UNUSED_LANE = -1
+internal const val LOW_BITS = 0xFFFFFFFFL

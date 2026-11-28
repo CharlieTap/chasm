@@ -40,19 +40,19 @@
 
     check-cast v10, Lio/github/charlietap/chasm/runtime/compiled/gc/Rtt;
 
-    new-instance v12, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/S_I_II_RR;
+    new-instance v12, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/Struct_I3_R2__I_II_RR;
 
-    invoke-direct {v12, v10}, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/S_I_II_RR;-><init>(Lio/github/charlietap/chasm/runtime/compiled/gc/Rtt;)V
+    invoke-direct {v12, v10}, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/Struct_I3_R2__I_II_RR;-><init>(Lio/github/charlietap/chasm/runtime/compiled/gc/Rtt;)V
 
     move/from16 v8, v22
 
-    iput v8, v12, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/S_I;->i0:I
+    iput v8, v12, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/Struct_I1_R0__I;->i0:I
 
     move-wide/from16 v2, v23
 
     long-to-int v8, v2
 
-    iput v8, v12, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/S_I_II;->i1:I
+    iput v8, v12, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/Struct_I3_R0__I_II;->i1:I
 
     const/16 v15, 0x20
 
@@ -60,11 +60,11 @@
 
     long-to-int v8, v2
 
-    iput v8, v12, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/S_I_II;->i2:I
+    iput v8, v12, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/Struct_I3_R0__I_II;->i2:I
 
     move-object/from16 v10, v25
 
-    iput-object v10, v12, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/S_I_II_RR;->r0:Ljava/lang/Object;
+    iput-object v10, v12, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/Struct_I3_R2__I_II_RR;->r0:Ljava/lang/Object;
 
     move-object/from16 v18, v12
 

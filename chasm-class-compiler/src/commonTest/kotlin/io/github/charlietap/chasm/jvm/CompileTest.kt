@@ -504,7 +504,7 @@ class CompileTest {
         assertEquals(decoded.exports, fromBytes.exports)
         assertEquals(sha256, fromBytes.sourceHash)
         assertEquals(sha256, fromFile.sourceHash)
-        assertEquals(4, fromBytes.runtimeAbi)
+        assertEquals(5, fromBytes.runtimeAbi)
         assertTrue(fromBytes.compilerVersion.isNotBlank())
         assertEquals(null, fromBytes.diagnostics)
         assertEquals(Diagnostics("test/info/traced/Module.sites", "test/info/traced/Module.lines"), traced.diagnostics)

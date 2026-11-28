@@ -13,9 +13,9 @@
 
     if-eqz v12, :cond_17
 
-    check-cast v12, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/S_I_IR_IR;
+    check-cast v12, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/Struct_I3_R2__I_IR_IR;
 
-    iget v8, v12, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/S_I;->i0:I
+    iget v8, v12, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/Struct_I1_R0__I;->i0:I
 
     move/from16 v17, v8
 

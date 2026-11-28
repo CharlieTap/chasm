@@ -2088,7 +2088,7 @@
 .method public runtimeAbi()I
     .registers 3
 
-    const/4 v0, 0x4
+    const/4 v0, 0x5
 
     return v0
 .end method

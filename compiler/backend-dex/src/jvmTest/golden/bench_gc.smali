@@ -96,17 +96,17 @@
 
     check-cast v10, Lio/github/charlietap/chasm/runtime/compiled/gc/Rtt;
 
-    new-instance v12, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/S_I_RR;
+    new-instance v12, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/Struct_I1_R2__I_RR;
 
-    invoke-direct {v12, v10}, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/S_I_RR;-><init>(Lio/github/charlietap/chasm/runtime/compiled/gc/Rtt;)V
+    invoke-direct {v12, v10}, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/Struct_I1_R2__I_RR;-><init>(Lio/github/charlietap/chasm/runtime/compiled/gc/Rtt;)V
 
     move/from16 v8, v21
 
-    iput v8, v12, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/S_I;->i0:I
+    iput v8, v12, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/Struct_I1_R0__I;->i0:I
 
     move-object/from16 v10, v24
 
-    iput-object v10, v12, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/S_I_RR;->r0:Ljava/lang/Object;
+    iput-object v10, v12, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/Struct_I1_R2__I_RR;->r0:Ljava/lang/Object;
 
     move-object/from16 v18, v12
 
@@ -152,9 +152,9 @@
 
     if-eqz v12, :cond_86
 
-    check-cast v12, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/S_I_RR;
+    check-cast v12, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/Struct_I1_R2__I_RR;
 
-    iget v8, v12, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/S_I;->i0:I
+    iget v8, v12, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/Struct_I1_R0__I;->i0:I
 
     move/from16 v23, v8
 
@@ -174,9 +174,9 @@
 
     if-eqz v12, :cond_90
 
-    check-cast v12, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/S_I_RR;
+    check-cast v12, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/Struct_I1_R2__I_RR;
 
-    iget-object v10, v12, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/S_I_RR;->r0:Ljava/lang/Object;
+    iget-object v10, v12, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/Struct_I1_R2__I_RR;->r0:Ljava/lang/Object;
 
     move-object/from16 v18, v10
 
@@ -2075,9 +2075,9 @@
     return-object v0
 
     :pswitch_8
-    new-instance v0, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/S_I_RR;
+    new-instance v0, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/Struct_I1_R2__I_RR;
 
-    invoke-direct {v0, p1}, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/S_I_RR;-><init>(Lio/github/charlietap/chasm/runtime/compiled/gc/Rtt;)V
+    invoke-direct {v0, p1}, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/Struct_I1_R2__I_RR;-><init>(Lio/github/charlietap/chasm/runtime/compiled/gc/Rtt;)V
 
     return-object v0
 
@@ -2322,7 +2322,7 @@
 .method public runtimeAbi()I
     .registers 3
 
-    const/4 v0, 0x4
+    const/4 v0, 0x5
 
     return v0
 .end method

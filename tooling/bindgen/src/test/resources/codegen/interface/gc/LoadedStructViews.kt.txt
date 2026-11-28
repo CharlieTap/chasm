@@ -6,10 +6,10 @@ import io.github.charlietap.chasm.reference.ArrayReference
 import io.github.charlietap.chasm.reference.StructReference
 import io.github.charlietap.chasm.runtime.compiled.gc.CompiledArray
 import io.github.charlietap.chasm.runtime.compiled.gc.CompiledStruct
-import io.github.charlietap.chasm.runtime.compiled.gc.storage.S_I
-import io.github.charlietap.chasm.runtime.compiled.gc.storage.S_I_II_II_RR_T3
-import io.github.charlietap.chasm.runtime.compiled.gc.storage.S_I_RR
-import io.github.charlietap.chasm.runtime.compiled.gc.storage.S_R
+import io.github.charlietap.chasm.runtime.compiled.gc.storage.Struct_I0_R1__R
+import io.github.charlietap.chasm.runtime.compiled.gc.storage.Struct_I1_R0__I
+import io.github.charlietap.chasm.runtime.compiled.gc.storage.Struct_I1_R2__I_RR
+import io.github.charlietap.chasm.runtime.compiled.gc.storage.Struct_I8_R5__I_II_IR_IRx4
 import kotlin.Any
 import kotlin.Double
 import kotlin.Float
@@ -56,8 +56,8 @@ public interface LoadedStructViews {
     public val f0: Int
       get() = storage().i0
 
-    private fun storage(): S_I {
-      val struct = reference as S_I
+    private fun storage(): Struct_I1_R0__I {
+      val struct = reference as Struct_I1_R0__I
       require(struct.rtt.key === "7cd61ed60e3e32738fd5976a89584478_0") { "the struct is not a Struct1" }
       return struct
     }
@@ -131,8 +131,8 @@ public interface LoadedStructViews {
         writeStructReference(reference, 10, newValue)
       }
 
-    private fun storage(): S_I_II_II_RR_T3 {
-      val struct = reference as S_I_II_II_RR_T3
+    private fun storage(): Struct_I8_R5__I_II_IR_IRx4 {
+      val struct = reference as Struct_I8_R5__I_II_IR_IRx4
       require(struct.rtt.key === "819217506f258f9b84be8103ddce7039_0") { "the struct is not a Struct2" }
       return struct
     }
@@ -146,8 +146,8 @@ public interface LoadedStructViews {
     public val f0: Struct4?
       get() = (storage().r0 as StructReference?)?.let { structReference -> Struct4(structReference) }
 
-    private fun storage(): S_R {
-      val struct = reference as S_R
+    private fun storage(): Struct_I0_R1__R {
+      val struct = reference as Struct_I0_R1__R
       require(struct.rtt.key === "096a44471f338e8b50afd7453b79f0b4_0") { "the struct is not a Struct3" }
       return struct
     }
@@ -170,8 +170,8 @@ public interface LoadedStructViews {
     public val f1: Int
       get() = storage().i0
 
-    private fun storage(): S_I_RR {
-      val struct = reference as S_I_RR
+    private fun storage(): Struct_I1_R2__I_RR {
+      val struct = reference as Struct_I1_R2__I_RR
       require(struct.rtt.key === "096a44471f338e8b50afd7453b79f0b4_1") { "the struct is not a Struct4" }
       return struct
     }

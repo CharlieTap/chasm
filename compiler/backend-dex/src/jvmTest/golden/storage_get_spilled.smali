@@ -13,9 +13,9 @@
 
     if-eqz v12, :cond_1a
 
-    check-cast v12, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/S_I_II_II_II_X;
+    check-cast v12, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/Struct_I23_R18__I_II_II_IRx18_Spill;
 
-    iget-object v11, v12, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/S_I_II_II_II_X;->spilledInts:[I
+    iget-object v11, v12, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/Struct_I23_R18__I_II_II_IRx18_Spill;->spilledInts:[I
 
     const/4 v15, 0x1
 

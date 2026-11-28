@@ -15,13 +15,13 @@
 
     if-eqz v12, :cond_18
 
-    check-cast v12, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/S_I_IR;
+    check-cast v12, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/Struct_I2_R1__I_IR;
 
     move/from16 v8, v18
 
     and-int/lit16 v8, v8, 0xff
 
-    iput v8, v12, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/S_I;->i0:I
+    iput v8, v12, Lio/github/charlietap/chasm/runtime/compiled/gc/storage/Struct_I1_R0__I;->i0:I
 
     return-void
 

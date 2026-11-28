@@ -52,14 +52,24 @@ class StorageClass internal constructor(
 }
 
 @InternalChasmApi
-class StorageFamily(
+class StorageBranch(
+    val root: List<LaneKind>,
+    val firstSteps: List<List<LaneKind>>,
     val inlineLanes: Int,
     val tailLevels: Int,
+)
+
+@InternalChasmApi
+class StorageFamily(
+    branches: List<StorageBranch>,
 ) {
     private val classesByName = LinkedHashMap<String, StorageClass>()
 
-    val roots: List<StorageClass> = listOf(LaneKind.INT, LaneKind.REFERENCE).map { kind ->
-        addTree(ROOT_NAME, null, listOf(kind))
+    val roots: List<StorageClass> = branches.map { branch ->
+        val path = letters(branch.root)
+        val root = addClass(path, null, branch.root, final = false)
+        addSteps(branch, path, root, branch.firstSteps)
+        root
     }
 
     val classes: Collection<StorageClass>
@@ -69,40 +79,40 @@ class StorageFamily(
         return classesByName[name] ?: error("$name is not a storage class")
     }
 
-    private fun addTree(
-        superclassName: String,
-        superclass: StorageClass?,
-        kinds: List<LaneKind>,
-    ): StorageClass {
-
-        val name = superclassName + "_" + kinds.joinToString("") { kind -> if (kind == LaneKind.INT) "I" else "R" }
-        val storageClass = addClass(name, superclass, kinds, final = false)
-
-        if (storageClass.intLanes + storageClass.referenceLanes < inlineLanes) {
-            for (pair in LANE_PAIRS) {
-                addTree(name, storageClass, pair)
+    private fun addSteps(
+        branch: StorageBranch,
+        path: String,
+        storageClass: StorageClass,
+        steps: List<List<LaneKind>>,
+    ) {
+        if (storageClass.intLanes + storageClass.referenceLanes < branch.inlineLanes) {
+            for (step in steps) {
+                val stepPath = path + PATH_SEPARATOR + letters(step)
+                addSteps(branch, stepPath, addClass(stepPath, storageClass, step, final = false), LANE_PAIRS)
             }
         } else {
-            addTail(name, storageClass, 1)
+            addTail(branch, path, storageClass, 1)
         }
-
-        return storageClass
     }
 
     private fun addTail(
-        leafName: String,
+        branch: StorageBranch,
+        leafPath: String,
         superclass: StorageClass,
         level: Int,
     ) {
-        if (level > tailLevels) {
-            addClass(leafName + "_X", superclass, emptyList(), final = true)
+
+        val steps = leafPath + PATH_SEPARATOR + letters(TAIL_LEVEL_LANES) + REPEAT_MARKER
+
+        if (level > branch.tailLevels) {
+            addClass(steps + branch.tailLevels + SPILL_SUFFIX, superclass, emptyList(), final = true)
         } else {
-            addTail(leafName, addClass(leafName + "_T" + level, superclass, TAIL_LEVEL_LANES, final = false), level + 1)
+            addTail(branch, leafPath, addClass(steps + level, superclass, TAIL_LEVEL_LANES, final = false), level + 1)
         }
     }
 
     private fun addClass(
-        name: String,
+        path: String,
         superclass: StorageClass?,
         kinds: List<LaneKind>,
         final: Boolean,
@@ -117,6 +127,7 @@ class StorageFamily(
             }
         }
 
+        val name = "Struct_I${nextInt}_R${nextReference}__$path"
         val storageClass = StorageClass("L$STORAGE_PACKAGE$name;", superclass, lanes, final)
         superclass?.mutableSubclasses?.add(storageClass)
         classesByName[storageClass.name] = storageClass
@@ -124,18 +135,39 @@ class StorageFamily(
         return storageClass
     }
 
+    private fun letters(kinds: List<LaneKind>): String {
+        return kinds.joinToString("") { kind -> if (kind == LaneKind.INT) "I" else "R" }
+    }
+
     private companion object {
-        const val ROOT_NAME = "S"
-        val LANE_PAIRS = listOf(
-            listOf(LaneKind.INT, LaneKind.INT),
-            listOf(LaneKind.INT, LaneKind.REFERENCE),
-            listOf(LaneKind.REFERENCE, LaneKind.REFERENCE),
-        )
-        val TAIL_LEVEL_LANES = listOf(LaneKind.INT, LaneKind.REFERENCE)
+        const val PATH_SEPARATOR = "_"
+        const val REPEAT_MARKER = "x"
+        const val SPILL_SUFFIX = "_Spill"
     }
 }
 
 internal const val STORAGE_PACKAGE = "io/github/charlietap/chasm/runtime/compiled/gc/storage/"
 
+private val LANE_SINGLES = listOf(
+    listOf(LaneKind.INT),
+    listOf(LaneKind.REFERENCE),
+)
+
+private val LANE_PAIRS = listOf(
+    listOf(LaneKind.INT, LaneKind.INT),
+    listOf(LaneKind.INT, LaneKind.REFERENCE),
+    listOf(LaneKind.REFERENCE, LaneKind.REFERENCE),
+)
+
+private val TAIL_LEVEL_LANES = listOf(LaneKind.INT, LaneKind.REFERENCE)
+
+private val KOTLIN_HEADER = listOf(LaneKind.INT, LaneKind.REFERENCE, LaneKind.REFERENCE, LaneKind.REFERENCE)
+
 @InternalChasmApi
-val STORAGE_FAMILY = StorageFamily(inlineLanes = 7, tailLevels = 16)
+val STORAGE_FAMILY = StorageFamily(
+    listOf(
+        StorageBranch(root = listOf(LaneKind.INT), firstSteps = LANE_PAIRS, inlineLanes = 5, tailLevels = 18),
+        StorageBranch(root = listOf(LaneKind.REFERENCE), firstSteps = LANE_PAIRS, inlineLanes = 5, tailLevels = 18),
+        StorageBranch(root = KOTLIN_HEADER, firstSteps = LANE_SINGLES + LANE_PAIRS, inlineLanes = 7, tailLevels = 16),
+    ),
+)

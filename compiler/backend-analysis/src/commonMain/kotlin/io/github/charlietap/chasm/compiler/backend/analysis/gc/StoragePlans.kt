@@ -48,11 +48,12 @@ class StoragePlans(
     private val structsByIndex = arrayOfNulls<StructStorage>(types.size)
     private val arraysByIndex = arrayOfNulls<ArrayStorage>(types.size)
     private val unsupportedByIndex = arrayOfNulls<String>(types.size)
-    private val emptyStructClass = family.roots.first { root -> root.lanes.single().kind == LaneKind.INT }
-    private val ranking = compareBy<Placement> { placement -> placement.bytes }
+    private val emptyStructClass = family.roots.first { root -> root.intLanes == 1 && root.referenceLanes == 0 }
+    private val ranking = compareBy<Placement> { placement -> placement.unpaddedBytes }
         .thenByDescending { placement -> placement.inlineFields }
         .thenByDescending { placement -> placement.inlineComponents }
         .thenBy { placement -> placement.unusedIntLanes }
+        .thenBy { placement -> placement.superclasses }
         .thenBy { placement -> placement.order }
 
     init {
@@ -196,33 +197,33 @@ class StoragePlans(
         return Placement(
             storageClass = storageClass,
             lanes = lanes,
-            bytes = bytes(storageClass, spillCounts[LaneKind.INT.ordinal], spillCounts[LaneKind.REFERENCE.ordinal]),
+            unpaddedBytes = unpaddedBytes(storageClass, spillCounts[LaneKind.INT.ordinal], spillCounts[LaneKind.REFERENCE.ordinal]),
             inlineFields = lanes.count { fieldLanes -> fieldLanes.none { lane -> lane.spilled } },
             inlineComponents = lanes.sumOf { fieldLanes -> fieldLanes.count { lane -> !lane.spilled } },
             unusedIntLanes = storageClass.intLanes - inlineCounts[LaneKind.INT.ordinal],
+            superclasses = superclasses(storageClass),
             order = order,
         )
     }
 
-    private fun bytes(
+    private fun unpaddedBytes(
         storageClass: StorageClass,
         spilledInts: Int,
         spilledReferences: Int,
     ): Int {
 
-        val spillArrays = if (storageClass.final) SPILL_ARRAY_FIELD_BYTES else 0
+        val spillFields = if (storageClass.final) SPILL_ARRAY_FIELD_BYTES else 0
         val lanes = storageClass.intLanes + storageClass.referenceLanes
-        val objectBytes = aligned(OBJECT_BYTES + LANE_BYTES * lanes + spillArrays)
 
-        return objectBytes + spillArrayBytes(spilledInts) + spillArrayBytes(spilledReferences)
+        return LANE_BYTES * lanes + spillFields + unpaddedArrayBytes(spilledInts) + unpaddedArrayBytes(spilledReferences)
     }
 
-    private fun spillArrayBytes(length: Int): Int {
-        return if (length == 0) 0 else aligned(ARRAY_BYTES + LANE_BYTES * length)
+    private fun unpaddedArrayBytes(length: Int): Int {
+        return if (length == 0) 0 else ARRAY_BYTES + LANE_BYTES * length
     }
 
-    private fun aligned(bytes: Int): Int {
-        return (bytes + 7) and 7.inv()
+    private fun superclasses(storageClass: StorageClass): Int {
+        return generateSequence(storageClass.superclass) { superclass -> superclass.superclass }.count()
     }
 
     private fun laneKinds(field: FieldType): List<LaneKind> {
@@ -262,15 +263,15 @@ class StoragePlans(
     private class Placement(
         val storageClass: StorageClass,
         val lanes: List<List<Lane>>,
-        val bytes: Int,
+        val unpaddedBytes: Int,
         val inlineFields: Int,
         val inlineComponents: Int,
         val unusedIntLanes: Int,
+        val superclasses: Int,
         val order: Int,
     )
 
     private companion object {
-        const val OBJECT_BYTES = 12
         const val LANE_BYTES = 4
         const val SPILL_ARRAY_FIELD_BYTES = 8
         const val ARRAY_BYTES = 12

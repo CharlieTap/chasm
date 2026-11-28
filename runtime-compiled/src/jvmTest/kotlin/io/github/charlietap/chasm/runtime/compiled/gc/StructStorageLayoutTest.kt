@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.runtime.compiled.gc
 
 import io.github.charlietap.chasm.embedding.reference.readStructFields
-import io.github.charlietap.chasm.runtime.compiled.gc.storage.S_I_II_II_II_X
+import io.github.charlietap.chasm.runtime.compiled.gc.storage.Struct_I23_R18__I_II_II_IRx18_Spill
 import io.github.charlietap.chasm.type.AbstractHeapType
 import io.github.charlietap.chasm.type.FieldType
 import io.github.charlietap.chasm.type.Mutability
@@ -17,7 +17,7 @@ import kotlin.test.assertFailsWith
 
 class StructStorageLayoutTest {
 
-    private val layout = StructStorageLayout(FIELDS, bytes = 0) { rtt -> S_I_II_II_II_X(rtt) }
+    private val layout = StructStorageLayout(FIELDS, bytes = 0) { rtt -> Struct_I23_R18__I_II_II_IRx18_Spill(rtt) }
     private val rtt = Rtt(0, "layout", fakeEngine(), null, layout)
 
     @Test
@@ -71,9 +71,56 @@ class StructStorageLayoutTest {
         assertContentEquals(expected, buffer.copyOfRange(1, REFERENCE_FIELD + 1))
     }
 
+    @Test
+    fun `reading a range that starts past the first field writes only its own cells`() {
+
+        val struct = populatedStruct()
+        val buffer = LongArray(8) { STALE }
+
+        readStructFields(struct, 2, buffer, bufferOffset = 3, count = 2)
+
+        val expected = LongArray(8) { STALE }
+        expected[3] = VALUES[2] and MASKS[2]
+        expected[4] = VALUES[3]
+        assertContentEquals(expected, buffer)
+    }
+
+    @Test
+    fun `reading a range joins both halves of a 64 bit field over stale buffer contents`() {
+
+        val struct = populatedStruct()
+        val buffer = LongArray(2) { STALE }
+
+        readStructFields(struct, I64_FIELD, buffer, count = 2)
+
+        assertEquals(0x1234_5678_9ABC_DEF0L, buffer[0])
+    }
+
+    @Test
+    fun `reading a range sign extends a 32 bit field`() {
+
+        val struct = populatedStruct()
+        val buffer = LongArray(2)
+
+        readStructFields(struct, 0, buffer, count = 2)
+
+        assertEquals(-5L, buffer[0])
+    }
+
+    @Test
+    fun `reading a range returns a spilled field and a field with one spilled half`() {
+
+        val struct = populatedStruct()
+        val buffer = LongArray(3) { STALE }
+
+        readStructFields(struct, SPILLED_FIELD, buffer, count = 3)
+
+        assertContentEquals(longArrayOf(VALUES[SPILLED_FIELD], VALUES[SPILLED_FIELD + 1], VALUES[SPILLED_FIELD + 2]), buffer)
+    }
+
     private fun populatedStruct(): CompiledStruct {
 
-        val struct = layout.newStruct(rtt) as S_I_II_II_II_X
+        val struct = layout.newStruct(rtt) as Struct_I23_R18__I_II_II_IRx18_Spill
         struct.spilledInts = IntArray(SPILLED_INTS)
         struct.spilledReferences = arrayOfNulls(0)
         NUMBER_FIELDS.forEach { index -> layout.writeBits(struct, index, VALUES[index]) }
@@ -84,8 +131,11 @@ class StructStorageLayoutTest {
 
     private companion object {
         const val REFERENCE_FIELD = 6
+        const val I64_FIELD = 3
+        const val SPILLED_FIELD = 9
         const val SPILLED_INTS = 4
         const val UNTOUCHED = -7L
+        const val STALE = -1L
 
         val FIELDS = listOf(
             field(StorageType.Value(ValueType.Number(NumberType.I32)), lane(0)),

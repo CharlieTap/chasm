@@ -1,19 +1,19 @@
-0 S_I_IR 24 open i0 r0 i1
-1 S_I_RR 24 open i0 r0
-2 S_I_RR_II 32 open i0 r0 i1,i2
-3 S_I_RR_II 32 open i0 r0 i1,i2 r1
-4 S_I_II_IR 32 open i0 i1 i2,i3
-5 S_I_II_II_II_T1 48 open i0 i1 i2 i3 i4 i5 i6,i7
-6 S_I_II_II_II_T2 56 open i0 i1 i2 i3 i4 i5 i6 i7,i8
-7 S_I_II_II_II_X 192 final i0 i1 i2 i3 i4 i5 i6 i7 i8 i9 i10 i11 i12 i13 i14 i15 i16 i17 i18 i19 i20 i21 i22,xi0
-8 S_I_II_II_II_X 208 final i0 i1 i2 i3 i4 i5 i6 i7 i8 i9 i10 i11 i12 i13 i14 i15 i16 i17 i18 i19 i20 i21 i22 xi0 xr0
-9 S_I_II_II_II_X 216 final i0 i1 i2 i3 i4 i5 i6 i7 i8 i9 i10 i11 i12 i13 i14 i15 i16 i17 i18 i19 i20 i21 i22,xi0 xr0 xi1
-10 S_I 16 open
-11 S_I 16 open i0
-12 S_I_II_II 32 open i0 i1 i2 i3,i4
-13 S_I_RR 24 open r0 i0
-14 S_I_RR_II 32 open r0 i0 i1,i2
-15 S_R_RR_RR_RR_X 200 final r0 r1 r2 r3 r4 r5 r6 r7 r8 r9 r10 r11 r12 r13 r14 r15 r16 r17 r18 r19 r20 r21 r22 xr0 xr1
+0 Struct_I2_R1__I_IR 24 open i0 r0 i1
+1 Struct_I1_R2__I_RR 24 open i0 r0
+2 Struct_I3_R2__I_RR_II 32 open i0 r0 i1,i2
+3 Struct_I3_R2__I_RR_II 32 open i0 r0 i1,i2 r1
+4 Struct_I4_R1__I_II_IR 32 open i0 i1 i2,i3
+5 Struct_I8_R3__I_II_II_IRx3 56 open i0 i1 i2 i3 i4 i5 i6,i7
+6 Struct_I9_R4__I_II_II_IRx4 64 open i0 i1 i2 i3 i4 i5 i6 i7,i8
+7 Struct_I23_R18__I_II_II_IRx18_Spill 200 final i0 i1 i2 i3 i4 i5 i6 i7 i8 i9 i10 i11 i12 i13 i14 i15 i16 i17 i18 i19 i20 i21 i22,xi0
+8 Struct_I23_R18__I_II_II_IRx18_Spill 216 final i0 i1 i2 i3 i4 i5 i6 i7 i8 i9 i10 i11 i12 i13 i14 i15 i16 i17 i18 i19 i20 i21 i22 xi0 xr0
+9 Struct_I23_R18__I_II_II_IRx18_Spill 224 final i0 i1 i2 i3 i4 i5 i6 i7 i8 i9 i10 i11 i12 i13 i14 i15 i16 i17 i18 i19 i20 i21 i22,xi0 xr0 xi1
+10 Struct_I1_R0__I 16 open
+11 Struct_I1_R0__I 16 open i0
+12 Struct_I5_R0__I_II_II 32 open i0 i1 i2 i3,i4
+13 Struct_I1_R2__I_RR 24 open r0 i0
+14 Struct_I3_R2__I_RR_II 32 open r0 i0 i1,i2
+15 Struct_I17_R23__IRRR_RR_RR_IRx16_Spill 208 final r0 r1 r2 r3 r4 r5 r6 r7 r8 r9 r10 r11 r12 r13 r14 r15 r16 r17 r18 r19 r20 r21 r22 xr0 xr1
 16 I8Array 0
 17 I16Array 1
 18 I32Array 2

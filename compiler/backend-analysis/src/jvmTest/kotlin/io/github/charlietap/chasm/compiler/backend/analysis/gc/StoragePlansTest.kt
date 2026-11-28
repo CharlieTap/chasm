@@ -28,6 +28,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertNotEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 class StoragePlansTest {
@@ -80,7 +81,7 @@ class StoragePlansTest {
         val other = types.struct(F32, FUNCREF)
         val plans = types.plans()
 
-        assertEquals("S_I_RR 24 open i0 r0", layout(plans.struct(shape)))
+        assertEquals("Struct_I1_R2__I_RR 24 open i0 r0", layout(plans.struct(shape)))
         assertEquals(layout(plans.struct(shape)), layout(plans.struct(other)))
         assertNotEquals(plans.struct(shape), plans.struct(other))
     }
@@ -107,13 +108,13 @@ class StoragePlansTest {
     }
 
     @Test
-    fun `an empty struct uses S_I`() {
+    fun `an empty struct uses the int root`() {
 
         val types = Types()
         val empty = types.struct()
         val plans = types.plans()
 
-        assertEquals("S_I 16 open", layout(plans.struct(empty)))
+        assertEquals("Struct_I1_R0__I 16 open", layout(plans.struct(empty)))
     }
 
     @Test
@@ -124,7 +125,97 @@ class StoragePlansTest {
         val child = types.subtype(empty, I32)
         val plans = types.plans()
 
-        assertEquals("S_I 16 open i0", layout(plans.struct(child)))
+        assertEquals("Struct_I1_R0__I 16 open i0", layout(plans.struct(child)))
+    }
+
+    @Test
+    fun `a subtype of an empty struct stays below the int root`() {
+
+        val types = Types()
+        val empty = types.struct()
+        val child = types.subtype(empty, ANYREF, ANYREF, ANYREF)
+        val plans = types.plans()
+
+        assertEquals("Struct_I1_R4__I_RR_RR 32 open r0 r1 r2", layout(plans.struct(child)))
+    }
+
+    @Test
+    fun `a type shaped like the Kotlin header uses the header root`() {
+
+        val types = Types()
+        val header = types.struct(I32, ANYREF, ANYREF, ANYREF)
+        val plans = types.plans()
+
+        assertEquals("Struct_I1_R3__IRRR 32 open i0 r0 r1 r2", layout(plans.struct(header)))
+    }
+
+    @Test
+    fun `a subtype of the header picks a single slot step for one added field`() {
+
+        val types = Types()
+        val header = types.struct(I32, ANYREF, ANYREF, ANYREF)
+        val oneReference = types.subtype(header, ANYREF)
+        val oneInt = types.subtype(header, I32)
+        val plans = types.plans()
+
+        assertEquals("Struct_I1_R4__IRRR_R 32 open i0 r0 r1 r2 r3", layout(plans.struct(oneReference)))
+        assertEquals("Struct_I2_R3__IRRR_I 32 open i0 r0 r1 r2 i1", layout(plans.struct(oneInt)))
+    }
+
+    @Test
+    fun `a subtype of the header picks a pair step for two added fields`() {
+
+        val types = Types()
+        val header = types.struct(I32, ANYREF, ANYREF, ANYREF)
+        val twoReferences = types.subtype(header, ANYREF, ANYREF)
+        val plans = types.plans()
+
+        assertEquals("Struct_I1_R5__IRRR_RR 40 open i0 r0 r1 r2 r3 r4", layout(plans.struct(twoReferences)))
+    }
+
+    @Test
+    fun `equal capacity prefers fewer superclasses`() {
+
+        val types = Types()
+        val struct = types.struct(I32, ANYREF, ANYREF, ANYREF, ANYREF)
+        val plans = types.plans()
+
+        assertEquals("Struct_I1_R4__IRRR_R 32 open i0 r0 r1 r2 r3", layout(plans.struct(struct)))
+    }
+
+    @Test
+    fun `fewest slots wins over search order`() {
+
+        val types = Types()
+        val struct = types.struct(I32, ANYREF, ANYREF, ANYREF)
+        val plans = types.plans()
+
+        val storageClass = STORAGE_FAMILY.storageClass(plans.struct(struct).className)
+
+        assertEquals(4, storageClass.intLanes + storageClass.referenceLanes)
+    }
+
+    @Test
+    fun `two declarations of the same subtype chain get the same classes and slots`() {
+
+        val first = Types()
+        val header = first.struct(I32, ANYREF, ANYREF, ANYREF)
+        val child = first.subtype(header, ANYREF, I32)
+        val grandchild = first.subtype(child, I64, ANYREF)
+        val firstPlans = first.plans()
+
+        val second = Types()
+        second.struct(F64, ANYREF)
+        val secondHeader = second.struct(I32, ANYREF, ANYREF, ANYREF)
+        second.struct(I32)
+        val secondChild = second.subtype(secondHeader, ANYREF, I32)
+        val secondGrandchild = second.subtype(secondChild, I64, ANYREF)
+        val secondPlans = second.plans()
+
+        assertEquals("Struct_I4_R6__IRRR_IR_IR_IRx1 56 open i0 r0 r1 r2 r3 i1 i2,i3 r4", layout(firstPlans.struct(grandchild)))
+        assertEquals(layout(firstPlans.struct(header)), layout(secondPlans.struct(secondHeader)))
+        assertEquals(layout(firstPlans.struct(child)), layout(secondPlans.struct(secondChild)))
+        assertEquals(layout(firstPlans.struct(grandchild)), layout(secondPlans.struct(secondGrandchild)))
     }
 
     @Test
@@ -214,17 +305,23 @@ class StoragePlansTest {
         val types = Types()
         val fewestBytes = types.struct(*Array(22) { I32 }, I64)
         val mostInlineFields = types.struct(*Array(25) { ANYREF })
-        val referenceRoot = types.struct(ANYREF)
-        val mostInlineComponents = types.subtype(referenceRoot, *Array(21) { I32 }, I64, I32)
+        val header = types.struct(I32, ANYREF, ANYREF, ANYREF)
+        val mostInlineComponents = types.subtype(header, *Array(16) { ANYREF }, *Array(19) { I32 }, I64)
         val fewestUnusedInts = types.struct(I32, ANYREF)
         val smallestPath = types.struct(I32, ANYREF, I32)
         val plans = types.plans()
 
-        assertEquals(TREE_LEAF + "_X 192 final " + ints(0, 21) + " i22,xi0", layout(plans.struct(fewestBytes)))
-        assertEquals("S_R_RR_RR_RR_X 200 final " + references(0, 22) + " xr0 xr1", layout(plans.struct(mostInlineFields)))
-        assertEquals("S_R_II_II_II_X 200 final r0 " + ints(0, 20) + " i21,xi0 xi1", layout(plans.struct(mostInlineComponents)))
-        assertEquals("S_I_RR 24 open i0 r0", layout(plans.struct(fewestUnusedInts)))
-        assertEquals("S_I_IR 24 open i0 r0 i1", layout(plans.struct(smallestPath)))
+        assertEquals(DEEPEST_INT_SPILL + " 200 final " + ints(0, 21) + " i22,xi0", layout(plans.struct(fewestBytes)))
+        assertEquals(
+            "Struct_I17_R23__IRRR_RR_RR_IRx16_Spill 208 final " + references(0, 22) + " xr0 xr1",
+            layout(plans.struct(mostInlineFields)),
+        )
+        assertEquals(
+            "Struct_I21_R19__IRRR_II_II_IRx16_Spill 200 final i0 " + references(0, 18) + " " + ints(1, 19) + " i20,xi0",
+            layout(plans.struct(mostInlineComponents)),
+        )
+        assertEquals("Struct_I1_R2__I_RR 24 open i0 r0", layout(plans.struct(fewestUnusedInts)))
+        assertEquals("Struct_I2_R1__I_IR 24 open i0 r0 i1", layout(plans.struct(smallestPath)))
     }
 
     @Test
@@ -236,9 +333,9 @@ class StoragePlansTest {
 
         val storage = plans.struct(struct)
 
-        assertEquals("S_I_IR 24 open r0 i0 i1", layout(storage))
-        assertEquals("S_I_IR", declaringClass(storage, 0, 0))
-        assertEquals("S_I", declaringClass(storage, 1, 0))
+        assertEquals("Struct_I2_R1__I_IR 24 open r0 i0 i1", layout(storage))
+        assertEquals("Struct_I2_R1__I_IR", declaringClass(storage, 0, 0))
+        assertEquals("Struct_I1_R0__I", declaringClass(storage, 1, 0))
     }
 
     @Test
@@ -250,9 +347,9 @@ class StoragePlansTest {
         val mixed = types.struct(I32, ANYREF)
         val plans = types.plans()
 
-        assertEquals("S_I_IR 24 open i0 i1", layout(plans.struct(ints)))
-        assertEquals("S_I_IR 24 open i0,i1", layout(plans.struct(wide)))
-        assertEquals("S_I_RR 24 open i0 r0", layout(plans.struct(mixed)))
+        assertEquals("Struct_I2_R1__I_IR 24 open i0 i1", layout(plans.struct(ints)))
+        assertEquals("Struct_I2_R1__I_IR 24 open i0,i1", layout(plans.struct(wide)))
+        assertEquals("Struct_I1_R2__I_RR 24 open i0 r0", layout(plans.struct(mixed)))
     }
 
     @Test
@@ -264,8 +361,8 @@ class StoragePlansTest {
 
         val storage = plans.struct(struct)
 
-        assertEquals("S_I_IR 24 open i0 r0 i1", layout(storage))
-        assertEquals("S_I_IR", declaringClass(storage, 2, 0))
+        assertEquals("Struct_I2_R1__I_IR 24 open i0 r0 i1", layout(storage))
+        assertEquals("Struct_I2_R1__I_IR", declaringClass(storage, 2, 0))
     }
 
     @Test
@@ -279,10 +376,10 @@ class StoragePlansTest {
 
         val storage = plans.struct(grandchild)
 
-        assertEquals("S_I_RR 24 open i0 r0", layout(plans.struct(parent)))
-        assertEquals("S_I_RR_II 32 open i0 r0 i1,i2", layout(plans.struct(child)))
-        assertEquals("S_I_RR_II 32 open i0 r0 i1,i2 r1", layout(storage))
-        assertEquals("S_I_RR", declaringClass(storage, 3, 0))
+        assertEquals("Struct_I1_R2__I_RR 24 open i0 r0", layout(plans.struct(parent)))
+        assertEquals("Struct_I3_R2__I_RR_II 32 open i0 r0 i1,i2", layout(plans.struct(child)))
+        assertEquals("Struct_I3_R2__I_RR_II 32 open i0 r0 i1,i2 r1", layout(storage))
+        assertEquals("Struct_I1_R2__I_RR", declaringClass(storage, 3, 0))
     }
 
     @Test
@@ -295,9 +392,9 @@ class StoragePlansTest {
 
         val storage = plans.struct(child)
 
-        assertEquals("S_I_IR 24 open r0 i0 i1", layout(storage))
-        assertEquals("S_I", declaringClass(storage, 1, 0))
-        assertEquals("S_I_IR", declaringClass(storage, 2, 0))
+        assertEquals("Struct_I2_R1__I_IR 24 open r0 i0 i1", layout(storage))
+        assertEquals("Struct_I1_R0__I", declaringClass(storage, 1, 0))
+        assertEquals("Struct_I2_R1__I_IR", declaringClass(storage, 2, 0))
     }
 
     @Test
@@ -309,37 +406,37 @@ class StoragePlansTest {
 
         val storage = plans.struct(struct)
 
-        assertEquals("S_I_II_IR 32 open i0 i1 i2,i3", layout(storage))
-        assertEquals("S_I_II", declaringClass(storage, 2, 0))
-        assertEquals("S_I_II_IR", declaringClass(storage, 2, 1))
+        assertEquals("Struct_I4_R1__I_II_IR 32 open i0 i1 i2,i3", layout(storage))
+        assertEquals("Struct_I3_R0__I_II", declaringClass(storage, 2, 0))
+        assertEquals("Struct_I4_R1__I_II_IR", declaringClass(storage, 2, 1))
     }
 
     @Test
     fun `a wide field crosses the tree and the tail`() {
 
         val types = Types()
-        val struct = types.struct(*Array(6) { I32 }, I64)
+        val struct = types.struct(*Array(4) { I32 }, I64)
         val plans = types.plans()
 
         val storage = plans.struct(struct)
 
-        assertEquals(TREE_LEAF + "_T1 48 open " + ints(0, 5) + " i6,i7", layout(storage))
-        assertEquals(TREE_LEAF, declaringClass(storage, 6, 0))
-        assertEquals(TREE_LEAF + "_T1", declaringClass(storage, 6, 1))
+        assertEquals("Struct_I6_R1__I_II_II_IRx1 40 open " + ints(0, 3) + " i4,i5", layout(storage))
+        assertEquals("Struct_I5_R0__I_II_II", declaringClass(storage, 4, 0))
+        assertEquals("Struct_I6_R1__I_II_II_IRx1", declaringClass(storage, 4, 1))
     }
 
     @Test
     fun `a wide field crosses tail levels`() {
 
         val types = Types()
-        val struct = types.struct(*Array(7) { I32 }, I64)
+        val struct = types.struct(*Array(5) { I32 }, I64)
         val plans = types.plans()
 
         val storage = plans.struct(struct)
 
-        assertEquals(TREE_LEAF + "_T2 56 open " + ints(0, 6) + " i7,i8", layout(storage))
-        assertEquals(TREE_LEAF + "_T1", declaringClass(storage, 7, 0))
-        assertEquals(TREE_LEAF + "_T2", declaringClass(storage, 7, 1))
+        assertEquals("Struct_I7_R2__I_II_II_IRx2 48 open " + ints(0, 4) + " i5,i6", layout(storage))
+        assertEquals("Struct_I6_R1__I_II_II_IRx1", declaringClass(storage, 5, 0))
+        assertEquals("Struct_I7_R2__I_II_II_IRx2", declaringClass(storage, 5, 1))
     }
 
     @Test
@@ -351,9 +448,36 @@ class StoragePlansTest {
 
         val storage = plans.struct(struct)
 
-        assertEquals(TREE_LEAF + "_X 192 final " + ints(0, 21) + " i22,xi0", layout(storage))
-        assertEquals(TREE_LEAF + "_T16", declaringClass(storage, 22, 0))
-        assertEquals(TREE_LEAF + "_X", declaringClass(storage, 22, 1))
+        assertEquals(DEEPEST_INT_SPILL + " 200 final " + ints(0, 21) + " i22,xi0", layout(storage))
+        assertEquals(DEEPEST_INT_TAIL, declaringClass(storage, 22, 0))
+        assertEquals(DEEPEST_INT_SPILL, declaringClass(storage, 22, 1))
+    }
+
+    @Test
+    fun `a 64 bit field that straddles the last inline slot keeps its inline low half`() {
+
+        val types = Types()
+        val struct = types.struct(*Array(22) { I32 }, I64)
+        val plans = types.plans()
+
+        val storage = plans.struct(struct)
+
+        assertEquals(DEEPEST_INT_SPILL, simpleName(storage.className))
+        assertTrue(layout(storage).endsWith(" i22,xi0"))
+    }
+
+    @Test
+    fun `the low half of an inline 64 bit field has the lower slot`() {
+
+        val types = Types()
+        val structs = chains(types).flatten()
+        val plans = types.plans()
+
+        val inlineWideFields = structs.flatMap { struct -> plans.struct(struct).fields }
+            .filter { field -> field.lanes.size == 2 && field.lanes.none { lane -> lane.spilled } }
+
+        assertTrue(inlineWideFields.isNotEmpty())
+        inlineWideFields.forEach { field -> assertTrue(field.lanes[0].index < field.lanes[1].index) }
     }
 
     @Test
@@ -365,7 +489,7 @@ class StoragePlansTest {
 
         val storage = plans.struct(struct)
 
-        assertEquals(TREE_LEAF + "_X 208 final " + ints(0, 22) + " xi0 xr0", layout(storage))
+        assertEquals(DEEPEST_INT_SPILL + " 216 final " + ints(0, 22) + " xi0 xr0", layout(storage))
         assertEquals(TAIL_REFERENCE_LANES, STORAGE_FAMILY.storageClass(storage.className).referenceLanes)
     }
 
@@ -377,7 +501,7 @@ class StoragePlansTest {
         val child = types.subtype(spilled, ANYREF, I32)
         val plans = types.plans()
 
-        assertEquals(TREE_LEAF + "_X 216 final " + ints(0, 21) + " i22,xi0 xr0 xi1", layout(plans.struct(child)))
+        assertEquals(DEEPEST_INT_SPILL + " 224 final " + ints(0, 21) + " i22,xi0 xr0 xi1", layout(plans.struct(child)))
     }
 
     @Test
@@ -406,7 +530,7 @@ class StoragePlansTest {
 
         val storage = plans.struct(struct)
 
-        assertEquals("S_I_II 24 open i0 i1 i2", layout(storage))
+        assertEquals("Struct_I3_R0__I_II 24 open i0 i1 i2", layout(storage))
         assertEquals(listOf(I8, I16, I32), storage.fields.map { field -> field.type })
     }
 
@@ -419,7 +543,7 @@ class StoragePlansTest {
 
         val storage = plans.struct(struct)
 
-        assertEquals("S_I_II 24 open i0 i1,i2", layout(storage))
+        assertEquals("Struct_I3_R0__I_II 24 open i0 i1,i2", layout(storage))
         assertEquals(listOf(F32, F64), storage.fields.map { field -> field.type })
     }
 
@@ -432,8 +556,8 @@ class StoragePlansTest {
         val bothSpills = types.struct(*Array(24) { I32 }, ANYREF)
         val plans = types.plans()
 
-        assertEquals(TREE_LEAF + "_T16 168 open " + ints(0, 22), layout(plans.struct(inline)))
-        assertEquals(TREE_LEAF + "_X 192 final " + ints(0, 22) + " xi0", layout(plans.struct(intSpill)))
+        assertEquals(DEEPEST_INT_TAIL + " 176 open " + ints(0, 22), layout(plans.struct(inline)))
+        assertEquals(DEEPEST_INT_SPILL + " 200 final " + ints(0, 22) + " xi0", layout(plans.struct(intSpill)))
         assertEquals(TERMINAL_BYTES + 16, ART_SIZES.bytes(plans.struct(intSpill)))
         assertEquals(TERMINAL_BYTES + 16 + 16, ART_SIZES.bytes(plans.struct(bothSpills)))
     }
@@ -451,7 +575,7 @@ class StoragePlansTest {
         assertFailsWith<UnsupportedShape> { plans.struct(vector) }
         assertFailsWith<UnsupportedShape> { plans.struct(child) }
         assertFailsWith<UnsupportedShape> { plans.array(vectors) }
-        assertEquals("S_I 16 open i0", layout(plans.struct(plain)))
+        assertEquals("Struct_I1_R0__I 16 open i0", layout(plans.struct(plain)))
     }
 
     @Test
@@ -464,15 +588,73 @@ class StoragePlansTest {
 
         val classes = STORAGE_FAMILY.classes
 
-        assertEquals(998, classes.size)
-        assertEquals(80, classes.count { storageClass -> "_T" !in storageClass.name && !storageClass.final })
-        assertEquals(54, classes.count { storageClass -> storageClass.final })
+        assertEquals(644, classes.size)
+        assertEquals(47, classes.count { storageClass -> "x" !in simpleName(storageClass.name) && !storageClass.final })
+        assertEquals(33, classes.count { storageClass -> storageClass.final })
         for (storageClass in classes) {
-            assertEquals(storageClass.name.endsWith("_X;"), storageClass.final)
+            assertEquals(storageClass.name.endsWith("_Spill;"), storageClass.final)
             assertEquals(storageClass.final, storageClass.subclasses.isEmpty())
         }
         assertFalse(plans.struct(tree).final)
         assertTrue(plans.struct(spilled).final)
+    }
+
+    @Test
+    fun `every storage class name states its capacity and adds one step to its superclass`() {
+
+        val classes = STORAGE_FAMILY.classes
+
+        assertEquals(644, classes.map { storageClass -> storageClass.name }.toSet().size)
+        classes.forEach { storageClass ->
+            val name = simpleName(storageClass.name)
+            val capacity = "Struct_I${storageClass.intLanes}_R${storageClass.referenceLanes}"
+
+            assertEquals(capacity, name.substringBefore("__"), name)
+            assertEquals(steps(storageClass.superclass) + letters(storageClass.lanes), steps(storageClass), name)
+            assertEquals(storageClass.final, name.endsWith("_Spill"), name)
+        }
+    }
+
+    @Test
+    fun `storage class names read capacity first then path`() {
+        assertEquals("Struct_I1_R0__I", simpleName(STORAGE_FAMILY.roots[0].name))
+        assertEquals("Struct_I0_R1__R", simpleName(STORAGE_FAMILY.roots[1].name))
+        assertEquals("Struct_I1_R3__IRRR", simpleName(STORAGE_FAMILY.roots[2].name))
+        assertEquals("Struct_I1_R4__I_RR_RR", simpleName(STORAGE_FAMILY.roots[0].subclasses[2].subclasses[2].name))
+        assertEquals("Struct_I1_R4__IRRR_R", simpleName(STORAGE_FAMILY.roots[2].subclasses[1].name))
+        assertNotNull(storageClass("Struct_I4_R5__IRRR_I_IR_IRx1"))
+        assertTrue(storageClass("Struct_I23_R18__I_II_II_IRx18_Spill").final)
+    }
+
+    @Test
+    fun `the family has three branches of the expected size`() {
+
+        val classes = STORAGE_FAMILY.classes
+
+        assertEquals(47, classes.count { storageClass -> "x" !in simpleName(storageClass.name) })
+        assertEquals(564, classes.count { storageClass -> "x" in simpleName(storageClass.name) && !storageClass.final })
+        assertEquals(33, classes.count { storageClass -> storageClass.final })
+        assertEquals(23, classes.maxOf { storageClass -> storageClass.intLanes })
+        assertEquals(23, classes.maxOf { storageClass -> storageClass.referenceLanes })
+    }
+
+    private fun steps(storageClass: StorageClass?): List<String> {
+
+        if (storageClass == null) {
+            return emptyList()
+        }
+
+        return simpleName(storageClass.name).substringAfter("__").removeSuffix("_Spill").split("_").flatMap { segment ->
+            List(segment.substringAfter("x", "1").toInt()) { segment.substringBefore("x") }
+        }
+    }
+
+    private fun letters(lanes: List<Lane>): List<String> {
+        return if (lanes.isEmpty()) emptyList() else listOf(lanes.joinToString("") { lane -> if (lane.kind == LaneKind.INT) "I" else "R" })
+    }
+
+    private fun storageClass(simpleName: String): StorageClass {
+        return STORAGE_FAMILY.storageClass("L$STORAGE_PACKAGE$simpleName;")
     }
 
     private fun chains(types: Types): List<List<Int>> {
@@ -616,9 +798,10 @@ class StoragePlansTest {
         const val COPIED_LEAF = 1
         const val COPIED_FIRST = 2
         const val COPIED_SECOND = 3
-        const val TREE_LEAF = "S_I_II_II_II"
-        const val TAIL_REFERENCE_LANES = 16
-        const val TERMINAL_BYTES = 176
+        const val DEEPEST_INT_TAIL = "Struct_I23_R18__I_II_II_IRx18"
+        const val DEEPEST_INT_SPILL = DEEPEST_INT_TAIL + "_Spill"
+        const val TAIL_REFERENCE_LANES = 18
+        const val TERMINAL_BYTES = 184
         const val CHAINS = 200
         const val CHAIN_SEED = 7
 
